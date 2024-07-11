@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css?family=Karla:400,700&display=swap");
+.font-family-karla {
+  font-family: karla;
+}
+.bg-sidebar {
+  background: rgba(245, 245, 245, 1);
+} /* Peach Fuzz */
+.cta-btn {
+  color: rgba(4, 38, 57, 1) /* Coral */
+}
+
+.upgrade-btn {
+  background: #daa49a; /* Dusty Rose */
+}
+
+.upgrade-btn:hover {
+  background: #a2b6b9; /* Dusty Blue */
+}
+
+.active-nav-link {
+  background:rgba(255, 161, 76, 1)/* Sage Green */
+}
+
+.nav-item:hover {
+  background: rgba(255, 161, 76, 1); /* Sage Green */
+}
+
+.account-link:hover {
+  background: #fff8e7; /* Cream */
+}
