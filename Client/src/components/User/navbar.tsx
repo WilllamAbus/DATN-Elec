@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
           <span className="text-white">
             <i className="fa-solid fa-bars"></i>
           </span>
-          <span className="capitalize ml-2 text-white">All Categories</span>
+          <span className="capitalize ml-2 text-white">Tất cả danh mục</span>
 
           {/* dropdown */}
           <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
@@ -108,8 +108,8 @@ const Navbar: React.FC = () => {
           <span className="text-white">
             <i className="fa-solid fa-user"></i>
           </span>
-          <Link to='/login' className="capitalize ml-2 text-white">Đăng nhập/ Đăng ký</Link>
-
+          <Link to='/login' className="capitalize ml-2 text-white">Đăng nhập |</Link>
+          <Link to='/register' className="capitalize ml-2 text-white">Đăng ký</Link>
           {/* dropdown */}
           <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
             <Link

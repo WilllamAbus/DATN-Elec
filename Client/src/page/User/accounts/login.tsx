@@ -16,15 +16,22 @@ const Login: React.FC = () => {
             <div className="contain py-16">
                 <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
                     <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
-                    <p className="text-gray-600 mb-6 text-sm">Welcome back customer</p>
+                    <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
                     <form id="addLoginButton" action="" method="post" autoComplete="off">
                         <div className="space-y-2">
                             <div>
-                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email address</label>
+                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email</label>
                                 <span id="emailRegisError" className="error"></span>
                                 <input type="email" name="email" id="email"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="youremail.@domain.com" />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="text-gray-600 mb-2 block">Mật Khẩu</label>
+                                <span id="passwordRegisError" className="error"></span>
+                                <input type="password" name="password" id="password"
+                                    className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
+                                    placeholder="Nhập mật khẩu....." />
                             </div>
                             {/* <div>
                                 <label htmlFor="password" className="text-gray-600 mb-2 block">Password</label>
