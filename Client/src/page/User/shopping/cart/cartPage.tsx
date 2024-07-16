@@ -4,8 +4,9 @@ import UserHeader from "../../../../components/User/header";
 import UserNav from "../../../../components/User/navbar";
 import UserFooter from "../../../../components/User/footer";
 import UserCoppyright from "../../../../components/User/copyright";
+import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const cartPage: React.FC = () => {
   return (
     <>
@@ -28,86 +29,71 @@ const cartPage: React.FC = () => {
         <div className="col-span-8 border border-gray-200 p-4 rounded">
           <h3 className="text-lg font-medium capitalize mb-4">Giỏ hàng</h3>
           <div className="space-y-4">
-            <div className="flex justify-between">
-              <div>
+          <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <img src={listOne} alt="product 1" className="w-28 h10 " />
                 <h5 className="text-gray-800 font-medium">
-                  Italian shape sofa
+                  Italian shape 
                 </h5>
-                <p className="text-sm text-gray-600">Size: M</p>
               </div>
               <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">$320</p>
-              <div className="flex items-center">
+                <p className="text-gray-800 font-medium">20.000 vnđ</p>
                 <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
                   <i className="fa-sharp fa-solid fa-trash"></i>
                 </button>
-              </div>
             </div>
-            <div className="flex justify-between">
-              <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <img src={listOne} alt="product 1" className="w-28 h10 " />
                 <h5 className="text-gray-800 font-medium">
-                  Italian shape sofa
+                  Italian shape 
                 </h5>
-                <p className="text-sm text-gray-600">Size: M</p>
               </div>
               <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">$320</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
+                <p className="text-gray-800 font-medium">20.000 vnđ</p>
+                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
+                  <i className="fa-sharp fa-solid fa-trash"></i>
+                </button>
             </div>
-            <div className="flex justify-between">
-              <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <img src={listOne} alt="product 1" className="w-28 h10 " />
                 <h5 className="text-gray-800 font-medium">
-                  Italian shape sofa
+                  Italian shape 
                 </h5>
-                <p className="text-sm text-gray-600">Size: M</p>
               </div>
               <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">$320</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
-            </div>
-            <div className="flex justify-between">
-              <div>
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape sofa
-                </h5>
-                <p className="text-sm text-gray-600">Size: M</p>
-              </div>
-              <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">$320</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
+                <p className="text-gray-800 font-medium">20.000 vnđ</p>
+                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
+                  <i className="fa-sharp fa-solid fa-trash"></i>
+                </button>
             </div>
           </div>
         </div>
 
         <div className="col-span-4 border border-gray-200 p-4 rounded">
           <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">
-            order summary
+            Tổng thanh toán
           </h4>
 
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>subtotal</p>
-            <p>$1280</p>
+            <p>Thanh toán</p>
+            <p>128.000 vnđ</p>
           </div>
 
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>shipping</p>
-            <p>Free</p>
+            <p>Vận chuyển</p>
+            <p>Miễn phí</p>
           </div>
 
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
+          {/* <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
             <p>Discount</p>
-            <p>$1280</p>
-          </div>
+            <p>128.000 vnđ</p>
+          </div> */}
 
           <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
-            <p className="font-semibold">Total</p>
-            <p>$1280</p>
+            <p className="font-semibold">Tổng cộng</p>
+            <p>128.000 vnđ</p>
           </div>
 
           <a

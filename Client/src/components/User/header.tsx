@@ -23,7 +23,7 @@ const Header:  React.FC = () => {
             name="search"
             id="searchTerm"
             className="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
-            placeholder="Search"
+            placeholder="Yêu cầu của bạn"
           />
           <button
             type="submit"

@@ -42,7 +42,7 @@ const UserProfile: React.FC = () => {
             </div>
           </div>
           <div className="mt-6 bg-white shadow rounded p-4 divide-y divide-gray-200 space-y-4 text-gray-600">
-          <div className="space-y-1 pl-8">
+          {/* <div className="space-y-1 pl-8">
             <a
               href="#"
               className="relative text-primary block font-medium capitalize transition"
@@ -70,7 +70,7 @@ const UserProfile: React.FC = () => {
             >
               Change password
             </a>
-          </div>
+          </div> */}
 
           <div className="space-y-1 pl-8 pt-4">
             <a
@@ -80,25 +80,14 @@ const UserProfile: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-solid fa-box-archive"></i>
               </span>
-              My order history
+             Lịch sử đơn hàng
             </a>
+        
             <a
               href="#"
               className="relative hover:text-primary block capitalize transition"
             >
-              My returns
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
-              My Cancellations
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
-              My reviews
+              Nhận xét 
             </a>
           </div>
 
@@ -110,14 +99,9 @@ const UserProfile: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-regular fa-credit-card"></i>
               </span>
-              Payment methods
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
               Voucher
             </a>
+   
           </div>
 
           <div className="space-y-1 pl-8 pt-4">
@@ -128,7 +112,7 @@ const UserProfile: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-regular fa-heart"></i>
               </span>
-              My wishlist
+             Yêu thích
             </a>
           </div>
 

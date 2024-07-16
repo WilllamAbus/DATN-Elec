@@ -38,11 +38,11 @@ const watchList: React.FC = () => {
             </div>
             <div className="flex-grow">
             <p className="text-gray-600">Hello,</p>
-            <h4 className="text-gray-800 font-medium">Email</h4>
+            <h4 className="text-gray-800 font-medium">EMail</h4>
             </div>
           </div>
           <div className="mt-6 bg-white shadow rounded p-4 divide-y divide-gray-200 space-y-4 text-gray-600">
-          <div className="space-y-1 pl-8">
+          {/* <div className="space-y-1 pl-8">
             <a
               href="#"
               className="relative text-primary block font-medium capitalize transition"
@@ -70,7 +70,7 @@ const watchList: React.FC = () => {
             >
               Change password
             </a>
-          </div>
+          </div> */}
 
           <div className="space-y-1 pl-8 pt-4">
             <a
@@ -80,25 +80,14 @@ const watchList: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-solid fa-box-archive"></i>
               </span>
-              My order history
+             Lịch sử đơn hàng
             </a>
+        
             <a
               href="#"
               className="relative hover:text-primary block capitalize transition"
             >
-              My returns
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
-              My Cancellations
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
-              My reviews
+              Nhận xét 
             </a>
           </div>
 
@@ -110,14 +99,9 @@ const watchList: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-regular fa-credit-card"></i>
               </span>
-              Payment methods
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block capitalize transition"
-            >
               Voucher
             </a>
+   
           </div>
 
           <div className="space-y-1 pl-8 pt-4">
@@ -128,16 +112,7 @@ const watchList: React.FC = () => {
               <span className="absolute -left-8 top-0 text-base">
                 <i className="fa-regular fa-heart"></i>
               </span>
-              My wishlist
-            </a>
-            <a
-              href="#"
-              className="relative hover:text-primary block font-medium capitalize transition"
-            >
-              <span className="absolute -left-8 top-0 text-base">
-                <i className="fa-regular fa-heart"></i>
-              </span>
-              Message
+             Yêu thích
             </a>
           </div>
 
@@ -159,61 +134,77 @@ const watchList: React.FC = () => {
 
         {/* Info */}
         <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
-          <div className="flex flex-col">
-            <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
-                <div className="overflow-hidden">
-                  <table className="min-w-full text-left text-sm font-light text-surface dark:text-white">
-                    <thead className="border-b border-neutral-200 font-medium dark:border-white/10">
-                      <tr>
-                        <th scope="col" className="px-6 py-4">
-                          #
-                        </th>
-                        <th scope="col" className="px-6 py-4">
-                          First
-                        </th>
-                        <th scope="col" className="px-6 py-4">
-                          Last
-                        </th>
-                        <th scope="col" className="px-6 py-4">
-                          Handle
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-neutral-200 dark:border-white/10">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">
-                          1
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">Mark</td>
-                        <td className="whitespace-nowrap px-6 py-4">Otto</td>
-                        <td className="whitespace-nowrap px-6 py-4">@mdo</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200 dark:border-white/10">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">
-                          2
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">Jacob</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          Thornton
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">@fat</td>
-                      </tr>
-                      <tr className="border-b border-neutral-200 dark:border-white/10">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">
-                          3
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">Larry</td>
-                        <td className="whitespace-nowrap px-6 py-4">Wild</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          @twitter
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+          <h4 className="text-lg font-medium capitalize mb-4">
+            Thông tin cá nhân
+          </h4>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="first">Tên đệm</label>
+                <input
+                  type="text"
+                  name="first"
+                  id="first"
+                  className="input-box"
+                />
+              </div>
+              <div>
+                <label htmlFor="last">Tên </label>
+                <input
+                  type="text"
+                  name="last"
+                  id="last"
+                  className="input-box"
+                />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="birthday">Sinh nhật</label>
+                <input
+                  type="date"
+                  name="birthday"
+                  id="birthday"
+                  className="input-box"
+                />
+              </div>
+              <div>
+                <label htmlFor="gender">Giới tính</label>
+                <select name="gender" id="gender" className="input-box">
+                  <option value="male">Nam</option>
+                  <option value="female">Nữ</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  className="input-box"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone">SĐT</label>
+                <input
+                  type="text"
+                  name="phone"
+                  id="phone"
+                  className="input-box"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <button
+              type="submit"
+              className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
+            >
+              Lưu thông tin
+            </button>
           </div>
         </div>
         {/* ./info */}

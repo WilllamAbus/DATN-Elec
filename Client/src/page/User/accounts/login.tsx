@@ -26,13 +26,13 @@ const Login: React.FC = () => {
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="youremail.@domain.com" />
                             </div>
-                            {/* <div>
+                            <div>
                                 <label htmlFor="password" className="text-gray-600 mb-2 block">OTP</label>
                                 <span id="passRegisError" className="error"></span>
                                 <input type="text" name="password" id="password"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="*******" />
-                            </div> */}
+                            </div>
                         </div>
                         <div className="flex items-center justify-between mt-6">
                             <div className="flex items-center">

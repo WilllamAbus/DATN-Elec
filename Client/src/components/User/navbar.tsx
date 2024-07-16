@@ -99,8 +99,8 @@ const Navbar: React.FC = () => {
             >
               Mua sắm
             </Link>
-            {/* <a href="#" className="text-gray-200 hover:text-white transition">About us</a>
-                        <a href="#" className="text-gray-200 hover:text-white transition">Contact us</a> */}
+            <a href="#" className="text-gray-200 hover:text-white transition">Dịch vụ</a>
+            <a href="#" className="text-gray-200 hover:text-white transition">Liên hệ</a>
           </div>
 
           <div></div>
