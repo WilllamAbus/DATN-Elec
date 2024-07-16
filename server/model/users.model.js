@@ -1,9 +1,11 @@
-
-const {Schema, model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const validator = require('validator');
-const userSchema = Schema(
+const bcrypt = require('bcrypt');
+
+const userSchema = new Schema(
     {
-        userId:{type: Number, require:true, index:true},
+        userId: { type: Number, required: true, index: true },
+        name: { type: String, required: true },
         email: {
             type: String,
             required: true,
@@ -13,37 +15,54 @@ const userSchema = Schema(
                 message: 'Invalid email format'
             }
         },
+        status: { type: String, default: 'Hoạt động' },
+        socialLogin: {
+            googleId: String,
+            facebookId: String
+        },
         roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }]
-         
-    },{
-        collection:'users',
-        timestamps: true,
-    }
+    }, {
+    collection: 'users',
+    timestamps: true,
+}
 );
 
-userSchema.virtual('getTime').get(()=>{
-    return Date.now()
-})
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.password && user.isModified('password')) {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(user.password, salt);
+        user.password = hash;
+    }
+    next();
+});
 
-userSchema.statics.getStatics = ()=>{
-    return "get Statics"
-}
+userSchema.methods.comparePassword = function (password) {
+    return bcrypt.compare(password, this.password);
+};
 
-userSchema.methods.getMethods = function() {
-    return `get getMethods with ${this.getTime}`
-}
+userSchema.virtual('getTime').get(() => {
+    return Date.now();
+});
+
+userSchema.statics.getStatics = () => {
+    return "get Statics";
+};
+
+userSchema.methods.getMethods = function () {
+    return `get getMethods with ${this.getTime}`;
+};
 
 userSchema.methods.populateRoles = async function () {
     await this.populate('roles');
     return this.roles;
 };
 
-userSchema.pre('save', function(next) {
-    // Kiểm tra nếu user đã có userID, không làm gì cả (giả sử userID là duy nhất và đã tồn tại)
-    if (!this.userID) {
-      // Tạo userID ngẫu nhiên, có thể là số ngẫu nhiên hoặc tùy chọn theo cách thức của bạn
-      this.userID = Math.floor(Math.random() * 1000); // Ví dụ đơn giản là số ngẫu nhiên từ 0 đến 999
+userSchema.pre('save', function (next) {
+    if (!this.userId) {
+        this.userId = Math.floor(Math.random() * 1000);
     }
     next();
-  });
-module.exports = model("users", userSchema);
+});
+
+module.exports = model("User", userSchema);

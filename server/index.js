@@ -6,9 +6,10 @@ const cors = require("cors");
 const http = require('http');
 const socketIo = require('socket.io');
 const connectDb = require("./config/connectDb");
-const  SocketServices  =  require('./services/serviceSocket')
+const SocketServices = require('./services/serviceSocket');
+const routes = require("./routes/index");
 // Router for api
-const apiGeneral = require("./routs/api")
+const apiGeneral = require("./routes/api")
 require('dotenv').config
 
 
@@ -23,14 +24,14 @@ app.use(cors())
 const server = http.createServer(app);
 
 // Initialize socket.io with the HTTP server
-const io =  socketIo(server, {
-   cors: {
+const io = socketIo(server, {
+  cors: {
     origin: ["http://localhost:4000"],
-     methods: ["GET", "POST"]
-     }
-   });
-global.__basedir  =  __dirname;
-global._io  = io;
+    methods: ["GET", "POST"]
+  }
+});
+global.__basedir = __dirname;
+global._io = io;
 // global.io = io;
 io.on('connection', SocketServices.connection);
 
@@ -40,7 +41,7 @@ app.use('/api', apiGeneral);
 
 
 
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT;
 // global._io.on('connection',  SocketServices.connection)
 //listen server
 server.listen(PORT, () => {
