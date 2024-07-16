@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
           <span className="text-white">
             <i className="fa-solid fa-bars"></i>
           </span>
-          <span className="capitalize ml-2 text-white">All Categories</span>
+          <span className="capitalize ml-2 text-white">Danh mục</span>
 
           {/* dropdown */}
           <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
@@ -28,7 +28,7 @@ const Navbar: React.FC = () => {
                 alt="sofa"
                 className="w-5 h-5 object-contain"
               />
-              <span className="ml-6 text-gray-600 text-sm">3D Printer Set</span>
+              <span className="ml-6 text-gray-600 text-sm">Máy in 3D</span>
             </a>
             <a
               href="#"
@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
                 alt="terrace"
                 className="w-5 h-5 object-contain"
               />
-              <span className="ml-6 text-gray-600 text-sm">Graphic Card</span>
+              <span className="ml-6 text-gray-600 text-sm">Card đồ họa</span>
             </a>
             <a
               href="#"
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
                 alt="office"
                 className="w-5 h-5 object-contain"
               />
-              <span className="ml-6 text-gray-600 text-sm">Game</span>
+              <span className="ml-6 text-gray-600 text-sm">Game </span>
             </a>
             <a
               href="#"
@@ -72,7 +72,7 @@ const Navbar: React.FC = () => {
                 alt="outdoor"
                 className="w-5 h-5 object-contain"
               />
-              <span className="ml-6 text-gray-600 text-sm">Digital Camera</span>
+              <span className="ml-6 text-gray-600 text-sm">Máy ảnh kĩ thuật số</span>
             </a>
             <a
               href="#"

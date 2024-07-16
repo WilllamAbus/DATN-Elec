@@ -7,7 +7,7 @@ import prodSelFour from '../../assets/images/products/product19.png'
 const Arrivale : React.FC = () => {
     return (
         <div className="container pb-16">
-            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">Best Seller</h2>
+            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">Bán chạy</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white shadow rounded overflow-hidden group">
                     <div className="relative">
@@ -26,7 +26,7 @@ const Arrivale : React.FC = () => {
                         </div>
                     </div>
                     <div className="pt-4 pb-3 px-4">
-                        <a href="#">
+                        <a href="/">
                             <h4 className="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">Quạt tản nhiệt </h4>
                         </a>
                         <div className="flex items-baseline mb-1 space-x-2">

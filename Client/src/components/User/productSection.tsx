@@ -11,7 +11,7 @@ import prodEight from '../../assets/images/products/product16.png'
 const ProductSection: React.FC = () => {
     return (
         <div className="container pb-16">
-            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">recomended for you</h2>
+            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">Đề xuất cho bạn</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="bg-white shadow rounded overflow-hidden group">
                     <div className="relative">
@@ -50,8 +50,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
                 <div className="bg-white shadow rounded overflow-hidden group">
@@ -91,8 +90,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
                 <div className="bg-white shadow rounded overflow-hidden group">
@@ -132,8 +130,8 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">
+                            Thêm giỏ hàng</a>
                 </div>
 
 
@@ -174,8 +172,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
 
@@ -216,8 +213,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
 
@@ -258,8 +254,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
                 <div className="bg-white shadow rounded overflow-hidden group">
@@ -340,8 +335,7 @@ const ProductSection: React.FC = () => {
                         </div>
                     </div>
                     <a href=""
-                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Add
-                        to cart</a>
+                        className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition">Thêm giỏ hàng</a>
                 </div>
 
             

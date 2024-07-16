@@ -29,7 +29,7 @@ const Header:  React.FC = () => {
             type="submit"
             className="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition"
           >
-            Search
+          Tìm
           </button>
         </div>
 
@@ -39,7 +39,7 @@ const Header:  React.FC = () => {
                     <div className="text-2xl">
                     <i className="fa-regular fa-bell"></i>
                     </div>
-                    <div className="text-xs leading-3">Notification</div>
+                    <div className="text-xs leading-3">Thông báo</div>
 
                     {/* dropdown */}
                     <div className="absolute
@@ -134,7 +134,7 @@ const Header:  React.FC = () => {
             <div className="text-2xl">
               <i className="fa-solid fa-bag-shopping"></i>
             </div>
-            <div className="text-xs leading-3">Cart</div>
+            <div className="text-xs leading-3">Giỏ hàng</div>
             <div className="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">
               2
             </div>
@@ -147,7 +147,7 @@ const Header:  React.FC = () => {
             <div className="text-2xl">
               <i className="fa-regular fa-user"></i>
             </div>
-            <div className="text-xs leading-3">Account</div>
+            <div className="text-xs leading-3">Tài khoản</div>
           </Link>
         </div>
       </div>

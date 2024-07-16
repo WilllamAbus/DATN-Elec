@@ -41,10 +41,14 @@ const Forgot: React.FC = () => {
                             {/* <a href="#" className="text-primary">Quên mật khẩu</a> */}
                         </div>
                         <div className="mt-4">
+                            <Link to=''>
                             <button type="submit"
                                 className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium">
                                     Gửi email
                             </button>
+                            
+                            </Link>
+                        
                         </div>
                     </form>
 
