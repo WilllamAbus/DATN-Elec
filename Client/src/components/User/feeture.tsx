@@ -9,7 +9,7 @@ const Features:React.FC = () => {
                 <div className="border border-primary rounded-sm px-3 py-6 flex justify-center items-center gap-5">
                     <img src={deleveryIcon} alt="Delivery" className="w-12 h-12 object-contain" />
                     <div>
-                        <h4 className="font-medium capitalize text-lg">Free Shipping</h4>
+                        <h4 className="font-medium capitalize text-lg">Miễn phí vận chuyển</h4>
                         <p className="text-gray-500 text-sm">Hóa đơn trên 400.000 vnđ</p>
                     </div>
                 </div>

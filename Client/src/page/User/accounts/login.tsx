@@ -16,30 +16,23 @@ const Login: React.FC = () => {
             <div className="contain py-16">
                 <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
                     <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
-                    <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
+                    <p className="text-gray-600 mb-6 text-sm">Welcome back </p>
                     <form id="addLoginButton" action="" method="post" autoComplete="off">
                         <div className="space-y-2">
                             <div>
-                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email</label>
+                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email </label>
                                 <span id="emailRegisError" className="error"></span>
                                 <input type="email" name="email" id="email"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="youremail.@domain.com" />
                             </div>
                             <div>
-                                <label htmlFor="password" className="text-gray-600 mb-2 block">Mật Khẩu</label>
-                                <span id="passwordRegisError" className="error"></span>
-                                <input type="password" name="password" id="password"
-                                    className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                                    placeholder="Nhập mật khẩu....." />
-                            </div>
-                            {/* <div>
-                                <label htmlFor="password" className="text-gray-600 mb-2 block">Password</label>
+                                <label htmlFor="password" className="text-gray-600 mb-2 block">OTP</label>
                                 <span id="passRegisError" className="error"></span>
-                                <input type="password" name="password" id="password"
+                                <input type="text" name="password" id="password"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="*******" />
-                            </div> */}
+                            </div>
                         </div>
                         <div className="flex items-center justify-between mt-6">
                             <div className="flex items-center">
@@ -50,10 +43,13 @@ const Login: React.FC = () => {
                             <a href="#" className="text-primary">Quên mật khẩu</a>
                         </div>
                         <div className="mt-4">
+                            <Link to='/'>
                             <button type="submit"
                                 className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium">
                                 ĐĂNG NHẬP
                             </button>
+                            </Link>
+                        
                         </div>
                     </form>
 
