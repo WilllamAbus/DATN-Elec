@@ -60,7 +60,7 @@ const userService = {
       const user = await _User.create({
         email,
         roles: [role._id],
-        userId: Math.floor(Math.random() * 1000), // Đảm bảo giá trị userId được tạo đúng
+   // Đảm bảo giá trị userId được tạo đúng
     });
 
     if (user) {
@@ -75,7 +75,7 @@ const userService = {
           {
             roles: user.roles,
             id: user._id, // Thay đổi role tùy theo logic của bạn
-              userId: user.userId, // Sử dụng _id của user trong MongoDB
+            // Sử dụng _id của user trong MongoDB
             email: user.email,
           },
           secretKey,

@@ -3,7 +3,7 @@ const {Schema, model } = require("mongoose");
 const validator = require('validator');
 const userSchema = Schema(
     {
-        userId:{type: Number, require:true, index:true},
+   
         email: {
             type: String,
             required: true,
@@ -38,12 +38,12 @@ userSchema.methods.populateRoles = async function () {
     return this.roles;
 };
 
-userSchema.pre('save', function(next) {
-    // Kiểm tra nếu user đã có userID, không làm gì cả (giả sử userID là duy nhất và đã tồn tại)
-    if (!this.userID) {
-      // Tạo userID ngẫu nhiên, có thể là số ngẫu nhiên hoặc tùy chọn theo cách thức của bạn
-      this.userID = Math.floor(Math.random() * 1000); // Ví dụ đơn giản là số ngẫu nhiên từ 0 đến 999
-    }
-    next();
-  });
+// userSchema.pre('save', function(next) {
+//     // Kiểm tra nếu user đã có userID, không làm gì cả (giả sử userID là duy nhất và đã tồn tại)
+//     if (!this.userID) {
+//       // Tạo userID ngẫu nhiên, có thể là số ngẫu nhiên hoặc tùy chọn theo cách thức của bạn
+//       this.userID = Math.floor(Math.random() * 1000); // Ví dụ đơn giản là số ngẫu nhiên từ 0 đến 999
+//     }
+//     next();
+//   });
 module.exports = model("users", userSchema);

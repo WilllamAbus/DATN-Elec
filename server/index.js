@@ -6,6 +6,7 @@ const cors = require("cors");
 const http = require('http');
 const socketIo = require('socket.io');
 const connectDb = require("./config/connectDb");
+// const firebaseAdmin = require('./config/firabaseConfig')
 const  SocketServices  =  require('./services/serviceSocket')
 // Router for api
 const apiGeneral = require("./routs/api")
@@ -15,7 +16,7 @@ require('dotenv').config
 //databse call
 connectDb();
 
-
+// firebaseAdmin()
 // midleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
