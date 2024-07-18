@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 
 const userSchema = new Schema(
     {
-        userId: { type: Number, required: true, index: true },
         name: { type: String, required: true },
         email: {
             type: String,
@@ -20,6 +19,7 @@ const userSchema = new Schema(
             googleId: String,
             facebookId: String
         },
+        tokenLogin: String,
         roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }]
     }, {
     collection: 'users',
@@ -64,5 +64,6 @@ userSchema.pre('save', function (next) {
     }
     next();
 });
+
 
 module.exports = model("User", userSchema);

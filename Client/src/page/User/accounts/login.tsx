@@ -6,9 +6,12 @@ import UserHeader from '../../../components/User/header';
 import UserNav from '../../../components/User/navbar';
 import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
+import authGoogleService from '../../../services/authGoogle.service';
 import '../../../assets/css/user.style.css'
 import '@fortawesome/fontawesome-free/css/all.min.css';
-const Login: React.FC = () => {
+
+const Login: React.FC = () => { 
+
     return (
         <>
             <UserHeader />
@@ -47,7 +50,8 @@ const Login: React.FC = () => {
                                     className="text-primary focus:ring-0 rounded-sm cursor-pointer" />
                                 <label htmlFor="remember" className="text-gray-600 ml-3 cursor-pointer">Remember me</label> */}
                             </div>
-                            <a href="#" className="text-primary">Quên mật khẩu</a>
+                            
+                            <Link to="/forgot" className="text-primary">Quên mật khẩu</Link>
                         </div>
                         <div className="mt-4">
                             <button type="submit"
@@ -62,14 +66,13 @@ const Login: React.FC = () => {
                         <div className="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
                     </div>
                     <div className="mt-4 flex gap-4">
-                        <a href="#"
+                        <a
                             className="w-1/2 py-2 text-center text-white bg-blue-800 rounded uppercase font-roboto font-medium text-sm hover:bg-blue-700">
                             OTP
                         </a>
-                        <a href="#"
-                            className="w-1/2 py-2 text-center text-white bg-red-600 rounded uppercase font-roboto font-medium text-sm hover:bg-red-500">
+                        <button onClick={authGoogleService.loginWithGoogle} className="w-1/2 py-2 text-center text-white bg-red-600 rounded uppercase font-roboto font-medium text-sm hover:bg-red-500">
                             Google
-                        </a>
+                    </button>
                        
                     </div>
 

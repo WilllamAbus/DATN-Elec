@@ -1,49 +1,34 @@
 const express = require("express");
+const cors = require("cors");
+const connectDb = require("./config/connectDb");
+const apiGeneral = require("./routes/api");
+require('dotenv').config();
+require('./services/passport');
+
 const app = express();
 
-const cors = require("cors");
+// Cấu hình CORS
+app.use(cors({
+  origin: process.env.URL_FE,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
+  credentials: true
+}));
 
-const http = require('http');
-const socketIo = require('socket.io');
-const connectDb = require("./config/connectDb");
-const SocketServices = require('./services/serviceSocket');
-const routes = require("./routes/index");
-// Router for api
-const apiGeneral = require("./routes/api")
-require('dotenv').config
-
-
-//databse call
-connectDb();
-
-
-// midleware
+// Sử dụng middleware để xử lý JSON và URL-encoded bodies
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-app.use(cors())
-const server = http.createServer(app);
+app.use(express.urlencoded({ extended: true }));
 
-// Initialize socket.io with the HTTP server
-const io = socketIo(server, {
-  cors: {
-    origin: ["http://localhost:4000"],
-    methods: ["GET", "POST"]
-  }
-});
-global.__basedir = __dirname;
-global._io = io;
-// global.io = io;
-io.on('connection', SocketServices.connection);
-
-
-//Headd Api
+// Sử dụng các route đã định nghĩa
+const routes = require("./routes/index");
+routes(app);
 app.use('/api', apiGeneral);
 
+// Kết nối đến cơ sở dữ liệu
+connectDb();
 
-
-const PORT = process.env.PORT;
-// global._io.on('connection',  SocketServices.connection)
-//listen server
-server.listen(PORT, () => {
+// Lắng nghe các kết nối tới server
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

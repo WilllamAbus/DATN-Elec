@@ -8,6 +8,7 @@ const UserRegister =  React.lazy(() => import('../page/User/accounts/register'))
 const UserRegisOTP =  React.lazy(() => import('../page/User/accounts/regisOTP'));
 const UserRecievePass = React.lazy(() => import('../page/User/accounts/recivePass'));
 const UserForgotPass = React.lazy(() => import('../page/User/accounts/forgot'));
+const UserLoginSuccess = React.lazy(() => import('../page/User/accounts/login-success'));
 const UserReciveCode =   React.lazy(() => import('../page/User/accounts/reciveCode'));
 
 const UserAllList =  React.lazy(() => import('../page/User/shopping/gallery/allListing'));
@@ -42,6 +43,10 @@ const UserRoutes: RouteObject[] = [
   {
     path: 'forgot',
     element: <UserForgotPass/>,
+  },
+  {
+    path: 'login-success/:userId/:tokenLogin',
+    element: <UserLoginSuccess/>,
   },
   {
     path: 'recivePass',
