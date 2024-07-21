@@ -14,6 +14,7 @@ const userSchema = new Schema(
                 message: 'Invalid email format'
             }
         },
+        address: { type: String, require: true},
         status: { type: String, default: 'Hoạt động' },
         socialLogin: {
             googleId: String,

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDb = require("./config/connectDb");
 const apiGeneral = require("./routes/api");
+const user = require("./routes/user");
 require('dotenv').config();
 require('./services/passport');
 
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 const routes = require("./routes/index");
 routes(app);
 app.use('/api', apiGeneral);
-
+app.use('/api',  user);
 // Kết nối đến cơ sở dữ liệu
 connectDb();
 

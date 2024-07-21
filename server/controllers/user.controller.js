@@ -1,5 +1,7 @@
 // const userList = require('./../model/users');
+const User = require('../model/users.model')
 const {regisUser, verifyOtp} = require('../services/user.service')
+
 const user = {
 verifyOtp: async(req, res, next)=>{
     try {
@@ -47,8 +49,131 @@ regisUser: async(req, res, next) =>{
         console.error(error);
         next(error)
     }
+},
+
+ // Đăng ký
+ registerUser: async (req, res) => {
+    try {
+        const { email, password, name } = req.body;
+
+        const checkEmail = await User.findOne({ email });
+        if (checkEmail) {
+            return res.status(400).json({ msg: 'Email đã tồn tại' });
+        }
+
+        const newUser = new User({ email, password, name });
+        const user = await newUser.save();
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        user.emailVerificationToken = hashedToken;
+        user.emailVerificationExpires = Date.now() + 3600000; // 1 giờ
+        await user.save();
+        const adminCategoriesDb = await Category.find({}).populate({
+            path: 'userId',
+            select: 'role'
+        });
+        adminCategoriesDb.forEach(async (element) => {
+            if (element.userId && element.userId.role === "admin" && element.status === 'active') {
+                await Category.create({
+                    userId: user._id,
+                    type: element.type,
+                    name: element.name,
+                    image:  element.image,
+                    description: element.description,
+                    status: element.status,
+                    createdAt: element.createdAt,
+                    updatedAt: element.updatedAt
+                })
+            }
+        });
+        await sendVerificationEmail(user.email, token);
+
+        res.status(200).json({ msg: 'User registered. Verification email sent.' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: 'Server error', error: err.message });
+    }
+},
+
+
+loginUser: async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(400).json({ msg: 'Thông tin đăng nhập không chính xác' });
+        }
+
+        const validPassword = await bcrypt.compare(req.body.password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ msg: 'Thông tin đăng nhập không chính xác' });
+        }
+
+        if (user && validPassword) {
+            if (!user.isEmailVerified) {
+                return res.status(400).json({ msg: 'Email chưa được xác minh' })
+
+            }
+            if (user.status != 'active') {
+                console.log({ msg: 'Tài khoản đã bị khóa vui lòng liên hệ email: bemoney@gmail.com' });
+                return res.status(400).json({ msg: 'Tài khoản đã bị khóa vui lòng liên hệ email: bemoney@gmail.com' });
+            }
+            const payload = {
+                id: user.id,
+                role: user.role,
+                name: user.name,
+            };
+            const jwtSecret = process.env.JWT_ACCESS_KEY;
+            if (!jwtSecret) {
+                throw new Error('JWT_ACCESS_KEY is not defined');
+            }
+
+            const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
+            const { password, ...others } = user._doc
+            return res.status(200).json({ ...others, accessToken: token });
+        }
+    } catch (err) {
+        return res.status(500).json({ msg: 'Server error', error: err.message });
+    }
+},
+
 }
-}
+
+
+exports.verifyEmail = (req, res) => {
+   
+};
+
+exports.resendEmail = (req, res) => {
+    
+};
+
+
+
+exports.forgotPassword = (req, res) => {
+   
+};
+
+exports.resetPassword = (req, res) => {
+   
+};
+
+exports.getAllUser = (req, res) => {
+    
+};
+
+exports.getProfile = (req, res) => {
+  
+};
+
+exports.updatePassword = (req, res) => {
+   
+};
+
+exports.deleteUser = (req, res) => {
+    
+};
 
 
 module.exports = user
