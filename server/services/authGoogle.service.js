@@ -18,10 +18,11 @@ const loginSuccessService = async (id, tokenLogin) => {
 
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role, name: user.name,avatar: user.avatar },
+      { id: user._id, email: user.email, roles: user.roles, name: user.name, avatar: user.avatar },
       process.env.JWT_ACCESS_KEY,
       { expiresIn: '5d' }
     );
+    console.log(token);
 
 
     await User.updateOne({ _id: id }, { tokenLogin: newTokenLogin });

@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new Schema(
     {
         name: { type: String, required: true },
+        password: { type: String },
         email: {
             type: String,
             required: true,
@@ -20,6 +21,7 @@ const userSchema = new Schema(
             facebookId: String
         },
         tokenLogin: String,
+        avatar: String,
         roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }]
     }, {
     collection: 'users',
@@ -40,6 +42,8 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = function (password) {
     return bcrypt.compare(password, this.password);
 };
+
+
 
 userSchema.virtual('getTime').get(() => {
     return Date.now();

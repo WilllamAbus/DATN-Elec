@@ -2,7 +2,7 @@
 const router = require('express').Router();
 require("dotenv").config();
 const passport = require('passport');
-const googleController = require('../controler/google.controller');
+const googleController = require('../controler/authentication/google.controller');
 
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
