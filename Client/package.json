@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "proxy": "http://localhost:4000/",
   "scripts": {
     "dev": "vite --open",
     "build": "vite build",
@@ -14,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@types/jwt-decode": "^2.2.1",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -31,6 +33,7 @@
     "@fortawesome/fontawesome-free": "^6.5.2",
     "@material-tailwind/react": "^2.1.9",
     "@reduxjs/toolkit": "^2.2.6",
+    "@rollup/plugin-commonjs": "^26.0.1",
     "@types/dotenv": "^8.2.0",
     "@types/react-router-dom": "^5.3.3",
     "@types/redux-thunk": "^2.1.0",
@@ -40,6 +43,7 @@
     "firebase": "^10.12.2",
     "jwt-decode": "^4.0.0",
     "localforage": "^1.10.0",
+    "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",

@@ -1,9 +1,11 @@
-
-const {Schema, model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const validator = require('validator');
-const userSchema = Schema(
+const bcrypt = require('bcrypt');
+
+const userSchema = new Schema(
     {
-   
+        name: { type: String, required: true },
+        password: { type: String },
         email: {
             type: String,
             required: true,
@@ -13,26 +15,47 @@ const userSchema = Schema(
                 message: 'Invalid email format'
             }
         },
-        
+        status: { type: String, default: 'Hoạt động' },
+        socialLogin: {
+            googleId: String,
+            facebookId: String
+        },
+        tokenLogin: String,
+        avatar: String,
         roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }]
-         
-    },{
-        collection:'users',
-        timestamps: true,
-    }
+    }, {
+    collection: 'users',
+    timestamps: true,
+}
 );
 
-userSchema.virtual('getTime').get(()=>{
-    return Date.now()
-})
+userSchema.pre('save', async function (next) {
+    const user = this;
+    if (user.password && user.isModified('password')) {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(user.password, salt);
+        user.password = hash;
+    }
+    next();
+});
 
-userSchema.statics.getStatics = ()=>{
-    return "get Statics"
-}
+userSchema.methods.comparePassword = function (password) {
+    return bcrypt.compare(password, this.password);
+};
 
-userSchema.methods.getMethods = function() {
-    return `get getMethods with ${this.getTime}`
-}
+
+
+userSchema.virtual('getTime').get(() => {
+    return Date.now();
+});
+
+userSchema.statics.getStatics = () => {
+    return "get Statics";
+};
+
+userSchema.methods.getMethods = function () {
+    return `get getMethods with ${this.getTime}`;
+};
 
 userSchema.methods.populateRoles = async function () {
     await this.populate('roles');
