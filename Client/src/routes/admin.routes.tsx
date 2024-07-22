@@ -62,7 +62,7 @@ const AdminRoutes: RouteObject[] = [
     element: <AdminAddCategories />,
   },
   {
-    path: 'editCategories',
+    path: 'editCategories/:id',
     element: <AdminEditCategories />,
   },
   {

@@ -27,7 +27,7 @@ const Login: React.FC = () => {
                                     placeholder="youremail.@domain.com" />
                             </div>
                             <div>
-                                <label htmlFor="password" className="text-gray-600 mb-2 block">OTP</label>
+                                <label htmlFor="password" className="text-gray-600 mb-2 block">Password</label>
                                 <span id="passRegisError" className="error"></span>
                                 <input type="text" name="password" id="password"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"

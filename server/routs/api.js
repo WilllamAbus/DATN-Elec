@@ -1,11 +1,11 @@
 const express = require("express");
-const multer = require("multer");
+
 const { homepage, message } = require("../controler/home");
 // regisOTP
 const { verifyOtp, regisUser } = require("../controler/user.controller");
 // middleware
 const { checkPermission } = require("../middleware/role.base");
-
+const upload = require('../middleware/multer.middle');
 const { createRole } = require("../controler/role.controller");
 // categories
 const {
@@ -28,10 +28,10 @@ router.post("/users/verifyOtp", verifyOtp);
 router.post("/addRole", checkPermission, createRole);
 
 // Categoris
-const upload = multer({ storage: multer.memoryStorage() });
-router.post("/addCate", upload.single("image"), uploadCategory);
+
+router.post("/addCate", upload.single("imgCate"), uploadCategory);
 router.get("/getAllCate", getAllCategoriesController);
 router.get("/getCate/:id", getCategoryByIdController);
-router.put("/updateCate/:id", upload.single("image"), updateCategoryController);
+router.put("/updateCate/:id", upload.single("imgCate"), updateCategoryController);
 router.delete("/delete/:id", deleteCategoryController);
 module.exports = router;

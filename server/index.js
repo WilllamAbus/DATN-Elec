@@ -26,8 +26,9 @@ const server = http.createServer(app);
 // Initialize socket.io with the HTTP server
 const io =  socketIo(server, {
    cors: {
-    origin: ["http://localhost:4000"],
-     methods: ["GET", "POST"]
+    origin: ["http://localhost:4000", "http://localhost:3150"],
+     methods: ["GET", "POST", "PUT", "DELETE"],
+     "maxAgeSeconds": 3600
      }
    });
 global.__basedir  =  __dirname;

@@ -11,6 +11,7 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../config/serviceAccount.json');
 const dotenv = require("dotenv");
 const { v4: uuidv4 } = require('uuid');
+const { message } = require('./home');
 
 
 dotenv.config();
@@ -28,8 +29,20 @@ const categoriesController ={
     uploadCategory : async (req, res) => {
         try {
             const { name,  path } = req.body;
+         
             const image = req.file;
             const pid = uuidv4();
+
+            // console.log('Name:', name, 'Type:', typeof name);
+            // console.log('Path:', path, 'Type:', typeof path);
+            // console.log('Image:', image, 'Type:', typeof image);
+            if (typeof name !== 'string' || typeof path !== 'string') {
+              throw new Error('Invalid data types');
+            }
+
+            if (!req.file || typeof req.file.buffer !== 'object') {
+              throw new Error('Invalid image data');
+            }
             // Upload file to Firebase Storage
             const filename = `${Date.now()}-${image.originalname}`;
             const file = bucket.file(`categories/${filename}`);
@@ -45,10 +58,14 @@ const categoriesController ={
             });
         
             fileStream.on('finish', async () => {
-              const imageURL = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
-              const category = await createCategory({ name, pid, path, imageURL });
+              const imgURL = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+              const category = await createCategory({  
+                 name ,// Đ,ảm bảo rằng 'name' là một chuỗi
+                pid ,  // Đảm bảo rằng 'pid' là một chuỗi
+                path ,// Đảm bảo rằng 'path' là một chuỗi
+                imgURL });
         
-              res.status(200).json({ category });
+              res.status(200).json({message:"Thêm vào thành công", category });
             });
         
             fileStream.end(image.buffer);
@@ -88,7 +105,7 @@ const categoriesController ={
             const { name, path } = req.body;
             const image = req.file;
             const pid = uuidv4();
-            let imageURL;
+            let  imgURL;
         
             if (image) {
               const filename = `${Date.now()}-${image.originalname}`;
@@ -105,9 +122,9 @@ const categoriesController ={
               });
         
               fileStream.on('finish', async () => {
-                imageURL = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
-                const updatedCategory = await updateCategory(id, { name, pid, path, imageURL });
-                res.status(200).json({ updatedCategory });
+                imgURL = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+                const updatedCategory = await updateCategory(id, { name, pid, path,  imgURL });
+                res.status(200).json({message:"Cập nhật thành công", updatedCategory });
               });
         
               fileStream.end(image.buffer);

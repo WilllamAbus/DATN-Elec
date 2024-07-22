@@ -1,25 +1,26 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// import dotenv from 'dotenv';
+import checker from 'vite-plugin-checker';
 
-// dotenv.config();
-// https://vitejs.dev/config/
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    checker({ typescript: true }),
+  ],
+  
   resolve: {
     alias: {
-      '@': '/src',
+      '@': 'src',
     },
   },
   server: {
     port: 3150,
-    open: true, // Automatically open the app in the browser
+    open: true,
     watch: {
-      usePolling: true, // Use polling to watch for file changes, useful in some environments
+      usePolling: true,
     },
-    // This enables Vite's middleware mode for handling HTML fallback
- 
-  
   },
-})
+});
+

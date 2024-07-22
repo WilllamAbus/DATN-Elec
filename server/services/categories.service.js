@@ -15,8 +15,17 @@ const upLoadImgBucket = {
         return await _Category.findById(id);
       },
 
-      createCategory: async (name, pid, path, imgURL) => {
-        const category = new _Category({ name, pid, path, imgURL });
+      createCategory: async (categoryData) => {
+        // const existingCategory = await _Category.findOne({ name });
+        // if (existingCategory) {
+        //   return res.status(400).json({ message: 'Category already exists' });
+        // }
+        const category = new _Category({
+          name: categoryData.name, // Ensure 'name' is a string
+          pid: categoryData.pid,   // Ensure 'pid' is a string
+          path: categoryData.path, // Ensure 'path' is a string
+          imgURL: categoryData.imgURL // Ensure 'imgURL' is a string
+        });
         await category.save();
         return category;
       },

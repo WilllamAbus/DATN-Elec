@@ -13,6 +13,7 @@ const userSchema = Schema(
                 message: 'Invalid email format'
             }
         },
+        
         roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }]
          
     },{
