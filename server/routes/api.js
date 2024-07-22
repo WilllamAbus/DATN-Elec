@@ -1,12 +1,12 @@
 const express = require("express");
 
-const { homepage, message } = require("../controllers/home")
+const { homepage, message } = require("../controler/home")
 const {
     verifyOtp,
     regisUser
-} = require('../controllers/user.controller')
+} = require('../controler/user.controller')
 const { checkPermission } = require('../middleware/role.base');
-const { createRole } = require('../controllers/role.controller')
+const { createRole } = require('../controler/role.controller')
 const router = express.Router();
 // Test
 router.get('/', homepage)

@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const User = require('../../model/users.model');
 const crypto = require('crypto');
 const Role = require('../../model/role.model');
@@ -46,7 +46,7 @@ const authController = {
             id: user.id,
             name: user.name,
         };
-        return jwt.sign(payload, jwtSecret, { expiresIn: '20s' });
+        return jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
     },
 
     generateRefreshToken: (user) => {
@@ -148,8 +148,47 @@ const authController = {
         } catch (error) {
             res.status(500).json({ message: "Lỗi server" });
         }
-    }
+    },
+    getProfile: async (req, res) => {
+        try {
+            const id = req.params.id;
+            const user = await User.findById(id);
+            if (!user) {
+                return res.status(404).json({ message: "Không tìm thấy người dùng" });
+            }
+            res.status(200).json(user);
+        } catch (error) {
+            console.error("Lỗi server khi lấy thông tin người dùng:", error);
+            res.status(500).json({ message: "Lỗi server khi lấy thông tin người dùng", error: error.message });
+        }
+    },
+  verifyEmail: async (req, res) => {
+   
+    },
+    
+resendEmail:  async (req, res) => {
+        
+    },
+    
 
+  forgotPassword: async (req, res) => {
+       
+    },
+    
+    resetPassword: async (req, res) => {
+       
+    },
+    
+    
+
+    
+updatePassword: async (req, res) => {
+       
+    },
+    
+   deleteUser: async (req, res) => {
+        
+    },
 };
 
 
