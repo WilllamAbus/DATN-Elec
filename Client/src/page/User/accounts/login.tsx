@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UserHeader from '../../../components/User/header';
 import UserNav from '../../../components/User/navbar';
 import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
 import authGoogleService from '../../../services/authGoogle.service';
+import { environment } from '~/environments/environment';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { loginUser } from '~/redux/auth/apiRequest';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { Cookies } from 'react-cookie';
+import { useForm } from 'react-hook-form';
+
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+
+
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const newUser = {
@@ -24,6 +32,29 @@ const Login: React.FC = () => {
         loginUser(newUser, dispatch, navigate);
     };
 
+
+    // const Login: React.FC = () => {
+    //     const {login, setValue,setError, formState,reset,handleSubmit, getValues} = useForm()
+      
+    //   const LoginSubmit = async (value) => {
+    //     try{
+    //       const res =  await axios.post("http://10.82.60.26:3001/user/register", {
+    //         username: value?.username,
+    //         password: value?.password,
+    //         device: "mobile"
+    //       });
+    //       console.log("res===", res.data);
+    //       const dateExpired = new Date();
+    //       let cookie = new Cookies();
+    //       dateExpired.setDate(dateExpired.getDate() + 1);
+    //       cookie.set("token", res?.data?.access_token, {expires: dateExpired});
+    //       cookie.update();
+        
+    //     }catch(err) {
+    //       console.log("error===", err);
+    //     }
+    //   };
+
     return (
         <>
             <UserHeader />
@@ -32,7 +63,7 @@ const Login: React.FC = () => {
                 <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
                     <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
                     <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
-                    <form id="addLoginButton" onSubmit={handleLogin} autoComplete="off">
+            
                         <div className="space-y-2">
                             <div>
                                 <label htmlFor="email" className="text-gray-600 mb-2 block">Email</label>
@@ -67,7 +98,7 @@ const Login: React.FC = () => {
                                 ĐĂNG NHẬP
                             </button>
                         </div>
-                    </form>
+                
 
                     <div className="mt-6 flex justify-center relative">
                         <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">Or</div>
