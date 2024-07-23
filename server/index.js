@@ -1,17 +1,17 @@
 const express = require("express");
 const cors = require("cors");
-const connectDb = require("./config/connectDb");
+
 const apiGeneral = require("./routes/api");
 const routes = require("./routes/index");
 require('dotenv').config();
 require('./services/passport');
 cookieParser = require('cookie-parser')
 const app = express();
-
+const connectDb = require('./config/connectDb')
 const http = require('http');
 const socketIo = require('socket.io');
 const SocketServices = require('./services/serviceSocket');
-const server = http.createServer(app);
+
 
 //databse call
 connectDb();
@@ -26,7 +26,7 @@ app.use(cors({
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
   credentials: true
 }));
-
+const server = http.createServer(app);
 
 app.use(cookieParser())
 // Initialize socket.io with the HTTP server
@@ -46,7 +46,7 @@ routes(app);
 //Headd Api
 app.use('/api', apiGeneral);
 
-connectDb();
+// connectDb();
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

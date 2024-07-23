@@ -10,7 +10,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { loginUser } from '../../../redux/auth/apiRequest';
 import { useDispatch } from 'react-redux';
 
-
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
