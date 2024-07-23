@@ -1,6 +1,6 @@
 import axios from "axios";
-import { loginFailed, loginStart, loginSuccess } from "../authSlice";
-import { AppDispatch } from "../store";
+import { loginFailed, loginStart, loginSuccess } from "./authSlice";
+import  {AppDispatch}  from "../../redux/store";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

@@ -4,11 +4,10 @@ import UserHeader from '../../../components/User/header';
 import UserNav from '../../../components/User/navbar';
 import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
-import authGoogleService from '../../../services/authGoogle.service';
-import { environment } from '~/environments/environment';
+import authGoogleService from '../../../services/authentication/authGoogle.service';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { loginUser } from '~/redux/auth/apiRequest';
+import { loginUser } from '../../../redux/auth/apiRequest';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { Cookies } from 'react-cookie';
@@ -26,7 +25,7 @@ const Login: React.FC = () => {
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const newUser = {
-            email: username,  // Adjust this to 'email'
+            email: username,  
             password: password,
         };
         loginUser(newUser, dispatch, navigate);
@@ -66,7 +65,7 @@ const Login: React.FC = () => {
             
                         <div className="space-y-2">
                             <div>
-                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email</label>
+                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email </label>
                                 <span id="emailRegisError" className="error"></span>
                                 <input type="email" name="email" id="email"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
@@ -93,10 +92,13 @@ const Login: React.FC = () => {
                             <Link to="/forgot" className="text-primary">Quên mật khẩu</Link>
                         </div>
                         <div className="mt-4">
+                            <Link to='/'>
                             <button type="submit"
                                 className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium">
                                 ĐĂNG NHẬP
                             </button>
+                            </Link>
+                        
                         </div>
                 
 

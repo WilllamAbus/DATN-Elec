@@ -1,5 +1,13 @@
+import React from 'react';
 import { Alert } from "@material-tailwind/react";
- 
+
+// Define the props interface
+interface AlertProps {
+  message: string;
+  type: "success" | "error" | null;
+}
+
+// Define the Icon component
 function Icon() {
   return (
     <svg
@@ -16,14 +24,24 @@ function Icon() {
     </svg>
   );
 }
- 
-export function AlertCustomStyles() {
+
+// Define the AlertCustomStyles component
+const AlertCustomStyles: React.FC<AlertProps> = ({ message, type }) => {
+  // Define the classes based on the alert type
+  const alertClasses = {
+    success: "border-[#2ec946] bg-[#2ec946]/10 text-[#2ec946]",
+    error: "border-red-500 bg-red-500/10 text-red-500",
+    default: "border-gray-500 bg-gray-500/10 text-gray-500"
+  };
+
   return (
     <Alert
       icon={<Icon />}
-      className="rounded-none border-l-4 border-[#2ec946] bg-[#2ec946]/10 font-medium text-[#2ec946]"
+      className={`rounded-none border-l-4 ${alertClasses[type || 'default']}`}
     >
-      Thành công 
+      {message}
     </Alert>
   );
-}
+};
+
+export default AlertCustomStyles;

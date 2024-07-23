@@ -7,6 +7,34 @@ const Sidebar: React.FC = () => {
     setIsProductsOpen(!isProductsOpen);
   };
 
+  const [isCateOpen, setIsCateOpen] = useState(false);
+
+  const toggleCate = () => {
+    setIsCateOpen(!isCateOpen);
+  };
+
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+
+  const toggleAccount = () => {
+    setIsAccountOpen(!isAccountOpen);
+  };
+
+  const [isInteractOpen, setIsInteractOpen] = useState(false);
+
+  const toggleInteract = () => {
+    setIsInteractOpen(!isInteractOpen);
+  };
+
+  const [isServiceOpen, setServiceOpen] = useState(false);
+
+  const toggleService = () => {
+    setServiceOpen(!isServiceOpen);
+  };
+  const [isOrderOpen, setOrderOpen] = useState(false);
+
+  const toggleOrder = () => {
+    setOrderOpen(!isOrderOpen);
+  };
   return (
     <aside className="relative bg-sidebar h-screen w-64 hidden sm:block shadow-xl">
       <div className="p-6">
@@ -28,13 +56,40 @@ const Sidebar: React.FC = () => {
           <i className="fas fa-tachometer-alt mr-3"></i>
           Dashboard
         </a>
-        <a
-          href="/admin/listCategories"
-          className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-        >
-          <i className="fas fa-sticky-note mr-3"></i>
-          Danh mục
-        </a>
+
+        <div className="flex flex-col">
+          <button
+            onClick={toggleCate}
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Danh mục
+            <i
+              className={`fas fa-chevron-${
+                isCateOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
+          </button>
+          {isCateOpen && (
+            <div className="pl-6">
+              <a
+                href="/admin/listCategories"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-sticky-note mr-3"></i>
+                Danh mục
+              </a>
+
+              <a
+                href="/admin/recycleBinCate"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Thùng rác
+              </a>
+            </div>
+          )}
+        </div>
         <div className="flex flex-col">
           <button
             onClick={toggleProducts}
@@ -42,16 +97,20 @@ const Sidebar: React.FC = () => {
           >
             <i className="fas fa-table mr-3"></i>
             Mua sắm
-            <i className={`fas fa-chevron-${isProductsOpen ? 'up' : 'down'} ml-2`}></i>
+            <i
+              className={`fas fa-chevron-${
+                isProductsOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
           </button>
           {isProductsOpen && (
             <div className="pl-6">
-                 <a
+              <a
                 href="/admin/listProducts"
                 className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
               >
                 <i className="fas fa-calendar mr-3"></i>
-                Sản phẩm 
+                Sản phẩm
               </a>
               <a
                 href="/admin/listBuyingFormat"
@@ -74,51 +133,133 @@ const Sidebar: React.FC = () => {
                 <i className="fas fa-calendar mr-3"></i>
                 Mã giảm giá
               </a>
+              <a
+                href="/admin/listBrands"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Thương hiệu
+              </a>
+              <a
+                href="/admin/recycleBin"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Thùng rác
+              </a>
             </div>
           )}
         </div>
-        <a
+        <div className="flex flex-col">
+          <button
+            onClick={toggleAccount}
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Tài khoản
+            <i
+              className={`fas fa-chevron-${
+                isAccountOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
+          </button>
+          {isAccountOpen && (
+            <div className="pl-6">
+                  <a
           href="/admin/listUser"
           className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
         >
           <i className="fas fa-align-left mr-3"></i>
           Người dùng
         </a>
-        <a
+
+        
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <button
+            onClick={toggleInteract}
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Tương tác
+            <i
+              className={`fas fa-chevron-${
+                isInteractOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
+          </button>
+          {isInteractOpen && (
+            <div className="pl-6">
+           <a
           href="/admin/listComments"
           className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
         >
           <i className="fas fa-tablet-alt mr-3"></i>
           Bình luận
         </a>
-        <a
+
+        
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <button
+            onClick={toggleService }
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Dịch vụ
+            <i
+              className={`fas fa-chevron-${
+                isServiceOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
+          </button>
+          {isServiceOpen && (
+            <div className="pl-6">
+         <a
           href="/admin/listCusSer"
           className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
         >
           <i className="fas fa-align-left mr-3"></i>
           Dịch vụ khách hàng
         </a>
-        <a
-          href="/admin/listBrands"
-          className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-        >
-          <i className="fas fa-calendar mr-3"></i>
-          Thương hiệu
-        </a>
-        <a
+
+        
+            </div>
+          )}
+        </div>  
+  
+        <div className="flex flex-col">
+          <button
+            onClick={toggleOrder }
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Đơn hàng
+            <i
+              className={`fas fa-chevron-${
+                isOrderOpen ? "up" : "down"
+              } ml-2`}
+            ></i>
+          </button>
+          {isOrderOpen && (
+            <div className="pl-6">
+             <a
           href="/admin/listOrders"
           className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
         >
           <i className="fas fa-calendar mr-3"></i>
           Đơn hàng
         </a>
-        <a
-          href="/admin/recycleBin"
-          className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-        >
-          <i className="fas fa-calendar mr-3"></i>
-          Thùng rác
-        </a>
+
+        
+            </div>
+          )}
+        </div>  
+ 
       </nav>
     </aside>
   );

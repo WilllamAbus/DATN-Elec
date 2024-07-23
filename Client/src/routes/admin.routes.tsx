@@ -47,7 +47,7 @@ const AdminListProdAuc =  React.lazy(() => import('../page/Admin/productAuction/
 /***RecycleBin */
 
 const AdminRecycleBin = React.lazy(() => import('../page/Admin/recycleBin/allItemList'))
-
+const AdminRecycleBinCate = React.lazy(() => import('../page/Admin/recycleBinCate/allItemList'))
 /**User */
 const AdminListUser = React.lazy(() => import('../page/Admin/users/listUser'))
 
@@ -62,7 +62,7 @@ const AdminRoutes: RouteObject[] = [
     element: <AdminAddCategories />,
   },
   {
-    path: 'editCategories',
+    path: 'editCategories/:id',
     element: <AdminEditCategories />,
   },
   {
@@ -180,6 +180,11 @@ const AdminRoutes: RouteObject[] = [
 {
   path: 'recycleBin',
   element: <AdminRecycleBin />,
+
+},
+{
+  path: 'recycleBinCate',
+  element: <AdminRecycleBinCate />,
 
 },
 

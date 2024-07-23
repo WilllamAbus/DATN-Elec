@@ -23,7 +23,7 @@ export function AlertCustomStyles() {
       icon={<Icon />}
       className="rounded-none border-l-4 border-[#c92e2e] bg-[#c92e2e]/10 font-medium text-[#2ec946]"
     >
-      Hãy thử lại !!@@@
+        Hãy thử lại
     </Alert>
   );
 }

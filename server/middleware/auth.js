@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
+const Role = require('../model/role.model');
 const middlewareController = {
 
     verifyToken: (req, res, next) => {
-        const token = req.headers.token;
+        const token = req.headers['authorization'];
         if (token) {
             const accessToken = token.split(" ")[1];
             jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
@@ -17,12 +18,15 @@ const middlewareController = {
         }
     },
 
-    verifyTokenAdminAuth: (req, res, next) => {
-        middlewareController.verifyToken(req, res, () => {
-            if (req.user.id === req.params.id || req.user.admin) {
+    verifyTokenAdminAuth: async (req, res, next) => {
+        await middlewareController.verifyToken(req, res, async () => {
+            const userRoles = req.user.roles;
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+            if (adminRole && userRoles.includes(adminRole._id.toString())) {
                 next();
             } else {
-                res.status(403).json("You're not allowed to delete others");
+                res.status(403).json("Access denied: Only admins can access this route");
             }
         });
     }
