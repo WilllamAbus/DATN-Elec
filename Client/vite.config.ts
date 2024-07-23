@@ -9,7 +9,14 @@ export default defineConfig({
     react(),
     checker({ typescript: true }),
   ],
-  
+  // proxy: {
+  //   '/api': {
+  //     target: 'http://localhost:4000',
+  //     changeOrigin: true,
+  //     secure: false,
+  //     rewrite: (path) => path.replace(/^\/api/, ''),
+  //   },
+  // },
   resolve: {
     alias: {
       '@': 'src',
@@ -18,10 +25,10 @@ export default defineConfig({
   server: {
     port: 3150,
     open: true,
-    open: true,
+
     watch: {
       usePolling: true,
-      usePolling: true,
+     
     },
   },
 });

@@ -7,8 +7,9 @@ import UserCoppyright from '../../../components/User/copyright';
 import authGoogleService from '../../../services/authGoogle.service';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { loginUser } from '~/redux/auth/apiRequest';
+import { loginUser } from '../../../redux/auth/apiRequest';
 import { useDispatch } from 'react-redux';
+
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState<string>("");
