@@ -1,21 +1,28 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import UserHeader from '../../../components/User/header';
 import UserNav from '../../../components/User/navbar';
 import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
-import '../../../assets/css/user.style.css'
+import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { apiLoginSuccess } from '~/services/authentication/loginSuccess.service';
+
 
 const LoginSuccess = () => {
+    const { userId, tokenLogin } = useParams<{ userId?: string; tokenLogin?: string }>();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        // Đợi 3 giây và sau đó chuyển hướng đến trang chủ
-        setTimeout(() => {
-            navigate('/');
-        }, 3000);
-    }, [navigate]);  
+        if (userId && tokenLogin) {
+            apiLoginSuccess(userId, tokenLogin, dispatch, navigate);
+        } else {
+            navigate('/login-error');
+        }
+    }, [userId, tokenLogin, dispatch, navigate]);
+    
 
     return (
         <>
@@ -40,7 +47,7 @@ const LoginSuccess = () => {
                     <div className="text-center px-6 py-4">
                         <h1 className="font-bold text-3xl text-gray-900">Success</h1>
                         <p className="text-gray-700 mt-2">
-                            Bạn đã đăng nhập thành công tài khoản google
+                            Bạn đã đăng nhập thành công tài khoản Google
                         </p>
                     </div>
                 </div>

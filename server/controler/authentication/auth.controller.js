@@ -24,11 +24,9 @@ const authController = {
                 return res.status(400).json({ msg: 'Email đã tồn tại' });
             }
 
-            // Tạo người dùng mới
             const newUser = new User({
                 email,
-                password, // Để mô hình tự động mã hóa mật khẩu
-                name,
+                password,
                 roles: [userRole._id]
             });
 
@@ -45,14 +43,16 @@ const authController = {
         const payload = {
             id: user.id,
             name: user.name,
+            roles: user.roles
         };
-        return jwt.sign(payload, jwtSecret, { expiresIn: '20s' });
+        return jwt.sign(payload, jwtSecret, { expiresIn: '30d' });
     },
 
     generateRefreshToken: (user) => {
         const payload = {
             id: user.id,
             name: user.name,
+            roles: user.roles
         };
         return jwt.sign(payload, jwtRefreshSecret, { expiresIn: '30d' });
     },
@@ -76,7 +76,7 @@ const authController = {
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                secure: false,
+                secure: true,
                 path: "/",
                 sameSite: "strict"
             });
@@ -98,7 +98,6 @@ const authController = {
             return res.status(403).json({ msg: 'Token này không phải của bạn' });
         }
 
-        // Loại bỏ refreshToken cũ và thêm refreshToken mới
         refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
         try {
             const userPayload = jwt.verify(refreshToken, jwtRefreshSecret);
@@ -109,7 +108,7 @@ const authController = {
 
             res.cookie("refreshToken", newRefreshToken, {
                 httpOnly: true,
-                secure: false,
+                secure: true,
                 path: "/",
                 sameSite: "strict"
             });

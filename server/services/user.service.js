@@ -5,7 +5,7 @@ const _User = require("../model/users.model");
 const _Otp = require("../model/otp.model");
 const otpGenerator = require("otp-generator");
 const jwt = require('jsonwebtoken');
-const validator = require('validator'); 
+const validator = require('validator');
 const _Role = require("../model/role.model");
 // service
 const { insertOTP, validOtp } = require("./otp.service");
@@ -45,50 +45,50 @@ const userService = {
       if (isValid && email === lastOtp.email) {
         if (!validator.isEmail(email)) {
           return {
-              code: 400,
-              message: "Invalid email format",
+            code: 400,
+            message: "Invalid email format",
           };
-      }
-      const role = await _Role.findOne({ name: "admin" });
-      if (!role) {
+        }
+        const role = await _Role.findOne({ name: "admin" });
+        if (!role) {
           return {
-              code: 400,
-              message: "Role not found",
+            code: 400,
+            message: "Role not found",
           };
-      }
-     
-      const user = await _User.create({
-        email,
-        roles: [role._id],
-        userId: Math.floor(Math.random() * 1000), // Đảm bảo giá trị userId được tạo đúng
-    });
+        }
 
-    if (user) {
-        await _Otp.deleteMany({ email });
-    }
+        const user = await _User.create({
+          email,
+          roles: [role._id],
+          userId: Math.floor(Math.random() * 1000), // Đảm bảo giá trị userId được tạo đúng
+        });
 
-    // Populate roles sau khi tạo người dùng
-    await user.populate('roles');
- 
-  
+        if (user) {
+          await _Otp.deleteMany({ email });
+        }
+
+        // Populate roles sau khi tạo người dùng
+        await user.populate('roles');
+
+
         const token = jwt.sign(
           {
             roles: user.roles,
             id: user._id, // Thay đổi role tùy theo logic của bạn
-              userId: user.userId, // Sử dụng _id của user trong MongoDB
+            userId: user.userId, // Sử dụng _id của user trong MongoDB
             email: user.email,
           },
           secretKey,
           { expiresIn: "1h" }
         );
-   
+
         // Tạo JWT token sử dụng secretKey từ biến môi trường
-      
+
 
         return {
           code: 201,
-          message:"Successfully!",
-          token:token,
+          message: "Successfully!",
+          token: token,
           elements: user,
         };
       }
@@ -114,7 +114,7 @@ const userService = {
       specialChars: false,
     });
 
-    
+
 
     return {
       code: 200,
@@ -126,6 +126,27 @@ const userService = {
       }),
     };
   },
+
+
+  getOne: async (id) => {
+    try {
+      const response = await _User.findOne({
+        _id: id 
+      }).select('-password'); 
+
+      return {
+        err: response ? 0 : 1, 
+        msg: response ? 'OK' : 'Failed to get user.',
+        response
+      };
+    } catch (error) {
+      return {
+        err: 1,
+        msg: 'An error occurred while fetching user.',
+        response: null
+      };
+    }
+  }
 };
 
 module.exports = userService;

@@ -4,7 +4,7 @@ import UserHeader from '../../../components/User/header';
 import UserNav from '../../../components/User/navbar';
 import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
-import authGoogleService from '../../../services/authGoogle.service';
+import authGoogleService from '../../../services/authentication/authGoogle.service';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { loginUser } from '~/redux/auth/apiRequest';
@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const newUser = {
-            email: username,  // Adjust this to 'email'
+            email: username,  
             password: password,
         };
         loginUser(newUser, dispatch, navigate);
