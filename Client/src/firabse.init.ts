@@ -5,6 +5,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage'; // Import for Firebase Storage
 
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_APP_FIREBASE_AUTH_DOMAIN,
@@ -21,4 +22,6 @@ const db = getFirestore(app);
 const storage = getStorage(app); // Initialize Firebase Storage
 
 export { auth, db, storage }; // Export storage for use in other files
+
+
 

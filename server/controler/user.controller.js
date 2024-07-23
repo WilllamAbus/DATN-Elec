@@ -1,5 +1,5 @@
 // const userList = require('./../model/users');
-const {regisUser, verifyOtp} = require('../services/user.service')
+const {regisUser, verifyOtp, getOne } = require('../services/user.service')
 const user = {
 verifyOtp: async(req, res, next)=>{
     try {
@@ -47,9 +47,20 @@ regisUser: async(req, res, next) =>{
         console.error(error);
         next(error)
     }
+},
+getCurrent: async (req, res) => {
+    const { id } = req.user; 
+    try {
+      const response = await getOne(id); 
+      return res.status(response.err === 0 ? 200 : 400).json(response); 
+    } catch (error) {
+      return res.status(500).json({
+        err: -1,
+        msg: `Failed at user controller: ${error.message}` 
+      });
+    }
+  }
 }
-}
-
 
 module.exports = user
 // // add a new user
