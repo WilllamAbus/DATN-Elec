@@ -7,7 +7,7 @@ import UserFooter from '../../../components/User/footer';
 import UserCoppyright from '../../../components/User/copyright';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { apiLoginSuccess } from '~/services/authentication/loginSuccess.service';
+import { apiLoginSuccess } from '../../../services/authentication/loginSuccess.service';
 
 
 const LoginSuccess = () => {

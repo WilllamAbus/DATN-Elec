@@ -1,21 +1,29 @@
 const { Schema, model } = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
-const discountSchema = Schema(
+
+const discountSchema = new Schema(
   {
-    code: String, 
-    discountPercentage:  Number,
-    expiryDate:  Date,
-    isActive:  Boolean ,
-    category: { type: Schema.Types.ObjectId, ref: 'categories', required: true } ,
-    conditionActive: String
+    code: { type: String, required: true },
+    discountPercentage: { type: Number, required: true },
+    cateReady: [
+      {
+        category: { type: Schema.Types.ObjectId, ref: 'categories' }, // Reference to Category model
+        name: { type: String, required: true }
+      }
+    ],
+    expiryDate: { type: Date, required: true },
+    conditionActive: { type: String, required: true },
+    isActive: { type: Boolean, default: true }
   },
   {
-    collection: "discount",
-    timestamps: true,
+    collection: "discount", // Name of the collection
+    timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
   }
 );
 
 discountSchema.statics.findWithCategory = function (query) {
-    return this.find(query).populate('categories').exec();
-  };
-module.exports = model("discount", discountSchema);
+  return this.find(query).populate('cateReady.category').exec();
+};
+
+module.exports = model("Discount", discountSchema);
+
+

@@ -35,7 +35,7 @@ const Login: React.FC = () => {
                     <form id="addLoginButton" onSubmit={handleLogin} autoComplete="off">
                         <div className="space-y-2">
                             <div>
-                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email </label>
+                                <label htmlFor="email" className="text-gray-600 mb-2 block">Email</label>
                                 <span id="emailRegisError" className="error"></span>
                                 <input type="email" name="email" id="email"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="Nhập mật khẩu....."
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)} />
+                                                        onChange={(e) => setPassword(e.target.value)} />
                             </div>
                         </div>
                         <div className="flex items-center justify-between mt-6">
@@ -62,13 +62,10 @@ const Login: React.FC = () => {
                             <Link to="/forgot" className="text-primary">Quên mật khẩu</Link>
                         </div>
                         <div className="mt-4">
-                            <Link to='/'>
                             <button type="submit"
                                 className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium">
                                 ĐĂNG NHẬP
                             </button>
-                            </Link>
-                        
                         </div>
                     </form>
 

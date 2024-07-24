@@ -143,7 +143,7 @@ const AdminRoutes: RouteObject[] = [
   element: <AdminAddDiscount/>,
 },
 {
-  path: 'editDiscounts',
+  path: 'editDiscounts/:id',
   element: <AdminEditDiscount />,
 },
 {
