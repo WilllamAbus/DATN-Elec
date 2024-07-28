@@ -7,7 +7,7 @@ import UserCoppyright from '../../../components/User/copyright';
 import authGoogleService from '../../../services/authentication/authGoogle.service';
 import '../../../assets/css/user.style.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { loginUser } from '~/redux/auth/apiRequest';
+import { loginUser } from '../../../redux/auth/apiRequest';
 import { useDispatch } from 'react-redux';
 
 const Login: React.FC = () => {
@@ -49,8 +49,8 @@ const Login: React.FC = () => {
                                 <input type="password" name="password" id="password"
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="Nhập mật khẩu....."
-                                    value={password}
-                                                        onChange={(e) => setPassword(e.target.value)} />
+                                    value={password} onChange={(e) => setPassword(e.target.value)} />
+
                             </div>
                         </div>
                         <div className="flex items-center justify-between mt-6">
