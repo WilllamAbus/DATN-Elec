@@ -3,7 +3,7 @@ import { toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const notify = () => {
-  toast.success("Đã thêm sản phẩm thành công!", {
+  toast.success("Đã thêm thành công!", {
     position: "top-right",
     autoClose: 2000,
     hideProgressBar: false,
