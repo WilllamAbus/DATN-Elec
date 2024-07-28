@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import { environment } from '../../environments/environment.prod';
-import { Category } from '../../types/Categories.d'; // Adjust the import path
+import { Category } from '../../types/Categories.d'; 
 
 const API_BASE_URL = `${environment.url}`;
 
@@ -11,7 +11,7 @@ export const createCategory = async (formData: FormData) => {
     const response = await axios.post(`${API_BASE_URL}/addCate`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data; // Assuming response.data contains the success message
+    return response.data; 
   } catch (error) {
     throw new Error((error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to create category');
   }

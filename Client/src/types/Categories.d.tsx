@@ -4,7 +4,7 @@ export interface Category {
     name: string;
     pid: string;
     path: string;
-    imgURL: string; // The path or URL to the image in Firebase Storage
+    imgURL: string; 
     createdAt: string;
     updatedAt: string;
     __v: number;

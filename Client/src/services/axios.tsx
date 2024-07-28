@@ -56,5 +56,6 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+console.log('Firebase API Key:', import.meta.env.VITE_APP_FIREBASE_API_KEY);
 
 export default instance;
