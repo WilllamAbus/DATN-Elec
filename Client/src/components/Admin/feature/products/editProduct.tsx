@@ -7,7 +7,7 @@ import { Category } from "../../../../types/Categories.d";
 import { getFileFirebase } from "../../../../services/firebase/getFirebse.service";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { notifyUpdate  } from "../../../../ultils/success";
+import { notifyUpdate } from "../../../../ultils/success";
 interface IFormInput {
   name: string;
   price: number;
@@ -125,7 +125,7 @@ const EditProduct: React.FC = () => {
         }
 
         await updateProduct(id, formData);
-        notifyUpdate ();
+        notifyUpdate();
         setTimeout(() => {
           navigate("/admin/listProducts");
         }, 2000);
@@ -144,13 +144,12 @@ const EditProduct: React.FC = () => {
       <div className="flex flex-wrap">
         <div className="w-full mt-6 pl-0 lg:pl-2">
           <div className="leading-loose">
-           
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="p-10 bg-white rounded shadow-xl"
               encType="multipart/form-data"
             >
-               <ToastContainer />
+              <ToastContainer />
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
@@ -218,9 +217,7 @@ const EditProduct: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  {errors.categoryId && (
-                    <span className="text-red-600">{errors.categoryId.message?.toString()}</span>
-                  )}
+                  {errors.categoryId && <span className="text-red-600">{errors.categoryId.message?.toString()}</span>}
                 </div>
                 <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
@@ -232,9 +229,7 @@ const EditProduct: React.FC = () => {
                     type="date"
                     {...register("createdAt", { required: "Ngày nhập không được bỏ trống" })}
                   />
-                  {errors.createdAt && (
-                    <span className="text-red-600">{errors.createdAt.message?.toString()}</span>
-                  )}
+                  {errors.createdAt && <span className="text-red-600">{errors.createdAt.message?.toString()}</span>}
                 </div>
               </div>
               <div className="flex flex-wrap -mx-3 mb-6">
@@ -285,9 +280,7 @@ const EditProduct: React.FC = () => {
                     placeholder="Màu sắc"
                     {...register("color")}
                   />
-                  {errors.color && (
-                    <span className="text-red-600">{errors.color.message?.toString()}</span>
-                  )}
+                  {errors.color && <span className="text-red-600">{errors.color.message?.toString()}</span>}
                 </div>
               </div>
 
@@ -300,9 +293,7 @@ const EditProduct: React.FC = () => {
                   id="description"
                   {...register("description")}
                 />
-                {errors.description && (
-                  <span className="text-red-600">{errors.description.message?.toString()}</span>
-                )}
+                {errors.description && <span className="text-red-600">{errors.description.message?.toString()}</span>}
               </div>
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3">
@@ -322,9 +313,7 @@ const EditProduct: React.FC = () => {
                     <option value="40">40%</option>
                     <option value="50">50%</option>
                   </select>
-                  {errors.discount && (
-                    <span className="text-red-600">{errors.discount.message?.toString()}</span>
-                  )}
+                  {errors.discount && <span className="text-red-600">{errors.discount.message?.toString()}</span>}
                 </div>
               </div>
               <div className="mb-4">

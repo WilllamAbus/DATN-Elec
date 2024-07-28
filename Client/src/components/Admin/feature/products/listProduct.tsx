@@ -34,7 +34,7 @@ const ProductList: React.FC = () => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Có",
-      cancelButtonText: "Hủy", 
+      cancelButtonText: "Hủy",
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {

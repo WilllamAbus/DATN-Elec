@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import AlertCustomStyles from '../../../../ultils/alert.succes';
-import { createCategoryThunk } from '../../../../redux/categories/categoriesThunk';
-import { useNavigate } from 'react-router-dom';
-import '../../../../assets/css/admin.style.css';
+import React, { useState, useEffect } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import AlertCustomStyles from "../../../../ultils/alert.succes";
+import { createCategoryThunk } from "../../../../redux/categories/categoriesThunk";
+import { useNavigate } from "react-router-dom";
+import "../../../../assets/css/admin.style.css";
 
 interface IFormInput {
   name: string;
@@ -21,21 +21,26 @@ const AddCate: React.FC = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<IFormInput>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<IFormInput>();
   const status = useSelector((state: any) => state.categories.status);
   const message = useSelector((state: any) => state.categories.message);
 
   useEffect(() => {
-    if (status === 'succeeded') {
+    if (status === "succeeded") {
       reset();
       setPreviewImage(null);
       setError(null);
       setSuccessMessage("Category added successfully!");
       setAlertType("success");
       setTimeout(() => {
-        navigate('/admin/listCategories');
+        navigate("/admin/listCategories");
       }, 2000); // 2 seconds delay before navigating
-    } else if (status === 'failed') {
+    } else if (status === "failed") {
       setError(message);
       setSuccessMessage(null);
     }
@@ -56,23 +61,23 @@ const AddCate: React.FC = () => {
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     if (!file) {
-      setError('No file selected');
+      setError("No file selected");
       return;
     }
 
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('path', data.path);
-    formData.append('imgCate', file);
+    formData.append("name", data.name);
+    formData.append("path", data.path);
+    formData.append("imgCate", file);
 
     try {
       const resultAction = await dispatch(createCategoryThunk(formData) as any).unwrap();
       setError(null);
       setSuccessMessage(resultAction.message);
     } catch (error) {
-      const errorMessage = (error as { message?: string })?.message || 'Error creating category';
+      const errorMessage = (error as { message?: string })?.message || "Error creating category";
       setError(errorMessage);
-      console.error('Error:', errorMessage);
+      console.error("Error:", errorMessage);
     }
   };
 
@@ -86,23 +91,14 @@ const AddCate: React.FC = () => {
         <div className="w-full mt-6 pl-0 lg:pl-2">
           <div className="leading-loose">
             <div className="mt-4">
-              {successMessage && alertType && (
-                <AlertCustomStyles
-                  message={successMessage}
-                  type={alertType}
-                />
-              )}
+              {successMessage && alertType && <AlertCustomStyles message={successMessage} type={alertType} />}
               {error && (
                 <div className="mt-4">
                   <span className="text-red-600">{error}</span>
                 </div>
               )}
             </div>
-            <form
-              id="addNewForm"
-              className="p-10 bg-white rounded shadow-xl"
-              encType="multipart/form-data"
-            >
+            <form id="addNewForm" className="p-10 bg-white rounded shadow-xl" encType="multipart/form-data">
               <div>
                 <label className="block text-sm text-gray-600" htmlFor="nameCate">
                   Name
@@ -111,7 +107,7 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-1 text-gray-700 bg-gray-200 rounded"
                   id="name"
                   type="text"
-                  {...register('name', { required: 'Tên không được bỏ trống' })}
+                  {...register("name", { required: "Tên không được bỏ trống" })}
                 />
                 {errors.name && <span className="text-red-600">{errors.name.message}</span>}
               </div>
@@ -123,7 +119,7 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-1 text-gray-700 bg-gray-200 rounded"
                   id="path"
                   type="text"
-                  {...register('path', { required: 'Đường truyền không được bỏ trống' })}
+                  {...register("path", { required: "Đường truyền không được bỏ trống" })}
                 />
                 {errors.path && <span className="text-red-600">{errors.path.message}</span>}
               </div>
@@ -135,7 +131,7 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-4 text-gray-700 bg-gray-200 rounded"
                   id="imgCate"
                   type="file"
-                  {...register('imgCate', { required: 'Hình không bỏ trống' })}
+                  {...register("imgCate", { required: "Hình không bỏ trống" })}
                   onChange={handleFileChange}
                 />
                 {errors.imgCate && <span className="text-red-600">{errors.imgCate.message}</span>}
@@ -154,10 +150,7 @@ const AddCate: React.FC = () => {
                 >
                   Thêm mới
                 </button>
-                <button
-                  className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
-                  type="button"
-                >
+                <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
                   <a href="/admin/listCategories">Danh sách</a>
                 </button>
               </div>

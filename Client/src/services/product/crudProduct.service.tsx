@@ -36,7 +36,6 @@ export const getOneProduct = async (id: string) => {
   try {
     const response = await instance.get(`/product/get-one/${id}`);
     return response.data;
-    
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
@@ -57,8 +56,8 @@ export const updateProduct = async (id: string, productData: FormData) => {
   try {
     const response = await instance.put(`/product/update/${id}`, productData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error) {

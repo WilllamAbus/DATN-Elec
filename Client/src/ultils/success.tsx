@@ -1,6 +1,6 @@
 // success.tsx
-import { toast, Bounce } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const notify = () => {
   toast.success("Đã thêm sản phẩm thành công!", {
