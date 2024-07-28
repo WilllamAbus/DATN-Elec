@@ -150,6 +150,19 @@ const AdminRoutes: RouteObject[] = [
     path: "listDiscounts",
     element: <AdminListDiscount />,
   },
+ /**discounts */
+ {
+  path: 'addDiscounts',
+  element: <AdminAddDiscount/>,
+},
+{
+  path: 'editDiscounts/:id',
+  element: <AdminEditDiscount />,
+},
+{
+  path: 'listDiscounts',
+  element: <AdminListDiscount />,
+},
 
   /**Orders */
   {

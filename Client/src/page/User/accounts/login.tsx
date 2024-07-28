@@ -50,7 +50,7 @@ const Login: React.FC = () => {
                                     className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                                     placeholder="Nhập mật khẩu....."
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)} />
+                                                        onChange={(e) => setPassword(e.target.value)} />
                             </div>
                         </div>
                         <div className="flex items-center justify-between mt-6">

@@ -8,6 +8,11 @@ export default defineConfig({
     },
   },
   server: {
+    port: 3150,
+    open: true,
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:4000',
@@ -15,12 +20,7 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-    },
-    port: 3150,
-    open: true,
-    watch: {
-      usePolling: true,
-    },
+    }
   },
   plugins: [react(), commonjs()],
 });

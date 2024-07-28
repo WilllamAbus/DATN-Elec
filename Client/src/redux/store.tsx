@@ -11,13 +11,15 @@
 
 // export default store;
 
-import { configureStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import authReducer from "./auth/authSlice";
-import categoriesSlice from "./categories/categoriesSlice";
-import productSlice from "./products/productsSlice";
 
+
+
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; 
+import authReducer from './auth/authSlice';
+import discountReducer from './discount/discountSlice'
+import categoriesSlice from './categories/categoriesSlice';
 // Cấu hình Redux Persist
 const persistConfig = {
   key: "root",
@@ -27,15 +29,16 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: persistedReducer,
-    categories: categoriesSlice,
-    products: productSlice, // Add product reducer
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
+    reducer: {
+        auth: persistedReducer,
+        categories: categoriesSlice,
+        discount:discountReducer
+
+           },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 });
 
 export const persistor = persistStore(store);
