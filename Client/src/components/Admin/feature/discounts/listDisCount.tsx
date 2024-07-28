@@ -58,7 +58,7 @@ const DiscountList: React.FC = () => {
               {discounts.map((discount) => (
                 <tr key={discount._id} className="hover:bg-grey-lighter">
                   <td className="py-4 px-6 border-b border-grey-light">{discount.code}</td>
-                  <td className="py-4 px-6 border-b border-grey-light">{discount.discountPercentage}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">{discount.discountNum}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">{discount.expiryDate}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
                     {discount.cateReady.map((category, index) => (

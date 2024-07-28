@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const discountSchema = new Schema(
   {
     code: { type: String, required: true },
-    discountPercentage: { type: Number, required: true },
+    discountNum: { type: Number, required: true },
     cateReady: [
       {
         category: { type: Schema.Types.ObjectId, ref: 'categories' }, // Reference to Category model

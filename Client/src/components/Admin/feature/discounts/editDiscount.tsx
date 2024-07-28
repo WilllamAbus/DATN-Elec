@@ -27,7 +27,7 @@ const EditDiscount: React.FC = () => {
         .then(discount => {
           // Populate form with discount data
           setValue('code', discount.code);
-          setValue('discountPercentage', discount.discountPercentage);
+          setValue('discountNum', discount. discountNum);
           setValue('cateReady', discount.cateReady);
           setValue('expiryDate', discount.expiryDate);
           setValue('conditionActive', discount.conditionActive);
@@ -106,14 +106,13 @@ const EditDiscount: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="number"
-                    {...register('discountPercentage', {
+                    {...register('discountNum', {
                       required: "Phần trăm giảm giá không được để trống",
-                      min: { value: 10, message: "Phần trăm giảm giá phải lớn hơn 10" },
-                      max: { value: 45, message: "Phần trăm giảm giá phải nhở hơn 45" }
+                      min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
                     })}
                   />
-                  {errors.discountPercentage && typeof errors.discountPercentage.message === 'string' && (
-                    <p className="text-red-500 text-xs">{errors.discountPercentage.message}</p>
+                  {errors. discountNum && typeof errors. discountNum.message === 'string' && (
+                    <p className="text-red-500 text-xs">{errors. discountNum.message}</p>
                   )}
                 </div>
               </div>
