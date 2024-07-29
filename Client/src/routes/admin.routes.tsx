@@ -32,9 +32,9 @@ const AdminListCondAuc = React.lazy(() => import("../page/Admin/conditionAuction
 const AdminListCService = React.lazy(() => import("../page/Admin/customerService/listCService"));
 
 /**discounts */
-const AdminAddDiscount = React.lazy(() => import("../page/Admin/discounts/addDiscount"));
-const AdminEditDiscount = React.lazy(() => import("../page/Admin/discounts/editDiscount"));
-const AdminListDiscount = React.lazy(() => import("../page/Admin/discounts/listDiscount"));
+const AdminAddVoucher = React.lazy(() => import("../page/Admin/vouchers/addVoucher"));
+const AdminEditVoucher = React.lazy(() => import("../page/Admin/vouchers/editVoucher"));
+const AdminListVoucher = React.lazy(() => import("../page/Admin/vouchers/listVoucher"));
 /**Orders */
 
 const AdminListOrder = React.lazy(() => import("../page/Admin/orders/listOrder"));
@@ -138,30 +138,19 @@ const AdminRoutes: RouteObject[] = [
     element: <AdminListCService />,
   },
   /**discounts */
-  {
-    path: "addDiscounts",
-    element: <AdminAddDiscount />,
-  },
-  {
-    path: "editDiscounts",
-    element: <AdminEditDiscount />,
-  },
-  {
-    path: "listDiscounts",
-    element: <AdminListDiscount />,
-  },
+
  /**discounts */
  {
-  path: 'addDiscounts',
-  element: <AdminAddDiscount/>,
+  path: 'addVouchers',
+  element: <AdminAddVoucher/>,
 },
 {
-  path: 'editDiscounts/:id',
-  element: <AdminEditDiscount />,
+  path: 'editVouchers/:id',
+  element: <AdminEditVoucher />,
 },
 {
-  path: 'listDiscounts',
-  element: <AdminListDiscount />,
+  path: 'listVouchers',
+  element: <AdminListVoucher />,
 },
 
   /**Orders */
