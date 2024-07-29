@@ -664,7 +664,6 @@ const allListing: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center">
-                    <div className="flex gap-1 text-sm text-yellow-400">
                       <div className="flex gap-1 text-sm text-yellow-400">
                         {Array.from({ length: product.rating }, (_, i) => (
                           <span key={i}>
@@ -672,12 +671,9 @@ const allListing: React.FC = () => {
                           </span>
                         ))}
                       </div>
-                      <div className="text-xs text-gray-500 ml-3">
+                      <div className="text-xs text-gray-500 items-center m-3">
                         {product.quantity > 0 ? `(${product.quantity})`: (" ")}
-
-                        
                       </div>
-                    </div>
                   </div>
                 </div>
                 <Link

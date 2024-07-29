@@ -65,7 +65,7 @@ const ProductSection: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                <div className="text-xs text-gray-500 ml-3">
+                <div className="text-xs text-gray-500 items-center m-3">
                 {product.quantity > 0 ? `(${product.quantity})`: (" ")}
                 </div>
               </div>
