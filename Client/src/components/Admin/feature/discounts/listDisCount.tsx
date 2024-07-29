@@ -5,7 +5,13 @@ import { RootState, AppDispatch } from '../../../../redux/store'; // Import your
 import { fetchDiscounts, deleteDiscount } from '../../../../redux/discount/discountThunk'; // Import the thunk actions
 import AlertCustomStyles from '../../../../ultils/alert.succes'; // Import your custom Alert component
 import { Link } from 'react-router-dom';
-
+const formatPrices = (price: number): string => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price) + ' vnđ';
+};
 const DiscountList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const { discounts, loading, error } = useSelector((state: RootState) => state.discount);
@@ -58,7 +64,7 @@ const DiscountList: React.FC = () => {
               {discounts.map((discount) => (
                 <tr key={discount._id} className="hover:bg-grey-lighter">
                   <td className="py-4 px-6 border-b border-grey-light">{discount.code}</td>
-                  <td className="py-4 px-6 border-b border-grey-light">{discount.discountPercentage}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">{formatPrices(discount.discountNum)}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">{discount.expiryDate}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
                     {discount.cateReady.map((category, index) => (

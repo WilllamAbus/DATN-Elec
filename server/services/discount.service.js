@@ -14,10 +14,10 @@ const discountService = {
 
   createDiscount: async (discountData) => {
     try {
-        const { code, discountPercentage, cateReady, expiryDate, conditionActive, isActive } = discountData;
+        const { code, discountNum, cateReady, expiryDate, conditionActive, isActive } = discountData;
     
         // Validate input data
-        if (!code || !discountPercentage || !expiryDate || !conditionActive) {
+        if (!code || !discountNum || !expiryDate || !conditionActive) {
           throw new Error('Missing required fields');
         }
     
@@ -38,7 +38,7 @@ const discountService = {
         // Create a discount document
         const newDiscount = new _Discount({
           code,
-          discountPercentage,
+          discountNum,
           cateReady: cateReady.map(name => {
             const category = categories.find(cat => cat.name === name);
             return {

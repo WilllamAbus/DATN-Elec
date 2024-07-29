@@ -13,19 +13,15 @@ const productSchema = new Schema({
     },
     image: {
         type: String,
-        required: false,
     },
     quantity: {
         type: Number,
         required: true,
     },
     categoryid: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
         required: true,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
     },
     weight: {
         type: Number,
@@ -44,11 +40,18 @@ const productSchema = new Schema({
         required: false,
     },
     discount: {
+        type: String,
+        default: "chưa giảm giá"
+    },
+    rating:{
         type: Number,
-        default: 0  
-      }
-});
-
+        default:0
+    },
+    view:{
+        type: Number,
+        default:0
+    }
+}, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
 

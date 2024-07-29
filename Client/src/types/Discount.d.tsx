@@ -7,7 +7,7 @@ export interface Category {
   export interface Discount {
     _id: string;
     code: string;
-    discountPercentage: number;
+    discountNum: number;
     expiryDate: string; // ISO date string
     isActive: boolean;
     cateReady: Category[];
