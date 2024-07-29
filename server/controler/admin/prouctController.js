@@ -161,7 +161,7 @@ const productsController = {
             const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
             const image = req.file ? req.file.filename : undefined;
 
-            console.log('Request body:', req.body);
+          
 
             if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
