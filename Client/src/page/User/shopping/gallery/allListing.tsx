@@ -1,4 +1,4 @@
-import React from "react";
+import React , { useEffect, useState } from "react";
 // import { Link } from 'react-router-dom';
 import UserHeader from "../../../../components/User/header";
 import UserNav from "../../../../components/User/navbar";
@@ -6,16 +6,26 @@ import UserFooter from "../../../../components/User/footer";
 import UserCoppyright from "../../../../components/User/copyright";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
-import listOne from "../../../../assets/images/products/product14.jpg";
-import listTwo from "../../../../assets/images/products/product15.png";
-import listThree from "../../../../assets/images/products/product12.jpg";
-
-import listFour from "../../../../assets/images/products/product17.jpg";
-import listFive from "../../../../assets/images/products/product18.jpg";
-import listSix from "../../../../assets/images/products/product18.jpg";
 import { Link } from "react-router-dom";
+import { listProduct } from "../../../../services/product/crudProduct.service";
+import currencyFormatter from 'currency-formatter';
+function formatCurrency(value:number) {
+  return currencyFormatter.format(value, { code: 'VND', symbol: '' });
+}
 const allListing: React.FC = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const productList = await listProduct();
+        setProducts(productList);
+      } catch (error) {
+       console.log(`lỗi: `,error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   return (
     <>
       <UserHeader />
@@ -621,62 +631,7 @@ const allListing: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-3 grid-cols-2 gap-6">
-            {[
-              {
-                imgSrc: listOne,
-                alt: "product 1",
-                title: "Quạt tản nhiệt",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-              {
-                imgSrc: listTwo,
-                alt: "product 2",
-                title: "Card đồ họa GTX",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-              {
-                imgSrc: listThree,
-                alt: "product 3",
-                title: "DRONE",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-              {
-                imgSrc: listFour,
-                alt: "product 4",
-                title: "DRONE X",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-              {
-                imgSrc: listFive,
-                alt: "product 4",
-                title: "DRONE X",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-              {
-                imgSrc: listSix,
-                alt: "product 4",
-                title: "DRONE X",
-                price: "450.000 vnđ",
-                oldPrice: "555.900 vnđ",
-                rating: 5,
-                reviews: 150,
-              },
-            ].map((product, index) => (
+            {products.map((product, index) => (
               <div
                 key={index}
                 className="bg-white shadow rounded overflow-hidden group"
@@ -684,7 +639,7 @@ const allListing: React.FC = () => {
                 <div className="relative">
                   <Link to="/detailProd">
                     <img
-                      src={product.imgSrc}
+                      src={product.image}
                       alt="product 1"
                       className="w-full"
                     />
@@ -702,10 +657,10 @@ const allListing: React.FC = () => {
                   </a>
                   <div className="flex items-baseline mb-1 space-x-2">
                     <p className="text-xl text-primary font-semibold">
-                      {product.price} 
+                    {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
                     </p>
                     <p className="text-sm text-gray-400 line-through">
-                      {product.oldPrice} 
+                       {formatCurrency(product.price)}
                     </p>
                   </div>
                   <div className="flex items-center">
@@ -718,7 +673,7 @@ const allListing: React.FC = () => {
                         ))}
                       </div>
                       <div className="text-xs text-gray-500 ml-3">
-                        ({product.reviews})
+                        {product.quantity > 0 ? `(${product.quantity})`: (" ")}
                       </div>
                     </div>
                   </div>
