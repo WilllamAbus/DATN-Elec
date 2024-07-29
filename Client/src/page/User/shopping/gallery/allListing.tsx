@@ -630,6 +630,7 @@ const allListing: React.FC = () => {
             </div>
           </div>
 
+              
           <div className="grid md:grid-cols-3 grid-cols-2 gap-6">
             {products.map((product, index) => (
               <div
