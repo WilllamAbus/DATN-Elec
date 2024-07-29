@@ -3,7 +3,7 @@ import AdminFooter from "../../../components/Admin/footer";
 import AdminHeader from "../../../components/Admin/header";
 import AdminSidebar from "../../../components/Admin/sidebar";
 import AdminStyleSheet from "../../../components/Admin/stySheet";
-import AdminEditDiscount from "../../../components/Admin/feature/discounts/editDiscount"
+import AdminEditDiscount from "../../../components/Admin/feature/vouchers/editVoucher"
 import AdminScript from "../../../components/Admin/script";
 import "../../../assets/css/admin.style.css";
 const editDiscounts: React.FC = () => {

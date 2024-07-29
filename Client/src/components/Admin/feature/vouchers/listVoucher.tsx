@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store'; // Import your RootState type
-import { fetchDiscounts, deleteDiscount } from '../../../../redux/discount/discountThunk'; // Import the thunk actions
+import { fetchVouchers, deleteVoucher } from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
 import AlertCustomStyles from '../../../../ultils/alert.succes'; // Import your custom Alert component
 import { Link } from 'react-router-dom';
 const formatPrices = (price: number): string => {
@@ -14,17 +14,17 @@ const formatPrices = (price: number): string => {
 };
 const DiscountList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
-    const { discounts, loading, error } = useSelector((state: RootState) => state.discount);
+    const { vouchers, loading, error } = useSelector((state: RootState) => state.voucher);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({ message: '', type: null });
   
     useEffect(() => {
-      dispatch(fetchDiscounts());
+      dispatch(fetchVouchers());
     }, [dispatch]);
   
     const handleDelete = async (id: string) => {
       if (window.confirm('Are you sure you want to delete this discount?')) {
         try {
-          await dispatch(deleteDiscount(id)).unwrap();
+          await dispatch(deleteVoucher(id)).unwrap();
           setAlert({ message: 'Mã giảm giá xóa thành công!', type: 'success' });
         } catch (err) {
           setAlert({ message: 'Failed to delete discount.', type: 'error' });
@@ -61,25 +61,25 @@ const DiscountList: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {discounts.map((discount) => (
-                <tr key={discount._id} className="hover:bg-grey-lighter">
-                  <td className="py-4 px-6 border-b border-grey-light">{discount.code}</td>
-                  <td className="py-4 px-6 border-b border-grey-light">{formatPrices(discount.discountNum)}</td> 
-                  <td className="py-4 px-6 border-b border-grey-light">{discount.expiryDate}</td> 
+              {vouchers.map((voucher) => (
+                <tr key={voucher._id} className="hover:bg-grey-lighter">
+                  <td className="py-4 px-6 border-b border-grey-light">{voucher.code}</td>
+                  <td className="py-4 px-6 border-b border-grey-light">{formatPrices(voucher.voucherNum)}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">{voucher.expiryDate}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
-                    {discount.cateReady.map((category, index) => (
+                    {voucher.cateReady.map((category, index) => (
                       <div key={index}>{category.name}</div>
                     ))}
                   </td>
-                  <td className="py-4 px-6 border-b border-grey-light">{discount.conditionActive}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">{voucher.conditionActive}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
                     <button
                       className="cta-btn btn text-red-500"
-                      onClick={() => handleDelete(discount._id)}
+                      onClick={() => handleDelete(voucher._id)}
                     >
                       Xoá
                     </button>
-                    <Link to={`/admin/editDiscounts/${discount._id}`}
+                    <Link to={`/admin/editVouchers/${voucher._id}`}
                     className="cta-btn btn text-green-500 ml-4">
                       Sửa
                     </Link>
@@ -93,7 +93,7 @@ const DiscountList: React.FC = () => {
 
       <div className="mt-6 flex gap-2">
         <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">
-          <a href="/admin/addDiscounts">Thêm mới</a>
+          <a href="/admin/addVouchers">Thêm mới</a>
         </button>
         {/* <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"><a href="/">Trở lại</a></button> */}
       </div>

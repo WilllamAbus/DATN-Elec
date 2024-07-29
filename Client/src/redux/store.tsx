@@ -18,7 +18,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; 
 import authReducer from './auth/authSlice';
-import discountReducer from './discount/discountSlice'
+import voucherReducer from './discount/voucherSlice'
 import categoriesSlice from './categories/categoriesSlice';
 // Cấu hình Redux Persist
 const persistConfig = {
@@ -32,7 +32,7 @@ export const store = configureStore({
     reducer: {
         auth: persistedReducer,
         categories: categoriesSlice,
-        discount:discountReducer
+        voucher: voucherReducer
 
            },
     middleware: (getDefaultMiddleware) =>

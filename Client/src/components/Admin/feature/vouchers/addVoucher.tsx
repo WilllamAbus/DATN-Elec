@@ -1,41 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
 import { fetchCategoriesThunk } from "../../../../redux/categories/categoriesThunk";
-import { createDiscount, updateDiscount, fetchDiscountById } from '../../../../redux/discount/discountThunk'; // Import your thunk
+import { createVoucher } from '../../../../redux/discount/voucherThunk'; // Import your thunk
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { Category } from "../../../../types/Categories.d";
-import { Discount } from "../../../../types/Discount.d"; // Import your Discount type
+import { Voucher } from "../../../../types/Voucher.d"; // Import your Discount type
 import AlertCustomStyles from '../../../../ultils/alert.succes';
-
-const EditDiscount: React.FC = () => {
+const addDiscount: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate(); 
-  const { id } = useParams<{ id?: string }>(); // Get ID from URL parameters
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Discount>();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Voucher>();
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
+  const navigate = useNavigate(); 
   const categories = useSelector(
     (state: RootState) => state.categories.categories
   ) as Category[];
-//   const discount = useSelector((state: RootState) => state.discount.discount);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchDiscountById(id))
-        .unwrap()
-        .then(discount => {
-          // Populate form with discount data
-          setValue('code', discount.code);
-          setValue('discountNum', discount. discountNum);
-          setValue('cateReady', discount.cateReady);
-          setValue('expiryDate', discount.expiryDate);
-          setValue('conditionActive', discount.conditionActive);
-        })
-        .catch(error => console.error('Error fetching discount:', error));
-    }
-    dispatch(fetchCategoriesThunk()); // Fetch categories for dropdown
-  }, [id, dispatch, setValue]);
+    dispatch(fetchCategoriesThunk());
+  }, [dispatch]);
+
+
 
   const validateExpirationDate = (date: string) => {
     const today = new Date();
@@ -44,32 +30,27 @@ const EditDiscount: React.FC = () => {
     return differenceInDays >= 15 || "Hạn sử dụng 15 ngày.";
   };
 
-  const onSubmit = async (data: Discount) => {
+  const onSubmit = async (data: Voucher) => {
+    const formattedData = {
+        ...data,
+        cateReady: Array.isArray(data.cateReady) ? data.cateReady : [data.cateReady],
+      };
     try {
-      if (id) {
-        // Ensure cateReady is an array
-        if (typeof data.cateReady === 'string') {
-          data.cateReady = [data.cateReady];
-        }
-        await dispatch(updateDiscount({ id, updatedDiscount: data })).unwrap();
-        setAlert({ message: 'Cập nhật giảm giá thành công!', type: 'success' });
-      } else {
-        await dispatch(createDiscount(data)).unwrap();
-        setAlert({ message: 'Cập nhật giảm giá không thành công!', type: 'error' });
-      }
+      await dispatch(createVoucher(formattedData)).unwrap();
+      setAlert({ message: 'Thêm giảm giá thành công!', type: 'success' });
       reset(); // Reset the form fields
-      setTimeout(() => navigate('/admin/listDiscounts'), 2000); // Navigate after 2 seconds
+      setTimeout(() => navigate('/admin/listVouchers'), 2000); // Navigate after 2 seconds
     } catch (error) {
-      setAlert({ message: 'Error saving discount!', type: 'error' });
-      console.error('Error saving discount:', error);
+      setAlert({ message: 'Error creating discount!', type: 'error' });
+      console.error('Error creating discount:', error);
     }
-  };;
+  };
 
   return (
     <main className="w-full flex-grow p-6">
       <div className="flex flex-wrap">
         <div className="w-full mt-6 pl-0 lg:pl-2">
-          {alert && (
+        {alert && (
             <div className="mb-4">
               <AlertCustomStyles message={alert.message} type={alert.type} />
             </div>
@@ -84,6 +65,7 @@ const EditDiscount: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="text"
+                 
                     {...register('code', {
                       required: "Mã giảm giá không được để trống",
                       pattern: {
@@ -101,18 +83,20 @@ const EditDiscount: React.FC = () => {
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Phần trăm giảm giá
+                      Giá giảm
                   </label>
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="number"
-                    {...register('discountNum', {
-                      required: "Phần trăm giảm giá không được để trống",
+                    {...register('voucherNum', {
+                      required: "Giá giảm không được để trống",
+                      
                       min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
+                    
                     })}
                   />
-                  {errors. discountNum && typeof errors. discountNum.message === 'string' && (
-                    <p className="text-red-500 text-xs">{errors. discountNum.message}</p>
+                  {errors.voucherNum && typeof errors. voucherNum.message === 'string' && (
+                    <p className="text-red-500 text-xs">{errors.voucherNum.message}</p>
                   )}
                 </div>
               </div>
@@ -127,7 +111,7 @@ const EditDiscount: React.FC = () => {
                       className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                       {...register('cateReady', { required: "Danh mục không được để trống" })}
                     >
-                      <option value="">Chọn danh mục</option>
+                      <option value="">Select a category</option>
                       {categories.map(category => (
                         <option key={category._id} value={category.name}>{category.name}</option>
                       ))}
@@ -183,10 +167,10 @@ const EditDiscount: React.FC = () => {
               <div className="mt-6 flex gap-2">
                 <button type="submit"
                  className="px-4 py-1 text-white font-light 
-                 tracking-wider bg-gray-900 rounded"onClick={handleSubmit(onSubmit)}
-                 >{ 'Cập nhật' }</button>
+                 tracking-wider bg-gray-900 rounded"
+                 onClick={handleSubmit(onSubmit)}>Thêm mới</button>
                 <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
-                  <a href="/admin/listDiscounts">Danh sách</a>
+                  <a href="/admin/listVouchers">Danh sách</a>
                 </button>
               </div>
             </form>
@@ -197,4 +181,4 @@ const EditDiscount: React.FC = () => {
   );
 };
 
-export default EditDiscount;
+export default addDiscount;
