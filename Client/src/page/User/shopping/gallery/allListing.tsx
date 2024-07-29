@@ -674,6 +674,8 @@ const allListing: React.FC = () => {
                       </div>
                       <div className="text-xs text-gray-500 ml-3">
                         {product.quantity > 0 ? `(${product.quantity})`: (" ")}
+
+                        
                       </div>
                     </div>
                   </div>
