@@ -48,7 +48,7 @@ app.use('/api', apiGeneral);
 
 // connectDb();
 
-const PORT = process.env.PORT || 5400;
+const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
