@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
@@ -7,45 +7,52 @@ import UserCoppyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
 import { useForm } from "react-hook-form";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { useDispatch } from "react-redux";
 import { registerApi } from "../../../services/authentication/auth.services";
+import { registerSuccess } from "../../../redux/actions";
+import axios from "axios";
 
 const Register: React.FC = () => {
-  const { register, getValues, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, getValues, formState } = useForm();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-  const naviagate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const registerUser = async (value: any) => {
+    setLoading(true);
+    setMessage(null);
 
-  const registerSubmit = async (value: any) => {
-    const res = await registerApi({
-      email: value?.email,
-      password: value?.password,
-      name: value?.name,
-    });
-    if (res) {
-      alert("Registration successful");
-    } else {
-      alert("Registration failed");
+    try {
+      console.log("Register values:", value);
+      const res = await registerApi({
+        email: value.email,
+        password: value.password,
+        name: value.name,
+      });
+
+      console.log("Register API response:", res);
+
+      setMessage(res?.msg || "Đăng ký thành công");
+
+      if (res?.accessToken) {
+        dispatch(registerSuccess(res));
+        navigate("/profile");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const errorData = err.response?.data;
+        const errorMessage = errorData?.msg || "Đã xảy ra lỗi không xác định";
+
+        setMessage(`Lỗi: ${status} - ${errorMessage}`);
+      } else {
+        setMessage("Đã xảy ra lỗi không xác định");
+      }
+    } finally {
+      setLoading(false);
     }
   };
-  // const registerSubmit = async (value: any) => {
-  //   console.log("value submit === ", value);
-  //   try {
-  //     console.log("start call api");
-  //     const res = await axios.post("http://10.82.60.85:3001/user/register", {
-  //       username: value?.username,
-  //       email: value?.email,
-  //       password: value?.password,
-  //       full_name: value?.name,
-  //     });
-
-  //     //   console.log("response === ", res);
-  //     console.log("end call api");
-  //   } catch (err) {
-  //     console.log("error === ", err);
-  //   }
-  // };
 
   return (
     <>
@@ -55,7 +62,12 @@ const Register: React.FC = () => {
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng Ký</h2>
           <p className="text-gray-600 mb-6 text-sm">Welcome back </p>
-          <form id="addLoginButton" action="" method="post" autoComplete="off">
+
+          <form
+            id="addLoginButton"
+            action=""
+            onSubmit={handleSubmit(registerUser)}
+          >
             <div className="space-y-2">
               <div>
                 <label htmlFor="name" className="text-gray-600 mb-2 block">
@@ -164,25 +176,25 @@ const Register: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center justify-between mt-6">
-              <div className="flex items-center">
-                {/* <input type="checkbox" name="remember" id="remember"
-                                    className="text-primary focus:ring-0 rounded-sm cursor-pointer" />
-                                <label htmlFor="remember" className="text-gray-600 ml-3 cursor-pointer">Remember me</label> */}
-              </div>
+              <div className="flex items-center"></div>
+              {loading && <div>Loading...</div>}{" "}
+              {message && (
+                <div style={{ color: "red", marginTop: "10px" }}>{message}</div>
+              )}
               <a href="#" className="text-primary">
                 Quên mật khẩu
               </a>
             </div>
             <div className="mt-4">
-              <Link to="/verifyOTP">
-                <button
-                  type="submit"
-                  className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium"
-                  // onClick={handleSubmit(registerSubmit)}
-                >
-                  ĐĂNG KÝ
-                </button>
-              </Link>
+              <button
+                type="submit"
+                className="block w-full py-2 text-center
+                 text-white bg-primary border border-primary rounded 
+                 hover:bg-transparent hover:text-primary transition uppercase 
+                 font-roboto font-medium"
+              >
+                ĐĂNG KÝ
+              </button>
             </div>
           </form>
 

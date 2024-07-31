@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import dropOneNav from "../../assets/images/icons/3d-printer-tool.svg";
 import dropTwoNav from "../../assets/images/icons/charge-nitendo-power-switch-svgrepo-com.svg";
@@ -6,8 +6,34 @@ import dropThreeNav from "../../assets/images/icons/digital-camera-photograph-sv
 import dropFourNav from "../../assets/images/icons/drone-quadcopter-top-svgrepo-com.svg";
 import dropFiveNav from "../../assets/images/icons/gpu-svgrepo-com.svg";
 import dropSixNav from "../../assets/images/icons/play-station-logo-svgrepo-com.svg";
-import Avatar  from '../../assets/images/avatar.png'
 const Navbar: React.FC = () => {
+  const [token, setToken] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
+  const [role, setRole] = useState<{ name: string } | null>(null);
+  useEffect(() => {
+    // Lấy token và name từ localStorage
+    const storedToken = localStorage.getItem("token");
+    const storedName = localStorage.getItem("name");
+    const storedRole = localStorage.getItem("role");
+
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
+    // Nếu lưu trữ name dưới dạng chuỗi đơn giản
+    if (storedName) {
+      setName(storedName); // Không cần JSON.parse
+    }
+    if (storedRole) {
+      try {
+        const parsedRole = JSON.parse(storedRole);
+        setRole(parsedRole);
+      } catch (error) {
+        console.error("Lỗi phân tích JSON:", error);
+      }
+    }
+  }, []);
+
   return (
     <nav className="bg-gray-800">
       <div className="container flex">
@@ -72,7 +98,9 @@ const Navbar: React.FC = () => {
                 alt="outdoor"
                 className="w-5 h-5 object-contain"
               />
-              <span className="ml-6 text-gray-600 text-sm">Máy ảnh kĩ thuật số</span>
+              <span className="ml-6 text-gray-600 text-sm">
+                Máy ảnh kĩ thuật số
+              </span>
             </a>
             <a
               href="#"
@@ -99,33 +127,69 @@ const Navbar: React.FC = () => {
             >
               Mua sắm
             </Link>
-            <a href="#" className="text-gray-200 hover:text-white transition">Dịch vụ</a>
-            <a href="#" className="text-gray-200 hover:text-white transition">Liên hệ</a>
+            <a href="#" className="text-gray-200 hover:text-white transition">
+              Dịch vụ
+            </a>
+            <a href="#" className="text-gray-200 hover:text-white transition">
+              Liên hệ
+            </a>
           </div>
 
           <div></div>
           <div className="px-8 py-4 flex items-center cursor-pointer relative group">
-          <span className="text-white">
-            <i className="fa-solid fa-user"></i>
-          </span>
-          <Link to='/login' className="capitalize ml-2 text-white">Đăng nhập |</Link>
-          <Link to='/register' className="capitalize ml-2 text-white">Đăng ký</Link>
-          {/* dropdown */}
-          <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
-            <Link
-                to="/admin/dashboard"
-              className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
-            >
-              <img
-                src={Avatar}
-                alt="Avatar"
-                className="w-10 h-5 object-contain"
-              />
-              <span className="ml-6 text-gray-600 text-lg">Admin</span>
-            </Link>
-     
+            <span className="text-white">
+              <i className="fa-solid fa-user"></i>
+            </span>
+            <div className="relative">
+              {token && name ? (
+                // Hiển thị thông tin người dùng nếu đã đăng nhập
+                <div className="flex items-center">
+                  <div className="relative group">
+                    <span className="ml-6 text-gray-600 text-lg">{name}</span>
+                    {/* dropdown */}
+                    <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
+                      >
+                        <img
+                          alt="Avatar"
+                          className="w-10 h-10 object-cover rounded-full"
+                        />
+                        <span className="ml-6 text-gray-600 text-lg">
+                          Profile
+                        </span>
+                      </Link>
+                      {role?.name === "admin" && (
+                        <Link
+                          to="/admin/dashboard"
+                          className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
+                        >
+                          <img
+                            alt="Admin"
+                            className="w-10 h-10 object-cover rounded-full"
+                          />
+                          <span className="ml-6 text-gray-600 text-lg">
+                            Admin
+                          </span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Hiển thị đăng nhập và đăng ký nếu chưa đăng nhập
+                <div>
+                  <Link to="/login" className="capitalize ml-2 text-white">
+                    Đăng nhập |
+                  </Link>
+                  <Link to="/register" className="capitalize ml-2 text-white">
+                    Đăng ký
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
           {/* <Link
             to="/login"
             className="text-gray-200 hover:text-white transition
