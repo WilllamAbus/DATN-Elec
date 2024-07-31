@@ -12,6 +12,12 @@ function formatCurrency(value:number) {
   return currencyFormatter.format(value, { code: 'VND', symbol: '' });
 }
 const ProductDetail:  React.FC = () => {
+    const [quantity, setQuantity] = useState(1);
+
+    const increaseQuantity = () => setQuantity(quantity + 1);
+    const decreaseQuantity = () => {
+        if (quantity > 1) setQuantity(quantity - 1);
+    };
     const [product, setProduct] = useState<any | null>(null);
     const [imgPreview, setImgPreview] = useState<string | null>(null);
     const { id } = useParams<{ id: string }>();
@@ -144,12 +150,22 @@ const ProductDetail:  React.FC = () => {
       </div>
 
       <div className="mt-4">
-          <h3 className="text-sm text-gray-800 uppercase mb-1">Số lượng</h3>
-          <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-              <div className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">-</div>
-              <div className="h-8 w-8 text-base flex items-center justify-center"></div>
-              <div className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">+</div>
-          </div>
+      <h3 className="text-sm text-gray-800 uppercase mb-1">Số lượng</h3>
+            <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
+                <div 
+                    className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
+                    onClick={decreaseQuantity}
+                >
+                    -
+                </div>
+                <div className="h-8 w-8 text-base flex items-center justify-center">{quantity}</div>
+                <div 
+                    className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
+                    onClick={increaseQuantity}
+                >
+                    +
+                </div>
+            </div>
       </div>
         
       <div className="mt-6 flex gap-3 border-b border-gray-200 pb-5 pt-5">
