@@ -1,10 +1,10 @@
 import React from 'react';
 
-import '../../../../assets/css/user.style.css'
+import '../../../../../assets/css/user.style.css'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 // import Avatar  from '../../../../assets/images/avatar.png'
-import listOne from "../../../../assets/images/products/product14.jpg";
-import listTwo from "../../../../assets/images/products/product15.png";
+import listOne from "../../../../../assets/images/products/product14.jpg";
+import listTwo from "../../../../../assets/images/products/product15.png";
 import Comment from '../../../../User/feature/details/comment/comment';
 const ProductDetail:  React.FC = () => {
 

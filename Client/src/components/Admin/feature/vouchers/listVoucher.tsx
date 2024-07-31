@@ -57,6 +57,7 @@ const DiscountList: React.FC = () => {
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HẠN SỬ DỤNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">DANH MỤC SẴN SÀNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">MÔ TẢ</th>
+                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Kích hoạt</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÀNH ĐỘNG</th>
               </tr>
             </thead>
@@ -72,6 +73,7 @@ const DiscountList: React.FC = () => {
                     ))}
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">{voucher.conditionActive}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">{voucher.isActive}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
                     <button
                       className="cta-btn btn text-red-500"
