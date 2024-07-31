@@ -77,7 +77,7 @@ const UserRoutes: RouteObject[] = [
     element: <UserAuction />,
   },
   {
-    path: 'detailProd',
+    path: 'detailProd/:id',
     element: <UserdetailsProd/>,
   },
   {

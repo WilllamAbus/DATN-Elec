@@ -12,6 +12,8 @@ const Arrivale : React.FC = () => {
       try {
         const productList = await listProduct();
         setProducts(productList);
+        console.log(productList);
+        
       } catch (error) {
        console.log(`lỗi: `,error);
       }
@@ -26,8 +28,8 @@ const Arrivale : React.FC = () => {
   {products.map((product, index) => (
     <div key={index} className="bg-white shadow rounded overflow-hidden group">
       <div className="relative">
-        <Link to="/detailProd">
-        <img src={product.img} alt={product.alt} className="w-full h-auto" />
+        <Link to={`/detailProd/${product._id}`}>
+        <img src={product.image} alt={product.alt} className="w-full h-auto" />
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition">
           {/* Optional icons */}
         </div>
@@ -36,7 +38,7 @@ const Arrivale : React.FC = () => {
       </div>
       <div className="pt-4 pb-3 px-4">
         <a href="/detailProd">
-          <h4 className="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{product.title}</h4>
+          <h4 className="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{product.name}</h4>
         </a>
         <div className="flex items-baseline mb-1 space-x-2">
           <p className="text-xl text-primary font-semibold">{formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ

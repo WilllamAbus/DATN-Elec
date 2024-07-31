@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Avatar from "../../../../assets/images/avatar.png";
+import Avatar from "../../../../../assets/images/avatar.png";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../../../../assets/css/user.style.css";
+import "../../../../../assets/css/user.style.css";
 const Comment = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
