@@ -81,6 +81,9 @@ const ProductDetail:  React.FC = () => {
               <span><i className="fa-solid fa-star"></i></span>
               <span><i className="fa-solid fa-star"></i></span>
           </div>
+
+
+          
           <div className="text-xs text-gray-500 ml-3">(150 Reviews)</div>
       </div>
       <div className="space-y-2">
