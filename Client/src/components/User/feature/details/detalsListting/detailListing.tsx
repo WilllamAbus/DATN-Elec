@@ -22,7 +22,6 @@ const ProductDetail:  React.FC = () => {
     const [imgPreview, setImgPreview] = useState<string | null>(null);
     const { id } = useParams<{ id: string }>();
 
-
     
     useEffect(() => {
         const fetchData = async () => {

@@ -241,7 +241,29 @@ const productsController = {
             res.status(500).json({ error: 'Server error' });
         }
     },
-
+    search: async (req, res) => {
+        try {
+            const keyword = req.params.keyword;
+            const result = await modelProduct.find({ name: { $regex: keyword, $options: 'i' } });
+            if (result && result.length > 0) {
+                res.status(200).json({
+                    data: result
+                });
+            } else {
+                console.error("No results found");
+                res.status(404).json({
+                    message: "No results found"
+                });
+            }
+        } catch (error) {
+            console.error('Error during search:', error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+    }
+    
 
 
 }

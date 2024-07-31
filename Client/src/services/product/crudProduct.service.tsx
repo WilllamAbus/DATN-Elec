@@ -65,3 +65,13 @@ export const updateProduct = async (id: string, productData: FormData) => {
     throw error;
   }
 };
+
+export const searchProduct = async (keyword:string) => {
+  try {
+    const response = await instance.get(`/product/search/${keyword}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
+  }
+};

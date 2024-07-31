@@ -22,6 +22,7 @@ const UserCheckoutpage = React.lazy(() => import('../page/User/shopping/cart/pay
 const UserPaymentpage = React.lazy(() => import('../page/User/shopping/cart/complate'));
 const UserProdfile = React.lazy(() => import('../page/User/shoppingMange/profile'));
 const UserWatchList =   React.lazy(() => import('../page/User/watchList/watchList'));
+const UserSearch =   React.lazy(() => import('../page/User/shopping/search/index'));
 
 const UserRoutes: RouteObject[] = [
   {
@@ -87,6 +88,10 @@ const UserRoutes: RouteObject[] = [
   {
     path: 'cart',
     element: <UserCartPage/>,
+  },
+  {
+    path: 'search/:keyword',
+    element: <UserSearch/>,
   },
   {
     path: 'checkout',
