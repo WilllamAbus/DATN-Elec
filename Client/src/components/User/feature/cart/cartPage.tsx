@@ -1,12 +1,15 @@
 import React from "react";
-
 import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-const cartPage: React.FC = () => {
+import Modal from "../../MoalButton";
+
+const CartPage: React.FC = () => {
+
+
   return (
     <>
-      {/* <!-- breadcrumb --> */}
+      {/* breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
           <i className="fa-solid fa-house"></i>
@@ -16,76 +19,41 @@ const cartPage: React.FC = () => {
         </span>
         <p className="text-gray-600 font-medium">Cart</p>
       </div>
-      {/* <!-- ./breadcrumb --> */}
+      {/* ./breadcrumb */}
 
-      {/* <!-- wrapper --> */}
+      {/* wrapper */}
       <div className="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
         <div className="col-span-8 border border-gray-200 p-4 rounded">
           <h3 className="text-lg font-medium capitalize mb-4">Giỏ hàng</h3>
           <div className="space-y-4">
-          <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
+            {/* Product Items */}
+            {['product1', 'product2', 'product3'].map((_, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <img src={listOne} alt={`product ${index + 1}`} className="w-28 h-10" />
+                  <h5 className="text-gray-800 font-medium">Italian shape</h5>
+                </div>
+                <p className="text-gray-600">x3</p>
                 <p className="text-gray-800 font-medium">20.000 vnđ</p>
                 <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
                   <i className="fa-sharp fa-solid fa-trash"></i>
                 </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
               </div>
-              <p className="text-gray-600">x3</p>
-                <p className="text-gray-800 font-medium">20.000 vnđ</p>
-                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                  <i className="fa-sharp fa-solid fa-trash"></i>
-                </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-                <p className="text-gray-800 font-medium">20.000 vnđ</p>
-                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                  <i className="fa-sharp fa-solid fa-trash"></i>
-                </button>
-            </div>
+            ))}
           </div>
         </div>
 
         <div className="col-span-4 border border-gray-200 p-4 rounded">
-          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">
-            Tổng thanh toán
-          </h4>
-
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
+          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">Tổng thanh toán</h4>
+          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
             <p>Thanh toán</p>
             <p>128.000 vnđ</p>
           </div>
-
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
+          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
             <p>Vận chuyển</p>
             <p>Miễn phí</p>
           </div>
-
-          {/* <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>Discount</p>
-            <p>128.000 vnđ</p>
-          </div> */}
-
-          <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
+          <div className="flex justify-between text-gray-800 font-medium py-3 uppercase">
             <p className="font-semibold">Tổng cộng</p>
             <p>128.000 vnđ</p>
           </div>
@@ -97,11 +65,12 @@ const cartPage: React.FC = () => {
           >
             Thanh toán
           </a>
+            <br/>
+          <Modal/>
         </div>
       </div>
-    
     </>
   );
 };
 
-export default cartPage;
+export default CartPage;
