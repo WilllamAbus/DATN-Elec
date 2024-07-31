@@ -630,6 +630,8 @@ const search: React.FC = () => {
             </div>
           </div>
 
+
+                    
           <h1 className="text-center text-3xl">Từ khóa tìm kiếm: {keyword}</h1>
 
           {(keyword ?? "").length > 0 && (
