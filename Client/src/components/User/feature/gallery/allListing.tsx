@@ -634,7 +634,7 @@ const allListing: React.FC = () => {
                 className="bg-white shadow rounded overflow-hidden group"
               >
                 <div className="relative">
-                  <Link to="/detailProd">
+                  <Link to={`/detailProd/${product._id}`}>
                     <img
                       src={product.image}
                       alt="product 1"
