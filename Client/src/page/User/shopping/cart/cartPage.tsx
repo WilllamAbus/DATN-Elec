@@ -7,7 +7,7 @@ import UserCoppyright from "../../../../components/User/copyright";
 import UserCartPage from "../../../../components/User/feature/cart/cartPage"
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import UsercartPage from '../../../../components/User/feature/cart/cartPage'
+
 const cartPage: React.FC = () => {
   return (
     <>
