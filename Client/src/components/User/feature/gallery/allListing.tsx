@@ -669,7 +669,7 @@ const allListing: React.FC = () => {
                         ))}
                       </div>
                       <div className="text-xs text-gray-500 items-center m-3">
-                        {product.quantity > 0 ? `(${product.quantity})`: (" ")}
+                      ({product?.view} Lượt xem)
                       </div>
                   </div>
                 </div>

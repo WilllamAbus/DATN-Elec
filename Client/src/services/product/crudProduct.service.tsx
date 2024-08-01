@@ -75,3 +75,11 @@ export const searchProduct = async (keyword:string) => {
     throw error;
   }
 };
+export const upViewProduct = async (id: string) => {
+  const response = await instance.put(`/product/upView/${id}`, {}, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};

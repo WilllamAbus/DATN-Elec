@@ -52,7 +52,7 @@ const Arrivale : React.FC = () => {
               <span key={i}><i className="fa-solid fa-star"></i></span>
             ))}
           </div>
-          <div className="text-xs text-gray-500 items-center m-3">{product.quantity > 0 ? `(${product.quantity})`: (" ")}
+          <div className="text-xs text-gray-500 items-center m-3"> ({product?.view} Lượt xem)
           </div>
         </div>
       </div>

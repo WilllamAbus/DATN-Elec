@@ -262,7 +262,36 @@ const productsController = {
                 error: error.message
             });
         }
+    },
+
+    upView: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const product = await modelProduct.findById(id);
+    
+            if (!product) {
+                console.error('Product not found');
+                return res.status(404).json({
+                    message: 'Product not found'
+                });
+            }
+    
+            product.view = (product.view || 0) + 1;
+            await product.save();
+    
+            res.status(200).json({
+                message: 'View count incremented successfully',
+                data: product
+            });
+        } catch (error) {
+            console.error('Error during view count increment:', error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
     }
+    
     
 
 
