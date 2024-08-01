@@ -8,28 +8,37 @@ import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useSelector, useDispatch } from "react-redux";
-import { getProfile } from "../../../services/authentication/auth.services";
+import { getProfile } from "~/services/authentication/auth.services";
 import { RootState } from "../../../redux/store";
 import type { UserProfile } from "../../../types/user";
-
 import EditProfile from "./edit-profile";
 import Info from "./info";
+// interface UserProfile {
+//   name: string;
+//   email: string;
+//   birthday: string;
+//   gender: string;
+//   phone: string;
+// }
+// interface info {
+//   profile: UserProfile;
+// }
 
-const UserProfile: React.FC = (profiles) => {
+const ProfileUse: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [view, setView] = useState<"info" | "edit">("info");
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
 
-  const getUserInfo = async () => {
-    try {
-      const res = await getProfile();
-      setProfile(res);
-    } catch (err) {
-      console.log("err === ", err);
-    }
-  };
+  // const getUserInfo = async () => {
+  //   try {
+  //     const res = await getProfile();
+  //     setProfile(res);
+  //   } catch (err) {
+  //     console.log("err === ", err);
+  //   }
+  // };
 
   if (!profile) return <p>Loading...</p>;
 
@@ -110,7 +119,7 @@ const UserProfile: React.FC = (profiles) => {
                 className={`relative hover:text-primary block capitalize transition ${
                   view === "info" ? "text-primary" : ""
                 }`}
-                onClick={() => setView("info")}
+                onClick={() => setView("edit")}
               >
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa fa-address-card"></i>
@@ -176,8 +185,8 @@ const UserProfile: React.FC = (profiles) => {
         </div>
         {/* ./sidebar */}
         {/* Info */}
-        {view === "info" && <Info profile={profile} />}
-        {/* {view === "edit" && <EditProfile profile={profile} />} */}
+        {view === "info" && <Info profiles={profile} />}
+        {view === "edit" && <EditProfile profile={profile} />}
         {/* ./info */}
       </div>
       {/* ./wrapper */}
@@ -187,4 +196,4 @@ const UserProfile: React.FC = (profiles) => {
   );
 };
 
-export default UserProfile;
+export default ProfileUse;

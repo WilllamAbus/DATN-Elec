@@ -1,11 +1,41 @@
-import React from "react";
-import UserProfile from "./profile";
+import React, { useEffect, useState } from "react";
+import { UserProfile } from "../../../types/user";
+import { getProfile } from "~/services/authentication/auth.services";
 
+// interface UserProfile {
+//   name: string;
+//   email: string;
+//   birthday: string;
+//   gender: string;
+//   phone: string;
+// }
 interface info {
-  profile: UserProfile;
+  profiles: UserProfile;
 }
 
-const info: React.FC<info> = ({ profile }) => (
+
+const info: React.FC<info> = ({profiles}) => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  const getUserInfo = async () => {
+    try {
+      const res = await getProfile();
+      setProfile(res);
+    } catch (err) {
+      console.log("err === ", err);
+    }
+  };
+
+  if (!profile) return <p>Loading...</p>;
+
+return (
+
+
+
   <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
     <h4 className="text-lg font-medium capitalize mb-4">Thông tin cá nhân</h4>
     <div className="space-y-4">
@@ -82,6 +112,7 @@ const info: React.FC<info> = ({ profile }) => (
       </div>
     </div>
   </div>
-);
+)
+}
 
 export default info;

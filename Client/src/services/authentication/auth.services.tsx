@@ -7,13 +7,19 @@ export interface LoginResponse {
   roles: { name: string }[]; // Thay đổi để chứa tên vai trò
   name: string;
 }
-
 export interface RegisterResponse {
   user?: any;
   msg?: string;
   accessToken?: string;
 }
-
+export interface Profile {
+  name: string;
+  email: string;
+  birthday: string;
+  gender: string;
+  phone: string;
+  address?: string;
+}
 const loginApi = async ({ email, password }: Login) => {
   const res = await request({
     path: "auth/login",
@@ -36,7 +42,23 @@ const getProfile = async (): Promise<UserProfile> => {
 
   return res as UserProfile;
 };
+const updateProfile = async (profileData: UserProfile): Promise<UserProfile> => {
+  try {
+    const res = await request({
+      path: "auth/profile",
+      method: "PUT",
+      data: profileData,
+    });
 
+    return res as UserProfile;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response) {
+      throw err.response.data;
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
 const registerApi = async ({
   email,
   password,
@@ -56,13 +78,13 @@ const registerApi = async ({
 
     return res;
   } catch (err) {
-    // Truyền lỗi cho component xử lý
+  
     if (axios.isAxiosError(err) && err.response) {
-      // Ném lỗi với thông tin phản hồi từ server
+      
       throw err.response.data;
     } else {
       throw new Error("An unknown error occurred");
     }
   }
 };
-export { loginApi, getProfile, registerApi };
+export { loginApi, getProfile, registerApi,updateProfile };

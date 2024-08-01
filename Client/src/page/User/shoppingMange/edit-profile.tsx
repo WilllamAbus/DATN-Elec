@@ -1,17 +1,25 @@
 import React from "react";
-import UserProfile from "./profile";
+import { UserProfile } from "../../../types/user";
 
+// interface UserProfile {
+//   name: string;
+//   email: string;
+//   birthday: string;
+//   gender: string;
+//   phone: string;
+// }
 interface editProfile {
-  profiles: UserProfile;
+  profile: UserProfile;
 }
 
-const editProfile: React.FC<editProfile> = ({ profiles }) => (
+const editProfile: React.FC<editProfile> = ({profile}) => {
+return (
   <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
     <h4 className="text-lg font-medium capitalize mb-4">Cập Nhật Thông Tin</h4>
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="first">Tên đệm</label>
+        <label htmlFor="first">Tên đệm</label>
           <input type="text" name="first" id="first" className="input-box" />
         </div>
         <div>
@@ -49,6 +57,6 @@ const editProfile: React.FC<editProfile> = ({ profiles }) => (
       </div>
     </div>
   </div>
-);
-
+)
+}
 export default editProfile;
