@@ -3,14 +3,18 @@ import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useSelector, useDispatch } from "react-redux";
-import { getProfile } from "~/services/authentication/auth.services";
+import {
+  getProfile,
+  logout,
+} from "../../../services/authentication/auth.services";
 import { RootState } from "../../../redux/store";
 import type { UserProfile } from "../../../types/user";
+import { useNavigate } from "react-router-dom";
 import EditProfile from "./edit-profile";
 import Info from "./info";
 // interface UserProfile {
@@ -27,19 +31,28 @@ import Info from "./info";
 const ProfileUse: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [view, setView] = useState<"info" | "edit">("info");
-  // useEffect(() => {
-  //   getUserInfo();
-  // }, []);
-
-  // const getUserInfo = async () => {
-  //   try {
-  //     const res = await getProfile();
-  //     setProfile(res);
-  //   } catch (err) {
-  //     console.log("err === ", err);
-  //   }
-  // };
-
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+  const navigate = useNavigate();
+  const getUserInfo = async () => {
+    try {
+      const res = await getProfile();
+      setProfile(res);
+    } catch (err) {
+      console.log("err === ", err);
+    }
+  };
+  const handleLogout = async () => {
+    try {
+      await logout(); // Gọi API đăng xuất
+      // Xóa cookie hoặc localStorage nếu cần
+      // Redirect người dùng về trang đăng nhập hoặc trang chủ
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
   if (!profile) return <p>Loading...</p>;
 
   return (
@@ -174,6 +187,7 @@ const ProfileUse: React.FC = () => {
               <a
                 href="#"
                 className="relative hover:text-primary block font-medium capitalize transition"
+                onClick={handleLogout}
               >
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa-solid fa-right-from-bracket"></i>

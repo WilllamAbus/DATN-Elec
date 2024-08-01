@@ -239,20 +239,16 @@ const authController = {
     }
   },
   updateProfile: async (req, res) => {
-    const { name, birthday, gender, phone } = req.body;
-    const id = req.params.id;
+    const { name, birthday, gender, phone, address } = req.body;
+    const userId = req.user.id; // Lấy ID người dùng từ token
 
-    console.log("ID từ URL:", id);
+    console.log("ID từ token:", userId);
     // Ghi log dữ liệu gửi lên
     console.log("Dữ liệu gửi lên:", req.body);
 
     try {
-      // Kiểm tra quyền cập nhật
-      // Đây là nơi bạn có thể thêm logic để kiểm tra quyền cập nhật,
-      // nhưng hiện tại bạn đã bỏ qua middleware verifyToken, vì vậy không cần kiểm tra quyền nữa
-
       // Tìm và cập nhật người dùng
-      let user = await User.findById(id);
+      let user = await User.findById(userId); // Sử dụng userId thay vì id
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -262,7 +258,7 @@ const authController = {
       if (birthday) user.birthday = birthday;
       if (gender) user.gender = gender;
       if (phone) user.phone = phone;
-
+      if (address) user.phone = address;
       // Lưu thông tin đã cập nhật
       const updatedUser = await user.save();
 
@@ -276,7 +272,6 @@ const authController = {
       });
     }
   },
-
   // getProfile: async (req, res) => {
   //   try {
   //     const userId = req.user.id;

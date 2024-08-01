@@ -20,11 +20,10 @@ router.get(
   authController.getProfile
 );
 router.put(
-  "/profile/:id",
+  "/profile",
   middlewareController.verifyToken,
   authController.updateProfile
 );
-
 //very
 router.get("/verifyEmail", authController.verifyEmail);
 router.post("/resendEmail", authController.resendEmail);

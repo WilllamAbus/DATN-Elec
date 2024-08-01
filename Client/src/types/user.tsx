@@ -33,10 +33,10 @@ export interface UserProfile {
   VerifiedEmail: boolean;
   status: string;
   roles: string[];
-  birthday?: string;
-  gender?: string;
-  phone?: string;
-  address?: string;
+  birthday: string;
+  gender: string;
+  phone: string;
+  address: string;
   createdAt: string;
   updatedAt: string;
 }

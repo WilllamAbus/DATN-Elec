@@ -9,7 +9,7 @@ const middlewareController = {
         if (err) {
           res.status(403).json("Token is not valid");
         }
-        console.log("Decoded User:", user);
+
         req.user = user;
         next();
       });

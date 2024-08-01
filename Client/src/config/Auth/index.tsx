@@ -12,17 +12,17 @@ const request = async ({
   try {
     const cookie = new Cookies();
     const token = cookie.get("token");
-    console.log("Token from cookies:", token);
-    // console.log("Request Details:", {
-    //   method: method,
-    //   baseURL: BASE_URL,
-    //   url: path,
-    //   data: data,
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     ...headers,
-    //   },
-    // });
+
+    console.log("Request Details:", {
+      method: method,
+      baseURL: BASE_URL,
+      url: path,
+      data: data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...headers,
+      },
+    });
 
     const res = await axios({
       method: method,

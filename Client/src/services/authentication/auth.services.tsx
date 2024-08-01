@@ -12,14 +12,14 @@ export interface RegisterResponse {
   msg?: string;
   accessToken?: string;
 }
-export interface Profile {
-  name: string;
-  email: string;
-  birthday: string;
-  gender: string;
-  phone: string;
-  address?: string;
-}
+// export interface Profile {
+//   name: string;
+//   email: string;
+//   birthday: string;
+//   gender: string;
+//   phone: string;
+//   address?: string;
+// }
 const loginApi = async ({ email, password }: Login) => {
   const res = await request({
     path: "auth/login",
@@ -42,7 +42,18 @@ const getProfile = async (): Promise<UserProfile> => {
 
   return res as UserProfile;
 };
-const updateProfile = async (profileData: UserProfile): Promise<UserProfile> => {
+
+const logout = async (): Promise<UserProfile> => {
+  const res = await request({
+    path: "auth/logout",
+    method: "POST",
+  });
+
+  return res as UserProfile;
+};
+const updateProfile = async (
+  profileData: UserProfile
+): Promise<UserProfile> => {
   try {
     const res = await request({
       path: "auth/profile",
@@ -78,13 +89,11 @@ const registerApi = async ({
 
     return res;
   } catch (err) {
-  
     if (axios.isAxiosError(err) && err.response) {
-      
       throw err.response.data;
     } else {
       throw new Error("An unknown error occurred");
     }
   }
 };
-export { loginApi, getProfile, registerApi,updateProfile };
+export { loginApi, getProfile, registerApi, updateProfile, logout };
