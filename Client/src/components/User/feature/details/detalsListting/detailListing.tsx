@@ -13,10 +13,10 @@ function formatCurrency(value:number) {
 }
 const ProductDetail:  React.FC = () => {
     const [quantity, setQuantity] = useState(1);
-
-    const increaseQuantity = () => setQuantity(quantity + 1);
+   
+    const increaseQuantity = () => setQuantity(prev => prev + 1);
     const decreaseQuantity = () => {
-        if (quantity > 1) setQuantity(quantity - 1);
+        if (quantity > 1) setQuantity(prev => prev - 1);
     };
     const [product, setProduct] = useState<any | null>(null);
     const [imgPreview, setImgPreview] = useState<string | null>(null);
@@ -44,7 +44,11 @@ const ProductDetail:  React.FC = () => {
 
         fetchData();
     }, [id]);
-
+    const calculatePrice = () => {
+        if (!product) return 0;
+        const basePrice = product.price * (1 - product.discount / 100);
+        return basePrice * quantity;
+    };
     return (
         <>
       
@@ -66,7 +70,7 @@ const ProductDetail:  React.FC = () => {
   <div >
       {imgPreview && (
                 <div >
-                  <img src={imgPreview} alt="Image Preview" className="w-full" />
+                  <img src={imgPreview} alt="Image Preview"     style={{ width: "450px", height: "450px" }}/>
                 </div>
               )}
       {/* <div className="grid grid-cols-5 gap-4 mt-4">
@@ -101,7 +105,7 @@ const ProductDetail:  React.FC = () => {
           </p>
       </div>
       <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
-          <p className="text-xl text-primary font-semibold">{formatCurrency(product?.price * ( 1 - product?.discount / 100))}VNĐ</p>
+          <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
           <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)}</p>
       </div>
 
@@ -182,20 +186,6 @@ const ProductDetail:  React.FC = () => {
           </a>
       </div>
 
-      <div className="flex gap-3 mt-4">
-          <a href="#" className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center">
-              <i className="fa-brands fa-facebook-f"></i>
-          </a>
-          <a href="#" className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center">
-              <i className="fa-brands fa-twitter"></i>
-          </a>
-          <a href="#" className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center">
-              <i className="fa-brands fa-linkedin-in"></i>
-          </a>
-          <a href="#" className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center">
-              <i className="fa-brands fa-pinterest"></i>
-          </a>
-      </div>
   </div>
 </div>
             
@@ -209,35 +199,29 @@ const ProductDetail:  React.FC = () => {
 
             {/* description */}
             <div className="container pb-16">
-                <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium">Product details</h3>
+                <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium">Chi tiết sản phẩm</h3>
                 <div className="w-3/5 pt-6">
                     <div className="text-gray-600">
                         <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm mt-6">
                             <tbody>
                                 <tr>
-                                    <td className="py-2">Category</td>
-                                    <td className="py-2">A</td>
+                                    <td className="py-2">Brand</td>
+                                    <td className="py-2">{product?.brand}</td>
                                 </tr>
                                 <tr>
-                                    <td className="py-2">Product Code</td>
-                                    <td className="py-2">B</td>
+                                    <td className="py-2">Description</td>
+                                    <td className="py-2">{product?.description}</td>
                                 </tr>
-                                <tr>
-                                    <td className="py-2">Size</td>
-                                    <td className="py-2">C</td>
-                                </tr>
+                            
                                 <tr>
                                     <td className="py-2">Weight</td>
-                                    <td className="py-2">D</td>
+                                    <td className="py-2">{product?.weight}</td>
                                 </tr>
                                 <tr>
                                     <td className="py-2">Color</td>
-                                    <td className="py-2">E</td>
+                                    <td className="py-2">{product?.color}</td>
                                 </tr>
-                                <tr>
-                                    <td className="py-2">Material</td>
-                                    <td className="py-2">F</td>
-                                </tr>
+                            
                             </tbody>
                         </table>
                     </div>
