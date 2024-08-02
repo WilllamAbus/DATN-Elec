@@ -1,17 +1,20 @@
 import axios from "axios";
 
-console.log("Axios instance configuration");
+// console.log("Axios instance configuration");
 
-console.log(import.meta.env.VITE_API_URL);
+// console.log(import.meta.env.VITE_API_URL);
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 instance.interceptors.request.use(
   function (config) {
     const token = window.localStorage.getItem("persist:root");
-    console.log("Stored token:", token);
+    // console.log("Stored token:", token);
 
     if (token) {
       try {
@@ -56,5 +59,6 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+console.log('Firebase API Key:', import.meta.env.VITE_APP_FIREBASE_API_KEY);
 
 export default instance;

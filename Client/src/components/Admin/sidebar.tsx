@@ -127,7 +127,7 @@ const Sidebar: React.FC = () => {
                 Điều kiện đấu giá
               </a>
               <a
-                href="/admin/listDiscounts"
+                href="/admin/listVouchers"
                 className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
               >
                 <i className="fas fa-calendar mr-3"></i>

@@ -1,12 +1,13 @@
-import { combineReducers } from '@reduxjs/toolkit';
-import categoriesSlice from './categories/categoriesSlice';
-// Import other reducers as needed
-
+import { combineReducers } from "@reduxjs/toolkit";
+// import categoriesSlice from "./categories/categoriesSlice";
+import productsReducer from "./products/productsSlice";
+// import discountReducer from './discount/discountSlice'
 const rootReducer = combineReducers({
-  categories: categoriesSlice,
-  // Add other reducers here
+  // categories: categoriesSlice,
+  products: productsReducer,
+  // discount:discountReducer
 });
 
-export type RootState = ReturnType<typeof rootReducer>; // Type for the store's state
+export type RootState = ReturnType<typeof rootReducer>;
 
 export default rootReducer;

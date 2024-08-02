@@ -19,7 +19,8 @@ import createSagaMiddleware from "redux-saga";
 import categoriesSlice from "./categories/categoriesSlice";
 import authWatch from "./saga/Auth";
 import AuthReducer from "./reducers/Auth";
-
+import voucherReducer from './discount/voucherSlice'
+// Cấu hình Redux Persist
 const persistConfig = {
   key: "root",
   storage,
@@ -28,16 +29,29 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, authReducer);
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
-  reducer: {
-    auth: persistedReducer,
-    categories: categoriesSlice,
-    authReducers: authReducer,
-    AuthReducer: AuthReducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }).concat(sagaMiddleware),
+//   reducer: {
+//     auth: persistedReducer,
+//     categories: categoriesSlice,
+//     authReducers: authReducer,
+//     AuthReducer: AuthReducer,
+//   },
+//   middleware: (getDefaultMiddleware) =>
+//     getDefaultMiddleware({
+//       serializableCheck: false,
+//     }).concat(sagaMiddleware),
+// });
+    reducer: {
+        auth: persistedReducer,
+        categories: categoriesSlice,
+        AuthReducer: AuthReducer,
+        authReducers: authReducer,
+        voucher: voucherReducer,
+
+           },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }).concat(sagaMiddleware),
 });
 sagaMiddleware.run(authWatch);
 export const persistor = persistStore(store);

@@ -1,17 +1,17 @@
 // src/services/apiService.ts
 
-import axios from 'axios';
-import { environment } from '../../environments/environment.prod';
-import { Category } from '../../types/Categories.d'; // Adjust the import path
 
+import { environment } from '../../environments/environment.prod';
+import { Category } from '../../types/Categories.d'; 
+import axiosInstance from '../axios';
 const API_BASE_URL = `${environment.url}`;
 
 export const createCategory = async (formData: FormData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/addCate`, formData, {
+    const response = await axiosInstance.post(`${API_BASE_URL}/addCate`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data; // Assuming response.data contains the success message
+    return response.data; 
   } catch (error) {
     throw new Error((error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to create category');
   }
@@ -19,7 +19,7 @@ export const createCategory = async (formData: FormData) => {
 
 export const getAllCategories = async (): Promise<Category[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getAllCate`);
+    const response = await axiosInstance.get(`${API_BASE_URL}/getAllCate`);
     return response.data;
   } catch (error: any) {
     throw new Error(`Error fetching categories: ${error.message}`);
@@ -28,7 +28,7 @@ export const getAllCategories = async (): Promise<Category[]> => {
 
 export const getCategoryById = async (id: string): Promise<Category> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getCate/${id}`);
+    const response = await axiosInstance.get(`${API_BASE_URL}/getCate/${id}`);
     return response.data;
   } catch (error: any) {
     throw new Error(`Error fetching category: ${error.message}`);
@@ -37,7 +37,7 @@ export const getCategoryById = async (id: string): Promise<Category> => {
 
 export const updateCategory = async (id: string, formData: FormData): Promise<Category> => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateCate/${id}`, formData, {
+    const response = await axiosInstance.put(`${API_BASE_URL}/updateCate/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -53,7 +53,7 @@ export const updateCategory = async (id: string, formData: FormData): Promise<Ca
 
 export const updateCategoryService = async (id: string, formData: FormData) => {
   try {
-    const response = await axios.put(`http://localhost:4000/api/categories/updateCate/${id}`, formData, {
+    const response = await axiosInstance.put(`http://localhost:4000/api/categories/updateCate/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -66,7 +66,7 @@ export const updateCategoryService = async (id: string, formData: FormData) => {
 
 export const deleteCategory = async (_id: string): Promise<{ message: string }> => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/delete/${_id}`);
+    const response = await axiosInstance.delete(`${API_BASE_URL}/delete/${_id}`);
     return response.data;
   } catch (error: any) {
     throw new Error(`Error deleting category: ${error.message}`);

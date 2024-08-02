@@ -1,94 +1,40 @@
-import React from "react";
-import prodOne from "../../assets/images/products/product2.png";
-import prodTwo from "../../assets/images/products/product15.png";
-import prodThree from "../../assets/images/products/product12.jpg";
-import prodFour from "../../assets/images/products/product12.png";
-
-import prodFive from "../../assets/images/products/product2.png";
-import prodSix from "../../assets/images/products/product15.png";
-import prodSeven from "../../assets/images/products/product12.jpg";
-import prodEight from "../../assets/images/products/product12.png";
+import React, { useEffect, useState } from "react";
+import { listProduct } from "../../services/product/crudProduct.service";
+import currencyFormatter from 'currency-formatter';
 import { Link } from "react-router-dom";
+function formatCurrency(value:number) {
+  return currencyFormatter.format(value, { code: 'VND', symbol: '' });
+}
+
 
 const ProductSection: React.FC = () => {
-  return (
+  const [products, setProducts] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const productList = await listProduct();
+        setProducts(productList);
+      } catch (error) {
+       console.log(`lỗi: `,error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+  
+    return (
     <div className="container pb-16">
       <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
         Đề xuất cho bạn
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {[
-          {
-            image: prodOne,
-            name: "Asus Tuf Gamming",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodTwo,
-            name: "QUẠT TẢN NHIỆT",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodThree,
-            name: "Quạt tản nhiệt",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodFour,
-            name: "Card đồ họa",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodFive,
-            name: "Asus Tuf Gamming",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodSix,
-            name: "Quạt tản nhiệt",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodSeven,
-            name: "Quạt tản nhiệt",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-          {
-            image: prodEight,
-            name: "Card đồ họa",
-            price: "450.000 vnđ",
-            originalPrice: "555.900 vnđ",
-            rating: 5,
-            reviews: 150,
-          },
-        ].map((product, index) => (
+      {products.map((product, index) => (
           <div
             key={index}
             className="bg-white shadow rounded overflow-hidden group"
           >
             <div className="relative">
-              <Link to="/detailProd">
+              <Link to={`/detailProd/${product._id}`}>
                 <img
                   src={product.image}
                   alt={`product ${index + 1}`}
@@ -105,10 +51,10 @@ const ProductSection: React.FC = () => {
               </a>
               <div className="flex items-baseline mb-1 space-x-2">
                 <p className="text-xl text-primary font-semibold">
-                  {product.price}
+                {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
                 </p>
                 <p className="text-sm text-gray-400 line-through">
-                  {product.originalPrice}
+                  {formatCurrency(product.price)}
                 </p>
               </div>
               <div className="flex items-center">
@@ -119,8 +65,8 @@ const ProductSection: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                <div className="text-xs text-gray-500 ml-3">
-                  ({product.reviews})
+                <div className="text-xs text-gray-500 items-center m-3">
+                {product.quantity > 0 ? `(${product.quantity})`: (" ")}
                 </div>
               </div>
             </div>

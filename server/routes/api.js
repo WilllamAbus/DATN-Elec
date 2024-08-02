@@ -5,6 +5,7 @@ const { homepage, message } = require("../controler/home");
 const { verifyOtp, regisUser } = require("../controler/user.controller");
 // middleware
 const { checkPermission } = require("../middleware/role.base");
+const middlewareController = require("../middleware/auth");
 const upload = require('../middleware/multer.middle');
 const { createRole } = require("../controler/role.controller");
 // const middlewareController = require('../middleware/auth');
@@ -16,6 +17,10 @@ const {
   updateCategoryController,
   deleteCategoryController,
 } = require("../controler/categories.controller");
+
+
+// discount
+const voucherController = require('../controler/voucher.controller')
 
 const router = express.Router();
 // Test
@@ -30,9 +35,21 @@ router.post("/addRole", checkPermission, createRole);
 
 // Categoris
 
-router.post("/addCate", upload.single("imgCate"), uploadCategory);
+router.post("/addCate",middlewareController.verifyTokenAdminAuth, upload.single("imgCate"), uploadCategory);
 router.get("/getAllCate", getAllCategoriesController);
 router.get("/getCate/:id", getCategoryByIdController);
-router.put("/updateCate/:id", upload.single("imgCate"), updateCategoryController);
-router.delete("/delete/:id", deleteCategoryController);
+router.put("/updateCate/:id",middlewareController.verifyTokenAdminAuth, upload.single("imgCate"), updateCategoryController);
+router.delete("/delete/:id",middlewareController.verifyTokenAdminAuth, deleteCategoryController);
+
+
+// discount
+router.post("/addVoucher",middlewareController.verifyTokenAdminAuth, voucherController.createVoucher);
+router.get("/getAllVoucher", voucherController.getAllVoucher);
+router.get("/getVoucher/:id", voucherController.getVoucherById);
+router.put("/updateVoucher/:id",middlewareController.verifyTokenAdminAuth, voucherController.updateVoucher);
+router.delete("/deleteVoucher/:id",middlewareController.verifyTokenAdminAuth, voucherController.deleteVoucher);
+
+
+
+
 module.exports = router;
