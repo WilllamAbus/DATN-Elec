@@ -290,12 +290,67 @@ const productsController = {
                 error: error.message
             });
         }
+    },
+    price: async (req, res) => {
+        try {
+            const price = req.params.price;
+            let minPrice = 0; // Giá tối thiểu, mặc định là 0
+            let maxPrice;
+    
+            switch (price) {
+                case 'price-0':
+                    maxPrice = 500000; // Dưới 500000
+                    break;
+                case 'price-1':
+                    minPrice = 500000;
+                    maxPrice = 1000000; // Từ 500000 đến dưới 2000000
+                    break;
+                case 'price-2':
+                    minPrice = 1000000;
+                    maxPrice = 3000000; // Từ 2000000 đến dưới 10000000
+                    break;
+                case 'price-3':
+                    minPrice = 3000000;
+                    maxPrice = 5000000; // Từ 10000000 đến dưới 14000000
+                    break;
+                case 'price-4':
+                    minPrice = 5000000; // Trên 14000000
+                    break;
+                default:
+                    return res.status(400).json({
+                        message: "Khoảng giá không hợp lệ"
+                    });
+            }
+    
+            const query = { price: { $gte: minPrice } };
+            if (maxPrice) {
+                query.price.$lt = maxPrice;
+            }
+    
+            const result = await modelProduct.find(query);
+    
+            if (result.length > 0) {
+                res.status(200).json({
+                    data: result
+                });
+            } else {
+                console.error("Không tìm thấy sản phẩm nào trong khoảng giá này");
+                res.status(404).json({
+                    message: "Không tìm thấy sản phẩm nào trong khoảng giá này"
+                });
+            }
+        } catch (error) {
+            console.error('Lỗi khi tìm kiếm sản phẩm:', error);
+            res.status(500).json({
+                message: 'Lỗi máy chủ nội bộ',
+                error: error.message
+            });
+        }
+    
     }
-    
-    
-
 
 }
+
 
 productsController.upload = upload.single('image');
 

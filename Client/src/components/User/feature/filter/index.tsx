@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link } from "react-router-dom";
-import { searchProduct } from "../../../../services/product/crudProduct.service";
+import { loadPrice } from "../../../../services/product/crudProduct.service";
 import currencyFormatter from "currency-formatter";
 import Filter from "../../filter";
 
@@ -12,14 +12,35 @@ function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
 const search: React.FC = () => {
-  const { keyword } = useParams<{ keyword: string }>();
+  const { price } = useParams<{ price: string }>();
   const [products, setProducts] = useState<any[]>([]);
+  let key : string;
+  switch (price) {
+    case 'price-0':
+        key = 'Dưới 500.000'; 
+        break;
+    case 'price-1':
+        key = '500.000 VNĐ - 1.000.000 VNĐ'; 
+        break;
+    case 'price-2':
+        key = '1.000.000 VNĐ - 3.000.000 VNĐ';
+        break;
+    case 'price-3':
+        key = '3.000.000 VNĐ - 5.000.000 VNĐ';
+        break;
+    case 'price-4':
+        key = 'Trên 5.000.000 VNĐ'; 
+        break;
+    default:
+        key = 'Khoảng giá không hợp lệ';
+        break;
 
+}
   useEffect(() => {
     const fetchProducts = async () => {
-      if (keyword) {
+      if (price) {
         try {
-          const result = await searchProduct(keyword);
+          const result = await loadPrice(price);
           setProducts(result.data);
         } catch (error) {
           console.error("Error fetching search results:", error);
@@ -30,7 +51,7 @@ const search: React.FC = () => {
     };
 
     fetchProducts();
-  }, [keyword]);
+  }, [price]);
   return (
     <>
       {/* <!-- breadcrumb --> */}
@@ -481,8 +502,8 @@ const search: React.FC = () => {
             </div>
 
             <div className="pt-4">
-              <Filter/>
-            </div>
+            <Filter/>
+           </div>
 
             {/* <div className="pt-4">
               <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -613,9 +634,9 @@ const search: React.FC = () => {
 
 
                     
-          <h1 className="text-center text-3xl">Từ khóa tìm kiếm: {keyword}</h1>
+          <h1 className="text-center text-3xl">Khoản giá: {key}</h1>
 
-          {(keyword ?? "").length > 0 && (
+          {(price ?? "").length > 0 && (
             <div className="grid md:grid-cols-3 grid-cols-2 gap-6">
               {products.length > 0 ? (
                 products.map((product) => (

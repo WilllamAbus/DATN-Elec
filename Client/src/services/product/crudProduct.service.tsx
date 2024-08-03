@@ -83,3 +83,12 @@ export const upViewProduct = async (id: string) => {
   });
   return response.data;
 };
+export const loadPrice = async (price:string) => {
+  try {
+    const response = await instance.get(`/product/filter/${price}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
+  }
+};

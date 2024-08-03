@@ -1,4 +1,4 @@
-import React , { useEffect, useState } from "react";
+import React , { useEffect, useState} from "react";
 // import { Link } from 'react-router-dom';
 
 import "../../../../assets/css/user.style.css";
@@ -6,6 +6,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link } from "react-router-dom";
 import { listProduct } from "../../../../services/product/crudProduct.service";
 import currencyFormatter from 'currency-formatter';
+import Filter from "../../filter";
 function formatCurrency(value:number) {
   return currencyFormatter.format(value, { code: 'VND', symbol: '' });
 }
@@ -23,6 +24,8 @@ const allListing: React.FC = () => {
 
     fetchProducts();
   }, []);
+  
+
   return (
     <>
     
@@ -474,29 +477,8 @@ const allListing: React.FC = () => {
             </div>
 
             <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Giá
-              </h3>
-              <div className="mt-4 flex items-center">
-                <input
-                  type="text"
-                  name="min"
-                  id="min"
-                  className="w-full border-gray-300 
-                            focus:border-primary rounded focus:ring-0 px-3
-                             py-1 text-gray-600 shadow-sm"
-                  placeholder="min"
-                />
-                <span className="mx-3 text-gray-500">-</span>
-                <input
-                  type="text"
-                  name="max"
-                  id="max"
-                  className="w-full border-gray-300 focus:border-primary rounded focus:ring-0 px-3 py-1 text-gray-600 shadow-sm"
-                  placeholder="max"
-                />
-              </div>
-            </div>
+            <Filter/>
+           </div>
 
             {/* <div className="pt-4">
               <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -653,12 +635,26 @@ const allListing: React.FC = () => {
                     </h4>
                   </a>
                   <div className="flex items-baseline mb-1 space-x-2">
+                  {product.discount > 1 ? (
+                <div>
                     <p className="text-xl text-primary font-semibold">
-                    {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
+                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product.price)}
+                    </p>
+                </div>
+            ) : (
+                <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product.price)} VNĐ
+                </p>
+            )}
+                    {/* <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product.price)}VNĐ
                     </p>
                     <p className="text-sm text-gray-400 line-through">
                        {formatCurrency(product.price)}
-                    </p>
+                    </p> */}
                   </div>
                   <div className="flex items-center">
                       <div className="flex gap-1 text-sm text-yellow-400">

@@ -50,12 +50,20 @@ const ProductSection: React.FC = () => {
                 </h4>
               </a>
               <div className="flex items-baseline mb-1 space-x-2">
+              {product.discount > 1 ? (
+                <div>
+                    <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product.price)}
+                    </p>
+                </div>
+            ) : (
                 <p className="text-xl text-primary font-semibold">
-                {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
+                    {formatCurrency(product.price)} VNĐ
                 </p>
-                <p className="text-sm text-gray-400 line-through">
-                  {formatCurrency(product.price)}
-                </p>
+            )}
               </div>
               <div className="flex items-center">
                 <div className="flex gap-1 text-sm text-yellow-400">

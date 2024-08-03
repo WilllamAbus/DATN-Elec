@@ -142,13 +142,20 @@ const ProductDetail: React.FC = () => {
             </p>
           </div>
           <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
-            <p className="text-xl text-primary font-semibold">
-              {formatCurrency(product?.price * (1 - product?.discount / 100))}
-              VNĐ
-            </p>
-            <p className="text-base text-gray-400 line-through">
-              {formatCurrency(product?.price)}
-            </p>
+          {product?.discount > 1 ? (
+                <div>
+                    <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product?.price * (1 - product?.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product?.price)}
+                    </p>
+                </div>
+            ) : (
+                <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product?.price)} VNĐ
+                </p>
+            )}
           </div>
 
           <p className="mt-4 text-gray-600"></p>

@@ -41,10 +41,20 @@ const Arrivale : React.FC = () => {
           <h4 className="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">{product.name}</h4>
         </a>
         <div className="flex items-baseline mb-1 space-x-2">
-          <p className="text-xl text-primary font-semibold">{formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
-          </p>
-          <p className="text-sm text-gray-400 line-through">{formatCurrency(product.price)}
-          </p>
+        {product.discount > 1 ? (
+                <div>
+                    <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product.price)}
+                    </p>
+                </div>
+            ) : (
+                <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product.price)} VNĐ
+                </p>
+            )}
         </div>
         <div className="flex items-center">
           <div className="flex gap-1 text-sm text-yellow-400">
