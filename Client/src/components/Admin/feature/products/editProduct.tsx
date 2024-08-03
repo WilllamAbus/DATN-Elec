@@ -257,15 +257,14 @@ const EditProduct: React.FC = () => {
                     {...register("brand")}
                   >
                     <option value="">Chọn Thương hiệu</option>
-                    <option value="HP">HP</option>
-                    <option value="B">ASUS</option>
-                    <option value="C">ACER</option>
-                    <option value="C">LENOVO</option>
-                    <option value="C">DELL</option>
-                    <option value="C">CORSAIR</option>
-                    <option value="C">GYGABYTE</option>
-                    <option value="C">MSI</option>
-                    <option value="C">SONY</option>
+                    <option value="ASUS">ASUS</option>
+                    <option value="ACER">ACER</option>
+                    <option value="LENOVO">LENOVO</option>
+                    <option value="DELL">DELL</option>
+                    <option value="CORSAIR">CORSAIR</option>
+                    <option value="GYGABYTE">GYGABYTE</option>
+                    <option value="MSI">MSI</option>
+                    <option value="SONY">SONY</option>
                   </select>
                   {errors.brand && (
                     <span className="text-red-500 text-xs italic">{errors.brand.message?.toString()}</span>

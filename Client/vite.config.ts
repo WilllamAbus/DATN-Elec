@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 export default defineConfig({
   resolve: {
     alias: {
-      '~': '/src',
+      '@': '/src',
     },
   },
   server: {

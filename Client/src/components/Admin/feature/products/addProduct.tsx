@@ -134,11 +134,7 @@ const AddProduct: React.FC = () => {
                       },
                     })}
                   />
-                  {errors.name && (
-                    <span className="text-red-600">
-                      {errors.name.message}
-                    </span>
-                  )}
+                  {errors.name && <span className="text-red-600">{errors.name.message}</span>}
                 </div>
                 <div className="w-full md:w-1/2 px-3">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Giá gốc</label>
@@ -214,14 +210,14 @@ const AddProduct: React.FC = () => {
                   >
                     <option value="">Chọn Thương hiệu</option>
                     <option value="HP">HP</option>
-                    <option value="B">ASUS</option>
-                    <option value="C">ACER</option>
-                    <option value="C">LENOVO</option>
-                    <option value="C">DELL</option>
-                    <option value="C">CORSAIR</option>
-                    <option value="C">GYGABYTE</option>
-                    <option value="C">MSI</option>
-                    <option value="C">SONY</option>
+                    <option value="ASUS">ASUS</option>
+                    <option value="ACER">ACER</option>
+                    <option value="LENOVO">LENOVO</option>
+                    <option value="DELL">DELL</option>
+                    <option value="CORSAIR">CORSAIR</option>
+                    <option value="GYGABYTE">GYGABYTE</option>
+                    <option value="MSI">MSI</option>
+                    <option value="SONY">SONY</option>
                   </select>
                 </div>
                 <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
