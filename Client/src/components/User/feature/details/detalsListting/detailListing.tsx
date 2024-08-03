@@ -68,6 +68,8 @@ const ProductDetail: React.FC = () => {
       }
     };
 
+
+    
     fetchData();
   }, [id]);
 

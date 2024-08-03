@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../../../middleware/multer.middle');
-const { addProduct, listProduct, hardDelete, getOne, update, getAllCategoriesController,search, upView, price } = require('../../../controler/admin/prouctController');
-const { addProduct, listProduct, hardDelete, getOne, update, getAllCategoriesController, softDelete, deletedList, restore } = require('../../../controler/admin/prouctController');
+const { addProduct, listProduct, hardDelete, getOne, update, getAllCategoriesController, softDelete, deletedList, restore,search, upView, price  } = require('../../../controler/admin/prouctController');
 
 const middlewareController = require('../../../middleware/auth');
 
@@ -18,7 +17,7 @@ router.get('/search/:keyword',search)
 //up view
 router.put('/upView/:id',upView)
 //comment
-router.post('/comment/')
+// router.post('/comment/')
 //filer
 router.get('/filter/:price', price)
 router.patch("/soft-delete/:id", middlewareController.verifyToken, softDelete);
