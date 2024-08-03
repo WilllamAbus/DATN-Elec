@@ -96,18 +96,13 @@ const AdminListProdAuc = React.lazy(
 );
 /***RecycleBin */
 
-const AdminRecycleBin = React.lazy(
-  () => import("../page/Admin/recycleBin/allItemList")
-);
 const AdminRecycleBinCate = React.lazy(
   () => import("../page/Admin/recycleBinCate/allItemList")
 );
 const AdminRecycleBin = React.lazy(
   () => import("../page/Admin/recycleBin/SoftDeletedProduct")
 );
-const AdminRecycleBinCate = React.lazy(
-  () => import("../page/Admin/recycleBinCate/allItemList")
-);
+
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
 
