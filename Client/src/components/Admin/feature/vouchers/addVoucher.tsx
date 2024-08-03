@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom'; 
 import { fetchCategoriesThunk } from "../../../../redux/categories/categoriesThunk";
-import { createDiscount } from '../../../../redux/discount/discountThunk'; // Import your thunk
+import { createVoucher } from '../../../../redux/discount/voucherThunk'; // Import your thunk
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { Category } from "../../../../types/Categories.d";
-import { Discount } from "../../../../types/Discount.d"; // Import your Discount type
+import { Voucher } from "../../../../types/Voucher.d"; // Import your Discount type
 import AlertCustomStyles from '../../../../ultils/alert.succes';
 const addDiscount: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Discount>();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Voucher>();
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
   const navigate = useNavigate(); 
   const categories = useSelector(
@@ -30,16 +30,16 @@ const addDiscount: React.FC = () => {
     return differenceInDays >= 15 || "Hạn sử dụng 15 ngày.";
   };
 
-  const onSubmit = async (data: Discount) => {
+  const onSubmit = async (data: Voucher) => {
     const formattedData = {
         ...data,
         cateReady: Array.isArray(data.cateReady) ? data.cateReady : [data.cateReady],
       };
     try {
-      await dispatch(createDiscount(formattedData)).unwrap();
+      await dispatch(createVoucher(formattedData)).unwrap();
       setAlert({ message: 'Thêm giảm giá thành công!', type: 'success' });
       reset(); // Reset the form fields
-      setTimeout(() => navigate('/admin/listDiscounts'), 2000); // Navigate after 2 seconds
+      setTimeout(() => navigate('/admin/listVouchers'), 2000); // Navigate after 2 seconds
     } catch (error) {
       setAlert({ message: 'Error creating discount!', type: 'error' });
       console.error('Error creating discount:', error);
@@ -83,20 +83,20 @@ const addDiscount: React.FC = () => {
               <div className="flex flex-wrap -mx-3 mb-6">
                 <div className="w-full px-3">
                   <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Phần trăm giảm giá
+                      Giá giảm
                   </label>
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="number"
-                    {...register('discountPercentage', {
-                      required: "Phần trăm giảm giá không được để trống",
+                    {...register('voucherNum', {
+                      required: "Giá giảm không được để trống",
                       
-                      min: { value: 10, message: "Phần trăm giảm giá phải lớn hơn 10" },
-                      max: { value: 45, message: "Phần trăm giảm giá phải nhở hơn 45" }
+                      min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
+                    
                     })}
                   />
-                  {errors.discountPercentage && typeof errors.discountPercentage.message === 'string' && (
-                    <p className="text-red-500 text-xs">{errors.discountPercentage.message}</p>
+                  {errors.voucherNum && typeof errors. voucherNum.message === 'string' && (
+                    <p className="text-red-500 text-xs">{errors.voucherNum.message}</p>
                   )}
                 </div>
               </div>
@@ -170,7 +170,7 @@ const addDiscount: React.FC = () => {
                  tracking-wider bg-gray-900 rounded"
                  onClick={handleSubmit(onSubmit)}>Thêm mới</button>
                 <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
-                  <a href="/admin/listDiscounts">Danh sách</a>
+                  <a href="/admin/listVouchers">Danh sách</a>
                 </button>
               </div>
             </form>

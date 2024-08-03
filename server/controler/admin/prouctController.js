@@ -124,15 +124,15 @@ const productsController = {
     },
     getOne: async (req, res) => {
         try {
-            const adminRole = await Role.findOne({ name: 'admin' });
+            // const adminRole = await Role.findOne({ name: 'admin' });
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+            // if (!adminRole) {
+            //     return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            // }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem sản phẩm" });
-            }
+            // if (!req.user.roles.includes(adminRole._id.toString())) {
+            //     return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem sản phẩm" });
+            // }
 
             const { id } = req.params;
             const product = await modelProduct.findById(id);
@@ -163,7 +163,7 @@ const productsController = {
             const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
             const image = req.file ? req.file.filename : undefined;
 
-            console.log('Request body:', req.body);
+          
 
             if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });

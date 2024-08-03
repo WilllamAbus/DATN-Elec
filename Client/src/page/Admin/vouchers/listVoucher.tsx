@@ -3,7 +3,7 @@ import AdminFooter from "../../../components/Admin/footer";
 import AdminHeader from "../../../components/Admin/header";
 import AdminSidebar from "../../../components/Admin/sidebar";
 import AdminStyleSheet from "../../../components/Admin/stySheet";
-import AdminListDiscount from '../../../components/Admin/feature/discounts/listDisCount'
+import AdminListDiscount from '../../../components/Admin/feature/vouchers/listVoucher'
 import AdminScript from "../../../components/Admin/script";
 import "../../../assets/css/admin.style.css";
 const listDiscounts: React.FC = () => {

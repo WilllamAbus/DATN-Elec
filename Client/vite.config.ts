@@ -1,8 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import commonjs from '@rollup/plugin-commonjs';
+import checker from 'vite-plugin-checker'
 export default defineConfig({
+  plugins: [
+    react(),
+    commonjs(),
+    checker({
+      typescript: true, // Enable TypeScript type checking
+     
+    }),
+  ],
   resolve: {
+   
     alias: {
       '@': '/src',
     },
@@ -22,5 +32,5 @@ export default defineConfig({
       },
     }
   },
-  plugins: [react(), commonjs()],
+ 
 });

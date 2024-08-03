@@ -4,10 +4,10 @@ export interface Category {
     name: string;
   }
   
-  export interface Discount {
+  export interface Voucher {
     _id: string;
     code: string;
-    discountPercentage: number;
+    voucherNum: number;
     expiryDate: string; // ISO date string
     isActive: boolean;
     cateReady: Category[];

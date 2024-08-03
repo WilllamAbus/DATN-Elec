@@ -20,7 +20,7 @@ const {
 
 
 // discount
-const discountController = require('../controler/discount.controller')
+const voucherController = require('../controler/voucher.controller')
 
 const router = express.Router();
 // Test
@@ -43,10 +43,13 @@ router.delete("/delete/:id",middlewareController.verifyTokenAdminAuth, deleteCat
 
 
 // discount
-router.post("/addDiscount",middlewareController.verifyTokenAdminAuth, discountController.createDiscount);
-router.get("/getAllDiscount", discountController.getAllDiscounts);
-router.get("/getDiscount/:id", discountController.getDiscountById);
-router.put("/updateDiscount/:id",middlewareController.verifyTokenAdminAuth, discountController.updateDiscount);
-router.delete("/deleteDiscount/:id",middlewareController.verifyTokenAdminAuth, discountController.deleteDiscount);
+router.post("/addVoucher",middlewareController.verifyTokenAdminAuth, voucherController.createVoucher);
+router.get("/getAllVoucher", voucherController.getAllVoucher);
+router.get("/getVoucher/:id", voucherController.getVoucherById);
+router.put("/updateVoucher/:id",middlewareController.verifyTokenAdminAuth, voucherController.updateVoucher);
+router.delete("/deleteVoucher/:id",middlewareController.verifyTokenAdminAuth, voucherController.deleteVoucher);
+
+
+
 
 module.exports = router;

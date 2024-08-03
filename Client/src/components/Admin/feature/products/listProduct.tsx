@@ -4,6 +4,13 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
+const formatPrices = (price: number): string => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price) + ' vnđ';
+};
 
 const MySwal = withReactContent(Swal);
 const ProductList: React.FC = () => {
@@ -77,7 +84,7 @@ const ProductList: React.FC = () => {
                   Tên sản phẩm
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  HIinh ảnh
+                  Hinh ảnh
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                   Giá
