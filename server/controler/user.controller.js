@@ -1,4 +1,6 @@
 // const userList = require('./../model/users');
+const User = require('../model/users.model')
+
 const {regisUser, verifyOtp, getOne } = require('../services/user.service')
 const user = {
 verifyOtp: async(req, res, next)=>{
