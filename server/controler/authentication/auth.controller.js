@@ -143,7 +143,7 @@ const authController = {
       const user = await User.findOne({ email: req.body.email });
       if (!user) {
         return res
-          .status(400)
+          .status(401)
           .json({ msg: "Thông tin đăng nhập không chính xác" });
       }
 
@@ -240,30 +240,28 @@ const authController = {
   },
   updateProfile: async (req, res) => {
     const { name, birthday, gender, phone, address } = req.body;
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     console.log("ID từ token:", userId);
-   
+
     console.log("Dữ liệu gửi lên:", req.body);
 
     try {
-   
-      let user = await User.findById(userId); 
+      let user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
 
       if (name) user.name = name;
       if (birthday) user.birthday = birthday;
       if (gender) user.gender = gender;
       if (phone) user.phone = phone;
       if (address) user.address = address;
-  
+
       const updatedUser = await user.save();
 
       // Gửi phản hồi thành công
-      return  res.status(200).json({msg: "Cập Nhật Thành Công"});
+      return res.status(200).json({ msg: "Cập Nhật Thành Công" });
     } catch (error) {
       console.error("Server error updating user profile:", error);
       return res.status(500).json({

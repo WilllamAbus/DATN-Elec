@@ -10,20 +10,20 @@ import { Outlet, Navigate } from "react-router-dom";
 import { getProfile } from "../../services/authentication/auth.services";
 import { useCookies } from "react-cookie";
 const Admin: React.FC = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["token", "role"]);
+  const [cookies, setCookie] = useCookies(["token", "roles"]);
   useEffect(() => {
     console.log("cookie === ", cookies);
     getUserInfo();
-  }, [cookies]);
+  }, []);
   const getUserInfo = async () => {
     const res = await getProfile();
-    if (res?.roles != cookies?.role) {
+    if (res?.roles != cookies?.roles) {
       const dateExpired = new Date();
       dateExpired.setHours(dateExpired.getHours() + 1);
-      setCookie("role", res?.roles, { path: "/", expires: dateExpired });
+      setCookie("roles", res?.roles, { path: "/", expires: dateExpired });
     }
   };
-  return cookies?.token && cookies?.role == "admin" ? (
+  return cookies?.token && cookies?.roles == "admin" ? (
     <>
       <AdminStyleSheet />
 

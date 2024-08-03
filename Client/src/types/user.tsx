@@ -26,6 +26,7 @@ export interface AuthAction {
   };
 }
 export interface UserProfile {
+  msg: string;
   token: string;
   _id: string;
   name: string;

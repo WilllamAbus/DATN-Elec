@@ -4,6 +4,7 @@ import {
   getProfile,
   updateProfile,
 } from "../../../services/authentication/auth.services";
+import axios from "axios";
 
 // interface UserProfile {
 //   name: string;
@@ -15,24 +16,26 @@ import {
 interface EditProfile {
   profile: UserProfile;
 }
-interface EditProfileProps {
-  profile: UserProfile;
-  onProfileUpdate: (profileData: UserProfile) => void; 
-}
+// interface EditProfileProps {
+//   profile: UserProfile;
+//   // onProfileUpdate: (profileData: UserProfile) => void;
+// }
 const EditProfile: React.FC<EditProfile> = ({ profile }) => {
-  const [update, setProfile] = useState<UserProfile | null>(null);
-  const [view, setView] = useState<"info" | "edit">("info");
-  const [message, setMessage] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(false);
   const [localProfile, setLocalProfile] = useState<UserProfile>(profile);
+  const [view, setView] = useState<"info" | "edit">("info");
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
   useEffect(() => {
-    setLocalProfile(profile); 
+    setLocalProfile(profile); // Cập nhật khi props thay đổi
   }, [profile]);
+
   const formatDateForInput = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toISOString().split("T")[0]; // Chuyển đổi thành định dạng yyyy-MM-dd
   };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -42,18 +45,30 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setMessage(null);
-    e.preventDefault();
+
     try {
-      await updateProfile(localProfile); 
-      console.log("Profile updated successfully");
+      const response = await updateProfile(localProfile);
+      console.log("Profile updated successfully:", response);
+
+      const successMessage = response.msg;
+      setMessage(successMessage);
     } catch (err) {
       console.error("Error updating profile:", err);
+      const errorMessage =
+        axios.isAxiosError(err) && err.response?.data?.msg
+          ? `Lỗi: ${err.response.status} - ${err.response.data.msg}`
+          : "Đã xảy ra lỗi không xác định";
+      setMessage(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
-  if (!profile) return <p>Loading...</p>;
+
   return (
     <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
       <h4 className="text-lg font-medium capitalize mb-4">
@@ -127,9 +142,11 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
           <button
             type="submit"
             className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
+            disabled={loading}
           >
-            Cập nhật
+            {loading ? "Đang cập nhật..." : "Cập nhật"}
           </button>
+          {message && <p className="mt-4 text-red-500">{message}</p>}
         </div>
       </form>
     </div>

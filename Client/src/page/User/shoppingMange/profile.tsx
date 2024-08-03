@@ -38,16 +38,13 @@ const ProfileUse: React.FC = () => {
   // }, []);
   const navigate = useNavigate();
   useEffect(() => {
-    // Kiểm tra cookies trước khi gọi getUserInfo
     if (!cookies.token) {
-      // Nếu không có cookie token, điều hướng đến trang đăng nhập
       navigate("/login");
     } else {
-      // Nếu có cookie token, gọi getUserInfo
       getUserInfo();
     }
   }, [cookies, navigate]);
- 
+
   const getUserInfo = async () => {
     try {
       const res = await getProfile();
@@ -58,9 +55,10 @@ const ProfileUse: React.FC = () => {
   };
   const handleLogout = async () => {
     try {
-      await logout(); 
+      await logout();
       removeCookie("token");
       removeCookie("role");
+
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);

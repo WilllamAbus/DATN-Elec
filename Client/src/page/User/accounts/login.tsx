@@ -12,6 +12,7 @@ import { useCookies } from "react-cookie";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Auth } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 interface IFormInput {
   email: string;
   password: string;
@@ -109,13 +110,10 @@ const Login: React.FC = () => {
     } catch (err) {
       console.error("Error logging in:", err);
 
-      if (err instanceof Error) {
-        setError(err.message || "Đã xảy ra lỗi không xác định");
-      } else if (err && typeof err === "object" && "response" in err) {
+      if (err && axios.isAxiosError(err)) {
         const axiosError = err as { response?: { data?: { msg?: string } } };
-        setError(axiosError.response?.data?.msg || "Đã xảy ra lỗi");
-      } else {
-        setError("Đã xảy ra lỗi không xác định");
+        // Chỉ hiển thị thông báo lỗi từ API nếu có
+        setError(axiosError.response?.data?.msg || "");
       }
     } finally {
       setLoading(false);
@@ -199,10 +197,12 @@ const Login: React.FC = () => {
             <div className="mt-4">
               <button
                 type="submit"
+                disabled={loading}
                 className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium"
               >
-                ĐĂNG NHẬP
+                {loading ? "Đang đăng nhập..." : "Đăng nhập"}
               </button>
+              {error && <div className="error-message">{error}</div>}
             </div>
           </form>
 
