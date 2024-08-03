@@ -17,6 +17,7 @@ import type { UserProfile } from "../../../types/user";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./edit-profile";
 import Info from "./info";
+import { useCookies } from "react-cookie";
 // interface UserProfile {
 //   name: string;
 //   email: string;
@@ -30,11 +31,23 @@ import Info from "./info";
 
 const ProfileUse: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [cookies, setCookie, removeCookie] = useCookies(["token", "role"]);
   const [view, setView] = useState<"info" | "edit">("info");
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
   const navigate = useNavigate();
+  useEffect(() => {
+    // Kiểm tra cookies trước khi gọi getUserInfo
+    if (!cookies.token) {
+      // Nếu không có cookie token, điều hướng đến trang đăng nhập
+      navigate("/login");
+    } else {
+      // Nếu có cookie token, gọi getUserInfo
+      getUserInfo();
+    }
+  }, [cookies, navigate]);
+ 
   const getUserInfo = async () => {
     try {
       const res = await getProfile();
@@ -45,9 +58,9 @@ const ProfileUse: React.FC = () => {
   };
   const handleLogout = async () => {
     try {
-      await logout(); // Gọi API đăng xuất
-      // Xóa cookie hoặc localStorage nếu cần
-      // Redirect người dùng về trang đăng nhập hoặc trang chủ
+      await logout(); 
+      removeCookie("token");
+      removeCookie("role");
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);

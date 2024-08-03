@@ -240,34 +240,34 @@ const authController = {
   },
   updateProfile: async (req, res) => {
     const { name, birthday, gender, phone, address } = req.body;
-    const userId = req.user.id; // Lấy ID người dùng từ token
+    const userId = req.user.id; 
 
     console.log("ID từ token:", userId);
-    // Ghi log dữ liệu gửi lên
+   
     console.log("Dữ liệu gửi lên:", req.body);
 
     try {
-      // Tìm và cập nhật người dùng
-      let user = await User.findById(userId); // Sử dụng userId thay vì id
+   
+      let user = await User.findById(userId); 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Cập nhật các trường nếu có dữ liệu mới
+
       if (name) user.name = name;
       if (birthday) user.birthday = birthday;
       if (gender) user.gender = gender;
       if (phone) user.phone = phone;
-      if (address) user.phone = address;
-      // Lưu thông tin đã cập nhật
+      if (address) user.address = address;
+  
       const updatedUser = await user.save();
 
       // Gửi phản hồi thành công
-      res.status(200).json(updatedUser);
+      return  res.status(200).json({msg: "Cập Nhật Thành Công"});
     } catch (error) {
       console.error("Server error updating user profile:", error);
-      res.status(500).json({
-        message: "Server error updating user profile",
+      return res.status(500).json({
+        msg: "Server error updating user profile",
         error: error.message,
       });
     }

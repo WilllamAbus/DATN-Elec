@@ -30,7 +30,7 @@ const Register: React.FC = () => {
         password: value.password,
         name: value.name,
       });
-
+      
       console.log("Register API response:", res);
 
       setMessage(res?.msg || "Đăng ký thành công");
@@ -71,7 +71,7 @@ const Register: React.FC = () => {
             <div className="space-y-2">
               <div>
                 <label htmlFor="name" className="text-gray-600 mb-2 block">
-                  Tên
+                  Họ Tên
                 </label>
                 <input
                   type="text"
