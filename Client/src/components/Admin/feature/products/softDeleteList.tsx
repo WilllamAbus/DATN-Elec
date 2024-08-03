@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { listProduct, softDeleteProduct } from "../../../../services/product/crudProduct.service";
+import { useEffect, useState } from "react";
+import {
+  getSoftDeletedProducts,
+  hardDeleteProduct,
+  restoreProduct,
+} from "../../../../services/product/crudProduct.service";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
-const formatPrices = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price) + ' vnđ';
-};
 
 const MySwal = withReactContent(Swal);
-const ProductList: React.FC = () => {
+const softDeleteList: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +17,7 @@ const ProductList: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productList = await listProduct();
+        const productList = await getSoftDeletedProducts();
         setProducts(productList);
       } catch (error) {
         setError("Error fetching products.");
@@ -32,7 +28,7 @@ const ProductList: React.FC = () => {
 
     fetchProducts();
   }, []);
-  const handlesoftDeleteProduct = async (productId: string) => {
+  const handleDelete = async (productId: string) => {
     MySwal.fire({
       title: "Xóa sản phẩm?",
       text: "Bạn có chắc muốn xóa sản phẩm này không!",
@@ -45,7 +41,7 @@ const ProductList: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await softDeleteProduct(productId);
+          await hardDeleteProduct(productId);
           setProducts(products.filter((product) => product._id !== productId));
           MySwal.fire({
             title: "Đã xóa!",
@@ -57,6 +53,37 @@ const ProductList: React.FC = () => {
           MySwal.fire({
             title: "Lỗi!",
             text: "Đã xảy ra sự cố khi xóa sản phẩm.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+  const handleRestore = async (productId: string) => {
+    MySwal.fire({
+      title: "Khôi phục sản phẩm?",
+      text: "Bạn có chắc muốn khôi phục sản phẩm này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await restoreProduct(productId);
+          setProducts(products.filter((product) => product._id !== productId));
+          MySwal.fire({
+            title: "Đã khôi phục!",
+            text: "Sản phẩm của bạn đã được khôi phục.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error restoring product:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi khôi phục sản phẩm.",
             icon: "error",
           });
         }
@@ -84,7 +111,7 @@ const ProductList: React.FC = () => {
                   Tên sản phẩm
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Hinh ảnh
+                  HIinh ảnh
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                   Giá
@@ -113,6 +140,7 @@ const ProductList: React.FC = () => {
                   <td className="py-4 px-6 border-b border-grey-light">
                     {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(product.price)}
                   </td>
+
                   <td className="py-4 px-6 border-b border-grey-light">
                     <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
                       {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
@@ -121,16 +149,16 @@ const ProductList: React.FC = () => {
                   <td className="py-4 px-6 border-b border-grey-light">
                     <button
                       className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                      onClick={() => handlesoftDeleteProduct(product._id)}
+                      onClick={() => handleDelete(product._id)}
                     >
                       Xoá
                     </button>
-                    <Link
-                      to={`/admin/editProducts/${product._id}`}
+                    <button
                       className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                      onClick={() => handleRestore(product._id)}
                     >
-                      Sửa
-                    </Link>
+                      Khôi phục
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -151,4 +179,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default softDeleteList;
