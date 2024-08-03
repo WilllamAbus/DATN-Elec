@@ -100,13 +100,15 @@ const productsController = {
     },
     listProduct: async (req, res) => {
         try {
-            const products = await modelProduct.find();
+            // Truy vấn để tìm các danh mục không bao gồm những danh mục đã bị xóa mềm
+            const products = await modelProduct.find({ status: { $ne: 'disable' } });
             res.status(200).json(products);
         } catch (error) {
             console.error('Lỗi khi lấy danh sách sản phẩm:', error);
             res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+
     hardDelete: async (req, res) => {
         const { id } = req.params;
         try {
@@ -347,7 +349,92 @@ const productsController = {
             });
         }
     
-    }
+    },
+    // Xóa mềm danh mục
+    softDelete: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            if (!req.user.roles.includes(adminRole._id.toString())) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa danh mục" });
+            }
+
+            const id = req.params.id;
+            // Cập nhật trạng thái của danh mục thành "Đã xóa"
+            const softDeletedProduct = await modelProduct.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+
+            if (!softDeletedProduct) {
+                return res.status(404).json({ message: "Không tìm thấy danh mục" });
+            }
+
+            // Trả về phản hồi thành công
+            res.status(200).json({ message: 'Đã xóa thành công', data: softDeletedProduct });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+    deletedList: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            if (!req.user.roles.includes(adminRole._id.toString())) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách danh mục đã bị xóa mềm" });
+            }
+
+            const deleteListCategory = await modelProduct.find({ status: 'disable' }) || [];
+
+            res.status(200).json({ data: deleteListCategory });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+    restore: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+            // Kiểm tra vai trò admin
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            if (!req.user.roles.includes(adminRole._id.toString())) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục sản phẩm" });
+            }
+
+            // Kiểm tra sự tồn tại của id trong req.params
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({ message: "Thiếu id sản phẩm" });
+            }
+
+            // Cập nhật trạng thái của sản phẩm thành 'active'
+            const restoreProduct = await modelProduct.findByIdAndUpdate(id, { status: 'active' }, { new: true });
+
+            if (!restoreProduct) {
+                return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+            }
+
+            // Trả về phản hồi thành công
+            res.status(200).json({ message: "Sản phẩm đã được khôi phục thành công", data: restoreProduct });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+
+
+
+
 
 }
 

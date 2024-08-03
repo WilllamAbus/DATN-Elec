@@ -7,6 +7,7 @@ const productSchema = new Schema({
         type: String,
         required: true,
     },
+    status: { type: String, default: 'active' },
     price: {
         type: Number,
         required: true,
@@ -43,13 +44,13 @@ const productSchema = new Schema({
         type: String,
         default: "chưa giảm giá"
     },
-    rating:{
+    rating: {
         type: Number,
-        default:0
+        default: 0
     },
-    view:{
+    view: {
         type: Number,
-        default:0
+        default: 0
     }
 }, { timestamps: true });
 

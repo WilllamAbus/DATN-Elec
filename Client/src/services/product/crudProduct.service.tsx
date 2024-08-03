@@ -66,29 +66,31 @@ export const updateProduct = async (id: string, productData: FormData) => {
   }
 };
 
-export const searchProduct = async (keyword:string) => {
+export const softDeleteProduct = async (id: string) => {
   try {
-    const response = await instance.get(`/product/search/${keyword}`);
+    const response = await instance.patch(`/product/soft-delete/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Lỗi:", error);
+    console.error("Error soft deleting product:", error);
     throw error;
   }
 };
-export const upViewProduct = async (id: string) => {
-  const response = await instance.put(`/product/upView/${id}`, {}, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
-};
-export const loadPrice = async (price:string) => {
+
+export const getSoftDeletedProducts = async () => {
   try {
-    const response = await instance.get(`/product/filter/${price}`);
+    const response = await instance.get("/product/deleted-list");
+    return response.data.data || [];
+  } catch (error) {
+    console.error("Error fetching soft-deleted products:", error);
+    throw error;
+  }
+};
+export const restoreProduct = async (id: string) => {
+  try {
+    const response = await instance.patch(`/product/restore/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Lỗi:", error);
+    console.error("Error restoring product:", error);
     throw error;
   }
 };
