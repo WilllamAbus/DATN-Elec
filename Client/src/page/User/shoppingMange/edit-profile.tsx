@@ -17,14 +17,16 @@ interface EditProfile {
 }
 interface EditProfileProps {
   profile: UserProfile;
-  onProfileUpdate: (profileData: UserProfile) => void; // Callback để xử lý cập nhật
+  onProfileUpdate: (profileData: UserProfile) => void; 
 }
 const EditProfile: React.FC<EditProfile> = ({ profile }) => {
   const [update, setProfile] = useState<UserProfile | null>(null);
   const [view, setView] = useState<"info" | "edit">("info");
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [localProfile, setLocalProfile] = useState<UserProfile>(profile);
   useEffect(() => {
-    setLocalProfile(profile); // Cập nhật khi props thay đổi
+    setLocalProfile(profile); 
   }, [profile]);
   const formatDateForInput = (dateString: string) => {
     if (!dateString) return "";
@@ -41,9 +43,11 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
     }));
   };
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
+    setMessage(null);
     e.preventDefault();
     try {
-      await updateProfile(localProfile); // Gọi callback để cập nhật hồ sơ
+      await updateProfile(localProfile); 
       console.log("Profile updated successfully");
     } catch (err) {
       console.error("Error updating profile:", err);

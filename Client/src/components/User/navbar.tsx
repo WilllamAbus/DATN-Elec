@@ -9,7 +9,7 @@ import dropSixNav from "../../assets/images/icons/play-station-logo-svgrepo-com.
 const Navbar: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
-  const [role, setRole] = useState<{ name: string } | null>(null);
+  const [roles, setRole] = useState<{ name: string } | null>(null);
   useEffect(() => {
     // Lấy token và name từ localStorage
     const storedToken = localStorage.getItem("token");
@@ -160,7 +160,7 @@ const Navbar: React.FC = () => {
                           Profile
                         </span>
                       </Link>
-                      {role?.name === "admin" && (
+                      {roles?.name === "admin" && (
                         <Link
                           to="/admin/dashboard"
                           className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
