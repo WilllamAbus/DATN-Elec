@@ -35,7 +35,7 @@ export interface UserProfile {
   email: string;
   VerifiedEmail: string;
   status: string;
-  roles: string;
+  roles: string[];
   birthday: string;
   gender: string;
   phone: string;

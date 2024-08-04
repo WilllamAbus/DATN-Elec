@@ -7,8 +7,9 @@ import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
 import { useForm } from "react-hook-form";
-import { useAppDispatch } from "../../../redux/rootReducer";
-import { register } from "../../../redux/auth/authThunk";
+import { registerUser } from "../../../services/authentication/auth.services";
+import { AppDispatch } from "../../../redux/store";
+import { useDispatch } from "react-redux";
 
 interface FormValues {
   email: string;
@@ -18,8 +19,9 @@ interface FormValues {
 }
 
 const Register: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+
   const {
     register: formRegister,
     handleSubmit,
@@ -28,17 +30,20 @@ const Register: React.FC = () => {
   } = useForm<FormValues>();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (data: FormValues) => {
-    const { email, password, name } = data;
+  const handleRegister = async (data: FormValues) => {
     setLoading(true);
+    setMessage(null);
+
     try {
-      // Chạy action register
-      await dispatch(register({ email, password, name })).unwrap();
-      // navigate("/login");
-    } catch (err) {
-      setError("Đã xảy ra lỗi trong quá trình đăng ký.");
+      await registerUser(
+        { email: data.email, password: data.password, name: data.name },
+        dispatch,
+        navigate
+      );
+      setMessage("Đăng ký thành công. Vui lòng kiểm tra Email để xác thực.");
+    } catch (error: any) {
+      setMessage(error.message || "Đã xảy ra lỗi khi đăng ký.");
     } finally {
       setLoading(false);
     }
@@ -51,9 +56,9 @@ const Register: React.FC = () => {
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng Ký</h2>
-          <p className="text-gray-600 mb-6 text-sm">Welcome back </p>
+          <p className="text-gray-600 mb-6 text-sm">Welcome back</p>
 
-          <form id="addLoginButton" onSubmit={handleSubmit(onSubmit)}>
+          <form id="addLoginButton" onSubmit={handleSubmit(handleRegister)}>
             <div className="space-y-2">
               <div>
                 <label htmlFor="name" className="text-gray-600 mb-2 block">
@@ -71,11 +76,12 @@ const Register: React.FC = () => {
                     {formState.errors.name.message}
                   </small>
                 )}
+              </div>
 
+              <div>
                 <label htmlFor="email" className="text-gray-600 mb-2 block">
-                  Email{" "}
+                  Email
                 </label>
-
                 <input
                   type="email"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
@@ -94,11 +100,11 @@ const Register: React.FC = () => {
                   </small>
                 )}
               </div>
+
               <div>
                 <label htmlFor="password" className="text-gray-600 mb-2 block">
-                  Mật khẩu{" "}
+                  Mật khẩu
                 </label>
-
                 <input
                   type="password"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
@@ -117,11 +123,11 @@ const Register: React.FC = () => {
                   </small>
                 )}
               </div>
+
               <div>
                 <label htmlFor="confirm" className="text-gray-600 mb-2 block">
-                  Xác nhận mật khẩu{" "}
+                  Xác nhận mật khẩu
                 </label>
-
                 <input
                   type="password"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
@@ -144,15 +150,14 @@ const Register: React.FC = () => {
                 )}
               </div>
             </div>
+
             <div className="flex items-center justify-between mt-6">
               {loading && <div>Loading...</div>}
               {message && (
                 <div style={{ color: "red", marginTop: "10px" }}>{message}</div>
               )}
-              <a href="#" className="text-primary">
-                Quên mật khẩu
-              </a>
             </div>
+
             <div className="mt-4">
               <button
                 type="submit"
@@ -169,6 +174,7 @@ const Register: React.FC = () => {
             </div>
             <div className="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
           </div>
+
           <div className="mt-4 flex gap-4">
             <a
               href="/regisOTP"
@@ -185,9 +191,9 @@ const Register: React.FC = () => {
           </div>
 
           <p className="mt-4 text-center text-gray-600">
-            Bạn chưa có tài khoản?{" "}
-            <Link to="/register" className="text-primary">
-              Đăng ký ngay
+            Bạn đã có tài khoản?{" "}
+            <Link to="/login" className="text-primary">
+              Đăng nhập ngay
             </Link>
           </p>
         </div>

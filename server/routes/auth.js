@@ -24,6 +24,11 @@ router.put(
   middlewareController.verifyToken,
   authController.updateProfile
 );
+router.put(
+  "/password",
+  middlewareController.verifyToken,
+  authController.updatePassword
+);
 //very
 router.get("/verifyEmail", authController.verifyEmail);
 router.post("/resendEmail", authController.resendEmail);

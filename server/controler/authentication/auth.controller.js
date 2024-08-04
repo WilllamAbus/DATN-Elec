@@ -321,13 +321,45 @@ const authController = {
       });
     }
   },
+  updatePassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.user.id;
+
+      if (!currentPassword || !newPassword) {
+        return res
+          .status(400)
+          .json({ msg: "Mật khẩu hiện tại và mật khẩu mới là bắt buộc" });
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ msg: "Không tìm thấy người dùng" });
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ msg: "Mật khẩu hiện tại không đúng" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      user.password = hashedPassword;
+      await user.save();
+
+      res.status(200).json({ msg: "Cập nhật mật khẩu thành công" });
+    } catch (error) {
+      console.error("Lỗi server khi cập nhật mật khẩu:", error);
+      res.status(500).json({ msg: "Lỗi server", error: error.message });
+    }
+  },
+
   resendEmail: async (req, res) => {},
 
   forgotPassword: async (req, res) => {},
 
   resetPassword: async (req, res) => {},
-
-  updatePassword: async (req, res) => {},
 
   deleteUser: async (req, res) => {},
 };

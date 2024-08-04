@@ -233,7 +233,6 @@ const Navbar: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [roles, setRole] = useState<string | null>(null);
-
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedName = localStorage.getItem("name");
@@ -251,7 +250,6 @@ const Navbar: React.FC = () => {
       setRole(storedRole);
     }
   }, []);
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");

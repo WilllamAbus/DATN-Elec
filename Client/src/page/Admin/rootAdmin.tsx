@@ -53,10 +53,9 @@ import AdminStyleSheet from "../../components/Admin/stySheet";
 import AdminContent from "../../components/Admin/mainContent";
 import AdminScript from "../../components/Admin/script";
 import "../../assets/css/admin.style.css";
-import { Outlet, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/rootReducer";
-import { RootState } from "../../redux/rootReducer";
-import { useCookies } from "react-cookie";
+
 import { getProfile } from "../../services/authentication/auth.services";
 
 const Admin: React.FC = () => {

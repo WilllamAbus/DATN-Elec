@@ -33,7 +33,7 @@ export const apiLoginSuccess = async (
       "Lỗi trong apiLoginSuccess:",
       err.response?.data || err.message
     );
-    dispatch(loginFailed());
+    dispatch(loginFailed(""));
     navigate("/login-error");
   }
 };

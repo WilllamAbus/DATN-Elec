@@ -1,85 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserProfile } from "../../../types/user";
-import { useDispatch, useSelector } from "react-redux";
+import { updateProfile } from "../../../services/authentication/auth.services";
 import { useAppDispatch, useAppSelector } from "../../../redux/rootReducer";
-import { updateUserProfile } from "../../../redux/auth/authThunk";
-import { RootState } from "../../../redux/rootReducer";
+import { setProfile } from "../../../redux/auth/authSlice";
 import axios from "axios";
+import moment from "moment";
 
-// interface UserProfile {
-//   name: string;
-//   email: string;
-//   birthday: string;
-//   gender: string;
-//   phone: string;
-// }
-interface EditProfile {
+interface EditProfileProps {
   profile: UserProfile | null;
 }
-const defaultProfile: UserProfile = {
-  msg: "",
-  token: "",
-  _id: "",
-  name: "",
-  accessToken: "",
-  email: "",
-  profile: "",
-  VerifiedEmail: "",
-  status: "",
-  roles: "",
-  birthday: "",
-  gender: "",
-  phone: "",
-  address: "",
-  createdAt: "",
-  updatedAt: "",
 
-  // Các thuộc tính khác với giá trị mặc định
-};
-// interface EditProfileProps {
-//   profile: UserProfile;
-//   // onProfileUpdate: (profileData: UserProfile) => void;
-// }
-const EditProfile: React.FC<EditProfile> = ({ profile }) => {
-  const [localProfile, setLocalProfile] = useState<UserProfile>(
-    profile || defaultProfile
-  );
-  const [view, setView] = useState<"info" | "edit">("info");
+const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
+  const [localProfile, setLocalProfile] = useState<UserProfile | null>(profile);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-  const profileStatus = useAppSelector(
-    (state: RootState) => state.auth.profile.status
-  );
-  const profileError = useAppSelector(
-    (state: RootState) => state.auth.profile.error
-  );
+  const profileState = useAppSelector((state) => state.auth.profile);
 
   useEffect(() => {
     if (profile) {
-      setLocalProfile({
-        ...defaultProfile,
-        ...profile,
-      });
+      setLocalProfile(profile);
     }
   }, [profile]);
 
-  const formatDateForInput = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
-  };
+  const birthday = localProfile?.birthday
+    ? moment(localProfile?.birthday).format("YYYY-MM-DD") // Định dạng ngày theo ý muốn
+    : "";
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     if (localProfile) {
-      setLocalProfile((prevProfile) => ({
-        ...prevProfile,
+      setLocalProfile({
+        ...localProfile,
         [name]: value,
-      }));
+      });
     }
   };
 
@@ -91,10 +48,16 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
     setMessage(null);
 
     try {
-      const resultAction = await dispatch(
-        updateUserProfile(localProfile)
-      ).unwrap();
-      console.log("Profile updated successfully:", resultAction);
+      const updatedProfile = await updateProfile(localProfile);
+      console.log("Profile updated successfully:", localProfile);
+
+      // Cập nhật trạng thái người dùng trong Redux
+      dispatch(setProfile(localProfile));
+
+      // Cập nhật thông tin người dùng trong localStorage nếu cần
+      localStorage.setItem("name", localProfile.name || "");
+      localStorage.setItem("roles", localProfile.roles[0] || "");
+      localStorage.setItem("birthday", localProfile.birthday || "");
 
       setMessage("Profile updated successfully!");
     } catch (err) {
@@ -126,7 +89,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
                 type="text"
                 name="name"
                 id="name"
-                value={localProfile.name}
+                value={localProfile?.name || ""}
                 onChange={handleChange}
                 className="input-box"
               />
@@ -137,7 +100,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
                 type="date"
                 name="birthday"
                 id="birthday"
-                value={formatDateForInput(localProfile.birthday || "")}
+                value={birthday}
                 onChange={handleChange}
                 className="input-box"
               />
@@ -149,7 +112,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
               <select
                 name="gender"
                 id="gender"
-                value={localProfile.gender}
+                value={localProfile?.gender || ""}
                 onChange={handleChange}
                 className="input-box"
               >
@@ -163,7 +126,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
                 type="text"
                 name="phone"
                 id="phone"
-                value={localProfile.phone}
+                value={localProfile?.phone || ""}
                 onChange={handleChange}
                 className="input-box"
               />
@@ -176,7 +139,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
                 type="text"
                 name="address"
                 id="address"
-                value={localProfile.address || ""}
+                value={localProfile?.address || ""}
                 onChange={handleChange}
                 className="input-box"
               />
@@ -195,4 +158,5 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
     </div>
   );
 };
+
 export default EditProfile;

@@ -4,6 +4,9 @@ import {
   loginFailed,
   loginStart,
   loginSuccess,
+  registerStart,
+  registerSuccess,
+  registerFailed,
   setProfile,
 } from "../../redux/auth/authSlice";
 import { AppDispatch } from "../../redux/store";
@@ -45,7 +48,7 @@ export const loginUser = async (
     if (err.response && err.response.data) {
       dispatch(loginFailed(err.response.data.msg || "Đã xảy ra lỗi"));
     } else {
-      dispatch(loginFailed());
+      dispatch(loginFailed("Lỗi"));
     }
   }
 };
@@ -96,28 +99,38 @@ export const updateProfile = async (
   }
 };
 
-export const registerApi = async ({
-  email,
-  password,
-  name,
-}: {
-  email: string;
-  password: string;
-  name: string;
-}): Promise<UserProfile> => {
+export const registerUser = async (
+  user: { email: string; password: string; name: string },
+  dispatch: AppDispatch,
+  navigate: (path: string) => void
+) => {
   try {
-    const response = await instance.post("/auth/register", {
-      email,
-      password,
-      name,
-      device: "website",
+    const response = await axios.post(`${API_URL}/auth/register`, user);
+    if (response.status === 200) {
+      return response.data;
+    }
+    throw new Error(response.data.msg || "Đã xảy ra lỗi khi đăng ký.");
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.msg || "Đã xảy ra lỗi khi đăng ký.");
+    } else {
+      throw new Error("Đã xảy ra lỗi khi đăng ký.");
+    }
+  }
+};
+export const updatePassword = async (
+  currentPassword: string,
+  newPassword: string
+) => {
+  try {
+    const response = await instance.put("/auth/password", {
+      currentPassword,
+      newPassword,
     });
     return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw error.response.data;
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.msg || "Đã xảy ra lỗi khi cập nhật mật khẩu."
+    );
   }
 };
