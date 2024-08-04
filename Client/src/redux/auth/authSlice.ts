@@ -6,6 +6,8 @@ interface AuthState {
         isFetching: boolean;
         error: boolean;
         isAuthenticated: boolean;
+        token: string | null;
+        isLoggedIn: boolean;
     };
 }
 
@@ -15,6 +17,8 @@ const initialState: AuthState = {
         isFetching: false,
         error: false,
         isAuthenticated: false,
+        token: null,
+        isLoggedIn: false,
     },
 };
 
@@ -25,20 +29,25 @@ const authSlice = createSlice({
         loginStart: (state) => {
             state.login.isFetching = true;
         },
-        loginSuccess: (state, action: PayloadAction<string>) => {
+        loginSuccess: (state, action: PayloadAction<{ currentUser: string, token: string }>) => {
             state.login.isFetching = false;
-            state.login.currentUser = action.payload;
+            state.login.currentUser = action.payload.currentUser;
+            state.login.token = action.payload.token;
             state.login.isAuthenticated = true;
+            state.login.isLoggedIn = true;
             state.login.error = false;
         },
         loginFailed: (state) => {
             state.login.isFetching = false;
             state.login.error = true;
             state.login.isAuthenticated = false;
+            state.login.isLoggedIn = false;
         },
         logout: (state) => {
             state.login.currentUser = null;
+            state.login.token = null;
             state.login.isAuthenticated = false;
+            state.login.isLoggedIn = false;
         },
     },
 });

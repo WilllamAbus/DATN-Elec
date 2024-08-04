@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { listProduct, hardDeleteProduct } from "../../../../services/product/crudProduct.service";
+import { listProduct, softDeleteProduct } from "../../../../services/product/crudProduct.service";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
-const formatPrices = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price) + ' vnđ';
-};
 
 const MySwal = withReactContent(Swal);
 const ProductList: React.FC = () => {
@@ -32,7 +25,7 @@ const ProductList: React.FC = () => {
 
     fetchProducts();
   }, []);
-  const handleDelete = async (productId: string) => {
+  const handlesoftDeleteProduct = async (productId: string) => {
     MySwal.fire({
       title: "Xóa sản phẩm?",
       text: "Bạn có chắc muốn xóa sản phẩm này không!",
@@ -45,7 +38,7 @@ const ProductList: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await hardDeleteProduct(productId);
+          await softDeleteProduct(productId);
           setProducts(products.filter((product) => product._id !== productId));
           MySwal.fire({
             title: "Đã xóa!",
@@ -90,6 +83,9 @@ const ProductList: React.FC = () => {
                   Giá
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                  Trạng thái
+                </th>
+                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                   Chức năng
                 </th>
               </tr>
@@ -107,18 +103,26 @@ const ProductList: React.FC = () => {
                       style={{ width: "50px", height: "50px" }}
                     />
                   </td>
-                  <td className="py-4 px-6 border-b border-grey-light">{formatPrices(product.price)}</td>
                   <td className="py-4 px-6 border-b border-grey-light">
-                    <a
-                      href="#"
-                      className="delete-link text-decoration:none color:green;"
-                      onClick={() => handleDelete(product._id)}
+                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                      product.price
+                    )}
+                  </td>
+                  <td className="py-4 px-6 border-b border-grey-light">
+                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                      {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 border-b border-grey-light">
+                    <button
+                      className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                      onClick={() => handlesoftDeleteProduct(product._id)}
                     >
                       Xoá
-                    </a>
+                    </button>
                     <Link
                       to={`/admin/editProducts/${product._id}`}
-                      className="delete-link p-4 text-decoration:none color:green;"
+                      className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                     >
                       Sửa
                     </Link>
@@ -131,10 +135,16 @@ const ProductList: React.FC = () => {
       </div>
 
       <div className="mt-6 flex gap-2">
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
+        <button
+          className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+          type="button"
+        >
           <a href="/admin/addProducts">Thêm mới</a>
         </button>
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
+        <button
+          className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+          type="button"
+        >
           <a href="/admin/dashboard">Trở lại</a>
         </button>
       </div>

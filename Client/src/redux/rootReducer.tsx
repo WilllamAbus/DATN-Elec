@@ -1,11 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
-// import categoriesSlice from "./categories/categoriesSlice";
-import productsReducer from "./products/productsSlice";
-// import discountReducer from './discount/discountSlice'
+import authReducer from "./auth/authSlice";
+import categoriesSlice from "./categories/categoriesSlice";
+import voucherReducer from "./discount/voucherSlice";
+
 const rootReducer = combineReducers({
-  // categories: categoriesSlice,
-  products: productsReducer,
-  // discount:discountReducer
+  auth: authReducer,
+  categories: categoriesSlice,
+  voucher: voucherReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

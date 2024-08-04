@@ -1,4 +1,4 @@
-import React , { useEffect, useState } from "react";
+import React , { useEffect, useState} from "react";
 // import { Link } from 'react-router-dom';
 
 import "../../../../assets/css/user.style.css";
@@ -6,6 +6,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link } from "react-router-dom";
 import { listProduct } from "../../../../services/product/crudProduct.service";
 import currencyFormatter from 'currency-formatter';
+import Filter from "../../filter";
 function formatCurrency(value:number) {
   return currencyFormatter.format(value, { code: 'VND', symbol: '' });
 }
@@ -23,6 +24,8 @@ const allListing: React.FC = () => {
 
     fetchProducts();
   }, []);
+  
+
   return (
     <>
     
@@ -40,8 +43,7 @@ const allListing: React.FC = () => {
 
       {/* <!-- shop wrapper --> */}
       <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
-        {/* <!-- sidebar --> */}
-        {/* <!-- drawer init and toggle --> */}
+     
         <div className="text-center md:hidden">
           <button
             className="text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block md:hidden"
@@ -474,29 +476,8 @@ const allListing: React.FC = () => {
             </div>
 
             <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Giá
-              </h3>
-              <div className="mt-4 flex items-center">
-                <input
-                  type="text"
-                  name="min"
-                  id="min"
-                  className="w-full border-gray-300 
-                            focus:border-primary rounded focus:ring-0 px-3
-                             py-1 text-gray-600 shadow-sm"
-                  placeholder="min"
-                />
-                <span className="mx-3 text-gray-500">-</span>
-                <input
-                  type="text"
-                  name="max"
-                  id="max"
-                  className="w-full border-gray-300 focus:border-primary rounded focus:ring-0 px-3 py-1 text-gray-600 shadow-sm"
-                  placeholder="max"
-                />
-              </div>
-            </div>
+            <Filter/>
+           </div>
 
             {/* <div className="pt-4">
               <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -653,47 +634,26 @@ const allListing: React.FC = () => {
                     </h4>
                   </a>
                   <div className="flex items-baseline mb-1 space-x-2">
+                  {product.discount > 1 ? (
+                <div>
                     <p className="text-xl text-primary font-semibold">
-                    {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
+                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
                     </p>
                     <p className="text-sm text-gray-400 line-through">
-                       {formatCurrency(product.price)} VNĐ
+                        {formatCurrency(product.price)}
                     </p>
-                  </div>
-                  <div className="flex items-center">
-                      <div className="flex gap-1 text-sm text-yellow-400">
-                        {Array.from({ length: product.rating }, (_, i) => (
-                          <span key={i}>
-                            <i className="fa-solid fa-star"></i>
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-xs text-gray-500 items-center m-3">
-                        {product.quantity > 0 ? `(${product.quantity})`: (" ")}
-                      </div>
-                  </div>
                 </div>
-                <Link
-                  to="/cart"
-                  className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition"
-                >
-                   Thêm giỏ hàng
-                </Link>
-              </div>
-            ))}
-
-     
-
+            ) : (
+                <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product.price)} VNĐ
+                </p>
+            )}
            
-          </div>
-        </div>
-        {/* 
-        <!-- ./products --> */}
       </div>
-      {/* <!-- ./shop wrapper --> */}
+    
   
     </>
-  );
+  )
 };
 
 export default allListing;

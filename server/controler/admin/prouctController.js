@@ -29,12 +29,16 @@ const productsController = {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
 
+
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể thêm sản phẩm" });
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể thêm sản phẩm" });
             }
 
             let { name, price, quantity, categoryid, createdAt, weight, brand, color, description, discount } = req.body;
@@ -100,16 +104,32 @@ const productsController = {
     },
     listProduct: async (req, res) => {
         try {
-            const products = await modelProduct.find();
+            // Truy vấn để tìm các danh mục không bao gồm những danh mục đã bị xóa mềm
+            const products = await modelProduct.find({ status: { $ne: 'disable' } });
             res.status(200).json(products);
         } catch (error) {
             console.error('Lỗi khi lấy danh sách sản phẩm:', error);
             res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+
     hardDelete: async (req, res) => {
         const { id } = req.params;
         try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
+            }
+
             const hardDeletedProduct = await modelProduct.findByIdAndDelete(id);
             if (!hardDeletedProduct) {
                 return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
@@ -149,19 +169,24 @@ const productsController = {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
 
+
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
                 return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể cập nhật sản phẩm" });
             }
+
 
             const { id } = req.params;
             const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
             const image = req.file ? req.file.filename : undefined;
 
-          
+
 
             if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
@@ -241,10 +266,212 @@ const productsController = {
             res.status(500).json({ error: 'Server error' });
         }
     },
+    search: async (req, res) => {
+        try {
+            const keyword = req.params.keyword;
+            const result = await modelProduct.find({ name: { $regex: keyword, $options: 'i' } });
+            if (result && result.length > 0) {
+                res.status(200).json({
+                    data: result
+                });
+            } else {
+                console.error("No results found");
+                res.status(404).json({
+                    message: "No results found"
+                });
+            }
+        } catch (error) {
+            console.error('Error during search:', error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+    },
+
+    upView: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const product = await modelProduct.findById(id);
+    
+            if (!product) {
+                console.error('Product not found');
+                return res.status(404).json({
+                    message: 'Product not found'
+                });
+            }
+    
+            product.view = (product.view || 0) + 1;
+            await product.save();
+    
+            res.status(200).json({
+                message: 'View count incremented successfully',
+                data: product
+            });
+        } catch (error) {
+            console.error('Error during view count increment:', error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+    },
+    price: async (req, res) => {
+        try {
+            const price = req.params.price;
+            let minPrice = 0; // Giá tối thiểu, mặc định là 0
+            let maxPrice;
+    
+            switch (price) {
+                case 'price-0':
+                    maxPrice = 500000; // Dưới 500000
+                    break;
+                case 'price-1':
+                    minPrice = 500000;
+                    maxPrice = 1000000; // Từ 500000 đến dưới 2000000
+                    break;
+                case 'price-2':
+                    minPrice = 1000000;
+                    maxPrice = 3000000; // Từ 2000000 đến dưới 10000000
+                    break;
+                case 'price-3':
+                    minPrice = 3000000;
+                    maxPrice = 5000000; // Từ 10000000 đến dưới 14000000
+                    break;
+                case 'price-4':
+                    minPrice = 5000000; // Trên 14000000
+                    break;
+                default:
+                    return res.status(400).json({
+                        message: "Khoảng giá không hợp lệ"
+                    });
+            }
+    
+            const query = { price: { $gte: minPrice } };
+            if (maxPrice) {
+                query.price.$lt = maxPrice;
+            }
+    
+            const result = await modelProduct.find(query);
+    
+            if (result.length > 0) {
+                res.status(200).json({
+                    data: result
+                });
+            } else {
+                console.error("Không tìm thấy sản phẩm nào trong khoảng giá này");
+                res.status(404).json({
+                    message: "Không tìm thấy sản phẩm nào trong khoảng giá này"
+                });
+            }
+        } catch (error) {
+            console.error('Lỗi khi tìm kiếm sản phẩm:', error);
+            res.status(500).json({
+                message: 'Lỗi máy chủ nội bộ',
+                error: error.message
+            });
+        }
+    
+    },
+    // Xóa mềm danh mục
+    softDelete: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
+            }
+
+            const id = req.params.id;
+            // Cập nhật trạng thái của danh mục thành "Đã xóa"
+            const softDeletedProduct = await modelProduct.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+
+            if (!softDeletedProduct) {
+                return res.status(404).json({ message: "Không tìm thấy danh mục" });
+            }
+
+            // Trả về phản hồi thành công
+            res.status(200).json({ message: 'Đã xóa thành công', data: softDeletedProduct });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+    deletedList: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách danh mục đã bị xóa mềm" });
+            }
+
+
+            const deleteListCategory = await modelProduct.find({ status: 'disable' }) || [];
+
+            res.status(200).json({ data: deleteListCategory });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+    restore: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục sản phẩm" });
+            }
+
+
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({ message: "Thiếu id sản phẩm" });
+            }
+
+            // Cập nhật trạng thái của sản phẩm thành 'active'
+            const restoreProduct = await modelProduct.findByIdAndUpdate(id, { status: 'active' }, { new: true });
+
+            if (!restoreProduct) {
+                return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+            }
+
+            // Trả về phản hồi thành công
+            res.status(200).json({ message: "Sản phẩm đã được khôi phục thành công", data: restoreProduct });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+
+
 
 
 
 }
+
 
 productsController.upload = upload.single('image');
 

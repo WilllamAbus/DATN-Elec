@@ -75,7 +75,12 @@ const AddCate: React.FC = () => {
       setError(null);
       setSuccessMessage(resultAction.message);
     } catch (error) {
-      const errorMessage = (error as { message?: string })?.message || "Error creating category";
+      const errorMessage =
+        (
+          error as {
+            message?: string;
+          }
+        )?.message || "Error creating category";
       setError(errorMessage);
       console.error("Error:", errorMessage);
     }
@@ -91,14 +96,20 @@ const AddCate: React.FC = () => {
         <div className="w-full mt-6 pl-0 lg:pl-2">
           <div className="leading-loose">
             <div className="mt-4">
-              {successMessage && alertType && <AlertCustomStyles message={successMessage} type={alertType} />}
+              {successMessage && alertType && (
+                <AlertCustomStyles message={successMessage} type={alertType} />
+              )}
               {error && (
                 <div className="mt-4">
                   <span className="text-red-600">{error}</span>
                 </div>
               )}
             </div>
-            <form id="addNewForm" className="p-10 bg-white rounded shadow-xl" encType="multipart/form-data">
+            <form
+              id="addNewForm"
+              className="p-10 bg-white rounded shadow-xl"
+              encType="multipart/form-data"
+            >
               <div>
                 <label className="block text-sm text-gray-600" htmlFor="nameCate">
                   Name
@@ -107,7 +118,9 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-1 text-gray-700 bg-gray-200 rounded"
                   id="name"
                   type="text"
-                  {...register("name", { required: "Tên không được bỏ trống" })}
+                  {...register("name", {
+                    required: "Tên không được bỏ trống",
+                  })}
                 />
                 {errors.name && <span className="text-red-600">{errors.name.message}</span>}
               </div>
@@ -119,7 +132,9 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-1 text-gray-700 bg-gray-200 rounded"
                   id="path"
                   type="text"
-                  {...register("path", { required: "Đường truyền không được bỏ trống" })}
+                  {...register("path", {
+                    required: "Đường truyền không được bỏ trống",
+                  })}
                 />
                 {errors.path && <span className="text-red-600">{errors.path.message}</span>}
               </div>
@@ -131,7 +146,9 @@ const AddCate: React.FC = () => {
                   className="w-full px-5 py-4 text-gray-700 bg-gray-200 rounded"
                   id="imgCate"
                   type="file"
-                  {...register("imgCate", { required: "Hình không bỏ trống" })}
+                  {...register("imgCate", {
+                    required: "Hình không bỏ trống",
+                  })}
                   onChange={handleFileChange}
                 />
                 {errors.imgCate && <span className="text-red-600">{errors.imgCate.message}</span>}
@@ -150,7 +167,10 @@ const AddCate: React.FC = () => {
                 >
                   Thêm mới
                 </button>
-                <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
+                <button
+                  className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+                  type="button"
+                >
                   <a href="/admin/listCategories">Danh sách</a>
                 </button>
               </div>
