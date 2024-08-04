@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -10,13 +10,17 @@ import {
   upViewProduct,
 } from "../../../../../services/product/crudProduct.service";
 import { getFileFirebase } from "../../../../../services/firebase/getFirebse.service";
-import currencyFormatter from "currency-formatter";
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
+import currencyFormatter from 'currency-formatter';
+// import AlertCustomStyles from '../../../../../ultils/alert.succes';
+function formatCurrency(value:number) {
+  return currencyFormatter.format(value, { code: 'VND', symbol: '' });
 }
+
+
+
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
-
+  const navigate = useNavigate();
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -24,7 +28,10 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<any | null>(null);
   const [imgPreview, setImgPreview] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
-
+//   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({
+//     message: "",
+//     type: null,
+//   });
   useEffect(() => {
     const fetchData = async () => {
       if (!id) {
@@ -67,11 +74,72 @@ const ProductDetail: React.FC = () => {
         );
       }
     };
-
-
-    
     fetchData();
-  }, [id]);
+  },[id])
+   
+    
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         if (!id) {
+              
+    //             return;
+    //         }
+    //         try {
+    //             const product = await getOneProduct(id);
+             
+    //             setProduct(product);
+    //             if (product.image) {
+    //                 const url = await getFileFirebase(product.image);
+    //                 setImgPreview(url);
+    //             }
+              
+    //         } catch (error) {
+    //             console.error(error)
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, [id]);
+
+    const calculatePrice = () => {
+        if (!product) return 0;
+        const basePrice = product.price * (1 - product.discount / 100);
+        return basePrice * quantity;
+    };
+
+
+    const addToCart = () => {
+        if (!product || !product._id) {
+         
+            return;
+        }
+    
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+        
+        const existingProductIndex = cart.findIndex((item: any) => item.id === product._id);
+      
+    
+        if (existingProductIndex > -1) {
+            cart[existingProductIndex].quantity += quantity;
+            cart[existingProductIndex].price = calculatePrice();
+        } else {
+            cart.push({
+                id: product._id,
+                name: product.name,
+                price: calculatePrice(),
+                quantity,
+                imgPreview
+            });
+        }
+    
+        localStorage.setItem('cart', JSON.stringify(cart));
+        // setAlert({ message: "Thêm vào giỏ hàng thành công!", type: "success" });
+        navigate('/cart');
+      };
+ 
+          
+
 
   return (
     <>
@@ -96,13 +164,7 @@ const ProductDetail: React.FC = () => {
               <img src={imgPreview} alt="Image Preview" className="w-full" />
             </div>
           )}
-          {/* <div className="grid grid-cols-5 gap-4 mt-4">
-          <img src="/images/products/product2.jpg" alt="product2" className="w-full cursor-pointer border border-primary" />
-          <img src="/images/products/product3.jpg" alt="product2" className="w-full cursor-pointer border" />
-          <img src="/images/products/product4.jpg" alt="product2" className="w-full cursor-pointer border" />
-          <img src="/images/products/product5.jpg" alt="product2" className="w-full cursor-pointer border" />
-          <img src="/images/products/product6.jpg" alt="product2" className="w-full cursor-pointer border" />
-      </div> */}
+    
         </div>
 
         <div>
@@ -134,16 +196,43 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-gray-800 font-semibold space-x-2">
+                 <p className="text-gray-800 font-semibold space-x-2">
               <span>Trạng thái: </span>
-              {product?.quantity > 0 ? (
-                <span className="text-green-600">Còn Hàng</span>
-              ) : (
-                <span className="text-red-600">Hết Hàng</span>
-              )}
-            </p>
+              {product?.quantity > 0 ?<span className="text-green-600">Còn Hàng</span>:  <span className="text-red-600">Hết Hàng</span>}
+                </p>
           </div>
-          <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+            <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+          <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
+          <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)} VNĐ</p>
+            </div>
+
+             <p className="mt-4 text-gray-600"></p>
+
+      <div className="pt-4">
+          <h3 className="text-sm text-gray-800 uppercase mb-1">Kích thước</h3>
+          <div className="flex items-center gap-2">
+              <div className="size-selector">
+                  <input type="radio" name="size" id="size-xs" className="hidden" />
+                  <label htmlFor="size-xs" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">XS</label>
+              </div>
+              <div className="size-selector">
+                  <input type="radio" name="size" id="size-sm" className="hidden" />
+                  <label htmlFor="size-sm" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">S</label>
+              </div>
+              <div className="size-selector">
+                  <input type="radio" name="size" id="size-m" className="hidden" />
+                  <label htmlFor="size-m" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">M</label>
+              </div>
+              <div className="size-selector">
+                  <input type="radio" name="size" id="size-l" className="hidden" />
+                  <label htmlFor="size-l" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">L</label>
+              </div>
+              <div className="size-selector">
+                  <input type="radio" name="size" id="size-xl" className="hidden" />
+                  <label htmlFor="size-xl" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">XL</label>
+              </div>
+          </div>
+          {/* <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
           {product?.discount > 1 ? (
                 <div>
                     <p className="text-xl text-primary font-semibold">
@@ -158,85 +247,11 @@ const ProductDetail: React.FC = () => {
                     {formatCurrency(product?.price)} VNĐ
                 </p>
             )}
-          </div>
-
+          </div> */}
+        </div>
           <p className="mt-4 text-gray-600"></p>
 
-          <div className="pt-4">
-            <h3 className="text-sm text-gray-800 uppercase mb-1">Kích thước</h3>
-            <div className="flex items-center gap-2">
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xs"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xs"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XS
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-sm"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-sm"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  S
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-m"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-m"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  M
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-l"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-l"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  L
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xl"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xl"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XL
-                </label>
-              </div>
-            </div>
-          </div>
+      
 
           <div className="pt-4">
             <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -299,158 +314,59 @@ const ProductDetail: React.FC = () => {
                 +
               </div>
             </div>
-          </div>
-
-          <div className="mt-6 flex gap-3 border-b border-gray-200 pb-5 pt-5">
-            <a
-              href="/checkout"
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
-            >
+      </div>
+        
+      <div className="mt-6 flex gap-3 border-b border-gray-200 pb-5 pt-5">
+          <a href="/checkout"  className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Mua ngay
-            </a>
-            <a
-              href="/cart"
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
-            >
+          </a>
+          <button  onClick={addToCart} className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
-            </a>
-            <a
-              href=""
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
-            >
+          </button>
+          <a href="" className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Add WatchList
             </a>
           </div>
 
-          <div className="flex gap-3 mt-4">
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-facebook-f"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-twitter"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-linkedin-in"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-pinterest"></i>
-            </a>
-          </div>
-        </div>
-      </div>
+  </div>
+</div>
+            
 
       {/* ./product-detail */}
 
-      {/* description */}
-      <div className="container pb-16">
-        <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium">
-          Product details
-        </h3>
-        <div className="w-3/5 pt-6">
-          <div className="text-gray-600">
-            <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm mt-6">
-              <tbody>
-                <tr>
-                  <td className="py-2">Category</td>
-                  <td className="py-2">A</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Product Code</td>
-                  <td className="py-2">B</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Size</td>
-                  <td className="py-2">C</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Weight</td>
-                  <td className="py-2">D</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Color</td>
-                  <td className="py-2">E</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Material</td>
-                  <td className="py-2">F</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      {/* ./description */}
-
-      {/* comments */}
-      {/* <div className="container py-8">
-                <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded" role="alert">
-                        Comment submitted successfully!
+            {/* description */}
+            <div className="container pb-16">
+                <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium">Chi tiết sản phẩm</h3>
+                <div className="w-3/5 pt-6">
+                    <div className="text-gray-600">
+                        <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm mt-6">
+                            <tbody>
+                                <tr>
+                                    <td className="py-2">Brand</td>
+                                    <td className="py-2">{product?.brand}</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2">Description</td>
+                                    <td className="py-2">{product?.description}</td>
+                                </tr>
+                            
+                                <tr>
+                                    <td className="py-2">Weight</td>
+                                    <td className="py-2">{product?.weight}</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2">Color</td>
+                                    <td className="py-2">{product?.color}</td>
+                                </tr>
+                            
+                            </tbody>
+                        </table>
                     </div>
-                <div>
-                <div className="flex items-start space-x-4 mb-4">
-                            <div className="flex-shrink-0">
-                                <img className="h-10 w-10 rounded-full" src={Avatar} alt="avatar" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="text-sm">
-                                    <p className="font-medium text-gray-800"></p>
-                                    <p className="text-gray-600">Sản Phẩm Tốt!!!</p>
-                                </div>
-                          <p className="text-yellow-400">    
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
-                           </p>
-                            </div>
-                 </div>
-                 <div className="flex items-start space-x-4 mb-4">
-                            <div className="flex-shrink-0">
-                                <img className="h-10 w-10 rounded-full" src={Avatar} alt="avatar" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="text-sm">
-                                    <p className="font-medium text-gray-800"></p>
-                                    <p className="text-gray-600">Good!!!</p>
-                                </div>
-                          <p className="text-yellow-400">    
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
-                           </p>
-                            </div>
-                 </div>
                 </div>
-                <form  className="mt-6">
-                    <div className="flex items-center space-x-3">
-                        <input type="text" name="contents" placeholder="Enter your comment..." className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md" />
-                        <button type="submit" className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">Submit</button>
-                    </div>
-                    <div className="text-gray-400">    
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
-                    </div>
-                </form>
-            </div> */}
+            </div>
+            {/* ./description */}
+
+   
       <Comment />
       {/* ./comments */}
 
@@ -477,6 +393,7 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
       {/* ./related-products */}
+     
     </>
   );
 };

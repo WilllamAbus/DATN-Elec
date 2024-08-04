@@ -21,6 +21,8 @@ const {
 // discount
 const voucherController = require("../controler/voucher.controller");
 
+// order
+const orderController = require("../controler/order.controller");
 const router = express.Router();
 // Test
 router.get("/", homepage);
@@ -73,4 +75,18 @@ router.delete(
   voucherController.deleteVoucher
 );
 
+// order
+router.post(
+  "/addOrder",
+  middlewareController.verifyToken,
+  orderController.createOrder
+);
+router.get("/getAllOrder", orderController.getAllOrder);
+router.get("/getOrder/:id", orderController.getOrderbyId);
+router.delete(
+  "/deleteOrder/:id",
+  middlewareController.verifyTokenAdminAuth,
+  orderController.deleteOrderById
+);
+//
 module.exports = router;

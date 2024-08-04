@@ -53,6 +53,7 @@ const authController = {
         .status(200)
         .json({ msg: "Đăng ký thành công. Vui lòng kiểm tra Email" });
 
+ 
       // res.status(200).json({ msg: "Người dùng đã đăng ký thành công", user });
     } catch (err) {
       console.log(err);

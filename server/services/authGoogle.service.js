@@ -23,7 +23,7 @@ const loginSuccessService = async (id, tokenLogin) => {
       process.env.JWT_ACCESS_KEY,
       { expiresIn: '5d' }
     );
-    console.log(token);
+    // console.log(token);
 
 
     await User.updateOne({ _id: id }, { tokenLogin: newTokenLogin });
