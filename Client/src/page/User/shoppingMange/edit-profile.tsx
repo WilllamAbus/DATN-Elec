@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { UserProfile } from "../../../types/user";
-import { useDispatch, useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/rootReducer";
 import { updateUserProfile } from "../../../redux/auth/authThunk";
 import { RootState } from "../../../redux/rootReducer";

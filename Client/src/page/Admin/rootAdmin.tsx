@@ -56,8 +56,8 @@ import "../../assets/css/admin.style.css";
 import { Outlet, Navigate, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/rootReducer";
 import { RootState } from "../../redux/rootReducer";
-import { useCookies } from "react-cookie";
 import { getProfile } from "../../services/authentication/auth.services";
+import { useCookies } from "react-cookie";
 
 const Admin: React.FC = () => {
   const dispatch = useAppDispatch();

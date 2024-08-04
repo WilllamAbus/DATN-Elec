@@ -66,6 +66,31 @@ export const updateProduct = async (id: string, productData: FormData) => {
   }
 };
 
+export const searchProduct = async (keyword:string) => {
+  try {
+    const response = await instance.get(`/product/search/${keyword}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
+  }
+};
+export const upViewProduct = async (id: string) => {
+  const response = await instance.put(`/product/upView/${id}`, {}, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+export const loadPrice = async (price:string) => {
+  try {
+    const response = await instance.get(`/product/filter/${price}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+  }
+}
 export const softDeleteProduct = async (id: string) => {
   try {
     const response = await instance.patch(`/product/soft-delete/${id}`);
@@ -93,4 +118,4 @@ export const restoreProduct = async (id: string) => {
     console.error("Error restoring product:", error);
     throw error;
   }
-};
+}

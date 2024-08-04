@@ -4,13 +4,6 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
-const formatPrices = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price) + ' vnđ';
-};
 
 const MySwal = withReactContent(Swal);
 const ProductList: React.FC = () => {
@@ -111,7 +104,9 @@ const ProductList: React.FC = () => {
                     />
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">
-                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(product.price)}
+                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                      product.price
+                    )}
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">
                     <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
@@ -140,10 +135,16 @@ const ProductList: React.FC = () => {
       </div>
 
       <div className="mt-6 flex gap-2">
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
+        <button
+          className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+          type="button"
+        >
           <a href="/admin/addProducts">Thêm mới</a>
         </button>
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
+        <button
+          className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+          type="button"
+        >
           <a href="/admin/dashboard">Trở lại</a>
         </button>
       </div>

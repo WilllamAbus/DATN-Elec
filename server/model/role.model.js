@@ -25,5 +25,4 @@ roleSchema.pre("save", function (next) {
   next();
 });
 
-// module.exports = model("Roles", roleSchema);
 module.exports = model("Role", roleSchema);

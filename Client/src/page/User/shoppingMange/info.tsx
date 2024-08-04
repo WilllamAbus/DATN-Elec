@@ -1,9 +1,15 @@
 import React from "react";
 import { UserProfile } from "../../../types/user";
 import moment from "moment";
-
+// interface UserProfile {
+//   name: string;
+//   email: string;
+//   birthday: string;
+//   gender: string;
+//   phone: string;
+// }
 interface InfoProps {
-  profiles: UserProfile | null;
+  profiles: UserProfile;
 }
 
 const Info: React.FC<InfoProps> = ({ profiles }) => {
