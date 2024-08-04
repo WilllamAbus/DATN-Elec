@@ -1,24 +1,36 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import Avatar from "../../../../../assets/images/avatar.png";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../../../../assets/css/user.style.css";
+import { useParams } from "react-router-dom";
+
+interface FormValues {
+  comment: string;
+}
+
 const Comment = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [comment, setComment] = useState("");
-  const { handleSubmit } = useForm();
-  const handleRatingClick = (rate: any) => {
+  const { register, handleSubmit, reset } = useForm<FormValues>();
+  const { id } = useParams<{ id: string }>();
+
+  const handleRatingClick = (rate: number) => {
     setRating(rate);
-    console.log(rate);
   };
-  const submitComment = () => {
-    console.log(comment);
-    setComment(comment);
+
+  const submitComment: SubmitHandler<FormValues> = (data) => {
+    console.log("Số sao:", rating);
+    console.log("Nội dung bình luận:", data.comment);
+    console.log("Id sản phẩm: ",id);
+    console.log("Id user:");
+    
+    
+    reset(); // Reset form fields after submission
   };
 
   return (
-    <div className="flex flex-col items-center p-4 border gray-300 rounded-lg ">
+    <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
       <div className="container py-8">
         <h2 className="text-2xl font-semibold mb-4">Comments</h2>
         <div
@@ -74,18 +86,20 @@ const Comment = () => {
             </div>
           </div>
         </div>
-        <form className="mt-6">
+        <form
+          className="mt-6"
+          onSubmit={handleSubmit(submitComment)}
+        >
           <div className="flex items-center space-x-3">
             <input
               type="text"
               placeholder="Enter your comment..."
               className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              {...register("comment")}
             />
             <button
+              type="submit"
               className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none"
-              onClick={handleSubmit(submitComment)}
             >
               Submit
             </button>

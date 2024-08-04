@@ -1,4 +1,4 @@
-import axios from "axios";
+import instance from "../axios";
 import {
   loginFailed,
   loginStart,
@@ -16,26 +16,15 @@ export const apiLoginSuccess = async (
 ) => {
   dispatch(loginStart());
   try {
-    const res = await axios.post(`${API_URL}/auth/login-success`, {
+    const res = await instance.post(`${API_URL}/auth/login-success`, {
       id,
       tokenLogin: token,
     });
-    const { token: accessToken } = res.data;
 
-    // Lưu token vào local storage
-    window.localStorage.setItem(
-      "persist:root",
-      JSON.stringify({
-        login: {
-          currentUser: {
-            accessToken,
-          },
-        },
-      })
-    );
-
+    // Dispatch the success action with the response data
     dispatch(loginSuccess(res.data));
 
+    // Navigate to the desired path after a short delay
     setTimeout(() => {
       navigate("/");
     }, 3000);

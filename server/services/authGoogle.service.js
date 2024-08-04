@@ -1,15 +1,14 @@
 const User = require('../model/users.model');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const authController = require('../controler/authentication/auth.controller');
-const jwtSecret = process.env.JWT_ACCESS_KEY;
-const jwtRefreshSecret = process.env.JWT_REFRESH_KEY;
+
+
 const loginSuccessService = async (id, tokenLogin) => {
   try {
     const newTokenLogin = uuidv4();
 
 
-    let user = await User.findOne({ _id: id, tokenLogin });
+    let user = await User.findOne({ _id: id, tokenLogin }).populate('roles');
 
     if (!user) {
       return {
@@ -19,8 +18,12 @@ const loginSuccessService = async (id, tokenLogin) => {
     }
 
 
-    const token = authController.generateToken(user);
-
+    const token = jwt.sign(
+      { id: user._id, email: user.email, roles: user.roles, name: user.name, avatar: user.avatar },
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: '5d' }
+    );
+    console.log(token);
 
 
     await User.updateOne({ _id: id }, { tokenLogin: newTokenLogin });

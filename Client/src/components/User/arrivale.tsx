@@ -79,9 +79,11 @@ const Arrivale: React.FC = () => {
               Thêm giỏ hàng
             </a>
           </div>
+          
         ))}
+          
+        </div>
       </div>
-    </div>
   );
 };
 

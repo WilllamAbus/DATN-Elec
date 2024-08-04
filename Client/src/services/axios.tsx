@@ -51,11 +51,30 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   function (config) {
-    const token = localStorage.getItem("token");
+    const token = window.localStorage.getItem("persist:root");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      try {
+        const parsedToken = JSON.parse(token);
+        const authData = JSON.parse(parsedToken.auth);
+        const accessToken = authData?.login?.token;
+        console.log("Access token:", accessToken);
+        config.headers.Authorization = accessToken
+          ? `Bearer ${accessToken}`
+          : undefined;
+      } catch (e) {
+        console.error("Error parsing token:", e);
+      }
     }
     return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
+
+instance.interceptors.response.use(
+  function (response) {
+    return response;
   },
   function (error) {
     return Promise.reject(error);

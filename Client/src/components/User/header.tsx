@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Make sure to import Link from react-router-dom
 import logo from '../../assets/images/logo.svg'; // Adjust path to your logo image
 import dropOneHeader from "../../assets/images/icons/gpu-svgrepo-com.svg"
 import dropTwoHeader from "../../assets/images/icons/3d-printer-tool.svg"
 const Header:  React.FC = () => {
-  // State to control dropdown visibility
 
+  const [keyword, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
+  const handleSearch = (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      if (keyword.trim()) {
+          navigate(`/search/${keyword}`);
+      } else {
+          console.log('Vui lòng nhập từ khóa tìm kiếm');
+      }
+  };
   return (
     <header className="py-4 shadow-sm bg-white">
       <div className="container flex items-center justify-between">
@@ -18,19 +29,23 @@ const Header:  React.FC = () => {
           <span className="absolute left-4 top-3 text-lg text-gray-400">
             <i className="fa-solid fa-magnifying-glass"></i>
           </span>
-          <input
-            type="text"
-            name="search"
-            id="searchTerm"
-            className="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
-            placeholder="Yêu cầu của bạn"
-          />
-          <button
-            type="submit"
-            className="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition"
-          >
-          Tìm
-          </button>
+          <form onSubmit={handleSearch} className="w-full flex">
+                <input
+                    type="text"
+                    name="search"
+                    id="searchTerm"
+                    className="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
+                    placeholder="Yêu cầu của bạn"
+                    value={keyword}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button
+                    type="submit"
+                    className="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition"
+                >
+                    Tìm 
+                </button>
+            </form>
         </div>
 
         <div className="flex items-center space-x-4">

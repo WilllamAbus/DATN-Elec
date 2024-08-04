@@ -1,15 +1,14 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-// import categoriesSlice from "./categories/categoriesSlice";
-import productsReducer from "./products/productsSlice";
 import authSlice from "./auth/authSlice";
+import categoriesSlice from "./categories/categoriesSlice";
+import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
-// import discountReducer from './discount/discountSlice'
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+
 const rootReducer = combineReducers({
-  // categories: categoriesSlice,
-  products: productsReducer,
   auth: authSlice,
-  // discount:discountReducer
+  categories: categoriesSlice,
+  voucher: voucherReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -230,7 +230,7 @@ import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -242,7 +242,6 @@ import { useCookies } from "react-cookie";
 import { getProfile } from "../../../services/authentication/auth.services";
 const ProfileUse: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [cookies, setCookie, removeCookie] = useCookies(["token", "roles"]);
   const [view, setView] = useState<"info" | "edit">("info");
 
   const navigate = useNavigate();
@@ -271,8 +270,6 @@ const ProfileUse: React.FC = () => {
   const handleLogout = async () => {
     try {
       dispatch(logoutAction());
-      removeCookie("token");
-      removeCookie("roles");
       localStorage.removeItem("token");
       localStorage.removeItem("name");
       localStorage.removeItem("roles");
