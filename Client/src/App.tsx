@@ -16,14 +16,10 @@ const routes: RouteObject[] = [
   },
   {
     path: "/",
-    // element: <UserRoutesWrapper />,
+
     children: UserRoutes,
   },
-  // {
-  //   path: '*',
-  //   // element: <UserRoutesWrapper />,
-  //   children: UserRoutes,
-  // },
+
 ];
 
 const router = createBrowserRouter(routes);

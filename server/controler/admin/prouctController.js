@@ -29,12 +29,16 @@ const productsController = {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
 
+
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể thêm sản phẩm" });
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể thêm sản phẩm" });
             }
 
             let { name, price, quantity, categoryid, createdAt, weight, brand, color, description, discount } = req.body;
@@ -112,6 +116,20 @@ const productsController = {
     hardDelete: async (req, res) => {
         const { id } = req.params;
         try {
+            const adminRole = await Role.findOne({ name: 'admin' });
+
+
+            if (!adminRole) {
+                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
+            }
+
             const hardDeletedProduct = await modelProduct.findByIdAndDelete(id);
             if (!hardDeletedProduct) {
                 return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
@@ -151,19 +169,24 @@ const productsController = {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
 
+
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
                 return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể cập nhật sản phẩm" });
             }
+
 
             const { id } = req.params;
             const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
             const image = req.file ? req.file.filename : undefined;
 
-          
+
 
             if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
@@ -244,17 +267,20 @@ const productsController = {
         }
     },
 
-    // Xóa mềm danh mục
     softDelete: async (req, res) => {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
+
 
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa danh mục" });
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
             }
 
             const id = req.params.id;
@@ -280,9 +306,13 @@ const productsController = {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
                 return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách danh mục đã bị xóa mềm" });
             }
+
 
             const deleteListCategory = await modelProduct.find({ status: 'disable' }) || [];
 
@@ -295,16 +325,19 @@ const productsController = {
         try {
             const adminRole = await Role.findOne({ name: 'admin' });
 
-            // Kiểm tra vai trò admin
+
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
 
-            if (!req.user.roles.includes(adminRole._id.toString())) {
+
+            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+
+            if (!isAdmin) {
                 return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục sản phẩm" });
             }
 
-            // Kiểm tra sự tồn tại của id trong req.params
+
             const { id } = req.params;
             if (!id) {
                 return res.status(400).json({ message: "Thiếu id sản phẩm" });

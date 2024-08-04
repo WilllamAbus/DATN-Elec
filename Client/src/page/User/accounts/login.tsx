@@ -56,7 +56,7 @@ const Login: React.FC = () => {
   } = useForm<IFormInput>();
 
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["token", "role"]);
+  const [, setCookie] = useCookies(["token", "role"]);
   const dispatch = useDispatch();
   const profile = useSelector((state: any) => state.auth.profile);
   const [loading, setLoading] = useState(false);
@@ -126,9 +126,7 @@ const Login: React.FC = () => {
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
-          <p className="text-gray-600 mb-6 text-sm">
-            Chào mừng khách hàng quay trở lại
-          </p>
+          <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
 
           <form onSubmit={handleSubmit(login)} className="space-y-4">
             <div>
@@ -148,9 +146,7 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.email && (
-                <small className="text-red-600">{errors.email.message}</small>
-              )}
+              {errors.email && <small className="text-red-600">{errors.email.message}</small>}
             </div>
 
             <div>
@@ -170,11 +166,7 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.password && (
-                <small className="text-red-600">
-                  {errors.password.message}
-                </small>
-              )}
+              {errors.password && <small className="text-red-600">{errors.password.message}</small>}
             </div>
 
             <div className="flex items-center justify-between mt-6">
@@ -207,9 +199,7 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 flex justify-center relative">
-            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">
-              Or
-            </div>
+            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">Or</div>
             <div className="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
           </div>
 

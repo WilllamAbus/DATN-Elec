@@ -6,9 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const loginUser = async (
   user: {
-    email: string;
-    password: string;
-  },
+    email: string; password: string;},
   dispatch: AppDispatch,
   navigate: (path: string) => void
 ) => {
