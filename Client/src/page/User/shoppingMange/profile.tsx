@@ -3,16 +3,13 @@ import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  getProfile,
-  logout,
-} from "../../../services/authentication/auth.services";
-import { RootState } from "../../../redux/store";
+
+import { getProfile, logout } from "../../../services/authentication/auth.services";
+
 import type { UserProfile } from "../../../types/user";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./edit-profile";
@@ -31,7 +28,7 @@ import { useCookies } from "react-cookie";
 
 const ProfileUse: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [cookies, setCookie, removeCookie] = useCookies(["token", "role"]);
+  const [cookies,, removeCookie] = useCookies(["token", "role"]);
   const [view, setView] = useState<"info" | "edit">("info");
   // useEffect(() => {
   //   getUserInfo();
@@ -105,10 +102,7 @@ const ProfileUse: React.FC = () => {
           </div>
           <div className="mt-6 bg-white shadow rounded p-4 divide-y divide-gray-200 space-y-4 text-gray-600">
             <div className="space-y-1 pl-8">
-              <a
-                href="#"
-                className="relative text-primary block font-medium capitalize transition"
-              >
+              <a href="#" className="relative text-primary block font-medium capitalize transition">
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa-regular fa-address-card"></i>
                 </span>
@@ -123,16 +117,10 @@ const ProfileUse: React.FC = () => {
               >
                 Thông tin cá nhân
               </a>
-              <a
-                href="#"
-                className="relative hover:text-primary block capitalize transition"
-              >
+              <a href="#" className="relative hover:text-primary block capitalize transition">
                 Manage addresses
               </a>
-              <a
-                href="#"
-                className="relative hover:text-primary block capitalize transition"
-              >
+              <a href="#" className="relative hover:text-primary block capitalize transition">
                 Change password
               </a>
             </div>
@@ -162,10 +150,7 @@ const ProfileUse: React.FC = () => {
                 Lịch sử đơn hàng
               </a>
 
-              <a
-                href="#"
-                className="relative hover:text-primary block capitalize transition"
-              >
+              <a href="#" className="relative hover:text-primary block capitalize transition">
                 Nhận xét
               </a>
             </div>

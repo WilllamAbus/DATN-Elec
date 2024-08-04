@@ -6,7 +6,7 @@ import AdminStyleSheet from "../../components/Admin/stySheet";
 import AdminContent from "../../components/Admin/mainContent";
 import AdminScript from "../../components/Admin/script";
 import "../../assets/css/admin.style.css";
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { getProfile } from "../../services/authentication/auth.services";
 import { useCookies } from "react-cookie";
 const Admin: React.FC = () => {

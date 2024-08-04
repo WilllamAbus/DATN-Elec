@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { UserProfile } from "../../../types/user";
-import {
-  getProfile,
-  updateProfile,
-} from "../../../services/authentication/auth.services";
+import { updateProfile } from "../../../services/authentication/auth.services";
 import axios from "axios";
 
 // interface UserProfile {
@@ -22,7 +19,6 @@ interface EditProfile {
 // }
 const EditProfile: React.FC<EditProfile> = ({ profile }) => {
   const [localProfile, setLocalProfile] = useState<UserProfile>(profile);
-  const [view, setView] = useState<"info" | "edit">("info");
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -36,9 +32,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
     return date.toISOString().split("T")[0]; // Chuyển đổi thành định dạng yyyy-MM-dd
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setLocalProfile((prevProfile) => ({
       ...prevProfile,
@@ -71,9 +65,7 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
 
   return (
     <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
-      <h4 className="text-lg font-medium capitalize mb-4">
-        Cập Nhật Thông Tin
-      </h4>
+      <h4 className="text-lg font-medium capitalize mb-4">Cập Nhật Thông Tin</h4>
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

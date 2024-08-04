@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { UserProfile, AuthState } from "../../../types/user";
+import { UserProfile } from "../../../types/user";
 import { getProfile } from "../../../services/authentication/auth.services";
-import moment from 'moment';
+import moment from "moment";
 // interface UserProfile {
 //   name: string;
 //   email: string;
@@ -29,8 +29,8 @@ const info: React.FC<info> = ({ profiles }) => {
     }
   };
   const formattedBirthday = profiles.birthday
-  ? moment(profiles.birthday).format('DD/MM/YYYY') // Định dạng ngày theo ý muốn
-  : '';
+    ? moment(profiles.birthday).format("DD/MM/YYYY") // Định dạng ngày theo ý muốn
+    : "";
   if (!profile) return <p>Loading...</p>;
 
   return (
