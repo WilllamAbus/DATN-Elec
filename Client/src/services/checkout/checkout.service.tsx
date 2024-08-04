@@ -2,16 +2,27 @@ import { OrderData } from '../../types/Checkout.d';
 
 import axiosInstance from '../axios';
 // const API_BASE_URL = `${environment.url}`;
-export const addOrder = async (order: OrderData):Promise<OrderData> => {
+export const addOrder = async (order: OrderData): Promise<OrderData> => {
     try {
-        const response = await axiosInstance.post('/addOrder', order);
-      
-        
-        return response.data;
+      // Log the order data for debugging
+      console.log('Order data being sent:', order);
+  
+      // Make the POST request to add the order
+      const response = await axiosInstance.post('/addOrder', order);
+  
+      // Log the response for debugging
+      console.log('Order response:', response.data);
+  
+      // Return the response data
+      return response.data;
     } catch (error) {
-        throw new Error('Failed to add order');
+      // Handle specific Axios errors
+     
+      
+      throw new Error('Failed to add order. Please try again later.');
     }
-};
+  };
+
 
 
 export const getAllOrders = async (): Promise<OrderData[]> => {

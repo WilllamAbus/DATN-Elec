@@ -38,7 +38,7 @@ const Arrivale: React.FC = () => {
                   src={product.image}
                   alt={`product ${index + 1}`}
                   // className="w-full h-auto"
-                  style={{ width: "360px", height: "367px" }}
+                  style={{ width: "360px", height: "337px" }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition">
                   {/* Optional icons */}

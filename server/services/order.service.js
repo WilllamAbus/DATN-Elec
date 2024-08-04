@@ -1,6 +1,6 @@
 const _Order = require('../model/order.model')
 const { sendMail } = require("../config/nodemailler");
-const { param } = require('../routes/api');
+
 
 
 const orderService  = {
@@ -11,7 +11,7 @@ const orderService  = {
             }
 
             // Log the incoming order data for debugging
-           
+        //    console.log('In comming data: ', orderData);
 
             // Validate quantityShopping field
             if (typeof orderData.quantityShopping === 'undefined' || orderData.quantityShopping === null) {

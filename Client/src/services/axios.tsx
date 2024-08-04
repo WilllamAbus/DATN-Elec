@@ -10,6 +10,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     const token = window.localStorage.getItem("persist:root");
+
+    
     if (token) {
       try {
         const parsedToken = JSON.parse(token);

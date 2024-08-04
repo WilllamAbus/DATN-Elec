@@ -1,6 +1,6 @@
 // src/models/order.model.js
 const { Schema, model } = require('mongoose');
-const { type } = require('os');
+
 
 const orderSchema = new Schema(
   {
@@ -14,7 +14,7 @@ const orderSchema = new Schema(
     totalPrice: { type: Number},
     userId: [
       {
-        user: { type: Schema.Types.ObjectId, ref: 'users' }, // Reference to User model
+        user: { type: Schema.Types.ObjectId, ref: 'users', required: true }, // Reference to User model
         email: { type: String, required: true },
      
       }

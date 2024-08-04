@@ -28,11 +28,15 @@ interface DecodedToken {
 
 const decodeToken = (token: string): DecodedToken => {
     try {
-      const decoded = jwtDecode<DecodedToken>(token);
-      return decoded;
+      // Decode the JWT token
+      const decoded: any = jwtDecode(token);
+      return {
+        id: decoded.id || "",
+        email: decoded.email || ""
+      };
     } catch (error) {
-      console.error("Error decoding token:", error);
-      throw error;
+      console.error("Failed to decode token:", error);
+      return { id: "", email: "" };
     }
   };
 
@@ -71,30 +75,36 @@ const Checkout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const getUserData = (): DecodedToken => {
-    const userData = localStorage.getItem("persist:root");
+    const userData = window.localStorage.getItem("persist:root");
     console.log("UserData:", userData);
   
     if (userData) {
       try {
+        // Parse the root state
         const parsedData = JSON.parse(userData);
         console.log("ParsedData:", parsedData);
   
-        const loginData = parsedData.login ? JSON.parse(parsedData.login) : null;
+        // Access the login data from parsedData
+        const loginData = JSON.parse(parsedData.auth)?.login;
         console.log("LoginData:", loginData);
   
-        if (loginData && loginData.currentUser && loginData.currentUser.token) {
-          const token = loginData.currentUser.token;
+        // Check if loginData and token are available
+        if (loginData && loginData.token) {
+          const token = loginData.token;
           console.log("Token:", token);
   
+          // Decode the token and return the result
           return decodeToken(token);
         }
       } catch (error) {
         console.error("Failed to parse user data:", error);
       }
     }
-    
+  
+    // Return default value if data is not available or error occurs
     return { id: "", email: "" };
   };
+  
 
   const calculateCartTotals = (items: CartItem[]) => {
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);

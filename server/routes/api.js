@@ -54,7 +54,7 @@ router.delete("/deleteVoucher/:id",middlewareController.verifyTokenAdminAuth, vo
 
 
 // order
-router.post("/addOrder", orderController.createOrder);
+router.post("/addOrder",middlewareController.verifyToken, orderController.createOrder);
 router.get("/getAllOrder", orderController.getAllOrder);
 router.get("/getOrder/:id", orderController.getOrderbyId);
 router.delete("/deleteOrder/:id",middlewareController.verifyTokenAdminAuth, orderController.deleteOrderById);
