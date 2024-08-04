@@ -1,5 +1,7 @@
+// src/@types/jwt-decode.d.ts  
 // src/@types/jwt-decode.d.ts
 declare module 'jwt-decode' {
-    function jwt_decode(token: string): any;
-    export default jwt_decode;
+  export function jwtDecode<T = any>(token: string): T;
 }
+
+

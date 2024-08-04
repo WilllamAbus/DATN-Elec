@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Make sure to import Link from react-router-dom
 import logo from '../../assets/images/logo.svg'; // Adjust path to your logo image
 import dropOneHeader from "../../assets/images/icons/gpu-svgrepo-com.svg"
 import dropTwoHeader from "../../assets/images/icons/3d-printer-tool.svg"
 const Header:  React.FC = () => {
   // State to control dropdown visibility
+  const [cartCount, setCartCount] = useState<number>(0);
 
+  useEffect(() => {
+    // Initialize cart count from localStorage
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartCount(storedCart.length);
+
+    // Add event listener for localStorage changes
+    window.addEventListener('storage', updateCartCount);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+    };
+  }, []);
+
+  const updateCartCount = () => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartCount(storedCart.length);
+  };
+
+  // const removeFromCart = (itemId: string) => {
+  //   // Assuming 'cart' is an array of item objects with 'id' properties
+  //   let storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+  //   storedCart = storedCart.filter((item: { id: string }) => item.id !== itemId);
+  //   localStorage.setItem('cart', JSON.stringify(storedCart));
+  //   updateCartCount(); // Manually update cart count
+  // };
 
   return (
     <header className="py-4 shadow-sm bg-white">
@@ -136,7 +163,7 @@ const Header:  React.FC = () => {
             </div>
             <div className="text-xs leading-3">Giỏ hàng</div>
             <div className="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">
-              2
+            {cartCount}
             </div>
           </Link>
 

@@ -10,21 +10,24 @@ import { RootState, AppDispatch } from "../../../../redux/store";
 import { getFileFirebase } from "../../../../services/firebase/getFirebse.service";
 import { Category } from "../../../../types/Categories.d";
 import "../../../../assets/css/admin.style.css";
-import  AlertCustomStyles  from "../../../../ultils/alert.succes";
+
 import LazyLoad from "react-lazyload";
 import { Link } from "react-router-dom";
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 interface ImageUrls {
   [key: string]: string;
 }
 
-const useAlert = (initialState: boolean) => {
-    const [showAlert, setShowAlert] = useState(initialState);
-    const triggerAlert = () => {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 2000);
-    };
-    return { showAlert, triggerAlert };
-  };
+// const useAlert = (initialState: boolean) => {
+//     const [showAlert, setShowAlert] = useState(initialState);
+//     const triggerAlert = () => {
+//       setShowAlert(true);
+//       setTimeout(() => setShowAlert(false), 2000);
+//     };
+//     return { showAlert, triggerAlert };
+//   };
 const ListCate: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const categories = useSelector(
@@ -33,7 +36,7 @@ const ListCate: React.FC = () => {
   const status = useSelector((state: RootState) => state.categories.status);
   const error = useSelector((state: RootState) => state.categories.error);
   const [imageUrls, setImageUrls] = useState<ImageUrls>({});
-  const { showAlert, triggerAlert } = useAlert(false);
+ 
 
   const fetchImageUrls = useCallback(async (categories: Category[]) => {
     const urls: ImageUrls = {};
@@ -61,26 +64,45 @@ const ListCate: React.FC = () => {
 
   const handleDelete = useCallback(
     (_id: string) => {
-      if (window.confirm("Bạn có muốn xóa dòng này ?")) {
-        dispatch(deleteCategoryThunk(_id))
-          .unwrap()
-          .then(() => {
-            triggerAlert();
-          });
-      }
+      MySwal.fire({
+        title: "Xóa danh mục?",
+        text: "Bạn có chắc muốn xóa dòng này không!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có",
+        cancelButtonText: "Hủy",
+      }).then(async (result: SweetAlertResult) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(deleteCategoryThunk(_id))
+            .unwrap()
+           
+        
+            MySwal.fire({
+              title: "Đã xóa!",
+              text: "Danh mục  đã  xóa.",
+              icon: "success",
+            });
+          } catch (error) {
+            console.error("Error deleting product:", error);
+            MySwal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra sự cố ",
+              icon: "error",
+            });
+          }
+        }
+      });
     },
-    [dispatch, triggerAlert]
+    [dispatch]
   );
 
   return (
     <>
       <main className="w-full flex-grow p-6">
-      {showAlert && (
-          <AlertCustomStyles
-            message="Xóa thành công"
-            type="success"
-          />
-        )}
+     
         <div className="w-full mt-12">
           <p className="text-xl pb-3 flex items-center">
             <i className="fas fa-list mr-3"></i> DANH SÁCH DANH MỤC

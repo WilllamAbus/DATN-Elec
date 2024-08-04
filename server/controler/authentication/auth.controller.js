@@ -43,6 +43,7 @@ const authController = {
         const payload = {
             id: user.id,
             name: user.name,
+            email: user.email,
             roles: user.roles
         };
         return jwt.sign(payload, jwtSecret, { expiresIn: '30d' });
@@ -52,6 +53,7 @@ const authController = {
         const payload = {
             id: user.id,
             name: user.name,
+            email: user.email,
             roles: user.roles
         };
         return jwt.sign(payload, jwtRefreshSecret, { expiresIn: '30d' });

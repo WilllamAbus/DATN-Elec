@@ -1,22 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import commonjs from '@rollup/plugin-commonjs';
-import checker from 'vite-plugin-checker'
+// import commonjs from '@rollup/plugin-commonjs';
+import checker from 'vite-plugin-checker';
+
 export default defineConfig({
   plugins: [
     react(),
-    commonjs(),
+    // commonjs(),
     checker({
       typescript: true, // Enable TypeScript type checking
-     
     }),
   ],
   resolve: {
-   
     alias: {
       '~': '/src',
     },
   },
+  
   server: {
     port: 3150,
     open: true,
@@ -32,5 +32,13 @@ export default defineConfig({
       },
     }
   },
- 
+  optimizeDeps: {
+    include: ['jwt-decode'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/]
+    }
+  },
+  
 });

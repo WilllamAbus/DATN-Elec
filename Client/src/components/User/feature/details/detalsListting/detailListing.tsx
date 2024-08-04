@@ -1,5 +1,5 @@
 import React , { useEffect, useState} from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import '../../../../../assets/css/user.style.css'
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -8,12 +8,13 @@ import Comment from '../../../../User/feature/details/comment/comment';
 import { getOneProduct } from "../../../../../services/product/crudProduct.service";
 import { getFileFirebase } from "../../../../../services/firebase/getFirebse.service";
 import currencyFormatter from 'currency-formatter';
+import AlertCustomStyles from '../../../../../ultils/alert.succes';
 function formatCurrency(value:number) {
   return currencyFormatter.format(value, { code: 'VND', symbol: '' });
 }
 const ProductDetail:  React.FC = () => {
     const [quantity, setQuantity] = useState(1);
-   
+    const navigate = useNavigate();
     const increaseQuantity = () => setQuantity(prev => prev + 1);
     const decreaseQuantity = () => {
         if (quantity > 1) setQuantity(prev => prev - 1);
@@ -22,23 +23,27 @@ const ProductDetail:  React.FC = () => {
     const [imgPreview, setImgPreview] = useState<string | null>(null);
     const { id } = useParams<{ id: string }>();
 
-
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({
+        message: "",
+        type: null,
+      });
     
     useEffect(() => {
         const fetchData = async () => {
             if (!id) {
-                console.log("Không có ID sản phẩm nào được cung cấp");
+              
                 return;
             }
             try {
                 const product = await getOneProduct(id);
+             
                 setProduct(product);
                 if (product.image) {
                     const url = await getFileFirebase(product.image);
                     setImgPreview(url);
                 }
             } catch (error) {
-                console.log("Failed to fetch product data");
+                console.error(error)
             }
         };
 
@@ -49,9 +54,42 @@ const ProductDetail:  React.FC = () => {
         const basePrice = product.price * (1 - product.discount / 100);
         return basePrice * quantity;
     };
+
+
+    const addToCart = () => {
+        if (!product || !product._id) {
+         
+            return;
+        }
+    
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+        
+        const existingProductIndex = cart.findIndex((item: any) => item.id === product._id);
+      
+    
+        if (existingProductIndex > -1) {
+            cart[existingProductIndex].quantity += quantity;
+            cart[existingProductIndex].price = calculatePrice();
+        } else {
+            cart.push({
+                id: product._id,
+                name: product.name,
+                price: calculatePrice(),
+                quantity,
+                imgPreview
+            });
+        }
+    
+        localStorage.setItem('cart', JSON.stringify(cart));
+        setAlert({ message: "Thêm vào giỏ hàng thành công!", type: "success" });
+        navigate('/cart');
+      };
     return (
         <>
-      
+          {alert.message && (
+        <AlertCustomStyles message={alert.message} type={alert.type} />
+      )}
             {/* breadcrumb */}
             <div className="container py-4 flex items-center gap-3">
                 <a href="/" className="text-primary text-base">
@@ -67,6 +105,7 @@ const ProductDetail:  React.FC = () => {
             {/* product-detail */}
           
   <div  className="container grid grid-cols-2 gap-6">
+
   <div >
       {imgPreview && (
                 <div >
@@ -106,7 +145,7 @@ const ProductDetail:  React.FC = () => {
       </div>
       <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
           <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
-          <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)}</p>
+          <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)} VNĐ</p>
       </div>
 
       <p className="mt-4 text-gray-600"></p>
@@ -175,12 +214,12 @@ const ProductDetail:  React.FC = () => {
       </div>
         
       <div className="mt-6 flex gap-3 border-b border-gray-200 pb-5 pt-5">
-          <a href="/checkout" className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
+          <a href="/checkout"  className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Mua ngay
           </a>
-          <a href="/cart" className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
+          <button  onClick={addToCart} className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
-          </a>
+          </button>
           <a href="" className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
               <i className="fa-solid fa-bag-shopping"></i> Add WatchList
           </a>

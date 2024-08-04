@@ -14,3 +14,19 @@ export interface Category {
     conditionActive: string;
   }
   
+
+  export interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    imgPreview: string;
+  }
+  
+  export  interface CartState {
+    items: CartItem[];
+    totalPrice: number;
+    shipping: number;
+    applyVoucher: boolean;
+    selectedVoucher?: Voucher;
+  }

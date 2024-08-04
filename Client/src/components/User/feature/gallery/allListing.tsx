@@ -638,7 +638,7 @@ const allListing: React.FC = () => {
                     <img
                       src={product.image}
                       alt="product 1"
-                      className="h-50"
+                      style={{ width: "360px", height: "367px" }}
                     />
                     <div
                       className="absolute inset-0  flex items-center 
@@ -657,7 +657,7 @@ const allListing: React.FC = () => {
                     {formatCurrency(product.price * ( 1 - product.discount / 100))}VNĐ
                     </p>
                     <p className="text-sm text-gray-400 line-through">
-                       {formatCurrency(product.price)}
+                       {formatCurrency(product.price)} VNĐ
                     </p>
                   </div>
                   <div className="flex items-center">

@@ -1,10 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { CartItem, CartState } from "../../../../types/Voucher.d";
 
 
 import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 const completePage: React.FC = () => {
+    const [cartState, setCartState] = useState<CartState>({
+        items: [],
+        totalPrice: 0,
+        shipping: 0,
+        applyVoucher: false,
+        selectedVoucher: undefined,
+      });
+      const navigate = useNavigate();
+      useEffect(() => {
+        // Retrieve cart items from localStorage
+        const storedCartItems = localStorage.getItem("cart");
+        if (storedCartItems) {
+          const items: CartItem[] = JSON.parse(storedCartItems);
+          setCartState(prevState => ({
+            ...prevState,
+            items,
+            totalPrice: calculateTotalPrice(items), // Calculate total price if needed
+          }));
+        }
+      }, []);
+    
+      const calculateTotalPrice = (items: CartItem[]): number => {
+        return items.reduce((total, item) => total + item.price * item.quantity, 0);
+      };
+      const handleHome = () => {
+        localStorage.removeItem("cart");
+    
+        navigate("/"); // Redirect to the complete page
+      };
   return (
     <>
    
@@ -25,45 +56,35 @@ const completePage: React.FC = () => {
         <div className="col-span-8 border border-gray-200 p-4 rounded">
           <h3 className="text-lg font-medium capitalize mb-4">Hoàn thành thanh toán</h3>
           <div className="space-y-4">
-          <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-                <p className="text-gray-800 font-medium">20.000 vnđ</p>
-                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                  <i className="fa-sharp fa-solid fa-trash"></i>
-                </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-                <p className="text-gray-800 font-medium">20.000 vnđ</p>
-                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                  <i className="fa-sharp fa-solid fa-trash"></i>
-                </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-                <p className="text-gray-800 font-medium">20.000 vnđ</p>
-                <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                  <i className="fa-sharp fa-solid fa-trash"></i>
-                </button>
-            </div>
+             {/* Product Items */}
+             {cartState.items.length > 0 ? (
+              cartState.items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <img
+                      src={item.imgPreview || listOne}
+                      alt={`product ${item.name}`}
+                      className="w-28 h-10"
+                    />
+                  
+                  </div>
+                  <h5 className="text-gray-800 font-medium">{item.name}</h5>
+                  <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
+                  
+                    <div className="h-8 w-8 text-base flex items-center justify-center">
+                      {item.quantity}
+                    </div>
+                
+                  </div>
+                  <p className="text-gray-800 font-medium">
+                    {(item.price * item.quantity).toLocaleString()} vnđ
+                  </p>
+                
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600">Giỏ hàng trống</p>
+            )}
           </div>
         </div>
 
@@ -74,28 +95,28 @@ const completePage: React.FC = () => {
 
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
             <p>Thanh toán</p>
-            <p>128.000 vnđ</p>
+            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
           </div>
 
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
+          {/* <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
             <p>Vận chuyển</p>
-            <p>Miễn phí</p>
-          </div>
+            <p>{cartState.shipping.toLocaleString()} vnđ</p>
+          </div> */}
 
     
 
           <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
             <p className="font-semibold">Tổng thanh toán</p>
-            <p>128.000 vnđ</p>
+            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
           </div>
 
-          <a
-            href="/"
+          <button
+            onClick={handleHome}
             className="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md 
                 hover:bg-transparent hover:text-primary transition font-medium"
           >
             Hoàn thành thanh toán
-          </a>
+          </button>
         </div>
       </div>
   

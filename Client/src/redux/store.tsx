@@ -20,6 +20,7 @@ import storage from 'redux-persist/lib/storage';
 import authReducer from './auth/authSlice';
 import voucherReducer from './discount/voucherSlice'
 import categoriesSlice from './categories/categoriesSlice';
+import checkoutSlice from './checkout/checkoutSlice';
 // Cấu hình Redux Persist
 const persistConfig = {
   key: "root",
@@ -32,7 +33,8 @@ export const store = configureStore({
     reducer: {
         auth: persistedReducer,
         categories: categoriesSlice,
-        voucher: voucherReducer
+        voucher: voucherReducer,
+        checkout: checkoutSlice
 
            },
     middleware: (getDefaultMiddleware) =>
