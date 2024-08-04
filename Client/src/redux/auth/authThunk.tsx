@@ -1,14 +1,13 @@
-import axios from "axios";
-import { loginFailed, loginStart, loginSuccess } from "./authSlice";
-import { AppDispatch } from "../store";
+// import axios from "axios";
+// import { loginFailed, loginStart, loginSuccess } from "./authSlice";
+// import { AppDispatch } from "../store";
 import {
-  getProfile,
   registerApi,
   updateProfile,
 } from "../../services/authentication/auth.services";
 import { UserProfile } from "../../types/user";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
 
 interface RegisterParams {
   email: string;

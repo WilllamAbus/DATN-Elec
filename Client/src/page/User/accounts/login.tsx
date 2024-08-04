@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
@@ -7,15 +7,9 @@ import UserCopyright from "../../../components/User/copyright";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { useCookies } from "react-cookie";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 
-import authSlice from "../../../redux/auth/authSlice";
-import { RootState } from "../../../redux/rootReducer";
-import axios from "axios";
-import { useAppDispatch, useAppSelector } from "../../../redux/rootReducer";
-import { UserProfile } from "../../../types/user";
+import { useAppDispatch } from "../../../redux/rootReducer";
 import { loginUser } from "../../../services/authentication/auth.services";
 interface IFormInput {
   email: string;
