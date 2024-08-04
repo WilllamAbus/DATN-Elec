@@ -120,7 +120,7 @@ const authController = {
   },
   generateToken: (user) => {
     const payload = {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
       roles: user.roles,
@@ -130,7 +130,7 @@ const authController = {
 
   generateRefreshToken: (user) => {
     const payload = {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
       roles: user.roles,
@@ -140,7 +140,9 @@ const authController = {
 
   loginUser: async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({ email: req.body.email }).populate(
+        "roles"
+      ); // Đảm bảo rằng trường roles được populate
       if (!user) {
         return res
           .status(401)
@@ -158,7 +160,6 @@ const authController = {
       }
 
       const token = authController.generateToken(user);
-
       const refreshToken = authController.generateRefreshToken(user);
       refreshTokens.push(refreshToken);
 
@@ -170,7 +171,10 @@ const authController = {
       // });
 
       const { password, ...others } = user._doc;
-      return res.status(200).json({ ...others, accessToken: token });
+      // Return user info including roles
+      return res
+        .status(200)
+        .json({ ...others, accessToken: token, roles: user.roles });
     } catch (err) {
       return res.status(500).json({ msg: "Server error", error: err.message });
     }

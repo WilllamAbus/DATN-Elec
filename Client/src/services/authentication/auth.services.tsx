@@ -1,99 +1,123 @@
-import { Login, Registe } from "../../types/user";
-import request from "../../config/Auth";
-import axios from "axios";
+import instance from "../axios";
 import { UserProfile } from "../../types/user";
-export interface LoginResponse {
-  accessToken: string;
-  roles: { name: string }[]; // Thay đổi để chứa tên vai trò
-  name: string;
-}
-export interface RegisterResponse {
-  user?: any;
-  msg?: string;
-  accessToken?: string;
-}
-// export interface Profile {
-//   name: string;
-//   email: string;
-//   birthday: string;
-//   gender: string;
-//   phone: string;
-//   address?: string;
-// }
-const loginApi = async ({ email, password }: Login) => {
-  const res = await request({
-    path: "auth/login",
-    method: "POST",
-    data: {
-      email: email,
-      password: password,
-      device: "website",
-    },
-  });
+import {
+  loginFailed,
+  loginStart,
+  loginSuccess,
+  setProfile,
+} from "../../redux/auth/authSlice";
+import { AppDispatch } from "../../redux/store";
+import axios from "axios";
 
-  return res;
+const API_URL = import.meta.env.VITE_API_URL;
+
+export const loginUser = async (
+  user: { email: string; password: string },
+  dispatch: AppDispatch,
+  navigate: (path: string) => void
+) => {
+  dispatch(loginStart());
+
+  try {
+    const response = await instance.post(`${API_URL}/auth/login`, user);
+    const { accessToken, roles, name } = response.data;
+
+    // Lưu thông tin vào localStorage
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("roles", roles?.[0]?.name || ""); // Lưu role nếu có
+    localStorage.setItem("name", name || ""); // Lưu tên nếu có
+
+    // Lưu token vào localStorage với cấu trúc JSON (nếu cần)
+    window.localStorage.setItem(
+      "persist:root",
+      JSON.stringify({
+        login: {
+          currentUser: {
+            accessToken,
+          },
+        },
+      })
+    );
+
+    dispatch(loginSuccess({ currentUser: name, token: accessToken }));
+    navigate("/profile");
+  } catch (err: any) {
+    if (err.response && err.response.data) {
+      dispatch(loginFailed(err.response.data.msg || "Đã xảy ra lỗi"));
+    } else {
+      dispatch(loginFailed());
+    }
+  }
 };
 
-const getProfile = async (): Promise<UserProfile> => {
-  const res = await request({
-    path: "auth/profile",
-    method: "GET",
-  });
+export const getProfile = () => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
 
-  return res as UserProfile;
+      const response = await instance.get(`${API_URL}/auth/profile`);
+      dispatch(setProfile(response.data));
+    } catch (err: any) {
+      console.error("Failed to fetch profile:", err);
+      if (err.response?.status === 401) {
+        console.error("Unauthorized: Token might be invalid or expired.");
+      }
+    }
+  };
 };
 
-const logout = async (): Promise<UserProfile> => {
-  const res = await request({
-    path: "auth/logout",
-    method: "POST",
-  });
-
-  return res as UserProfile;
+export const logout = async (): Promise<void> => {
+  try {
+    await instance.post("/auth/logout");
+    localStorage.removeItem("token");
+    localStorage.removeItem("roles");
+    localStorage.removeItem("name");
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
 };
-const updateProfile = async (
+export const updateProfile = async (
   profileData: UserProfile
 ): Promise<UserProfile> => {
   try {
-    const res = await request({
-      path: "auth/profile",
-      method: "PUT",
-      data: profileData,
-    });
-
-    return res as UserProfile;
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response) {
-      throw err.response.data;
+    const response = await instance.put("/auth/profile", profileData);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
     } else {
       throw new Error("An unknown error occurred");
     }
   }
 };
-const registerApi = async ({
+
+export const registerApi = async ({
   email,
   password,
   name,
-}: Registe): Promise<RegisterResponse> => {
+}: {
+  email: string;
+  password: string;
+  name: string;
+}): Promise<UserProfile> => {
   try {
-    const res = await request({
-      path: "auth/register",
-      method: "POST",
-      data: {
-        email: email,
-        password: password,
-        name: name,
-        device: "website",
-      },
+    const response = await instance.post("/auth/register", {
+      email,
+      password,
+      name,
+      device: "website",
     });
-
-    return res;
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response) {
-      throw err.response.data;
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
     } else {
       throw new Error("An unknown error occurred");
     }
   }
 };
-export { loginApi, getProfile, registerApi, updateProfile, logout };

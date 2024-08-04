@@ -40,7 +40,7 @@ const defaultProfile: UserProfile = {
 //   profile: UserProfile;
 //   // onProfileUpdate: (profileData: UserProfile) => void;
 // }
-const EditProfile: React.FC<EditProfile> = ({ profile }) => {
+const changePassword: React.FC<EditProfile> = ({ profile }) => {
   const [localProfile, setLocalProfile] = useState<UserProfile>(
     profile || defaultProfile
   );
@@ -121,23 +121,11 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name">Tên</label>
+              <label htmlFor="name">Mật khẩu cũ</label>
               <input
                 type="text"
                 name="name"
                 id="name"
-                value={localProfile.name}
-                onChange={handleChange}
-                className="input-box"
-              />
-            </div>
-            <div>
-              <label htmlFor="birthday">Ngày sinh</label>
-              <input
-                type="date"
-                name="birthday"
-                id="birthday"
-                value={formatDateForInput(localProfile.birthday || "")}
                 onChange={handleChange}
                 className="input-box"
               />
@@ -145,11 +133,10 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="gender">Giới tính</label>
+              <label htmlFor="password">Mật khẩu mới</label>
               <select
-                name="gender"
-                id="gender"
-                value={localProfile.gender}
+                name="password"
+                id="password"
                 onChange={handleChange}
                 className="input-box"
               >
@@ -195,4 +182,4 @@ const EditProfile: React.FC<EditProfile> = ({ profile }) => {
     </div>
   );
 };
-export default EditProfile;
+export default changePassword;

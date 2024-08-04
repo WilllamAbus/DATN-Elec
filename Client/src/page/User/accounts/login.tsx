@@ -7,118 +7,46 @@ import UserCopyright from "../../../components/User/copyright";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { loginApi } from "../../../services/authentication/auth.services";
 import { useCookies } from "react-cookie";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Auth } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
+
+import authSlice from "../../../redux/auth/authSlice";
+import { RootState } from "../../../redux/rootReducer";
 import axios from "axios";
+import { useAppDispatch, useAppSelector } from "../../../redux/rootReducer";
+import { UserProfile } from "../../../types/user";
+import { loginUser } from "../../../services/authentication/auth.services";
 interface IFormInput {
   email: string;
   password: string;
 }
 
-// const Login: React.FC = () => {
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//   } = useForm<IFormInput>();
-//   const navigate = useNavigate();
-//   const [cookies, setCookie] = useCookies(["token"]);
-//   const login: SubmitHandler<IFormInput> = async (data) => {
-//     try {
-//       const res = await loginApi({
-//         email: data.email,
-//         password: data.password,
-//       });
-
-//       if (res?.accessToken) {
-//         const dateExpired = new Date();
-//         dateExpired.setHours(dateExpired.getHours() + 1);
-//         setCookie("token", res.accessToken, {
-//           expires: dateExpired,
-//           path: "/",
-//         });
-//         localStorage.setItem("token", res.accessToken);
-//         localStorage.setItem("name", res.name);
-//         navigate("/profile");
-//       }
-//     } catch (err) {
-//       console.error("Error logging in:", err);
-//     }
-//   };
 const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormInput>();
-
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["token", "role"]);
-  const dispatch = useDispatch();
-  const profile = useSelector((state: any) => state.auth.profile);
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (profile) {
-      const dateExpired = new Date();
-      dateExpired.setHours(dateExpired.getHours() + 1);
-      setCookie("role", profile?.role, { path: "/", expires: dateExpired });
-      navigate("/profile");
-    }
-  }, [profile, navigate, setCookie]);
-
-  const login: SubmitHandler<IFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
     setError(null);
 
     try {
-      const res = await loginApi({
-        email: data.email,
-        password: data.password,
-      });
-
-      console.log("Login Response:", res);
-
-      if (res?.accessToken) {
-        const dateExpired = new Date();
-        dateExpired.setHours(dateExpired.getHours() + 1);
-
-        setCookie("token", res.accessToken, {
-          path: "/",
-          expires: dateExpired,
-        });
-
-        const roleName = res.roles.length > 0 ? res.roles[0]?.name : "";
-        setCookie("role", roleName, {
-          path: "/",
-          expires: dateExpired,
-        });
-
-        dispatch(Auth.getProfile());
-
-        localStorage.setItem("token", res.accessToken);
-        localStorage.setItem("name", res.name);
-
-        navigate("/profile");
-      } else {
-        setError("Đăng nhập không thành công");
-      }
+      await loginUser(data, dispatch, navigate);
     } catch (err) {
-      console.error("Error logging in:", err);
-
-      if (err && axios.isAxiosError(err)) {
-        const axiosError = err as { response?: { data?: { msg?: string } } };
-        // Chỉ hiển thị thông báo lỗi từ API nếu có
-        setError(axiosError.response?.data?.msg || "");
-      }
+      setError("Đã xảy ra lỗi không xác định");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <>
       <UserHeader />
@@ -130,7 +58,7 @@ const Login: React.FC = () => {
             Chào mừng khách hàng quay trở lại
           </p>
 
-          <form onSubmit={handleSubmit(login)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label htmlFor="email" className="text-gray-600 mb-2 block">
                 Email
