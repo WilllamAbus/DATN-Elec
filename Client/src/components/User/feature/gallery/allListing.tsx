@@ -1,14 +1,13 @@
-import React , { useEffect, useState} from "react";
-// import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
 
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link } from "react-router-dom";
 import { listProduct } from "../../../../services/product/crudProduct.service";
-import currencyFormatter from 'currency-formatter';
+import currencyFormatter from "currency-formatter";
 import Filter from "../../filter";
-function formatCurrency(value:number) {
-  return currencyFormatter.format(value, { code: 'VND', symbol: '' });
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
 const allListing: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -18,17 +17,15 @@ const allListing: React.FC = () => {
         const productList = await listProduct();
         setProducts(productList);
       } catch (error) {
-       console.log(`lỗi: `,error);
+        console.log(`lỗi: `, error);
       }
     };
 
     fetchProducts();
   }, []);
-  
 
   return (
     <>
-    
       {/* <!-- breadcrumb --> */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
@@ -43,7 +40,6 @@ const allListing: React.FC = () => {
 
       {/* <!-- shop wrapper --> */}
       <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
-     
         <div className="text-center md:hidden">
           <button
             className="text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block md:hidden"
@@ -56,7 +52,6 @@ const allListing: React.FC = () => {
           </button>
         </div>
 
-        {/* <!-- drawer component tabindex="-1"--> */}
         <div
           id="drawer-example"
           className="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800"
@@ -251,104 +246,6 @@ const allListing: React.FC = () => {
                 />
               </div>
             </div>
-
-            {/* <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                size
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-xs"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    XS
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-sm"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    S
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-m"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    M
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-l"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    L
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-xl"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    XL
-                  </label>
-                </div>
-              </div>
-            </div> */}
-            {/* 
-            <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Color
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="red"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="black"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="white"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-              </div>
-            </div> */}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <a
@@ -379,7 +276,6 @@ const allListing: React.FC = () => {
           </div>
         </div>
 
-        {/* <!-- ./sidebar --> */}
         <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hiddenb hidden md:block">
           <div className="divide-y divide-gray-200 space-y-5">
             <div>
@@ -476,8 +372,8 @@ const allListing: React.FC = () => {
             </div>
 
             <div className="pt-4">
-            <Filter/>
-           </div>
+              <Filter />
+            </div>
 
             {/* <div className="pt-4">
               <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -583,7 +479,7 @@ const allListing: React.FC = () => {
             </div> */}
           </div>
         </div>
-        {/* <!-- products --> */}
+
         <div className="col-span-3">
           <div className="flex items-center mb-4">
             <select
@@ -594,7 +490,6 @@ const allListing: React.FC = () => {
               <option value="">Mặc định sắp xếp</option>
               <option value="price-low-to-high">Giá thấp to cao</option>
               <option value="price-high-to-low">Price cao to thấp</option>
-        
             </select>
 
             <div className="flex gap-2 ml-auto">
@@ -607,7 +502,6 @@ const allListing: React.FC = () => {
             </div>
           </div>
 
-              
           <div className="grid md:grid-cols-3 grid-cols-2 gap-6">
             {products.map((product, index) => (
               <div
@@ -622,8 +516,8 @@ const allListing: React.FC = () => {
                       style={{ width: "360px", height: "367px" }}
                     />
                     <div
-                      className="absolute inset-0  flex items-center 
-                  justify-center gap-2 opacity-0 group-hover:opacity-100 transition"
+                      className="absolute inset-0 flex items-center 
+          justify-center gap-2 opacity-0 group-hover:opacity-100 transition"
                     ></div>
                   </Link>
                 </div>
@@ -634,26 +528,39 @@ const allListing: React.FC = () => {
                     </h4>
                   </a>
                   <div className="flex items-baseline mb-1 space-x-2">
-                  {product.discount > 1 ? (
-                <div>
-                    <p className="text-xl text-primary font-semibold">
-                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
-                    </p>
-                    <p className="text-sm text-gray-400 line-through">
-                        {formatCurrency(product.price)}
-                    </p>
+                    {product.discount > 1 ? (
+                      <div>
+                        <p className="text-xl text-primary font-semibold">
+                          {formatCurrency(
+                            product.price * (1 - product.discount / 100)
+                          )}{" "}
+                          VNĐ
+                        </p>
+                        <p className="text-sm text-gray-400 line-through">
+                          {formatCurrency(product.price)} VNĐ
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product.price)} VNĐ
+                      </p>
+                    )}
+
+                  </div>
+                  <a
+                href="#"
+                className="block w-full py-1 text-center text-white bg-primary border border-primary rounded-b hover:bg-transparent hover:text-primary transition"
+              >
+                Thêm giỏ hàng
+              </a>
                 </div>
-            ) : (
-                <p className="text-xl text-primary font-semibold">
-                    {formatCurrency(product.price)} VNĐ
-                </p>
-            )}
-           
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    
-  
     </>
-  )
+  );
 };
 
 export default allListing;

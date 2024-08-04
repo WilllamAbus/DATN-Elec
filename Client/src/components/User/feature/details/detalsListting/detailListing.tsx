@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -28,7 +28,10 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<any | null>(null);
   const [imgPreview, setImgPreview] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
-
+//   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({
+//     message: "",
+//     type: null,
+//   });
   useEffect(() => {
     const fetchData = async () => {
       if (!id) {
@@ -73,10 +76,7 @@ const ProductDetail: React.FC = () => {
     };
     fetchData();
   },[id])
-    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({
-        message: "",
-        type: null,
-      });
+   
     
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -134,7 +134,7 @@ const ProductDetail: React.FC = () => {
         }
     
         localStorage.setItem('cart', JSON.stringify(cart));
-        setAlert({ message: "Thêm vào giỏ hàng thành công!", type: "success" });
+        // setAlert({ message: "Thêm vào giỏ hàng thành công!", type: "success" });
         navigate('/cart');
       };
  
@@ -196,17 +196,17 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-gray-800 font-semibold space-x-2">
+                 <p className="text-gray-800 font-semibold space-x-2">
               <span>Trạng thái: </span>
               {product?.quantity > 0 ?<span className="text-green-600">Còn Hàng</span>:  <span className="text-red-600">Hết Hàng</span>}
-          </p>
-      </div>
-      <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+                </p>
+          </div>
+            <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
           <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
           <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)} VNĐ</p>
-      </div>
+            </div>
 
-      <p className="mt-4 text-gray-600"></p>
+             <p className="mt-4 text-gray-600"></p>
 
       <div className="pt-4">
           <h3 className="text-sm text-gray-800 uppercase mb-1">Kích thước</h3>
@@ -232,7 +232,7 @@ const ProductDetail: React.FC = () => {
                   <label htmlFor="size-xl" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">XL</label>
               </div>
           </div>
-          <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+          {/* <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
           {product?.discount > 1 ? (
                 <div>
                     <p className="text-xl text-primary font-semibold">
@@ -247,85 +247,11 @@ const ProductDetail: React.FC = () => {
                     {formatCurrency(product?.price)} VNĐ
                 </p>
             )}
-          </div>
-
+          </div> */}
+        </div>
           <p className="mt-4 text-gray-600"></p>
 
-          <div className="pt-4">
-            <h3 className="text-sm text-gray-800 uppercase mb-1">Kích thước</h3>
-            <div className="flex items-center gap-2">
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xs"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xs"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XS
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-sm"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-sm"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  S
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-m"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-m"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  M
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-l"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-l"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  L
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xl"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xl"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XL
-                </label>
-              </div>
-            </div>
-          </div>
+      
 
           <div className="pt-4">
             <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
@@ -467,8 +393,7 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
       {/* ./related-products */}
-      <div/>
-      <div/>
+     
     </>
   );
 };
