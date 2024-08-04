@@ -100,9 +100,9 @@ export const updateProfile = async (
 };
 
 export const registerUser = async (
-  user: { email: string; password: string; name: string },
-  dispatch: AppDispatch,
-  navigate: (path: string) => void
+  user: { email: string; password: string; name: string }
+  // dispatch: AppDispatch,
+  // navigate: (path: string) => void
 ) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, user);

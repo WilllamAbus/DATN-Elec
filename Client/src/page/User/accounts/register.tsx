@@ -8,8 +8,8 @@ import UserCoppyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
 import { useForm } from "react-hook-form";
 import { registerUser } from "../../../services/authentication/auth.services";
-import { AppDispatch } from "../../../redux/store";
-import { useDispatch } from "react-redux";
+// import { AppDispatch } from "../../../redux/store";
+// import { useDispatch } from "react-redux";
 
 interface FormValues {
   email: string;
@@ -19,8 +19,8 @@ interface FormValues {
 }
 
 const Register: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
+  // const dispatch: AppDispatch = useDispatch();
+  // const navigate = useNavigate();
 
   const {
     register: formRegister,
@@ -36,11 +36,11 @@ const Register: React.FC = () => {
     setMessage(null);
 
     try {
-      await registerUser(
-        { email: data.email, password: data.password, name: data.name },
-        dispatch,
-        navigate
-      );
+      await registerUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      });
       setMessage("Đăng ký thành công. Vui lòng kiểm tra Email để xác thực.");
     } catch (error: any) {
       setMessage(error.message || "Đã xảy ra lỗi khi đăng ký.");

@@ -49,7 +49,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
 
     try {
       const updatedProfile = await updateProfile(localProfile);
-      console.log("Profile updated successfully:", localProfile);
+      console.log("Profile updated successfully:", updatedProfile);
 
       // Cập nhật trạng thái người dùng trong Redux
       dispatch(setProfile(localProfile));
