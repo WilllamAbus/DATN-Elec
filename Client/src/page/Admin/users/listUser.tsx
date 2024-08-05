@@ -3,10 +3,11 @@ import AdminFooter from "../../../components/Admin/footer";
 import AdminHeader from "../../../components/Admin/header";
 import AdminSidebar from "../../../components/Admin/sidebar";
 import AdminStyleSheet from "../../../components/Admin/stySheet";
-
+import { getList } from "../../../services/authentication/auth.services";
 import AdminScript from "../../../components/Admin/script";
 import "../../../assets/css/admin.style.css";
 const listUsers: React.FC = () => {
+  
   return (
     <>
       <AdminStyleSheet />

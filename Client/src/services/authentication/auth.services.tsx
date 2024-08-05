@@ -25,12 +25,12 @@ export const loginUser = async (
     const response = await instance.post(`${API_URL}/auth/login`, user);
     const { accessToken, roles, name } = response.data;
 
-    // Lưu thông tin vào localStorage
+   
     localStorage.setItem("token", accessToken);
-    localStorage.setItem("roles", roles?.[0]?.name || ""); // Lưu role nếu có
-    localStorage.setItem("name", name || ""); // Lưu tên nếu có
+    localStorage.setItem("roles", roles?.[0]?.name || "");
+    localStorage.setItem("name", name || ""); 
 
-    // Lưu token vào localStorage với cấu trúc JSON (nếu cần)
+   
     window.localStorage.setItem(
       "persist:root",
       JSON.stringify({
@@ -69,7 +69,22 @@ export const getProfile = () => {
     }
   };
 };
+export const getList = () => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
 
+      const response = await instance.get(`${API_URL}/auth/list`);
+      dispatch(setProfile(response.data));
+    } catch (err: any) {
+      console.error("Failed to fetch profile:", err);
+      if (err.response?.status === 401) {
+        console.error("Unauthorized: Token might be invalid or expired.");
+      }
+    }
+  };
+};
 export const logout = async (): Promise<void> => {
   try {
     await instance.post("/auth/logout");
