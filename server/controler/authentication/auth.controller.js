@@ -15,8 +15,7 @@ let refreshTokens = [];
 const authController = {
   registerUser: async (req, res) => {
     try {
-      // Tìm vai trò người dùng
-      const userRole = await Role.findOne({ name: "admin" });
+      const userRole = await Role.findOne({ name: "user" });
       if (!userRole) {
         return res
           .status(500)
@@ -25,7 +24,6 @@ const authController = {
 
       const { email, password, name } = req.body;
 
-      // Kiểm tra xem email đã tồn tại chưa
       const checkEmail = await User.findOne({ email });
       if (checkEmail) {
         return res.status(200).json({ msg: "Email đã tồn tại" });
@@ -52,8 +50,6 @@ const authController = {
       return res
         .status(200)
         .json({ msg: "Đăng ký thành công. Vui lòng kiểm tra Email" });
-
-      // res.status(200).json({ msg: "Người dùng đã đăng ký thành công", user });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ msg: "Server error", error: err.message });
@@ -321,6 +317,7 @@ const authController = {
       });
     }
   },
+
   updatePassword: async (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
@@ -337,15 +334,12 @@ const authController = {
         return res.status(404).json({ msg: "Không tìm thấy người dùng" });
       }
 
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      const isMatch = await user.comparePassword(currentPassword);
       if (!isMatch) {
         return res.status(400).json({ msg: "Mật khẩu hiện tại không đúng" });
       }
 
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-      user.password = hashedPassword;
+      user.password = newPassword;
       await user.save();
 
       res.status(200).json({ msg: "Cập nhật mật khẩu thành công" });

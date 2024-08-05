@@ -100,7 +100,8 @@ const UpdatePassword: React.FC<password> = ({}) => {
         <div>
           <button
             type="submit"
-            className="bg-blue-500 text-blue py-2 px-4 rounded"
+            className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
+            disabled={loading}
           >
             {loading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
           </button>
