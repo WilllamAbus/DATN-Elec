@@ -649,7 +649,7 @@ const search: React.FC = () => {
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-50 object-cover"
+                          style={{ width: "360px", height: "337px" }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition"></div>
                       </Link>

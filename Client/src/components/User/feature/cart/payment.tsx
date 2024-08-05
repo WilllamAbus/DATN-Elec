@@ -76,22 +76,22 @@ const Checkout: React.FC = () => {
 
   const getUserData = (): DecodedToken => {
     const userData = window.localStorage.getItem("persist:root");
-    console.log("UserData:", userData);
+   
   
     if (userData) {
       try {
         // Parse the root state
         const parsedData = JSON.parse(userData);
-        console.log("ParsedData:", parsedData);
+    
   
         // Access the login data from parsedData
         const loginData = JSON.parse(parsedData.auth)?.login;
-        console.log("LoginData:", loginData);
+    
   
         // Check if loginData and token are available
         if (loginData && loginData.token) {
           const token = loginData.token;
-          console.log("Token:", token);
+         
   
           // Decode the token and return the result
           return decodeToken(token);
