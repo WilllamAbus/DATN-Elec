@@ -113,13 +113,11 @@ export const logout = async (): Promise<void> => {
     }
   }
 };
-export const updateProfile = async (formData: FormData): Promise<any> => {
+export const updateProfile = async (
+  profileData: UserProfile
+): Promise<UserProfile> => {
   try {
-    const response = await axios.put("/auth/profile", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await instance.put("/auth/profile", profileData);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
