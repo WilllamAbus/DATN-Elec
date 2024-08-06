@@ -1,28 +1,63 @@
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firabse.init'; // Adjust the path accordingly
+// import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+// import { storage } from "../../firabse.init"; // Adjust the path accordingly
 
-export const uploadFileFirebase = async (file: File, filePath: string): Promise<string> => {
+// export const uploadFileFirebase = async (
+//   file: File,
+//   filePath: string
+// ): Promise<string> => {
+//   try {
+//     const storageRef = ref(storage, filePath);
+//     const uploadTask = uploadBytesResumable(storageRef, file);
+
+//     return new Promise<string>((resolve, reject) => {
+//       uploadTask.on(
+//         "state_changed",
+//         null,
+//         (error) => reject(error),
+//         async () => {
+//           try {
+//             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+//             resolve(downloadURL);
+//           } catch (error) {
+//             reject(error);
+//           }
+//         }
+//       );
+//     });
+//   } catch (error) {
+//     console.error("Upload failed:", (error as Error).message);
+//     throw error;
+//   }
+// };
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firabse.init";
+
+export const uploadFileFirebase = async (
+  file: File,
+  filePath: string
+): Promise<string> => {
+  const storageRef = ref(storage, filePath);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
   try {
-    const storageRef = ref(storage, filePath);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    return new Promise<string>((resolve, reject) => {
+    const downloadURL = await new Promise<string>((resolve, reject) => {
       uploadTask.on(
-        'state_changed',
-        null,
+        "state_changed",
+        null, // Bạn có thể thêm xử lý progress nếu cần
         (error) => reject(error),
         async () => {
           try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(downloadURL);
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(url);
           } catch (error) {
             reject(error);
           }
         }
       );
     });
+    return downloadURL;
   } catch (error) {
-    console.error('Upload failed:', (error as Error).message);
+    console.error("Upload failed:", (error as Error).message);
     throw error;
   }
 };

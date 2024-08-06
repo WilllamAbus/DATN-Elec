@@ -21,7 +21,7 @@ interface AuthState {
     error: boolean;
     successMessage: string | null;
   };
-  users: UserProfile[]; 
+  users: any[];
 }
 
 const initialState: AuthState = {
@@ -96,7 +96,7 @@ const authSlice = createSlice({
       state.profile.roles = action.payload.roles; // Cập nhật vai trò
       state.profile.status = "succeeded"; // Đánh dấu trạng thái thành công
     },
-    setUserList(state, action: PayloadAction<UserProfile[]>) {
+    setUserList: (state, action: PayloadAction<any[]>) => {
       state.users = action.payload;
     },
     profileLoading(state) {

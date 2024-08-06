@@ -8,9 +8,11 @@ import {
   registerSuccess,
   registerFailed,
   setProfile,
+  setUserList,
 } from "../../redux/auth/authSlice";
 import { AppDispatch } from "../../redux/store";
 import axios from "axios";
+import { uploadFileFirebase } from "../firebase/uploadFirebase.service";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,12 +27,10 @@ export const loginUser = async (
     const response = await instance.post(`${API_URL}/auth/login`, user);
     const { accessToken, roles, name } = response.data;
 
-   
     localStorage.setItem("token", accessToken);
     localStorage.setItem("roles", roles?.[0]?.name || "");
-    localStorage.setItem("name", name || ""); 
+    localStorage.setItem("name", name || "");
 
-   
     window.localStorage.setItem(
       "persist:root",
       JSON.stringify({
@@ -75,12 +75,26 @@ export const getList = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await instance.get(`${API_URL}/auth/list`);
-      dispatch(setProfile(response.data));
+      const response = await instance.get(`/auth/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("API response data:", response.data);
+
+      // Truy cập trường 'data' của phản hồi
+      if (Array.isArray(response.data.data)) {
+        dispatch(setUserList(response.data.data));
+      } else {
+        throw new Error("Dữ liệu trả về không phải là mảng");
+      }
     } catch (err: any) {
-      console.error("Failed to fetch profile:", err);
+      console.error("Failed to fetch user list:", err);
       if (err.response?.status === 401) {
         console.error("Unauthorized: Token might be invalid or expired.");
+      } else {
+        console.error("Failed to fetch user list:", err.message);
       }
     }
   };
@@ -113,11 +127,36 @@ export const updateProfile = async (
     }
   }
 };
+// export const updateProfile = async (
+//   profileData: UserProfile,
+//   file?: File
+// ): Promise<UserProfile> => {
+//   try {
+//     let imageUrl: string | undefined;
 
+//     // Nếu có file ảnh, upload lên Firebase và lấy URL
+//     if (file) {
+//       const filePath = `profiles/${file.name}`; // Đặt đường dẫn cho ảnh
+//       imageUrl = await uploadFileFirebase(file, filePath);
+//     }
+
+//     // Cập nhật thông tin người dùng
+//     const updatedProfileData = { ...profileData, avatar: imageUrl };
+
+//     const response = await axios.put("/auth/profile", updatedProfileData);
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw error.response.data;
+//     } else {
+//       throw new Error("An unknown error occurred");
+//     }
+//   }
+// };
 export const registerUser = async (
   user: { email: string; password: string; name: string }
   // dispatch: AppDispatch,
-  // navigate: (path: string) => void
+  // navigate: (path: string) =>
 ) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, user);
