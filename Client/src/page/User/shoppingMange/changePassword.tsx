@@ -13,7 +13,7 @@ interface password {
   profile: UserProfile | null;
 }
 
-const UpdatePassword: React.FC<password> = ({ profile }) => {
+const UpdatePassword: React.FC<password> = ({}) => {
   const { register, handleSubmit, getValues, formState } =
     useForm<FormValues>();
   const [message, setMessage] = useState<string | null>(null);
@@ -100,7 +100,8 @@ const UpdatePassword: React.FC<password> = ({ profile }) => {
         <div>
           <button
             type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+            className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
+            disabled={loading}
           >
             {loading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
           </button>

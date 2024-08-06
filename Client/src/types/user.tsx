@@ -26,10 +26,10 @@ export interface AuthAction {
   };
 }
 export interface UserProfile {
-  profile: string;
-  msg: string;
-  token: string;
-  _id: string;
+  profile?: string;
+  msg?: string;
+  token?: string;
+  _id?: string;
   name: string;
   accessToken: string;
   email: string;
@@ -39,7 +39,8 @@ export interface UserProfile {
   birthday: string;
   gender: string;
   phone: string;
+  avatar: string;
   address: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }

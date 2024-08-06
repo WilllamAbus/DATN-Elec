@@ -54,18 +54,23 @@ import AdminContent from "../../components/Admin/mainContent";
 import AdminScript from "../../components/Admin/script";
 import "../../assets/css/admin.style.css";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../redux/rootReducer";
-
+import { RootState, AppDispatch } from "../../redux/store";
 import { getProfile } from "../../services/authentication/auth.services";
+import { useDispatch, useSelector } from "react-redux";
 
 const Admin: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const profile = useAppSelector((state) => state.auth.profile.profile);
-  const profileStatus = useAppSelector((state) => state.auth.profile.status);
-  const profileError = useAppSelector((state) => state.auth.profile.error);
-
+  const profile = useSelector(
+    (state: RootState) => state.auth.auth.profile.profile
+  );
+  const profileStatus = useSelector(
+    (state: RootState) => state.auth.auth.profile.status
+  );
+  const profileError = useSelector(
+    (state: RootState) => state.auth.auth.profile.error
+  );
   useEffect(() => {
     const fetchProfile = async () => {
       try {

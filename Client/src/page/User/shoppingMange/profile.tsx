@@ -20,13 +20,14 @@ const ProfileUse: React.FC = () => {
   const [view, setView] = useState<"info" | "edit" | "password">("info");
 
   const navigate = useNavigate();
-
-  const profile = useSelector((state: RootState) => state.auth.profile.profile);
+  const profile = useSelector(
+    (state: RootState) => state.auth.auth.profile.profile
+  );
   const profileStatus = useSelector(
-    (state: RootState) => state.auth.profile.status
+    (state: RootState) => state.auth.auth.profile.status
   );
   const profileError = useSelector(
-    (state: RootState) => state.auth.profile.error
+    (state: RootState) => state.auth.auth.profile.error
   );
 
   useEffect(() => {

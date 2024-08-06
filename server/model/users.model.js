@@ -16,13 +16,14 @@ const userSchema = new Schema(
     emailVerificationExpires: Date,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    avatar: String,
     status: { type: String, default: "Hoạt động" },
     socialLogin: {
       googleId: String,
       facebookId: String,
     },
     tokenLogin: String,
-    avatar: String,
+
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
   },
   {

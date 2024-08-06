@@ -12,7 +12,7 @@ interface AuthState {
   };
   profile: {
     profile: UserProfile | null;
-    roles: string[] | null; // Đổi từ string thành string[] nếu có nhiều vai trò
+    roles: string[] | null;
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
@@ -21,6 +21,7 @@ interface AuthState {
     error: boolean;
     successMessage: string | null;
   };
+  users: any[];
 }
 
 const initialState: AuthState = {
@@ -43,6 +44,7 @@ const initialState: AuthState = {
     error: false,
     successMessage: null,
   },
+  users: [],
 };
 
 const authSlice = createSlice({
@@ -94,6 +96,9 @@ const authSlice = createSlice({
       state.profile.roles = action.payload.roles; // Cập nhật vai trò
       state.profile.status = "succeeded"; // Đánh dấu trạng thái thành công
     },
+    setUserList: (state, action: PayloadAction<any[]>) => {
+      state.users = action.payload;
+    },
     profileLoading(state) {
       state.profile.status = "loading";
     },
@@ -110,6 +115,7 @@ export const {
   loginFailed,
   logout,
   setProfile,
+  setUserList,
   profileLoading,
   profileFailed,
   registerFailed,

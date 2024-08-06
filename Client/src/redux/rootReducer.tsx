@@ -1,12 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import authSlice from "./auth/authSlice";
+import AuthSlice from "./auth/authSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const rootReducer = combineReducers({
-  auth: authSlice,
+  auth: AuthSlice,
   categories: categoriesSlice,
   voucher: voucherReducer,
 });
