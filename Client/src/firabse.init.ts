@@ -1,9 +1,8 @@
-
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Observable, from } from 'rxjs';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Observable, from } from "rxjs";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
@@ -15,14 +14,12 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
 export class FirebaseStorageService {
-
   getFileUrl(filePath: string): Observable<string> {
     const fileRef = ref(storage, filePath);
     return from(getDownloadURL(fileRef));
@@ -32,9 +29,11 @@ export class FirebaseStorageService {
     const fileRef = ref(storage, `categories/${file.name}`);
     return from(uploadBytes(fileRef, file));
   }
+
+  uploadimg(file: File): Observable<any> {
+    const fileRef = ref(storage, `avatars/${file.name}`);
+    return from(uploadBytes(fileRef, file));
+  }
 }
 
 export { auth, db, storage };
-
-
-

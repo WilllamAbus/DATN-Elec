@@ -1,61 +1,29 @@
-// import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-// import { storage } from "../../firabse.init"; // Adjust the path accordingly
-
-// export const uploadFileFirebase = async (
-//   file: File,
-//   filePath: string
-// ): Promise<string> => {
-//   try {
-//     const storageRef = ref(storage, filePath);
-//     const uploadTask = uploadBytesResumable(storageRef, file);
-
-//     return new Promise<string>((resolve, reject) => {
-//       uploadTask.on(
-//         "state_changed",
-//         null,
-//         (error) => reject(error),
-//         async () => {
-//           try {
-//             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-//             resolve(downloadURL);
-//           } catch (error) {
-//             reject(error);
-//           }
-//         }
-//       );
-//     });
-//   } catch (error) {
-//     console.error("Upload failed:", (error as Error).message);
-//     throw error;
-//   }
-// };
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../../firabse.init";
+import { storage } from "../../firabse.init"; // Adjust the path accordingly
 
 export const uploadFileFirebase = async (
   file: File,
   filePath: string
 ): Promise<string> => {
-  const storageRef = ref(storage, filePath);
-  const uploadTask = uploadBytesResumable(storageRef, file);
-
   try {
-    const downloadURL = await new Promise<string>((resolve, reject) => {
+    const storageRef = ref(storage, filePath);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise<string>((resolve, reject) => {
       uploadTask.on(
         "state_changed",
-        null, // Bạn có thể thêm xử lý progress nếu cần
+        null,
         (error) => reject(error),
         async () => {
           try {
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(url);
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
           } catch (error) {
             reject(error);
           }
         }
       );
     });
-    return downloadURL;
   } catch (error) {
     console.error("Upload failed:", (error as Error).message);
     throw error;
