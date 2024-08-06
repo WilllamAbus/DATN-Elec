@@ -4,7 +4,7 @@ import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Modal from "../../MoalButton";
-
+import { getUserData } from "../../../../middleware/getToken";
 import { Voucher, CartItem , CartState} from "../../../../types/Voucher.d";
 // Define an interface for cart item
 
@@ -88,7 +88,18 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     localStorage.setItem("cart", JSON.stringify(cartState.items));
-    navigate("/checkout");
+    const userData = getUserData();
+    if (userData) {
+      const isAdmin = userData.roles.some(role => role.name === 'admin');
+      if (isAdmin) {
+        navigate('/login');
+      } else {
+        navigate('/checkout');
+      }
+    } else {
+      navigate('/login');
+    }
+  
   };
 
   return (

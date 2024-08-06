@@ -55,6 +55,7 @@ const categoriesController = {
       });
 
       fileStream.on('finish', async () => {
+        await file.makePublic();
         const imgURL = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
         const category = await createCategory({
           name,// Đ,ảm bảo rằng 'name' là một chuỗi
