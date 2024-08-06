@@ -1,13 +1,179 @@
 import React from "react";
 
-
 import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-const cartPage: React.FC = () => {
+import listOne from "../../../../assets/images/products/product14.jpg";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
+import { useDispatch } from "react-redux";
+import { addOrderThunk } from "../../../../redux/checkout/checkoutThunk";
+import { AppDispatch } from "../../../../redux/store";
+import { SanboxPayment } from "../../../../services/pay/sanboxPayment";
+import { calculateSignature } from "../../../../services/pay/signature";
+
+// Implement signatureService
+const signatureService = {
+  calculateSignature,
+};
+
+// Create an instance of SanboxPayment
+const paymentService = new SanboxPayment(signatureService);
+// Implement signatureService
+interface DecodedToken {
+  id: string;
+  email: string;
+}
+
+const decodeToken = (token: string): DecodedToken => {
+  try {
+    // Decode the JWT token
+    const decoded: any = jwtDecode(token);
+    return {
+      id: decoded.id || "",
+      email: decoded.email || "",
+    };
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return { id: "", email: "" };
+  }
+};
+
+// Now you can call processMoMoPaymentWithRetry on paymentService
+interface FormValues {
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  payment: string;
+}
+
+const Checkout: React.FC = () => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      name: "",
+      address: "",
+      city: "",
+      phone: "",
+      payment: "",
+    },
+  });
+  const [cartState, setCartState] = useState<CartState>({
+    items: [],
+    totalPrice: 0,
+    shipping: 0,
+    applyVoucher: false,
+    selectedVoucher: undefined,
+  });
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const getUserData = (): DecodedToken => {
+    const userData = window.localStorage.getItem("persist:root");
+
+    if (userData) {
+      try {
+        // Parse the root state
+        const parsedData = JSON.parse(userData);
+
+        // Access the login data from parsedData
+        const loginData = JSON.parse(parsedData.auth)?.login;
+
+        // Check if loginData and token are available
+        if (loginData && loginData.token) {
+          const token = loginData.token;
+
+          // Decode the token and return the result
+          return decodeToken(token);
+        }
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+
+    // Return default value if data is not available or error occurs
+    return { id: "", email: "" };
+  };
+
+  const calculateCartTotals = (items: CartItem[]) => {
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    return { totalQuantity, totalPrice };
+  };
+
+  useEffect(() => {
+    // Retrieve cart items from localStorage
+    const storedCartItems = localStorage.getItem("cart");
+    if (storedCartItems) {
+      const items: CartItem[] = JSON.parse(storedCartItems);
+      setCartState((prevState) => ({
+        ...prevState,
+        items,
+        totalPrice: calculateTotalPrice(items), // Calculate total price if needed
+      }));
+    }
+  }, []);
+
+  const calculateTotalPrice = (items: CartItem[]): number => {
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+  const handleCheckout: SubmitHandler<FormValues> = async (data) => {
+    localStorage.setItem("cart", JSON.stringify(cartState.items));
+    const userData = getUserData();
+    console.log("User data: ", userData);
+
+    const { totalQuantity, totalPrice } = calculateCartTotals(cartState.items);
+
+    const orderData = {
+      payment: {
+        method: data.payment,
+        details: "123456789", // Add payment details as needed
+      },
+      quantityShopping: totalQuantity,
+      totalPrice: totalPrice,
+      userId: [{ user: userData.id, email: userData.email }],
+      products: cartState.items.map((item) => ({
+        product: item.id,
+        name: item.name,
+      })),
+      shipping: {
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        sdt: data.phone,
+        formatShipping: {
+          type: "standard",
+          price: 0,
+        },
+      },
+      status: "active",
+    };
+    console.log("Order data:", orderData);
+
+    try {
+      await dispatch(addOrderThunk(orderData)).unwrap();
+      if (data.payment === "momo") {
+        await paymentService.processMoMoPaymentWithRetry();
+      } else {
+        navigate("/complete");
+      }
+      reset(); // Reset the form after successful submission
+    } catch (error) {
+      console.error("Error processing order:", error);
+    }
+  };
+
   return (
     <>
-   
       {/* <!-- breadcrumb --> */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
@@ -50,7 +216,6 @@ const cartPage: React.FC = () => {
                 <div>
                   <label className="text-gray-600">Thành Phố</label>
                   <select name="city" id="city" className="input-box">
-                  
                     <option value="hanoi">Cần Thơ</option>
                     <option value="hochiminh">Hồ Chí Minh</option>
                     <option value="danang">Đà Nẵng</option>
@@ -128,9 +293,7 @@ const cartPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape
-                </h5>
+                <h5 className="text-gray-800 font-medium">Italian shape</h5>
               </div>
               <p className="text-gray-600">x3</p>
               <p className="text-gray-800 font-medium">20.000 vnđ</p>
@@ -141,9 +304,7 @@ const cartPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
+                <h5 className="text-gray-800 font-medium">Italian shape</h5>
               </div>
               <p className="text-gray-600">x3</p>
               <p className="text-gray-800 font-medium">20.000 vnđ</p>
@@ -154,9 +315,7 @@ const cartPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
+                <h5 className="text-gray-800 font-medium">Italian shape</h5>
               </div>
               <p className="text-gray-600">x3</p>
               <p className="text-gray-800 font-medium">20.000 vnđ</p>
@@ -197,7 +356,6 @@ const cartPage: React.FC = () => {
         </div>
       </div>
       {/* <!-- ./wrapper --> */}
-   
     </>
   );
 };

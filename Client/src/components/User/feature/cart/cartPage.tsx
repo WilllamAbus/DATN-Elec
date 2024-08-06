@@ -3,9 +3,92 @@ import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Modal from "../../MoalButton";
+import { getUserData } from "../../../../middleware/getToken";
+import { Voucher, CartItem, CartState } from "../../../../types/Voucher.d";
+// Define an interface for cart item
 
 const CartPage: React.FC = () => {
+  useEffect(() => {
+    // Fetch cart data from localStorage
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCartState((prevState) => ({
+      ...prevState,
+      items: cart,
+      totalPrice: calculateTotal(cart),
+    }));
+  }, []);
 
+  const handleRemoveItem = (id: string) => {
+    const updatedItems = cartState.items.filter((item) => item.id !== id);
+    localStorage.setItem("cart", JSON.stringify(updatedItems));
+    setCartState((prevState) => ({
+      ...prevState,
+      items: updatedItems,
+      totalPrice: calculateTotal(updatedItems),
+    }));
+  };
+
+  const increaseQuantity = (id: string) => {
+    const updatedItems = cartState.items.map((item) =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    );
+    localStorage.setItem("cart", JSON.stringify(updatedItems));
+    setCartState((prevState) => ({
+      ...prevState,
+      items: updatedItems,
+      totalPrice: calculateTotal(updatedItems),
+    }));
+  };
+
+  const decreaseQuantity = (id: string) => {
+    const updatedItems = cartState.items.map((item) =>
+      item.id === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    localStorage.setItem("cart", JSON.stringify(updatedItems));
+    setCartState((prevState) => ({
+      ...prevState,
+      items: updatedItems,
+      totalPrice: calculateTotal(updatedItems),
+    }));
+  };
+
+  const calculateTotal = (items: CartItem[]) => {
+    const subtotal = items.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+    return subtotal - (cartState.selectedVoucher?.voucherNum || 0);
+  };
+
+  const calculateGrandTotal = () => {
+    return cartState.totalPrice + cartState.shipping;
+  };
+
+  const handleVoucherApply = (voucher: Voucher) => {
+    setCartState((prevState) => ({
+      ...prevState,
+      applyVoucher: true,
+      selectedVoucher: voucher,
+      totalPrice: calculateTotal(prevState.items),
+    }));
+  };
+
+  const handleCheckout = () => {
+    localStorage.setItem("cart", JSON.stringify(cartState.items));
+    const userData = getUserData();
+    if (userData) {
+      const isAdmin = userData.roles.some((role) => role.name === "admin");
+      if (isAdmin) {
+        navigate("/login");
+      } else {
+        navigate("/checkout");
+      }
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -27,10 +110,14 @@ const CartPage: React.FC = () => {
           <h3 className="text-lg font-medium capitalize mb-4">Giỏ hàng</h3>
           <div className="space-y-4">
             {/* Product Items */}
-            {['product1', 'product2', 'product3'].map((_, index) => (
+            {["product1", "product2", "product3"].map((_, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <img src={listOne} alt={`product ${index + 1}`} className="w-28 h-10" />
+                  <img
+                    src={listOne}
+                    alt={`product ${index + 1}`}
+                    className="w-28 h-10"
+                  />
                   <h5 className="text-gray-800 font-medium">Italian shape</h5>
                 </div>
                 <p className="text-gray-600">x3</p>
@@ -44,7 +131,9 @@ const CartPage: React.FC = () => {
         </div>
 
         <div className="col-span-4 border border-gray-200 p-4 rounded">
-          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">Tổng thanh toán</h4>
+          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">
+            Tổng thanh toán
+          </h4>
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
             <p>Thanh toán</p>
             <p>128.000 vnđ</p>
@@ -65,8 +154,8 @@ const CartPage: React.FC = () => {
           >
             Thanh toán
           </a>
-            <br/>
-          <Modal/>
+          <br />
+          <Modal />
         </div>
       </div>
     </>

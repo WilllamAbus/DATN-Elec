@@ -368,7 +368,8 @@ const Navbar: React.FC = () => {
               {token && name ? (
                 <div className="flex items-center">
                   <div className="relative group">
-                    <span className="ml-6 text-gray-600 text-lg">{name}</span>
+                    <span className="ml-6 text-white text-lg">{name}</span>
+                    {/* dropdown */}
                     <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
                       <Link
                         to="/profile"

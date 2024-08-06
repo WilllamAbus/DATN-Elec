@@ -6,6 +6,7 @@ const categorySchema = Schema(
     pid: { type: String, required: true, default: uuidv4 },
     path: { type: String, required: true },
     imgURL: { type: String, required: true },
+    status: { type: String, default: 'active' },
   },
   {
     collection: "categories",

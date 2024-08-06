@@ -36,7 +36,7 @@ router.post("/addRole", checkPermission, createRole);
 
 router.post(
   "/addCate",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   upload.single("imgCate"),
   uploadCategory
 );
@@ -44,33 +44,47 @@ router.get("/getAllCate", getAllCategoriesController);
 router.get("/getCate/:id", getCategoryByIdController);
 router.put(
   "/updateCate/:id",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   upload.single("imgCate"),
   updateCategoryController
 );
 router.delete(
   "/delete/:id",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   deleteCategoryController
 );
 
 // discount
 router.post(
   "/addVoucher",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   voucherController.createVoucher
 );
 router.get("/getAllVoucher", voucherController.getAllVoucher);
 router.get("/getVoucher/:id", voucherController.getVoucherById);
 router.put(
   "/updateVoucher/:id",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   voucherController.updateVoucher
 );
 router.delete(
   "/deleteVoucher/:id",
-  middlewareController.verifyTokenAdminAuth,
+  middlewareController.verifyToken,
   voucherController.deleteVoucher
 );
 
+// order
+router.post(
+  "/addOrder",
+  middlewareController.verifyToken,
+  orderController.createOrder
+);
+router.get("/getAllOrder", orderController.getAllOrder);
+router.get("/getOrder/:id", orderController.getOrderbyId);
+router.delete(
+  "/deleteOrder/:id",
+  middlewareController.verifyToken,
+  orderController.deleteOrderById
+);
+//
 module.exports = router;
