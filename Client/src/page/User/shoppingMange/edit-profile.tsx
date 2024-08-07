@@ -686,12 +686,11 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
 
       await dispatch(updateProfileThunk(formData)).unwrap();
 
-      // Fetch the updated profile data
       const updatedProfile = await dispatch(getProfileThunk()).unwrap();
       dispatch(setProfile(updatedProfile));
 
       localStorage.setItem("name", updatedProfile.name || "");
-      // localStorage.setItem("roles", updatedProfile.roles[0] || ""); // Uncomment if needed
+      localStorage.setItem("roles", updatedProfile.roles[0] || "");
       localStorage.setItem("birthday", updatedProfile.birthday || "");
       localStorage.setItem("avatar", updatedProfile.avatar || "");
 
@@ -801,8 +800,12 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               )}
             </div>
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Updating..." : "Update Profile"}
+          <button
+            type="submit"
+            className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
+            disabled={loading}
+          >
+            {loading ? "Đang cập nhật..." : "Cập Nhật"}
           </button>
         </div>
       </form>
