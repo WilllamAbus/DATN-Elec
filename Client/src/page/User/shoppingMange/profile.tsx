@@ -1,41 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../redux/store";
+import {
+  RootState,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../redux/store";
+import { getProfileThunk, logoutService } from "../../../redux/auth/authThunk";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { logout as logoutAction } from "../../../redux/auth/authSlice";
-import { useNavigate } from "react-router-dom";
 import EditProfile from "./edit-profile";
 import Info from "./info";
 import UpdatePassword from "./changePassword";
-import { getProfile } from "../../../services/authentication/auth.services";
+
 const ProfileUse: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [view, setView] = useState<"info" | "edit" | "password">("info");
 
-  const navigate = useNavigate();
-  const profile = useSelector(
-    (state: RootState) => state.auth.auth.profile.profile
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
   );
-  const profileStatus = useSelector(
-    (state: RootState) => state.auth.auth.profile.status
+  const profileStatus = useAppSelector(
+    (state: RootState) => state.auth.profile.status
   );
-  const profileError = useSelector(
-    (state: RootState) => state.auth.auth.profile.error
+  const profileError = useAppSelector(
+    (state: RootState) => state.auth.profile.error
   );
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    dispatch(getProfile() as any);
-  }, [dispatch]);
+    if (token) {
+      dispatch(getProfileThunk());
+    } else {
+      navigate("/login");
+    }
+  }, [dispatch, token, navigate]);
 
   useEffect(() => {
-    if (profile) {
+    if (profileStatus === "succeeded" && profile) {
       const profileData = {
         name: profile.name || "",
         address: profile.address || "",
@@ -45,22 +53,23 @@ const ProfileUse: React.FC = () => {
       };
       localStorage.setItem("userProfile", JSON.stringify(profileData));
     }
-  }, [profile]);
+  }, [profile, profileStatus]);
 
   if (profileStatus === "loading") {
     return <p>Loading...</p>;
   }
 
   if (profileStatus === "failed") {
-    return <p>Error: {profileError}</p>;
+    return <p>Error: {profileError || "Unknown error occurred"}</p>;
   }
 
   const handleLogout = async () => {
     try {
-      await dispatch(logoutAction() as any); // Type-cast vì bạn có thể đang dùng thunk middleware
+      await dispatch(logoutAction());
       localStorage.removeItem("token");
       localStorage.removeItem("name");
       localStorage.removeItem("roles");
+      localStorage.removeItem("userProfile");
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -89,7 +98,7 @@ const ProfileUse: React.FC = () => {
           <div className="px-4 py-3 shadow flex items-center gap-4">
             <div className="flex-shrink-0">
               <img
-                src={Avatar}
+                src={profile?.avatar}
                 alt="profile"
                 className="rounded-full w-14 h-14 border border-gray-200 p-1 object-cover"
               />
@@ -126,7 +135,7 @@ const ProfileUse: React.FC = () => {
                 }`}
                 onClick={() => setView("password")}
               >
-                Cập nhật mật khẩu
+                Đổi mật khẩu
               </a>
             </div>
 
@@ -206,6 +215,7 @@ const ProfileUse: React.FC = () => {
         {view === "info" && <Info profiles={profile} />}
         {view === "edit" && <EditProfile profile={profile} />}
         {view === "password" && <UpdatePassword profile={profile} />}
+
         {/* ./info */}
       </div>
       {/* ./wrapper */}

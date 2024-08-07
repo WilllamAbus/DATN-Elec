@@ -8,10 +8,9 @@ import authGoogleService from "../../../services/authentication/authGoogle.servi
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useAppDispatch } from "../../../redux/store";
+import { loginUserThunk } from "../../../redux/auth/authThunk";
 
-import { useAppDispatch } from "../../../redux/rootReducer";
-
-import { loginUser } from "../../../services/authentication/auth.services";
 interface IFormInput {
   email: string;
   password: string;
@@ -34,9 +33,14 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      await loginUser(data, dispatch, navigate);
-    } catch (err) {
-      setError("Đã xảy ra lỗi không xác định");
+      await dispatch(loginUserThunk(data)).unwrap();
+      navigate("/profile"); // Chuyển hướng sau khi đăng nhập thành công
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "An unknown error occurred");
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }

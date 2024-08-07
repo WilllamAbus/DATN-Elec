@@ -1,24 +1,38 @@
 import React, { useEffect } from "react";
-import { getList } from "../../../../services/authentication/auth.services";
-
+import {
+  getListThunk,
+  softDeleteUserThunk,
+} from "../../../../redux/auth/authThunk";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 
-const userList: React.FC = () => {
+const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const users = useSelector((state: RootState) => state.auth.auth.users);
+  const users = useSelector((state: RootState) => state.auth.users);
   const userListStatus = useSelector(
-    (state: RootState) => state.auth.auth.profile.status
+    (state: RootState) => state.auth.userListStatus
   );
   const userListError = useSelector(
-    (state: RootState) => state.auth.auth.profile.error
+    (state: RootState) => state.auth.userListError
   );
 
   useEffect(() => {
-    dispatch(getList() as any);
+    dispatch(getListThunk());
   }, [dispatch]);
+
+  const handlesoftDelete = async (userId: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này không?")) {
+      try {
+        await dispatch(softDeleteUserThunk(userId)).unwrap();
+        // Optionally, you can dispatch getListThunk() again to refresh the user list
+        dispatch(getListThunk());
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+      }
+    }
+  };
 
   if (userListStatus === "loading") {
     return <p>Loading...</p>;
@@ -28,15 +42,15 @@ const userList: React.FC = () => {
     return <p>Error: {userListError}</p>;
   }
 
-  // Kiểm tra nếu users là mảng và có dữ liệu
   if (!Array.isArray(users)) {
     return <p>Invalid data format</p>;
   }
+
   return (
     <main className="w-full flex-grow p-6">
       <div className="w-full mt-12">
         <p className="text-xl pb-3 flex items-center">
-          <i className="fas fa-list mr-3"></i> DANH SÁCH SẢN PHẨM
+          <i className="fas fa-list mr-3"></i> DANH SÁCH NGƯỜI DÙNG
         </p>
         <div className="bg-white overflow-auto">
           <table className="text-left w-full border-collapse">
@@ -64,10 +78,10 @@ const userList: React.FC = () => {
             </thead>
             <tbody>
               {users.length > 0 ? (
-                users.map((user) => (
+                users.map((user, index) => (
                   <tr key={user._id} className="hover:bg-grey-lighter">
                     <td className="py-4 px-6 border-b border-grey-light">
-                      {user._id}
+                      {index + 1}
                     </td>
                     <td className="py-4 px-6 border-b border-grey-light">
                       {user.name}
@@ -79,15 +93,9 @@ const userList: React.FC = () => {
                       <img
                         className="w-10 h-10 rounded-sm"
                         src={user.avatar}
-                        alt="Student avatar"
+                        alt="User avatar"
                         style={{ width: "50px", height: "50px" }}
                       />
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(user.price)}
                     </td>
                     <td className="py-4 px-6 border-b border-grey-light">
                       <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
@@ -97,12 +105,12 @@ const userList: React.FC = () => {
                     <td className="py-4 px-6 border-b border-grey-light">
                       <button
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                        // onClick={() => handlesoftDeleteProduct(product._id)}
+                        onClick={() => handlesoftDelete(user._id)}
                       >
-                        Xoá
+                        Xóa
                       </button>
                       <Link
-                        to={`/admin/editProducts/${user._id}`}
+                        to={`/admin/editUser/${user._id}`}
                         className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                       >
                         Sửa
@@ -135,4 +143,5 @@ const userList: React.FC = () => {
     </main>
   );
 };
-export default userList;
+
+export default UserList;

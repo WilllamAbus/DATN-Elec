@@ -17,7 +17,7 @@ const userSchema = new Schema(
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     avatar: String,
-    status: { type: String, default: "Hoạt động" },
+    status: { type: String, default: "active" },
     socialLogin: {
       googleId: String,
       facebookId: String,

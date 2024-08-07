@@ -62,14 +62,12 @@ const Admin: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const profile = useSelector(
-    (state: RootState) => state.auth.auth.profile.profile
-  );
+  const profile = useSelector((state: RootState) => state.auth.profile.profile);
   const profileStatus = useSelector(
-    (state: RootState) => state.auth.auth.profile.status
+    (state: RootState) => state.auth.profile.status
   );
   const profileError = useSelector(
-    (state: RootState) => state.auth.auth.profile.error
+    (state: RootState) => state.auth.profile.error
   );
   useEffect(() => {
     const fetchProfile = async () => {

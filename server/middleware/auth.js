@@ -17,18 +17,26 @@ const middlewareController = {
       res.status(401).json("You're not authenticated");
     }
   },
-
   verifyTokenAdminAuth: async (req, res, next) => {
     await middlewareController.verifyToken(req, res, async () => {
       const userRoles = req.user.roles;
       const adminRole = await Role.findOne({ name: "admin" });
 
-      if (adminRole && userRoles.includes(adminRole._id.toString())) {
-        next();
+      if (adminRole) {
+        const adminRoleId = adminRole._id.toString();
+        const hasAdminRole = userRoles.some(
+          (role) => role._id.toString() === adminRoleId
+        );
+
+        if (hasAdminRole) {
+          next();
+        } else {
+          res
+            .status(403)
+            .json("Access denied: Only admins can access this route");
+        }
       } else {
-        res
-          .status(403)
-          .json("Access denied: Only admins can access this route");
+        res.status(403).json("Access denied: Admin role not found");
       }
     });
   },

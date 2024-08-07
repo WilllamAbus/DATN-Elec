@@ -1,18 +1,13 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import AuthSlice from "./auth/authSlice";
+import authReducer from "./auth/authSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
-import { store } from "./store";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const rootReducer = combineReducers({
-  auth: AuthSlice,
+  auth: authReducer,
   categories: categoriesSlice,
   voucher: voucherReducer,
 });
 
-export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof rootReducer>;
-export const useAppDispatch = () => useDispatch<AppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export default rootReducer;

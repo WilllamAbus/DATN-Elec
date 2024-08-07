@@ -1,7 +1,8 @@
-// src/components/UpdatePassword.tsx
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { updatePassword } from "../../../services/authentication/auth.services";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../redux/store";
+import { updatePasswordThunk } from "../../../redux/auth/authThunk";
 import { UserProfile } from "../../../types/user";
 
 interface FormValues {
@@ -9,28 +10,32 @@ interface FormValues {
   newPassword: string;
   confirmNewPassword: string;
 }
-interface password {
+
+interface UpdatePasswordProps {
   profile: UserProfile | null;
 }
 
-const UpdatePassword: React.FC<password> = ({}) => {
+const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
   const { register, handleSubmit, getValues, formState } =
     useForm<FormValues>();
+  const dispatch: AppDispatch = useDispatch();
+  const passwordUpdate = useSelector(
+    (state: RootState) => state.auth.passwordUpdate
+  );
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const handlePasswordUpdate = async (data: FormValues) => {
-    setLoading(true);
-    setMessage(null);
+    const { currentPassword, newPassword } = data;
 
     try {
-      const { currentPassword, newPassword } = data;
-      const response = await updatePassword(currentPassword, newPassword);
-      setMessage(response.msg);
+      await dispatch(
+        updatePasswordThunk({ currentPassword, newPassword })
+      ).unwrap();
+      setMessage(
+        passwordUpdate.successMessage || "Cập nhật mật khẩu thành công"
+      );
     } catch (error: any) {
-      setMessage(error.message);
-    } finally {
-      setLoading(false);
+      setMessage(passwordUpdate.error || "Đã xảy ra lỗi");
     }
   };
 
@@ -101,9 +106,11 @@ const UpdatePassword: React.FC<password> = ({}) => {
           <button
             type="submit"
             className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
-            disabled={loading}
+            disabled={passwordUpdate.isFetching}
           >
-            {loading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+            {passwordUpdate.isFetching
+              ? "Đang cập nhật..."
+              : "Cập nhật mật khẩu"}
           </button>
         </div>
         {message && (

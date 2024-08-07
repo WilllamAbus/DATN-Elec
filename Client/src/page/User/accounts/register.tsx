@@ -1,15 +1,13 @@
-// src/components/Register.tsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
-import UserCoppyright from "../../../components/User/copyright";
+import UserCopyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
-import { useForm } from "react-hook-form";
-import { registerUser } from "../../../services/authentication/auth.services";
-// import { AppDispatch } from "../../../redux/store";
-// import { useDispatch } from "react-redux";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { registerUserThunk } from "../../../redux/auth/authThunk";
 
 interface FormValues {
   email: string;
@@ -19,31 +17,37 @@ interface FormValues {
 }
 
 const Register: React.FC = () => {
-  // const dispatch: AppDispatch = useDispatch();
-  // const navigate = useNavigate();
-
-  const {
-    register: formRegister,
-    handleSubmit,
-    getValues,
-    formState,
-  } = useForm<FormValues>();
+  const { register, handleSubmit, getValues, formState } =
+    useForm<FormValues>();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch(); // Hook để gọi dispatch từ Redux
 
-  const handleRegister = async (data: FormValues) => {
+  const handleRegister: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
     setMessage(null);
 
     try {
-      await registerUser({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-      });
-      setMessage("Đăng ký thành công. Vui lòng kiểm tra Email để xác thực.");
-    } catch (error: any) {
-      setMessage(error.message || "Đã xảy ra lỗi khi đăng ký.");
+      // Gọi dispatch để thực thi thunk
+      const resultAction = await dispatch(
+        registerUserThunk({
+          email: data.email,
+          password: data.password,
+          name: data.name,
+        })
+      );
+
+      if (registerUserThunk.fulfilled.match(resultAction)) {
+        setMessage("Đăng ký thành công. Vui lòng kiểm tra Email để xác thực.");
+        // navigate("/login");
+      } else {
+        setMessage(
+          (resultAction.payload as string) || "Đã xảy ra lỗi khi đăng ký."
+        );
+      }
+    } catch (error) {
+      setMessage("Đã xảy ra lỗi khi đăng ký.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +71,7 @@ const Register: React.FC = () => {
                 <input
                   type="text"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                  {...formRegister("name", {
+                  {...register("name", {
                     required: "Tên không được bỏ trống",
                   })}
                 />
@@ -85,8 +89,8 @@ const Register: React.FC = () => {
                 <input
                   type="email"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                  placeholder="youremail.@domain.com"
-                  {...formRegister("email", {
+                  placeholder="youremail@domain.com"
+                  {...register("email", {
                     required: "Email không được bỏ trống",
                     pattern: {
                       value: /^\S+@\S+$/i,
@@ -109,7 +113,7 @@ const Register: React.FC = () => {
                   type="password"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                   placeholder="Nhập mật khẩu..."
-                  {...formRegister("password", {
+                  {...register("password", {
                     required: "Mật khẩu không được bỏ trống",
                     minLength: {
                       value: 6,
@@ -132,7 +136,7 @@ const Register: React.FC = () => {
                   type="password"
                   className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
                   placeholder="Xác nhận mật khẩu..."
-                  {...formRegister("confirm", {
+                  {...register("confirm", {
                     required: "Xác nhận mật khẩu không được bỏ trống",
                     validate: (confirm) => {
                       const password = getValues("password");
@@ -199,7 +203,7 @@ const Register: React.FC = () => {
         </div>
       </div>
       <UserFooter />
-      <UserCoppyright />
+      <UserCopyright />
     </>
   );
 };
