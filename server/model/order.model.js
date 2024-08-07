@@ -40,7 +40,8 @@ const orderSchema = new Schema(
             price: Number
           }
       },
-    status: {type: String, default: 'active'}
+    status: {type: String, default: 'active'},
+  
   },
   {
     collection: "order",

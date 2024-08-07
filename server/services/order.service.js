@@ -68,7 +68,7 @@ const orderService  = {
 
     getAllOrder: async (req, res) => {
         try {
-            const orders = await _Order.find({});
+            const orders = await _Order.find({ status: { $ne: 'disable' } });
             return orders;
           } catch (error) {
             throw new Error('Error retrieving orders: ' + error.message);
@@ -85,8 +85,42 @@ const orderService  = {
       },
 
       deleOrder : async ( id) => {
-      return  await _Order.findByIdAndDelete(id)
+        try {
+            return  await _Order.findByIdAndDelete(id)
+        } catch (error) {
+            console.error(error)
+        }
+  
+    },
+
+
+    softDeleteOrder: async (id) => {
+        try {
+            return await _Order.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+        } catch (error) {
+            console.error(error)
+        }
+
+      
+    },
+    deletedList: async (req, res) => {
+   
+        try {
+            return await _Order.find({ status: 'disable' }) || [];
+        } catch (error) {
+            console.error(error)
+        }
+    
+    },
+    restore: async (id) => {
+    try {
+        
+        return await _Order.findByIdAndUpdate(id, { status: 'active' }, { new: true });
+    } catch (error) {
+        console.error(error)
     }
+
+    },
 }
 
 module.exports  = orderService

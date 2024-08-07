@@ -3,7 +3,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCategoriesThunk,
-  deleteCategoryThunk,
+  
+  softDeleteCategoryThunk
 } from "../../../../redux/categories/categoriesThunk";
 import { RootState, AppDispatch } from "../../../../redux/store";
 
@@ -76,7 +77,7 @@ const ListCate: React.FC = () => {
       }).then(async (result: SweetAlertResult) => {
         if (result.isConfirmed) {
           try {
-            await dispatch(deleteCategoryThunk(_id))
+            await dispatch(softDeleteCategoryThunk(_id))
             .unwrap()
            
         

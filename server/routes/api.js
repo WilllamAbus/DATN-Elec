@@ -16,6 +16,9 @@ const {
   getCategoryByIdController,
   updateCategoryController,
   deleteCategoryController,
+  sofDelCate,
+  restore,
+  deletedListCategory
 } = require("../controler/categories.controller");
 
 
@@ -44,6 +47,9 @@ router.get("/getCate/:id", getCategoryByIdController);
 router.put("/updateCate/:id",middlewareController.verifyToken, upload.single("imgCate"), updateCategoryController);
 router.delete("/delete/:id",middlewareController.verifyToken, deleteCategoryController);
 
+router.patch("/soft-delete/:id", middlewareController.verifyToken, sofDelCate);
+router.get("/deleted-list", middlewareController.verifyToken, deletedListCategory);
+router.patch("/restore/:id", middlewareController.verifyToken, restore);
 
 // discount
 router.post("/addVoucher",middlewareController.verifyToken, voucherController.createVoucher);
@@ -53,10 +59,19 @@ router.put("/updateVoucher/:id",middlewareController.verifyToken, voucherControl
 router.delete("/deleteVoucher/:id",middlewareController.verifyToken, voucherController.deleteVoucher);
 
 
+router.patch("/soft-delete/:id", middlewareController.verifyToken, voucherController.sofDelVoucher);
+router.get("/deleted-list", middlewareController.verifyToken, voucherController.deletedListVoucher);
+router.patch("/restore/:id", middlewareController.verifyToken, voucherController.restore);
+
 // order
 router.post("/addOrder",middlewareController.verifyToken, orderController.createOrder);
 router.get("/getAllOrder", orderController.getAllOrder);
 router.get("/getOrder/:id", orderController.getOrderbyId);
 router.delete("/deleteOrder/:id",middlewareController.verifyToken, orderController.deleteOrderById);
+
+
+router.patch("/soft-delete/:id", middlewareController.verifyToken, orderController.sofDelOrder);
+router.get("/deleted-list", middlewareController.verifyToken, orderController.deletedListOrder);
+router.patch("/restore/:id", middlewareController.verifyToken, orderController.restore);
 // 
 module.exports = router;

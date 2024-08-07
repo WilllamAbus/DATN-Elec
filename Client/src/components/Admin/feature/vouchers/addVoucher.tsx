@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom'; 
@@ -7,11 +7,13 @@ import { createVoucher } from '../../../../redux/discount/voucherThunk'; // Impo
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { Category } from "../../../../types/Categories.d";
 import { Voucher } from "../../../../types/Voucher.d"; // Import your Discount type
-import AlertCustomStyles from '../../../../ultils/alert.succes';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { notify } from "../../../../ultils/success";
 const addDiscount: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Voucher>();
-  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
+  // const [ setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
   const navigate = useNavigate(); 
   const categories = useSelector(
     (state: RootState) => state.categories.categories
@@ -37,11 +39,11 @@ const addDiscount: React.FC = () => {
       };
     try {
       await dispatch(createVoucher(formattedData)).unwrap();
-      setAlert({ message: 'Thêm giảm giá thành công!', type: 'success' });
+      notify()
       reset(); // Reset the form fields
       setTimeout(() => navigate('/admin/listVouchers'), 2000); // Navigate after 2 seconds
     } catch (error) {
-      setAlert({ message: 'Error creating discount!', type: 'error' });
+      // setAlert({ message: 'Error creating discount!', type: 'error' });
       console.error('Error creating discount:', error);
     }
   };
@@ -50,11 +52,7 @@ const addDiscount: React.FC = () => {
     <main className="w-full flex-grow p-6">
       <div className="flex flex-wrap">
         <div className="w-full mt-6 pl-0 lg:pl-2">
-        {alert && (
-            <div className="mb-4">
-              <AlertCustomStyles message={alert.message} type={alert.type} />
-            </div>
-          )}
+          <ToastContainer/>
           <div className="leading-loose">
             <form >
               <div className="flex flex-wrap -mx-3 mb-6">

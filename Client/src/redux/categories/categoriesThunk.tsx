@@ -6,7 +6,11 @@ import {
   getAllCategories, 
   getCategoryById, 
   updateCategory, 
-  deleteCategory 
+  deleteCategory ,
+  deleteListCate,
+  sofDeleteCategory,
+  restore,
+  ApiResponse
 } from '../../services/categories/categories.service';
 import { Category } from '../../types/Categories.d';
 
@@ -66,3 +70,38 @@ export const deleteCategoryThunk = createAsyncThunk<{ _id: string }, string>(
       return { _id: id }; // Ensure the return type matches the thunk's expected payload type
     }
   );
+
+
+
+
+
+// Soft Delete Category Thunk
+export const softDeleteCategoryThunk = createAsyncThunk<Category, string>(
+  'categories/softDeleteCategory',
+  async (categoryId: string) => {
+    const response = await sofDeleteCategory(categoryId);
+    return response;  // This should be the full Category object
+  }
+);
+
+export const fetchDeletedCategoriesThunk = createAsyncThunk<Category[]>(
+  'categories/fetchDeletedCategories',
+  async () => {
+    try {
+      const response: ApiResponse = await deleteListCate();
+      return response.data; // Ensure this is Category[]
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return []; // Return an empty array on error
+    }
+  }
+);
+
+
+export const restoreCategoryThunk = createAsyncThunk<Category, string>(
+  'categories/restoreCategory',
+  async (categoryId: string) => {
+    const response = await restore(categoryId);
+    return response;  // This should be the full Category object
+  }
+);

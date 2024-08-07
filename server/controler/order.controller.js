@@ -70,6 +70,98 @@ const orderController = {
             message: error.message
           });
         }
+      },
+
+      sofDelOrder: async (req, res)=>{
+        try {
+          const adminRole = await Role.findOne({ name: 'admin' });
+    
+    
+          if (!adminRole) {
+              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+          }
+    
+    
+          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+    
+          if (!isAdmin) {
+              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
+          }
+    
+          const id = req.params.id;
+          // Cập nhật trạng thái của danh mục thành "Đã xóa"
+          const softDeletedOrder = await orderService.softDeleteOrder(id)
+    
+          if (!softDeletedOrder ) {
+              return res.status(404).json({ message: "Không tìm thấy danh mục" });
+          }
+    
+          // Trả về phản hồi thành công
+          res.status(200).json({ message: 'Đã xóa thành công', softDel: softDeletedOrder });
+      } catch (error) {
+          // Xử lý lỗi và trả về phản hồi lỗi server
+          res.status(500).json({ message: "Lỗi server", error: error.message });
+      }
+      },
+    
+      deletedListOrder: async(req, res)=>{
+        try {
+          const adminRole = await Role.findOne({ name: 'admin' });
+    
+          if (!adminRole) {
+              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+          }
+    
+    
+          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+    
+          if (!isAdmin) {
+              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách danh mục đã bị xóa mềm" });
+          }
+    
+    
+          const deleteListCategory = await orderService.deletedList()
+    
+          res.status(200).json({ data: deleteListCategory });
+      } catch (error) {
+          res.status(500).json({ message: "Lỗi server", error: error.message });
+      }
+      }, 
+      restore: async(req, res)=>{
+        try {
+          const adminRole = await Role.findOne({ name: 'admin' });
+    
+    
+          if (!adminRole) {
+              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
+          }
+    
+    
+          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+    
+          if (!isAdmin) {
+              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục sản phẩm" });
+          }
+    
+    
+          const { id } = req.params;
+          if (!id) {
+              return res.status(400).json({ message: "Thiếu id sản phẩm" });
+          }
+    
+          // Cập nhật trạng thái của sản phẩm thành 'active'
+          const restoreProduct = await orderService.restore(id)
+    
+          if (!restoreProduct) {
+              return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+          }
+    
+          // Trả về phản hồi thành công
+          res.status(200).json({ message: "Sản phẩm đã được khôi phục thành công", data: restoreProduct });
+      } catch (error) {
+          // Xử lý lỗi và trả về phản hồi lỗi server
+          res.status(500).json({ message: "Lỗi server", error: error.message });
+      }
       }
 
 }

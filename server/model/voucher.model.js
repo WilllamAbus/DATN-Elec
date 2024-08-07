@@ -14,6 +14,7 @@ const voucherSchema = new Schema(
     conditionActive: { type: String, required: true },
     isActive: { type: Boolean, default: true },
     status: { type: String, default: 'active' },
+  
   },
   {
     collection: "voucher", // Name of the collection

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import AlertCustomStyles from "../../../../ultils/alert.succes";
+// import AlertCustomStyles from "../../../../ultils/alert.succes";
 import { createCategoryThunk } from "../../../../redux/categories/categoriesThunk";
 import { useNavigate } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { notify } from "../../../../ultils/success";
 interface IFormInput {
   name: string;
   path: string;
@@ -14,10 +16,10 @@ interface IFormInput {
 
 const AddCate: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
+  // const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,14 +37,14 @@ const AddCate: React.FC = () => {
       reset();
       setPreviewImage(null);
       setError(null);
-      setSuccessMessage("Category added successfully!");
-      setAlertType("success");
-      setTimeout(() => {
-        navigate("/admin/listCategories");
-      }, 2000); // 2 seconds delay before navigating
+      // setSuccessMessage("Category added successfully!");
+      // setAlertType("success");
+      // setTimeout(() => {
+      //   navigate("/admin/listCategories");
+      // }, 2000); // 2 seconds delay before navigating
     } else if (status === "failed") {
       setError(message);
-      setSuccessMessage(null);
+      // setSuccessMessage(null);
     }
   }, [status, reset, message, navigate]);
 
@@ -64,16 +66,23 @@ const AddCate: React.FC = () => {
       setError("No file selected");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("path", data.path);
     formData.append("imgCate", file);
-
+  
     try {
-      const resultAction = await dispatch(createCategoryThunk(formData) as any).unwrap();
+       await dispatch(createCategoryThunk(formData) as any).unwrap();
       setError(null);
-      setSuccessMessage(resultAction.message);
+      notify()
+      // setSuccessMessage(resultAction.message);
+  
+      // Navigate after a successful submission
+      setTimeout(() => {
+        navigate("/admin/listCategories");
+      }, 2000); // 2 seconds delay before navigating
+  
     } catch (error) {
       const errorMessage =
         (
@@ -85,6 +94,7 @@ const AddCate: React.FC = () => {
       console.error("Error:", errorMessage);
     }
   };
+  
 
   const handleButtonClick = () => {
     handleSubmit(onSubmit)();
@@ -96,14 +106,7 @@ const AddCate: React.FC = () => {
         <div className="w-full mt-6 pl-0 lg:pl-2">
           <div className="leading-loose">
             <div className="mt-4">
-              {successMessage && alertType && (
-                <AlertCustomStyles message={successMessage} type={alertType} />
-              )}
-              {error && (
-                <div className="mt-4">
-                  <span className="text-red-600">{error}</span>
-                </div>
-              )}
+            <ToastContainer />
             </div>
             <form
               id="addNewForm"
