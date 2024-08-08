@@ -17,12 +17,12 @@ const ListDelete: React.FC = () => {
   const userListError = useSelector(
     (state: RootState) => state.auth.deletedUsersError
   );
-  const restoreStatus = useSelector(
-    (state: RootState) => state.auth.restoreUserStatus
-  );
-  const restoreError = useSelector(
-    (state: RootState) => state.auth.restoreUserError
-  );
+  // const restoreStatus = useSelector(
+  //   (state: RootState) => state.auth.restoreUserStatus
+  // );
+  // const restoreError = useSelector(
+  //   (state: RootState) => state.auth.restoreUserError
+  // );
 
   useEffect(() => {
     dispatch(getDeletedListThunk());

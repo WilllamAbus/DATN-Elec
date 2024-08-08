@@ -601,7 +601,7 @@
 // export default EditProfile;
 import React, { useState, useEffect } from "react";
 import { UserProfile } from "../../../types/user";
-import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { useAppDispatch } from "../../../redux/store";
 import { setProfile } from "../../../redux/auth/authSlice";
 import {
   updateProfileThunk,
@@ -622,7 +622,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const dispatch = useAppDispatch();
-  const profileState = useAppSelector((state) => state.auth.profile);
+  // const profileState = useAppSelector((state) => state.auth.profile);
 
   useEffect(() => {
     if (profile) {

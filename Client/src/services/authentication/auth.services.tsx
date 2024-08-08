@@ -1,8 +1,8 @@
-import instance from "../axios";
-import { UserProfile } from "../../types/user";
+import instance from "../axois_V2";
+// import { UserProfile } from "../../types/user";
 const API_URL = import.meta.env.VITE_API_URL;
-import { AppDispatch } from "../../redux/store";
-import axios from "axios";
+// import { AppDispatch } from "../../redux/store";
+// import axios from "axios";
 // export const loginUser = async (user: { email: string; password: string }) => {
 //   try {
 //     const response = await instance.post(`${API_URL}/auth/login`, user);

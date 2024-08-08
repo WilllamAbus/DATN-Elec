@@ -107,7 +107,7 @@ const authSlice = createSlice({
       state.register.successMessage = action.payload;
       state.register.error = false;
     },
-    registerFailed: (state, action: PayloadAction<string>) => {
+    registerFailed: (state,) => {
       state.register.isFetching = false;
       state.register.error = true;
       state.register.successMessage = null;
@@ -265,7 +265,7 @@ const authSlice = createSlice({
         state.restoreUserStatus = "loading";
         state.restoreUserError = null;
       })
-      .addCase(restoreUserThunk.fulfilled, (state, action) => {
+      .addCase(restoreUserThunk.fulfilled, (state, ) => {
         state.restoreUserStatus = "succeeded";
         state.restoreUserError = null;
         // Cập nhật lại danh sách người dùng đã bị xóa mềm nếu cần
@@ -282,7 +282,7 @@ const authSlice = createSlice({
       })
       .addCase(
         updateUserThunk.fulfilled,
-        (state, action: PayloadAction<any>) => {
+        (state,) => {
           state.updateUserStatus = "succeeded";
           // Cập nhật trạng thái người dùng nếu cần
           state.updateUserError = null;

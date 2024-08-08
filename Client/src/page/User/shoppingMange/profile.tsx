@@ -4,13 +4,13 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../redux/store";
-import { getProfileThunk, logoutService } from "../../../redux/auth/authThunk";
+import { getProfileThunk } from "../../../redux/auth/authThunk";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCoppyright from "../../../components/User/copyright";
 import { Link, useNavigate } from "react-router-dom";
-import Avatar from "../../../assets/images/avatar.png";
+// import Avatar from "../../../assets/images/avatar.png";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { logout as logoutAction } from "../../../redux/auth/authSlice";

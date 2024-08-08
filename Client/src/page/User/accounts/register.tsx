@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
 import UserFooter from "../../../components/User/footer";
 import UserCopyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import { useAppDispatch, } from "../../../redux/store";
 import { registerUserThunk } from "../../../redux/auth/authThunk";
 
 interface FormValues {
@@ -21,7 +21,7 @@ const Register: React.FC = () => {
     useForm<FormValues>();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useAppDispatch(); // Hook để gọi dispatch từ Redux
 
   const handleRegister: SubmitHandler<FormValues> = async (data) => {
