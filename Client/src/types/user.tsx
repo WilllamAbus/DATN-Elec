@@ -26,19 +26,21 @@ export interface AuthAction {
   };
 }
 export interface UserProfile {
-  msg: string;
-  token: string;
-  _id: string;
+  profile?: string;
+  msg?: string;
+  token?: string;
+  _id?: string;
   name: string;
+  accessToken: string;
   email: string;
-  profile: any;
-  VerifiedEmail: boolean;
+  VerifiedEmail: string;
   status: string;
-  roles: string;
+  roles: string[];
   birthday: string;
   gender: string;
   phone: string;
+  avatar: string;
   address: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }

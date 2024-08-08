@@ -1,6 +1,6 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { Auth } from "../../types";
-import { getProfile } from "../../../services/authentication/auth.services";
+import { getProfile } from "../../../services/authentication/demo.services";
 import { UserProfile } from "../../../types/user";
 function* authWatch() {
   yield all([takeLatest(Auth.USE_INFO, getUserInfo)]);

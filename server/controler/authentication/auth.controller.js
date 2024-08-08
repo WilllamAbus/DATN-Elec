@@ -1,6 +1,8 @@
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuid");
+const serviceAccount = require("./authFirebase.json");
 const User = require("../../model/users.model");
 const {
   sendPasswordResetEmail,
@@ -8,27 +10,41 @@ const {
 } = require("../../services/email.service");
 const crypto = require("crypto");
 const Role = require("../../model/role.model");
+const multer = require("multer");
 
 const jwtSecret = process.env.JWT_ACCESS_KEY;
 const jwtRefreshSecret = process.env.JWT_REFRESH_KEY;
+const admin = require("firebase-admin");
+const STORE_BUCKET = process.env.STORE_BUCKET;
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: STORE_BUCKET,
+  });
+}
+
+const storage = admin.storage();
+const bucket = storage.bucket();
+
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 let refreshTokens = [];
 const authController = {
   registerUser: async (req, res) => {
     try {
-      // Tìm vai trò người dùng
-      const userRole = await Role.findOne({ name: "admin" });
+      const userRole = await Role.findOne({ name: "user" });
       if (!userRole) {
         return res
           .status(500)
-          .json({ msg: "Không tìm thấy vai trò người dùng" });
+          .json({ message: "Không tìm thấy vai trò người dùng" });
       }
 
       const { email, password, name } = req.body;
 
-      // Kiểm tra xem email đã tồn tại chưa
       const checkEmail = await User.findOne({ email });
       if (checkEmail) {
-        return res.status(200).json({ msg: "Email đã tồn tại" });
+        return res.status(200).json({ message: "Email đã tồn tại" });
       }
 
       const newUser = new User({
@@ -51,13 +67,12 @@ const authController = {
 
       return res
         .status(200)
-        .json({ msg: "Đăng ký thành công. Vui lòng kiểm tra Email" });
-
- 
-      // res.status(200).json({ msg: "Người dùng đã đăng ký thành công", user });
+        .json({ message: "Đăng ký thành công. Vui lòng kiểm tra Email" });
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ msg: "Server error", error: err.message });
+      return res
+        .status(500)
+        .json({ message: "Server error", error: err.message });
     }
   },
 
@@ -74,17 +89,19 @@ const authController = {
       });
 
       if (!user) {
-        return res.status(400).json({ msg: "Token is invalid or has expired" });
+        return res
+          .status(400)
+          .json({ message: "Token is invalid or has expired" });
       }
 
-      user.Verifiedemail = true;
+      user.VerifiedEmail = true;
       user.emailVerificationToken = undefined;
       user.emailVerificationExpires = undefined;
       await user.save();
 
-      res.status(200).json({ msg: "Email verified successfully" });
+      res.status(200).json({ message: "Email verified successfully" });
     } catch (err) {
-      res.status(500).json({ msg: "Server error", error: err.message });
+      res.status(500).json({ message: "Server error", error: err.message });
     }
   },
 
@@ -95,11 +112,13 @@ const authController = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(400).json({ msg: "Email không tồn tại" });
+        return res.status(400).json({ message: "Email không tồn tại" });
       }
 
       if (user.Verifiedemail) {
-        return res.status(400).json({ msg: "Email đã được xác minh trước đó" });
+        return res
+          .status(400)
+          .json({ message: "Email đã được xác minh trước đó" });
       }
 
       const token = crypto.randomBytes(20).toString("hex");
@@ -113,15 +132,16 @@ const authController = {
       await sendVerificationEmail(email, token);
 
       res.status(200).json({
-        msg: "Mã xác minh đã được gửi lại. Vui lòng kiểm tra email của bạn.",
+        message:
+          "Mã xác minh đã được gửi lại. Vui lòng kiểm tra email của bạn.",
       });
     } catch (err) {
-      res.status(500).json({ msg: "Lỗi server", error: err.message });
+      res.status(500).json({ message: "Lỗi server", error: err.message });
     }
   },
   generateToken: (user) => {
     const payload = {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
       roles: user.roles,
@@ -131,7 +151,7 @@ const authController = {
 
   generateRefreshToken: (user) => {
     const payload = {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
       roles: user.roles,
@@ -139,41 +159,100 @@ const authController = {
     return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "30d" });
   },
 
+  // loginUser: async (req, res) => {
+  //   try {
+  //     const user = await User.findOne({ email: req.body.email }).populate(
+  //       "roles"
+  //     ); // Đảm bảo rằng trường roles được populate
+  //     if (!user) {
+  //       return res
+  //         .status(401)
+  //         .json({ msg: "Thông tin đăng nhập không chính xác" });
+  //     }
+
+  //     const validPassword = await user.comparePassword(
+  //       req.body.password,
+  //       user.password
+  //     );
+  //     if (!validPassword) {
+  //       return res
+  //         .status(401)
+  //         .json({ msg: "Thông tin đăng nhập không chính xác" });
+  //     }
+
+  //     const token = authController.generateToken(user);
+  //     const refreshToken = authController.generateRefreshToken(user);
+  //     refreshTokens.push(refreshToken);
+
+  //     res.cookie("refreshToken", refreshToken, {
+  //       httpOnly: true,
+  //       secure: true,
+  //       path: "/",
+  //       sameSite: "strict",
+  //     });
+
+  //     const { password, ...others } = user._doc;
+  //     // Return user info including roles
+  //     return res
+  //       .status(200)
+  //       .json({ ...others, accessToken: token, roles: user.roles });
+  //   } catch (err) {
+  //     return res.status(500).json({ msg: "Server error", error: err.message });
+  //   }
+  // },
   loginUser: async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({ email: req.body.email }).populate(
+        "roles"
+      );
       if (!user) {
         return res
           .status(401)
-          .json({ msg: "Thông tin đăng nhập không chính xác" });
+          .json({ message: "Thông tin đăng nhập không chính xác" });
       }
 
-      const validPassword = await user.comparePassword(
+      const validPassword = await bcrypt.compare(
         req.body.password,
         user.password
       );
       if (!validPassword) {
         return res
           .status(401)
-          .json({ msg: "Thông tin đăng nhập không chính xác" });
+          .json({ message: "Thông tin đăng nhập không chính xác" });
+      }
+
+      if (!user.VerifiedEmail) {
+        return res.status(400).json({ message: "Email chưa được xác minh" });
+      }
+
+      if (user.status !== "active") {
+        console.log("Tài khoản đã bị khóa");
+        return res.status(400).json({
+          message: "Tài khoản đã bị khóa ",
+        });
       }
 
       const token = authController.generateToken(user);
-
       const refreshToken = authController.generateRefreshToken(user);
+
       refreshTokens.push(refreshToken);
 
-      // res.cookie("refreshToken", refreshToken, {
-      //   httpOnly: true,
-      //   secure: true,
-      //   path: "/",
-      //   sameSite: "strict",
-      // });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        path: "/",
+        sameSite: "strict",
+      });
 
       const { password, ...others } = user._doc;
-      return res.status(200).json({ ...others, accessToken: token });
+
+      return res
+        .status(200)
+        .json({ ...others, accessToken: token, roles: user.roles });
     } catch (err) {
-      return res.status(500).json({ msg: "Server error", error: err.message });
+      return res
+        .status(500)
+        .json({ message: "Server error", error: err.message });
     }
   },
 
@@ -181,10 +260,10 @@ const authController = {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Bạn chưa đăng nhập" });
+      return res.status(401).json({ message: "Bạn chưa đăng nhập" });
     }
     if (!refreshTokens.includes(refreshToken)) {
-      return res.status(403).json({ msg: "Token này không phải của bạn" });
+      return res.status(403).json({ message: "Token này không phải của bạn" });
     }
 
     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
@@ -206,14 +285,14 @@ const authController = {
     } catch (err) {
       return res
         .status(403)
-        .json({ msg: "Refresh token không hợp lệ", error: err.message });
+        .json({ message: "Refresh token không hợp lệ", error: err.message });
     }
   },
   logout: async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     res.clearCookie("refreshToken");
     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
-    return res.status(200).json({ msg: "Đăng xuất thành công" });
+    return res.status(200).json({ message: "Đăng xuất thành công" });
   },
 
   list: async (req, res) => {
@@ -239,57 +318,108 @@ const authController = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
-  updateProfile: async (req, res) => {
-    const { name, birthday, gender, phone, address } = req.body;
-    const userId = req.user.id;
+  // updateProfile: async (req, res) => {
+  //   const { name, birthday, gender, phone, address, avatar } = req.body;
+  //   const userId = req.user.id;
 
-    console.log("ID từ token:", userId);
+  //   console.log("ID từ token:", userId);
 
-    console.log("Dữ liệu gửi lên:", req.body);
+  //   console.log("Dữ liệu gửi lên:", req.body);
 
-    try {
-      let user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (name) user.name = name;
-      if (birthday) user.birthday = birthday;
-      if (gender) user.gender = gender;
-      if (phone) user.phone = phone;
-      if (address) user.address = address;
-
-      const updatedUser = await user.save();
-
-      // Gửi phản hồi thành công
-      return res.status(200).json({ msg: "Cập Nhật Thành Công" });
-    } catch (error) {
-      console.error("Server error updating user profile:", error);
-      return res.status(500).json({
-        msg: "Server error updating user profile",
-        error: error.message,
-      });
-    }
-  },
-  // getProfile: async (req, res) => {
   //   try {
-  //     const userId = req.user.id;
-  //     if (!userId) {
-  //       return res.status(400).json({ message: "User ID is not defined" });
-  //     }
-  //     const user = await User.findById(userId);
+  //     let user = await User.findById(userId);
   //     if (!user) {
-  //       return res.status(404).json({ message: "Không tìm thấy người dùng" });
+  //       return res.status(404).json({ message: "User not found" });
   //     }
-  //     res.status(200).json(user);
+
+  //     if (name) user.name = name;
+  //     if (birthday) user.birthday = birthday;
+  //     if (gender) user.gender = gender;
+  //     if (phone) user.phone = phone;
+  //     if (address) user.address = address;
+  //     if (avatar) user.avatar = avatar;
+
+  //     const updatedUser = await user.save();
+
+  //     // Gửi phản hồi thành công
+  //     return res.status(200).json({ msg: "Cập Nhật Thành Công" });
   //   } catch (error) {
-  //     console.error("Lỗi server khi lấy thông tin người dùng:", error);
-  //     res.status(500).json({
-  //       message: "Lỗi server khi lấy thông tin người dùng",
+  //     console.error("Server error updating user profile:", error);
+  //     return res.status(500).json({
+  //       msg: "Server error updating user profile",
   //       error: error.message,
   //     });
   //   }
   // },
+
+  updateProfile: async (req, res) => {
+    try {
+      const id = req.user.id;
+      const { name, address, phone, gender, birthday } = req.body;
+      const avatar = req.file ? req.file : undefined;
+      let avatarURL;
+      if (avatar) {
+        const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
+        const file = bucket.file(`avatars/${filename}`);
+        const fileStream = file.createWriteStream({
+          metadata: {
+            contentType: avatar.mimetype,
+          },
+        });
+
+        fileStream.on("finish", async () => {
+          try {
+            await file.makePublic();
+            const encodedFilename = encodeURIComponent(file.name);
+            avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
+
+            const updatedUser = await User.findByIdAndUpdate(
+              id,
+              { name, address, phone, birthday, gender, avatar: avatarURL },
+              { new: true }
+            );
+
+            if (!updatedUser) {
+              return res
+                .status(404)
+                .json({ message: "Người dùng không tìm thấy" });
+            }
+
+            return res
+              .status(200)
+              .json({ message: "Cập Nhật Thành Công", user: updatedUser });
+          } catch (err) {
+            console.error("Lỗi khi lấy URL của hình ảnh:", err);
+            return res
+              .status(500)
+              .json({ message: "Không thể lấy URL của hình ảnh" });
+          }
+        });
+
+        fileStream.end(avatar.buffer);
+      } else {
+        const updatedUser = await User.findByIdAndUpdate(
+          id,
+          { name, address, phone, gender, birthday },
+          { new: true }
+        );
+
+        if (!updatedUser) {
+          return res.status(404).json({ message: "Người dùng không tìm thấy" });
+        }
+        return res
+          .status(200)
+          .json({ message: "Cập Nhật Thành Công", user: updatedUser });
+      }
+    } catch (error) {
+      console.error("Server error updating user profile:", error);
+      return res.status(500).json({
+        message: "Server error updating user profile",
+        error: error.message,
+      });
+    }
+  },
+
   getProfile: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -318,13 +448,45 @@ const authController = {
       });
     }
   },
+
+  updatePassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.user.id;
+
+      if (!currentPassword || !newPassword) {
+        return res
+          .status(400)
+          .json({ message: "Mật khẩu hiện tại và mật khẩu mới là bắt buộc" });
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res
+          .status(400)
+          .json({ message: "Mật khẩu hiện tại không đúng" });
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      res.status(200).json({ message: "Cập nhật mật khẩu thành công" });
+    } catch (error) {
+      console.error("Lỗi server khi cập nhật mật khẩu:", error);
+      res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+  },
+
   resendEmail: async (req, res) => {},
 
   forgotPassword: async (req, res) => {},
 
   resetPassword: async (req, res) => {},
-
-  updatePassword: async (req, res) => {},
 
   deleteUser: async (req, res) => {},
 };

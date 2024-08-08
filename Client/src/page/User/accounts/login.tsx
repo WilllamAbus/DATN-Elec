@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
@@ -7,118 +7,45 @@ import UserCopyright from "../../../components/User/copyright";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
 import "../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { loginApi } from "../../../services/authentication/auth.services";
-import { useCookies } from "react-cookie";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Auth } from "../../../redux/actions";
-import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import { useAppDispatch } from "../../../redux/store";
+import { loginUserThunk } from "../../../redux/auth/authThunk";
+
 interface IFormInput {
   email: string;
   password: string;
 }
 
-// const Login: React.FC = () => {
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//   } = useForm<IFormInput>();
-//   const navigate = useNavigate();
-//   const [cookies, setCookie] = useCookies(["token"]);
-//   const login: SubmitHandler<IFormInput> = async (data) => {
-//     try {
-//       const res = await loginApi({
-//         email: data.email,
-//         password: data.password,
-//       });
-
-//       if (res?.accessToken) {
-//         const dateExpired = new Date();
-//         dateExpired.setHours(dateExpired.getHours() + 1);
-//         setCookie("token", res.accessToken, {
-//           expires: dateExpired,
-//           path: "/",
-//         });
-//         localStorage.setItem("token", res.accessToken);
-//         localStorage.setItem("name", res.name);
-//         navigate("/profile");
-//       }
-//     } catch (err) {
-//       console.error("Error logging in:", err);
-//     }
-//   };
 const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormInput>();
-
   const navigate = useNavigate();
-  const [, setCookie] = useCookies(["token", "role"]);
-  const dispatch = useDispatch();
-  const profile = useSelector((state: any) => state.auth.profile);
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (profile) {
-      const dateExpired = new Date();
-      dateExpired.setHours(dateExpired.getHours() + 1);
-      setCookie("role", profile?.role, { path: "/", expires: dateExpired });
-      navigate("/profile");
-    }
-  }, [profile, navigate, setCookie]);
-
-  const login: SubmitHandler<IFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
     setError(null);
 
     try {
-      const res = await loginApi({
-        email: data.email,
-        password: data.password,
-      });
-
-      console.log("Login Response:", res);
-
-      if (res?.accessToken) {
-        const dateExpired = new Date();
-        dateExpired.setHours(dateExpired.getHours() + 1);
-
-        setCookie("token", res.accessToken, {
-          path: "/",
-          expires: dateExpired,
-        });
-
-        const roleName = res.roles.length > 0 ? res.roles[0]?.name : "";
-        setCookie("role", roleName, {
-          path: "/",
-          expires: dateExpired,
-        });
-
-        dispatch(Auth.getProfile());
-
-        localStorage.setItem("token", res.accessToken);
-        localStorage.setItem("name", res.name);
-
-        navigate("/profile");
+      await dispatch(loginUserThunk(data)).unwrap();
+      navigate("/profile"); // Chuyển hướng sau khi đăng nhập thành công
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "An unknown error occurred");
       } else {
-        setError("Đăng nhập không thành công");
-      }
-    } catch (err) {
-      console.error("Error logging in:", err);
-
-      if (err && axios.isAxiosError(err)) {
-        const axiosError = err as { response?: { data?: { msg?: string } } };
-        // Chỉ hiển thị thông báo lỗi từ API nếu có
-        setError(axiosError.response?.data?.msg || "");
+        setError("An unknown error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <>
       <UserHeader />
@@ -126,9 +53,11 @@ const Login: React.FC = () => {
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
-          <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
+          <p className="text-gray-600 mb-6 text-sm">
+            Chào mừng khách hàng quay trở lại
+          </p>
 
-          <form onSubmit={handleSubmit(login)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label htmlFor="email" className="text-gray-600 mb-2 block">
                 Email
@@ -146,7 +75,9 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.email && <small className="text-red-600">{errors.email.message}</small>}
+              {errors.email && (
+                <small className="text-red-600">{errors.email.message}</small>
+              )}
             </div>
 
             <div>
@@ -166,7 +97,11 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.password && <small className="text-red-600">{errors.password.message}</small>}
+              {errors.password && (
+                <small className="text-red-600">
+                  {errors.password.message}
+                </small>
+              )}
             </div>
 
             <div className="flex items-center justify-between mt-6">
@@ -199,7 +134,9 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 flex justify-center relative">
-            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">Or</div>
+            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">
+              Or
+            </div>
             <div className="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
           </div>
 

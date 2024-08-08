@@ -3,6 +3,8 @@ const router = express.Router();
 const authController = require("../controler/authentication/auth.controller");
 const middlewareController = require("../middleware/auth");
 
+const upload = require("../middleware/multer.middle");
+
 router.post("/register", authController.registerUser);
 router.post("/login", authController.loginUser);
 router.post("/logout", middlewareController.verifyToken, authController.logout);
@@ -21,8 +23,14 @@ router.get(
 );
 router.put(
   "/profile",
+  upload.single("avatar"),
   middlewareController.verifyToken,
   authController.updateProfile
+);
+router.put(
+  "/password",
+  middlewareController.verifyToken,
+  authController.updatePassword
 );
 //very
 router.get("/verifyEmail", authController.verifyEmail);

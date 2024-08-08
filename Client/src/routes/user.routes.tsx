@@ -1,123 +1,161 @@
 // src/routes/UserRoutes.tsx
-import React from 'react';
-import { RouteObject } from 'react-router-dom';
+import React from "react";
+import { RouteObject } from "react-router-dom";
 
-const UserHome = React.lazy(() => import('../page/User/rootUser'));
-const UserLogin = React.lazy(() => import('../page/User/accounts/login'));
-const UserRegister =  React.lazy(() => import('../page/User/accounts/register'));
-const UserRegisOTP =  React.lazy(() => import('../page/User/accounts/regisOTP'));
-const UserVerifyOTP =  React.lazy(() => import('../page/User/accounts/verifyOtp'));
-const UserRecievePass = React.lazy(() => import('../page/User/accounts/recivePass'));
-const UserForgotPass = React.lazy(() => import('../page/User/accounts/forgot'));
-const UserLoginSuccess = React.lazy(() => import('../page/User/accounts/login-success'));
-const UserReciveCode =   React.lazy(() => import('../page/User/accounts/reciveCode'));
-
-const UserAllList =  React.lazy(() => import('../page/User/shopping/gallery/allListing'));
-const UserMyList =  React.lazy(() => import('../page/User/shopping/gallery/listTing'));
-const UserAuction =  React.lazy(() => import('../page/User/shopping/gallery/auction'));
-const UserdetailsProd =  React.lazy(() => import('../page/User/shopping/details/detail'));
-const UserdetailsAuc =  React.lazy(() => import('../page/User/shopping/auction/auctionDetails'));
-const UserCartPage =  React.lazy(() => import('../page/User/shopping/cart/cartPage'));
-const UserCheckoutpage = React.lazy(() => import('../page/User/shopping/cart/paymentPage'));
-const UserPaymentpage = React.lazy(() => import('../page/User/shopping/cart/complate'));
-const UserProdfile = React.lazy(() => import('../page/User/shoppingMange/profile'));
-const UserWatchList =   React.lazy(() => import('../page/User/watchList/watchList'));
-const UserSearch =   React.lazy(() => import('../page/User/shopping/search/index'));
-const UserFilter =   React.lazy(() => import('../page/User/shopping/filter/index'));
+const UserHome = React.lazy(() => import("../page/User/rootUser"));
+const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
+const UserRegister = React.lazy(() => import("../page/User/accounts/register"));
+const UserRegisOTP = React.lazy(() => import("../page/User/accounts/regisOTP"));
+const UserVerifyOTP = React.lazy(
+  () => import("../page/User/accounts/verifyOtp")
+);
+const UserRecievePass = React.lazy(
+  () => import("../page/User/accounts/recivePass")
+);
+const UserForgotPass = React.lazy(() => import("../page/User/accounts/forgot"));
+const UserLoginSuccess = React.lazy(
+  () => import("../page/User/accounts/login-success")
+);
+const UserReciveCode = React.lazy(
+  () => import("../page/User/accounts/reciveCode")
+);
+const VerifyEmailPage = React.lazy(
+  () => import("../page/User/accounts/VerifyEmail")
+);
+const UserAllList = React.lazy(
+  () => import("../page/User/shopping/gallery/allListing")
+);
+const UserMyList = React.lazy(
+  () => import("../page/User/shopping/gallery/listTing")
+);
+const UserAuction = React.lazy(
+  () => import("../page/User/shopping/gallery/auction")
+);
+const UserdetailsProd = React.lazy(
+  () => import("../page/User/shopping/details/detail")
+);
+const UserdetailsAuc = React.lazy(
+  () => import("../page/User/shopping/auction/auctionDetails")
+);
+const UserCartPage = React.lazy(
+  () => import("../page/User/shopping/cart/cartPage")
+);
+const UserCheckoutpage = React.lazy(
+  () => import("../page/User/shopping/cart/paymentPage")
+);
+const UserPaymentpage = React.lazy(
+  () => import("../page/User/shopping/cart/complate")
+);
+const UserProdfile = React.lazy(
+  () => import("../page/User/shoppingMange/profile")
+);
+const UserWatchList = React.lazy(
+  () => import("../page/User/watchList/watchList")
+);
+const UserSearch = React.lazy(
+  () => import("../page/User/shopping/search/index")
+);
+const UserFilter = React.lazy(
+  () => import("../page/User/shopping/filter/index")
+);
 
 const UserRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <UserHome />,
   },
   /***Accounts Router */
   {
-    path: 'login',
-    element: <UserLogin/>,
+    path: "login",
+    element: <UserLogin />,
   },
   {
-    path: 'register',
-    element: <UserRegister/>,
+    path: "register",
+    element: <UserRegister />,
   },
   {
-    path: 'regisOTP',
-    element: <UserRegisOTP/>,
+    path: "/verifyEmail/:token",
+    element: <VerifyEmailPage />,
   },
   {
-    path: 'verifyOTP',
-    element: <UserVerifyOTP/>,
+    path: "regisOTP",
+    element: <UserRegisOTP />,
   },
   {
-    path: 'forgot',
-    element: <UserForgotPass/>,
+    path: "verifyOTP",
+    element: <UserVerifyOTP />,
   },
   {
-    path: 'login-success/:userId/:tokenLogin',
-    element: <UserLoginSuccess/>,
+    path: "forgot",
+    element: <UserForgotPass />,
   },
   {
-    path: 'recivePass',
-    element: <UserRecievePass/>,
+    path: "login-success/:userId/:tokenLogin",
+    element: <UserLoginSuccess />,
   },
   {
-    path: 'reciveCode',
-    element: <UserReciveCode/>,
+    path: "recivePass",
+    element: <UserRecievePass />,
+  },
+  {
+    path: "reciveCode",
+    element: <UserReciveCode />,
   },
 
   /**Shopping router */
 
   {
-    path: 'allList',
-    element: <UserAllList/>,
+    path: "allList",
+    element: <UserAllList />,
   },
   {
-    path: 'listTing',
-    element: <UserMyList/>,
+    path: "listTing",
+    element: <UserMyList />,
   },
   {
-    path: 'auction',
+    path: "auction",
     element: <UserAuction />,
   },
   {
-    path: 'detailProd/:id',
-    element: <UserdetailsProd/>,
+    path: "detailProd/:id",
+    element: <UserdetailsProd />,
   },
   {
-    path: 'detailAuc',
-    element: <UserdetailsAuc/>,
+    path: "detailAuc",
+    element: <UserdetailsAuc />,
   },
   {
-    path: 'cart',
-    element: <UserCartPage/>,
+    path: "cart",
+    element: <UserCartPage />,
   },
   {
-    path: 'search/:keyword',
-    element: <UserSearch/>,
+    path: "search/:keyword",
+    element: <UserSearch />,
   },
   {
-    path: 'filter/:price',
-    element: <UserFilter/>,
+    path: "filter/:price",
+    element: <UserFilter />,
   },
   {
-    path: 'checkout',
-    element: <UserCheckoutpage/>,
+    path: "checkout",
+    element: <UserCheckoutpage />,
   },
   {
-    path: 'complete',
-    element: <UserPaymentpage/>,
+    path: "complete",
+    element: <UserPaymentpage />,
   },
 
   /***Profile */
   {
-    path: 'profile',
-    element: <UserProdfile/>,
+    path: "profile",
+    element: <UserProdfile />,
   },
   {
-    path: 'watchList',
-    element: <UserWatchList/>,
+    path: "watchList",
+    element: <UserWatchList />,
   },
   {
-    path: '*',
+    path: "*",
     element: <UserHome />,
   },
 ];
@@ -126,8 +164,7 @@ const UserRoutes: RouteObject[] = [
 //   <div>
 //      <Outlet />
 //   </div>
- 
+
 // );
 
-export default UserRoutes ;
-
+export default UserRoutes;

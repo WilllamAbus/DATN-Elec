@@ -1,37 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UserProfile } from "../../../types/user";
-import { getProfile } from "../../../services/authentication/auth.services";
 import moment from "moment";
-// interface UserProfile {
-//   name: string;
-//   email: string;
-//   birthday: string;
-//   gender: string;
-//   phone: string;
-// }
-interface info {
-  profiles: UserProfile;
+
+interface InfoProps {
+  profiles: UserProfile | null;
 }
 
-const info: React.FC<info> = ({ profiles }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+const Info: React.FC<InfoProps> = ({ profiles }) => {
+  if (!profiles) return <p>No profile data available</p>;
 
-  useEffect(() => {
-    getUserInfo();
-  }, [profile]);
-
-  const getUserInfo = async () => {
-    try {
-      const res = await getProfile();
-      setProfile(res);
-    } catch (err) {
-      console.log("err === ", err);
-    }
-  };
   const formattedBirthday = profiles.birthday
     ? moment(profiles.birthday).format("DD/MM/YYYY") // Định dạng ngày theo ý muốn
     : "";
-  if (!profile) return <p>Loading...</p>;
 
   return (
     <div className="col-span-9 shadow rounded px-6 pt-5 pb-7">
@@ -45,7 +25,7 @@ const info: React.FC<info> = ({ profiles }) => {
               name="first"
               id="first"
               className="input-box"
-              value={profile.name || ""}
+              value={profiles.name || ""}
               readOnly
             />
           </div>
@@ -56,7 +36,6 @@ const info: React.FC<info> = ({ profiles }) => {
               name="birthday"
               id="birthday"
               className="input-box"
-              // value={profile.birthday || ""}
               value={formattedBirthday}
               readOnly
             />
@@ -69,7 +48,7 @@ const info: React.FC<info> = ({ profiles }) => {
               name="gender"
               id="gender"
               className="input-box"
-              value={profile.gender || ""}
+              value={profiles.gender || ""}
               readOnly
             />
           </div>
@@ -80,7 +59,7 @@ const info: React.FC<info> = ({ profiles }) => {
               name="email"
               id="email"
               className="input-box"
-              value={profile.email || ""}
+              value={profiles.email || ""}
               readOnly
             />
           </div>
@@ -93,7 +72,7 @@ const info: React.FC<info> = ({ profiles }) => {
               name="phone"
               id="phone"
               className="input-box"
-              value={profile.phone || ""}
+              value={profiles.phone || ""}
               readOnly
             />
           </div>
@@ -104,7 +83,7 @@ const info: React.FC<info> = ({ profiles }) => {
               name="address"
               id="address"
               className="input-box"
-              value={profile.address || ""}
+              value={profiles.address || ""}
               readOnly
             />
           </div>
@@ -114,4 +93,4 @@ const info: React.FC<info> = ({ profiles }) => {
   );
 };
 
-export default info;
+export default Info;

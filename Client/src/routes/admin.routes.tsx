@@ -105,7 +105,10 @@ const AdminRecycleBin = React.lazy(
 
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
-
+const AdminListDeleted = React.lazy(
+  () => import("../page/Admin/users/listDelete")
+);
+const AdminEditUser = React.lazy(() => import("../page/Admin/users/editUser"));
 const AdminRoutes: RouteObject[] = [
   {
     path: "",
@@ -246,6 +249,14 @@ const AdminRoutes: RouteObject[] = [
   {
     path: "listUser",
     element: <AdminListUser />,
+  },
+  {
+    path: "listDelete",
+    element: <AdminListDeleted />,
+  },
+  {
+    path: "editUser",
+    element: <AdminEditUser />,
   },
 ];
 

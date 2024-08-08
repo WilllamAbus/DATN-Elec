@@ -6,7 +6,7 @@ const { verifyOtp, regisUser } = require("../controler/user.controller");
 // middleware
 const { checkPermission } = require("../middleware/role.base");
 const middlewareController = require("../middleware/auth");
-const upload = require('../middleware/multer.middle');
+const upload = require("../middleware/multer.middle");
 const { createRole } = require("../controler/role.controller");
 // const middlewareController = require('../middleware/auth');
 // categories
@@ -21,13 +21,11 @@ const {
   deletedListCategory
 } = require("../controler/categories.controller");
 
-
 // discount
-const voucherController = require('../controler/voucher.controller')
-
+const voucherController = require("../controler/voucher.controller");
 
 // order
-const orderController = require('../controler/order.controller')
+const orderController = require("../controler/order.controller");
 const router = express.Router();
 // Test
 router.get("/", homepage);
@@ -41,7 +39,12 @@ router.post("/addRole", checkPermission, createRole);
 
 // Categoris
 
-router.post("/addCate",middlewareController.verifyToken, upload.single("imgCate"), uploadCategory);
+router.post(
+  "/addCate",
+  middlewareController.verifyToken,
+  upload.single("imgCate"),
+  uploadCategory
+);
 router.get("/getAllCate", getAllCategoriesController);
 router.get("/getCate/:id", getCategoryByIdController);
 router.put("/updateCate/:id",middlewareController.verifyToken, upload.single("imgCate"), updateCategoryController);
@@ -52,19 +55,34 @@ router.get("/deleted-list", middlewareController.verifyToken, deletedListCategor
 router.patch("/restore/:id", middlewareController.verifyToken, restore);
 
 // discount
-router.post("/addVoucher",middlewareController.verifyToken, voucherController.createVoucher);
+router.post(
+  "/addVoucher",
+  middlewareController.verifyToken,
+  voucherController.createVoucher
+);
 router.get("/getAllVoucher", voucherController.getAllVoucher);
 router.get("/getVoucher/:id", voucherController.getVoucherById);
-router.put("/updateVoucher/:id",middlewareController.verifyToken, voucherController.updateVoucher);
-router.delete("/deleteVoucher/:id",middlewareController.verifyToken, voucherController.deleteVoucher);
-
+router.put(
+  "/updateVoucher/:id",
+  middlewareController.verifyToken,
+  voucherController.updateVoucher
+);
+router.delete(
+  "/deleteVoucher/:id",
+  middlewareController.verifyToken,
+  voucherController.deleteVoucher
+);
 
 router.patch("/soft-delete/:id", middlewareController.verifyToken, voucherController.sofDelVoucher);
 router.get("/deleted-list", middlewareController.verifyToken, voucherController.deletedListVoucher);
 router.patch("/restore/:id", middlewareController.verifyToken, voucherController.restore);
 
 // order
-router.post("/addOrder",middlewareController.verifyToken, orderController.createOrder);
+router.post(
+  "/addOrder",
+  middlewareController.verifyToken,
+  orderController.createOrder
+);
 router.get("/getAllOrder", orderController.getAllOrder);
 router.get("/getOrder/:id", orderController.getOrderbyId);
 router.delete("/deleteOrder/:id",middlewareController.verifyToken, orderController.deleteOrderById);
