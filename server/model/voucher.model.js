@@ -10,7 +10,12 @@ const voucherSchema = new Schema(
         name: { type: String, required: true }
       }
     ],
-    expiryDate: { type: Date, required: true },
+    expiryDate: { 
+      type: Date, 
+      required: true
+    
+    
+    },
     conditionActive: { type: String, required: true },
     isActive: { type: Boolean, default: true },
     status: { type: String, default: 'active' },

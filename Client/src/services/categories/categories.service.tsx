@@ -7,7 +7,10 @@ const API_BASE_URL = `${environment.url}`;
 export interface ApiResponse {
   data: Category[];
 }
-
+export const checkCategoryExists = async (name: any) => {
+  const response = await axiosInstance.get(`/checkCategory/${name}`);
+  return response.data.exists;
+};
 export const createCategory = async (formData: FormData) => {
   try {
     const response = await axiosInstance.post(`${API_BASE_URL}/addCate`, formData, {

@@ -29,7 +29,9 @@ export const fetchOrderById = createAsyncThunk(
     'order/fetchOrderById',
     async (id: string) => {
       const response = await getOrderById(id);
-      return response;
+      console.log('responese:', response);
+      
+      return response.order  as OrderData ;
     }
   );
   

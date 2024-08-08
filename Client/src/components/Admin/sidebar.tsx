@@ -35,6 +35,13 @@ const Sidebar: React.FC = () => {
   const toggleOrder = () => {
     setOrderOpen(!isOrderOpen);
   };
+
+  const [isRestoreOpen, setRestoreOpen] = useState(false);
+
+  const toggleRestore = () => {
+    setRestoreOpen(!isRestoreOpen);
+  };
+
   return (
     <aside className="relative bg-sidebar h-screen w-64 hidden sm:block shadow-xl">
       <div className="p-6">
@@ -78,13 +85,7 @@ const Sidebar: React.FC = () => {
                 Danh mục
               </a>
 
-              <a
-                href="/admin/recycleBinCate"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Thùng rác
-              </a>
+          
             </div>
           )}
         </div>
@@ -138,13 +139,7 @@ const Sidebar: React.FC = () => {
                 <i className="fas fa-calendar mr-3"></i>
                 Thương hiệu
               </a>
-              <a
-                href="/admin/recycleBin"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Thùng rác
-              </a>
+       
             </div>
           )}
         </div>
@@ -246,6 +241,47 @@ const Sidebar: React.FC = () => {
             <div className="pl-6">
               <a
                 href="/admin/listOrders"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Đơn hàng
+              </a>
+            </div>
+          )}
+        </div>
+
+
+        <div className="flex flex-col">
+          <button
+            onClick={toggleRestore}
+            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+          >
+            <i className="fas fa-table mr-3"></i>
+            Khôi phục dữ liệu
+            <i
+              className={`fas fa-chevron-${isRestoreOpen ? "up" : "down"} ml-2`}
+            ></i>
+          </button>
+          {isRestoreOpen && (
+            <div className="pl-6">
+                  <a
+                href="/admin/recycleBin"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Sản phẩm
+              </a>
+
+              <a
+                href="/admin/recycleBinCate"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Danh mục
+              </a>
+
+              <a
+                href="/admin/recycleBinCate"
                 className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
               >
                 <i className="fas fa-calendar mr-3"></i>

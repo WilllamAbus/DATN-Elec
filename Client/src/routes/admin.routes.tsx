@@ -217,7 +217,7 @@ const AdminRoutes: RouteObject[] = [
     element: <AdminListOrder />,
   },
   {
-    path: "listDetailOrder",
+    path: "listDetailOrder/:id",
     element: <AdminDetailsOrder />,
   },
 

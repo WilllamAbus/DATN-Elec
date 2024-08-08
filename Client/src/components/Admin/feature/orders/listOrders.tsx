@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store"; // Adjust the import path as needed
-import { fetchAllOrdersThunk, removeOrderById } from "../../../../redux/checkout/checkoutThunk"; // Adjust the import path as needed
+import { fetchAllOrdersThunk } from "../../../../redux/checkout/checkoutThunk"; // Adjust the import path as needed
 import "../../../../assets/css/admin.style.css";
-import Swal, { SweetAlertResult } from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-const MySwal = withReactContent(Swal);
+import { Link } from "react-router-dom";
+
 const ListOrders: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { orders, status, error } = useSelector((state: RootState) => state.checkout);
@@ -14,38 +13,7 @@ const ListOrders: React.FC = () => {
     dispatch(fetchAllOrdersThunk());
   }, [dispatch]);
 
-  const handleDelete = (_id: string) => {
-    MySwal.fire({
-        title: "Xóa sản phẩm?",
-        text: "Bạn có chắc muốn xóa dòng này không!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Có",
-        cancelButtonText: "Hủy",
-      }).then(async (result: SweetAlertResult) => {
-        if (result.isConfirmed) {
-          try {
-            await  dispatch(removeOrderById(_id));;
-        
-            MySwal.fire({
-              title: "Đã xóa!",
-              text: "Đơn hàng  đã  xóa.",
-              icon: "success",
-            });
-          } catch (error) {
-            console.error("Error deleting product:", error);
-            MySwal.fire({
-              title: "Lỗi!",
-              text: "Đã xảy ra sự cố ",
-              icon: "error",
-            });
-          }
-        }
-      });
 
-  };
 
   return (
     <>
@@ -60,9 +28,7 @@ const ListOrders: React.FC = () => {
                     <thead>
                       <tr>
                     
-                      <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">SẢN PHẨM</th>
-                        <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">SỐ LƯỢNG</th>
-                        <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">THANH TOÁN</th>
+                     
                         <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">EMAIL</th>
                        
                         <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">VẬN CHUYỂN</th>
@@ -83,16 +49,8 @@ const ListOrders: React.FC = () => {
                       )}
                       {orders.map((order) => (
                         <tr key={order._id || 'no-id'} className="hover:bg-grey-lighter">
-                           <td className="py-4 px-6 border-b border-grey-light">
-                            {order.products.map(product => (
-                              <div key={product.product}>
-                                {product.name}
-                              </div>
-                            ))}
-                          </td>
+                         
                        
-                          <td className="py-4 px-6 border-b border-grey-light">{order.quantityShopping.toString()}</td>
-                          <td className="py-4 px-6 border-b border-grey-light">{order.totalPrice.toLocaleString()}</td>
                           <td className="py-4 px-6 border-b border-grey-light">{order.userId.map(user => user.email).join(', ')}</td>
                         
                           <td className="py-4 px-6 border-b border-grey-light">
@@ -102,15 +60,17 @@ const ListOrders: React.FC = () => {
                           
                           <td className="py-4 px-6 border-b border-grey-light">
                          
-                            <button 
-                              onClick={() => {
-                                if (order._id) {
-                                  handleDelete(order._id);
-                                }
-                              }} 
-                              className="cta-btn btn text-red-500">
-                              Xóa
-                            </button>
+                            <Link
+                              to={`/admin/listDetailOrder/${order._id}`}
+                              className="focus:outline-none
+                       text-white
+                        bg-green-700
+                         hover:bg-green-800 
+                         focus:ring-4
+                          focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2
+                           dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                              Chi tiết
+                            </Link>
                           </td>
                         </tr>
                       ))}

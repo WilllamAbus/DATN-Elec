@@ -9,6 +9,7 @@ const {
   softDeleteCategory,
   deletedList,
   restore,
+  checkCategoryExists
 } = require("../services/categories.service");
 
 const admin = require("firebase-admin");
@@ -28,6 +29,15 @@ const storage = admin.storage();
 const bucket = storage.bucket();
 
 const categoriesController = {
+  checkCategory : async (req, res) => {
+    try {
+      const name = req.params.name;
+      const exists = await checkCategoryExists(name);
+      return res.status(200).json({ exists });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
   uploadCategory: async (req, res) => {
     try {
       const { name, path } = req.body;

@@ -5,7 +5,7 @@ const _Voucher = require("../model/voucher.model");
 
 const voucherService = {
   getAllVoucher: async () => {
-    return await _Voucher.findWithCategory({ status: { $ne: 'disable' } });
+    return await _Voucher.findWithCategory({ status: { $ne: "disable" } });
   },
 
   getVoucherById: async (id) => {
@@ -44,7 +44,15 @@ const voucherService = {
       if (categories.length !== cateReady.length) {
         throw new Error("One or more categories do not exist");
       }
+      
 
+      const today = new Date();
+      const minValidDate = new Date(today);
+      minValidDate.setDate(today.getDate() + 15); // 15 days from today
+    
+      if (new Date(voucherData.expiryDate) < minValidDate) {
+        throw new Error("Hạn sử dụng phải ít nhất là 15 ngày kể từ ngày hôm nay.");
+      }
       // Create a discount document
       const newVoucher = new _Voucher({
         code,
@@ -131,7 +139,7 @@ const voucherService = {
   },
   deletedList: async (req, res) => {
     try {
-      return await _Voucher.find({ status: "disable" }) || [];
+      return (await _Voucher.find({ status: "disable" })) || [];
     } catch (error) {
       console.error(error);
     }

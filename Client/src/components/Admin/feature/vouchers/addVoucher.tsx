@@ -25,13 +25,29 @@ const addDiscount: React.FC = () => {
 
 
 
-  const validateExpirationDate = (date: string) => {
+  const validateExpiryDate = (date: string) => {
     const today = new Date();
+    const minValidDate = new Date(today);
+    minValidDate.setDate(today.getDate() + 15); // 15 days from today
     const selectedDate = new Date(date);
-    const differenceInDays = (selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-    return differenceInDays >= 15 || "Hạn sử dụng 15 ngày.";
+    return selectedDate >= minValidDate || "Hạn sử dụng phải ít nhất là 15 ngày kể từ ngày hôm nay.";
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+      e.preventDefault();
+    }
   };
 
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData('Text');
+    if (!/^\d+$/.test(pastedData)) {
+      e.preventDefault();
+    }
+  };
   const onSubmit = async (data: Voucher) => {
     const formattedData = {
         ...data,
@@ -85,13 +101,16 @@ const addDiscount: React.FC = () => {
                   </label>
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    type="number"
+                    type="text"
                     {...register('voucherNum', {
                       required: "Giá giảm không được để trống",
                       
                       min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
-                    
+                      validate: value => !isNaN(value) || "Giá sản phẩm phải là số"
                     })}
+                    onKeyDown={handleKeyDown}
+                    onInput={handleInput}
+                    onPaste={handlePaste}
                   />
                   {errors.voucherNum && typeof errors. voucherNum.message === 'string' && (
                     <p className="text-red-500 text-xs">{errors.voucherNum.message}</p>
@@ -137,8 +156,8 @@ const addDiscount: React.FC = () => {
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="date"
                     {...register('expiryDate', {
-                      required: "Expiration date is required",
-                      validate: validateExpirationDate
+                      required: "Ngày nhập không được bỏ trống",
+                      validate: validateExpiryDate
                     })}
                   />
                   {errors.expiryDate && typeof errors.expiryDate.message === 'string' && (

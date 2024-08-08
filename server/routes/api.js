@@ -18,7 +18,8 @@ const {
   deleteCategoryController,
   sofDelCate,
   restore,
-  deletedListCategory
+  deletedListCategory,
+  checkCategory
 } = require("../controler/categories.controller");
 
 // discount
@@ -49,7 +50,7 @@ router.get("/getAllCate", getAllCategoriesController);
 router.get("/getCate/:id", getCategoryByIdController);
 router.put("/updateCate/:id",middlewareController.verifyToken, upload.single("imgCate"), updateCategoryController);
 router.delete("/delete/:id",middlewareController.verifyToken, deleteCategoryController);
-
+router.get('/checkCategory/:name', checkCategory);
 router.patch("/soft-delete/:id", middlewareController.verifyToken, sofDelCate);
 router.get("/deleted-list", middlewareController.verifyToken, deletedListCategory);
 router.patch("/restore/:id", middlewareController.verifyToken, restore);

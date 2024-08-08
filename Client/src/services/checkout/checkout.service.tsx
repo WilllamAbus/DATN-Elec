@@ -28,7 +28,7 @@ export const addOrder = async (order: OrderData): Promise<OrderData> => {
 export const getAllOrders = async (): Promise<OrderData[]> => {
     try {
         const response = await axiosInstance.get('/getAllOrder');
-        console.log('API response:', response.data);
+      
         
         // Check if the response data contains success and orders fields
         if (response.data.success && Array.isArray(response.data.orders)) {
@@ -45,9 +45,11 @@ export const getAllOrders = async (): Promise<OrderData[]> => {
 
 
 
-export const getOrderById = async (_id: string) => {
+export const getOrderById = async (id: string) => {
     try {
-      const response = await axiosInstance.get(`/getOrder/${_id}`);
+      const response = await axiosInstance.get(`/getOrder/${id}`);
+      console.log('respones:', response);
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching order:', error);

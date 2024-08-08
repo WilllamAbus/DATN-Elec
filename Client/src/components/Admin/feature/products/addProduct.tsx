@@ -70,7 +70,22 @@ const AddProduct: React.FC = () => {
 
     fetchCategories();
   }, []);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+      e.preventDefault();
+    }
+  };
 
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData('Text');
+    if (!/^\d+$/.test(pastedData)) {
+      e.preventDefault();
+    }
+  };
   const submitFormAdd = async (data: IFormInput) => {
     try {
       const formData = new FormData();
@@ -126,7 +141,7 @@ const AddProduct: React.FC = () => {
                     {...register("name", {
                       required: {
                         value: true,
-                        message: "tài khoản không được để trống",
+                        message: "Tên sản phẩm không được để trống",
                       },
                       minLength: {
                         value: 5,
@@ -141,8 +156,15 @@ const AddProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="price"
-                    type="number"
-                    {...register("price", { required: "Giá không được bỏ trống" })}
+                    type="text"
+                    {...register("price", { 
+                      required: "Giá không được bỏ trống",
+                      min: { value: 0.001, message: "Giá sản phẩm phải lớn hơn 0.000" },
+                      validate: value => !isNaN(value) || "Giá sản phẩm phải là số"
+                    })}
+                    onKeyDown={handleKeyDown}
+                    onInput={handleInput}
+                    onPaste={handlePaste}
                   />
                   {errors.price && <span className="text-red-600">{errors.price.message}</span>}
                 </div>
@@ -153,8 +175,16 @@ const AddProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="quantity"
-                    type="number"
-                    {...register("quantity", { required: "Số lượng không được bỏ trống" })}
+                    type="text"
+                    {...register("quantity", 
+                      { required: "Số lượng không được bỏ trống" ,
+                         min: { value: 11, message: "Số lượng phải lớn hơn 11" },
+                      validate: value => !isNaN(value) || "Số lượng sản phẩm phải là số"
+                    
+                      })}
+                      onKeyDown={handleKeyDown}
+                      onInput={handleInput}
+                      onPaste={handlePaste}
                   />
                   {errors.quantity && <span className="text-red-600">{errors.quantity.message}</span>}
                 </div>
@@ -195,8 +225,14 @@ const AddProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="weight"
-                    type="number"
-                    {...register("weight")}
+                    type="text"
+                    {...register("weight", 
+                      { required: "Số lượng không được bỏ trống" ,
+                    
+                  })}
+                  onKeyDown={handleKeyDown}
+                  onInput={handleInput}
+                  onPaste={handlePaste}
                   />
                 </div>
                 <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">

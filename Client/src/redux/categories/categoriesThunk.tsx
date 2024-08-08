@@ -10,7 +10,8 @@ import {
   deleteListCate,
   sofDeleteCategory,
   restore,
-  ApiResponse
+  ApiResponse,
+  checkCategoryExists
 } from '../../services/categories/categories.service';
 import { Category } from '../../types/Categories.d';
 
@@ -36,6 +37,14 @@ export const createCategoryThunk = createAsyncThunk(
     'categories/createCategory',
     async (formData: FormData, { rejectWithValue }) => {
       try {
+        const name = formData.get('name');
+      
+        // Check if category already exists
+        const exists = await checkCategoryExists(name);
+        if (exists) {
+          return rejectWithValue('Category already exists');
+        }
+  
         const result = await createCategory(formData);
         return { category: result.category, message: result.message }; // Return both category and message
       } catch (error) {
