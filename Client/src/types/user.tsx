@@ -29,7 +29,7 @@ export interface UserProfile {
   profile?: string;
   msg?: string;
   token?: string;
-  _id?: string;
+  _id: string;
   name: string;
   accessToken: string;
   email: string;

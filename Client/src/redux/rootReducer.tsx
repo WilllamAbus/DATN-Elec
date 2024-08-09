@@ -5,13 +5,12 @@ import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import checkoutSlice from './checkout/checkoutSlice'
+import checkoutSlice from "./checkout/checkoutSlice";
 const rootReducer = combineReducers({
   auth: AuthSlice,
   categories: categoriesSlice,
- 
   voucher: voucherReducer,
-  checkout:checkoutSlice
+  checkout: checkoutSlice,
 });
 
 export type AppDispatch = typeof store.dispatch;

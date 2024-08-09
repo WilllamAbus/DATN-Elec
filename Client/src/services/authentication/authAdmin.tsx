@@ -43,6 +43,13 @@ export const listDeleted = async () => {
 
   return response.data;
 };
+// http://localhost:4000/api/admin/list
+//list active tk
+export const listActive = async () => {
+  const response = await instance.get(`${API_URL}/admin/list`);
+
+  return response.data;
+};
 // cập nhật thông tin người dùng
 export const updateUser = async (userId: string, userData: any) => {
   try {

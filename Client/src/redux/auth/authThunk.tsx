@@ -15,24 +15,44 @@ import {
   restore,
   softDeleteUser,
   updateUser,
+  listActive,
 } from "../../services/authentication/authAdmin";
 import { UserProfile } from "../../types/user";
+interface LoginResponse {
+  status: number;
+  message: string;
+  token?: string;
+}
 
 // Thunk cho việc đăng nhập
-export const loginUserThunk = createAsyncThunk(
-  "auth/login",
-  async (user: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await loginUserService(user);
-      return response;
-    } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
-      return rejectWithValue("An unknown error occurred");
+// export const loginUserThunk = createAsyncThunk(
+//   "auth/login",
+//   async (user: { email: string; password: string }, { rejectWithValue }) => {
+//     try {
+//       const response = await loginUserService(user);
+//       return response;
+//     } catch (error) {
+//       if (error instanceof Error) {
+//         return rejectWithValue((error as { message: string }).message);
+//       }
+//     }
+//   }
+// );
+export const loginUserThunk = createAsyncThunk<
+  LoginResponse,
+  { email: string; password: string }
+>("auth/login", async (user, { rejectWithValue }) => {
+  try {
+    const response = await loginUserService(user);
+    return response as LoginResponse;
+  } catch (error) {
+    if (error instanceof Error) {
+      return rejectWithValue((error as { message: string }).message);
     }
+    return rejectWithValue("An unknown error occurred");
   }
-);
+});
+
 export const getProfileThunk = createAsyncThunk<
   UserProfile,
   void,
@@ -86,6 +106,20 @@ export const updateProfileThunk = createAsyncThunk<
 });
 
 // Thunk cho việc đăng ký người dùng
+// export const registerUserThunk = createAsyncThunk(
+//   "auth/registerUser",
+//   async (
+//     user: { email: string; password: string; name: string },
+//     { rejectWithValue }
+//   ) => {
+//     try {
+//       const result = await registerUserService(user);
+//       return result;
+//     } catch (error) {
+//       return rejectWithValue((error as Error).message);
+//     }
+//   }
+// );
 export const registerUserThunk = createAsyncThunk(
   "auth/registerUser",
   async (
@@ -96,10 +130,14 @@ export const registerUserThunk = createAsyncThunk(
       const result = await registerUserService(user);
       return result;
     } catch (error) {
-      return rejectWithValue((error as Error).message);
+      if (error instanceof Error) {
+        return rejectWithValue((error as { message: string }).message);
+      }
+      return rejectWithValue("An unknown error occurred");
     }
   }
 );
+
 // xac thuc email
 export const verifyEmail = createAsyncThunk(
   "emailVerification/verifyEmail",
@@ -151,7 +189,23 @@ export const getDeletedListThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const result = await listDeleted();
+      console.log(result);
       return result;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+//Lấy danh sách tk là active
+// Thunk để lấy danh sách người dùng đã bị xóa mềm
+export const getActiveListThunk = createAsyncThunk(
+  "auth/getActiveList",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await listActive(); // Giả sử listActive là hàm gọi API
+      console.log(result);
+      return result; // Giả sử kết quả trả về có cấu trúc { data: User[] }
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

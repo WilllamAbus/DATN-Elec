@@ -23,19 +23,34 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
     (state: RootState) => state.auth.passwordUpdate
   );
   const [message, setMessage] = useState<string | null>(null);
-
+  const [, setLoading] = useState<boolean>(false);
   const handlePasswordUpdate = async (data: FormValues) => {
     const { currentPassword, newPassword } = data;
 
+    setLoading(true); // Bắt đầu trạng thái tải
+
     try {
-      await dispatch(
+      const resultAction = await dispatch(
         updatePasswordThunk({ currentPassword, newPassword })
       ).unwrap();
-      setMessage(
-        passwordUpdate.successMessage || "Cập nhật mật khẩu thành công"
-      );
+
+      if (resultAction && "status" in resultAction) {
+        if (resultAction.status === 200) {
+          setMessage(resultAction.message || "Cập nhật mật khẩu thành công.");
+        } else {
+          setMessage(
+            resultAction.message || "Đã xảy ra lỗi khi cập nhật mật khẩu."
+          );
+        }
+      }
     } catch (error: any) {
-      setMessage(passwordUpdate.error || "Đã xảy ra lỗi");
+      if (error instanceof Error) {
+        setMessage(error.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.");
+      } else {
+        setMessage("Đã xảy ra lỗi khi cập nhật mật khẩu.");
+      }
+    } finally {
+      setLoading(false); // Kết thúc trạng thái tải
     }
   };
 
@@ -105,10 +120,14 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
         <div>
           <button
             type="submit"
-            className="py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
-            disabled={passwordUpdate.isFetching}
+            className={`py-3 px-4 text-center text-white border border-primary rounded-md transition font-medium ${
+              passwordUpdate.status === "loading"
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-primary hover:bg-transparent hover:text-primary"
+            }`}
+            disabled={passwordUpdate.status === "loading"}
           >
-            {passwordUpdate.isFetching
+            {passwordUpdate.status === "loading"
               ? "Đang cập nhật..."
               : "Cập nhật mật khẩu"}
           </button>

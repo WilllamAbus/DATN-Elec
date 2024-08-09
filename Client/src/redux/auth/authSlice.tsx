@@ -8,9 +8,15 @@ import {
   restoreUserThunk,
   getDeletedListThunk,
   updateUserThunk,
-  verifyEmail, // Import thunk
+  verifyEmail,
+  getActiveListThunk, // Import thunk
 } from "./authThunk";
-
+// interface User {
+//   // Định nghĩa kiểu dữ liệu cho người dùng nếu cần
+//   id: string;
+//   name: string;
+//   status: string;
+// }
 interface AuthState {
   login: {
     currentUser: string | null;
@@ -32,7 +38,7 @@ interface AuthState {
     successMessage: string | null;
   };
   passwordUpdate: {
-    isFetching: boolean;
+    status: string;
     successMessage: string | null;
     error: string | null;
   };
@@ -41,12 +47,19 @@ interface AuthState {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
+
   users: any[];
-  deletedUsers: any[];
   userListStatus: "idle" | "loading" | "succeeded" | "failed";
   userListError: string | null;
+
+  deletedUsers: any[];
   deletedUsersStatus: "idle" | "loading" | "succeeded" | "failed";
   deletedUsersError: string | null;
+
+  activeUsers: any[];
+  activeUsersStatus: "idle" | "loading" | "succeeded" | "failed";
+  activeUsersError: string | null;
+
   restoreUserStatus: "idle" | "loading" | "succeeded" | "failed";
   restoreUserError: string | null;
   updateUserStatus: "idle" | "loading" | "succeeded" | "failed";
@@ -74,7 +87,7 @@ const initialState: AuthState = {
     successMessage: null,
   },
   passwordUpdate: {
-    isFetching: false,
+    status: "idle",
     successMessage: null,
     error: null,
   },
@@ -83,6 +96,11 @@ const initialState: AuthState = {
     status: "idle",
     error: null,
   },
+
+  activeUsers: [],
+  activeUsersStatus: "idle",
+  activeUsersError: null,
+
   users: [],
   deletedUsers: [],
   userListStatus: "idle",
@@ -107,7 +125,7 @@ const authSlice = createSlice({
       state.register.successMessage = action.payload;
       state.register.error = false;
     },
-    registerFailed: (state,) => {
+    registerFailed: (state) => {
       state.register.isFetching = false;
       state.register.error = true;
       state.register.successMessage = null;
@@ -158,17 +176,17 @@ const authSlice = createSlice({
       state.profile.error = action.payload;
     },
     passwordUpdateStart(state) {
-      state.passwordUpdate.isFetching = true;
+      state.passwordUpdate.status = "loading";
       state.passwordUpdate.error = null;
       state.passwordUpdate.successMessage = null;
     },
     passwordUpdateSuccess(state, action: PayloadAction<string>) {
-      state.passwordUpdate.isFetching = false;
+      state.passwordUpdate.status = "succeeded";
       state.passwordUpdate.successMessage = action.payload;
       state.passwordUpdate.error = null;
     },
     passwordUpdateFailed(state, action: PayloadAction<string | null>) {
-      state.passwordUpdate.isFetching = false;
+      state.passwordUpdate.status = "failed";
       state.passwordUpdate.error =
         action.payload || "An unknown error occurred";
       state.passwordUpdate.successMessage = null;
@@ -228,44 +246,33 @@ const authSlice = createSlice({
           (action.payload as string) || "An unknown error occurred";
       })
       .addCase(updatePasswordThunk.pending, (state) => {
-        state.passwordUpdate.isFetching = true;
+        state.passwordUpdate.status = "loading";
+        state.passwordUpdate.successMessage = null;
+        state.passwordUpdate.error = null;
       })
       .addCase(
         updatePasswordThunk.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.passwordUpdate.isFetching = false;
-          state.passwordUpdate.successMessage = action.payload;
+        (
+          state,
+          action: PayloadAction<{ status: number; message: string; data?: any }>
+        ) => {
+          state.passwordUpdate.status = "succeeded";
+          state.passwordUpdate.successMessage = action.payload.message;
           state.passwordUpdate.error = null;
         }
       )
       .addCase(updatePasswordThunk.rejected, (state, action) => {
-        state.passwordUpdate.isFetching = false;
-        state.passwordUpdate.error =
-          (action.payload as string) || "An unknown error occurred";
+        state.passwordUpdate.status = "failed";
         state.passwordUpdate.successMessage = null;
+        state.passwordUpdate.error =
+          action.error.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.";
       })
-      .addCase(getDeletedListThunk.pending, (state) => {
-        state.deletedUsersStatus = "loading";
-        state.deletedUsersError = null;
-      })
-      .addCase(
-        getDeletedListThunk.fulfilled,
-        (state, action: PayloadAction<any[]>) => {
-          state.deletedUsersStatus = "succeeded";
-          state.deletedUsers = action.payload;
-          state.deletedUsersError = null;
-        }
-      )
-      .addCase(getDeletedListThunk.rejected, (state, action) => {
-        state.deletedUsersStatus = "failed";
-        state.deletedUsersError =
-          (action.payload as string) || "An unknown error occurred";
-      })
+
       .addCase(restoreUserThunk.pending, (state) => {
         state.restoreUserStatus = "loading";
         state.restoreUserError = null;
       })
-      .addCase(restoreUserThunk.fulfilled, (state, ) => {
+      .addCase(restoreUserThunk.fulfilled, (state) => {
         state.restoreUserStatus = "succeeded";
         state.restoreUserError = null;
         // Cập nhật lại danh sách người dùng đã bị xóa mềm nếu cần
@@ -280,14 +287,11 @@ const authSlice = createSlice({
         state.updateUserStatus = "loading";
         state.updateUserError = null;
       })
-      .addCase(
-        updateUserThunk.fulfilled,
-        (state,) => {
-          state.updateUserStatus = "succeeded";
-          // Cập nhật trạng thái người dùng nếu cần
-          state.updateUserError = null;
-        }
-      )
+      .addCase(updateUserThunk.fulfilled, (state) => {
+        state.updateUserStatus = "succeeded";
+        // Cập nhật trạng thái người dùng nếu cần
+        state.updateUserError = null;
+      })
       .addCase(updateUserThunk.rejected, (state, action) => {
         state.updateUserStatus = "failed";
         state.updateUserError =
@@ -304,6 +308,56 @@ const authSlice = createSlice({
       .addCase(verifyEmail.rejected, (state, action) => {
         state.EmailVerification.status = "failed";
         state.EmailVerification.error = action.payload as string;
+      })
+      // .addCase(getActiveListThunk.pending, (state) => {
+      //   state.active.status = "loading";
+      //   state.active.error = null;
+      // })
+      // .addCase(
+      //   getActiveListThunk.fulfilled,
+      //   (state, action: PayloadAction<UserProfile[]>) => {
+      //     state.active.status = "succeeded";
+      //     state.active.data = action.payload;
+      //   }
+      // )
+      // .addCase(getActiveListThunk.rejected, (state, action) => {
+      //   state.active.status = "failed";
+      //   state.active.error = action.payload as string;
+      // })
+      .addCase(getActiveListThunk.pending, (state) => {
+        state.activeUsersStatus = "loading";
+        state.activeUsersError = null;
+      })
+      .addCase(
+        getActiveListThunk.fulfilled,
+        (state, action: PayloadAction<any[]>) => {
+          state.activeUsersStatus = "succeeded";
+          state.activeUsers = action.payload;
+          state.activeUsersError = null;
+        }
+      )
+      .addCase(getActiveListThunk.rejected, (state, action) => {
+        state.activeUsersStatus = "failed";
+        state.activeUsersError =
+          (action.payload as string) || "An unknown error occurred";
+      })
+
+      .addCase(getDeletedListThunk.pending, (state) => {
+        state.deletedUsersStatus = "loading";
+        state.deletedUsersError = null;
+      })
+      .addCase(
+        getDeletedListThunk.fulfilled,
+        (state, action: PayloadAction<any[]>) => {
+          state.deletedUsersStatus = "succeeded";
+          state.deletedUsers = action.payload;
+          state.deletedUsersError = null;
+        }
+      )
+      .addCase(getDeletedListThunk.rejected, (state, action) => {
+        state.deletedUsersStatus = "failed";
+        state.deletedUsersError =
+          (action.payload as string) || "An unknown error occurred";
       });
   },
 });

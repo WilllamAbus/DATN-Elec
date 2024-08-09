@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import {
-  getListThunk,
+  getActiveListThunk,
   softDeleteUserThunk,
 } from "../../../../redux/auth/authThunk";
 import { Link } from "react-router-dom";
@@ -10,24 +10,27 @@ import { useDispatch, useSelector } from "react-redux";
 
 const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const users = useSelector((state: RootState) => state.auth.users);
+  const users = useSelector((state: RootState) => state.auth.activeUsers);
   const userListStatus = useSelector(
-    (state: RootState) => state.auth.userListStatus
+    (state: RootState) => state.auth.activeUsersStatus
   );
   const userListError = useSelector(
-    (state: RootState) => state.auth.userListError
+    (state: RootState) => state.auth.activeUsersError
   );
 
   useEffect(() => {
-    dispatch(getListThunk());
+    dispatch(getActiveListThunk());
   }, [dispatch]);
+  console.log("Users:", users);
+  console.log("User List Status:", userListStatus);
+  console.log("User List Error:", userListError);
 
   const handlesoftDelete = async (userId: string) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này không?")) {
       try {
         await dispatch(softDeleteUserThunk(userId)).unwrap();
-        // Optionally, you can dispatch getListThunk() again to refresh the user list
-        dispatch(getListThunk());
+
+        dispatch(getActiveListThunk());
       } catch (error) {
         console.error("Failed to delete user:", error);
       }

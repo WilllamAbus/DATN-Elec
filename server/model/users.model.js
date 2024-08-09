@@ -18,6 +18,7 @@ const userSchema = new Schema(
     resetPasswordExpires: Date,
     avatar: String,
     status: { type: String, default: "active" },
+    disabledAt: { type: Date, default: null },
     socialLogin: {
       googleId: String,
       facebookId: String,

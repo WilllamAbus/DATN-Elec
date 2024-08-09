@@ -49,23 +49,25 @@ export const loginUser = async (user: { email: string; password: string }) => {
     const response = await instance.post("/auth/login", user);
     console.log("API Response:", response.data);
 
-    const { accessToken, roles, name } = response.data;
+    const { accessToken, roles, name, email } = response.data;
 
     localStorage.setItem("token", accessToken);
     localStorage.setItem("roles", roles?.[0]?.name || "");
     localStorage.setItem("name", name || "");
+    localStorage.setItem("userProfile", JSON.stringify({ name, roles, email }));
+
     if (!accessToken) throw new Error("No access token received");
 
     localStorage.setItem("token", accessToken);
-    localStorage.setItem("userProfile", JSON.stringify({ name, roles }));
 
     const persistRoot = JSON.parse(
       localStorage.getItem("persist:root") || "{}"
     );
+
     persistRoot.auth = JSON.stringify({
       login: {
         token: accessToken,
-        currentUser: { name, roles },
+        currentUser: { roles },
         isFetching: false,
         error: null,
         isAuthenticated: true,
@@ -78,13 +80,16 @@ export const loginUser = async (user: { email: string; password: string }) => {
 
     localStorage.setItem("persist:root", JSON.stringify(persistRoot));
     console.log("Token after login:", localStorage.getItem("persist:root"));
-
-    return { token: accessToken };
-  } catch (error) {
-    const errorMessage =
-      (error as { response?: { data?: { message?: string } } })?.response?.data
-        ?.message || "Thông tin đăng nhập không chính xác";
-    throw new Error(errorMessage);
+    return {
+      status: response.status,
+      message: response.data.message,
+      token: accessToken,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.",
+    };
   }
 };
 
@@ -135,17 +140,37 @@ export const updateProfile = async (formData: FormData) => {
   return response.data;
 };
 
+// export const registerUser = async (user: {
+//   email: string;
+//   password: string;
+//   name: string;
+// }) => {
+//   const response = await instance.post(`${API_URL}/auth/register`, user);
+//   if (response.status === 200) {
+//     return response.data;
+//   }
+//   throw new Error(response.data.msg || "Đã xảy ra lỗi khi đăng ký.");
+// };
+
 export const registerUser = async (user: {
   email: string;
   password: string;
   name: string;
 }) => {
-  const response = await instance.post(`${API_URL}/auth/register`, user);
-  if (response.status === 200) {
-    return response.data;
+  try {
+    const response = await instance.post(`${API_URL}/auth/register`, user);
+    return {
+      status: response.status,
+      message: response.data.message,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng ký.",
+    };
   }
-  throw new Error(response.data.msg || "Đã xảy ra lỗi khi đăng ký.");
 };
+
 //xác thực email
 export const verifyEmailService = async (token: string): Promise<string> => {
   const response = await fetch(`/api/auth/verifyEmail?token=${token}`, {
@@ -167,9 +192,21 @@ export const updatePassword = async (
   currentPassword: string,
   newPassword: string
 ) => {
-  const response = await instance.put(`${API_URL}/auth/password`, {
-    currentPassword,
-    newPassword,
-  });
-  return response.data;
+  try {
+    const response = await instance.put(`${API_URL}/auth/password`, {
+      currentPassword,
+      newPassword,
+    });
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.",
+    };
+  }
 };

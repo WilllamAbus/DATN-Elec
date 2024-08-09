@@ -12,10 +12,9 @@ const connectDb = require("./config/connectDb");
 const http = require("http");
 const socketIo = require("socket.io");
 const SocketServices = require("./services/serviceSocket");
-
+require("./controler/cronJob");
 //databse call
 connectDb();
-
 // firebaseAdmin()
 // midleware
 app.use(express.json());

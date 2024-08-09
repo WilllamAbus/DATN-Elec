@@ -8,6 +8,7 @@ const {
   restore,
   getOne,
   update,
+  list,
 } = require("../../../controler/admin/authController");
 const middlewareController = require("../../../middleware/auth");
 
@@ -20,6 +21,7 @@ router.patch(
 );
 router.patch("/restore/:id", restore);
 router.get("/deleted", deletedList);
+router.get("/list", list);
 router.get("/get-one/:id", getOne);
 router.put("/edit/:id", middlewareController.verifyTokenAdminAuth, update);
 module.exports = router;

@@ -29,10 +29,19 @@ exports.add = async (req, res) => {
   }
 };
 
+// exports.list = async (req, res) => {
+//   try {
+//     const arayUser = await modelUser.find({ status: { $ne: "disable" } });
+//     res.status(200).json({ data: arayUser });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server errors" });
+//   }
+// };
+
 exports.list = async (req, res) => {
   try {
-    const arayUser = await modelUser.find({ status: { $ne: "disable" } });
-    res.status(200).json({ data: arayUser });
+    const ListUser = await modelUser.find({ status: "active" });
+    res.status(200).json(ListUser);
   } catch (error) {
     res.status(500).json({ message: "Server errors" });
   }
@@ -55,16 +64,27 @@ exports.hardDelete = async (req, res) => {
 exports.softDelete = async (req, res) => {
   try {
     const id = req.params.id;
+    const now = new Date();
+
     const softDeleteUser = await modelUser.findByIdAndUpdate(
       id,
-      { status: "disable" },
-      { new: true }
+      {
+        status: "disable",
+        disabledAt: now, // Lưu thời gian disable
+      },
+      { new: true, runValidators: true } // Thêm tùy chọn runValidators nếu cần
     );
+
     if (!softDeleteUser) {
       return res.status(404).json({ message: "Không tìm thấy danh mục" });
     }
+
+    // Kiểm tra xem thời gian disable có được set không
+    console.log("Updated User:", softDeleteUser);
+
     res.status(200).json(softDeleteUser);
   } catch (error) {
+    console.error("Error in softDelete:", error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };
@@ -109,7 +129,7 @@ exports.getOne = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  const { email, password, name, avatar, role } = req.body;
+  const { email, password, name, avatar, roles } = req.body;
   const id = req.params.id;
 
   try {
@@ -121,7 +141,7 @@ exports.update = async (req, res) => {
     if (email) user.email = email;
     if (name) user.name = name;
     if (avatar) user.avatar = avatar;
-    if (role) user.role = role;
+    if (roles) user.roles = roles;
 
     if (password) {
       const salt = await bcrypt.genSalt(10);

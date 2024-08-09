@@ -6,7 +6,7 @@ import UserFooter from "../../../components/User/footer";
 import UserCopyright from "../../../components/User/copyright";
 import "../../../assets/css/user.style.css";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAppDispatch, } from "../../../redux/store";
+import { useAppDispatch } from "../../../redux/store";
 import { registerUserThunk } from "../../../redux/auth/authThunk";
 
 interface FormValues {
@@ -39,9 +39,13 @@ const Register: React.FC = () => {
       );
 
       if (registerUserThunk.fulfilled.match(resultAction)) {
-        setMessage("Đăng ký thành công. Vui lòng kiểm tra Email để xác thực.");
-        // navigate("/login");
+        const { message } = resultAction.payload as {
+          status: number;
+          message: string;
+        };
+        setMessage(message || "Đăng ký thành công.");
       } else {
+        // Lấy thông báo lỗi từ payload hoặc dùng thông báo lỗi mặc định
         setMessage(
           (resultAction.payload as string) || "Đã xảy ra lỗi khi đăng ký."
         );
@@ -52,7 +56,6 @@ const Register: React.FC = () => {
       setLoading(false);
     }
   };
-
   return (
     <>
       <UserHeader />

@@ -26,26 +26,32 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+  const [message, setMessage] = useState<string | null>(null);
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
-    setError(null);
+    setMessage(null);
 
     try {
-      await dispatch(loginUserThunk(data)).unwrap();
-      navigate("/profile"); // Chuyển hướng sau khi đăng nhập thành công
+      const resultAction = await dispatch(loginUserThunk(data)).unwrap();
+
+      if (resultAction && "status" in resultAction) {
+        if (resultAction.status === 200) {
+          setMessage(resultAction.message);
+          navigate("/profile");
+        } else {
+          setMessage(resultAction.message);
+        }
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message || "An unknown error occurred");
+        setMessage(err.message || "Đã xảy ra lỗi khi đăng nhập.");
       } else {
-        setError("An unknown error occurred");
+        setMessage("Đã xảy ra lỗi khi đăng nhập.");
       }
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <>
       <UserHeader />
@@ -129,7 +135,14 @@ const Login: React.FC = () => {
               >
                 {loading ? "Đang đăng nhập..." : "Đăng nhập"}
               </button>
-              {error && <div className="error-message">{error}</div>}
+              <div className="flex items-center justify-between mt-6">
+                {loading && <div>Loading...</div>}
+                {message && (
+                  <div style={{ color: "red", marginTop: "10px" }}>
+                    {message}
+                  </div>
+                )}
+              </div>
             </div>
           </form>
 

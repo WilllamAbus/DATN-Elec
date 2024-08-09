@@ -229,36 +229,64 @@ import dropFourNav from "../../assets/images/icons/drone-quadcopter-top-svgrepo-
 import dropFiveNav from "../../assets/images/icons/gpu-svgrepo-com.svg";
 import dropSixNav from "../../assets/images/icons/play-station-logo-svgrepo-com.svg";
 
-const Navbar: React.FC = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [name, setName] = useState<string | null>(null);
-  const [roles, setRole] = useState<string | null>(null);
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedName = localStorage.getItem("name");
-    const storedRole = localStorage.getItem("roles");
+import { RootState, useAppDispatch, useAppSelector } from "../../redux/store";
+import { getProfileThunk } from "../../redux/auth/authThunk";
 
+const Navbar: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector((state: RootState) => state.auth.profile);
+  const [token, setToken] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const [profileRoles, setProfileRoles] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        await dispatch(getProfileThunk()).unwrap();
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
-    }
 
-    if (storedName) {
-      setName(storedName);
-    }
+      const storedProfileName = localStorage.getItem("name");
+      const storedProfileRoles = localStorage.getItem("roles");
 
-    if (storedRole) {
-      setRole(storedRole);
+      if (storedProfileName) {
+        setProfileName(storedProfileName);
+      }
+      if (storedProfileRoles) {
+        setProfileRoles(storedProfileRoles);
+      } else {
+        fetchProfile();
+      }
     }
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (profile.profile) {
+      const { name, roles } = profile.profile;
+      setProfileName(name);
+
+      const roleString = roles && roles.length > 0 ? roles[0] : "";
+      setProfileRoles(roleString);
+
+      localStorage.setItem("name", name);
+      localStorage.setItem("roles", roleString);
+    }
+  }, [profile]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
     localStorage.removeItem("roles");
     setToken(null);
-    setName(null);
-    setRole(null);
+    setProfileName(null);
+    setProfileRoles(null);
   };
-
   return (
     <nav className="bg-gray-800">
       <div className="container flex">
@@ -365,58 +393,47 @@ const Navbar: React.FC = () => {
               <i className="fa-solid fa-user"></i>
             </span>
             <div className="relative">
-              {token && name ? (
+              {token && profileName ? (
                 <div className="flex items-center">
                   <div className="relative group">
-                    <span className="ml-6 text-white text-lg">{name}</span>
-                    {/* dropdown */}
-                    <div className="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
+                    <span className="ml-6 text-white text-lg">
+                      {profileName}
+                    </span>
+                    <div className="absolute right-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
                       <Link
                         to="/profile"
                         className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
                       >
-                        <img
-                          alt="Avatar"
-                          className="w-10 h-10 object-cover rounded-full"
-                        />
                         <span className="ml-6 text-gray-600 text-lg">
-                          Profile
+                          Hồ sơ
                         </span>
                       </Link>
-                      {roles === "admin" && (
+                      {profileRoles && profileRoles.includes("admin") && (
                         <Link
                           to="/admin"
                           className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
                         >
-                          <img
-                            alt="Admin"
-                            className="w-10 h-10 object-cover rounded-full"
-                          />
                           <span className="ml-6 text-gray-600 text-lg">
                             Admin
                           </span>
                         </Link>
                       )}
-                      <button
-                        onClick={handleLogout}
+                      <a
+                        href="#"
                         className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
+                        onClick={handleLogout}
                       >
                         <span className="ml-6 text-gray-600 text-lg">
-                          Logout
+                          Đăng xuất
                         </span>
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div>
-                  <Link to="/login" className="capitalize ml-2 text-white">
-                    Đăng nhập |
-                  </Link>
-                  <Link to="/register" className="capitalize ml-2 text-white">
-                    Đăng ký
-                  </Link>
-                </div>
+                <Link to="/login" className="text-white hover:text-gray-400">
+                  Đăng nhập
+                </Link>
               )}
             </div>
           </div>
