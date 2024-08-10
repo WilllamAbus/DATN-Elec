@@ -1,3 +1,4 @@
+import axios from "axios";
 import instance from "../axois_V2";
 // import { UserProfile } from "../../types/user";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -172,22 +173,51 @@ export const registerUser = async (user: {
 };
 
 //xác thực email
-export const verifyEmailService = async (token: string): Promise<string> => {
-  const response = await fetch(`/api/auth/verifyEmail?token=${token}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to verify email");
+export const verifyEmail = async (token: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/auth/verifyEmail`, {
+      params: { token },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      // Xử lý lỗi từ Axios
+      throw new Error(
+        `Error verifying email: ${error.response.data.message || error.message}`
+      );
+    } else if (error instanceof Error) {
+      throw new Error(`Error verifying email: ${error.message}`);
+    } else {
+      throw new Error("Error verifying email: An unknown error occurred");
+    }
   }
-
-  const data = await response.json();
-  return data.message || "Email verified successfully";
 };
+
+// Function to handle forgot password
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+      email,
+    });
+
+    // Trả về thông tin chi tiết về phản hồi
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
+    // Xử lý lỗi và trả về thông tin chi tiết về lỗi
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message ||
+        "Đã xảy ra lỗi khi gửi yêu cầu quên mật khẩu.",
+    };
+  }
+};
+
 export const updatePassword = async (
   currentPassword: string,
   newPassword: string
@@ -208,5 +238,25 @@ export const updatePassword = async (
       message:
         error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.",
     };
+  }
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  try {
+    const response = await axios.put(`${API_URL}/auth/resetPassword`, {
+      token,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        `Error resetPassword: ${error.response.data.message || error.message}`
+      );
+    } else if (error instanceof Error) {
+      throw new Error(`Error resetPassword: ${error.message}`);
+    } else {
+      throw new Error("Error resetPassword: An unknown error occurred");
+    }
   }
 };

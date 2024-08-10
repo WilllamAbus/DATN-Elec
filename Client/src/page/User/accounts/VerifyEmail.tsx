@@ -1,30 +1,34 @@
-// page/User/accounts/VerifyEmail.tsx
+// VerifyEmail.tsx
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../redux/store";
-import { verifyEmail } from "../../../redux/auth/authThunk";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { verifyEmailThunk } from "../../../redux/auth/authThunk";
 
-const VerifyEmailPage: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { message, error, status } = useAppSelector(
-    (state) => state.auth.EmailVerification
-  );
-
+const VerifyEmail: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const token = query.get("token");
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+
+  const { message, status, error } = useSelector(
+    (state: RootState) => state.auth.EmailVerification
+  );
 
   useEffect(() => {
     if (token) {
-      dispatch(verifyEmail(token));
+      dispatch(verifyEmailThunk(token));
     }
-  }, [dispatch, token]);
+  }, [token, dispatch]);
 
-  if (status === "loading") return <p>Loading...</p>;
-  if (status === "failed") return <p>Error: {error}</p>;
-  if (status === "succeeded" && message) return <p>{message}</p>;
-
-  return <p>No data available</p>;
+  return (
+    <div>
+      <h1>Xác Thực Email</h1>
+      {status === "loading" && <p>Đang xác thực...</p>}
+      {status === "succeeded" && <p>{message}</p>}
+      {status === "failed" && <p>{error}</p>}
+    </div>
+  );
 };
 
-export default VerifyEmailPage;
+export default VerifyEmail;

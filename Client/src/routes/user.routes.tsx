@@ -19,8 +19,11 @@ const UserLoginSuccess = React.lazy(
 const UserReciveCode = React.lazy(
   () => import("../page/User/accounts/reciveCode")
 );
-const VerifyEmailPage = React.lazy(
+const VerifyEmail = React.lazy(
   () => import("../page/User/accounts/VerifyEmail")
+);
+const ResetPassword = React.lazy(
+  () => import("../page/User/accounts/ResetPassword")
 );
 const UserAllList = React.lazy(
   () => import("../page/User/shopping/gallery/allListing")
@@ -74,8 +77,8 @@ const UserRoutes: RouteObject[] = [
     element: <UserRegister />,
   },
   {
-    path: "/verifyEmail/:token",
-    element: <VerifyEmailPage />,
+    path: "verifyEmail",
+    element: <VerifyEmail />,
   },
   {
     path: "regisOTP",
@@ -88,6 +91,10 @@ const UserRoutes: RouteObject[] = [
   {
     path: "forgot",
     element: <UserForgotPass />,
+  },
+  {
+    path: "reset-password",
+    element: <ResetPassword />,
   },
   {
     path: "login-success/:userId/:tokenLogin",

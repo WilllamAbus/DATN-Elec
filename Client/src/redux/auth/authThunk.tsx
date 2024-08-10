@@ -7,7 +7,9 @@ import {
   updateProfile as updateProfileService,
   registerUser as registerUserService,
   updatePassword as updatePasswordService,
-  verifyEmailService,
+  verifyEmail as verifyEmailService,
+  forgotPassword,
+  resetPassword,
 } from "../../services/authentication/auth.services";
 
 import {
@@ -139,14 +141,38 @@ export const registerUserThunk = createAsyncThunk(
 );
 
 // xac thuc email
-export const verifyEmail = createAsyncThunk(
-  "emailVerification/verifyEmail",
-  async (token: string, { rejectWithValue }) => {
+export const verifyEmailThunk = createAsyncThunk(
+  "auth/verifyEmail",
+  async (token: string) => {
+    const response = await verifyEmailService(token);
+    return response.message;
+  }
+);
+export const forgotPasswordThunk = createAsyncThunk(
+  "auth/forgotPassword",
+  async (email: string, { rejectWithValue }) => {
     try {
-      const message = await verifyEmailService(token);
-      return message;
+      const response = await forgotPassword(email);
+      console.log(response);
+      return response.message;
     } catch (error) {
       return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const resetPasswordThunk = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    { token, password }: { token: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await resetPassword(token, password);
+      console.log(response);
+      return response.message;
+    } catch (error) {
+      return rejectWithValue(error);
     }
   }
 );

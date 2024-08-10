@@ -117,7 +117,7 @@ const ProfileUse: React.FC = () => {
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa-regular fa-address-card"></i>
                 </span>
-                Manage account
+                Quản lý tài khoản
               </a>
               <a
                 href="#"
@@ -205,7 +205,7 @@ const ProfileUse: React.FC = () => {
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa-solid fa-right-from-bracket"></i>
                 </span>
-                Logout
+                Đăng Xuất
               </a>
             </div>
           </div>
