@@ -1,26 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store"; // Adjust the import path as needed
-import { fetchAllOrdersThunk, softDeleteOrderThunk } from "../../../../redux/checkout/checkoutThunk"; // Adjust the import path as needed
+import { 
+    restoreOrderThunk,
+     fetchDeletedOrderThunk,
+      removeOrderById } from "../../../../redux/checkout/checkoutThunk"; // Adjust the import path as needed
 import "../../../../assets/css/admin.style.css";
-import { Link } from "react-router-dom";
+import { OrderData } from "../../../../types/Checkout.d";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
-import { OrderData } from "../../../../types/Checkout.d";
+
 import withReactContent from "sweetalert2-react-content";
+
 const MySwal = withReactContent(Swal);
-const ListOrders: React.FC = () => {
+const ListOrdersDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { orders, status, error } = useSelector((state: RootState) => state.checkout);
-  const [, setOrder] = useState<OrderData[]>(orders);
+  const {deletedOrder}   = useSelector((state: RootState) => state.checkout);
+  const [, setOrder] = useState<OrderData[]>(deletedOrder);
+  const status = useSelector((state: RootState) => state.checkout.status);
+  const error = useSelector((state: RootState) => state.checkout.error);
   useEffect(() => {
-    dispatch(fetchAllOrdersThunk());
+    dispatch(fetchDeletedOrderThunk());
   }, [dispatch]);
 
-  const handlesoftDeleteOrder = async (_id: string) => {
+  const handleRestoreDeleteOrder = async (_id: string) => {
     MySwal.fire({
-      title: "Xóa đơn hàng?",
-      text: "Bạn có chắc muốn đơn hàng này không!",
+      title: "Khôi phục đơn hàng?",
+      text: "Bạn có muốn khôi phục đơn hàng này không!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -30,9 +36,44 @@ const ListOrders: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await dispatch(softDeleteOrderThunk(_id))
-          .unwrap()
-          dispatch(fetchAllOrdersThunk());
+          await dispatch(restoreOrderThunk(_id)).unwrap()
+      
+          dispatch(fetchDeletedOrderThunk());
+          setOrder((prevOrder) =>
+            prevOrder.filter((order) => order._id !== _id)
+          );
+          MySwal.fire({
+            title: "Đã xóa!",
+            text: "Đơn  hàng của bạn được khôi phục.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting order:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi xóa sản phẩm.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const handleRemoveDeleteOrder = async (_id: string) => {
+    MySwal.fire({
+      title: "Xóa đơn hàng?",
+      text: "Bạn có chắc muốn xóa đơn hàng này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(removeOrderById(_id)).unwrap()
+         dispatch(  fetchDeletedOrderThunk())
           setOrder((prevOrder) =>
             prevOrder.filter((order) => order._id !== _id)
           );
@@ -53,12 +94,11 @@ const ListOrders: React.FC = () => {
       }
     });
   };
-
   return (
     <main className="w-full flex-grow p-6">
     <div className="w-full mt-12">
       <p className="text-xl pb-3 flex items-center">
-        <i className="fas fa-list mr-3"></i> DANH SÁCH ĐƠN HÀNG
+        <i className="fas fa-list mr-3"></i> DANH SÁCH ĐƠN HÀNG KHÔI PHỤC
       </p>
       <div className="bg-white overflow-auto">
         <table className="text-left w-full border-collapse">
@@ -85,7 +125,7 @@ const ListOrders: React.FC = () => {
                 <td colSpan={8} className="py-4 px-6 border-b border-grey-light text-center text-red-500">Error: {error}</td>
               </tr>
             )}
-            {orders.map((order) => (
+            {deletedOrder.map((order) => (
               <tr key={order._id || 'no-id'} className="hover:bg-grey-lighter">
                
              
@@ -102,13 +142,14 @@ const ListOrders: React.FC = () => {
         </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                 <button
-            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-            onClick={() => order._id && handlesoftDeleteOrder(order._id)}
+            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium 
+            rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            onClick={() => order._id && handleRemoveDeleteOrder(order._id)}
           >
             Xoá
           </button>
-                  <Link
-                    to={`/admin/listDetailOrder/${order._id}`}
+                  <button
+                  onClick={() => order._id && handleRestoreDeleteOrder(order._id)}
                     className="focus:outline-none
              text-white
               bg-green-700
@@ -116,8 +157,8 @@ const ListOrders: React.FC = () => {
                focus:ring-4
                 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2
                  dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                    Chi tiết
-                  </Link>
+                    Khôi phục
+                  </button>
                 </td>
               </tr>
             ))}
@@ -126,7 +167,8 @@ const ListOrders: React.FC = () => {
       </div>
     </div>
   </main>
+ 
   );
 };
 
-export default ListOrders;
+export default ListOrdersDelete;

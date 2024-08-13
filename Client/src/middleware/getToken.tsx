@@ -54,12 +54,48 @@ interface Permission {
   
   export  const getUserData = (): DecodedToken => {
     const userData = window.localStorage.getItem("persist:root");
-  
-    if (userData) {
+
+    if (userData ) {
       try {
         // Parse the root state
         const parsedData = JSON.parse(userData);
+        
+        // Access the login data from parsedData
+        const loginData = JSON.parse(parsedData.auth)?.login;
   
+        // Check if loginData and token are available
+        if (loginData && loginData.token) {
+          const token = loginData.token;
+  
+          // Decode the token and return the result
+          return decodeToken(token);
+        }
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+  
+    // Return default value if data is not available or error occurs
+    return {
+      id: "",
+      email: "",
+      roles: [],
+      name: "",
+      avatar: "",
+      iat: 0,
+      exp: 0
+    };
+  };
+
+
+  export  const getUserDataV2= (): DecodedToken => {
+    const userDataV2 = localStorage.getItem("token");
+
+    if (userDataV2 ) {
+      try {
+        // Parse the root state
+        const parsedData = JSON.parse(userDataV2);
+        
         // Access the login data from parsedData
         const loginData = JSON.parse(parsedData.auth)?.login;
   

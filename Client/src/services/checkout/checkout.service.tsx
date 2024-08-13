@@ -1,6 +1,11 @@
 import { OrderData } from '../../types/Checkout.d';
 
 import axiosInstance from '../axios';
+export interface ApiResponse {
+  softDel:  OrderData[];
+}
+
+
 // const API_BASE_URL = `${environment.url}`;
 export const addOrder = async (order: OrderData): Promise<OrderData> => {
     try {
@@ -64,5 +69,44 @@ export const getOrderById = async (id: string) => {
     } catch (error) {
       console.error('Error deleting order:', error);
       throw error;
+    }
+  };
+
+
+  export const sofDeleteOrder = async (_id: string): Promise<{ softDel: OrderData }> => {
+    try {
+      const response = await axiosInstance.patch<{ softDel: OrderData }>(`/soft-deleteOrder/${_id}`);
+      console.log("response", response);
+      
+      return response.data;  // Assume this returns the updated Category object
+    } catch (error: any) {
+      throw new Error(`Error deleting category: ${error.message}`);
+    }
+  };
+  
+  export const deleteListOrder = async (): Promise<ApiResponse> => {
+    // Replace this with your actual API call
+    const response = await axiosInstance.get('/deleted-listOder');
+    const softDel = response.data.data; // Adjust this if the actual path is different
+  
+    // Log the data to debug the response structure
+    console.log('API response data:', softDel);
+  
+    if (!Array.isArray(softDel)) {
+      console.error('Expected data to be an array, but received:', softDel);
+      return { softDel: [] }; // Return an empty array on unexpected data
+    }
+  
+    return { softDel };// Ensure this matches the ApiResponse type
+  };
+  
+  export const restore = async (_id: string): Promise<{ data: OrderData }> => {
+    try {
+      const response = await axiosInstance.patch<{ data: OrderData }>(`/restoreOrder/${_id}`);
+      console.log("responese:", response);
+      
+      return response.data;  // Assume this returns the restored Category object
+    } catch (error: any) {
+      throw new Error(`Error restoring category: ${error.message}`);
     }
   };

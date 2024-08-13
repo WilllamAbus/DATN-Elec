@@ -37,7 +37,7 @@ const ListCate: React.FC = () => {
   const status = useSelector((state: RootState) => state.categories.status);
   const error = useSelector((state: RootState) => state.categories.error);
   const [imageUrls, setImageUrls] = useState<ImageUrls>({});
- 
+  const [, setCategories] = useState<Category[]>(categories);
 
   const fetchImageUrls = useCallback(async (categories: Category[]) => {
     const urls: ImageUrls = {};
@@ -79,8 +79,10 @@ const ListCate: React.FC = () => {
           try {
             await dispatch(softDeleteCategoryThunk(_id))
             .unwrap()
-           
-        
+            dispatch(fetchCategoriesThunk())
+            setCategories((prevCategories) =>
+              prevCategories.filter((category) => category._id !== _id)
+            );
             MySwal.fire({
               title: "Đã xóa!",
               text: "Danh mục  đã  xóa.",

@@ -5,7 +5,7 @@ import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import listOne from "../../../../assets/images/products/product14.jpg";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 import { useDispatch } from "react-redux";
 import { addOrderThunk } from "../../../../redux/checkout/checkoutThunk";
@@ -27,18 +27,18 @@ interface DecodedToken {
 }
 
 const decodeToken = (token: string): DecodedToken => {
-    try {
-      // Decode the JWT token
-      const decoded: any = jwtDecode(token);
-      return {
-        id: decoded.id || "",
-        email: decoded.email || ""
-      };
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return { id: "", email: "" };
-    }
-  };
+  try {
+    // Decode the JWT token
+    const decoded: any = jwtDecode(token);
+    return {
+      id: decoded.id || "",
+      email: decoded.email || "",
+    };
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return { id: "", email: "" };
+  }
+};
 
 // Now you can call processMoMoPaymentWithRetry on paymentService
 interface FormValues {
@@ -71,53 +71,21 @@ const Checkout: React.FC = () => {
     applyVoucher: false,
     selectedVoucher: undefined,
   });
+
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+  const [voucher, setVoucher] = useState<{
+    code: string;
+    discount: number;
+  } | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
-  const getUserData = (): DecodedToken => {
-    const userData = window.localStorage.getItem("persist:root");
-   
-  
-    if (userData) {
-      try {
-        // Parse the root state
-        const parsedData = JSON.parse(userData);
-    
-  
-        // Access the login data from parsedData
-        const loginData = JSON.parse(parsedData.auth)?.login;
-    
-  
-        // Check if loginData and token are available
-        if (loginData && loginData.token) {
-          const token = loginData.token;
-         
-  
-          // Decode the token and return the result
-          return decodeToken(token);
-        }
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
-      }
-    }
-  
-    // Return default value if data is not available or error occurs
-    return { id: "", email: "" };
-  };
-  
-
-  const calculateCartTotals = (items: CartItem[]) => {
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    return { totalQuantity, totalPrice };
-  };
-
   useEffect(() => {
-    // Retrieve cart items from localStorage
+    // Retrieve cart items and grand total from localStorage
     const storedCartItems = localStorage.getItem("cart");
+    const storedGrandTotal = localStorage.getItem("grandTotal");
+    const storedVoucher = JSON.parse(
+      localStorage.getItem("selectedVoucher") || "null"
+    );
     if (storedCartItems) {
       const items: CartItem[] = JSON.parse(storedCartItems);
       setCartState((prevState) => ({
@@ -126,7 +94,64 @@ const Checkout: React.FC = () => {
         totalPrice: calculateTotalPrice(items), // Calculate total price if needed
       }));
     }
+
+    if (storedGrandTotal) {
+      setGrandTotal(JSON.parse(storedGrandTotal));
+    }
+    if (storedVoucher) {
+      setVoucher({
+        code: storedVoucher.code,
+        discount: storedVoucher.voucherNum,
+      });
+    }
   }, []);
+
+
+  const getUserData = (): DecodedToken => {
+    const userData = window.localStorage.getItem("persist:root");
+
+    if (userData) {
+      try {
+        // Parse the root state
+        const parsedData = JSON.parse(userData);
+
+        // Access the login data from parsedData
+        const loginData = JSON.parse(parsedData.auth)?.login;
+
+        // Check if loginData and token are available
+        if (loginData && loginData.token) {
+          const token = loginData.token;
+
+          // Decode the token and return the result
+          return decodeToken(token);
+        }
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+
+    // Return default value if data is not available or error occurs
+    return { id: "", email: "" };
+  };
+
+  const calculateCartTotals = (items: CartItem[]) => {
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    return { totalQuantity };
+  };
+
+  // useEffect(() => {
+  //   // Retrieve cart items from localStorage
+  //   const storedCartItems = localStorage.getItem("cart");
+  //   if (storedCartItems) {
+  //     const items: CartItem[] = JSON.parse(storedCartItems);
+  //     setCartState((prevState) => ({
+  //       ...prevState,
+  //       items,
+  //       totalPrice: calculateTotalPrice(items), // Calculate total price if needed
+  //     }));
+  //   }
+  // }, []);
 
   const calculateTotalPrice = (items: CartItem[]): number => {
     return items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -134,9 +159,9 @@ const Checkout: React.FC = () => {
   const handleCheckout: SubmitHandler<FormValues> = async (data) => {
     localStorage.setItem("cart", JSON.stringify(cartState.items));
     const userData = getUserData();
-    console.log("User data: ", userData);
 
-    const { totalQuantity, totalPrice } = calculateCartTotals(cartState.items);
+
+    const { totalQuantity } = calculateCartTotals(cartState.items);
 
     const orderData = {
       payment: {
@@ -144,7 +169,7 @@ const Checkout: React.FC = () => {
         details: "123456789", // Add payment details as needed
       },
       quantityShopping: totalQuantity,
-      totalPrice: totalPrice,
+      totalPrice: grandTotal,
       userId: [{ user: userData.id, email: userData.email }],
       products: cartState.items.map((item) => ({
         product: item.id,
@@ -157,13 +182,13 @@ const Checkout: React.FC = () => {
         sdt: data.phone,
         formatShipping: {
           type: "standard",
-          price: 0,
+          price: 25000,
         },
       },
       status: "active",
     };
-    console.log('Order data:', orderData);
-    
+    console.log("Order data:", orderData);
+
     try {
       await dispatch(addOrderThunk(orderData)).unwrap();
       if (data.payment === "momo") {
@@ -204,26 +229,41 @@ const Checkout: React.FC = () => {
                 <Controller
                   name="name"
                   control={control}
+                  rules={{ 
+                    required: "Tên người nhận không được để trống", 
+                    minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                    validate: {
+                      // noSpecialChars: value => /^[a-zA-Z\s]*$/.test(value) || "Tên người nhận không được chứa ký tự đặc biệt",
+                      noNumbers: value => !/\d/.test(value) || "Tên người nhận không được chứa số",
+                    },
+                  }}
                   render={({ field }) => (
                     <input {...field} className="input-box" />
                   )}
                 />
                 {errors.name && (
-                  <span className="text-red-500">{errors.name.message}</span>
+                  <span className="text-red-600">{errors.name.message}</span>
                 )}
               </div>
+              <br/>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-gray-600">Địa chỉ</label>
                   <Controller
                     name="address"
+                   
                     control={control}
+                    rules={{ 
+                      required: "Địa chỉ không được để trống " ,
+                      minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                  
+                    }}
                     render={({ field }) => (
                       <input {...field} className="input-box" />
                     )}
                   />
                   {errors.address && (
-                    <span className="text-red-500">
+                    <span className="text-red-600">
                       {errors.address.message}
                     </span>
                   )}
@@ -233,7 +273,7 @@ const Checkout: React.FC = () => {
                   <Controller
                     name="city"
                     control={control}
-                    rules={{ required: "City is required" }}
+                    rules={{ required: "Thành phố không được bỏ trống" }}
                     render={({ field }) => (
                       <select {...field} className="input-box">
                         <option value="">Select a city</option>
@@ -245,21 +285,29 @@ const Checkout: React.FC = () => {
                     )}
                   />
                   {errors.city && (
-                    <span className="text-red-500">{errors.city.message}</span>
+                    <span className="text-red-600">{errors.city.message}</span>
                   )}
                 </div>
               </div>
+              <br/>
               <div>
                 <label className="text-gray-600">SĐT</label>
                 <Controller
                   name="phone"
                   control={control}
+                  rules={{ 
+                    required: "Sđt không được bỏ trống" ,
+                    pattern: {
+                      value: /^\d{10}$/,
+                      message: "Số điện thoại phải có chính xác 10 chữ số",
+                    },
+                  }}
                   render={({ field }) => (
                     <input {...field} className="input-box" />
                   )}
                 />
                 {errors.phone && (
-                  <span className="text-red-500">{errors.phone.message}</span>
+                  <span className="text-red-600">{errors.phone.message}</span>
                 )}
               </div>
               <div className="mb-4">
@@ -348,12 +396,22 @@ const Checkout: React.FC = () => {
 
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
             <p>Thanh toán</p>
-            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
+            <span>{grandTotal.toLocaleString()} VNĐ</span>
           </div>
-        
+          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
+            <p>Mã giảm giá</p>
+            {voucher ? (
+              <div>
+               
+                <span> {voucher.discount.toLocaleString()} vnđ</span>
+              </div>
+            ) : (
+              <p>No voucher applied</p>
+            )}
+          </div>
           <div className="flex justify-between text-gray-800 font-medium py-3 uppercase">
             <p className="font-semibold">Tổng cộng</p>
-            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
+            <span>{grandTotal.toLocaleString()} VNĐ</span>
           </div>
 
           <button

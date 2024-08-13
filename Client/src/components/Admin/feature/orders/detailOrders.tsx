@@ -5,7 +5,9 @@ import { AppDispatch, RootState } from '../../../../redux/store';
 import { fetchOrderById } from '../../../../redux/checkout/checkoutThunk'; // Adjust import path as needed
 // import { OrderData } from '../../../../redux/types/Checkout.d'; // Import the type
 
+
 const OrderDetails: React.FC = () => {
+
   const dispatch: AppDispatch = useDispatch();
   const { id } = useParams<{ id: string }>(); // Get order ID from URL params
   const { currentOrder, status, error } = useSelector((state: RootState) => state.checkout);
@@ -15,7 +17,7 @@ const OrderDetails: React.FC = () => {
       dispatch(fetchOrderById(id));
     }
   }, [dispatch, id]);
-
+ 
   return (
     <main className="w-full flex-grow p-6">
       <div className="w-full mt-12">
@@ -35,8 +37,8 @@ const OrderDetails: React.FC = () => {
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">PTTT</th>
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">EMAIL</th>
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">SHIPPING</th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">TRẠNG THÁI</th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÀNH ĐỘNG</th>
+               
+                 
                 </tr>
               </thead>
               <tbody>
@@ -60,20 +62,8 @@ const OrderDetails: React.FC = () => {
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">{currentOrder.shipping?.address || 'N/A'}</td>
                
-                  <td className="py-4 px-6 border-b border-grey-light">
-                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
-                      {currentOrder?.status === "active" ? "Hiển thị" : "Đã ẩn"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 border-b border-grey-light">
-                         
-                  <button
-                      className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                      // onClick={() => handlesoftDeleteProduct(product._id)}
-                    >
-                      Xoá
-                    </button>
-                       </td>
+                
+              
                 </tr>
               </tbody>
             </table>

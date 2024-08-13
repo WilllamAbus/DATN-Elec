@@ -74,9 +74,9 @@ router.delete(
   voucherController.deleteVoucher
 );
 
-router.patch("/soft-delete/:id", middlewareController.verifyToken, voucherController.sofDelVoucher);
-router.get("/deleted-list", middlewareController.verifyToken, voucherController.deletedListVoucher);
-router.patch("/restore/:id", middlewareController.verifyToken, voucherController.restore);
+router.patch("/soft-deleteVoucher/:id", middlewareController.verifyToken, voucherController.sofDelVoucher);
+router.get("/deleted-listVoucher", middlewareController.verifyToken, voucherController.deletedListVoucher);
+router.patch("/restoreVoucher/:id", middlewareController.verifyToken, voucherController.restore);
 
 // order
 router.post(
@@ -89,8 +89,8 @@ router.get("/getOrder/:id", orderController.getOrderbyId);
 router.delete("/deleteOrder/:id",middlewareController.verifyToken, orderController.deleteOrderById);
 
 
-router.patch("/soft-delete/:id", middlewareController.verifyToken, orderController.sofDelOrder);
-router.get("/deleted-list", middlewareController.verifyToken, orderController.deletedListOrder);
-router.patch("/restore/:id", middlewareController.verifyToken, orderController.restore);
+router.patch("/soft-deleteOrder/:id", middlewareController.verifyToken, orderController.sofDelOrder);
+router.get("/deleted-listOder", middlewareController.verifyToken, orderController.deletedListOrder);
+router.patch("/restoreOrder/:id", middlewareController.verifyToken, orderController.restore);
 // 
 module.exports = router;

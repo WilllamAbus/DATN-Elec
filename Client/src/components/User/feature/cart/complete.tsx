@@ -14,10 +14,20 @@ const completePage: React.FC = () => {
         applyVoucher: false,
         selectedVoucher: undefined,
       });
+      const [grandTotal, setGrandTotal] = useState<number>(0);
+      const [, setVoucher] = useState<{
+        code: string;
+        discount: number;
+      } | null>(null);
+    
       const navigate = useNavigate();
       useEffect(() => {
         // Retrieve cart items from localStorage
         const storedCartItems = localStorage.getItem("cart");
+        const storedGrandTotal = localStorage.getItem("grandTotal");
+        const storedVoucher = JSON.parse(
+          localStorage.getItem("selectedVoucher") || "null"
+        );
         if (storedCartItems) {
           const items: CartItem[] = JSON.parse(storedCartItems);
           setCartState(prevState => ({
@@ -26,6 +36,13 @@ const completePage: React.FC = () => {
             totalPrice: calculateTotalPrice(items), // Calculate total price if needed
           }));
         }
+
+        if (storedGrandTotal) {
+          setGrandTotal(JSON.parse(storedGrandTotal));
+        }
+        if (storedVoucher) {
+          setVoucher(JSON.parse(storedVoucher));
+        }
       }, []);
     
       const calculateTotalPrice = (items: CartItem[]): number => {
@@ -33,7 +50,8 @@ const completePage: React.FC = () => {
       };
       const handleHome = () => {
         localStorage.removeItem("cart");
-    
+        localStorage.removeItem("grandTotal");
+        localStorage.removeItem("selectedVoucher");
         navigate("/"); // Redirect to the complete page
       };
   return (
@@ -95,7 +113,7 @@ const completePage: React.FC = () => {
 
           <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
             <p>Thanh toán</p>
-            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
+            <p>{grandTotal.toLocaleString()} vnđ</p>
           </div>
 
           {/* <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
@@ -107,7 +125,7 @@ const completePage: React.FC = () => {
 
           <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
             <p className="font-semibold">Tổng thanh toán</p>
-            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
+            <p>{grandTotal.toLocaleString()} vnđ</p>
           </div>
 
           <button
