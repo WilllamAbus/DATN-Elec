@@ -3,11 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   getDeletedListThunk,
-  restoreUserThunk, // Import thunk khôi phục
+  restoreUserThunk,
 } from "../../../../redux/auth/authThunk";
 import "../../../../assets/css/admin.style.css";
 import { AppDispatch, RootState } from "../../../../redux/store";
 
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 const ListDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.deletedUsers);
@@ -17,29 +21,43 @@ const ListDelete: React.FC = () => {
   const userListError = useSelector(
     (state: RootState) => state.auth.deletedUsersError
   );
-  // const restoreStatus = useSelector(
-  //   (state: RootState) => state.auth.restoreUserStatus
-  // );
-  // const restoreError = useSelector(
-  //   (state: RootState) => state.auth.restoreUserError
-  // );
 
   useEffect(() => {
     dispatch(getDeletedListThunk());
   }, [dispatch]);
 
   const handleRestore = async (userId: string) => {
-    if (
-      window.confirm("Bạn có chắc chắn muốn khôi phục người dùng này không?")
-    ) {
-      try {
-        await dispatch(restoreUserThunk(userId)).unwrap();
-        // Optionally, refresh the list of deleted users
-        dispatch(getDeletedListThunk());
-      } catch (error) {
-        console.error("Failed to restore user:", error);
+    MySwal.fire({
+      title: "Khôi phục người dùng?",
+      text: "Bạn có chắc muốn khôi phục người dùng này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(restoreUserThunk(userId)).unwrap();
+
+          dispatch(getDeletedListThunk());
+
+          MySwal.fire({
+            title: "Đã Khôi phục!",
+            text: "Người dùng đã khôi phục.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi khôi phục người dùng.",
+            icon: "error",
+          });
+        }
       }
-    }
+    });
   };
 
   if (userListStatus === "loading") {
@@ -51,14 +69,14 @@ const ListDelete: React.FC = () => {
   }
 
   if (!Array.isArray(users) || users.length === 0) {
-    return <p>Không có người dùng nào bị xóa mềm.</p>;
+    return <p>Không có người dùng nào bị Khóa.</p>;
   }
 
   return (
     <main className="w-full flex-grow p-6">
       <div className="w-full mt-12">
         <p className="text-xl pb-3 flex items-center">
-          <i className="fas fa-list mr-3"></i> DANH SÁCH TÀI KHOẢN ĐÃ BỊ XÓA MỀM
+          <i className="fas fa-list mr-3"></i> DANH SÁCH TÀI KHOẢN ĐÃ BỊ KHÓA
         </p>
         <div className="bg-white overflow-auto">
           <table className="text-left w-full border-collapse">

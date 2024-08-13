@@ -5,9 +5,12 @@ import {
 } from "../../../../redux/auth/authThunk";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
+import withReactContent from "sweetalert2-react-content";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
+import Swal, { SweetAlertResult } from "sweetalert2";
 
+const MySwal = withReactContent(Swal);
 const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.activeUsers);
@@ -17,7 +20,6 @@ const UserList: React.FC = () => {
   const userListError = useSelector(
     (state: RootState) => state.auth.activeUsersError
   );
-
   useEffect(() => {
     dispatch(getActiveListThunk());
   }, [dispatch]);
@@ -26,15 +28,37 @@ const UserList: React.FC = () => {
   console.log("User List Error:", userListError);
 
   const handlesoftDelete = async (userId: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này không?")) {
-      try {
-        await dispatch(softDeleteUserThunk(userId)).unwrap();
+    MySwal.fire({
+      title: "Khóa người dùng?",
+      text: "Bạn có chắc muốn khóa người dùng này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(softDeleteUserThunk(userId)).unwrap();
 
-        dispatch(getActiveListThunk());
-      } catch (error) {
-        console.error("Failed to delete user:", error);
+          dispatch(getActiveListThunk());
+
+          MySwal.fire({
+            title: "Đã Khóa!",
+            text: "Người dùng đã bị khóa.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi khóa người dùng.",
+            icon: "error",
+          });
+        }
       }
-    }
+    });
   };
 
   if (userListStatus === "loading") {
@@ -110,10 +134,10 @@ const UserList: React.FC = () => {
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         onClick={() => handlesoftDelete(user._id)}
                       >
-                        Xóa
+                        Khóa
                       </button>
                       <Link
-                        to={`/admin/editUser/${user._id}`}
+                        to={`/admin/editUser?userId=${user._id}`}
                         className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                       >
                         Sửa

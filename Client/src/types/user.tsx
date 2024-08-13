@@ -54,3 +54,13 @@ export interface ResetPassState {
   message: string;
   error: string | null;
 }
+export interface UpdateUser {
+  _id: string;
+  name: string;
+  roles: string[];
+  birthday: string;
+  gender: string;
+  phone: string;
+  avatar: string;
+  address: string;
+}

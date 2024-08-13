@@ -193,22 +193,34 @@ export const verifyEmail = async (token: string) => {
     }
   }
 };
-
-// Function to handle forgot password
-export const forgotPassword = async (email: string) => {
+export const resendEmail = async (email: string) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
-      email,
-    });
-
-    // Trả về thông tin chi tiết về phản hồi
+    const response = await axios.post(`${API_URL}/resendEmail`, { email });
     return {
       status: response.status,
       message: response.data.message,
       data: response.data,
     };
   } catch (error: any) {
-    // Xử lý lỗi và trả về thông tin chi tiết về lỗi
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message || "Đã xảy ra lỗi khi yêu cầu xác lại.",
+    };
+  }
+};
+// yêu cầu mail reset
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+      email,
+    });
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
     return {
       status: error.response?.status || 500,
       message:

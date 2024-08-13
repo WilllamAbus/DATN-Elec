@@ -10,6 +10,7 @@ import {
   verifyEmail as verifyEmailService,
   forgotPassword,
   resetPassword,
+  resendEmail,
 } from "../../services/authentication/auth.services";
 
 import {
@@ -18,6 +19,7 @@ import {
   softDeleteUser,
   updateUser,
   listActive,
+  getUserById,
 } from "../../services/authentication/authAdmin";
 import { UserProfile } from "../../types/user";
 interface LoginResponse {
@@ -161,6 +163,18 @@ export const forgotPasswordThunk = createAsyncThunk(
   }
 );
 
+//yêu cầu lại email
+export const resendEmailThunk = createAsyncThunk(
+  "auth/resendEmail",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const response = await resendEmail(email);
+      return response;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
 export const resetPasswordThunk = createAsyncThunk(
   "auth/resetPassword",
   async (
@@ -254,15 +268,25 @@ export const restoreUserThunk = createAsyncThunk(
 );
 
 //cập nhật người dùng từ admin
-export const updateUserThunk = createAsyncThunk(
-  "auth/updateUser",
-  async (
-    { userId, userData }: { userId: string; userData: any },
-    { rejectWithValue }
-  ) => {
+export const updateUserThunk = createAsyncThunk<
+  UserProfile,
+  { userId: string; formData: FormData },
+  { rejectValue: string }
+>("auth/updateUser", async ({ userId, formData }, { rejectWithValue }) => {
+  try {
+    const result = await updateUser(userId, formData);
+    return result;
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
+  }
+});
+
+export const fetchUserById = createAsyncThunk(
+  "user/fetchUserById",
+  async (userId: string, { rejectWithValue }) => {
     try {
-      const result = await updateUser(userId, userData);
-      return result;
+      const user = await getUserById(userId);
+      return user;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserProfile, ResetPassState, ForgotState } from "../../types/user";
+import {
+  UserProfile,
+  ResetPassState,
+  ForgotState,
+  UpdateUser,
+} from "../../types/user";
 import {
   getProfileThunk,
   getListThunk,
@@ -11,7 +16,9 @@ import {
   verifyEmailThunk,
   getActiveListThunk,
   resetPasswordThunk,
-  forgotPasswordThunk, // Import thunk
+  forgotPasswordThunk,
+  resendEmailThunk,
+  fetchUserById,
 } from "./authThunk";
 // interface User {
 //   // Định nghĩa kiểu dữ liệu cho người dùng nếu cần
@@ -44,11 +51,17 @@ interface AuthState {
     successMessage: string | null;
     error: string | null;
   };
-  // passwordMail: {
-  //   status: "idle" | "loading" | "succeeded" | "failed";
-  //   message: string | null;
-  //   error: string | null;
-  // };
+  resendEmail: {
+    message: string;
+    error: string;
+    status: "idle" | "pending" | "succeeded" | "failed";
+  };
+  fetchUser: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    profile: UpdateUser | null;
+    error: string | null;
+  };
+
   ForgotPassword: ForgotState;
   ResetPassword: ResetPassState;
   EmailVerification: {
@@ -105,6 +118,11 @@ const initialState: AuthState = {
     status: "idle",
     error: null,
   },
+  resendEmail: {
+    message: "",
+    error: "",
+    status: "idle",
+  },
   ForgotPassword: {
     status: "idle",
     message: "",
@@ -113,6 +131,11 @@ const initialState: AuthState = {
   ResetPassword: {
     status: "idle",
     message: "",
+    error: null,
+  },
+  fetchUser: {
+    status: "idle",
+    profile: null,
     error: null,
   },
   activeUsers: [],
@@ -307,7 +330,6 @@ const authSlice = createSlice({
       })
       .addCase(updateUserThunk.fulfilled, (state) => {
         state.updateUserStatus = "succeeded";
-        // Cập nhật trạng thái người dùng nếu cần
         state.updateUserError = null;
       })
       .addCase(updateUserThunk.rejected, (state, action) => {
@@ -327,21 +349,7 @@ const authSlice = createSlice({
         state.EmailVerification.status = "failed";
         state.EmailVerification.error = action.payload as string;
       })
-      // .addCase(getActiveListThunk.pending, (state) => {
-      //   state.active.status = "loading";
-      //   state.active.error = null;
-      // })
-      // .addCase(
-      //   getActiveListThunk.fulfilled,
-      //   (state, action: PayloadAction<UserProfile[]>) => {
-      //     state.active.status = "succeeded";
-      //     state.active.data = action.payload;
-      //   }
-      // )
-      // .addCase(getActiveListThunk.rejected, (state, action) => {
-      //   state.active.status = "failed";
-      //   state.active.error = action.payload as string;
-      // })
+
       .addCase(getActiveListThunk.pending, (state) => {
         state.activeUsersStatus = "loading";
         state.activeUsersError = null;
@@ -410,6 +418,39 @@ const authSlice = createSlice({
           state.ForgotPassword.status = "failed";
           state.ForgotPassword.error = action.payload as string;
         }
+      })
+      .addCase(resendEmailThunk.pending, (state) => {
+        state.resendEmail.status = "pending";
+        state.resendEmail.message = "";
+        state.resendEmail.error = "";
+      })
+      .addCase(
+        resendEmailThunk.fulfilled,
+        (state, action: PayloadAction<{ message: string }>) => {
+          state.resendEmail.status = "succeeded";
+          state.resendEmail.message = action.payload.message;
+          state.resendEmail.error = "";
+        }
+      )
+      .addCase(resendEmailThunk.rejected, (state, action) => {
+        state.resendEmail.status = "failed";
+        state.resendEmail.error =
+          (action.payload as string) || "An unknown error occurred";
+      })
+      .addCase(fetchUserById.pending, (state) => {
+        state.fetchUser.status = "loading";
+      })
+      .addCase(
+        fetchUserById.fulfilled,
+        (state, action: PayloadAction<UserProfile>) => {
+          state.fetchUser.status = "succeeded";
+          state.fetchUser.profile = action.payload;
+          state.fetchUser.error = null;
+        }
+      )
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.fetchUser.status = "failed";
+        state.fetchUser.error = action.payload as string;
       });
   },
 });
