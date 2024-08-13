@@ -279,9 +279,15 @@ const Sidebar: React.FC = () => {
                 <i className="fas fa-calendar mr-3"></i>
                 Danh mục
               </a>
-
               <a
-                href="/admin/recycleBinCate"
+                href="/admin/recycleBinVoucher"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Mã giảm giá
+              </a>
+              <a
+                href="/admin/recycleBinOrder"
                 className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
               >
                 <i className="fas fa-calendar mr-3"></i>

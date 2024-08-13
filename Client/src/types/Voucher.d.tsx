@@ -12,6 +12,7 @@ export interface Category {
     isActive: boolean;
     cateReady: Category[];
     conditionActive: string;
+    status: string;
   }
   
 
@@ -29,4 +30,6 @@ export interface Category {
     shipping: number;
     applyVoucher: boolean;
     selectedVoucher?: Voucher;
+    // email: string,
+    // roles:string
   }

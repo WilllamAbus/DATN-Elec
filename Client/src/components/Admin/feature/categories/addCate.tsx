@@ -123,6 +123,12 @@ const AddCate: React.FC = () => {
                   type="text"
                   {...register("name", {
                     required: "Tên không được bỏ trống",
+                
+                    minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                    validate: {
+                      noSpecialChars: value => /^[a-zA-Z\s]*$/.test(value) || "Tên  không được chứa ký tự đặc biệt",
+                      noNumbers: value => !/\d/.test(value) || "Tên  không được chứa số",
+                    },
                   })}
                 />
                 {errors.name && <span className="text-red-600">{errors.name.message}</span>}
@@ -137,6 +143,8 @@ const AddCate: React.FC = () => {
                   type="text"
                   {...register("path", {
                     required: "Đường truyền không được bỏ trống",
+                    minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                  
                   })}
                 />
                 {errors.path && <span className="text-red-600">{errors.path.message}</span>}

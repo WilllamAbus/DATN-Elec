@@ -27,13 +27,13 @@ export interface PaymentDetails {
 
 export interface OrderData {
     _id?: string;
-    payment: PaymentDetails;
-    quantityShopping: Number;
-    totalPrice: Number;
-    userId: OrderUser[];
-    products: OrderProduct[];
-    shipping: OrderShipping;
-    status: string; // Default value 'active'
+    payment?: PaymentDetails;
+    quantityShopping?: Number;
+    totalPrice?: Number;
+    userId?: OrderUser[];
+    products?: OrderProduct[];
+    shipping?: OrderShipping;
+    status?: string; // Default value 'active'
 }
 
 

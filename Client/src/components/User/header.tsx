@@ -186,7 +186,7 @@ const Header:  React.FC = () => {
           </Link>
 
           <Link
-            to="/profile"
+            to="/listCart"
             className="text-center text-gray-700 hover:text-primary relative"
           >
             <div className="text-2xl">

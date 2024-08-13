@@ -104,7 +104,7 @@ const ProductDetail: React.FC = () => {
     const calculatePrice = () => {
         if (!product) return 0;
         const basePrice = product.price * (1 - product.discount / 100);
-        return basePrice * quantity;
+        return basePrice 
     };
 
 
@@ -117,22 +117,22 @@ const ProductDetail: React.FC = () => {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
       
         
-        const existingProductIndex = cart.findIndex((item: any) => item.id === product._id);
+        // const existingProductIndex = cart.findIndex((item: any) => item.id === product._id);
       
     
-        if (existingProductIndex > -1) {
-            cart[existingProductIndex].quantity += quantity;
-            cart[existingProductIndex].price = calculatePrice();
-        } else {
-            cart.push({
-                id: product._id,
-                name: product.name,
-                price: calculatePrice(),
-                quantity,
-                imgPreview
-            });
-        }
-    
+        // if (existingProductIndex > -1) {
+        //     cart[existingProductIndex].quantity += quantity;
+        //     cart[existingProductIndex].price = calculatePrice();
+        // } else {
+          
+        // }
+        cart.push({
+          id: product._id,
+          name: product.name,
+          price: product.price,
+          quantity,
+          imgPreview
+      });
         localStorage.setItem('cart', JSON.stringify(cart));
         // setAlert({ message: "Thêm vào giỏ hàng thành công!", type: "success" });
         navigate('/cart');
@@ -381,7 +381,7 @@ const ProductDetail: React.FC = () => {
             <img src={listTwo} alt="related-product" className="w-full" />
             <div className="p-4">
               <h3 className="text-gray-800 font-medium">
-                Related Product Name
+              Nvidia
               </h3>
               <p className="text-gray-600">Related Product Price</p>
               <button className="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">

@@ -4,7 +4,7 @@ import {
   fetchDeletedCategoriesThunk,
   deleteCategoryThunk,
   restoreCategoryThunk,
-  fetchCategoriesThunk,
+  // fetchCategoriesThunk,
 } from "../../../../redux/categories/categoriesThunk";
 import { RootState, AppDispatch } from "../../../../redux/store";
 import { getFileFirebase } from "../../../../services/firebase/getFirebse.service";
@@ -110,7 +110,7 @@ const ListCateDeleted: React.FC = () => {
         if (result.isConfirmed) {
           try {
             await dispatch(restoreCategoryThunk(_id)).unwrap();
-            dispatch(fetchCategoriesThunk()); 
+            dispatch(fetchDeletedCategoriesThunk()); 
             
             setCategories((prevCategories) =>
                 prevCategories.filter((category) => category._id !== _id)

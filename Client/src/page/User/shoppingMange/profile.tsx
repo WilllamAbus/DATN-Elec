@@ -154,15 +154,16 @@ const ProfileUse: React.FC = () => {
               </a>
             </div>
             <div className="space-y-1 pl-8 pt-4">
-              <a
-                href="#"
+              <Link
+               
+                to="/listCart"
                 className="relative hover:text-primary block font-medium capitalize transition"
               >
                 <span className="absolute -left-8 top-0 text-base">
                   <i className="fa-solid fa-box-archive"></i>
                 </span>
                 Lịch sử đơn hàng
-              </a>
+              </Link>
 
               <a
                 href="#"

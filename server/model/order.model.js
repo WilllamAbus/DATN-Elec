@@ -41,7 +41,7 @@ const orderSchema = new Schema(
           }
       },
     status: {type: String, default: 'active'},
-  
+ 
   },
   {
     collection: "order",

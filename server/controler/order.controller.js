@@ -74,24 +74,15 @@ const orderController = {
 
       sofDelOrder: async (req, res)=>{
         try {
-          const adminRole = await Role.findOne({ name: 'admin' });
+     
     
-    
-          if (!adminRole) {
-              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-          }
-    
-    
-          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-          if (!isAdmin) {
-              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm" });
-          }
-    
-          const id = req.params.id;
+          const {id} = req.params;
+       
+          
           // Cập nhật trạng thái của danh mục thành "Đã xóa"
           const softDeletedOrder = await orderService.softDeleteOrder(id)
-    
+         
+          
           if (!softDeletedOrder ) {
               return res.status(404).json({ message: "Không tìm thấy danh mục" });
           }
@@ -106,18 +97,7 @@ const orderController = {
     
       deletedListOrder: async(req, res)=>{
         try {
-          const adminRole = await Role.findOne({ name: 'admin' });
-    
-          if (!adminRole) {
-              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-          }
-    
-    
-          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-          if (!isAdmin) {
-              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách danh mục đã bị xóa mềm" });
-          }
+       
     
     
           const deleteListCategory = await orderService.deletedList()
@@ -129,20 +109,7 @@ const orderController = {
       }, 
       restore: async(req, res)=>{
         try {
-          const adminRole = await Role.findOne({ name: 'admin' });
-    
-    
-          if (!adminRole) {
-              return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-          }
-    
-    
-          const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-          if (!isAdmin) {
-              return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục sản phẩm" });
-          }
-    
+       
     
           const { id } = req.params;
           if (!id) {

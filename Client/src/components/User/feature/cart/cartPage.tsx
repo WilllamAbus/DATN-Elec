@@ -4,7 +4,7 @@ import listOne from "../../../../assets/images/products/product14.jpg";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Modal from "../../MoalButton";
-import { getUserData } from "../../../../middleware/getToken";
+import { getUserData, getUserDataV2 } from "../../../../middleware/getToken";
 import { Voucher, CartItem , CartState} from "../../../../types/Voucher.d";
 // Define an interface for cart item
 
@@ -17,25 +17,66 @@ const CartPage: React.FC = () => {
     applyVoucher: false,
     selectedVoucher: undefined,
   });
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch cart data from localStorage
+    // Retrieve cart and voucher from local storage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartState((prevState) => ({
-      ...prevState,
+    const storedVoucher = JSON.parse(localStorage.getItem("selectedVoucher") || "null");
+
+  
+
+    // Update cart state with retrieved data
+    const updatedTotalPrice = calculateTotal(cart, storedVoucher);
+  
+
+    setCartState({
       items: cart,
-      totalPrice: calculateTotal(cart),
-    }));
+      selectedVoucher: storedVoucher || undefined,
+      applyVoucher: !!storedVoucher,
+      totalPrice: updatedTotalPrice,
+      shipping: 25000, // Assuming static shipping cost for this example
+    });
   }, []);
+
+  const calculateTotal = (items: CartItem[], voucher?: Voucher) => {
+    // Calculate subtotal
+    const subtotal = items.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+ 
+
+    // Calculate discount
+    const discount = voucher ? voucher.voucherNum : 0;
+   
+
+    const totalPrice = subtotal - discount;
+
+
+    // Ensure totalPrice doesn't go below zero
+    return Math.max(totalPrice, 0);
+  };
+
+  const calculateGrandTotal = () => {
+    const grandTotal = cartState.totalPrice + cartState.shipping;
+    console.log("Grand Total:", grandTotal);
+    return grandTotal;
+  };
 
   const handleRemoveItem = (id: string) => {
     const updatedItems = cartState.items.filter((item) => item.id !== id);
+   
+
     localStorage.setItem("cart", JSON.stringify(updatedItems));
+    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
+ 
+
     setCartState((prevState) => ({
       ...prevState,
       items: updatedItems,
-      totalPrice: calculateTotal(updatedItems),
+      totalPrice: newTotalPrice,
     }));
   };
 
@@ -43,11 +84,16 @@ const CartPage: React.FC = () => {
     const updatedItems = cartState.items.map((item) =>
       item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     );
+   
+
     localStorage.setItem("cart", JSON.stringify(updatedItems));
+    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
+   
+
     setCartState((prevState) => ({
       ...prevState,
       items: updatedItems,
-      totalPrice: calculateTotal(updatedItems),
+      totalPrice: newTotalPrice,
     }));
   };
 
@@ -57,41 +103,51 @@ const CartPage: React.FC = () => {
         ? { ...item, quantity: item.quantity - 1 }
         : item
     );
+    console.log("Updated Items after Decreasing Quantity:", updatedItems);
+
     localStorage.setItem("cart", JSON.stringify(updatedItems));
+    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
+    console.log("New Total Price after Decreasing Quantity:", newTotalPrice);
+
     setCartState((prevState) => ({
       ...prevState,
       items: updatedItems,
-      totalPrice: calculateTotal(updatedItems),
+      totalPrice: newTotalPrice,
     }));
   };
 
-  const calculateTotal = (items: CartItem[]) => {
-    const subtotal = items.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-    return subtotal - (cartState.selectedVoucher?.voucherNum || 0);
-  };
-
-  const calculateGrandTotal = () => {
-    return cartState.totalPrice + cartState.shipping;
-  };
-
   const handleVoucherApply = (voucher: Voucher) => {
+    const newTotalPrice = calculateTotal(cartState.items, voucher);
+    console.log("Applying Voucher:", voucher);
+    console.log("New Total Price after Applying Voucher:", newTotalPrice);
+
     setCartState((prevState) => ({
       ...prevState,
       applyVoucher: true,
       selectedVoucher: voucher,
-      totalPrice: calculateTotal(prevState.items),
+      totalPrice: newTotalPrice,
     }));
+    localStorage.setItem("selectedVoucher", JSON.stringify(voucher));
   };
 
   const handleCheckout = () => {
+    // Calculate and store the grand total in localStorage or state
+    const grandTotal = calculateGrandTotal();
+    console.log("Grand Total for Checkout:", grandTotal);
+
     localStorage.setItem("cart", JSON.stringify(cartState.items));
+    localStorage.setItem("grandTotal", JSON.stringify(grandTotal));
+    const storedVoucher = JSON.parse(localStorage.getItem("selectedVoucher") || "null");
+    if (storedVoucher) {
+      localStorage.setItem("selectedVoucher", JSON.stringify(storedVoucher));
+    }
     const userData = getUserData();
-    if (userData) {
+
+    const userDataV2 = getUserDataV2();
+    if (userData ||userDataV2) {
       const isAdmin = userData.roles.some(role => role.name === 'admin');
-      if (isAdmin) {
+      const isAdminV2 = userDataV2 .roles.some(role => role.name === 'admin');
+      if (isAdmin || isAdminV2) {
         navigate('/login');
       } else {
         navigate('/checkout');
@@ -99,7 +155,6 @@ const CartPage: React.FC = () => {
     } else {
       navigate('/login');
     }
-  
   };
 
   return (

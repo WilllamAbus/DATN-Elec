@@ -49,6 +49,9 @@ const UserPaymentpage = React.lazy(
 const UserProdfile = React.lazy(
   () => import("../page/User/shoppingMange/profile")
 );
+const UserListCart = React.lazy(
+  () => import("../page/User/shoppingMange/manageCart/list-Cart")
+);
 const UserWatchList = React.lazy(
   () => import("../page/User/watchList/watchList")
 );
@@ -149,6 +152,10 @@ const UserRoutes: RouteObject[] = [
   {
     path: "profile",
     element: <UserProdfile />,
+  },
+  {
+    path: "listCart",
+    element: <UserListCart />,
   },
   {
     path: "watchList",

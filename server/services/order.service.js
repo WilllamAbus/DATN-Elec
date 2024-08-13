@@ -43,7 +43,8 @@ const orderService  = {
                         price: orderData.shipping.formatShipping.price
                     }
                 },
-                status: orderData.status || 'active'
+                status: orderData.status || 'active',
+              
             });
          
             const savedOrder = await newOrder.save();
@@ -66,14 +67,7 @@ const orderService  = {
         }
     },
 
-    getAllOrder: async (req, res) => {
-        try {
-            const orders = await _Order.find({ status: { $ne: 'disable' } });
-            return orders;
-          } catch (error) {
-            throw new Error('Error retrieving orders: ' + error.message);
-          }
-    },
+  
 
     getOrderById : async ( id) => {
         try {
@@ -93,12 +87,24 @@ const orderService  = {
   
     },
 
-
+    getAllOrder: async (req, res) => {
+        try {
+            const orders = await _Order.find({ status: { $ne: 'disable' } });
+            return orders;
+          } catch (error) {
+            throw new Error('Error retrieving orders: ' + error.message);
+          }
+    },
     softDeleteOrder: async (id) => {
         try {
-            return await _Order.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+            const order = await _Order.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+            if (!order) {
+                console.error('Order not found with ID:', id);
+            }
+            return order;
         } catch (error) {
-            console.error(error)
+            console.error('Error in softDeleteOrder service:', error);
+            throw error; // Re-throw the error to be caught by the controller
         }
 
       

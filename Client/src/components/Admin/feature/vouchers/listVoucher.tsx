@@ -2,12 +2,12 @@
 import React, { useEffect} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store'; // Import your RootState type
-import { fetchVouchers, deleteVoucher } from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
+import { fetchVouchers} from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
 // Import your custom Alert component
 import { Link } from 'react-router-dom';
-import Swal, { SweetAlertResult } from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-const MySwal = withReactContent(Swal);
+// import Swal, { SweetAlertResult } from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+// const MySwal = withReactContent(Swal);
 const formatPrices = (price: number): string => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'decimal',
@@ -24,37 +24,37 @@ const DiscountList: React.FC = () => {
       dispatch(fetchVouchers());
     }, [dispatch]);
   
-    const handleDelete = async (id: string) => {
-      MySwal.fire({
-        title: "Xóa mã giảm giá?",
-        text: "Bạn có chắc muốn xóa dòng này không!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Có",
-        cancelButtonText: "Hủy",
-      }).then(async (result: SweetAlertResult) => {
-        if (result.isConfirmed) {
-          try {
-            await dispatch(deleteVoucher(id)).unwrap();
+    // const handleDelete = async (id: string) => {
+    //   MySwal.fire({
+    //     title: "Xóa mã giảm giá?",
+    //     text: "Bạn có chắc muốn xóa dòng này không!",
+    //     icon: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonColor: "#3085d6",
+    //     cancelButtonColor: "#d33",
+    //     confirmButtonText: "Có",
+    //     cancelButtonText: "Hủy",
+    //   }).then(async (result: SweetAlertResult) => {
+    //     if (result.isConfirmed) {
+    //       try {
+    //         await dispatch(deleteVoucher(id)).unwrap();
         
-            MySwal.fire({
-              title: "Đã xóa!",
-              text: "Mã giảm giá  đã  xóa.",
-              icon: "success",
-            });
-          } catch (error) {
-            console.error("Error deleting product:", error);
-            MySwal.fire({
-              title: "Lỗi!",
-              text: "Đã xảy ra sự cố ",
-              icon: "error",
-            });
-          }
-        }
-      });
-    };
+    //         MySwal.fire({
+    //           title: "Đã xóa!",
+    //           text: "Mã giảm giá  đã  xóa.",
+    //           icon: "success",
+    //         });
+    //       } catch (error) {
+    //         console.error("Error deleting product:", error);
+    //         MySwal.fire({
+    //           title: "Lỗi!",
+    //           text: "Đã xảy ra sự cố ",
+    //           icon: "error",
+    //         });
+    //       }
+    //     }
+    //   });
+    // };
   
     if (loading) {
       return <p>Loading...</p>;
@@ -81,7 +81,7 @@ const DiscountList: React.FC = () => {
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HẠN SỬ DỤNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">DANH MỤC SẴN SÀNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">MÔ TẢ</th>
-          
+                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">TRẠNG THÁI</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÀNH ĐỘNG</th>
               </tr>
             </thead>
@@ -97,16 +97,26 @@ const DiscountList: React.FC = () => {
                     ))}
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">{voucher.conditionActive}</td> 
-               
                   <td className="py-4 px-6 border-b border-grey-light">
-                    <button
+                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                      {voucher.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 border-b border-grey-light">
+                    {/* <button
                       className="cta-btn btn text-red-500"
                       onClick={() => handleDelete(voucher._id)}
                     >
                       Xoá
-                    </button>
+                    </button> */}
                     <Link to={`/admin/editVouchers/${voucher._id}`}
-                    className="cta-btn btn text-green-500 ml-4">
+                    className="focus:outline-none
+             text-white
+              bg-green-700
+               hover:bg-green-800 
+               focus:ring-4
+                focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2
+                 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                       Sửa
                     </Link>
                   </td>

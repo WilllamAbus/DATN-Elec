@@ -20,9 +20,9 @@ cron.schedule("* * * * *", async () => {
       await modelUser.deleteMany({
         _id: { $in: usersToDelete.map((user) => user._id) },
       });
-      console.log(`Đã xóa ${usersToDelete.length} tài khoản`);
+      // console.log(`Đã xóa ${usersToDelete.length} tài khoản`);
     } else {
-      console.log("Không có tài khoản nào cần xóa.");
+      // console.log("Không có tài khoản nào cần xóa.");
     }
   } catch (error) {
     console.error("Lỗi khi xóa vĩnh viễn tài khoản:", error);

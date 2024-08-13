@@ -4,9 +4,7 @@ const _Category = require("../model/catgories.model");
 const _Voucher = require("../model/voucher.model");
 
 const voucherService = {
-  getAllVoucher: async () => {
-    return await _Voucher.findWithCategory({ status: { $ne: "disable" } });
-  },
+
 
   getVoucherById: async (id) => {
     return await _Voucher.findById(id).populate("cateReady.category");
@@ -125,7 +123,9 @@ const voucherService = {
   deleteVoucher: async (id) => {
     return await _Voucher.findByIdAndDelete(id);
   },
-
+  getAllVoucher: async () => {
+    return await _Voucher.findWithCategory({ status: { $ne: "disable" } });
+  },
   softDeleteVoucher: async (id) => {
     try {
       return await _Voucher.findByIdAndUpdate(
@@ -139,7 +139,7 @@ const voucherService = {
   },
   deletedList: async (req, res) => {
     try {
-      return (await _Voucher.find({ status: "disable" })) || [];
+      return await _Voucher.find({ status: "disable" }) || [];
     } catch (error) {
       console.error(error);
     }
