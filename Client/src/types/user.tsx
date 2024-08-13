@@ -44,3 +44,13 @@ export interface UserProfile {
   createdAt: string;
   updatedAt?: string;
 }
+export interface ForgotState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  message: string;
+  error: string | null;
+}
+export interface ResetPassState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  message: string;
+  error: string | null;
+}

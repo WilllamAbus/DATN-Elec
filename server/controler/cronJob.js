@@ -1,15 +1,15 @@
 const cron = require("node-cron");
 const modelUser = require("../model/users.model");
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   // Chạy mỗi phút
   try {
     console.log("Cron job đã được khởi chạy tại:", new Date());
 
     const now = new Date();
     const thresholdDate = new Date();
-    // thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
-    thresholdDate.setTime(now.getTime() - 30 * 1000);
+    thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
+    // thresholdDate.setTime(now.getTime() - 30 * 1000); //30s
     // Tìm các tài khoản đã bị disable hơn 30 ngày
     const usersToDelete = await modelUser.find({
       status: "disable",

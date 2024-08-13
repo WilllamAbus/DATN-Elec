@@ -31,6 +31,52 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 let refreshTokens = [];
 const authController = {
+  // registerUser: async (req, res) => {
+  //   try {
+  //     const userRole = await Role.findOne({ name: "user" });
+  //     if (!userRole) {
+  //       return res
+  //         .status(500)
+  //         .json({ message: "Không tìm thấy vai trò người dùng" });
+  //     }
+
+  //     const { email, password, name } = req.body;
+
+  //     const checkEmail = await User.findOne({ email });
+  //     if (checkEmail) {
+  //       return res.status(200).json({ message: "Email đã tồn tại" });
+  //     }
+
+  //     const newUser = new User({
+  //       email,
+  //       name,
+  //       password,
+  //       roles: [userRole._id],
+  //     });
+
+  //     const user = await newUser.save();
+  //     const token = crypto.randomBytes(32).toString("hex");
+  //     const hashedToken = crypto
+  //       .createHash("sha256")
+  //       .update(token)
+  //       .digest("hex");
+
+  //     user.emailVerificationToken = hashedToken;
+  //     user.emailVerificationExpires = Date.now() + 3600000; // 1 giờ
+  //     await sendVerificationEmail(user.email, token);
+  //     console.log("Token:", hashedToken);
+  //     console.log("Expires:", user.emailVerificationExpires);
+
+  //     return res
+  //       .status(200)
+  //       .json({ message: "Đăng ký thành công. Vui lòng kiểm tra Email" });
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res
+  //       .status(500)
+  //       .json({ message: "Server error", error: err.message });
+  //   }
+  // },
   registerUser: async (req, res) => {
     try {
       const userRole = await Role.findOne({ name: "user" });
@@ -61,9 +107,17 @@ const authController = {
         .update(token)
         .digest("hex");
 
+      // Cập nhật token và thời gian hết hạn vào đối tượng user
       user.emailVerificationToken = hashedToken;
       user.emailVerificationExpires = Date.now() + 3600000; // 1 giờ
+
+      // Lưu đối tượng user sau khi cập nhật các trường
+      await user.save();
+
+      // Gửi email xác thực
       await sendVerificationEmail(user.email, token);
+      console.log("Token:", hashedToken);
+      console.log("Expires:", user.emailVerificationExpires);
 
       return res
         .status(200)
@@ -89,19 +143,17 @@ const authController = {
       });
 
       if (!user) {
-        return res
-          .status(400)
-          .json({ message: "Token is invalid or has expired" });
+        return res.status(400).json({ msg: "Token is invalid or has expired" });
       }
 
-      user.VerifiedEmail = true;
+      user.isEmailVerified = true;
       user.emailVerificationToken = undefined;
       user.emailVerificationExpires = undefined;
       await user.save();
 
-      res.status(200).json({ message: "Email verified successfully" });
+      res.status(200).json({ msg: "Email verified successfully" });
     } catch (err) {
-      res.status(500).json({ message: "Server error", error: err.message });
+      res.status(500).json({ msg: "Server error", error: err.message });
     }
   },
 
@@ -115,7 +167,7 @@ const authController = {
         return res.status(400).json({ message: "Email không tồn tại" });
       }
 
-      if (user.Verifiedemail) {
+      if (user.VerifiedEmail) {
         return res
           .status(400)
           .json({ message: "Email đã được xác minh trước đó" });
@@ -221,7 +273,7 @@ const authController = {
           .json({ message: "Thông tin đăng nhập không chính xác" });
       }
 
-      if (!user.VerifiedEmail) {
+      if (!user.isEmailVerified) {
         return res.status(400).json({ message: "Email chưa được xác minh" });
       }
 
@@ -481,13 +533,82 @@ const authController = {
       res.status(500).json({ message: "Lỗi server", error: error.message });
     }
   },
+  forgotPassword: async (req, res) => {
+    const { email } = req.body;
+    try {
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "No account found with that email" });
+      }
+
+      // Kiểm tra thời gian gửi yêu cầu gần đây
+      if (user.resetPasswordExpires && user.resetPasswordExpires > Date.now()) {
+        return res.status(400).json({
+          message:
+            "A password reset request has already been sent. Please try again later.",
+        });
+      }
+
+      const token = crypto.randomBytes(32).toString("hex");
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      user.resetPasswordToken = hashedToken;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 giờ
+      await user.save();
+
+      await sendPasswordResetEmail(user.email, token);
+
+      res.status(200).json({ message: "Password reset email sent." });
+    } catch (err) {
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const { password, token } = req.body;
+      if (!password || !token) {
+        return res
+          .status(400)
+          .json({ message: "Password and token are required" });
+      }
+
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+      const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+
+      if (!user) {
+        return res.status(400).json({ message: "Token đã hết hạn !!" });
+      }
+
+      user.password = password;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      res.status(200).json({ message: "Đặt lại mật khẩu thành công" });
+    } catch (error) {
+      console.error("Lỗi đặt lại mật khẩu:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
 
   resendEmail: async (req, res) => {},
-
-  forgotPassword: async (req, res) => {},
-
-  resetPassword: async (req, res) => {},
-
   deleteUser: async (req, res) => {},
 };
 

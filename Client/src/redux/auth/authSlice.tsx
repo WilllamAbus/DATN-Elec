@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserProfile } from "../../types/user";
+import { UserProfile, ResetPassState, ForgotState } from "../../types/user";
 import {
   getProfileThunk,
   getListThunk,
@@ -8,8 +8,10 @@ import {
   restoreUserThunk,
   getDeletedListThunk,
   updateUserThunk,
-  verifyEmail,
-  getActiveListThunk, // Import thunk
+  verifyEmailThunk,
+  getActiveListThunk,
+  resetPasswordThunk,
+  forgotPasswordThunk, // Import thunk
 } from "./authThunk";
 // interface User {
 //   // Định nghĩa kiểu dữ liệu cho người dùng nếu cần
@@ -42,6 +44,13 @@ interface AuthState {
     successMessage: string | null;
     error: string | null;
   };
+  // passwordMail: {
+  //   status: "idle" | "loading" | "succeeded" | "failed";
+  //   message: string | null;
+  //   error: string | null;
+  // };
+  ForgotPassword: ForgotState;
+  ResetPassword: ResetPassState;
   EmailVerification: {
     message: string | null;
     status: "idle" | "loading" | "succeeded" | "failed";
@@ -96,7 +105,16 @@ const initialState: AuthState = {
     status: "idle",
     error: null,
   },
-
+  ForgotPassword: {
+    status: "idle",
+    message: "",
+    error: null,
+  },
+  ResetPassword: {
+    status: "idle",
+    message: "",
+    error: null,
+  },
   activeUsers: [],
   activeUsersStatus: "idle",
   activeUsersError: null,
@@ -297,15 +315,15 @@ const authSlice = createSlice({
         state.updateUserError =
           (action.payload as string) || "An unknown error occurred";
       })
-      .addCase(verifyEmail.pending, (state) => {
+      .addCase(verifyEmailThunk.pending, (state) => {
         state.EmailVerification.status = "loading";
         state.EmailVerification.error = null;
       })
-      .addCase(verifyEmail.fulfilled, (state, action) => {
+      .addCase(verifyEmailThunk.fulfilled, (state, action) => {
         state.EmailVerification.status = "succeeded";
         state.EmailVerification.message = action.payload;
       })
-      .addCase(verifyEmail.rejected, (state, action) => {
+      .addCase(verifyEmailThunk.rejected, (state, action) => {
         state.EmailVerification.status = "failed";
         state.EmailVerification.error = action.payload as string;
       })
@@ -358,6 +376,40 @@ const authSlice = createSlice({
         state.deletedUsersStatus = "failed";
         state.deletedUsersError =
           (action.payload as string) || "An unknown error occurred";
+      })
+      .addCase(forgotPasswordThunk.pending, (state) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "loading";
+        }
+      })
+      .addCase(forgotPasswordThunk.fulfilled, (state, action) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "succeeded";
+          state.ForgotPassword.message = action.payload;
+        }
+      })
+      .addCase(forgotPasswordThunk.rejected, (state, action) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "failed";
+          state.ForgotPassword.error = action.payload as string;
+        }
+      })
+      .addCase(resetPasswordThunk.pending, (state) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "loading";
+        }
+      })
+      .addCase(resetPasswordThunk.fulfilled, (state, action) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "succeeded";
+          state.ForgotPassword.message = action.payload;
+        }
+      })
+      .addCase(resetPasswordThunk.rejected, (state, action) => {
+        if (state.ForgotPassword) {
+          state.ForgotPassword.status = "failed";
+          state.ForgotPassword.error = action.payload as string;
+        }
       });
   },
 });

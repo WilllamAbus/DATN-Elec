@@ -11,9 +11,10 @@ const userSchema = new Schema(
     birthday: { type: Date, require: true },
     gender: { type: String, enum: ["Nam", "Nữ"] },
     phone: { type: String, require: true },
-    VerifiedEmail: { type: Boolean, default: false },
-    emailVerificationToken: String,
-    emailVerificationExpires: Date,
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     avatar: String,
