@@ -104,7 +104,7 @@ export class SanboxPayment {
           localStorage.setItem('paymentExpirationTime', expirationTime.toString());
 
           // Hiển thị thông báo về thời gian hiệu lực của QR code
-          alert("Please complete the payment within 10 minutes.");
+        
 
           console.log("Redirecting to MoMo payment page...");
           window.location.href = result.payUrl;

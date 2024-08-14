@@ -129,7 +129,7 @@ const ProductDetail: React.FC = () => {
         cart.push({
           id: product._id,
           name: product.name,
-          price: product.price,
+          price: product.price* (1 - product?.discount / 100),
           quantity,
           imgPreview
       });

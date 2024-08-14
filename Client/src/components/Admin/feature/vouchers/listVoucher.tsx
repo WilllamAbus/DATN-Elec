@@ -1,13 +1,14 @@
 // DiscountList.tsx
-import React, { useEffect} from 'react';
+import React, { useEffect, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store'; // Import your RootState type
-import { fetchVouchers} from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
+import { fetchVouchers,softDeleteVoucherThunk} from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
 // Import your custom Alert component
 import { Link } from 'react-router-dom';
-// import Swal, { SweetAlertResult } from "sweetalert2";
-// import withReactContent from "sweetalert2-react-content";
-// const MySwal = withReactContent(Swal);
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { Voucher } from '../../../../types/Voucher.d';
+const MySwal = withReactContent(Swal);
 const formatPrices = (price: number): string => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'decimal',
@@ -18,43 +19,46 @@ const formatPrices = (price: number): string => {
 const DiscountList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const { vouchers, loading, error } = useSelector((state: RootState) => state.voucher);
-  
+  const [, setVoucher] = useState<Voucher[]>(vouchers);
   
     useEffect(() => {
       dispatch(fetchVouchers());
     }, [dispatch]);
   
-    // const handleDelete = async (id: string) => {
-    //   MySwal.fire({
-    //     title: "Xóa mã giảm giá?",
-    //     text: "Bạn có chắc muốn xóa dòng này không!",
-    //     icon: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonColor: "#3085d6",
-    //     cancelButtonColor: "#d33",
-    //     confirmButtonText: "Có",
-    //     cancelButtonText: "Hủy",
-    //   }).then(async (result: SweetAlertResult) => {
-    //     if (result.isConfirmed) {
-    //       try {
-    //         await dispatch(deleteVoucher(id)).unwrap();
-        
-    //         MySwal.fire({
-    //           title: "Đã xóa!",
-    //           text: "Mã giảm giá  đã  xóa.",
-    //           icon: "success",
-    //         });
-    //       } catch (error) {
-    //         console.error("Error deleting product:", error);
-    //         MySwal.fire({
-    //           title: "Lỗi!",
-    //           text: "Đã xảy ra sự cố ",
-    //           icon: "error",
-    //         });
-    //       }
-    //     }
-    //   });
-    // };
+    const handleSoftDelete = async (id: string) => {
+      MySwal.fire({
+        title: "Xóa mã giảm giá?",
+        text: "Bạn có chắc muốn xóa dòng này không!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có",
+        cancelButtonText: "Hủy",
+      }).then(async (result: SweetAlertResult) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(softDeleteVoucherThunk(id)).unwrap();
+          dispatch(fetchVouchers());
+    setVoucher((prevVoucher) =>
+      prevVoucher.filter(vouchers=> vouchers._id !== id)  // Use `voucher._id` instead of `_id`
+    );
+            MySwal.fire({
+              title: "Đã xóa!",
+              text: "Mã giảm giá  đã  xóa.",
+              icon: "success",
+            });
+          } catch (error) {
+            console.error("Error deleting product:", error);
+            MySwal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra sự cố ",
+              icon: "error",
+            });
+          }
+        }
+      });
+    };
   
     if (loading) {
       return <p>Loading...</p>;
@@ -103,12 +107,15 @@ const DiscountList: React.FC = () => {
                     </span>
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">
-                    {/* <button
-                      className="cta-btn btn text-red-500"
-                      onClick={() => handleDelete(voucher._id)}
+                    <button
+                      className="focus:outline-none text-white bg-red-700
+             hover:bg-red-800 focus:ring-4 focus:ring-red-300 
+             font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2
+              dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                      onClick={() => handleSoftDelete(voucher._id)}
                     >
                       Xoá
-                    </button> */}
+                    </button>
                     <Link to={`/admin/editVouchers/${voucher._id}`}
                     className="focus:outline-none
              text-white
