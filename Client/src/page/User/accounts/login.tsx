@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserHeader from "../../../components/User/header";
 import UserNav from "../../../components/User/navbar";
@@ -27,6 +27,14 @@ const Login: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/profile");
+    }
+  }, [navigate]);
+
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
     setMessage(null);

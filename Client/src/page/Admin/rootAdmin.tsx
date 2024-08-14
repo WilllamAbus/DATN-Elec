@@ -69,6 +69,7 @@ const Admin: React.FC = () => {
   const profileError = useSelector(
     (state: RootState) => state.auth.profile.error
   );
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -97,13 +98,18 @@ const Admin: React.FC = () => {
     return <Navigate to="/login" />;
   }
 
-  if (role !== "admin" || profileStatus === "loading") {
+  if (role !== "admin") {
+    return <Navigate to="/" />;
+  }
+
+  if (profileStatus === "loading") {
     return <p>Loading...</p>;
   }
 
   if (profileStatus === "failed") {
     return <p>Error: {profileError}</p>;
   }
+
   return (
     <>
       <AdminStyleSheet />

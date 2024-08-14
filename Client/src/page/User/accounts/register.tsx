@@ -22,14 +22,13 @@ const Register: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   // const navigate = useNavigate();
-  const dispatch = useAppDispatch(); // Hook để gọi dispatch từ Redux
+  const dispatch = useAppDispatch();
 
   const handleRegister: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
     setMessage(null);
 
     try {
-      // Gọi dispatch để thực thi thunk
       const resultAction = await dispatch(
         registerUserThunk({
           email: data.email,
@@ -45,7 +44,6 @@ const Register: React.FC = () => {
         };
         setMessage(message || "Đăng ký thành công.");
       } else {
-        // Lấy thông báo lỗi từ payload hoặc dùng thông báo lỗi mặc định
         setMessage(
           (resultAction.payload as string) || "Đã xảy ra lỗi khi đăng ký."
         );

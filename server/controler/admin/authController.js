@@ -57,11 +57,30 @@ exports.add = async (req, res) => {
 //   }
 // };
 
+// exports.list = async (req, res) => {
+//   try {
+//     const ListUser = await modelUser.find({ status: "active" });
+//     res.status(200).json(ListUser);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server errors" });
+//   }
+// };
+
 exports.list = async (req, res) => {
   try {
-    const ListUser = await modelUser.find({ status: "active" });
-    res.status(200).json(ListUser);
+    const listUsers = await modelUser
+      .find({ status: "active" })
+      .populate("roles");
+    const userRole = listUsers.map((user) => {
+      const roleNames = user.roles.map((role) => role.name);
+      return {
+        ...user.toObject(),
+        roles: roleNames,
+      };
+    });
+    res.status(200).json(userRole);
   } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server errors" });
   }
 };
@@ -107,15 +126,52 @@ exports.softDelete = async (req, res) => {
   }
 };
 
-// Lấy danh sách các tài khoản đã xóa mềm
-exports.deletedList = async (req, res) => {
+exports.list = async (req, res) => {
   try {
-    const deleteListUser = await modelUser.find({ status: "disable" });
-    res.status(200).json(deleteListUser);
+    const listUsers = await modelUser
+      .find({ status: "active" })
+      .populate("roles");
+    const userRole = listUsers.map((user) => {
+      const roleNames = user.roles.map((role) => role.name);
+      return {
+        ...user.toObject(),
+        roles: roleNames,
+      };
+    });
+    res.status(200).json(userRole);
   } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server errors" });
   }
 };
+
+// exports.deletedList = async (req, res) => {
+//   try {
+//     const deleteListUser = await modelUser.find({ status: "disable" });
+//     res.status(200).json(deleteListUser);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server errors" });
+//   }
+// };
+exports.deletedList = async (req, res) => {
+  try {
+    const deleteListUser = await modelUser
+      .find({ status: "disable" })
+      .populate("roles");
+    const userRole = deleteListUser.map((user) => {
+      const roleNames = user.roles.map((role) => role.name);
+      return {
+        ...user.toObject(),
+        roles: roleNames,
+      };
+    });
+    res.status(200).json(userRole);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server errors" });
+  }
+};
+
 // Khôi phục danh mục đã xóa mềm
 exports.restore = async (req, res) => {
   try {

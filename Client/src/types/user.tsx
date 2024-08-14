@@ -64,3 +64,7 @@ export interface UpdateUser {
   avatar: string;
   address: string;
 }
+export interface Role {
+  _id: string;
+  name: string;
+}

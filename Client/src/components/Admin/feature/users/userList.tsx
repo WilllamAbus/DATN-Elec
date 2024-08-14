@@ -93,6 +93,9 @@ const UserList: React.FC = () => {
                   Email
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                  Vai Trò
+                </th>
+                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
                   Ảnh
                 </th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
@@ -115,6 +118,9 @@ const UserList: React.FC = () => {
                     </td>
                     <td className="py-4 px-6 border-b border-grey-light">
                       {user.email}
+                    </td>
+                    <td className="py-4 px-6 border-b border-grey-light">
+                      {user.roles.join(", ")}
                     </td>
                     <td className="py-4 px-6 border-b border-grey-light">
                       <img

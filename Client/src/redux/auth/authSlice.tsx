@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserProfile, ResetPassState, ForgotState } from "../../types/user";
+import {
+  UserProfile,
+  Role,
+  ResetPassState,
+  ForgotState,
+} from "../../types/user";
 import {
   getProfileThunk,
   getListThunk,
@@ -23,8 +28,8 @@ import {
 //   status: string;
 // }
 interface AuthState {
-  roles: {
-    roles: string[] | null;
+  role: {
+    roles: Role[];
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
   };
@@ -87,10 +92,14 @@ interface AuthState {
   restoreUserError: string | null;
   updateUserStatus: "idle" | "loading" | "succeeded" | "failed";
   updateUserError: string | null;
+
+  roles: string[] | null;
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
 }
 
 const initialState: AuthState = {
-  roles: {
+  role: {
     roles: [],
     status: "idle",
     error: null,
@@ -147,6 +156,10 @@ const initialState: AuthState = {
   activeUsers: [],
   activeUsersStatus: "idle",
   activeUsersError: null,
+
+  roles: null,
+  status: "idle",
+  error: null,
 
   users: [],
   deletedUsers: [],
@@ -462,20 +475,41 @@ const authSlice = createSlice({
         state.profile.error = action.payload as string;
       })
       .addCase(getlistRoleThunk.pending, (state) => {
-        state.roles.status = "loading";
-        state.roles.error = null;
+        if (state.role) {
+          state.role.status = "loading";
+          state.role.error = null;
+        }
       })
       .addCase(
         getlistRoleThunk.fulfilled,
-        (state, action: PayloadAction<any[]>) => {
-          state.roles.status = "succeeded";
-          state.roles.roles = action.payload;
+        (state, action: PayloadAction<Role[]>) => {
+          if (state.role) {
+            state.role.status = "succeeded";
+            state.role.roles = action.payload;
+          }
         }
       )
       .addCase(getlistRoleThunk.rejected, (state, action) => {
-        state.roles.status = "failed";
-        state.roles.error = action.payload as string;
+        if (state.role) {
+          state.role.status = "failed";
+          state.role.error = action.payload as string;
+        }
       });
+    // .addCase(getlistRoleThunk.pending, (state) => {
+    //   state.status = "loading";
+    //   state.error = null;
+    // })
+    // .addCase(
+    //   getlistRoleThunk.fulfilled,
+    //   (state, action: PayloadAction<string[]>) => {
+    //     state.status = "succeeded";
+    //     state.roles = action.payload;
+    //   }
+    // )
+    // .addCase(getlistRoleThunk.rejected, (state, action) => {
+    //   state.status = "failed";
+    //   state.error = action.payload as string;
+    // });
   },
 });
 

@@ -22,7 +22,7 @@ import {
   getUserById,
   listRole,
 } from "../../services/authentication/authAdmin";
-import { UserProfile } from "../../types/user";
+import { Role, UserProfile } from "../../types/user";
 interface LoginResponse {
   status: number;
   message: string;
@@ -266,7 +266,7 @@ export const getActiveListThunk = createAsyncThunk(
 );
 
 //Thunk list role
-export const getlistRoleThunk = createAsyncThunk(
+export const getlistRoleThunk = createAsyncThunk<Role[]>(
   "auth/getlistRole",
   async (_, { rejectWithValue }) => {
     try {
