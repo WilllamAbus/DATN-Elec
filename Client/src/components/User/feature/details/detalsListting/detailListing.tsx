@@ -101,11 +101,11 @@ const ProductDetail: React.FC = () => {
     //     fetchData();
     // }, [id]);
 
-    const calculatePrice = () => {
-        if (!product) return 0;
-        const basePrice = product.price * (1 - product.discount / 100);
-        return basePrice 
-    };
+    // const calculatePrice = () => {
+    //     if (!product) return 0;
+    //     const basePrice = product.price * (1 - product.discount / 100);
+    //     return basePrice 
+    // };
 
 
     const addToCart = () => {
@@ -201,11 +201,27 @@ const ProductDetail: React.FC = () => {
               {product?.quantity > 0 ?<span className="text-green-600">Còn Hàng</span>:  <span className="text-red-600">Hết Hàng</span>}
                 </p>
           </div>
-            <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
-          <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
-          <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)} VNĐ</p>
-            </div>
-
+          <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+          {product?.discount > 1 ? (
+                <div>
+                    <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product?.price * (1 - product?.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product?.price)} VNĐ
+                    </p>
+                </div>
+            ) : (
+                <p className="text-xl text-primary font-semibold">
+                    {formatCurrency(product?.price)} VNĐ
+                </p>
+            )}
+          </div>
+            {/* <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
+         
+            </div> */}
+ {/* <p className="text-xl text-primary font-semibold">{formatCurrency(calculatePrice())} VNĐ</p>
+          <p className="text-base text-gray-400 line-through">{formatCurrency(product?.price)} VNĐ</p> */}
              <p className="mt-4 text-gray-600"></p>
 
       <div className="pt-4">
@@ -232,22 +248,7 @@ const ProductDetail: React.FC = () => {
                   <label htmlFor="size-xl" className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">XL</label>
               </div>
           </div>
-          {/* <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
-          {product?.discount > 1 ? (
-                <div>
-                    <p className="text-xl text-primary font-semibold">
-                        {formatCurrency(product?.price * (1 - product?.discount / 100))} VNĐ
-                    </p>
-                    <p className="text-sm text-gray-400 line-through">
-                        {formatCurrency(product?.price)}
-                    </p>
-                </div>
-            ) : (
-                <p className="text-xl text-primary font-semibold">
-                    {formatCurrency(product?.price)} VNĐ
-                </p>
-            )}
-          </div> */}
+        
         </div>
           <p className="mt-4 text-gray-600"></p>
 
