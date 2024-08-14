@@ -14,7 +14,7 @@ interface IFormInput {
   createdAt: string;
   quantity: number;
   categoryId: string;
-  weight?: number;
+  weight: number;
   brand?: string;
   color?: string;
   description?: string;
@@ -104,6 +104,22 @@ const EditProduct: React.FC = () => {
       }
     }
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+      e.preventDefault();
+    }
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData('Text');
+    if (!/^\d+$/.test(pastedData)) {
+      e.preventDefault();
+    }
+  };
   const onSubmit = async (data: IFormInput) => {
     if (id) {
       try {
@@ -162,7 +178,7 @@ const EditProduct: React.FC = () => {
                     {...register("name", {
                       required: {
                         value: true,
-                        message: "tài khoản không được để trống",
+                        message: "Tên không được để trống",
                       },
                       minLength: {
                         value: 5,
@@ -179,8 +195,15 @@ const EditProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="price"
-                    type="number"
-                    {...register("price", { required: "Price is required" })}
+                    type="text"
+                    {...register("price", { 
+                      required: "Giá không được bỏ trống",
+                      min: { value: 0.001, message: "Giá sản phẩm phải lớn hơn 0.000" },
+                      validate: value => !isNaN(value) || "Giá sản phẩm phải là số"
+                    })}
+                    onKeyDown={handleKeyDown}
+                    onInput={handleInput}
+                    onPaste={handlePaste}
                   />
                   {errors.price && (
                     <span className="text-red-500 text-xs italic">{errors.price.message?.toString()}</span>
@@ -194,8 +217,16 @@ const EditProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="quantity"
-                    type="number"
-                    {...register("quantity", { required: "Số lượng không được bỏ trống" })}
+                    type="text"
+                    {...register("quantity", 
+                      { required: "Số lượng không được bỏ trống" ,
+                         min: { value: 11, message: "Số lượng phải lớn hơn 11" },
+                      validate: value => !isNaN(value) || "Số lượng sản phẩm phải là số"
+                    
+                      })}
+                      onKeyDown={handleKeyDown}
+                      onInput={handleInput}
+                      onPaste={handlePaste}
                   />
                   {errors.quantity && (
                     <span className="text-red-500 text-xs italic">{errors.quantity.message?.toString()}</span>
@@ -240,8 +271,14 @@ const EditProduct: React.FC = () => {
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="weight"
-                    type="number"
-                    {...register("weight")}
+                    type="text"
+                    {...register("weight", 
+                      { required: "Khối lượng không được bỏ trống" ,
+                          validate: value => !isNaN(value) || "Khối lượng sản phẩm phải là số"
+                  })}
+                  onKeyDown={handleKeyDown}
+                  onInput={handleInput}
+                  onPaste={handlePaste}
                   />
                   {errors.weight && (
                     <span className="text-red-500 text-xs italic">{errors.weight.message?.toString()}</span>

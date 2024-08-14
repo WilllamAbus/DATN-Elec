@@ -15,19 +15,19 @@ const completePage: React.FC = () => {
         selectedVoucher: undefined,
       });
       const [grandTotal, setGrandTotal] = useState<number>(0);
-      const [, setVoucher] = useState<{
-        code: string;
-        discount: number;
-      } | null>(null);
+      // const [, setVoucher] = useState<{
+      //   code: string;
+      //   discount: number;
+      // } | null>(null);
     
       const navigate = useNavigate();
       useEffect(() => {
         // Retrieve cart items from localStorage
         const storedCartItems = localStorage.getItem("cart");
         const storedGrandTotal = localStorage.getItem("grandTotal");
-        const storedVoucher = JSON.parse(
-          localStorage.getItem("selectedVoucher") || "null"
-        );
+        // const storedVoucher = JSON.parse(
+        //   localStorage.getItem("selectedVoucher") || "null"
+        // );
         if (storedCartItems) {
           const items: CartItem[] = JSON.parse(storedCartItems);
           setCartState(prevState => ({
@@ -40,9 +40,9 @@ const completePage: React.FC = () => {
         if (storedGrandTotal) {
           setGrandTotal(JSON.parse(storedGrandTotal));
         }
-        if (storedVoucher) {
-          setVoucher(JSON.parse(storedVoucher));
-        }
+        // if (storedVoucher) {
+        //   setVoucher(JSON.parse(storedVoucher));
+        // }
       }, []);
     
       const calculateTotalPrice = (items: CartItem[]): number => {

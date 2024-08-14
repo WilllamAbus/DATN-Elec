@@ -14,7 +14,7 @@ interface IFormInput {
   createdAt: string;
   quantity: number;
   categoryid: string;
-  weight?: number;
+  weight: number;
   brand?: string;
   color?: string;
   description?: string;
@@ -227,8 +227,8 @@ const AddProduct: React.FC = () => {
                     id="weight"
                     type="text"
                     {...register("weight", 
-                      { required: "Số lượng không được bỏ trống" ,
-                    
+                      { required: "Khối lượng không được bỏ trống" ,
+                          validate: value => !isNaN(value) || "Khối lượng sản phẩm phải là số"
                   })}
                   onKeyDown={handleKeyDown}
                   onInput={handleInput}

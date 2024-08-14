@@ -68,8 +68,7 @@ const ListOrders: React.FC = () => {
            
               <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">EMAIL</th>
              
-              <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">VẬN CHUYỂN</th>
-              <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">PTTT</th>
+              <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">NGƯỜI NHẬN</th>
               <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">TRẠNG THÁI</th>
               <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÀNH ĐỘNG</th>
             </tr>
@@ -88,13 +87,10 @@ const ListOrders: React.FC = () => {
             {orders.map((order) => (
               <tr key={order._id || 'no-id'} className="hover:bg-grey-lighter">
                
-             
+               
                 <td className="py-4 px-6 border-b border-grey-light">{order.userId?.map(user => user.email).join(', ')}</td>
               
-                <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shipping?.address || 'N/A'} {/* Replace 'address' with the correct property if needed */}
-                </td>
-                <td className="py-4 px-6 border-b border-grey-light">{order.payment?.method}</td>
+                <td className="py-4 px-6 border-b border-grey-light">{order.shipping?.name}</td>
                 <td className="py-4 px-6 border-b border-grey-light">
           <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
             {order?.status === "active" ? "Hiển thị" : "Đã ẩn"}
@@ -102,7 +98,10 @@ const ListOrders: React.FC = () => {
         </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                 <button
-            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            className="focus:outline-none text-white bg-red-700
+             hover:bg-red-800 focus:ring-4 focus:ring-red-300 
+             font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2
+              dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
             onClick={() => order._id && handlesoftDeleteOrder(order._id)}
           >
             Xoá
@@ -125,6 +124,8 @@ const ListOrders: React.FC = () => {
         </table>
       </div>
     </div>
+
+ 
   </main>
   );
 };
