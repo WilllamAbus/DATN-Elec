@@ -129,7 +129,7 @@ const DiscountListRestore: React.FC = () => {
                   <td className="py-4 px-6 border-b border-grey-light">{formatPrices(voucher.voucherNum)}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">{voucher.expiryDate}</td> 
                   <td className="py-4 px-6 border-b border-grey-light">
-                    {voucher.cateReady.map((category, index) => (
+                    {voucher.cateReady?.map((category, index) => (
                       <div key={index}>{category.name}</div>
                     ))}
                   </td>

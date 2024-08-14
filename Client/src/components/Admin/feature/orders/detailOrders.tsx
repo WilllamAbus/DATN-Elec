@@ -36,8 +36,11 @@ const OrderDetails: React.FC = () => {
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">SỐ LƯỢNG</th>
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">PTTT</th>
                   <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">EMAIL</th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">SHIPPING</th>
-               
+                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">VẬN CHUYỂN</th>
+                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">NGƯỜI NHẬN</th>
+                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">THÀNH PHỐ</th>
+                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÌNH THỨC VẬN CHUYỂN</th>
+                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">TRẠNG THÁI</th>
                  
                 </tr>
               </thead>
@@ -61,7 +64,14 @@ const OrderDetails: React.FC = () => {
                     {currentOrder.userId?.map((user: { email: string }) => user.email).join(', ')}
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">{currentOrder.shipping?.address || 'N/A'}</td>
-               
+                  <td className="py-4 px-6 border-b border-grey-light">{currentOrder.shipping?.name || 'N/A'}</td>
+                  <td className="py-4 px-6 border-b border-grey-light">{currentOrder.shipping?.city || 'N/A'}</td>
+                  <td className="py-4 px-6 border-b border-grey-light">{currentOrder.shipping?.formatShipping?.type || 'N/A'}</td>
+                  <td className="py-4 px-6 border-b border-grey-light">
+          <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+            {currentOrder?.status === "active" ? "Hiển thị" : "Đã ẩn"}
+          </span>
+        </td>
                 
               
                 </tr>
@@ -70,6 +80,16 @@ const OrderDetails: React.FC = () => {
           </div>
         )}
       </div>
+
+      <div className="mt-6 flex gap-2">
+     
+     <button
+       className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
+       type="submit"
+     >
+       <a href="/admin/listOrders">Trở lại</a>
+     </button>
+   </div>
     </main>
   );
 };
