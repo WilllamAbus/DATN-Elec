@@ -9,6 +9,7 @@ const {
   getOne,
   update,
   list,
+  listRole,
 } = require("../../../controler/admin/authController");
 const middlewareController = require("../../../middleware/auth");
 const upload = require("../../../middleware/multer.middle");
@@ -22,6 +23,7 @@ router.patch(
 router.patch("/restore/:id", restore);
 router.get("/deleted", deletedList);
 router.get("/list", list);
+router.get("/listRole", listRole);
 router.get("/get-one/:id", getOne);
 router.put(
   "/edit/:id",

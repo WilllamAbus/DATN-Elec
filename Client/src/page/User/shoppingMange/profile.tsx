@@ -155,7 +155,6 @@ const ProfileUse: React.FC = () => {
             </div>
             <div className="space-y-1 pl-8 pt-4">
               <Link
-               
                 to="/listCart"
                 className="relative hover:text-primary block font-medium capitalize transition"
               >

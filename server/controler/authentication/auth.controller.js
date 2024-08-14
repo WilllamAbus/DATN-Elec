@@ -607,8 +607,6 @@ const authController = {
       res.status(500).json({ message: "Server error" });
     }
   },
-
-  deleteUser: async (req, res) => {},
 };
 
 module.exports = authController;

@@ -1,4 +1,5 @@
 const modelUser = require("../../model/users.model");
+const modelRole = require("../../model/role.model");
 const bcrypt = require("bcryptjs");
 const { v4: uuidv4 } = require("uuid");
 const serviceAccount = require("../authentication/authFirebase.json");
@@ -90,14 +91,13 @@ exports.softDelete = async (req, res) => {
         status: "disable",
         disabledAt: now, // Lưu thời gian disable
       },
-      { new: true, runValidators: true } // Thêm tùy chọn runValidators nếu cần
+      { new: true, runValidators: true }
     );
 
     if (!softDeleteUser) {
       return res.status(404).json({ message: "Không tìm thấy danh mục" });
     }
 
-    // Kiểm tra xem thời gian disable có được set không
     console.log("Updated User:", softDeleteUser);
 
     res.status(200).json(softDeleteUser);
@@ -145,33 +145,6 @@ exports.getOne = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
-
-// exports.update = async (req, res) => {
-//   const {  password, name, avatar, roles, birthday,  } = req.body;
-//   const id = req.params.id;
-
-//   try {
-//     let user = await modelUser.findById(id);
-//     if (!user) {
-//       return res.status(404).json({ message: "Không tìm thấy người dùng" });
-//     }
-
-//     if (name) user.name = name;
-//     if (avatar) user.avatar = avatar;
-//     if (roles) user.roles = roles;
-
-//     if (password) {
-//       const salt = await bcrypt.genSalt(10);
-//       user.password = await bcrypt.hash(password, salt);
-//     }
-
-//     const updatedUser = await user.save();
-//     res.status(200).json(updatedUser);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Lỗi server" });
-//   }
-// };
 
 exports.update = async (req, res) => {
   try {
@@ -239,5 +212,15 @@ exports.update = async (req, res) => {
       message: "Server error updating user profile",
       error: error.message,
     });
+  }
+};
+
+//lay danh sách roles
+exports.listRole = async (req, res) => {
+  try {
+    const listRole = await modelRole.find({});
+    res.status(200).json(listRole);
+  } catch (error) {
+    res.status(500).json({ message: "Server errors" });
   }
 };

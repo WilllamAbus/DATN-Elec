@@ -1,10 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  UserProfile,
-  ResetPassState,
-  ForgotState,
-  UpdateUser,
-} from "../../types/user";
+import { UserProfile, ResetPassState, ForgotState } from "../../types/user";
 import {
   getProfileThunk,
   getListThunk,
@@ -57,8 +52,8 @@ interface AuthState {
     status: "idle" | "pending" | "succeeded" | "failed";
   };
   fetchUser: {
+    user: UserProfile | null;
     status: "idle" | "loading" | "succeeded" | "failed";
-    profile: UpdateUser | null;
     error: string | null;
   };
 
@@ -134,8 +129,8 @@ const initialState: AuthState = {
     error: null,
   },
   fetchUser: {
+    user: null,
     status: "idle",
-    profile: null,
     error: null,
   },
   activeUsers: [],
@@ -324,19 +319,6 @@ const authSlice = createSlice({
         state.restoreUserError =
           (action.payload as string) || "An unknown error occurred";
       })
-      .addCase(updateUserThunk.pending, (state) => {
-        state.updateUserStatus = "loading";
-        state.updateUserError = null;
-      })
-      .addCase(updateUserThunk.fulfilled, (state) => {
-        state.updateUserStatus = "succeeded";
-        state.updateUserError = null;
-      })
-      .addCase(updateUserThunk.rejected, (state, action) => {
-        state.updateUserStatus = "failed";
-        state.updateUserError =
-          (action.payload as string) || "An unknown error occurred";
-      })
       .addCase(verifyEmailThunk.pending, (state) => {
         state.EmailVerification.status = "loading";
         state.EmailVerification.error = null;
@@ -438,19 +420,34 @@ const authSlice = createSlice({
           (action.payload as string) || "An unknown error occurred";
       })
       .addCase(fetchUserById.pending, (state) => {
-        state.fetchUser.status = "loading";
+        state.profile.status = "loading";
       })
       .addCase(
         fetchUserById.fulfilled,
         (state, action: PayloadAction<UserProfile>) => {
-          state.fetchUser.status = "succeeded";
-          state.fetchUser.profile = action.payload;
-          state.fetchUser.error = null;
+          state.profile.status = "succeeded";
+          state.profile.profile = action.payload;
+          state.profile.error = null;
         }
       )
       .addCase(fetchUserById.rejected, (state, action) => {
-        state.fetchUser.status = "failed";
-        state.fetchUser.error = action.payload as string;
+        state.profile.status = "failed";
+        state.profile.error = action.payload as string;
+      })
+      .addCase(updateUserThunk.pending, (state) => {
+        state.profile.status = "loading";
+      })
+      .addCase(
+        updateUserThunk.fulfilled,
+        (state, action: PayloadAction<UserProfile>) => {
+          state.profile.status = "succeeded";
+          state.profile.profile = action.payload;
+          state.profile.error = null;
+        }
+      )
+      .addCase(updateUserThunk.rejected, (state, action) => {
+        state.profile.status = "failed";
+        state.profile.error = action.payload as string;
       });
   },
 });

@@ -73,7 +73,7 @@ export const updateUser = async (
 };
 export const getUserById = async (userId: string) => {
   try {
-    const response = await instance.get(`${API_URL}/get-one/${userId}`);
+    const response = await instance.get(`${API_URL}/admin/get-one/${userId}`);
     return response.data;
   } catch (error) {
     throw new Error((error as Error).message);
