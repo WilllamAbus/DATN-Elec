@@ -256,15 +256,15 @@
 
 // export default editUser;
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch,  } from "react-redux";
 import { useLocation } from "react-router-dom";
 import {
   fetchUserById,
   updateUserThunk,
 } from "../../../../redux/auth/authThunk";
 import "../../../../assets/css/admin.style.css";
-import { AppDispatch, RootState } from "../../../../redux/store";
-import moment from "moment";
+import { AppDispatch, } from "../../../../redux/store";
+// import moment from "moment";
 import { UserProfile } from "../../../../types/user";
 import axios from "axios";
 
@@ -299,9 +299,9 @@ const AdminEditUser = () => {
     fetchProfile();
   }, [userId, dispatch]);
 
-  const birthday = localProfile?.birthday
-    ? moment(localProfile.birthday).format("YYYY-MM-DD")
-    : "";
+  // const birthday = localProfile?.birthday
+  //   ? moment(localProfile.birthday).format("YYYY-MM-DD")
+  //   : "";
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
