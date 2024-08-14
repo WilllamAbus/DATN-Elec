@@ -8,7 +8,9 @@ import axios from "axios";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useForm, SubmitHandler } from "react-hook-form";
-
+import { notify } from "../../../../ultils/success";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const MySwal = withReactContent(Swal);
 
 interface Comment {
@@ -167,7 +169,8 @@ const ListComment: React.FC = () => {
       const response = await postRepComment(selectedCommentId,commentData);
       console.log("Comment submitted:", response.data);
       reset();
-      alert("Comment submitted successfully!");
+      notify()
+      // alert("Comment submitted successfully!");
       window.location.reload();
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -191,6 +194,7 @@ const ListComment: React.FC = () => {
           <p className="text-xl pb-3 flex items-center">
             <i className="fas fa-list mr-3"></i> DANH SÁCH BÌNH LUẬN
           </p>
+          <ToastContainer/>
           <div className="bg-white">
             <table className="text-left w-full border-collapse">
               <thead>

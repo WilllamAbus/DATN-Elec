@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../redux/store';
-import { fetchVouchers, softDeleteVoucherThunk } from '../../redux/discount/voucherThunk';
+import { fetchVouchers } from '../../redux/discount/voucherThunk';
 import { Voucher } from '../../types/Voucher.d'; // Ensure this path is correct
 
 interface ModalProps {
@@ -21,7 +21,7 @@ const Modal: React.FC<ModalProps> = ({ onVoucherApply }) => {
 
   const dispatch: AppDispatch = useDispatch();
   const { vouchers, loading, error } = useSelector((state: RootState) => state.voucher);
-  const [, setVoucher] = useState<Voucher[]>(vouchers);
+  
   useEffect(() => {
     dispatch(fetchVouchers());
   }, [dispatch]);
@@ -39,11 +39,8 @@ const Modal: React.FC<ModalProps> = ({ onVoucherApply }) => {
   const handleApplyVoucher = async (voucher: Voucher) => {
    try {
     onVoucherApply(voucher);
-    await dispatch(softDeleteVoucherThunk(voucher._id)).unwrap();
-    dispatch(fetchVouchers());
-    setVoucher((prevVoucher) =>
-      prevVoucher.filter((v) => v._id !== voucher._id)  // Use `voucher._id` instead of `_id`
-    );
+    // await dispatch(softDeleteVoucherThunk(voucher._id)).unwrap();
+  
     closeModal();
    } catch (error) {
     console.error("Error deleting Voucher:", error);
