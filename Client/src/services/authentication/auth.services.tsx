@@ -174,6 +174,25 @@ export const registerUser = async (user: {
 
 //xác thực email
 
+// export const verifyEmail = async (token: string) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/auth/verifyEmail`, {
+//       params: { token },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       // Xử lý lỗi từ Axios
+//       throw new Error(
+//         `Error verifying email: ${error.response.data.message || error.message}`
+//       );
+//     } else if (error instanceof Error) {
+//       throw new Error(`Error verifying email: ${error.message}`);
+//     } else {
+//       throw new Error("Error verifying email: An unknown error occurred");
+//     }
+//   }
+// };
 export const verifyEmail = async (token: string) => {
   try {
     const response = await axios.get(`${API_URL}/auth/verifyEmail`, {
@@ -183,16 +202,20 @@ export const verifyEmail = async (token: string) => {
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       // Xử lý lỗi từ Axios
-      throw new Error(
+      console.error(
         `Error verifying email: ${error.response.data.message || error.message}`
       );
+      throw new Error(error.response.data.message || error.message);
     } else if (error instanceof Error) {
-      throw new Error(`Error verifying email: ${error.message}`);
+      console.error(`Error verifying email: ${error.message}`);
+      throw new Error(error.message);
     } else {
-      throw new Error("Error verifying email: An unknown error occurred");
+      console.error("Error verifying email: An unknown error occurred");
+      throw new Error("An unknown error occurred");
     }
   }
 };
+
 export const resendEmail = async (email: string) => {
   try {
     const response = await axios.post(`${API_URL}/resendEmail`, { email });

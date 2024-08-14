@@ -14,6 +14,7 @@ import {
   forgotPasswordThunk,
   resendEmailThunk,
   fetchUserById,
+  getlistRoleThunk,
 } from "./authThunk";
 // interface User {
 //   // Định nghĩa kiểu dữ liệu cho người dùng nếu cần
@@ -22,6 +23,11 @@ import {
 //   status: string;
 // }
 interface AuthState {
+  roles: {
+    roles: string[] | null;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
   login: {
     currentUser: string | null;
     isFetching: boolean;
@@ -84,6 +90,11 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
+  roles: {
+    roles: [],
+    status: "idle",
+    error: null,
+  },
   login: {
     currentUser: null,
     isFetching: false,
@@ -329,7 +340,8 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmailThunk.rejected, (state, action) => {
         state.EmailVerification.status = "failed";
-        state.EmailVerification.error = action.payload as string;
+        state.EmailVerification.error =
+          (action.payload as string) || "Đã xảy ra lỗi không xác định";
       })
 
       .addCase(getActiveListThunk.pending, (state) => {
@@ -448,6 +460,21 @@ const authSlice = createSlice({
       .addCase(updateUserThunk.rejected, (state, action) => {
         state.profile.status = "failed";
         state.profile.error = action.payload as string;
+      })
+      .addCase(getlistRoleThunk.pending, (state) => {
+        state.roles.status = "loading";
+        state.roles.error = null;
+      })
+      .addCase(
+        getlistRoleThunk.fulfilled,
+        (state, action: PayloadAction<any[]>) => {
+          state.roles.status = "succeeded";
+          state.roles.roles = action.payload;
+        }
+      )
+      .addCase(getlistRoleThunk.rejected, (state, action) => {
+        state.roles.status = "failed";
+        state.roles.error = action.payload as string;
       });
   },
 });

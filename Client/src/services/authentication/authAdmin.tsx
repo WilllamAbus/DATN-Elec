@@ -51,6 +51,12 @@ export const listActive = async () => {
 
   return response.data;
 };
+//list Role
+export const listRole = async () => {
+  const response = await instance.get(`${API_URL}/admin/listRole`);
+
+  return response.data;
+};
 // cập nhật thông tin người dùng
 export const updateUser = async (
   userId: string,

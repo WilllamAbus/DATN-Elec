@@ -31,52 +31,6 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 let refreshTokens = [];
 const authController = {
-  // registerUser: async (req, res) => {
-  //   try {
-  //     const userRole = await Role.findOne({ name: "user" });
-  //     if (!userRole) {
-  //       return res
-  //         .status(500)
-  //         .json({ message: "Không tìm thấy vai trò người dùng" });
-  //     }
-
-  //     const { email, password, name } = req.body;
-
-  //     const checkEmail = await User.findOne({ email });
-  //     if (checkEmail) {
-  //       return res.status(200).json({ message: "Email đã tồn tại" });
-  //     }
-
-  //     const newUser = new User({
-  //       email,
-  //       name,
-  //       password,
-  //       roles: [userRole._id],
-  //     });
-
-  //     const user = await newUser.save();
-  //     const token = crypto.randomBytes(32).toString("hex");
-  //     const hashedToken = crypto
-  //       .createHash("sha256")
-  //       .update(token)
-  //       .digest("hex");
-
-  //     user.emailVerificationToken = hashedToken;
-  //     user.emailVerificationExpires = Date.now() + 3600000; // 1 giờ
-  //     await sendVerificationEmail(user.email, token);
-  //     console.log("Token:", hashedToken);
-  //     console.log("Expires:", user.emailVerificationExpires);
-
-  //     return res
-  //       .status(200)
-  //       .json({ message: "Đăng ký thành công. Vui lòng kiểm tra Email" });
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res
-  //       .status(500)
-  //       .json({ message: "Server error", error: err.message });
-  //   }
-  // },
   registerUser: async (req, res) => {
     try {
       const userRole = await Role.findOne({ name: "user" });
@@ -143,7 +97,9 @@ const authController = {
       });
 
       if (!user) {
-        return res.status(400).json({ msg: "Token is invalid or has expired" });
+        return res
+          .status(400)
+          .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
       }
 
       user.isEmailVerified = true;
@@ -151,9 +107,9 @@ const authController = {
       user.emailVerificationExpires = undefined;
       await user.save();
 
-      res.status(200).json({ msg: "Email verified successfully" });
+      res.status(200).json({ message: "Email đã được xác minh thành công" });
     } catch (err) {
-      res.status(500).json({ msg: "Server error", error: err.message });
+      res.status(500).json({ message: "Server error", error: err.message });
     }
   },
 
@@ -211,47 +167,6 @@ const authController = {
     return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "30d" });
   },
 
-  // loginUser: async (req, res) => {
-  //   try {
-  //     const user = await User.findOne({ email: req.body.email }).populate(
-  //       "roles"
-  //     ); // Đảm bảo rằng trường roles được populate
-  //     if (!user) {
-  //       return res
-  //         .status(401)
-  //         .json({ msg: "Thông tin đăng nhập không chính xác" });
-  //     }
-
-  //     const validPassword = await user.comparePassword(
-  //       req.body.password,
-  //       user.password
-  //     );
-  //     if (!validPassword) {
-  //       return res
-  //         .status(401)
-  //         .json({ msg: "Thông tin đăng nhập không chính xác" });
-  //     }
-
-  //     const token = authController.generateToken(user);
-  //     const refreshToken = authController.generateRefreshToken(user);
-  //     refreshTokens.push(refreshToken);
-
-  //     res.cookie("refreshToken", refreshToken, {
-  //       httpOnly: true,
-  //       secure: true,
-  //       path: "/",
-  //       sameSite: "strict",
-  //     });
-
-  //     const { password, ...others } = user._doc;
-  //     // Return user info including roles
-  //     return res
-  //       .status(200)
-  //       .json({ ...others, accessToken: token, roles: user.roles });
-  //   } catch (err) {
-  //     return res.status(500).json({ msg: "Server error", error: err.message });
-  //   }
-  // },
   loginUser: async (req, res) => {
     try {
       const user = await User.findOne({ email: req.body.email }).populate(
@@ -370,39 +285,6 @@ const authController = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
-  // updateProfile: async (req, res) => {
-  //   const { name, birthday, gender, phone, address, avatar } = req.body;
-  //   const userId = req.user.id;
-
-  //   console.log("ID từ token:", userId);
-
-  //   console.log("Dữ liệu gửi lên:", req.body);
-
-  //   try {
-  //     let user = await User.findById(userId);
-  //     if (!user) {
-  //       return res.status(404).json({ message: "User not found" });
-  //     }
-
-  //     if (name) user.name = name;
-  //     if (birthday) user.birthday = birthday;
-  //     if (gender) user.gender = gender;
-  //     if (phone) user.phone = phone;
-  //     if (address) user.address = address;
-  //     if (avatar) user.avatar = avatar;
-
-  //     const updatedUser = await user.save();
-
-  //     // Gửi phản hồi thành công
-  //     return res.status(200).json({ msg: "Cập Nhật Thành Công" });
-  //   } catch (error) {
-  //     console.error("Server error updating user profile:", error);
-  //     return res.status(500).json({
-  //       msg: "Server error updating user profile",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
 
   updateProfile: async (req, res) => {
     try {
@@ -537,7 +419,7 @@ const authController = {
     const { email } = req.body;
     try {
       if (!email) {
-        return res.status(400).json({ message: "Email is required" });
+        return res.status(400).json({ message: "Email là bắt buộc" });
       }
 
       const user = await User.findOne({ email });
@@ -545,14 +427,12 @@ const authController = {
       if (!user) {
         return res
           .status(400)
-          .json({ message: "No account found with that email" });
+          .json({ message: "Email không tồn tại trên hệ thống" });
       }
 
-      // Kiểm tra thời gian gửi yêu cầu gần đây
       if (user.resetPasswordExpires && user.resetPasswordExpires > Date.now()) {
         return res.status(400).json({
-          message:
-            "A password reset request has already been sent. Please try again later.",
+          message: "Không được yêu cầu liên tục",
         });
       }
 
@@ -568,7 +448,7 @@ const authController = {
 
       await sendPasswordResetEmail(user.email, token);
 
-      res.status(200).json({ message: "Password reset email sent." });
+      res.status(200).json({ message: "Đã gửi email đặt lại mật khẩu." });
     } catch (err) {
       res.status(500).json({ message: "Server error", error: err.message });
     }

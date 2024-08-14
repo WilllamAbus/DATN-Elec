@@ -20,6 +20,7 @@ import {
   updateUser,
   listActive,
   getUserById,
+  listRole,
 } from "../../services/authentication/authAdmin";
 import { UserProfile } from "../../types/user";
 interface LoginResponse {
@@ -143,13 +144,25 @@ export const registerUserThunk = createAsyncThunk(
 );
 
 // xac thuc email
+// export const verifyEmailThunk = createAsyncThunk(
+//   "auth/verifyEmail",
+//   async (token: string) => {
+//     const response = await verifyEmailService(token);
+//     return response.message;
+//   }
+// );
 export const verifyEmailThunk = createAsyncThunk(
   "auth/verifyEmail",
-  async (token: string) => {
-    const response = await verifyEmailService(token);
-    return response.message;
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const response = await verifyEmailService(token);
+      return response.message;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
   }
 );
+
 export const forgotPasswordThunk = createAsyncThunk(
   "auth/forgotPassword",
   async (email: string, { rejectWithValue }) => {
@@ -210,7 +223,7 @@ export const updatePasswordThunk = createAsyncThunk(
 );
 export { logoutService };
 
-//////////////////ADMIN
+///////////////////////////////////////////////////////////////////////ADMIN////////////////////////////////////////////////
 export const softDeleteUserThunk = createAsyncThunk(
   "auth/softDeleteUser",
   async (userId: string, { rejectWithValue }) => {
@@ -252,8 +265,19 @@ export const getActiveListThunk = createAsyncThunk(
   }
 );
 
-//Thunk khôi phục đã xóa mềm
-
+//Thunk list role
+export const getlistRoleThunk = createAsyncThunk(
+  "auth/getlistRole",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await listRole();
+      console.log(result);
+      return result;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
 // Thunk để khôi phục người dùng
 export const restoreUserThunk = createAsyncThunk(
   "auth/restoreUser",
