@@ -1,5 +1,20 @@
 import instance from "../axios";
 
+export const listProduct = async () => {
+  try {
+    const response = await instance.get("/product/list");
+
+    if (response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách sản phẩm");
+    }
+  } catch (error) {
+    console.error("Error fetching product list:", error);
+    throw error;
+  }
+};
+
 export const addProduct = async (product: FormData) => {
   try {
     const response = await instance.post("/product/add", product, {
@@ -14,15 +29,6 @@ export const addProduct = async (product: FormData) => {
   }
 };
 
-export const listProduct = async () => {
-  try {
-    const response = await instance.get("/product/list");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching product list:", error);
-    throw error;
-  }
-};
 export const hardDeleteProduct = async (id: string) => {
   try {
     const response = await instance.delete(`/product/hard-delete/${id}`);
@@ -66,7 +72,7 @@ export const updateProduct = async (id: string, productData: FormData) => {
   }
 };
 
-export const searchProduct = async (keyword:string) => {
+export const searchProduct = async (keyword: string) => {
   try {
     const response = await instance.get(`/product/search/${keyword}`);
     return response.data;
@@ -76,21 +82,25 @@ export const searchProduct = async (keyword:string) => {
   }
 };
 export const upViewProduct = async (id: string) => {
-  const response = await instance.put(`/product/upView/${id}`, {}, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await instance.put(
+    `/product/upView/${id}`,
+    {},
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };
-export const loadPrice = async (price:string) => {
+export const loadPrice = async (price: string) => {
   try {
     const response = await instance.get(`/product/filter/${price}`);
     return response.data;
   } catch (error) {
     console.error("Lỗi:", error);
   }
-}
+};
 export const softDeleteProduct = async (id: string) => {
   try {
     const response = await instance.patch(`/product/soft-delete/${id}`);
@@ -118,4 +128,15 @@ export const restoreProduct = async (id: string) => {
     console.error("Error restoring product:", error);
     throw error;
   }
-}
+};
+export const getProductLimit = async (page = 1) => {
+  try {
+    const response = await instance.get(`/product/limit`, {
+      params: { page },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching products with limit:", error);
+    throw error;
+  }
+};

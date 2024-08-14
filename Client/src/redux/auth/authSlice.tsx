@@ -1,5 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface Permission {
+    name: string;
+    resources: string[];
+}
+
+interface Role {
+    _id: string;
+    roleId: string;
+    name: string;
+    permissions: Permission[];
+}
+
 interface AuthState {
     login: {
         currentUser: string | null;
@@ -8,6 +20,7 @@ interface AuthState {
         isAuthenticated: boolean;
         token: string | null;
         isLoggedIn: boolean;
+        roles: Role[]; 
     };
 }
 
@@ -19,6 +32,7 @@ const initialState: AuthState = {
         isAuthenticated: false,
         token: null,
         isLoggedIn: false,
+        roles: [], 
     },
 };
 
@@ -29,13 +43,14 @@ const authSlice = createSlice({
         loginStart: (state) => {
             state.login.isFetching = true;
         },
-        loginSuccess: (state, action: PayloadAction<{ currentUser: string, token: string }>) => {
+        loginSuccess: (state, action: PayloadAction<{ currentUser: string, token: string, roles: Role[] }>) => {
             state.login.isFetching = false;
             state.login.currentUser = action.payload.currentUser;
             state.login.token = action.payload.token;
             state.login.isAuthenticated = true;
             state.login.isLoggedIn = true;
             state.login.error = false;
+            state.login.roles = action.payload.roles; 
         },
         loginFailed: (state) => {
             state.login.isFetching = false;
@@ -48,9 +63,11 @@ const authSlice = createSlice({
             state.login.token = null;
             state.login.isAuthenticated = false;
             state.login.isLoggedIn = false;
+            state.login.roles = []; 
         },
     },
 });
+
 
 export const { loginStart, loginSuccess, loginFailed, logout } = authSlice.actions;
 

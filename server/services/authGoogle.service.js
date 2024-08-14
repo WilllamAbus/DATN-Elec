@@ -32,7 +32,8 @@ const loginSuccessService = async (id, tokenLogin) => {
     return {
       err: 0,
       msg: 'OK',
-      token
+      token,
+      roles: user.roles
     };
 
   } catch (error) {

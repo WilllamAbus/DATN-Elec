@@ -9,7 +9,6 @@ const loginSuccess = async (req, res) => {
       });
     }
 
-    // Gọi service để xử lý lưu trữ thông tin và trả về token
     let response = await authService.loginSuccessService(id, tokenLogin);
 
     // Xử lý kết quả từ authService
@@ -17,7 +16,6 @@ const loginSuccess = async (req, res) => {
       console.log('User not found or invalid token:', id, tokenLogin);
     }
 
-    // Trả về kết quả
     return res.status(200).json(response);
   } catch (error) {
     console.error('Error in loginSuccess controller:', error);

@@ -48,7 +48,6 @@ const AddProduct: React.FC = () => {
       } else {
         const reader = new FileReader();
         reader.onloadend = () => {
-          // Đảm bảo rằng kết quả đọc từ FileReader là chuỗi
           if (typeof reader.result === "string") {
             setImgPreview(reader.result);
           }

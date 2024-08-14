@@ -1,10 +1,21 @@
+// src/redux/rootReducer.ts
+
 import { combineReducers } from "@reduxjs/toolkit";
+import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/authSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 
+const authConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["login"],
+};
+
+
 const rootReducer = combineReducers({
-  auth: authReducer,
+  auth: persistReducer(authConfig, authReducer),
   categories: categoriesSlice,
   voucher: voucherReducer,
 });

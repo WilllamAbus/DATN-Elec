@@ -4,6 +4,7 @@ const modelCategory = require('../../model/catgories.model');
 const Role = require('../../model/role.model');
 const admin = require('firebase-admin');
 const serviceAccount = require('../../config/serviceAccount.json');
+const ProductService = require('../../services/product.service');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const dotenv = require("dotenv");
@@ -104,14 +105,22 @@ const productsController = {
     },
     listProduct: async (req, res) => {
         try {
-            // Truy vấn để tìm các danh mục không bao gồm những danh mục đã bị xóa mềm
             const products = await modelProduct.find({ status: { $ne: 'disable' } });
-            res.status(200).json(products);
+            res.status(200).json({
+                success: true,
+                msg: "Lấy danh sách sản phẩm thành công",
+                data: products
+            });
         } catch (error) {
             console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+            res.status(500).json({
+                success: false,
+                msg: "Lỗi khi lấy danh sách sản phẩm",
+                error: error.message
+            });
         }
     },
+
 
     hardDelete: async (req, res) => {
         const { id } = req.params;
@@ -247,8 +256,6 @@ const productsController = {
             return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
-
-
     getAllCategoriesController: async (req, res) => {
         try {
 
@@ -293,17 +300,17 @@ const productsController = {
         try {
             const { id } = req.params;
             const product = await modelProduct.findById(id);
-    
+
             if (!product) {
                 console.error('Product not found');
                 return res.status(404).json({
                     message: 'Product not found'
                 });
             }
-    
+
             product.view = (product.view || 0) + 1;
             await product.save();
-    
+
             res.status(200).json({
                 message: 'View count incremented successfully',
                 data: product
@@ -321,7 +328,7 @@ const productsController = {
             const price = req.params.price;
             let minPrice = 0; // Giá tối thiểu, mặc định là 0
             let maxPrice;
-    
+
             switch (price) {
                 case 'price-0':
                     maxPrice = 500000; // Dưới 500000
@@ -346,14 +353,14 @@ const productsController = {
                         message: "Khoảng giá không hợp lệ"
                     });
             }
-    
+
             const query = { price: { $gte: minPrice } };
             if (maxPrice) {
                 query.price.$lt = maxPrice;
             }
-    
+
             const result = await modelProduct.find(query);
-    
+
             if (result.length > 0) {
                 res.status(200).json({
                     data: result
@@ -371,7 +378,7 @@ const productsController = {
                 error: error.message
             });
         }
-    
+
     },
     // Xóa mềm danh mục
     softDelete: async (req, res) => {
@@ -464,6 +471,40 @@ const productsController = {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
+    getProductLimit: async (req, res) => {
+        const { page } = req.query;
+
+        try {
+            console.log('Page:', page);
+
+            const response = await ProductService.getProductLimitService(page);
+            console.log('Response:', response); 
+
+            if (response.err) {
+                return res.status(400).json(response); 
+            }
+
+            const currentPage = page ? +page : 1;
+            const totalPages = Math.ceil(response.response.total / (+process.env.LIMIT || 1));
+
+            return res.status(200).json({
+                ...response,
+                pagination: {
+                    currentPage,
+                    totalPages,
+                    hasNextPage: currentPage < totalPages,
+                    hasPrevPage: currentPage > 1,
+                }
+            });
+
+        } catch (error) {
+            console.error('Error:', error); 
+            return res.status(500).json({
+                err: -1,
+                msg: 'Failed at product controller: ' + error.message
+            });
+        }
+    }
 
 
 
