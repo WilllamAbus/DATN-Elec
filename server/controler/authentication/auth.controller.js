@@ -608,7 +608,6 @@ const authController = {
     }
   },
 
-  resendEmail: async (req, res) => {},
   deleteUser: async (req, res) => {},
 };
 

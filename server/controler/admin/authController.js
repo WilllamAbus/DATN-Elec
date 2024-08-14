@@ -1,5 +1,23 @@
 const modelUser = require("../../model/users.model");
 const bcrypt = require("bcryptjs");
+const { v4: uuidv4 } = require("uuid");
+const serviceAccount = require("../authentication/authFirebase.json");
+const admin = require("firebase-admin");
+const multer = require("multer");
+const STORE_BUCKET = process.env.STORE_BUCKET;
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: STORE_BUCKET,
+  });
+}
+
+const storage = admin.storage();
+const bucket = storage.bucket();
+
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 
 exports.add = async (req, res) => {
   const { email, password, name, avatar, role } = req.body;
@@ -128,30 +146,98 @@ exports.getOne = async (req, res) => {
   }
 };
 
+// exports.update = async (req, res) => {
+//   const {  password, name, avatar, roles, birthday,  } = req.body;
+//   const id = req.params.id;
+
+//   try {
+//     let user = await modelUser.findById(id);
+//     if (!user) {
+//       return res.status(404).json({ message: "Không tìm thấy người dùng" });
+//     }
+
+//     if (name) user.name = name;
+//     if (avatar) user.avatar = avatar;
+//     if (roles) user.roles = roles;
+
+//     if (password) {
+//       const salt = await bcrypt.genSalt(10);
+//       user.password = await bcrypt.hash(password, salt);
+//     }
+
+//     const updatedUser = await user.save();
+//     res.status(200).json(updatedUser);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Lỗi server" });
+//   }
+// };
+
 exports.update = async (req, res) => {
-  const { email, password, name, avatar, roles } = req.body;
-  const id = req.params.id;
-
   try {
-    let user = await modelUser.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    const { id } = req.params;
+
+    const { name, address, phone, gender, birthday } = req.body;
+    const avatar = req.file ? req.file : undefined;
+    let avatarURL;
+    if (avatar) {
+      const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
+      const file = bucket.file(`avatars/${filename}`);
+      const fileStream = file.createWriteStream({
+        metadata: {
+          contentType: avatar.mimetype,
+        },
+      });
+
+      fileStream.on("finish", async () => {
+        try {
+          await file.makePublic();
+          const encodedFilename = encodeURIComponent(file.name);
+          avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
+
+          const updatedUser = await modelUser.findByIdAndUpdate(
+            id,
+            { name, address, phone, birthday, gender, avatar: avatarURL },
+            { new: true }
+          );
+
+          if (!updatedUser) {
+            return res
+              .status(404)
+              .json({ message: "Người dùng không tìm thấy" });
+          }
+
+          return res
+            .status(200)
+            .json({ message: "Cập Nhật Thành Công", user: updatedUser });
+        } catch (err) {
+          console.error("Lỗi khi lấy URL của hình ảnh:", err);
+          return res
+            .status(500)
+            .json({ message: "Không thể lấy URL của hình ảnh" });
+        }
+      });
+
+      fileStream.end(avatar.buffer);
+    } else {
+      const updatedUser = await modelUser.findByIdAndUpdate(
+        id,
+        { name, address, phone, gender, birthday },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Người dùng không tìm thấy" });
+      }
+      return res
+        .status(200)
+        .json({ message: "Cập Nhật Thành Công", user: updatedUser });
     }
-
-    if (email) user.email = email;
-    if (name) user.name = name;
-    if (avatar) user.avatar = avatar;
-    if (roles) user.roles = roles;
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
-    }
-
-    const updatedUser = await user.save();
-    res.status(200).json(updatedUser);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Lỗi server" });
+    console.error("Server error updating user profile:", error);
+    return res.status(500).json({
+      message: "Server error updating user profile",
+      error: error.message,
+    });
   }
 };

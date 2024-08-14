@@ -111,17 +111,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between mt-6">
-              <div className="flex items-center">
-                {/* <input
-                  type="checkbox"
-                  name="remember"
-                  id="remember"
-                  className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                />
-                <label htmlFor="remember" className="text-gray-600 ml-3 cursor-pointer">
-                  Remember me
-                </label> */}
-              </div>
+              <div className="flex items-center"></div>
               <Link to="/forgot" className="text-primary">
                 Quên mật khẩu
               </Link>
