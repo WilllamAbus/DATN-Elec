@@ -3,28 +3,32 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCategoriesThunk,
-  deleteCategoryThunk,
+  
+  softDeleteCategoryThunk
 } from "../../../../redux/categories/categoriesThunk";
 import { RootState, AppDispatch } from "../../../../redux/store";
 
 import { getFileFirebase } from "../../../../services/firebase/getFirebse.service";
 import { Category } from "../../../../types/Categories.d";
 import "../../../../assets/css/admin.style.css";
-import  AlertCustomStyles  from "../../../../ultils/alert.succes";
+
 import LazyLoad from "react-lazyload";
 import { Link } from "react-router-dom";
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 interface ImageUrls {
   [key: string]: string;
 }
 
-const useAlert = (initialState: boolean) => {
-    const [showAlert, setShowAlert] = useState(initialState);
-    const triggerAlert = () => {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 2000);
-    };
-    return { showAlert, triggerAlert };
-  };
+// const useAlert = (initialState: boolean) => {
+//     const [showAlert, setShowAlert] = useState(initialState);
+//     const triggerAlert = () => {
+//       setShowAlert(true);
+//       setTimeout(() => setShowAlert(false), 2000);
+//     };
+//     return { showAlert, triggerAlert };
+//   };
 const ListCate: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const categories = useSelector(
@@ -33,7 +37,7 @@ const ListCate: React.FC = () => {
   const status = useSelector((state: RootState) => state.categories.status);
   const error = useSelector((state: RootState) => state.categories.error);
   const [imageUrls, setImageUrls] = useState<ImageUrls>({});
-  const { showAlert, triggerAlert } = useAlert(false);
+  const [, setCategories] = useState<Category[]>(categories);
 
   const fetchImageUrls = useCallback(async (categories: Category[]) => {
     const urls: ImageUrls = {};
@@ -61,26 +65,47 @@ const ListCate: React.FC = () => {
 
   const handleDelete = useCallback(
     (_id: string) => {
-      if (window.confirm("Bạn có muốn xóa dòng này ?")) {
-        dispatch(deleteCategoryThunk(_id))
-          .unwrap()
-          .then(() => {
-            triggerAlert();
-          });
-      }
+      MySwal.fire({
+        title: "Xóa danh mục?",
+        text: "Bạn có chắc muốn xóa dòng này không!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có",
+        cancelButtonText: "Hủy",
+      }).then(async (result: SweetAlertResult) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(softDeleteCategoryThunk(_id))
+            .unwrap()
+            dispatch(fetchCategoriesThunk())
+            setCategories((prevCategories) =>
+              prevCategories.filter((category) => category._id !== _id)
+            );
+            MySwal.fire({
+              title: "Đã xóa!",
+              text: "Danh mục  đã  xóa.",
+              icon: "success",
+            });
+          } catch (error) {
+            console.error("Error deleting product:", error);
+            MySwal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra sự cố ",
+              icon: "error",
+            });
+          }
+        }
+      });
     },
-    [dispatch, triggerAlert]
+    [dispatch]
   );
 
   return (
     <>
       <main className="w-full flex-grow p-6">
-      {showAlert && (
-          <AlertCustomStyles
-            message="Xóa thành công"
-            type="success"
-          />
-        )}
+     
         <div className="w-full mt-12">
           <p className="text-xl pb-3 flex items-center">
             <i className="fas fa-list mr-3"></i> DANH SÁCH DANH MỤC
@@ -134,13 +159,22 @@ const ListCate: React.FC = () => {
                       <td className="py-4 px-6 border-b border-grey-light">
                         <button
                           onClick={() => handleDelete(category._id)}
-                          className="cta-btn btn text-red-500"
+                          className="focus:outline-none text-white bg-red-700
+             hover:bg-red-800 focus:ring-4 focus:ring-red-300 
+             font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2
+              dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         >
                           Xoá
                         </button>
                         <Link
                           to={`/admin/editCategories/${category._id}`}
-                          className="cta-btn btn text-green-500 ml-4"
+                          className="focus:outline-none
+             text-white
+              bg-green-700
+               hover:bg-green-800 
+               focus:ring-4
+                focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2
+                 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                         >
                           Sửa
                         </Link>

@@ -1,10 +1,14 @@
 // DiscountList.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../redux/store'; // Import your RootState type
-import { fetchVouchers, deleteVoucher } from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
-import AlertCustomStyles from '../../../../ultils/alert.succes'; // Import your custom Alert component
+import { fetchVouchers,softDeleteVoucherThunk} from '../../../../redux/discount/voucherThunk'; // Import the thunk actions
+// Import your custom Alert component
 import { Link } from 'react-router-dom';
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { Voucher } from '../../../../types/Voucher.d';
+const MySwal = withReactContent(Swal);
 const formatPrices = (price: number): string => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'decimal',
@@ -15,21 +19,45 @@ const formatPrices = (price: number): string => {
 const DiscountList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const { vouchers, loading, error } = useSelector((state: RootState) => state.voucher);
-    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({ message: '', type: null });
+  const [, setVoucher] = useState<Voucher[]>(vouchers);
   
     useEffect(() => {
       dispatch(fetchVouchers());
     }, [dispatch]);
   
-    const handleDelete = async (id: string) => {
-      if (window.confirm('Are you sure you want to delete this discount?')) {
-        try {
-          await dispatch(deleteVoucher(id)).unwrap();
-          setAlert({ message: 'Mã giảm giá xóa thành công!', type: 'success' });
-        } catch (err) {
-          setAlert({ message: 'Failed to delete discount.', type: 'error' });
+    const handleSoftDelete = async (id: string) => {
+      MySwal.fire({
+        title: "Xóa mã giảm giá?",
+        text: "Bạn có chắc muốn xóa dòng này không!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có",
+        cancelButtonText: "Hủy",
+      }).then(async (result: SweetAlertResult) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(softDeleteVoucherThunk(id)).unwrap();
+          dispatch(fetchVouchers());
+    setVoucher((prevVoucher) =>
+      prevVoucher.filter(vouchers=> vouchers._id !== id)  // Use `voucher._id` instead of `_id`
+    );
+            MySwal.fire({
+              title: "Đã xóa!",
+              text: "Mã giảm giá  đã  xóa.",
+              icon: "success",
+            });
+          } catch (error) {
+            console.error("Error deleting product:", error);
+            MySwal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra sự cố ",
+              icon: "error",
+            });
+          }
         }
-      }
+      });
     };
   
     if (loading) {
@@ -47,7 +75,7 @@ const DiscountList: React.FC = () => {
         <p className="text-xl pb-3 flex items-center">
           <i className="fas fa-list mr-3"></i> DANH SÁCH ĐƠN HÀNG
         </p>
-        {alert.type && <AlertCustomStyles message={alert.message} type={alert.type} />}
+  
         <div className="bg-white overflow-auto">
           <table className="text-left w-full border-collapse">
             <thead>
@@ -57,7 +85,7 @@ const DiscountList: React.FC = () => {
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HẠN SỬ DỤNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">DANH MỤC SẴN SÀNG</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">MÔ TẢ</th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">Kích hoạt</th>
+                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">TRẠNG THÁI</th>
                 <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">HÀNH ĐỘNG</th>
               </tr>
             </thead>
@@ -73,16 +101,29 @@ const DiscountList: React.FC = () => {
                     ))}
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">{voucher.conditionActive}</td> 
-                  <td className="py-4 px-6 border-b border-grey-light">{voucher.isActive}</td> 
+                  <td className="py-4 px-6 border-b border-grey-light">
+                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                      {voucher.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                    </span>
+                  </td>
                   <td className="py-4 px-6 border-b border-grey-light">
                     <button
-                      className="cta-btn btn text-red-500"
-                      onClick={() => handleDelete(voucher._id)}
+                      className="focus:outline-none text-white bg-red-700
+             hover:bg-red-800 focus:ring-4 focus:ring-red-300 
+             font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2
+              dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                      onClick={() => handleSoftDelete(voucher._id)}
                     >
                       Xoá
                     </button>
                     <Link to={`/admin/editVouchers/${voucher._id}`}
-                    className="cta-btn btn text-green-500 ml-4">
+                    className="focus:outline-none
+             text-white
+              bg-green-700
+               hover:bg-green-800 
+               focus:ring-4
+                focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2
+                 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                       Sửa
                     </Link>
                   </td>

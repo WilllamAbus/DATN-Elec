@@ -1,14 +1,210 @@
-import React from "react";
-
-
-import listOne from "../../../../assets/images/products/product14.jpg";
+import React, { useEffect, useState } from "react";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { CartItem, CartState } from "../../../../types/Voucher.d";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-const cartPage: React.FC = () => {
+import listOne from "../../../../assets/images/products/product14.jpg";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
+import { useDispatch } from "react-redux";
+import { addOrderThunk } from "../../../../redux/checkout/checkoutThunk";
+import { AppDispatch } from "../../../../redux/store";
+import { SanboxPayment } from "../../../../services/pay/sanboxPayment";
+import { calculateSignature } from "../../../../services/pay/signature";
+
+// Implement signatureService
+const signatureService = {
+  calculateSignature,
+};
+
+// Create an instance of SanboxPayment
+const paymentService = new SanboxPayment(signatureService);
+// Implement signatureService
+interface DecodedToken {
+  id: string;
+  email: string;
+}
+
+const decodeToken = (token: string): DecodedToken => {
+  try {
+    // Decode the JWT token
+    const decoded: any = jwtDecode(token);
+    return {
+      id: decoded.id || "",
+      email: decoded.email || "",
+    };
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return { id: "", email: "" };
+  }
+};
+
+// Now you can call processMoMoPaymentWithRetry on paymentService
+interface FormValues {
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  payment: string;
+}
+
+const Checkout: React.FC = () => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      name: "",
+      address: "",
+      city: "",
+      phone: "",
+      payment: "",
+    },
+  });
+  const [cartState, setCartState] = useState<CartState>({
+    items: [],
+    totalPrice: 0,
+    shipping: 0,
+    applyVoucher: false,
+    selectedVoucher: undefined,
+  });
+
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+  const [voucher, setVoucher] = useState<{
+    code: string;
+    discount: number;
+  } | null>(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    // Retrieve cart items and grand total from localStorage
+    const storedCartItems = localStorage.getItem("cart");
+    const storedGrandTotal = localStorage.getItem("grandTotal");
+    const storedVoucher = JSON.parse(
+      localStorage.getItem("selectedVoucher") || "null"
+    );
+    if (storedCartItems) {
+      const items: CartItem[] = JSON.parse(storedCartItems);
+      setCartState((prevState) => ({
+        ...prevState,
+        items,
+        totalPrice: calculateTotalPrice(items), // Calculate total price if needed
+      }));
+    }
+
+    if (storedGrandTotal) {
+      setGrandTotal(JSON.parse(storedGrandTotal));
+    }
+    if (storedVoucher) {
+      setVoucher({
+        code: storedVoucher.code,
+        discount: storedVoucher.voucherNum,
+      });
+    }
+  }, []);
+
+
+  const getUserData = (): DecodedToken => {
+    const userData = window.localStorage.getItem("persist:root");
+
+    if (userData) {
+      try {
+        // Parse the root state
+        const parsedData = JSON.parse(userData);
+
+        // Access the login data from parsedData
+        const loginData = JSON.parse(parsedData.auth)?.login;
+
+        // Check if loginData and token are available
+        if (loginData && loginData.token) {
+          const token = loginData.token;
+
+          // Decode the token and return the result
+          return decodeToken(token);
+        }
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+
+    // Return default value if data is not available or error occurs
+    return { id: "", email: "" };
+  };
+
+  const calculateCartTotals = (items: CartItem[]) => {
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    return { totalQuantity };
+  };
+
+  // useEffect(() => {
+  //   // Retrieve cart items from localStorage
+  //   const storedCartItems = localStorage.getItem("cart");
+  //   if (storedCartItems) {
+  //     const items: CartItem[] = JSON.parse(storedCartItems);
+  //     setCartState((prevState) => ({
+  //       ...prevState,
+  //       items,
+  //       totalPrice: calculateTotalPrice(items), // Calculate total price if needed
+  //     }));
+  //   }
+  // }, []);
+
+  const calculateTotalPrice = (items: CartItem[]): number => {
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+  const handleCheckout: SubmitHandler<FormValues> = async (data) => {
+    localStorage.setItem("cart", JSON.stringify(cartState.items));
+    const userData = getUserData();
+
+
+    const { totalQuantity } = calculateCartTotals(cartState.items);
+
+    const orderData = {
+      payment: {
+        method: data.payment,
+        details: "123456789", // Add payment details as needed
+      },
+      quantityShopping: totalQuantity,
+      totalPrice: grandTotal,
+      userId: [{ user: userData.id, email: userData.email }],
+      products: cartState.items.map((item) => ({
+        product: item.id,
+        name: item.name,
+      })),
+      shipping: {
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        sdt: data.phone,
+        formatShipping: {
+          type: "standard",
+          price: 25000,
+        },
+      },
+      status: "active",
+    };
+    console.log("Order data:", orderData);
+
+    try {
+      await dispatch(addOrderThunk(orderData)).unwrap();
+      if (data.payment === "momo") {
+        await paymentService.processMoMoPaymentWithRetry();
+      } else {
+        navigate("/complete");
+      }
+      reset(); // Reset the form after successful submission
+    } catch (error) {
+      console.error("Error processing order:", error);
+    }
+  };
+
   return (
     <>
-   
-      {/* <!-- breadcrumb --> */}
+      {/* Breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
           <i className="fa-solid fa-house"></i>
@@ -18,105 +214,148 @@ const cartPage: React.FC = () => {
         </span>
         <p className="text-gray-600 font-medium">Checkout</p>
       </div>
-      {/* <!-- ./breadcrumb --> */}
 
-      {/* <!-- wrapper --> */}
+      {/* Wrapper */}
       <div className="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
         <div className="col-span-8 border border-gray-200 p-4 rounded">
           <h3 className="text-lg font-medium capitalize mb-4">Checkout</h3>
           <div className="space-y-4">
-            <form action="" method="post">
+            <form>
+              {/* Form fields */}
               <div>
                 <label className="text-gray-600">
                   Tên người nhận <span className="text-primary">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="first-name"
-                  id="first-name"
-                  className="input-box"
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{ 
+                    required: "Tên người nhận không được để trống", 
+                    minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                    validate: {
+                      // noSpecialChars: value => /^[a-zA-Z\s]*$/.test(value) || "Tên người nhận không được chứa ký tự đặc biệt",
+                      noNumbers: value => !/\d/.test(value) || "Tên người nhận không được chứa số",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <input {...field} className="input-box" />
+                  )}
                 />
+                {errors.name && (
+                  <span className="text-red-600">{errors.name.message}</span>
+                )}
               </div>
+              <br/>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-gray-600">Địa chỉ</label>
-                  <input
-                    type="text"
+                  <Controller
                     name="address"
-                    id="address"
-                    className="input-box"
+                   
+                    control={control}
+                    rules={{ 
+                      required: "Địa chỉ không được để trống " ,
+                      minLength: {value:3 , message:"Độ đài phải có ít nhất 3 kí tự"},
+                  
+                    }}
+                    render={({ field }) => (
+                      <input {...field} className="input-box" />
+                    )}
                   />
+                  {errors.address && (
+                    <span className="text-red-600">
+                      {errors.address.message}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="text-gray-600">Thành Phố</label>
-                  <select name="city" id="city" className="input-box">
-                  
-                    <option value="hanoi">Cần Thơ</option>
-                    <option value="hochiminh">Hồ Chí Minh</option>
-                    <option value="danang">Đà Nẵng</option>
-                    <option value="haiphong">Hải Phòng</option>
-                  </select>
+                  <Controller
+                    name="city"
+                    control={control}
+                    rules={{ required: "Thành phố không được bỏ trống" }}
+                    render={({ field }) => (
+                      <select {...field} className="input-box">
+                        <option value="">Select a city</option>
+                        <option value="Cần Thơ">Cần Thơ</option>
+                        <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                        <option value="Đà Nẵng">Đà Nẵng</option>
+                        <option value="Hải Phòng">Hải Phòng</option>
+                      </select>
+                    )}
+                  />
+                  {errors.city && (
+                    <span className="text-red-600">{errors.city.message}</span>
+                  )}
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-gray-600">SĐT </label>
-                  <input
-                    type="text"
-                    name="phone"
-                    id="phone"
-                    className="input-box"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-600">Email </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    className="input-box"
-                  />
-                </div>
+              <br/>
+              <div>
+                <label className="text-gray-600">SĐT</label>
+                <Controller
+                  name="phone"
+                  control={control}
+                  rules={{ 
+                    required: "Sđt không được bỏ trống" ,
+                    pattern: {
+                      value: /^\d{10}$/,
+                      message: "Số điện thoại phải có chính xác 10 chữ số",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <input {...field} className="input-box" />
+                  )}
+                />
+                {errors.phone && (
+                  <span className="text-red-600">{errors.phone.message}</span>
+                )}
               </div>
-
               <div className="mb-4">
                 <label className="text-gray-600" htmlFor="payment">
                   Phương thức thanh toán
                 </label>
-                <div className="flex items-center mt-2">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="momo"
-                    className="mr-2"
+                <div className="flex items-center mt-2 space-x-4">
+                  <Controller
+                    name="payment" // Name should match the form field name
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            id="momo" // Unique id for this radio button
+                            {...field}
+                            value="momo" // Ensure value matches the field value
+                            className="mr-2"
+                            checked={field.value === "momo"}
+                          />
+                          <label htmlFor="momo" className="text-gray-600">
+                            MoMo
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            id="direct" // Unique id for this radio button
+                            {...field}
+                            value="direct" // Ensure value matches the field value
+                            className="mr-2"
+                            checked={field.value === "direct"}
+                          />
+                          <label htmlFor="direct" className="text-gray-600">
+                            Thanh toán trực tiếp
+                          </label>
+                        </div>
+                      </>
+                    )}
                   />
-                  <label htmlFor="momo" className="text-gray-600">
-                    MoMo
-                  </label>
                 </div>
-                <div className="flex items-center mt-2">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id="direct"
-                    className="mr-2"
-                  />
-                  <label htmlFor="direct" className="text-gray-600">
-                    Thanh toán trực tiếp
-                  </label>
-                </div>
+
+                {errors.payment && (
+                  <span className="text-red-500">{errors.payment.message}</span>
+                )}
               </div>
             </form>
-
-            {/* <div>
-                    <label  className="text-gray-600">Company</label>
-                    <input type="text" name="company" id="company" className="input-box"/>
-                </div> */}
-            {/* <div>
-                    <label  className="text-gray-600">Country/Region</label>
-                    <input type="text" name="region" id="region" className="input-box"/>
-                </div> */}
           </div>
         </div>
 
@@ -125,81 +364,66 @@ const cartPage: React.FC = () => {
             Tổng thanh toán
           </h4>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">20.000 vnđ</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">20.000 vnđ</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={listOne} alt="product 1" className="w-28 h10 " />
-                <h5 className="text-gray-800 font-medium">
-                  Italian shape 
-                </h5>
-              </div>
-              <p className="text-gray-600">x3</p>
-              <p className="text-gray-800 font-medium">20.000 vnđ</p>
-              <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
-                <i className="fa-sharp fa-solid fa-trash"></i>
-              </button>
-            </div>
+            {cartState.items.length > 0 ? (
+              cartState.items.map((item: CartItem) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={item.imgPreview || listOne}
+                      alt={item.name || "Product Image"}
+                      className="w-28 h-10"
+                    />
+                    <h5 className="text-gray-800 font-medium">
+                      {item.name || "Product Name"}
+                    </h5>
+                  </div>
+                  <p className="text-gray-600">x{item.quantity}</p>
+                  <p className="text-gray-800 font-medium">
+                    {(item.price * item.quantity).toLocaleString()} vnđ
+                  </p>
+                  <button className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none">
+                    <i className="fa-sharp fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600">No items in cart</p>
+            )}
           </div>
 
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
+          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
             <p>Thanh toán</p>
-            <p>128.000 vnđ</p>
+            <span>{grandTotal.toLocaleString()} VNĐ</span>
           </div>
-
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>Vận chuyển</p>
-            <p>Miễn phí</p>
+          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
+            <p>Mã giảm giá</p>
+            {voucher ? (
+              <div>
+               
+                <span> {voucher.discount.toLocaleString()} vnđ</span>
+              </div>
+            ) : (
+              <p>No voucher applied</p>
+            )}
           </div>
-
-          <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
+          <div className="flex justify-between text-gray-800 font-medium py-3 uppercase">
             <p className="font-semibold">Tổng cộng</p>
-            <p>128.000 vnđ</p>
+            <span>{grandTotal.toLocaleString()} VNĐ</span>
           </div>
 
-          {/* <div className="flex items-center mb-4 mt-2">
-                <input type="checkbox" name="aggrement" id="aggrement"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer w-3 h-3"/>
-                <label  className="text-gray-600 ml-3 cursor-pointer text-sm">I agree to the <a href="#"
-                        className="text-primary">terms & conditions</a></label>
-            </div> */}
-
-          <a
-            href="/complete"
+          <button
+            onClick={handleSubmit(handleCheckout)}
             className="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium"
           >
             Thanh Toán
-          </a>
+          </button>
         </div>
       </div>
-      {/* <!-- ./wrapper --> */}
-   
     </>
   );
 };
 
-export default cartPage;
+export default Checkout;

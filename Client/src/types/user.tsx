@@ -26,19 +26,45 @@ export interface AuthAction {
   };
 }
 export interface UserProfile {
-  msg: string;
-  token: string;
+  profile?: string;
+  msg?: string;
+  token?: string;
   _id: string;
   name: string;
+  accessToken: string;
   email: string;
-  profile: any;
-  VerifiedEmail: boolean;
+  VerifiedEmail: string;
   status: string;
-  roles: string;
+  roles: string[];
   birthday: string;
   gender: string;
   phone: string;
+  avatar: string;
   address: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+}
+export interface ForgotState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  message: string;
+  error: string | null;
+}
+export interface ResetPassState {
+  status: "idle" | "loading" | "succeeded" | "failed";
+  message: string;
+  error: string | null;
+}
+export interface UpdateUser {
+  _id: string;
+  name: string;
+  roles: string[];
+  birthday: string;
+  gender: string;
+  phone: string;
+  avatar: string;
+  address: string;
+}
+export interface Role {
+  _id: string;
+  name: string;
 }

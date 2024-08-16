@@ -12,7 +12,7 @@ const Arrivale: React.FC = () => {
       try {
         const productList = await listProduct();
         setProducts(productList);
-        console.log(productList);
+      
         
       } catch (error) {
         console.log(`lỗi: `, error);
@@ -33,11 +33,12 @@ const Arrivale: React.FC = () => {
             className="bg-white shadow rounded overflow-hidden group"
           >
             <div className="relative">
-              <Link to="/detailProd">
+              <Link to={`/detailProd/${product._id}`}>
                 <img
                   src={product.image}
                   alt={`product ${index + 1}`}
-                  className="w-full h-auto"
+                  // className="w-full h-auto"
+                  style={{ width: "360px", height: "337px" }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition">
                   {/* Optional icons */}
@@ -50,15 +51,20 @@ const Arrivale: React.FC = () => {
                   {product.name}
                 </h4>
               </a>
-              <div className="flex items-baseline mb-1 space-x-2">
+              {product.discount > 1 ? (
+                <div>
+                    <p className="text-xl text-primary font-semibold">
+                        {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
+                    </p>
+                    <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product.price)}
+                    </p>
+                </div>
+            ) : (
                 <p className="text-xl text-primary font-semibold">
-                  {formatCurrency(product.price * (1 - product.discount / 100))}
-                  VNĐ
+                    {formatCurrency(product.price)} VNĐ
                 </p>
-                <p className="text-sm text-gray-400 line-through">
-                  {formatCurrency(product.price)}
-                </p>
-              </div>
+            )}
               <div className="flex items-center">
                 <div className="flex gap-1 text-sm text-yellow-400">
                   {Array.from({ length: product.rating }, (_, i) => (

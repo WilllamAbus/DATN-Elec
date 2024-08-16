@@ -24,7 +24,7 @@ module.exports.sendPasswordResetEmail = async (email, token) => {
     );
 
     const info = await transporter.sendMail({
-      from: "TEST EMAIL <noreply@gmail.com",
+      from: "DuPiNDuPi <noreply@gmail.com",
       to: email,
       subject: "Reset Password",
       html: emailTemplate,
@@ -47,7 +47,7 @@ module.exports.sendVerificationEmail = async (email, token) => {
     );
 
     const info = await transporter.sendMail({
-      from: "TEST EMAIL <haudppc07506@fpt.edu.vn>",
+      from: "DuPiNDuPi <noreply@gmail.com",
       to: email,
       subject: "Verify Email",
       html: emailTemplate,
@@ -68,7 +68,7 @@ module.exports.sendRandomPasswordEmail = async (email, randomPassword) => {
     );
 
     const info = await transporter.sendMail({
-      from: "TEST EMAIL <noreply@gmail.com>",
+      from: "DuPiNDuPi <noreply@gmail.com",
       to: email,
       subject: "Your Temporary Password",
       html: emailTemplate,

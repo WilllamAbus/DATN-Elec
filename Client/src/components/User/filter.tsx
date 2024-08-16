@@ -3,26 +3,23 @@ import React , {  useState, ChangeEvent, FormEvent } from "react";
 
 
 const Filter :React.FC = () => {
-    const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
+    const [selectedPrices, setSelectedPrice] = useState<string>("");
   const [error, setError] = useState<string>('');
-//   const navigate = useNavigate();
 
   const handleSub = (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
+   
       if (selectedPrices.length > 0) {
-          window.location.href=(`/filter/${selectedPrices.join(',')}`);
+        setError('');
+          window.location.href=(`/filter/${selectedPrices}`);
       } else {
           setError('Vui lòng chọn ít nhất một khoảng giá');
       }
   };
 
-  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-      const { value, checked } = e.target;
-
-      setSelectedPrices((prev) =>
-          checked ? [...prev, value] : prev.filter((price) => price !== value)
-      );
+  const handleCheckPrice = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedPrice(e.target.value);
+    setError(''); 
   };
     return (
       <>
@@ -33,12 +30,12 @@ const Filter :React.FC = () => {
                 <div className="space-y-2">
                     <div className="flex items-center">
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="price"
                             value="price-0"
                             id="brand-1"
                             className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckPrice}
                         />
                         <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-1">
                             Dưới 500.000 VNĐ
@@ -46,12 +43,12 @@ const Filter :React.FC = () => {
                     </div>
                     <div className="flex items-center">
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="price"
                             value="price-1"
                             id="brand-2"
                             className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckPrice}
                         />
                         <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-2">
                             500.000 VNĐ - 1.000.000 VNĐ
@@ -59,12 +56,12 @@ const Filter :React.FC = () => {
                     </div>
                     <div className="flex items-center">
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="price"
                             value="price-2"
                             id="brand-3"
                             className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckPrice}
                         />
                         <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-3">
                             1.000.000 VNĐ - 3.000.000 VNĐ
@@ -72,12 +69,12 @@ const Filter :React.FC = () => {
                     </div>
                     <div className="flex items-center">
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="price"
                             value="price-3"
                             id="brand-4"
                             className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckPrice}
                         />
                         <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-4">
                             3.000.000 VNĐ - 5.000.000 VNĐ
@@ -85,12 +82,12 @@ const Filter :React.FC = () => {
                     </div>
                     <div className="flex items-center">
                         <input
-                            type="checkbox"
+                            type="radio"
                             name="price"
                             value="price-4"
                             id="brand-5"
                             className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckboxChange}
+                            onChange={handleCheckPrice}
                         />
                         <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-5">
                             Trên 5.000.000 VNĐ

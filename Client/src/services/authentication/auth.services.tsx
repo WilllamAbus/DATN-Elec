@@ -1,100 +1,297 @@
-import { Login, Registe } from "../../types/user";
-import request from "../../config/Auth";
 import axios from "axios";
-import { UserProfile } from "../../types/user";
+import instance from "../axois_V2";
+// import { UserProfile } from "../../types/user";
+const API_URL = import.meta.env.VITE_API_URL;
+// import { AppDispatch } from "../../redux/store";
+// import axios from "axios";
+// export const loginUser = async (user: { email: string; password: string }) => {
+//   try {
+//     const response = await instance.post(`${API_URL}/auth/login`, user);
+//     console.log("API Response:", response.data);
 
-export interface LoginResponse {
-  accessToken: string;
-  roles: { name: string }[]; // Thay đổi để chứa tên vai trò
-  name: string;
-}
-export interface RegisterResponse {
-  user?: any;
-  msg?: string;
-  accessToken?: string;
-}
-// export interface Profile {
-//   name: string;
-//   email: string;
-//   birthday: string;
-//   gender: string;
-//   phone: string;
-//   address?: string;
-// }
-const loginApi = async ({ email, password }: Login) => {
-  const res = await request({
-    path: "auth/login",
-    method: "POST",
-    data: {
-      email: email,
-      password: password,
-      device: "website",
+//     // const { accessToken } = response.data;
+//     const { accessToken, roles, name } = response.data;
+//     localStorage.setItem("token", accessToken);
+//     localStorage.setItem("roles", roles?.[0]?.name || "");
+//     localStorage.setItem("name", name || "");
+//     // Lấy dữ liệu hiện tại từ localStorage
+//     const persistRoot = JSON.parse(
+//       localStorage.getItem("persist:root") || "{}"
+//     );
+
+//     // Cập nhật dữ liệu với token mới
+//     persistRoot.auth = JSON.stringify({
+//       login: {
+//         token: accessToken,
+//         currentUser: null, // Thay đổi nếu cần
+//         isFetching: false,
+//         error: null,
+//         isAuthenticated: true,
+//         isLoggedIn: true,
+//       },
+//       profile: persistRoot.auth?.profile || {},
+//       register: persistRoot.auth?.register || {},
+//       users: persistRoot.auth?.users || [],
+//     });
+
+//     localStorage.setItem("persist:root", JSON.stringify(persistRoot));
+//     console.log("Token after login:", localStorage.getItem("persist:root"));
+
+//     return { token: accessToken };
+//   } catch (error) {
+//     const errorMessage =
+//       (error as { response?: { data?: { message?: string } } })?.response?.data
+//         ?.message || "An error occurred during login";
+//     throw new Error(errorMessage);
+//   }
+// };
+export const loginUser = async (user: { email: string; password: string }) => {
+  try {
+    const response = await instance.post("/auth/login", user);
+    console.log("API Response:", response.data);
+
+    const { accessToken, roles, name, email } = response.data;
+
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("roles", roles?.[0]?.name || "");
+    localStorage.setItem("name", name || "");
+    localStorage.setItem("userProfile", JSON.stringify({ name, roles, email }));
+
+    if (!accessToken) throw new Error("No access token received");
+
+    localStorage.setItem("token", accessToken);
+
+    const persistRoot = JSON.parse(
+      localStorage.getItem("persist:root") || "{}"
+    );
+
+    persistRoot.auth = JSON.stringify({
+      login: {
+        token: accessToken,
+        currentUser: { roles },
+        isFetching: false,
+        error: null,
+        isAuthenticated: true,
+        isLoggedIn: true,
+      },
+      profile: persistRoot.auth?.profile || {},
+      register: persistRoot.auth?.register || {},
+      users: persistRoot.auth?.users || [],
+    });
+
+    localStorage.setItem("persist:root", JSON.stringify(persistRoot));
+    console.log("Token after login:", localStorage.getItem("persist:root"));
+    return {
+      status: response.status,
+      message: response.data.message,
+      token: accessToken,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.",
+    };
+  }
+};
+
+export const getProfile = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  try {
+    const response = await instance.get(`${API_URL}/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching profile:", (error as Error).message);
+    throw new Error("Failed to fetch profile: " + (error as Error).message);
+  }
+};
+export const getList = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found");
+
+  const response = await instance.get(`${API_URL}/auth/list`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   });
 
-  return res;
+  return response.data.data;
 };
 
-const getProfile = async (): Promise<UserProfile> => {
-  const res = await request({
-    path: "auth/profile",
-    method: "GET",
+export const logout = async () => {
+  await instance.post(`${API_URL}/auth/logout`);
+  localStorage.removeItem("token");
+  localStorage.removeItem("roles");
+  localStorage.removeItem("name");
+};
+
+export const updateProfile = async (formData: FormData) => {
+  const response = await instance.put(`${API_URL}/auth/profile`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
-
-  return res as UserProfile;
+  return response.data;
 };
 
-const logout = async (): Promise<UserProfile> => {
-  const res = await request({
-    path: "auth/logout",
-    method: "POST",
-  });
+// export const registerUser = async (user: {
+//   email: string;
+//   password: string;
+//   name: string;
+// }) => {
+//   const response = await instance.post(`${API_URL}/auth/register`, user);
+//   if (response.status === 200) {
+//     return response.data;
+//   }
+//   throw new Error(response.data.msg || "Đã xảy ra lỗi khi đăng ký.");
+// };
 
-  return res as UserProfile;
-};
-const updateProfile = async (
-  profileData: UserProfile
-): Promise<UserProfile> => {
+export const registerUser = async (user: {
+  email: string;
+  password: string;
+  name: string;
+}) => {
   try {
-    const res = await request({
-      path: "auth/profile",
-      method: "PUT",
-      data: profileData,
-    });
+    const response = await instance.post(`${API_URL}/auth/register`, user);
+    return {
+      status: response.status,
+      message: response.data.message,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng ký.",
+    };
+  }
+};
 
-    return res as UserProfile;
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response) {
-      throw err.response.data;
+//xác thực email
+
+// export const verifyEmail = async (token: string) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/auth/verifyEmail`, {
+//       params: { token },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       // Xử lý lỗi từ Axios
+//       throw new Error(
+//         `Error verifying email: ${error.response.data.message || error.message}`
+//       );
+//     } else if (error instanceof Error) {
+//       throw new Error(`Error verifying email: ${error.message}`);
+//     } else {
+//       throw new Error("Error verifying email: An unknown error occurred");
+//     }
+//   }
+// };
+export const verifyEmail = async (token: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/auth/verifyEmail`, {
+      params: { token },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      // Xử lý lỗi từ Axios
+      console.error(
+        `Error verifying email: ${error.response.data.message || error.message}`
+      );
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      console.error(`Error verifying email: ${error.message}`);
+      throw new Error(error.message);
     } else {
+      console.error("Error verifying email: An unknown error occurred");
       throw new Error("An unknown error occurred");
     }
   }
 };
-const registerApi = async ({
-  email,
-  password,
-  name,
-}: Registe): Promise<RegisterResponse> => {
-  try {
-    const res = await request({
-      path: "auth/register",
-      method: "POST",
-      data: {
-        email: email,
-        password: password,
-        name: name,
-        device: "website",
-      },
-    });
 
-    return res;
-  } catch (err) {
-    if (axios.isAxiosError(err) && err.response) {
-      throw err.response.data;
+export const resendEmail = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/resendEmail`, { email });
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message || "Đã xảy ra lỗi khi yêu cầu xác lại.",
+    };
+  }
+};
+// yêu cầu mail reset
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+      email,
+    });
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message ||
+        "Đã xảy ra lỗi khi gửi yêu cầu quên mật khẩu.",
+    };
+  }
+};
+
+export const updatePassword = async (
+  currentPassword: string,
+  newPassword: string
+) => {
+  try {
+    const response = await instance.put(`${API_URL}/auth/password`, {
+      currentPassword,
+      newPassword,
+    });
+    return {
+      status: response.status,
+      message: response.data.message,
+      data: response.data,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.",
+    };
+  }
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  try {
+    const response = await axios.put(`${API_URL}/auth/resetPassword`, {
+      token,
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        `Error resetPassword: ${error.response.data.message || error.message}`
+      );
+    } else if (error instanceof Error) {
+      throw new Error(`Error resetPassword: ${error.message}`);
     } else {
-      throw new Error("An unknown error occurred");
+      throw new Error("Error resetPassword: An unknown error occurred");
     }
   }
 };
-export { loginApi, getProfile, registerApi, updateProfile, logout };

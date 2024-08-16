@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const discountSchema = new Schema(
+const voucherSchema = new Schema(
   {
     code: { type: String, required: true },
     voucherNum: { type: Number, required: true },
@@ -10,9 +10,16 @@ const discountSchema = new Schema(
         name: { type: String, required: true }
       }
     ],
-    expiryDate: { type: Date, required: true },
+    expiryDate: { 
+      type: Date, 
+      required: true
+    
+    
+    },
     conditionActive: { type: String, required: true },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    status: { type: String, default: 'active' },
+  
   },
   {
     collection: "voucher", // Name of the collection
@@ -20,10 +27,10 @@ const discountSchema = new Schema(
   }
 );
 
-discountSchema.statics.findWithCategory = function (query) {
+voucherSchema.statics.findWithCategory = function (query) {
   return this.find(query).populate('cateReady.category').exec();
 };
 
-module.exports = model("Voucher", discountSchema);
+module.exports = model("Voucher", voucherSchema);
 
 

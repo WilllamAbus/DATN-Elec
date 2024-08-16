@@ -6,7 +6,12 @@ import {
   getAllCategories, 
   getCategoryById, 
   updateCategory, 
-  deleteCategory 
+  deleteCategory ,
+  deleteListCate,
+  sofDeleteCategory,
+  restore,
+  ApiResponse,
+  checkCategoryExists
 } from '../../services/categories/categories.service';
 import { Category } from '../../types/Categories.d';
 
@@ -32,6 +37,14 @@ export const createCategoryThunk = createAsyncThunk(
     'categories/createCategory',
     async (formData: FormData, { rejectWithValue }) => {
       try {
+        const name = formData.get('name');
+      
+        // Check if category already exists
+        const exists = await checkCategoryExists(name);
+        if (exists) {
+          return rejectWithValue('Category already exists');
+        }
+  
         const result = await createCategory(formData);
         return { category: result.category, message: result.message }; // Return both category and message
       } catch (error) {
@@ -66,3 +79,38 @@ export const deleteCategoryThunk = createAsyncThunk<{ _id: string }, string>(
       return { _id: id }; // Ensure the return type matches the thunk's expected payload type
     }
   );
+
+
+
+
+
+// Soft Delete Category Thunk
+export const softDeleteCategoryThunk = createAsyncThunk<Category, string>(
+  'categories/softDeleteCategory',
+  async (categoryId: string) => {
+    const response = await sofDeleteCategory(categoryId);
+    return response;  // This should be the full Category object
+  }
+);
+
+export const fetchDeletedCategoriesThunk = createAsyncThunk<Category[]>(
+  'categories/fetchDeletedCategories',
+  async () => {
+    try {
+      const response: ApiResponse = await deleteListCate();
+      return response.data; // Ensure this is Category[]
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return []; // Return an empty array on error
+    }
+  }
+);
+
+
+export const restoreCategoryThunk = createAsyncThunk<Category, string>(
+  'categories/restoreCategory',
+  async (categoryId: string) => {
+    const response = await restore(categoryId);
+    return response;  // This should be the full Category object
+  }
+);

@@ -6,10 +6,15 @@ const _Category = require('../model/catgories.model');
 
 const upLoadImgBucket = {
 
-
-    getAllCategories: async () => {
-        return await _Category.find({});
-    },
+  checkCategoryExists : async (name) => {
+    try {
+      const category = await _Category.findOne({ name });
+      return !!category; // Return true if category exists, otherwise false
+    } catch (error) {
+      throw new Error('Error checking category');
+    }
+  },
+   
 
     getCategoryById : async (id) => {
         return await _Category.findById(id);
@@ -35,7 +40,39 @@ const upLoadImgBucket = {
 
       deleteCategory: async (id) => {
         return await _Category.findByIdAndDelete(id);
+      },
+      getAllCategories: async () => {
+        return await _Category.find({ status: { $ne: 'deleted' } });
+    },
+      softDeleteCategory: async (id) => {
+    
+        try {
+          return await _Category.findByIdAndUpdate(id,   { status: 'deleted' }, { new: true });  
+        
+        } catch (error) {
+          console.error(error)
+        }
+      
+    },
+    deletedList: async (req, res) => {
+      try {
+        return await _Category.find({ status: 'deleted' });
+      } catch (error) {
+        console.error(error)
       }
+
+       
+    },
+    restore: async (id) => {
+      try {
+        return await _Category.findByIdAndUpdate(id,   { status: 'active' }, { new: true });
+        
+      } catch (error) {
+        console.error(error)
+      }
+
+     
+    },
 
 }
 

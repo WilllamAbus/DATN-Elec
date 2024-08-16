@@ -19,7 +19,22 @@ const EditDiscount: React.FC = () => {
     (state: RootState) => state.categories.categories
   ) as Category[];
 //   const discount = useSelector((state: RootState) => state.discount.discount);
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+    e.preventDefault();
+  }
+};
 
+const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+  e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+};
+
+const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const pastedData = e.clipboardData.getData('Text');
+  if (!/^\d+$/.test(pastedData)) {
+    e.preventDefault();
+  }
+};
   useEffect(() => {
     if (id) {
       dispatch(fetchVoucherById(id))
@@ -105,11 +120,16 @@ const EditDiscount: React.FC = () => {
                   </label>
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    type="number"
+                    type="text"
                     {...register('voucherNum', {
-                      required: "Phần trăm giảm giá không được để trống",
+                      required: "Giá giảm không được để trống",
+                      
                       min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
+                      validate: value => !isNaN(value) || "Giá sản phẩm phải là số"
                     })}
+                    onKeyDown={handleKeyDown}
+                    onInput={handleInput}
+                    onPaste={handlePaste}
                   />
                   {errors. voucherNum && typeof errors. voucherNum.message === 'string' && (
                     <p className="text-red-500 text-xs">{errors.voucherNum.message}</p>

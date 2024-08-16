@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom'; 
@@ -7,11 +7,13 @@ import { createVoucher } from '../../../../redux/discount/voucherThunk'; // Impo
 import { RootState, AppDispatch } from '../../../../redux/store';
 import { Category } from "../../../../types/Categories.d";
 import { Voucher } from "../../../../types/Voucher.d"; // Import your Discount type
-import AlertCustomStyles from '../../../../ultils/alert.succes';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { notify } from "../../../../ultils/success";
 const addDiscount: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Voucher>();
-  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
+  // const [ setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
   const navigate = useNavigate(); 
   const categories = useSelector(
     (state: RootState) => state.categories.categories
@@ -23,13 +25,29 @@ const addDiscount: React.FC = () => {
 
 
 
-  const validateExpirationDate = (date: string) => {
+  const validateExpiryDate = (date: string) => {
     const today = new Date();
+    const minValidDate = new Date(today);
+    minValidDate.setDate(today.getDate() + 15); // 15 days from today
     const selectedDate = new Date(date);
-    const differenceInDays = (selectedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-    return differenceInDays >= 15 || "Hạn sử dụng 15 ngày.";
+    return selectedDate >= minValidDate || "Hạn sử dụng phải ít nhất là 15 ngày kể từ ngày hôm nay.";
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+      e.preventDefault();
+    }
   };
 
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData('Text');
+    if (!/^\d+$/.test(pastedData)) {
+      e.preventDefault();
+    }
+  };
   const onSubmit = async (data: Voucher) => {
     const formattedData = {
         ...data,
@@ -37,11 +55,11 @@ const addDiscount: React.FC = () => {
       };
     try {
       await dispatch(createVoucher(formattedData)).unwrap();
-      setAlert({ message: 'Thêm giảm giá thành công!', type: 'success' });
+      notify()
       reset(); // Reset the form fields
       setTimeout(() => navigate('/admin/listVouchers'), 2000); // Navigate after 2 seconds
     } catch (error) {
-      setAlert({ message: 'Error creating discount!', type: 'error' });
+      // setAlert({ message: 'Error creating discount!', type: 'error' });
       console.error('Error creating discount:', error);
     }
   };
@@ -50,11 +68,7 @@ const addDiscount: React.FC = () => {
     <main className="w-full flex-grow p-6">
       <div className="flex flex-wrap">
         <div className="w-full mt-6 pl-0 lg:pl-2">
-        {alert && (
-            <div className="mb-4">
-              <AlertCustomStyles message={alert.message} type={alert.type} />
-            </div>
-          )}
+          <ToastContainer/>
           <div className="leading-loose">
             <form >
               <div className="flex flex-wrap -mx-3 mb-6">
@@ -87,13 +101,16 @@ const addDiscount: React.FC = () => {
                   </label>
                   <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    type="number"
+                    type="text"
                     {...register('voucherNum', {
                       required: "Giá giảm không được để trống",
                       
                       min: { value: 10.000, message: "Giá giảm phải lớn hơn 10.000" },
-                    
+                      validate: value => !isNaN(value) || "Giá sản phẩm phải là số"
                     })}
+                    onKeyDown={handleKeyDown}
+                    onInput={handleInput}
+                    onPaste={handlePaste}
                   />
                   {errors.voucherNum && typeof errors. voucherNum.message === 'string' && (
                     <p className="text-red-500 text-xs">{errors.voucherNum.message}</p>
@@ -139,8 +156,8 @@ const addDiscount: React.FC = () => {
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="date"
                     {...register('expiryDate', {
-                      required: "Expiration date is required",
-                      validate: validateExpirationDate
+                      required: "Ngày nhập không được bỏ trống",
+                      validate: validateExpiryDate
                     })}
                   />
                   {errors.expiryDate && typeof errors.expiryDate.message === 'string' && (

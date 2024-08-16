@@ -1,4 +1,4 @@
-import instance from "../axios";
+import instance from "../axois_V2";
 
 export const listProduct = async () => {
   try {

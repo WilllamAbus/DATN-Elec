@@ -7,7 +7,9 @@ import authReducer from "./auth/authSlice";
 import authGoogleReducer from "./auth/googleSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
-
+import { store } from "./store";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import checkoutSlice from "./checkout/checkoutSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -19,13 +21,19 @@ const authConfigGoogle = {
   whitelist: ["login"],
 };
 
+
+
+
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
   authGoogle: persistReducer(authConfigGoogle, authGoogleReducer),
   categories: categoriesSlice,
   voucher: voucherReducer,
+  checkout: checkoutSlice,
 });
 
+export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof rootReducer>;
-
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export default rootReducer;

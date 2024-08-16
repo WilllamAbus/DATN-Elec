@@ -12,5 +12,24 @@ export interface Category {
     isActive: boolean;
     cateReady: Category[];
     conditionActive: string;
+    status: string;
   }
   
+
+  export interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    imgPreview: string;
+  }
+  
+  export  interface CartState {
+    items: CartItem[];
+    totalPrice: number;
+    shipping: number;
+    applyVoucher: boolean;
+    selectedVoucher?: Voucher;
+    // email: string,
+    // roles:string
+  }

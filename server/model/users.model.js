@@ -11,18 +11,21 @@ const userSchema = new Schema(
     birthday: { type: Date, require: true },
     gender: { type: String, enum: ["Nam", "Nữ"] },
     phone: { type: String, require: true },
-    VerifiedEmail: { type: Boolean, default: false },
-    emailVerificationToken: String,
-    emailVerificationExpires: Date,
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
+
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    status: { type: String, default: "Hoạt động" },
+    avatar: String,
+    status: { type: String, default: "active" },
+    disabledAt: { type: Date, default: null },
     socialLogin: {
       googleId: String,
       facebookId: String,
     },
     tokenLogin: String,
-    avatar: String,
+
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
   },
   {

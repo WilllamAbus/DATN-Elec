@@ -1,21 +1,32 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Voucher } from '../../types/Voucher.d';
-import { createVoucher, deleteVoucher, fetchVoucherById, fetchVouchers, updateVoucher } from './voucherThunk';
+import { createVoucher, 
+  deleteVoucher, 
+  fetchVoucherById, 
+  fetchVouchers, 
+  updateVoucher ,
+softDeleteVoucherThunk,
+fetchDeletedVoucherThunk,
+restoreVoucherThunk} from './voucherThunk';
 
 interface VoucherState {
   vouchers: Voucher[];
+  deletedVoucher: Voucher[]
   voucher: Voucher | null; // New state for a single discount
   loading: boolean;
   error: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  message: string | null;
 }
 
 const initialState: VoucherState = {
   vouchers: [],
+  deletedVoucher:[],
   voucher: null,
   loading: false,
   error: null,
   status: 'idle',
+  message:null
 };
 
 const discountSlice = createSlice({
@@ -85,7 +96,75 @@ const discountSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch discount';
         state.status = 'failed';
+      })
+
+
+
+      .addCase(fetchDeletedVoucherThunk.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchDeletedVoucherThunk.fulfilled, (state, action: PayloadAction<Voucher[]>) => {
+        state.status = 'succeeded';
+        state.deletedVoucher = action.payload;
+        state.message = null;
+      })
+      .addCase(fetchDeletedVoucherThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Failed to fetch deleted order';
+        state.message = null;
+      })
+      // .addCase(restoreCategoryThunk.pending, (state) => {
+      //   state.status = 'loading';
+      // })
+      .addCase(restoreVoucherThunk.fulfilled, (state, action: PayloadAction<Voucher>) => {
+        state.status = 'succeeded';
+        if (Array.isArray(state.deletedVoucher)) {
+          const existingOrder = state.deletedVoucher.find(order => order._id === action.payload._id);
+          if (!existingOrder) {
+            state. vouchers.push(action.payload);
+          }
+        } else {
+          console.error('State.deletedOrder is not an array. Resetting to empty array.');
+          state.deletedVoucher = [action.payload];
+        }
+      
+        state.error = null;
+        // state.deletedOrder = state.deletedOrder.filter(order => order._id !== action.payload._id);
+        // state.orders.push(action.payload);
+        // state.message = null;
+      })
+      .addCase(restoreVoucherThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Failed to restore category';
+        state.message = null;
+      })
+      // .addCase(softDeleteCategoryThunk.pending, (state) => {
+      //   state.status = 'loading';
+      // })
+      .addCase(softDeleteVoucherThunk.fulfilled, (state, action: PayloadAction<Voucher>) => {
+        state.status = 'succeeded';
+      
+     
+      
+        if (Array.isArray(state.deletedVoucher)) {
+          const existingOrder = state.deletedVoucher.find(voucher => voucher._id === action.payload._id);
+          if (!existingOrder) {
+            state.deletedVoucher.push(action.payload);
+          }
+        } else {
+          console.error('State.deletedOrder is not an array. Resetting to empty array.');
+          state.deletedVoucher = [action.payload];
+        }
+      
+        state.error = null;
+      })
+      
+      
+      .addCase(softDeleteVoucherThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to soft delete order';
       });
+
   },
 });
 

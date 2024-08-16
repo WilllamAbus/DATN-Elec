@@ -8,7 +8,9 @@ const ProductService = require('../../services/product.service');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const dotenv = require("dotenv");
-
+const modelUser = require("../../model/users.model");
+const modelComment = require("../../model/comment.model");
+const modelRepComment = require("../../model/repComment.model")
 dotenv.config();
 
 const STORE_BUCKET = process.env.STORE_BUCKET;
@@ -504,9 +506,129 @@ const productsController = {
                 msg: 'Failed at product controller: ' + error.message
             });
         }
-    }
+    },
+    userID: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const product = await modelUser.findById(id);
+            if (!product) {
+                return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+            }
 
+            res.status(200).json(product);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    comment: async (req, res) => {
+        try {
+            let { content, id_product, id_user, rating, createdAt } = req.body;
 
+            if (!content || !id_product|| !id_user || !rating) {
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin" });
+            }
+
+            createdAt = createdAt ? new Date(createdAt) : new Date();
+
+          
+                await saveComment();
+
+            async function saveComment() {
+                let data = { content, id_product, id_user, rating, createdAt };
+
+                // Save to database
+                const savedProduct = await modelComment.create(data);
+                res.status(201).json({ message: "Sản phẩm được tạo thành công", savedProduct });
+            }
+        } catch (error) {
+            console.error('Lỗi khi thêm sản phẩm:', error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+    commentProduct : async (req, res) => {
+        try {
+            const { id } = req.params; 
+            const comments = await modelComment.find({ id_product: id })
+            if (comments.length === 0) {
+                return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+            }
+            res.status(200).json(comments);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    deleteComment: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const comment = await modelComment.findById(id);
+            
+            if (!comment) {
+                return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+            }
+    
+            await modelComment.findByIdAndDelete(id);
+            res.status(200).json({ message: "Bình luận đã được xóa thành công" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    
+    commentAllProduct :  async (req, res) => {
+        try {
+            const comments = await modelComment.find()
+            if (comments.length === 0) {
+                return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+            }
+            res.status(200).json(comments);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    repComment: async (req, res) => {
+        try {
+            let { content, id_comment, createdAt } = req.body;
+    
+            // Kiểm tra xem các trường cần thiết có được gửi lên không
+            if (!content || !id_comment) {
+                return res.status(400).json({ message: "Vui lòng nhập đủ thông tin" });
+            }
+    
+            // Nếu không có createdAt thì lấy thời gian hiện tại
+            createdAt = createdAt ? new Date(createdAt) : new Date();
+    
+            // Gọi hàm lưu comment
+            await saverepComment();
+    
+            async function saverepComment() {
+                let data = { content, id_comment, createdAt };
+    
+                // Lưu vào cơ sở dữ liệu
+                const savedComment = await modelRepComment.create(data);
+                res.status(201).json({ message: "Phản hồi bình luận được tạo thành công", savedComment });
+            }
+        } catch (error) {
+            console.error('Lỗi khi thêm phản hồi:', error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+    getRepComment : async (req, res) => {
+        try {
+            const { id } = req.params; 
+            const comments = await modelRepComment.find({ id_comment: id })
+            if (comments.length === 0) {
+                return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+            }
+            res.status(200).json(comments);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    
 
 
 

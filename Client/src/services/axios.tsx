@@ -6,17 +6,27 @@ const instance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 instance.interceptors.request.use(
   function (config) {
-    const token = window.localStorage.getItem("persist:root");
-    if (token) {
+    const tokenData = window.localStorage.getItem("persist:root");
+    if (tokenData) {
       try {
-        const parsedToken = JSON.parse(token);
-        const authData = JSON.parse(parsedToken.authGoogle);
-        const accessToken = authData?.login?.token;
-        console.log("Access token:", accessToken);
-        config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : undefined;
+        // Phân tích dữ liệu lưu trữ
+        const parsedToken = JSON.parse(tokenData);
+        if (parsedToken && parsedToken.auth) {
+          const authData = JSON.parse(parsedToken.auth); // Phân tích chuỗi JSON bên trong
+          if (authData && authData.login) {
+            const accessToken = authData.login.token;
+            console.log("Access token:", accessToken);
+            config.headers.Authorization = accessToken
+              ? `Bearer ${accessToken}`
+              : undefined;
+          } else {
+            console.error("Auth data is not in expected format:", authData);
+          }
+        } else {
+          console.error("Token data is not in expected format:", parsedToken);
+        }
       } catch (e) {
         console.error("Error parsing token:", e);
       }
@@ -38,3 +48,5 @@ instance.interceptors.response.use(
 );
 
 export default instance;
+
+

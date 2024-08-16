@@ -6,12 +6,16 @@ import {
   fetchCategoryByIdThunk, 
   createCategoryThunk, 
   updateCategoryThunk, 
-  deleteCategoryThunk 
+  deleteCategoryThunk ,
+  restoreCategoryThunk,
+  softDeleteCategoryThunk,
+  fetchDeletedCategoriesThunk
 } from './categoriesThunk';
 import { Category } from '../../types/Categories.d';
 
 interface CategoryState {
   categories: Category[];
+  deletedCategories: Category[] ;
   selectedCategory: Category | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
@@ -20,6 +24,7 @@ interface CategoryState {
 
 const initialState: CategoryState = {
   categories: [],
+  deletedCategories: [] as Category[] ,
   selectedCategory: null,
   status: 'idle',
   error: null,
@@ -78,7 +83,7 @@ const categoriesSlice = createSlice({
   
       .addCase(updateCategoryThunk.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Update the categories array with the updated category
+// Update the categories array with the updated category
         const updatedCategory = action.payload;
         state.categories = state.categories.map(category =>
           category._id === updatedCategory._id ? updatedCategory : category
@@ -101,6 +106,56 @@ const categoriesSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || 'Failed to delete category';
         state.message = null; // Clear any existing message
+      })
+
+
+
+
+
+      .addCase(fetchDeletedCategoriesThunk.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchDeletedCategoriesThunk.fulfilled, (state, action: PayloadAction<Category[]>) => {
+        state.status = 'succeeded';
+        state.deletedCategories = action.payload;
+        state.message = null;
+      })
+      .addCase(fetchDeletedCategoriesThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Failed to fetch deleted categories';
+        state.message = null;
+      })
+      // .addCase(restoreCategoryThunk.pending, (state) => {
+      //   state.status = 'loading';
+      // })
+      .addCase(restoreCategoryThunk.fulfilled, (state, action: PayloadAction<Category>) => {
+        state.status = 'succeeded';
+        state.deletedCategories = state.deletedCategories.filter(category => category._id !== action.payload._id);
+        state.categories.push(action.payload);
+        state.message = null;
+      })
+      .addCase(restoreCategoryThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Failed to restore category';
+        state.message = null;
+      })
+      // .addCase(softDeleteCategoryThunk.pending, (state) => {
+      //   state.status = 'loading';
+      // })
+      .addCase(softDeleteCategoryThunk.fulfilled, (state, action: PayloadAction<Category>) => {
+        state.status = 'succeeded';
+        // state.categories = state.categories.filter(category => category._id !== action.payload._id);
+        if (!state.deletedCategories.find(category => category._id === action.payload._id)) {
+          state.deletedCategories.push(action.payload);
+        }
+        // state.deletedCategories.push(action.payload);
+        // state.message = 'Category soft deleted successfully';
+        state.error = null;
+      })
+      .addCase(softDeleteCategoryThunk.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? 'Failed to soft delete category';
+        state.message = null;
       });
   },
 });
