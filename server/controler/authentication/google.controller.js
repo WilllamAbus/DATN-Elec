@@ -11,7 +11,6 @@ const loginSuccess = async (req, res) => {
 
     let response = await authService.loginSuccessService(id, tokenLogin);
 
-    // Xử lý kết quả từ authService
     if (response.err === 1) {
       console.log('User not found or invalid token:', id, tokenLogin);
     }

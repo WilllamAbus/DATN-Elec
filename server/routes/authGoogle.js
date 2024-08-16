@@ -18,13 +18,11 @@ router.get('/google/callback', (req, res, next) => {
     }
 
     if (profile.existingUser) {
-      // Người dùng cũ đã tồn tại, chuyển hướng đến trang nhập mật khẩu
       const email = encodeURIComponent(profile.email);
       const googleId = encodeURIComponent(profile.googleId);
       return res.redirect(`${process.env.URL_FE}/link-account?email=${email}&googleId=${googleId}`);
     }
 
-    // Người dùng mới hoặc đã hoàn tất liên kết, chuyển hướng đến trang thành công
     res.redirect(`${process.env.URL_FE}/login-success/${profile.id}/${profile.tokenLogin}`);
   })(req, res, next);
 });

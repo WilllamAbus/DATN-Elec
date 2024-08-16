@@ -12,8 +12,8 @@ const LoginSuccess = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const roles = useSelector((state: RootState) => state.auth.login.roles);
-  const isLoggedIn = useSelector((state: RootState) => state.auth.login.isLoggedIn);
+  const roles = useSelector((state: RootState) => state.authGoogle.login.roles);
+  const isLoggedIn = useSelector((state: RootState) => state.authGoogle.login.isLoggedIn);
 
   useEffect(() => {
     if (userId && tokenLogin) {

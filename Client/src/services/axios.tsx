@@ -13,7 +13,7 @@ instance.interceptors.request.use(
     if (token) {
       try {
         const parsedToken = JSON.parse(token);
-        const authData = JSON.parse(parsedToken.auth);
+        const authData = JSON.parse(parsedToken.authGoogle);
         const accessToken = authData?.login?.token;
         console.log("Access token:", accessToken);
         config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : undefined;

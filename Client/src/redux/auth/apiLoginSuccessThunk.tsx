@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { apiLoginSuccessService } from "../../services/authentication/loginSuccess.service";
-import { loginStart, loginSuccess, loginFailed } from "../../redux/auth/authSlice";
+import { loginStart, loginSuccess, loginFailed } from "../../redux/auth/googleSlice";
 
 export const apiLoginSuccessThunk = createAsyncThunk(
   "auth/loginSuccess",
