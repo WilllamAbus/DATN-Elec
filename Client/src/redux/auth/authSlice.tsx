@@ -4,6 +4,7 @@ import {
   Role,
   ResetPassState,
   ForgotState,
+  // LoginResponse,
 } from "../../types/user";
 import {
   getProfileThunk,
@@ -16,6 +17,7 @@ import {
   verifyEmailThunk,
   getActiveListThunk,
   resetPasswordThunk,
+  // loginUserThunk,
   forgotPasswordThunk,
   resendEmailThunk,
   fetchUserById,
@@ -217,6 +219,7 @@ const authSlice = createSlice({
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
     },
+
     setProfile(state, action: PayloadAction<UserProfile>) {
       state.profile.profile = action.payload;
       state.profile.roles = action.payload.roles || [];

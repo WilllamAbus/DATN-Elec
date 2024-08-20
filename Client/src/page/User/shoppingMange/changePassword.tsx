@@ -86,6 +86,9 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
             className="border border-gray-300 px-4 py-2 w-full"
             {...register("newPassword", {
               required: "Mật khẩu mới là bắt buộc",
+              validate: (value) =>
+                value !== getValues("currentPassword") ||
+                "Mật khẩu mới không được trùng với mật khẩu hiện tại",
             })}
           />
           {formState.errors.newPassword && (
