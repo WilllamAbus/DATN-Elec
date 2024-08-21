@@ -160,7 +160,7 @@ const Register: React.FC = () => {
             <div className="mt-4">
               <button
                 type="submit"
-                className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium"
+                className="block w-full py-2 text-center bg-yellow-400 text-white bg-primary border border-primary rounded hover:bg-yellow-500 hover:text-primary transition uppercase font-roboto font-medium"
               >
                 ĐĂNG KÝ
               </button>
