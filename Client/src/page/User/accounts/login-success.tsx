@@ -6,18 +6,25 @@ import { apiLoginSuccessThunk } from "../../../redux/auth/apiLoginSuccessThunk";
 import { AppDispatch, RootState } from "../../../redux/store";
 
 const LoginSuccess = () => {
-  const { userId, tokenLogin } = useParams<{ userId?: string; tokenLogin?: string }>();
+  const { userId, tokenLogin } = useParams<{
+    userId?: string;
+    tokenLogin?: string;
+  }>();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const roles = useSelector((state: RootState) => state.authGoogle.login.roles);
-  const isLoggedIn = useSelector((state: RootState) => state.authGoogle.login.isLoggedIn);
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.authGoogle.login.isLoggedIn
+  );
 
   useEffect(() => {
     if (userId && tokenLogin) {
       const loginSuccess = async () => {
         try {
-          await dispatch(apiLoginSuccessThunk({ id: userId, token: tokenLogin })).unwrap();
+          await dispatch(
+            apiLoginSuccessThunk({ id: userId, token: tokenLogin })
+          ).unwrap();
         } catch (error: any) {
           console.error("Lỗi khi đăng nhập:", error.message);
           navigate("/login-error");
@@ -67,7 +74,9 @@ const LoginSuccess = () => {
           </div>
           <div className="text-center px-6 py-4">
             <h1 className="font-bold text-3xl text-gray-900">Success</h1>
-            <p className="text-gray-700 mt-2">Bạn đã đăng nhập thành công tài khoản Google</p>
+            <p className="text-gray-700 mt-2">
+              Bạn đã đăng nhập thành công tài khoản Google
+            </p>
           </div>
         </div>
       </div>

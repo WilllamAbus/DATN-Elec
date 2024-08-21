@@ -14,7 +14,7 @@ interface Role {
 
 interface AuthState {
   login: {
-    currentUser: string | null;
+    name: string | null;
     isFetching: boolean;
     error: boolean;
     isAuthenticated: boolean;
@@ -26,7 +26,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   login: {
-    currentUser: null,
+    name: null,
     isFetching: false,
     error: false,
     isAuthenticated: false,
@@ -45,10 +45,14 @@ const authSlice = createSlice({
     },
     loginSuccess: (
       state,
-      action: PayloadAction<{ currentUser: string; token: string; roles: Role[] }>
+      action: PayloadAction<{
+        currentUser: string;
+        token: string;
+        roles: Role[];
+      }>
     ) => {
       state.login.isFetching = false;
-      state.login.currentUser = action.payload.currentUser;
+      state.login.name = action.payload.currentUser;
       state.login.token = action.payload.token;
       state.login.isAuthenticated = true;
       state.login.isLoggedIn = true;
@@ -62,7 +66,7 @@ const authSlice = createSlice({
       state.login.isLoggedIn = false;
     },
     logout: (state) => {
-      state.login.currentUser = null;
+      state.login.name = null;
       state.login.token = null;
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
@@ -71,6 +75,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFailed, logout } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailed, logout } =
+  authSlice.actions;
 
 export default authSlice.reducer;

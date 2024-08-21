@@ -1,5 +1,5 @@
 import { UserProfile } from "../../types/user";
-import instance from "../axois_V2";
+import instance from "../axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // xóa mềm

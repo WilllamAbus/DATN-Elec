@@ -22,12 +22,7 @@ import {
   getUserById,
   listRole,
 } from "../../services/authentication/authAdmin";
-import { Role, UserProfile } from "../../types/user";
-interface LoginResponse {
-  status: number;
-  message: string;
-  token?: string;
-}
+import { Role, UserProfile, LoginResponse } from "../../types/user";
 
 // Thunk cho việc đăng nhập
 // export const loginUserThunk = createAsyncThunk(
@@ -52,12 +47,11 @@ export const loginUserThunk = createAsyncThunk<
     return response as LoginResponse;
   } catch (error) {
     if (error instanceof Error) {
-      return rejectWithValue((error as { message: string }).message);
+      return rejectWithValue(error.message);
     }
     return rejectWithValue("An unknown error occurred");
   }
 });
-
 export const getProfileThunk = createAsyncThunk<
   UserProfile,
   void,

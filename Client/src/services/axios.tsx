@@ -2,32 +2,17 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
 instance.interceptors.request.use(
   function (config) {
-    const tokenData = window.localStorage.getItem("persist:root");
-    if (tokenData) {
-      try {
-        // Phân tích dữ liệu lưu trữ
-        const parsedToken = JSON.parse(tokenData);
-        if (parsedToken && parsedToken.authGoogle) {
-          const authData = JSON.parse(parsedToken.authGoogle);
-          if (authData && authData.login) {
-            const accessToken = authData.login.token;
-            console.log("Access token:", accessToken);
-            config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : undefined;
-          } else {
-            console.error("Auth data is not in expected format:", authData);
-          }
-        } else {
-          console.error("Token data is not in expected format:", parsedToken);
-        }
-      } catch (e) {
-        console.error("Error parsing token:", e);
-      }
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -40,7 +25,35 @@ instance.interceptors.response.use(
   function (response) {
     return response;
   },
-  function (error) {
+  async function (error) {
+    const originalRequest = error.config;
+
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshResponse = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+
+        const newAccessToken = refreshResponse.data.accessToken;
+        localStorage.setItem("token", newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

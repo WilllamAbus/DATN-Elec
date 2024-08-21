@@ -1,4 +1,4 @@
-import instance from "../axois_V2";
+import instance from "../axios";
 
 export const listProduct = async () => {
   try {
@@ -7,7 +7,9 @@ export const listProduct = async () => {
     if (response.data.success) {
       return response.data.data;
     } else {
-      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách sản phẩm");
+      throw new Error(
+        response.data.msg || "Lỗi không xác định khi lấy danh sách sản phẩm"
+      );
     }
   } catch (error) {
     console.error("Error fetching product list:", error);

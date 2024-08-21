@@ -35,6 +35,7 @@ export interface UserProfile {
   email: string;
   VerifiedEmail: string;
   status: string;
+  refreshToken: string;
   roles: string[];
   birthday: string;
   gender: string;
@@ -67,4 +68,12 @@ export interface UpdateUser {
 export interface Role {
   _id: string;
   name: string;
+}
+export interface LoginResponse {
+  status: number;
+  message: string;
+  token?: string;
+  userProfile: UserProfile;
+  accessToken: string;
+  refreshToken: string;
 }
