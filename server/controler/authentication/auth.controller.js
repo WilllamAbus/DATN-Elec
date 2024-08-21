@@ -227,12 +227,14 @@ const authController = {
 
     try {
       if (!id || !tokenLogin) {
-        return res.status(400).json({ err: 1, msg: "Thiếu thông tin đầu vào" });
+        return res
+          .status(400)
+          .json({ err: 1, message: "Thiếu thông tin đầu vào" });
       }
 
       let response = await authService.loginSuccessService(id, tokenLogin);
 
-      if (response.err === 1 || !response.user) {
+      if (response.err === 1) {
         console.log(
           "Người dùng không tìm thấy hoặc token không hợp lệ:",
           id,
@@ -256,12 +258,11 @@ const authController = {
 
       const token = authController.generateToken(user);
       const refreshToken = authController.generateRefreshToken(user);
-
       refreshTokens.push(refreshToken);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         path: "/",
         sameSite: "strict",
       });
@@ -273,9 +274,10 @@ const authController = {
         .json({ ...others, accessToken: token, roles: user.roles });
     } catch (error) {
       console.error("Lỗi trong loginSuccess controller:", error);
-      return res
-        .status(500)
-        .json({ err: -1, msg: "Xử lý đăng nhập thất bại: " + error.message });
+      return res.status(500).json({
+        err: -1,
+        message: "Xử lý đăng nhập thất bại: " + error.message,
+      });
     }
   },
 
