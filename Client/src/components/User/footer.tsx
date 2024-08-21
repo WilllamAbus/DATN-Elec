@@ -23,7 +23,7 @@ export function UserFooter() {
             </FooterLinkGroup>
           </div>
           <div>
-            <FooterTitle title="hMạng xã hội" />
+            <FooterTitle title="Mạng xã hội" />
             <FooterLinkGroup col>
               <FooterLink href="#">Discord Server</FooterLink>
               <FooterLink href="#">Twitter</FooterLink>
