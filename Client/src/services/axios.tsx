@@ -13,14 +13,12 @@ instance.interceptors.request.use(
       try {
         // Phân tích dữ liệu lưu trữ
         const parsedToken = JSON.parse(tokenData);
-        if (parsedToken && parsedToken.auth) {
-          const authData = JSON.parse(parsedToken.auth); // Phân tích chuỗi JSON bên trong
+        if (parsedToken && parsedToken.authGoogle) {
+          const authData = JSON.parse(parsedToken.authGoogle);
           if (authData && authData.login) {
             const accessToken = authData.login.token;
             console.log("Access token:", accessToken);
-            config.headers.Authorization = accessToken
-              ? `Bearer ${accessToken}`
-              : undefined;
+            config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : undefined;
           } else {
             console.error("Auth data is not in expected format:", authData);
           }
@@ -48,5 +46,3 @@ instance.interceptors.response.use(
 );
 
 export default instance;
-
-

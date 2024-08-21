@@ -5,14 +5,7 @@ import {
   useAppSelector,
 } from "../../../redux/store";
 import { getProfileThunk } from "../../../redux/auth/authThunk";
-import UserHeader from "../../../components/User/header";
-import UserNav from "../../../components/User/navbar";
-import UserFooter from "../../../components/User/footer";
-import UserCoppyright from "../../../components/User/copyright";
 import { Link, useNavigate } from "react-router-dom";
-// import Avatar from "../../../assets/images/avatar.png";
-import "../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import { logout as logoutAction } from "../../../redux/auth/authSlice";
 import EditProfile from "./edit-profile";
 import Info from "./info";
@@ -78,8 +71,6 @@ const ProfileUse: React.FC = () => {
 
   return (
     <>
-      <UserHeader />
-      <UserNav />
       {/* Breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <Link to="/" className="text-primary text-base">
@@ -218,9 +209,7 @@ const ProfileUse: React.FC = () => {
 
         {/* ./info */}
       </div>
-      {/* ./wrapper */}
-      <UserFooter />
-      <UserCoppyright />
+
     </>
   );
 };

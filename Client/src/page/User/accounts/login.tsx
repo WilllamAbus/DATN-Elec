@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import UserHeader from "../../../components/User/header";
-import UserNav from "../../../components/User/navbar";
-import UserFooter from "../../../components/User/footer";
-import UserCopyright from "../../../components/User/copyright";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
-import "../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAppDispatch } from "../../../redux/store";
 import { loginUserThunk } from "../../../redux/auth/authThunk";
@@ -62,14 +57,10 @@ const Login: React.FC = () => {
   };
   return (
     <>
-      <UserHeader />
-      <UserNav />
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng nhập</h2>
-          <p className="text-gray-600 mb-6 text-sm">
-            Chào mừng khách hàng quay trở lại
-          </p>
+          <p className="text-gray-600 mb-6 text-sm">Chào mừng khách hàng quay trở lại</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
@@ -89,9 +80,7 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.email && (
-                <small className="text-red-600">{errors.email.message}</small>
-              )}
+              {errors.email && <small className="text-red-600">{errors.email.message}</small>}
             </div>
 
             <div>
@@ -111,11 +100,7 @@ const Login: React.FC = () => {
                   },
                 })}
               />
-              {errors.password && (
-                <small className="text-red-600">
-                  {errors.password.message}
-                </small>
-              )}
+              {errors.password && <small className="text-red-600">{errors.password.message}</small>}
             </div>
 
             <div className="flex items-center justify-between mt-6">
@@ -135,19 +120,13 @@ const Login: React.FC = () => {
               </button>
               <div className="flex items-center justify-between mt-6">
                 {loading && <div>Loading...</div>}
-                {message && (
-                  <div style={{ color: "red", marginTop: "10px" }}>
-                    {message}
-                  </div>
-                )}
+                {message && <div style={{ color: "red", marginTop: "10px" }}>{message}</div>}
               </div>
             </div>
           </form>
 
           <div className="mt-6 flex justify-center relative">
-            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">
-              Or
-            </div>
+            <div className="text-gray-600 uppercase px-3 bg-white z-10 relative">Or</div>
             <div className="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
           </div>
 
@@ -171,8 +150,6 @@ const Login: React.FC = () => {
           </p>
         </div>
       </div>
-      <UserFooter />
-      <UserCopyright />
     </>
   );
 };

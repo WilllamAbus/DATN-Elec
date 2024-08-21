@@ -10,7 +10,6 @@ interface ImportMetaEnv {
     readonly VITE_APP_FIREBASE_APP_ID: string;
     readonly VITE_APP_FIREBASE_MEASUREMENT_ID:string
 
-    // add more environment variables here if needed
   }
   
   interface ImportMeta {

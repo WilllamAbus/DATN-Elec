@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import "../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import { apiLoginSuccessThunk } from "../../../redux/auth/apiLoginSuccessThunk";
 import { AppDispatch, RootState } from "../../../redux/store";
 

@@ -1,201 +1,224 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom'; // Make sure to import Link from react-router-dom
-import logo from '../../assets/images/logo.svg'; // Adjust path to your logo image
-import dropOneHeader from "../../assets/images/icons/gpu-svgrepo-com.svg"
-import dropTwoHeader from "../../assets/images/icons/3d-printer-tool.svg"
-const Header:  React.FC = () => {
-  // State to control dropdown visibility
+const Header: React.FC = () => {
   const [cartCount, setCartCount] = useState<number>(0);
 
   useEffect(() => {
-    // Initialize cart count from localStorage
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartCount(storedCart.length);
-
-    // Add event listener for localStorage changes
-    window.addEventListener('storage', updateCartCount);
-
-    // Cleanup event listener on component unmount
+    window.addEventListener("storage", updateCartCount);
     return () => {
-      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener("storage", updateCartCount);
     };
   }, []);
 
   const updateCartCount = () => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartCount(storedCart.length);
   };
 
-  // const removeFromCart = (itemId: string) => {
-  //   // Assuming 'cart' is an array of item objects with 'id' properties
-  //   let storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-  //   storedCart = storedCart.filter((item: { id: string }) => item.id !== itemId);
-  //   localStorage.setItem('cart', JSON.stringify(storedCart));
-  //   updateCartCount(); // Manually update cart count
-  // };
-
-  const [keyword, setSearchTerm] = useState('');
-  const navigate = useNavigate();
-
-  const handleSearch = (e: React.FormEvent) => {
-      e.preventDefault();
-      
-      if (keyword.trim()) {
-          navigate(`/search/${keyword}`);
-      } else {
-          console.log('Vui lòng nhập từ khóa tìm kiếm');
-      }
-  };
   return (
-    <header className="py-4 shadow-sm bg-white">
-      <div className="container flex items-center justify-between">
-        <Link to="/">
-          <img src={logo} alt="Logo" className="w-40" />
-        </Link>
-
-        <div className="w-full max-w-xl relative flex">
-          <span className="absolute left-4 top-3 text-lg text-gray-400">
-            <i className="fa-solid fa-magnifying-glass"></i>
-          </span>
-          <form onSubmit={handleSearch} className="w-full flex">
-                <input
-                    type="text"
-                    name="search"
-                    id="searchTerm"
-                    className="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
-                    placeholder="Yêu cầu của bạn"
-                    value={keyword}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button
-                    type="submit"
-                    className="bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition"
-                >
-                    Tìm 
-                </button>
-            </form>
-        </div>
-
-        <div className="flex items-center space-x-4">
-              {/* Notification dropdown */}
-          <Link to="#" className="text-center text-gray-700   hover:text-primary px-8 py-4  cursor-pointer relative group">
-                    <div className="text-2xl">
-                    <i className="fa-regular fa-bell"></i>
-                    </div>
-                    <div className="text-xs leading-3">Thông báo</div>
-
-                    {/* dropdown */}
-                    <div className="absolute
-                     w-full left-0 
-                     top-full bg-white
-                      shadow-md py-3
-                       divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 
-                       transition duration-300 invisible group-hover:visible">
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-gray-100 transition">
-                            <img src={dropOneHeader} alt="sofa" className="w-5 h-5 object-contain" />
-                            <span className="ml-6 text-gray-600 text-sm">Graphic Card</span>
-                        </a>
-                        <a href="#" className="flex items-center px-6 py-3 hover:bg-gray-100 transition">
-                            <img src={dropTwoHeader} alt="terrace" className="w-5 h-5 object-contain" />
-                            <span className="ml-6 text-gray-600 text-sm">3D Printer Set</span>
-                        </a>
-                
-                    </div>
-            </Link>
-          <Link
-            to="#"
-            className="text-center text-gray-700 hover:text-primary relative"
-          >
-            <div className="text-2xl">
-              <i className="fa-regular fa-heart"></i>
+    <header className="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
+      <nav className="bg-primary-901 dark:bg-gray-800 antialiased">
+        <div className="max-w-screen-2xl px-8 mx-auto 2xl:px-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <ul className="hidden lg:flex items-center justify-start gap-6 md:gap-8 sm:justify-center">
+                <li>
+                  <a
+                    href="#"
+                    title=""
+                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
+                  >
+                    Liên hệ
+                  </a>
+                </li>
+                <li className="shrink-0">
+                  <a
+                    href="#"
+                    title=""
+                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
+                  >
+                    Tin công ngệ
+                  </a>
+                </li>
+                <li className="shrink-0">
+                  <a
+                    href="#"
+                    title=""
+                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
+                  >
+                    Khuyến mại
+                  </a>
+                </li>
+              </ul>
             </div>
-            <div className="text-xs leading-3">Yêu thích</div>
-            <div className="absolute 
-            right-0 -top-1 w-5 h-5 
-            rounded-full flex items-center justify-center bg-primary text-white text-xs">
-              8
-            </div>
-          </Link>
-
-        
-          {/* <div className="relative  ">
-            <Link
-              to="#"
-              className="text-center text-gray-700 hover:text-primary "
-              onClick={toggleDropdown}
-            >
-              <div className="text-2xl">
-                <i className="fa-regular fa-bell"></i>
-              </div>
-              <div className="text-xs leading-3">Notification</div>
-              <div
-                className={`absolute right-0 -top-1 w-40 rounded-md mt-2 bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 ${
-                  isDropdownOpen ? 'visible' : 'invisible'
-                }`}
+            <div className="flex items-center lg:space-x-2">
+              <Link
+                to="/cart"
+                type="button"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
-                <a
-                  href="#"
-                  className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
+                <svg
+                  className="w-5 h-5 lg:me-1"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  fill="none"
+                  viewBox="0 0 24 24"
                 >
-                  <img
-                    src="../../assets/images/icons/sofa.svg"
-                    alt="sofa"
-                    className="w-5 h-5 object-contain"
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                   />
-                  <span className="ml-2 text-gray-600 text-sm">Sofa</span>
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
+                </svg>
+                <span className="hidden sm:flex">Giỏ hàng</span>
+                <span className="cart-count ml-2"> {cartCount}</span>
+              </Link>
+
+              <button
+                id="userDropdownButton1"
+                data-dropdown-toggle="userDropdown1"
+                type="button"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  fill="none"
+                  viewBox="0 0 24 24"
                 >
-                  <img
-                    src="../../assets/images/icons/terrace.svg"
-                    alt="terrace"
-                    className="w-5 h-5 object-contain"
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
                   />
-                  <span className="ml-2 text-gray-600 text-sm">Terrace</span>
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-6 py-3 hover:bg-gray-100 transition"
-                >
-                  <img
-                    src="../../assets/images/icons/bed.svg"
-                    alt="bed"
-                    className="w-5 h-5 object-contain"
-                  />
-                  <span className="ml-2 text-gray-600 text-sm">Giường</span>
-                </a>
+                </svg>
+                Yêu thích
+              </button>
+              <div
+                id="userDropdown1"
+                className="hidden z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"
+              >
+                <ul className="p-2 text-start text-sm font-medium text-gray-900 dark:text-white">
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      My Account{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      My Orders{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      Settings{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      Favourites{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      Delivery Addresses{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      title=""
+                      className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      {" "}
+                      Billing Data{" "}
+                    </a>
+                  </li>
+                </ul>
+                <div className="p-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <a
+                    href="#"
+                    title=""
+                    className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    {" "}
+                    Sign Out{" "}
+                  </a>
+                </div>
               </div>
-            </Link>
-          </div> */}
-
-          <Link
-            to="/cart"
-            className="text-center text-gray-700 hover:text-primary relative"
+            </div>
+          </div>
+          <div
+            id="ecommerce-navbar-menu-1"
+            className="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 border border-gray-200 rounded-lg py-3 hidden px-4 mt-4"
           >
-            <div className="text-2xl">
-              <i className="fa-solid fa-bag-shopping"></i>
-            </div>
-            <div className="text-xs leading-3">Giỏ hàng</div>
-            <div className="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">
-            {cartCount}
-            </div>
-          </Link>
-
-          <Link
-            to="/listCart"
-            className="text-center text-gray-700 hover:text-primary relative"
-          >
-            <div className="text-2xl">
-              <i className="fa-regular fa-user"></i>
-            </div>
-            <div className="text-xs leading-3">Tài khoản</div>
-          </Link>
+            <ul className="text-gray-900 dark:text-white text-sm font-medium space-y-3">
+              <li>
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                  Best Sellers
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                  Gift Ideas
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                  Games
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                  Electronics
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 };

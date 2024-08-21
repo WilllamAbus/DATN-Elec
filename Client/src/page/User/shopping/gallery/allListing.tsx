@@ -1,24 +1,12 @@
 import React  from "react";
-// import { Link } from 'react-router-dom';
-import UserHeader from "../../../../components/User/header";
-import UserNav from "../../../../components/User/navbar";
-import UserFooter from "../../../../components/User/footer";
-import UserCoppyright from "../../../../components/User/copyright";
-import "../../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+
 import UserListting from "../../../../components/User/feature/gallery/allListing"
 
 const allListing: React.FC = () => {
  
   return (
     <>
-      <UserHeader />
-      <UserNav />
       <UserListting/>
-
-   
-      <UserFooter />
-      <UserCoppyright />
     </>
   );
 };

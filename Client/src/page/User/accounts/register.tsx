@@ -1,10 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import UserHeader from "../../../components/User/header";
-import UserNav from "../../../components/User/navbar";
-import UserFooter from "../../../components/User/footer";
-import UserCopyright from "../../../components/User/copyright";
-import "../../../assets/css/user.style.css";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAppDispatch } from "../../../redux/store";
 import { registerUserThunk } from "../../../redux/auth/authThunk";
@@ -56,8 +51,7 @@ const Register: React.FC = () => {
   };
   return (
     <>
-      <UserHeader />
-      <UserNav />
+
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Đăng Ký</h2>
@@ -203,8 +197,7 @@ const Register: React.FC = () => {
           </p>
         </div>
       </div>
-      <UserFooter />
-      <UserCopyright />
+
     </>
   );
 };

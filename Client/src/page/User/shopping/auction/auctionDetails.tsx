@@ -1,18 +1,9 @@
 import React from 'react';
-import UserHeader from '../../../../components/User/header';
-import UserNav from '../../../../components/User/navbar';
-import UserFooter from '../../../../components/User/footer';
-import UserCoppyright from '../../../../components/User/copyright';
-import '../../../../assets/css/user.style.css'
-import '@fortawesome/fontawesome-free/css/all.min.css';
 const AuctionDetails:  React.FC = () => {
 
 
     return (
         <>
-         <UserHeader />
-         <UserNav />
-            {/* breadcrumb */}
             <div className="container py-4 flex items-center gap-3">
                 <a href="/" className="text-primary text-base">
                     <i className="fa-solid fa-house"></i>
@@ -226,9 +217,6 @@ const AuctionDetails:  React.FC = () => {
                     {/* Repeat for other related products */}
                 </div>
             </div>
-            {/* ./related-products */}
-            <UserFooter />
-            <UserCoppyright />
         </>
     );
 };

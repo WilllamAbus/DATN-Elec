@@ -1,11 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import UserHeader from "../../../components/User/header";
-import UserNav from "../../../components/User/navbar";
-import UserFooter from "../../../components/User/footer";
-import UserCoppyright from "../../../components/User/copyright";
-import "../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
 import { forgotPasswordThunk } from "../../../redux/auth/authThunk";
@@ -26,8 +20,7 @@ const Forgot: React.FC = () => {
 
   return (
     <>
-      <UserHeader />
-      <UserNav />
+
       <div className="contain py-16">
         <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
           <h2 className="text-2xl uppercase font-medium mb-1">Quên mật khẩu</h2>
@@ -67,8 +60,7 @@ const Forgot: React.FC = () => {
           </p>
         </div>
       </div>
-      <UserFooter />
-      <UserCoppyright />
+
     </>
   );
 };
