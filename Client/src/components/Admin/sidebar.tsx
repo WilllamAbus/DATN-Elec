@@ -84,8 +84,6 @@ const Sidebar: React.FC = () => {
                 <i className="fas fa-sticky-note mr-3"></i>
                 Danh mục
               </a>
-
-          
             </div>
           )}
         </div>
@@ -97,9 +95,8 @@ const Sidebar: React.FC = () => {
             <i className="fas fa-table mr-3"></i>
             Mua sắm
             <i
-              className={`fas fa-chevron-${
-                isProductsOpen ? "up" : "down"
-              } ml-2`}
+              className={`fas fa-chevron-${isProductsOpen ? "up" : "down"
+                } ml-2`}
             ></i>
           </button>
           {isProductsOpen && (
@@ -139,7 +136,13 @@ const Sidebar: React.FC = () => {
                 <i className="fas fa-calendar mr-3"></i>
                 Thương hiệu
               </a>
-       
+              <a
+                href="/admin/listSuppliers"
+                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
+              >
+                <i className="fas fa-calendar mr-3"></i>
+                Nhà cung cấp
+              </a>
             </div>
           )}
         </div>
@@ -185,9 +188,8 @@ const Sidebar: React.FC = () => {
             <i className="fas fa-table mr-3"></i>
             Tương tác
             <i
-              className={`fas fa-chevron-${
-                isInteractOpen ? "up" : "down"
-              } ml-2`}
+              className={`fas fa-chevron-${isInteractOpen ? "up" : "down"
+                } ml-2`}
             ></i>
           </button>
           {isInteractOpen && (
@@ -250,7 +252,6 @@ const Sidebar: React.FC = () => {
           )}
         </div>
 
-
         <div className="flex flex-col">
           <button
             onClick={toggleRestore}
@@ -264,7 +265,7 @@ const Sidebar: React.FC = () => {
           </button>
           {isRestoreOpen && (
             <div className="pl-6">
-                  <a
+              <a
                 href="/admin/recycleBin"
                 className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
               >

@@ -33,6 +33,18 @@ const AdminEditBrands = React.lazy(
 const AdminListBrands = React.lazy(
   () => import("../page/Admin/brands/listBrands")
 );
+
+// Suppliers
+const AdminListSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/listSuppliers")
+);
+const AdminAddSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/addSuppliers")
+);
+const AdminEditSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/editSuppliers")
+);
+
 /**BuyingFormat */
 const AdminAddBuyingFormat = React.lazy(
   () => import("../page/Admin/buyingFormat/addBuyFormat")
@@ -162,6 +174,19 @@ const AdminRoutes: RouteObject[] = [
   {
     path: "listBrands",
     element: <AdminListBrands />,
+  },
+  /*****Suppliers */
+  {
+    path: "addSuppliers",
+    element: <AdminAddSuppliers />,
+  },
+  {
+    path: "editSuppliers/:id",
+    element: <AdminEditSuppliers />,
+  },
+  {
+    path: "listSuppliers",
+    element: <AdminListSuppliers />,
   },
 
   /*****Buying Format */

@@ -3,32 +3,27 @@ import AdminFooter from "../../../components/Admin/footer";
 import AdminHeader from "../../../components/Admin/header";
 import AdminSidebar from "../../../components/Admin/sidebar";
 import AdminStyleSheet from "../../../components/Admin/stySheet";
-import AdminFetListProducts from "../../../components/Admin/feature/brands/listBrands";
-
+import AdminFetEditSupplier from "../../../components/Admin/feature/suppliers/editSuppliers";
 import AdminScript from "../../../components/Admin/script";
 import "../../../assets/css/admin.style.css";
-const listBrands: React.FC = () => {
+const editProd: React.FC = () => {
   return (
     <>
       <AdminStyleSheet />
 
       <div className="bg-gray-100 font-family-karla flex">
-      <AdminSidebar />
+        <AdminSidebar />
         <div className="relative w-full flex flex-col h-screen overflow-y-hidden">
           <AdminHeader />
-          <AdminFetListProducts />
-          <AdminFooter />
-
-
+          <div className="w-full h-screen overflow-x-hidden border-t flex flex-col">
+          <AdminFetEditSupplier />
+            <AdminFooter />
+          </div>
         </div>
         <AdminScript />
-
-
       </div>
-     
-     
     </>
   );
 };
 
-export default listBrands;
+export default editProd;
