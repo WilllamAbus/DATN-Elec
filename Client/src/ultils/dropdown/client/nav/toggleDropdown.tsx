@@ -24,7 +24,6 @@ const UserMenuDropdown: React.FC = () => {
 
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-      localStorage.removeItem("userProfile");
 
       navigate("/login");
     } catch (error) {
