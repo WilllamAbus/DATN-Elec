@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { fetchUserById, updateUserThunk } from "../../../../redux/auth/authThunk";
-import "../../../../assets/css/admin.style.css";
 import { AppDispatch } from "../../../../redux/store";
 import moment from "moment";
 import { UserProfile } from "../../../../types/user";

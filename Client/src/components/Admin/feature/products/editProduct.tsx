@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOneProduct, updateProduct } from "../../../../services/product/crudProduct.service";
-import { getListCategories } from "../../../../services/product/crudProduct.service";
-import { Category } from "../../../../types/Categories.d";
+import {
+  getOneProduct,
+  updateProduct,
+  getListCategories,
+} from "../../../../services/product/crudProduct.service";
 import { getFileFirebase } from "../../../../services/firebase/getFirebse.service";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notifyUpdate } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { Category } from "~/types/Categories.d";
+
 interface IFormInput {
   name: string;
   price: number;
@@ -22,6 +26,7 @@ interface IFormInput {
   discount: string;
   image?: FileList;
 }
+
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const {
@@ -32,10 +37,13 @@ const EditProduct: React.FC = () => {
   } = useForm<IFormInput>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [defaultCategoryId, setDefaultCategoryId] = useState<string>("");
+
   const [error, setError] = useState<string | null>(null);
-  const [defaultCategoryId, setDefaultCategoryId] = useState("");
-  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!id) {
       setError("Không có ID sản phẩm nào được cung cấp");
@@ -55,12 +63,10 @@ const EditProduct: React.FC = () => {
         setValue("color", product.color);
         setValue("description", product.description);
         setValue("categoryId", product.categoryId);
-        setValue("image", product.image);
         setDefaultCategoryId(product.categoryId);
         if (product.image) {
-          getFileFirebase(product.image).then((url) => {
-            setImgPreview(url);
-          });
+          const url = await getFileFirebase(product.image);
+          setImagePreview(url);
         }
         setLoading(false);
       } catch (error) {
@@ -85,24 +91,14 @@ const EditProduct: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const fileSize = file.size / 1024 / 1024; // in MB
-      const fileType = file.type;
-
-      if (fileSize > 2) {
-        setError("Kích thước tệp quá lớn. Tối đa 2MB.");
-      } else if (!fileType.match(/image\/*/)) {
-        setError("Định dạng tệp không hợp lệ. Chỉ chấp nhận hình ảnh.");
-      } else {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          // Đảm bảo rằng kết quả đọc từ FileReader là chuỗi
-          if (typeof reader.result === "string") {
-            setImgPreview(reader.result);
-          }
-          setError(null);
-        };
-        reader.readAsDataURL(file);
-      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setImagePreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+      setSelectedImage(file);
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -136,10 +132,7 @@ const EditProduct: React.FC = () => {
         if (data.color) formData.append("color", data.color);
         if (data.description) formData.append("description", data.description);
         if (data.weight) formData.append("weight", String(data.weight));
-        if (data.image && data.image.length > 0) formData.append("image", data.image[0]);
-        for (let [key, value] of formData.entries()) {
-          console.log(key, value);
-        }
+        if (selectedImage) formData.append("image", selectedImage);
 
         await updateProduct(id, formData);
         notifyUpdate();
@@ -155,7 +148,6 @@ const EditProduct: React.FC = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
       <ToastContainer />
@@ -169,9 +161,9 @@ const EditProduct: React.FC = () => {
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
-              {imgPreview && (
+              {imagePreview && (
                 <div className="mb-4 rounded-lg w-24 h-24 sm:mb-0 xl:mb-4 2xl:mb-0">
-                  <img src={imgPreview} alt="Image Preview" />
+                  <img src={imagePreview} alt="Image Preview" />
                 </div>
               )}
               <div>

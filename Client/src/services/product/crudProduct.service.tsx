@@ -52,9 +52,9 @@ export const getOneProduct = async (id: string) => {
 export const getListCategories = async () => {
   try {
     const response = await instance.get("/product/listcate");
-    // Kiểm tra cấu trúc dữ liệu trả về
-    console.log(response.data); // Xem cấu trúc dữ liệu trả về từ API
-    return response.data; // Trả về toàn bộ dữ liệu nếu bạn không chắc chắn về cấu trúc
+ 
+    console.log(response.data); 
+    return response.data; 
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
