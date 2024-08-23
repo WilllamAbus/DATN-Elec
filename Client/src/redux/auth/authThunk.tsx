@@ -79,18 +79,18 @@ export const getListThunk = createAsyncThunk<
   }
 });
 
-// Thunk cho việc đăng xuất
+//  đăng xuất
 export const logoutThunk = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
       await logoutService();
+      return true;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
-
 export const updateProfileThunk = createAsyncThunk<
   UserProfile,
   FormData,
@@ -215,7 +215,6 @@ export const updatePasswordThunk = createAsyncThunk(
     }
   }
 );
-export { logoutService };
 
 ///////////////////////////////////////////////////////////////////////ADMIN////////////////////////////////////////////////
 export const softDeleteUserThunk = createAsyncThunk(

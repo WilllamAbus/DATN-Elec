@@ -1,38 +1,28 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface Permission {
-  name: string;
-  resources: string[];
-}
-
-interface Role {
-  _id: string;
-  roleId: string;
-  name: string;
-  permissions: Permission[];
-}
+import { apiLoginSuccessThunk } from "./apiLoginSuccessThunk";
+import { LoginResponse } from "../../types/user";
 
 interface AuthState {
   login: {
-    name: string | null;
     isFetching: boolean;
-    error: boolean;
+    error: string | null;
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
-    roles: Role[];
+    roles: string[];
+    currentUser: string | null;
   };
 }
 
 const initialState: AuthState = {
   login: {
-    name: null,
     isFetching: false,
-    error: false,
     isAuthenticated: false,
     token: null,
     isLoggedIn: false,
     roles: [],
+    currentUser: null,
+    error: null,
   },
 };
 
@@ -48,30 +38,55 @@ const authSlice = createSlice({
       action: PayloadAction<{
         currentUser: string;
         token: string;
-        roles: Role[];
+        roles: string[];
       }>
     ) => {
       state.login.isFetching = false;
-      state.login.name = action.payload.currentUser;
+      state.login.currentUser = action.payload.currentUser;
       state.login.token = action.payload.token;
       state.login.isAuthenticated = true;
       state.login.isLoggedIn = true;
-      state.login.error = false;
+      state.login.error = null;
       state.login.roles = action.payload.roles;
     },
-    loginFailed: (state) => {
+    loginFailed: (state, action) => {
       state.login.isFetching = false;
-      state.login.error = true;
+      state.login.error = action.payload as string;
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
     },
     logout: (state) => {
-      state.login.name = null;
+      state.login.currentUser = null;
       state.login.token = null;
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
-      state.login.roles = [];
+      state.login.roles = []; // Xóa roles khi logout
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(apiLoginSuccessThunk.pending, (state) => {
+        state.login.isFetching = true;
+        state.login.error = null;
+      })
+      .addCase(
+        apiLoginSuccessThunk.fulfilled,
+        (state, action: PayloadAction<LoginResponse>) => {
+          state.login.isFetching = false;
+          state.login.currentUser = action.payload.currentUser;
+          state.login.token = action.payload.token ?? null;
+          state.login.isAuthenticated = true;
+          state.login.isLoggedIn = true;
+          state.login.error = null;
+          state.login.roles = action.payload.roles;
+        }
+      )
+      .addCase(apiLoginSuccessThunk.rejected, (state, action) => {
+        state.login.isFetching = false;
+        state.login.error = action.payload as string;
+        state.login.isAuthenticated = false;
+        state.login.isLoggedIn = false;
+      });
   },
 });
 

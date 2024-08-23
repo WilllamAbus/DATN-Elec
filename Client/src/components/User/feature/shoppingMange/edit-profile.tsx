@@ -88,10 +88,10 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
       const updatedProfile = await dispatch(getProfileThunk()).unwrap();
       dispatch(setProfile(updatedProfile));
 
-      localStorage.setItem("name", updatedProfile.name || "");
-      localStorage.setItem("roles", updatedProfile.roles[0] || "");
-      localStorage.setItem("birthday", updatedProfile.birthday || "");
-      localStorage.setItem("avatar", updatedProfile.avatar || "");
+      // localStorage.setItem("name", updatedProfile.name || "");
+      // localStorage.setItem("roles", updatedProfile.roles[0] || "");
+      // localStorage.setItem("birthday", updatedProfile.birthday || "");
+      // localStorage.setItem("avatar", updatedProfile.avatar || "");
 
       setMessage("Profile updated successfully!");
     } catch (err) {

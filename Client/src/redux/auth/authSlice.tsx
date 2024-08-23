@@ -4,6 +4,7 @@ import {
   Role,
   ResetPassState,
   ForgotState,
+  LoginResponse,
   // LoginResponse,
 } from "../../types/user";
 import {
@@ -17,7 +18,8 @@ import {
   verifyEmailThunk,
   getActiveListThunk,
   resetPasswordThunk,
-  // loginUserThunk,
+  loginUserThunk,
+  logoutThunk,
   forgotPasswordThunk,
   resendEmailThunk,
   fetchUserById,
@@ -213,13 +215,13 @@ const authSlice = createSlice({
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
     },
-    logout: (state) => {
+    logout(state) {
       state.login.currentUser = null;
       state.login.token = null;
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
+      state.profile.profile = null;
     },
-
     setProfile(state, action: PayloadAction<UserProfile>) {
       state.profile.profile = action.payload;
       state.profile.roles = action.payload.roles || [];
@@ -498,6 +500,41 @@ const authSlice = createSlice({
           state.role.error = action.payload as string;
         }
       });
+    builder.addCase(logoutThunk.fulfilled, (state) => {
+      state.login.isFetching = false;
+      state.login.currentUser = null;
+      state.login.token = null;
+      state.login.isAuthenticated = false;
+      state.login.isLoggedIn = false;
+      state.profile.profile = null;
+    });
+    builder
+      .addCase(logoutThunk.rejected, (state, action) => {
+        state.login.isFetching = false;
+        state.login.error = action.payload as string;
+      })
+      .addCase(loginUserThunk.pending, (state) => {
+        state.login.isFetching = true;
+        state.login.error = null;
+      })
+      .addCase(
+        loginUserThunk.fulfilled,
+        (state, action: PayloadAction<LoginResponse>) => {
+          state.login.isFetching = false;
+          state.login.currentUser = action.payload.currentUser;
+          state.login.token = action.payload.token ?? null;
+          state.login.isAuthenticated = true;
+          state.login.isLoggedIn = true;
+          state.login.error = null;
+        }
+      )
+      .addCase(loginUserThunk.rejected, (state, action) => {
+        state.login.isFetching = false;
+        state.login.error = action.payload as string;
+        state.login.isAuthenticated = false;
+        state.login.isLoggedIn = false;
+      });
+
     // .addCase(getlistRoleThunk.pending, (state) => {
     //   state.status = "loading";
     //   state.error = null;

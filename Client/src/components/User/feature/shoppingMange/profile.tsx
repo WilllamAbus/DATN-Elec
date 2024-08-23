@@ -6,10 +6,12 @@ import {
 } from "../../../../redux/store";
 import { getProfileThunk } from "../../../../redux/auth/authThunk";
 import { Link, useNavigate } from "react-router-dom";
-import { logout as logoutAction } from "../../../../redux/auth/authSlice";
+import { logoutThunk } from "../../../../redux/auth/authThunk";
 import EditProfile from "./edit-profile";
 import Info from "./info";
 import UpdatePassword from "./changePassword";
+import useAuth from "../../../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -25,28 +27,25 @@ const ProfileUse: React.FC = () => {
   const profileError = useAppSelector(
     (state: RootState) => state.auth.profile.error
   );
-  const token = localStorage.getItem("token");
+
+  useAuth();
 
   useEffect(() => {
-    if (token) {
-      dispatch(getProfileThunk());
-    } else {
-      navigate("/login");
-    }
-  }, [dispatch, token, navigate]);
+    dispatch(getProfileThunk());
+  }, [dispatch]);
 
-  useEffect(() => {
-    if (profileStatus === "succeeded" && profile) {
-      const profileData = {
-        name: profile.name || "",
-        address: profile.address || "",
-        phone: profile.phone || "",
-        roles: profile.roles || [],
-        birthday: profile.birthday || "",
-      };
-      localStorage.setItem("userProfile", JSON.stringify(profileData));
-    }
-  }, [profile, profileStatus]);
+  // useEffect(() => {
+  //   if (profileStatus === "succeeded" && profile) {
+  //     const profileData = {
+  //       name: profile.name || "",
+  //       address: profile.address || "",
+  //       phone: profile.phone || "",
+  //       roles: profile.roles || [],
+  //       birthday: profile.birthday || "",
+  //     };
+  //     localStorage.setItem("userProfile", JSON.stringify(profileData));
+  //   }
+  // }, [profile, profileStatus]);
 
   if (profileStatus === "loading") {
     return <p>Loading...</p>;
@@ -55,14 +54,14 @@ const ProfileUse: React.FC = () => {
   if (profileStatus === "failed") {
     return <p>Error: {profileError || "Unknown error occurred"}</p>;
   }
-
   const handleLogout = async () => {
     try {
-      await dispatch(logoutAction());
-      localStorage.removeItem("token");
-      localStorage.removeItem("name");
-      localStorage.removeItem("roles");
+      await dispatch(logoutThunk()).unwrap();
+
+      Cookies.remove("token");
+      Cookies.remove("refreshToken");
       localStorage.removeItem("userProfile");
+
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);

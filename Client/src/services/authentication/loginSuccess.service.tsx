@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import instance from "../axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -10,17 +11,22 @@ export const apiLoginSuccessService = async (id: string, token: string) => {
     });
     console.log("API Response:", response.data);
 
-    const { accessToken, roles, name, email, avatar } = response.data;
+    const { accessToken } = response.data;
 
     if (!accessToken) throw new Error("No access token received");
-
-    localStorage.setItem("token", accessToken);
-    localStorage.setItem("roles", roles?.[0]?.name || "");
-    localStorage.setItem("name", name || "");
-    localStorage.setItem(
-      "userProfile",
-      JSON.stringify({ name, roles, email, avatar })
-    );
+    Cookies.set("token", accessToken, {
+      path: "/",
+      expires: 7,
+      secure: true,
+      sameSite: "strict",
+    });
+    // localStorage.setItem("token", accessToken);
+    // localStorage.setItem("roles", roles?.[0]?.name || "");
+    // localStorage.setItem("name", name || "");
+    // localStorage.setItem(
+    //   "userProfile",
+    //   JSON.stringify({ name, roles, email, avatar })
+    // );
 
     return response.data;
   } catch (error: any) {

@@ -1,5 +1,6 @@
 import axios from "axios";
 import instance from "../axios";
+import Cookies from "js-cookie";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const registerUser = async (user: {
@@ -26,12 +27,21 @@ export const loginUser = async (user: { email: string; password: string }) => {
     const response = await instance.post(`${API_URL}/auth/login`, user);
     console.log("API Response:", response.data);
 
-    const { accessToken, roles, name, email } = response.data;
+    const { accessToken } = response.data;
 
-    localStorage.setItem("token", accessToken);
-    localStorage.setItem("roles", roles?.[0]?.name || "");
-    localStorage.setItem("name", name || "");
-    localStorage.setItem("userProfile", JSON.stringify({ name, roles, email }));
+    // Lưu token vào cookie
+    Cookies.set("token", accessToken, {
+      path: "/",
+      expires: 7,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    // Lưu trữ thông tin vào localStorage
+    // localStorage.setItem("roles", roles?.[0]?.name || "");
+    // localStorage.setItem("name", name || "");
+    // localStorage.setItem("userProfile", JSON.stringify({ name, roles, email }));
+
     return {
       status: response.status,
       message: response.data.message,
@@ -45,7 +55,6 @@ export const loginUser = async (user: { email: string; password: string }) => {
     };
   }
 };
-
 export const getProfile = async () => {
   try {
     const response = await instance.get(`/auth/profile`);
@@ -73,9 +82,8 @@ export const getList = async () => {
 
 export const logout = async () => {
   await instance.post(`${API_URL}/auth/logout`);
-  localStorage.removeItem("token");
-  localStorage.removeItem("roles");
-  localStorage.removeItem("name");
+  Cookies.remove("token");
+  Cookies.remove("refreshToken");
 };
 
 export const updateProfile = async (formData: FormData) => {

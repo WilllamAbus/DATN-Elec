@@ -15,18 +15,10 @@ const authConfig = {
   storage,
   whitelist: ["login"],
 };
-const authConfigGoogle = {
-  key: "authGoogle",
-  storage,
-  whitelist: ["login"],
-};
-
-
-
 
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
-  authGoogle: persistReducer(authConfigGoogle, authGoogleReducer),
+  authGoogle: persistReducer(authConfig, authGoogleReducer),
   categories: categoriesSlice,
   voucher: voucherReducer,
   checkout: checkoutSlice,
