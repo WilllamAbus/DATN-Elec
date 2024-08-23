@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  fetchUserById,
-  updateUserThunk,
-  // getlistRoleThunk,
-} from "../../../../redux/auth/authThunk";
+import { fetchUserById, updateUserThunk } from "../../../../redux/auth/authThunk";
 import "../../../../assets/css/admin.style.css";
 import { AppDispatch } from "../../../../redux/store";
 import moment from "moment";
 import { UserProfile } from "../../../../types/user";
 import axios from "axios";
-
+import { ToastContainer } from "react-toastify";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 const AdminEditUser = () => {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +18,6 @@ const AdminEditUser = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  // Lấy userId từ URL
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("userId");
@@ -45,12 +41,8 @@ const AdminEditUser = () => {
     fetchProfile();
   }, [userId, dispatch]);
 
-  const birthday = localProfile?.birthday
-    ? moment(localProfile.birthday).format("YYYY-MM-DD")
-    : "";
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const birthday = localProfile?.birthday ? moment(localProfile.birthday).format("YYYY-MM-DD") : "";
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
 
     if (name === "avatar" && files) {
@@ -94,9 +86,7 @@ const AdminEditUser = () => {
         formData.append("avatar", selectedImage);
       }
 
-      const updatedProfile = await dispatch(
-        updateUserThunk({ userId, formData })
-      ).unwrap();
+      const updatedProfile = await dispatch(updateUserThunk({ userId, formData })).unwrap();
       setLocalProfile(updatedProfile);
 
       setMessage("Cập nhật hồ sơ thành công!");
@@ -114,181 +104,167 @@ const AdminEditUser = () => {
   };
 
   return (
-    <main className="w-full flex-grow p-6">
-      <div className="flex flex-wrap">
-        <div className="w-full mt-6 pl-0 lg:pl-2">
-          <div className="leading-loose">
-            <form
-              onSubmit={handleSubmit}
-              className="p-10 bg-white rounded shadow-xl"
-            >
-              {message && (
-                <p
-                  className={`text-xs italic ${
-                    message.startsWith("Lỗi")
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }`}
-                >
-                  {message}
-                </p>
+    <form onSubmit={handleSubmit} encType="multipart/form-data">
+      {message && (
+        <p
+          className={`text-xs italic ${
+            message.startsWith("Lỗi") ? "text-red-500" : "text-green-500"
+          }`}
+        >
+          {message}
+        </p>
+      )}
+      {loading && <p className="text-gray-500 text-xs italic">Đang cập nhật...</p>}
+      <ToastContainer />
+      <ReusableBreadcrumb items={breadcrumbItems.editUser} />
+      <div className="mb-4 ml-4 col-span-full xl:mb-2">
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          Cập nhật người dùng
+        </h1>
+      </div>
+      <div className="grid grid-cols-[1fr_2fr] px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
+        <div className="col-span-full xl:col-auto">
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Avatar preview"
+                  className="w-24 h-24 object-cover mt-2"
+                />
               )}
-              {loading && (
-                <p className="text-gray-500 text-xs italic">Đang cập nhật...</p>
-              )}
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Tên
-                  </label>
-                  <input
-                    id="name"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="text"
-                    name="name"
-                    value={localProfile?.name || ""}
-                    onChange={handleChange}
-                    required
-                  />
+              <div>
+                <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">Hình ảnh</h3>
+                <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                  JPG, GIF or PNG. Max size of 800KB
                 </div>
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Giới tính
-                  </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={localProfile?.gender || ""}
-                    onChange={handleChange}
-                    className="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    required
-                  >
-                    <option value="">Chọn giới tính</option>
-                    <option value="male">Nam</option>
-                    <option value="female">Nữ</option>
-                  </select>
-                </div>
-              </div>
-              {/*
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Roles
-                  </label>
-                  <input
-                    id="roles"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="text"
-                    name="roles"
-                    value={localProfile.roles?.join(", ") || ""}
-                    onChange={(e) =>
-                      setLocalProfile({
-                        ...localProfile,
-                        roles: e.target.value
-                          .split(", ")
-                          .map((role) => role.trim()),
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div> */}
 
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Số điện thoại
-                  </label>
+                <div className="flex items-center space-x-4">
                   <input
-                    id="phone"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="text"
-                    name="phone"
-                    value={localProfile?.phone || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Địa chỉ
-                  </label>
-                  <input
-                    id="address"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="text"
-                    name="address"
-                    value={localProfile?.address || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  {/* <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Ngày sinh
-                  </label>
-                  <input
-                    id="birthdate"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="date"
-                    name="birthdate"
-                    value={birthday}
-                    onChange={handleChange}
-                  /> */}
-
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Ngày sinh
-                  </label>
-                  <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                    type="date"
-                    name="birthday"
-                    id="birthday"
-                    value={birthday}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                    Avatar
-                  </label>
-                  <input
-                    id="avatar"
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                     type="file"
                     name="avatar"
                     accept="image/*"
                     onChange={handleChange}
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                   />
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="Avatar preview"
-                      className="w-24 h-24 object-cover mt-2"
-                    />
-                  )}
                 </div>
               </div>
+            </div>
+          </div>
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <h3 className="mb-4 text-xl font-semibold dark:text-white">Giới tính</h3>
+            <div className="mb-4">
+              <label
+                htmlFor="settings-language"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Chọn giới tính
+              </label>
+              <select
+                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                id="gender"
+                name="gender"
+                value={localProfile?.gender || ""}
+                onChange={handleChange}
+              >
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="col-span-full xl:col-auto">
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan sản phẩm</h3>
 
-              <div className="mt-6 flex gap-2">
-                <button
-                  id="updateButton"
-                  type="submit"
-                  className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
-                  disabled={loading}
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="first-name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Cập nhật
-                </button>
-                <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded">
-                  <Link to="/admin/listUsers">Trở lại</Link>
-                </button>
+                  Tên
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  name="name"
+                  value={localProfile?.name || ""}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-            </form>
+
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="launch-year"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Số điện thoại
+                </label>
+                <input
+                  type="text"
+                  id="phone"
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  name="phone"
+                  value={localProfile?.phone || ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="birthday"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Ngày sinh
+                </label>
+                <input
+                  type="date"
+                  id="createdAt"
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="12/12/2024"
+                  value={birthday}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="weight"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Địa chỉ
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  name="address"
+                  value={localProfile?.address || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="col-span-6 mt-4 sm:col-full flex space-x-4">
+              <button
+                type="submit"
+                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={loading}
+              >
+                Cập nhật
+              </button>
+              <Link
+                to="/admin/listUser"
+                className="text-white bg-emerald-700 hover:bg-lime-600 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                Trở lại
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </form>
   );
 };
 export default AdminEditUser;

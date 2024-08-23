@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
-import AdminFooter from "../../components/Admin/footer";
-import AdminHeader from "../../components/Admin/header";
 import AdminSidebar from "../../components/Admin/sidebar";
-import AdminStyleSheet from "../../components/Admin/stySheet";
-import AdminContent from "../../components/Admin/mainContent";
-import AdminScript from "../../components/Admin/script";
-import "../../assets/css/admin.style.css";
+import AdminFooter from "../../components/Admin/footer";
 import { Navigate, useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../../redux/store";
 import { getProfileThunk } from "../../redux/auth/authThunk";
 import { useDispatch, useSelector } from "react-redux";
+import { Outlet } from "react-router-dom";
+import Nav from "../../components/Admin/nav";
 
 const Admin: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
@@ -44,18 +41,20 @@ const Admin: React.FC = () => {
 
   return (
     <>
-      <AdminStyleSheet />
-      <div className="bg-gray-100 font-family-karla flex">
-        <AdminSidebar />
-        <div className="relative w-full flex flex-col h-screen overflow-y-hidden">
-          <AdminHeader />
-          <div className="w-full h-screen overflow-x-hidden border-t flex flex-col">
-            <AdminContent />
-            <AdminFooter />
-          </div>
+      <div className="bg-gray-50 dark:bg-gray-800 font-barlow">
+      <Nav />
+      <div className="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
+      <AdminSidebar />
+        <div className="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop" />
+        <div id="main-content" className="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
+          <main>
+            <Outlet />
+          </main>
+          <AdminFooter />
         </div>
-        <AdminScript />
-      </div>
+      </div >
+    </div>
+
     </>
   );
 };

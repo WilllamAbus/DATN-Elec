@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
-// Hàm xử lý toggle Dropdown
+import LogoAdmin from "../../../../assets/images/icons/userAmin.png";
 const useDropdownToggle = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -25,11 +24,7 @@ const UserMenuDropdown: React.FC = () => {
         onClick={toggleDropdown}
       >
         <span className="sr-only">Open user menu</span>
-        <img
-          className="w-8 h-8 rounded-full"
-          src="https://cdn-icons-png.flaticon.com/128/149/149071.png"
-          alt="user photo"
-        />
+        <img className="w-8 h-8 rounded-full" src={LogoAdmin} alt="user photo" />
       </button>
 
       {isOpen && (

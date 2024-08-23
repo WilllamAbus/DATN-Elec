@@ -1,9 +1,8 @@
 import "flowbite";
 import React from "react";
 import { RouteObject } from "react-router-dom";
-
+import Admin from "../page/Admin/Home/home";
 const Dashboard = React.lazy(() => import("../page/Admin/rootAdmin"));
-/**Categoris */
 const AdminAddCategories = React.lazy(() => import("../page/Admin/categories/addCategories"));
 const AdminEditCategories = React.lazy(() => import("../page/Admin/categories/editCategories"));
 const AdminListCategories = React.lazy(() => import("../page/Admin/categories/listCategories"));
@@ -23,7 +22,6 @@ const AdminListBuyingFormat = React.lazy(() => import("../page/Admin/buyingForma
 const AdminListComments = React.lazy(() => import("../page/Admin/comments/listComments"));
 
 /**ConditionAuc */
-
 const AdminConditionAuc = React.lazy(
   () => import("../page/Admin/conditionAuction/addConditionAuction")
 );
@@ -38,7 +36,6 @@ const AdminAddVoucher = React.lazy(() => import("../page/Admin/vouchers/addVouch
 const AdminEditVoucher = React.lazy(() => import("../page/Admin/vouchers/editVoucher"));
 const AdminListVoucher = React.lazy(() => import("../page/Admin/vouchers/listVoucher"));
 /**Orders */
-
 const AdminListOrder = React.lazy(() => import("../page/Admin/orders/listOrder"));
 const AdminDetailsOrder = React.lazy(() => import("../page/Admin/orders/detailsOrder"));
 
@@ -47,7 +44,6 @@ const AdminAddProdAuc = React.lazy(() => import("../page/Admin/productAuction/ad
 const AdminEditProdAuc = React.lazy(() => import("../page/Admin/productAuction/editProdAuc"));
 const AdminListProdAuc = React.lazy(() => import("../page/Admin/productAuction/listProdAuc"));
 /***RecycleBin */
-
 const AdminRecycleBinCate = React.lazy(() => import("../page/Admin/recycleBinCate/allItemList"));
 const AdminRecycleBin = React.lazy(() => import("../page/Admin/recycleBin/SoftDeletedProduct"));
 const AdminRecycleBinOrder = React.lazy(() => import("../page/Admin/orders/recycleBinOrder"));
@@ -60,166 +56,45 @@ const AdminEditUser = React.lazy(() => import("../page/Admin/users/editUser"));
 
 const AdminRoutes: RouteObject[] = [
   {
-    path: "",
+    path: "/admin",
     element: <Dashboard />,
-  },
-  // categories module
-  {
-    path: "addCategories",
-    element: <AdminAddCategories />,
-  },
-  {
-    path: "editCategories/:id",
-    element: <AdminEditCategories />,
-  },
-  {
-    path: "listCategories",
-    element: <AdminListCategories />,
-  },
-
-  /*****Products */
-  {
-    path: "addProducts",
-    element: <AdminAddProducts />,
-  },
-  {
-    path: "editProducts/:id",
-    element: <AdminEditProducts />,
-  },
-  {
-    path: "listProducts",
-    element: <AdminListProducts />,
-  },
-
-  /*****Brands */
-  {
-    path: "addBrands",
-    element: <AdminAddBrands />,
-  },
-  {
-    path: "editBrands",
-    element: <AdminEditBrands />,
-  },
-  {
-    path: "listBrands",
-    element: <AdminListBrands />,
-  },
-
-  /*****Buying Format */
-  {
-    path: "addBuyingFormat",
-    element: <AdminAddBuyingFormat />,
-  },
-  {
-    path: "editBuyingFormat",
-    element: <AdminEditBuyingFormat />,
-  },
-  {
-    path: "listBuyingFormat",
-    element: <AdminListBuyingFormat />,
-  },
-
-  /*******Comment-rating */
-  {
-    path: "listComments",
-    element: <AdminListComments />,
-  },
-
-  /***Condition */
-  {
-    path: "addConditon",
-    element: <AdminConditionAuc />,
-  },
-  {
-    path: "editCondition",
-    element: <AdminEditConditionAuc />,
-  },
-  {
-    path: "listCondition",
-    element: <AdminListCondAuc />,
-  },
-
-  /**CustomerService */
-  {
-    path: "listCusSer",
-    element: <AdminListCService />,
-  },
-  /**discounts */
-
-  /**discounts */
-  {
-    path: "addVouchers",
-    element: <AdminAddVoucher />,
-  },
-  {
-    path: "editVouchers/:id",
-    element: <AdminEditVoucher />,
-  },
-  {
-    path: "listVouchers",
-    element: <AdminListVoucher />,
-  },
-
-  /**Orders */
-  {
-    path: "listOrders",
-    element: <AdminListOrder />,
-  },
-  {
-    path: "listDetailOrder/:id",
-    element: <AdminDetailsOrder />,
-  },
-
-  /**productionAuc */
-  {
-    path: "addProdAuc",
-    element: <AdminAddProdAuc />,
-  },
-  {
-    path: "editProdAuc",
-    element: <AdminEditProdAuc />,
-  },
-  {
-    path: "listProdAuc",
-    element: <AdminListProdAuc />,
-  },
-
-  /***RecycleBin */
-  {
-    path: "recycleBin",
-    element: <AdminRecycleBin />,
-  },
-  {
-    path: "recycleBinCate",
-    element: <AdminRecycleBinCate />,
-  },
-  {
-    path: "recycleBinOrder",
-    element: <AdminRecycleBinOrder />,
-  },
-  {
-    path: "recycleBinVoucher",
-    element: <AdminRecycleBinVoucher />,
-  },
-  /*****User */
-  {
-    path: "listUser",
-    element: <AdminListUser />,
-  },
-  {
-    path: "listDelete",
-    element: <AdminListDeleted />,
-  },
-  {
-    path: "editUser",
-    element: <AdminEditUser />,
+    children: [
+      { index: true, element: <Admin /> },
+      { path: "addCategories", element: <AdminAddCategories /> },
+      { path: "editCategories/:id", element: <AdminEditCategories /> },
+      { path: "listCategories", element: <AdminListCategories /> },
+      { path: "addProducts", element: <AdminAddProducts /> },
+      { path: "editProducts/:id", element: <AdminEditProducts /> },
+      { path: "listProducts", element: <AdminListProducts /> },
+      { path: "addBrands", element: <AdminAddBrands /> },
+      { path: "editBrands", element: <AdminEditBrands /> },
+      { path: "listBrands", element: <AdminListBrands /> },
+      { path: "addBuyingFormat", element: <AdminAddBuyingFormat /> },
+      { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
+      { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
+      { path: "listComments", element: <AdminListComments /> },
+      { path: "addConditon", element: <AdminConditionAuc /> },
+      { path: "editCondition", element: <AdminEditConditionAuc /> },
+      { path: "listCondition", element: <AdminListCondAuc /> },
+      { path: "listCusSer", element: <AdminListCService /> },
+      { path: "addVouchers", element: <AdminAddVoucher /> },
+      { path: "editVouchers/:id", element: <AdminEditVoucher /> },
+      { path: "listVouchers", element: <AdminListVoucher /> },
+      { path: "listOrders", element: <AdminListOrder /> },
+      { path: "listDetailOrder/:id", element: <AdminDetailsOrder /> },
+      { path: "addProdAuc", element: <AdminAddProdAuc /> },
+      { path: "editProdAuc", element: <AdminEditProdAuc /> },
+      { path: "listProdAuc", element: <AdminListProdAuc /> },
+      { path: "recycleBin", element: <AdminRecycleBin /> },
+      { path: "recycleBinCate", element: <AdminRecycleBinCate /> },
+      { path: "recycleBinOrder", element: <AdminRecycleBinOrder /> },
+      { path: "recycleBinVoucher", element: <AdminRecycleBinVoucher /> },
+      { path: "listUser", element: <AdminListUser /> },
+      { path: "listDelete", element: <AdminListDeleted /> },
+      { path: "editUser", element: <AdminEditUser /> },
+      { path: "*", element: <Dashboard /> },
+    ],
   },
 ];
-
-// const AdminRoutesWrapper: React.FC = () => (
-//     <div>
-//       <Outlet/>
-//     </div>
-// );
 
 export default AdminRoutes;

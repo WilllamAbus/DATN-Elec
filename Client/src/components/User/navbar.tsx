@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "flowbite";
 import { Link, useNavigate } from "react-router-dom";
-import Dropdown from "../../ultils/dropdown/dropdown.nav";
-import UserMenuDropdown from "../../ultils/dropdown/toggleDropdown";
+import Dropdown from "../../ultils/dropdown/client/nav/dropdown.LogoUser.nav";
+import UserMenuDropdown from "../../ultils/dropdown/client/nav/toggleDropdown";
 import logoNav from "../../assets/images/logoHeader/logo.svg";
 const Navbar: React.FC = () => {
   const [keyword, setSearchTerm] = useState("");

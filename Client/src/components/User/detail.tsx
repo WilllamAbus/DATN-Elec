@@ -96,7 +96,6 @@ const ProductDetail = () => {
                 name="quantity"
                 min="1"
                 max="10"
-                defaultValue="1"
                 className="w-16 px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>

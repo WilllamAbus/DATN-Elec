@@ -5,7 +5,7 @@ import AdminRoutes from "./routes/admin.routes";
 import "flowbite";
 const routes: RouteObject[] = [
   {
-    path: "/admin/*",
+    path: "/admin",
     children: AdminRoutes,
   },
   {

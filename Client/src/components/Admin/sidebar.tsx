@@ -1,302 +1,172 @@
-import React, { useState } from "react";
+import React from "react";
+
+import DropdownItem from "../../ultils/dropdown/admin/sidebar";
+import { Link } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
-
-  const toggleProducts = () => {
-    setIsProductsOpen(!isProductsOpen);
-  };
-
-  const [isCateOpen, setIsCateOpen] = useState(false);
-
-  const toggleCate = () => {
-    setIsCateOpen(!isCateOpen);
-  };
-
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-
-  const toggleAccount = () => {
-    setIsAccountOpen(!isAccountOpen);
-  };
-
-  const [isInteractOpen, setIsInteractOpen] = useState(false);
-
-  const toggleInteract = () => {
-    setIsInteractOpen(!isInteractOpen);
-  };
-
-  const [isServiceOpen, setServiceOpen] = useState(false);
-
-  const toggleService = () => {
-    setServiceOpen(!isServiceOpen);
-  };
-  const [isOrderOpen, setOrderOpen] = useState(false);
-
-  const toggleOrder = () => {
-    setOrderOpen(!isOrderOpen);
-  };
-
-  const [isRestoreOpen, setRestoreOpen] = useState(false);
-
-  const toggleRestore = () => {
-    setRestoreOpen(!isRestoreOpen);
-  };
-
   return (
-    <aside className="relative bg-sidebar h-screen w-64 hidden sm:block shadow-xl">
-      <div className="p-6">
-        <a
-          href="/admin/dashboard"
-          className="text-black text-3xl font-semibold uppercase hover:text-black-300"
-        >
-          Admin
-        </a>
-        <button className="w-full bg-white cta-btn font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center">
-          <i className="fas fa-plus mr-3"></i> New Report
-        </button>
+    <aside
+      id="sidebar"
+      className="fixed top-0 left-0 z-20 flex-col flex-shrink-0 hidden w-64 h-full pt-16 font-normal duration-75 lg:flex transition-width"
+      aria-label="Sidebar"
+    >
+      <div className="relative flex flex-col flex-1 min-h-0 pt-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
+          <div className="flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+            <ul className="pb-2 space-y-2">
+              <li>
+                <form action="#" method="GET" className="lg:hidden">
+                  <label htmlFor="mobile-search" className="sr-only">
+                    Search
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      name="email"
+                      id="mobile-search"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Search"
+                    />
+                  </div>
+                </form>
+              </li>
+              <li>
+                <a
+                  href="/admin"
+                  className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                    <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                  </svg>
+                  <span className="ml-3" sidebar-toggle-item="">
+                    Trang chủ
+                  </span>
+                </a>
+              </li>
+              <DropdownItem type="product" />
+              <DropdownItem type="account" />
+              <li>
+                <Link
+                  to="/admin/listCategories"
+                  className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                  aria-controls="dropdown-auth"
+                  data-collapse-toggle="dropdown-auth"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 6h8M6 10h12M8 14h8M6 18h12"
+                    />
+                  </svg>
+
+                  <span className="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item="">
+                    Danh mục
+                  </span>
+                </Link>
+              </li>
+            </ul>
+            <div className="pt-2 space-y-2">
+              <ul className="pb-2 space-y-2">
+                <li>
+                  <form action="#" method="GET" className="lg:hidden">
+                    <label htmlFor="mobile-search" className="sr-only">
+                      Search
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg
+                          className="w-5 h-5 text-gray-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="email"
+                        id="mobile-search"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Search"
+                      />
+                    </div>
+                  </form>
+                </li>
+                <DropdownItem type="recycleBin" />
+                <li>
+                  <button
+                    type="button"
+                    className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                    aria-controls="dropdown-auth"
+                    data-collapse-toggle="dropdown-auth"
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-800 dark:text-white"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width={24}
+                      height={24}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"
+                      />
+                    </svg>
+
+                    <span
+                      className="flex-1 ml-3 text-left whitespace-nowrap"
+                      sidebar-toggle-item=""
+                    >
+                      Đăng xuất
+                    </span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-      <nav className="text-black text-base font-semibold pt-3">
-        <a
-          href="/admin/dashboard"
-          className="flex items-center active-nav-link text-black py-4 pl-6 nav-item"
-        >
-          <i className="fas fa-tachometer-alt mr-3"></i>
-          Dashboard
-        </a>
-
-        <div className="flex flex-col">
-          <button
-            onClick={toggleCate}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Danh mục
-            <i
-              className={`fas fa-chevron-${isCateOpen ? "up" : "down"} ml-2`}
-            ></i>
-          </button>
-          {isCateOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listCategories"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-sticky-note mr-3"></i>
-                Danh mục
-              </a>
-
-          
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col">
-          <button
-            onClick={toggleProducts}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Mua sắm
-            <i
-              className={`fas fa-chevron-${
-                isProductsOpen ? "up" : "down"
-              } ml-2`}
-            ></i>
-          </button>
-          {isProductsOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listProducts"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Sản phẩm
-              </a>
-              <a
-                href="/admin/listBuyingFormat"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Sản phẩm đấu giá
-              </a>
-              <a
-                href="/admin/listCondition"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Điều kiện đấu giá
-              </a>
-              <a
-                href="/admin/listVouchers"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Mã giảm giá
-              </a>
-              <a
-                href="/admin/listBrands"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Thương hiệu
-              </a>
-       
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col">
-          <button
-            onClick={toggleAccount}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Tài khoản
-            <i
-              className={`fas fa-chevron-${isAccountOpen ? "up" : "down"} ml-2`}
-            ></i>
-          </button>
-          {isAccountOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listUser"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-align-left mr-3"></i>
-                Người dùng
-              </a>
-            </div>
-          )}
-          {isAccountOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listDelete"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-align-left mr-3"></i>
-                Tài khoản đã khóa
-              </a>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col">
-          <button
-            onClick={toggleInteract}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Tương tác
-            <i
-              className={`fas fa-chevron-${
-                isInteractOpen ? "up" : "down"
-              } ml-2`}
-            ></i>
-          </button>
-          {isInteractOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listComments"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-tablet-alt mr-3"></i>
-                Bình luận
-              </a>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col">
-          <button
-            onClick={toggleService}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Dịch vụ
-            <i
-              className={`fas fa-chevron-${isServiceOpen ? "up" : "down"} ml-2`}
-            ></i>
-          </button>
-          {isServiceOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listCusSer"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-align-left mr-3"></i>
-                Dịch vụ khách hàng
-              </a>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col">
-          <button
-            onClick={toggleOrder}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Đơn hàng
-            <i
-              className={`fas fa-chevron-${isOrderOpen ? "up" : "down"} ml-2`}
-            ></i>
-          </button>
-          {isOrderOpen && (
-            <div className="pl-6">
-              <a
-                href="/admin/listOrders"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Đơn hàng
-              </a>
-            </div>
-          )}
-        </div>
-
-
-        <div className="flex flex-col">
-          <button
-            onClick={toggleRestore}
-            className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-          >
-            <i className="fas fa-table mr-3"></i>
-            Khôi phục dữ liệu
-            <i
-              className={`fas fa-chevron-${isRestoreOpen ? "up" : "down"} ml-2`}
-            ></i>
-          </button>
-          {isRestoreOpen && (
-            <div className="pl-6">
-                  <a
-                href="/admin/recycleBin"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Sản phẩm
-              </a>
-
-              <a
-                href="/admin/recycleBinCate"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Danh mục
-              </a>
-              <a
-                href="/admin/recycleBinVoucher"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Mã giảm giá
-              </a>
-              <a
-                href="/admin/recycleBinOrder"
-                className="flex items-center text-black opacity-75 hover:opacity-100 py-4 pl-6 nav-item"
-              >
-                <i className="fas fa-calendar mr-3"></i>
-                Đơn hàng
-              </a>
-            </div>
-          )}
-        </div>
-      </nav>
     </aside>
   );
 };
