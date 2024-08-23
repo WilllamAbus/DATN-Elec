@@ -14,4 +14,4 @@ const suppliersSchema = Schema(
   }
 );
 
-module.exports = model("suppliers", suppliersSchema);
+module.exports = model("Supplier", suppliersSchema);

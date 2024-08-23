@@ -29,7 +29,7 @@ const supplierController = {
 
     listSuppliers: async (req, res) => {
         try {
-            const suppliers = await modelSupplier.find();
+            const suppliers = await modelSupplier.find({ status: { $ne: 'disable' } });
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách nhà cung cấp thành công",

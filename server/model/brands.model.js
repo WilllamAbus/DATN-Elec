@@ -1,11 +1,22 @@
 const { Schema, model } = require("mongoose");
+const Category = require("./catgories.model");
+const Supplier = require("./suppliers.model");
 const brandsSchema = Schema(
   {
     name: { type: String, required: true },
     description: { type: String },
-    imgURL: { type: String},
+    image: { type: String },
     status: { type: String, default: 'active' },
-
+    category_id: {
+      type: Schema.Types.ObjectId,
+      ref: Category,
+      required: true,
+    },
+    supplier_id: {
+      type: Schema.Types.ObjectId,
+      ref: Supplier,
+      required: true,
+    },
 
   },
   {
@@ -14,4 +25,4 @@ const brandsSchema = Schema(
   }
 );
 
-module.exports = model("brands", brandsSchema);
+module.exports = model("Brand", brandsSchema);
