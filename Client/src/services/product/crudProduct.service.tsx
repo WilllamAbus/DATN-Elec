@@ -21,7 +21,7 @@ export const addProduct = async (product: FormData) => {
   try {
     const response = await instance.post("/product/add", product, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "multipart/form-data",  
       },
     });
     return response.data;

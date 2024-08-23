@@ -6,7 +6,6 @@ import {
 } from "../../../../services/product/crudProduct.service";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import "../../../../assets/css/admin.style.css";
 
 const MySwal = withReactContent(Swal);
 const softDeleteList: React.FC = () => {
@@ -95,87 +94,110 @@ const softDeleteList: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <main className="w-full flex-grow p-6">
-      <div className="w-full mt-12">
-        <p className="text-xl pb-3 flex items-center">
-          <i className="fas fa-list mr-3"></i> DANH SÁCH SẢN PHẨM
-        </p>
-        <div className="bg-white overflow-auto">
-          <table className="text-left w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Thương hiệu
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Tên sản phẩm
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  HIinh ảnh
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Giá
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Trạng thái
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  Chức năng
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product._id} className="hover:bg-grey-lighter">
-                  <td className="py-4 px-6 border-b border-grey-light">{product.brand}</td>
-                  <td className="py-4 px-6 border-b border-grey-light">{product.name}</td>
-                  <td className="py-4 px-6 border-b border-grey-light">
-                    <img
-                      className="w-10 h-10 rounded-sm"
-                      src={product.image}
-                      alt="Student avatar"
-                      style={{ width: "50px", height: "50px" }}
-                    />
-                  </td>
-                  <td className="py-4 px-6 border-b border-grey-light">
-                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(product.price)}
-                  </td>
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" className="p-4">
+            <div className="flex items-center">
+              <input
+                id="checkbox-all"
+                type="checkbox"
+                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="checkbox-all" className="sr-only">
+                checkbox
+              </label>
+            </div>
+          </th>
+          <th scope="col" className="p-4">
+            Tên sản phẩm
+          </th>
+          <th scope="col" className="p-4">
+            Danh mục
+          </th>
+          <th scope="col" className="p-4">
+            Giá gốc
+          </th>
+          <th scope="col" className="p-4">
+            Trạng thái
+          </th>
+          <th scope="col" className="p-4">
+            Màu sắc
+          </th>
+          <th scope="col" className="p-4">
+            Chức năng
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((product) => (
+          <tr
+            key={product._id}
+            className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <td className="p-4 w-4">
+              <div className="flex items-center">
+                <input
+                  id="checkbox-table-search-1"
+                  type="checkbox"
+                  className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="checkbox-table-search-1" className="sr-only">
+                  checkbox
+                </label>
+              </div>
+            </td>
+            <th
+              scope="row"
+              className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              <div className="flex items-center mr-3">
+                <img src={product.image} className="h-8 w-auto mr-3" />
+                {product.name}
+              </div>
+            </th>
+            <td className="px-4 py-3">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                {product.brand}
+              </span>
+            </td>
+            <td className="px-4 py-3">
+              {" "}
+              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                product.price
+              )}
+            </td>
 
-                  <td className="py-4 px-6 border-b border-grey-light">
-                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
-                      {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 border-b border-grey-light">
-                    <button
-                      className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                      onClick={() => handleDelete(product._id)}
-                    >
-                      Xoá
-                    </button>
-                    <button
-                      className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                      onClick={() => handleRestore(product._id)}
-                    >
-                      Khôi phục
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="mt-6 flex gap-2">
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
-          <a href="/admin/addProducts">Thêm mới</a>
-        </button>
-        <button className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded" type="button">
-          <a href="/admin/dashboard">Trở lại</a>
-        </button>
-      </div>
-    </main>
+            <td className="py-4 px-6 border-b border-grey-light">
+              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
+              </span>
+            </td>
+            <td className="px-4 py-3">{product.color}</td>
+            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  data-modal-target="delete-modal"
+                  data-modal-toggle="delete-modal"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleDelete(product._id)}
+                >
+                  Xoá
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleRestore(product._id)}
+                >
+                  Khôi phục
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

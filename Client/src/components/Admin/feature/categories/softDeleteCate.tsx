@@ -110,11 +110,11 @@ const ListCateDeleted: React.FC = () => {
         if (result.isConfirmed) {
           try {
             await dispatch(restoreCategoryThunk(_id)).unwrap();
-            dispatch(fetchDeletedCategoriesThunk()); 
-            
+            dispatch(fetchDeletedCategoriesThunk());
+
             setCategories((prevCategories) =>
-                prevCategories.filter((category) => category._id !== _id)
-              );
+              prevCategories.filter((category) => category._id !== _id)
+            );
             // Fetch current categories after restore
             MySwal.fire({
               title: "Đã khôi phục!",
@@ -136,90 +136,103 @@ const ListCateDeleted: React.FC = () => {
   );
 
   return (
-    <main className="w-full flex-grow p-6">
-      <div className="w-full mt-12">
-        <p className="text-xl pb-3 flex items-center">
-          <i className="fas fa-list mr-3"></i> DANH SÁCH DANH MỤC ĐÃ XOÁ
-        </p>
-        <div className="bg-white overflow-auto">
-          <table className="text-left w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  TÊN DANH MỤC
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  HÌNH ẢNH
-                </th>
-                <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                  HÀNH ĐỘNG
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {status === "loading" && (
-                <tr>
-                  <td colSpan={3} className="text-center py-4">
-                    Loading...
-                  </td>
-                </tr>
-              )}
-              {status === "failed" && (
-                <tr>
-                  <td colSpan={3} className="text-center py-4 text-red-500">
-                    {error}
-                  </td>
-                </tr>
-              )}
-              {status === "succeeded" && categories.length > 0 ? (
-                categories.map((category: Category) => (
-                  <tr key={category._id} className="hover:bg-grey-lighter">
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {category.name}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      <LazyLoad height={50} offset={100} once>
-                        <img
-                          src={
-                            imageUrls[category._id] ||
-                            "path/to/default/image.jpg"
-                          }
-                          loading="lazy"
-                          alt={category.name}
-                          style={{ width: "50px", height: "50px" }}
-                        />
-                      </LazyLoad>
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleRestore(category._id)}
-                          className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                        >
-                          Khôi phục
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category._id)}
-                          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="text-center py-4">
-                    No categories found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" className="p-4">
+            <div className="flex items-center">
+              <input
+                id="checkbox-all"
+                type="checkbox"
+                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="checkbox-all" className="sr-only">
+                checkbox
+              </label>
+            </div>
+          </th>
+          <th scope="col" className="px-16 py-3">
+            <span className="sr-only">Hình ảnh</span>
+          </th>
+          <th scope="col" className="p-4">
+            Tên danh mục
+          </th>
+
+          <th scope="col" className="p-4">
+            Chức năng
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {status === "loading" && (
+          <tr>
+            <td colSpan={3} className="text-center py-4">
+              Loading...
+            </td>
+          </tr>
+        )}
+        {status === "failed" && (
+          <tr>
+            <td colSpan={3} className="text-center py-4 text-red-500">
+              {error}
+            </td>
+          </tr>
+        )}
+        {status === "succeeded" &&
+          categories.map((category: Category) => (
+            <tr
+              key={category._id}
+              className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <td className="p-4 w-4">
+                <div className="flex items-center">
+                  <input
+                    id="checkbox-table-search-1"
+                    type="checkbox"
+                    className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label htmlFor="checkbox-table-search-1" className="sr-only">
+                    checkbox
+                  </label>
+                </div>
+              </td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                <LazyLoad height={50} offset={100} once>
+                  <img
+                    src={imageUrls[category._id]}
+                    loading="lazy"
+                    alt={category.name}
+                    className="w-16 md:w-32 max-w-full max-h-full"
+                  />
+                </LazyLoad>
+              </td>
+              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                {category.name}
+              </td>
+
+              <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => handleDelete(category._id)}
+                    type="button"
+                    data-modal-target="delete-modal"
+                    data-modal-toggle="delete-modal"
+                    className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  >
+                    Xoá
+                  </button>
+                  <button
+                    onClick={() => handleRestore(category._id)}
+                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  >
+                    Khôi phục
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+      </tbody>
+    </table>
   );
 };
 
