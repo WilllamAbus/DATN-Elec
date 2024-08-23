@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CartItem, CartState } from "../../../../types/Voucher.d";
 import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { getUserData } from "../../../../middleware/getToken"; // Import the getUserData function
+import { getUserData } from "../../../../middleware/getToken";
 
 const ListCart: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>({
@@ -69,18 +69,29 @@ const ListCart: React.FC = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
-                <th scope="col" className="px-6 py-3">Email</th>
-                <th scope="col" className="px-6 py-3">Hình ảnh</th>
-                <th scope="col" className="px-6 py-3">Tên sản phẩm</th>
-                <th scope="col" className="px-6 py-3">Số lượng</th>
-                <th scope="col" className="px-6 py-3">Giá</th>
+                <th scope="col" className="px-6 py-3">
+                  Email
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Hình ảnh
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Tên sản phẩm
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Số lượng
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Giá
+                </th>
               </tr>
             </thead>
             <tbody>
               {/* Hiển thị email của người dùng */}
               <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <td className="px-6 py-4">{userData.email}</td>
-                <td colSpan={4}></td> {/* Khoảng trống để tránh trùng lặp các cột khác */}
+                <td colSpan={4}></td>{" "}
+                {/* Khoảng trống để tránh trùng lặp các cột khác */}
               </tr>
 
               {/* Hiển thị các mục giỏ hàng */}
@@ -89,7 +100,8 @@ const ListCart: React.FC = () => {
                   key={index}
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                 >
-                  <td className="px-6 py-4"></td> {/* Giữ khoảng trống cho email */}
+                  <td className="px-6 py-4"></td>{" "}
+                  {/* Giữ khoảng trống cho email */}
                   <td className="px-6 py-4">
                     <img
                       src={item.imgPreview}
@@ -99,7 +111,9 @@ const ListCart: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">{item.name}</td>
                   <td className="px-6 py-4">{item.quantity}</td>
-                  <td className="px-6 py-4">{item.price.toLocaleString()} vnđ</td>
+                  <td className="px-6 py-4">
+                    {item.price.toLocaleString()} vnđ
+                  </td>
                 </tr>
               ))}
 

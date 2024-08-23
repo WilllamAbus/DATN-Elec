@@ -1,22 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-// import commonjs from '@rollup/plugin-commonjs';
 import checker from 'vite-plugin-checker';
 
 export default defineConfig({
   plugins: [
     react(),
-    // commonjs(),
     checker({
-      typescript: true, // Enable TypeScript type checking
+      typescript: true,
     }),
   ],
   resolve: {
     alias: {
-      '@': '/src',
+      src: '/src',
     },
   },
-  
   server: {
     port: 3150,
     open: true,
@@ -40,5 +37,4 @@ export default defineConfig({
       include: [/node_modules/]
     }
   },
-  
 });

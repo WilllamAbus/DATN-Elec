@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 const serviceAccount = require("./authFirebase.json");
 const User = require("../../model/users.model");
+const authService = require("../../services/authGoogle.service");
 const {
   sendPasswordResetEmail,
   sendVerificationEmail,
@@ -60,12 +61,9 @@ const authController = {
         .createHash("sha256")
         .update(token)
         .digest("hex");
-
-      // Cập nhật token và thời gian hết hạn vào đối tượng user
       user.emailVerificationToken = hashedToken;
       user.emailVerificationExpires = Date.now() + 3600000; // 1 giờ
 
-      // Lưu đối tượng user sau khi cập nhật các trường
       await user.save();
 
       // Gửi email xác thực
@@ -149,22 +147,23 @@ const authController = {
   },
   generateToken: (user) => {
     const payload = {
-      id: user._id,
+      id: user.id,
       email: user.email,
       name: user.name,
       roles: user.roles,
     };
-    return jwt.sign(payload, jwtSecret, { expiresIn: "30d" });
+    return jwt.sign(payload, jwtSecret, { expiresIn: "1d" });
   },
 
   generateRefreshToken: (user) => {
     const payload = {
-      id: user._id,
+      id: user.id,
       email: user.email,
       name: user.name,
       roles: user.roles,
     };
-    return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "30d" });
+    console.log("Generating refresh token with payload:", payload);
+    return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "2d" });
   },
 
   loginUser: async (req, res) => {
@@ -223,38 +222,101 @@ const authController = {
     }
   },
 
-  requestRefreshToken: async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
+  loginSuccess: async (req, res) => {
+    const { id, tokenLogin } = req.body;
 
-    if (!refreshToken) {
-      return res.status(401).json({ message: "Bạn chưa đăng nhập" });
-    }
-    if (!refreshTokens.includes(refreshToken)) {
-      return res.status(403).json({ message: "Token này không phải của bạn" });
-    }
-
-    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
     try {
-      const userPayload = jwt.verify(refreshToken, jwtRefreshSecret);
+      if (!id || !tokenLogin) {
+        return res
+          .status(400)
+          .json({ err: 1, message: "Thiếu thông tin đầu vào" });
+      }
 
-      const newAccessToken = authController.generateToken(userPayload);
-      const newRefreshToken = authController.generateRefreshToken(userPayload);
-      refreshTokens.push(newRefreshToken);
+      let response = await authService.loginSuccessService(id, tokenLogin);
 
-      res.cookie("refreshToken", newRefreshToken, {
+      if (response.err === 1) {
+        console.log(
+          "Người dùng không tìm thấy hoặc token không hợp lệ:",
+          id,
+          tokenLogin
+        );
+        return res
+          .status(401)
+          .json({ message: "Thông tin đăng nhập không chính xác" });
+      }
+
+      const user = response.user;
+
+      if (!user.isEmailVerified) {
+        return res.status(400).json({ message: "Email chưa được xác minh" });
+      }
+
+      if (user.status !== "active") {
+        console.log("Tài khoản đã bị khóa");
+        return res.status(400).json({ message: "Tài khoản đã bị khóa" });
+      }
+
+      const token = authController.generateToken(user);
+      const refreshToken = authController.generateRefreshToken(user);
+      refreshTokens.push(refreshToken);
+
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         path: "/",
         sameSite: "strict",
       });
 
-      return res.status(200).json({ accessToken: newAccessToken });
-    } catch (err) {
+      const { password, ...others } = user._doc;
+
       return res
-        .status(403)
-        .json({ message: "Refresh token không hợp lệ", error: err.message });
+        .status(200)
+        .json({ ...others, accessToken: token, roles: user.roles });
+    } catch (error) {
+      console.error("Lỗi trong loginSuccess controller:", error);
+      return res.status(500).json({
+        err: -1,
+        message: "Xử lý đăng nhập thất bại: " + error.message,
+      });
     }
   },
+
+  requestRefreshToken: async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json("Bạn chưa được xác thực");
+    }
+
+    if (!refreshTokens.includes(refreshToken)) {
+      return res.status(403).json("Token không hợp lệ");
+    }
+
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json("Token không hợp lệ");
+      }
+
+      refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+
+      const newAccessToken = authController.generateToken(user);
+      const newRefreshToken = authController.generateRefreshToken(user);
+
+      refreshTokens.push(newRefreshToken);
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        sameSite: "strict",
+      });
+      return res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    });
+  },
+
   logout: async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     res.clearCookie("refreshToken");
@@ -356,6 +418,8 @@ const authController = {
 
   getProfile: async (req, res) => {
     try {
+      console.log("User object:", req.user); // Thêm log để kiểm tra thông tin người dùng
+
       const userId = req.user.id;
 
       if (!userId) {

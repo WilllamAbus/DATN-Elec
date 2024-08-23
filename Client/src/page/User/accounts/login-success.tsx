@@ -1,61 +1,98 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import UserHeader from '../../../components/User/header';
-import UserNav from '../../../components/User/navbar';
-import UserFooter from '../../../components/User/footer';
-import UserCoppyright from '../../../components/User/copyright';
-import '../../../assets/css/user.style.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import { apiLoginSuccess } from '../../../services/authentication/loginSuccess.service';
-
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { apiLoginSuccessThunk } from "../../../redux/auth/apiLoginSuccessThunk";
+import { AppDispatch, RootState } from "../../../redux/store";
 
 const LoginSuccess = () => {
-    const { userId, tokenLogin } = useParams<{ userId?: string; tokenLogin?: string }>();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const { userId, tokenLogin } = useParams<{
+    userId?: string;
+    tokenLogin?: string;
+  }>();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
-    useEffect(() => {
-        if (userId && tokenLogin) {
-            apiLoginSuccess(userId, tokenLogin, dispatch, navigate);
-        } else {
-            navigate('/login-error');
+  // Lấy thông tin từ Redux store
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.authGoogle.login.isLoggedIn
+  );
+  const error = useSelector((state: RootState) => state.authGoogle.login.error);
+  const roles = useSelector((state: RootState) => state.authGoogle.login.roles);
+
+  useEffect(() => {
+    if (userId && tokenLogin) {
+      const loginSuccess = async () => {
+        try {
+          await dispatch(
+            apiLoginSuccessThunk({ id: userId, token: tokenLogin })
+          ).unwrap();
+        } catch (error: any) {
+          console.error("Lỗi khi đăng nhập:", error.message);
         }
-    }, [userId, tokenLogin, dispatch, navigate]);
-    
+      };
+      loginSuccess();
+    } else {
+      navigate("/login-error");
+    }
+  }, [userId, tokenLogin, dispatch, navigate]);
 
-    return (
-        <>
-            <UserHeader />
-            <UserNav />
+  useEffect(() => {
+    if (isLoggedIn) {
+      const timer = setTimeout(() => {
+        if (roles && roles.length > 0) {
+          const isAdmin = roles.some((role) => role === "admin");
+          if (isAdmin) {
+            navigate("/admin");
+          } else {
+            window.location.href = "/";
+          }
+        } else {
+          navigate("/login-error");
+        }
+      }, 3000);
 
-            <link
-                href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap"
-                rel="stylesheet"
-            />
-            <link
-                href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-                rel="stylesheet"
-            />
-            <div className="container mx-auto px-4">
-                <div className="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden my-20">
-                    <div className="flex justify-center items-center mt-8">
-                        <div className="rounded-full bg-gray-200 h-40 w-40 flex items-center justify-center">
-                            <i className="text-6xl text-green-500">✓</i>
-                        </div>
-                    </div>
-                    <div className="text-center px-6 py-4">
-                        <h1 className="font-bold text-3xl text-gray-900">Success</h1>
-                        <p className="text-gray-700 mt-2">
-                            Bạn đã đăng nhập thành công tài khoản Google
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <UserFooter />
-            <UserCoppyright />
-        </>
-    );
-}
+      return () => clearTimeout(timer);
+    } else if (error) {
+      // Điều hướng đến trang lỗi nếu có lỗi
+      navigate("/login-error");
+    }
+  }, [isLoggedIn, roles, error, navigate]);
+
+  return (
+    <div className="container mx-auto px-4">
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden my-20">
+        <div className="flex justify-center items-center mt-8">
+          <div
+            className={`rounded-full h-40 w-40 flex items-center justify-center ${
+              error ? "bg-red-100" : "bg-green-100"
+            }`}
+          >
+            <i
+              className={`text-6xl ${
+                error ? "text-red-500" : "text-green-500"
+              }`}
+            >
+              {error ? "✘" : "✓"}
+            </i>
+          </div>
+        </div>
+        <div className="text-center px-6 py-4">
+          <h1
+            className={`text-3xl font-bold ${
+              error ? "text-red-900" : "text-green-900"
+            }`}
+          >
+            {error ? "Lỗi" : "Thành Công"}
+          </h1>
+          <p className="text-gray-700 mt-2">
+            {error
+              ? `Đã xảy ra lỗi khi đăng nhập: ${error}`
+              : "Bạn đã đăng nhập thành công tài khoản Google"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default LoginSuccess;

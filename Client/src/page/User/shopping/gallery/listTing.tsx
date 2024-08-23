@@ -1,16 +1,9 @@
 import React from "react";
-// import { Link } from 'react-router-dom';
-import UserHeader from "../../../../components/User/header";
-import UserNav from "../../../../components/User/navbar";
-import UserFooter from "../../../../components/User/footer";
-import UserCoppyright from "../../../../components/User/copyright";
-import "../../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+
+
 const Listting: React.FC = () => {
   return (
     <>
-      <UserHeader />
-      <UserNav />
       {/* <!-- breadcrumb --> */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
@@ -57,9 +50,9 @@ const Listting: React.FC = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                fill-rule="evenodd"
+             fillRule="evenodd"
                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clip-rule="evenodd"
+             clipRule="evenodd"
               ></path>
             </svg>
             Info
@@ -78,9 +71,9 @@ const Listting: React.FC = () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                fill-rule="evenodd"
+               fillRule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"
+               clipRule="evenodd"
               ></path>
             </svg>
             <span className="sr-only">Close menu</span>
@@ -353,9 +346,9 @@ const Listting: React.FC = () => {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fill-rule="evenodd"
+                 fillRule="evenodd"
                   d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
             </a>
@@ -1029,8 +1022,7 @@ const Listting: React.FC = () => {
         <!-- ./products --> */}
       </div>
       {/* <!-- ./shop wrapper --> */}
-      <UserFooter />
-      <UserCoppyright />
+
     </>
   );
 };

@@ -1,17 +1,11 @@
-// // src/App.tsx
 import React, { Suspense } from "react";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  RouteObject,
-} from "react-router-dom";
-// import AdminRoutes from './routes/AdminRoutes';
+import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import UserRoutes from "./routes/user.routes";
 import AdminRoutes from "./routes/admin.routes";
-
+import "flowbite";
 const routes: RouteObject[] = [
   {
-    path: "/admin/*",
+    path: "/admin",
     children: AdminRoutes,
   },
   {
@@ -19,7 +13,6 @@ const routes: RouteObject[] = [
 
     children: UserRoutes,
   },
-
 ];
 
 const router = createBrowserRouter(routes);

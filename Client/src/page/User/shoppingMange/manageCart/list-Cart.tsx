@@ -1,18 +1,11 @@
 import React from "react";
-import UserHeader from "../../../../components/User/header";
-import UserNav from "../../../../components/User/navbar";
-import UserFooter from "../../../../components/User/footer";
-import UserCoppyright from "../../../../components/User/copyright";
 import { Link } from 'react-router-dom'; 
 import UserSideBarProfile from '../../../../components/User/sidebarProfile/sidebar'
 import UserListCart from "../../../../components/User/feature/manage/listCart"
-import "../../../../assets/css/user.style.css";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+
 const UserProfile: React.FC = () => {
   return (
     <>
-      <UserHeader />
-      <UserNav />
       {/* Breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <Link  to="/"  className="text-primary text-base">
@@ -36,9 +29,7 @@ const UserProfile: React.FC = () => {
        <UserListCart/>
         {/* ./info */}
       </div>
-      {/* ./wrapper */}
-      <UserFooter />
-      <UserCoppyright />
+
     </>
   );
 };

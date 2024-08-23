@@ -22,12 +22,7 @@ import {
   getUserById,
   listRole,
 } from "../../services/authentication/authAdmin";
-import { Role, UserProfile } from "../../types/user";
-interface LoginResponse {
-  status: number;
-  message: string;
-  token?: string;
-}
+import { Role, UserProfile, LoginResponse } from "../../types/user";
 
 // Thunk cho việc đăng nhập
 // export const loginUserThunk = createAsyncThunk(
@@ -52,12 +47,11 @@ export const loginUserThunk = createAsyncThunk<
     return response as LoginResponse;
   } catch (error) {
     if (error instanceof Error) {
-      return rejectWithValue((error as { message: string }).message);
+      return rejectWithValue(error.message);
     }
     return rejectWithValue("An unknown error occurred");
   }
 });
-
 export const getProfileThunk = createAsyncThunk<
   UserProfile,
   void,
@@ -85,18 +79,18 @@ export const getListThunk = createAsyncThunk<
   }
 });
 
-// Thunk cho việc đăng xuất
+//  đăng xuất
 export const logoutThunk = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
       await logoutService();
+      return true;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
-
 export const updateProfileThunk = createAsyncThunk<
   UserProfile,
   FormData,
@@ -221,7 +215,6 @@ export const updatePasswordThunk = createAsyncThunk(
     }
   }
 );
-export { logoutService };
 
 ///////////////////////////////////////////////////////////////////////ADMIN////////////////////////////////////////////////
 export const softDeleteUserThunk = createAsyncThunk(

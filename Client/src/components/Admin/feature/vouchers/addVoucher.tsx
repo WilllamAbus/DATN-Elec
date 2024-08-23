@@ -13,7 +13,7 @@ import { notify } from "../../../../ultils/success";
 const addDiscount: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Voucher>();
-  // const [ setAlert] = useState<{ message: string; type: "success" | "error" | null } | null>(null);
+
   const navigate = useNavigate(); 
   const categories = useSelector(
     (state: RootState) => state.categories.categories

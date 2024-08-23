@@ -1,66 +1,69 @@
-import React from 'react';
-// import { Link } from 'react-router-dom';
+import {
+  Footer,
+  FooterCopyright,
+  FooterIcon,
+  FooterLink,
+  FooterLinkGroup,
+  FooterTitle,
+} from "flowbite-react";
+import {
+  BsDribbble,
+  BsFacebook,
+  BsGithub,
+  BsInstagram,
+  BsTwitter,
+} from "react-icons/bs";
 
-const Footer :React.FC = () => {
-    return (
-        <footer className="bg-upFot pt-16 pb-12 border-t border-gray-100">
-            <div className="container grid grid-cols-1">
-                <div className="col-span-1 space-y-4">
-                  
-                    <div className="mr-2"></div>
-                    {/* <div className="flex space-x-5">
-                        <a href="#" className="text-white hover:text-white"><i className="fa-brands fa-facebook-square"></i></a>
-                        <a href="#" className="text-white hover:text-white"><i className="fa-brands fa-instagram-square"></i></a>
-                        <a href="#" className="text-white hover:text-white"><i className="fa-brands fa-twitter-square"></i></a>
-                        <a href="#" className="text-white hover:text-white"><i className="fa-brands fa-github-square"></i></a>
-                    </div> */}
-                </div>
-
-                <div className="col-span-2 grid grid-cols-2 gap-4">
-                    <div className="grid grid-cols-2 gap-4 md:gap-8">
-                        <div>
-                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Giải pháp</h3>
-                            <div className="mt-4 space-y-4">
-                                <a href="#" className="text-base text-white block">Marketing</a>
-                                <a href="#" className="text-base text-white block">Analitycs</a>
-                                <a href="#" className="text-base text-white block">Commerce</a>
-                                <a href="#" className="text-base text-white block">Insights</a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Hỗ trợ</h3>
-                            <div className="mt-4 space-y-4">
-                                <a href="#" className="text-base text-white block">Giá </a>
-                                <a href="#" className="text-base text-white block">Dịch vụ khách hàng</a>
-                                <a href="#" className="text-base text-white block">Thanh toán</a>
-                              
-                            </div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-8">
-                        <div>
-                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Mạng xã hội</h3>
-                            <div className="mt-4 space-y-4">
-                                <a href="#" className="text-base text-white block">Facebook</a>
-                                <a href="#" className="text-base text-white block">X</a>
-                                <a href="#" className="text-base text-white block">Tiktok</a>
-                                <a href="#" className="text-base text-white block">Youtube</a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Kiếm tiền</h3>
-                            <div className="mt-4 space-y-4">
-                                <a href="#" className="text-base text-white block">Bán hàng</a>
-                                <a href="#" className="text-base text-white block">Affiliate</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    );
+export function UserFooter() {
+  return (
+    <Footer className="bg-bgZincFoter">
+      <div className="w-full">
+        <div className="grid w-full grid-cols-2 gap-8 px-6 py-8 md:grid-cols-4">
+          <div>
+            <FooterTitle title="Giải pháp" />
+            <FooterLinkGroup col>
+              <FooterLink href="#">Marketing</FooterLink>
+              <FooterLink href="#">Analitycs</FooterLink>
+              <FooterLink href="#">Commerce</FooterLink>
+              <FooterLink href="#">Insight</FooterLink>
+            </FooterLinkGroup>
+          </div>
+          <div>
+            <FooterTitle title="Mạng xã hội" />
+            <FooterLinkGroup col>
+              <FooterLink href="#">Discord Server</FooterLink>
+              <FooterLink href="#">Twitter</FooterLink>
+              <FooterLink href="#">Facebook</FooterLink>
+              <FooterLink href="#">Youtube</FooterLink>
+            </FooterLinkGroup>
+          </div>
+          <div>
+            <FooterTitle title="Kiếm tiền" />
+            <FooterLinkGroup col>
+              <FooterLink href="#">Bán hàng</FooterLink>
+              <FooterLink href="#">Affiliate</FooterLink>
+            </FooterLinkGroup>
+          </div>
+          <div>
+            <FooterTitle title="Hỗ trợ" />
+            <FooterLinkGroup col>
+              <FooterLink href="#">Giá</FooterLink>
+              <FooterLink href="#">Dịch vụ khách hàng</FooterLink>
+              <FooterLink href="#">Thanh toán</FooterLink>
+            </FooterLinkGroup>
+          </div>
+        </div>
+        <div className="w-full bg-bgZincFoterCopyRight px-4 py-6 sm:flex sm:items-center sm:justify-between">
+          <FooterCopyright href="#" by="E-Com" year={2024} />
+          <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
+            <FooterIcon href="#" icon={BsFacebook} />
+            <FooterIcon href="#" icon={BsInstagram} />
+            <FooterIcon href="#" icon={BsTwitter} />
+            <FooterIcon href="#" icon={BsGithub} />
+            <FooterIcon href="#" icon={BsDribbble} />
+          </div>
+        </div>
+      </div>
+    </Footer>
+  );
 }
-
-export default Footer;

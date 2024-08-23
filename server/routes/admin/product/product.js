@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../../../middleware/multer.middle");
+const upload = require('../../../middleware/multer.middle');
 const {
   addProduct,
   listProduct,
@@ -21,6 +21,7 @@ const {
   deleteComment,
   repComment,
   getRepComment,
+  getProductLimit
 } = require("../../../controler/admin/prouctController");
 
 const middlewareController = require("../../../middleware/auth");
@@ -47,16 +48,17 @@ router.get("/search/:keyword", search);
 //up view
 router.put("/upView/:id", upView);
 //comment
-router.post('/comment',comment);
-router.get('/comment/:id',commentProduct);
-router.delete('/comment/:id',deleteComment);
-router.get('/comment',commentAllProduct);
-router.get("/userID/:id",userID);
-router.post('/repComment/:id',repComment);
-router.get('/repComment/:id',getRepComment);
+router.post('/comment', comment);
+router.get('/comment/:id', commentProduct);
+router.delete('/comment/:id', deleteComment);
+router.get('/comment', commentAllProduct);
+router.get("/userID/:id", userID);
+router.post('/repComment/:id', repComment);
+router.get('/repComment/:id', getRepComment);
 //filer
 router.get("/filter/:price", price);
 router.patch("/soft-delete/:id", middlewareController.verifyToken, softDelete);
 router.get("/deleted-list", middlewareController.verifyToken, deletedList);
 router.patch("/restore/:id", middlewareController.verifyToken, restore);
+router.get('/limit', getProductLimit)
 module.exports = router;

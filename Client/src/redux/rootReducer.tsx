@@ -1,13 +1,24 @@
-import { combineReducers } from "@reduxjs/toolkit";
-import AuthSlice from "./auth/authSlice";
-import categoriesSlice from "./categories/categoriesSlice";
+// src/redux/rootReducer.ts
 
+import { combineReducers } from "@reduxjs/toolkit";
+import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import authReducer from "./auth/authSlice";
+import authGoogleReducer from "./auth/googleSlice";
+import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
+const authConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["login"],
+};
+
 const rootReducer = combineReducers({
-  auth: AuthSlice,
+  auth: persistReducer(authConfig, authReducer),
+  authGoogle: persistReducer(authConfig, authGoogleReducer),
   categories: categoriesSlice,
   voucher: voucherReducer,
   checkout: checkoutSlice,

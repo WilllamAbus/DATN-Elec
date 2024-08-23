@@ -1,39 +1,39 @@
+import Cookies from "js-cookie";
 import instance from "../axios";
-import {
-  loginFailed,
-  loginStart,
-  loginSuccess,
-} from "../../redux/auth/authSlice";
-import { AppDispatch } from "../../redux/store";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const apiLoginSuccess = async (
-  id: string,
-  token: string,
-  dispatch: AppDispatch,
-  navigate: (path: string) => void
-) => {
-  dispatch(loginStart());
+export const apiLoginSuccessService = async (id: string, token: string) => {
   try {
-    const res = await instance.post(`${API_URL}/auth/login-success`, {
+    const response = await instance.post(`${API_URL}/auth/login-success`, {
       id,
       tokenLogin: token,
     });
+    console.log("API Response:", response.data);
 
-    // Dispatch the success action with the response data
-    dispatch(loginSuccess(res.data));
+    const { accessToken } = response.data;
 
-    // Navigate to the desired path after a short delay
-    setTimeout(() => {
-      navigate("/");
-    }, 3000);
-  } catch (err: any) {
-    console.error(
-      "Lỗi trong apiLoginSuccess:",
-      err.response?.data || err.message
-    );
-    dispatch(loginFailed(""));
-    navigate("/login-error");
+    if (!accessToken) throw new Error("No access token received");
+    Cookies.set("token", accessToken, {
+      path: "/",
+      expires: 7,
+      secure: true,
+      sameSite: "strict",
+    });
+    // localStorage.setItem("token", accessToken);
+    // localStorage.setItem("roles", roles?.[0]?.name || "");
+    // localStorage.setItem("name", name || "");
+    // localStorage.setItem(
+    //   "userProfile",
+    //   JSON.stringify({ name, roles, email, avatar })
+    // );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Error in apiLoginSuccessService:", error);
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.",
+    };
   }
 };

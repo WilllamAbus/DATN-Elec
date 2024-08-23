@@ -1,0 +1,7 @@
+
+
+export const labels: Record<string, string> = {
+  account: "Tài khoản",
+  product: "Sản phẩm",
+  recycleBin: "Thùng rác",
+};
