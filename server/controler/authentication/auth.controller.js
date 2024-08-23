@@ -152,7 +152,7 @@ const authController = {
       name: user.name,
       roles: user.roles,
     };
-    return jwt.sign(payload, jwtSecret, { expiresIn: "10s" });
+    return jwt.sign(payload, jwtSecret, { expiresIn: "1d" });
   },
 
   generateRefreshToken: (user) => {
@@ -163,7 +163,7 @@ const authController = {
       roles: user.roles,
     };
     console.log("Generating refresh token with payload:", payload);
-    return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "2h" });
+    return jwt.sign(payload, jwtRefreshSecret, { expiresIn: "2d" });
   },
 
   loginUser: async (req, res) => {

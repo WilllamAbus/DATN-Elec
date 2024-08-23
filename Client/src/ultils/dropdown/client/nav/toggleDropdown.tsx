@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { RootState, useAppDispatch } from "../../redux/store";
-import { getProfileThunk, logoutThunk } from "../../redux/auth/authThunk";
+import { RootState, useAppDispatch } from "../../../../redux/store";
+import { logoutThunk, getProfileThunk } from "../../../../redux/auth/authThunk";
 import Cookies from "js-cookie";
 
 const UserMenuDropdown: React.FC = () => {
