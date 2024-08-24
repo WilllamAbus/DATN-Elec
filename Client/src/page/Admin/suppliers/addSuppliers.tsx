@@ -1,17 +1,16 @@
 import React from "react";
+import AdminFetAddSuppliers from "../../../components/Admin/feature/suppliers/addSuppliers";
 
-import AdminFetAddBrands from "../../../components/Admin/feature/brands/addBrands";
-
-const addBrands: React.FC = () => {
+const addSuppliers: React.FC = () => {
   return (
     <>
       <div className="bg-gray-100 font-family-karla flex">
         <div className="relative w-full flex flex-col h-screen overflow-y-hidden">
-          <AdminFetAddBrands />
+          <AdminFetAddSuppliers />
         </div>
       </div>     
     </>
   );
 };
 
-export default addBrands;
+export default addSuppliers;

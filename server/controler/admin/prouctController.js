@@ -81,7 +81,7 @@ const productsController = {
                         const [metadata] = await file.getMetadata();
                         imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
 
-                        await saveProduct();
+                      await saveProduct();
                     } catch (err) {
                         console.error('Lỗi khi lấy URL của hình ảnh:', err);
                         res.status(500).json({ error: 'Không thể lấy URL của hình ảnh' });
