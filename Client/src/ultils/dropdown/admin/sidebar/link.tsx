@@ -12,7 +12,7 @@ export const links: Record<string, Link[]> = {
   ],
   product: [
     { label: "Sản phẩm", to: "/admin/listProducts" },
-    { label: "Sale", to: "/admin/listProducts" },
+    { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
   supplier: [
     { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
@@ -23,5 +23,6 @@ export const links: Record<string, Link[]> = {
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },
+    { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
   ],
 };

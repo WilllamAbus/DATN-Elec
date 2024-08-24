@@ -157,7 +157,9 @@ const ListCateDeleted: React.FC = () => {
           <th scope="col" className="p-4">
             Tên danh mục
           </th>
-
+          <th scope="col" className="p-4">
+            Trạng thái 
+          </th>
           <th scope="col" className="p-4">
             Chức năng
           </th>
@@ -209,7 +211,11 @@ const ListCateDeleted: React.FC = () => {
               <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                 {category.name}
               </td>
-
+              <td className="py-4 px-6 border-b border-grey-light">
+              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                {category.status === "active" ? "Hiển thị" : "Đã ẩn"}
+              </span>
+            </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <div className="flex items-center space-x-4">
                   <button

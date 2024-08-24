@@ -162,11 +162,11 @@ const EditCate: React.FC = () => {
                       value: 3,
                       message: "Độ đài phải có ít nhất 3 kí tự",
                     },
-                    validate: {
-                      noSpecialChars: (value) =>
-                        /^[a-zA-Z\s]*$/.test(value) ||
-                        "Tên không được chứa ký tự đặc biệt",
-                    },
+                    // validate: {
+                    //   noSpecialChars: (value) =>
+                    //     /^[a-zA-Z\s]*$/.test(value) ||
+                    //     "Tên không được chứa ký tự đặc biệt",
+                    // },
                   })}
                 />
                 {errors.name && (
@@ -202,7 +202,11 @@ const EditCate: React.FC = () => {
             <div className="col-span-6 mt-4 sm:col-full flex space-x-4">
               <button
                 type="submit"
-                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="text-white bg-blue-600
+                 hover:bg-primary-800 focus:ring-4
+                  focus:ring-primary-300 font-medium 
+                  rounded-lg text-sm px-5 py-2.5 
+                  text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
                 Cập nhật
               </button>

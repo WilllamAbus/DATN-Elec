@@ -150,10 +150,10 @@ const AddCate: React.FC = () => {
                     required: "Tên không được bỏ trống",
 
                     minLength: { value: 3, message: "Độ đài phải có ít nhất 3 kí tự" },
-                    validate: {
-                      noSpecialChars: (value) =>
-                        /^[a-zA-Z\s]*$/.test(value) || "Tên  không được chứa ký tự đặc biệt",
-                    },
+                    // validate: {
+                    //   noSpecialChars: (value) =>
+                    //     /^[a-zA-Z\s]*$/.test(value) || "Tên  không được chứa ký tự đặc biệt",
+                    // },
                   })}
                 />
                 {errors.name && <span className="text-red-600">{errors.name.message}</span>}
