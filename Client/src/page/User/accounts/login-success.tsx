@@ -53,7 +53,7 @@ const LoginSuccess = () => {
 
       return () => clearTimeout(timer);
     } else if (error) {
-      // Điều hướng đến trang lỗi nếu có lỗi
+
       navigate("/login-error");
     }
   }, [isLoggedIn, roles, error, navigate]);

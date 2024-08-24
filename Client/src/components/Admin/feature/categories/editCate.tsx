@@ -11,7 +11,10 @@ import { getFileFirebase } from "../../../../services/firebase/getFirebse.servic
 import "../../../../assets/css/admin.style.css";
 import AlertCustomStyles from "../../../../ultils/alert.succes";
 import { ToastContainer } from "react-toastify";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import {
+  breadcrumbItems,
+  ReusableBreadcrumb,
+} from "../../../../ultils/breadcrumb";
 interface IFormInput {
   name: string;
   path: string;
@@ -22,9 +25,11 @@ const EditCate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
-  const category = useSelector((state: RootState) => state.categories.selectedCategory);
+  const category = useSelector(
+    (state: RootState) => state.categories.selectedCategory
+  );
 
-  const [, setImg] = useState<File | null>(null);
+  const [img, setImg] = useState<File | null>(null);
   const [imgPreview, setImgPreview] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "error" | null>(null);
@@ -58,14 +63,14 @@ const EditCate: React.FC = () => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      setValue("imgCate", files);
-      setImg(file);
-
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImgPreview(reader.result as string);
+        if (typeof reader.result === "string") {
+          setImgPreview(reader.result);
+        }
       };
       reader.readAsDataURL(file);
+      setImg(file);
     }
   };
 
@@ -74,8 +79,8 @@ const EditCate: React.FC = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("path", data.path);
-      if (data.imgCate?.[0]) {
-        formData.append("imgCate", data.imgCate[0]);
+      if (img) {
+        formData.append("imgCate", img);
       }
       try {
         await dispatch(updateCategoryThunk({ id, formData }));
@@ -92,7 +97,9 @@ const EditCate: React.FC = () => {
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
-      {alertMessage && <AlertCustomStyles message={alertMessage} type={alertType} />}
+      {alertMessage && (
+        <AlertCustomStyles message={alertMessage} type={alertType} />
+      )}
       <ToastContainer />
       <ReusableBreadcrumb items={breadcrumbItems.editProducts} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
@@ -110,7 +117,9 @@ const EditCate: React.FC = () => {
                 </div>
               )}
               <div>
-                <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">Hình ảnh</h3>
+                <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
+                  Hình ảnh
+                </h3>
                 <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                   JPG, GIF or PNG. Max size of 800KB
                 </div>
@@ -130,7 +139,9 @@ const EditCate: React.FC = () => {
         </div>
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan sản phẩm</h3>
+            <h3 className="mb-4 text-xl font-semibold dark:text-white">
+              Tổng quan sản phẩm
+            </h3>
 
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6 sm:col-span-3">
@@ -147,15 +158,21 @@ const EditCate: React.FC = () => {
                   id="name"
                   {...register("name", {
                     required: "Tên không được bỏ trống",
-                    minLength: { value: 3, message: "Độ đài phải có ít nhất 3 kí tự" },
+                    minLength: {
+                      value: 3,
+                      message: "Độ đài phải có ít nhất 3 kí tự",
+                    },
                     validate: {
                       noSpecialChars: (value) =>
-                        /^[a-zA-Z\s]*$/.test(value) || "Tên không được chứa ký tự đặc biệt",
+                        /^[a-zA-Z\s]*$/.test(value) ||
+                        "Tên không được chứa ký tự đặc biệt",
                     },
                   })}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-xs italic">{errors.name.message}</p>
+                  <p className="text-red-500 text-xs italic">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -175,7 +192,9 @@ const EditCate: React.FC = () => {
                   })}
                 />
                 {errors.path && (
-                  <p className="text-red-500 text-xs italic">{errors.path.message}</p>
+                  <p className="text-red-500 text-xs italic">
+                    {errors.path.message}
+                  </p>
                 )}
               </div>
             </div>
