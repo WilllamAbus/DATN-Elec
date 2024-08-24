@@ -14,6 +14,12 @@ export const links: Record<string, Link[]> = {
     { label: "Sản phẩm", to: "/admin/listProducts" },
     { label: "Sale", to: "/admin/listProducts" },
   ],
+  supplier: [
+    { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
+  ],
+  brand: [
+    { label: "Thương hiệu", to: "/admin/listBrands" },
+  ],
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },

@@ -64,6 +64,8 @@ const Sidebar: React.FC = () => {
                 </a>
               </li>
               <DropdownItem type="product" />
+              <DropdownItem type="supplier" />
+              <DropdownItem type="brand" />
               <DropdownItem type="account" />
               <li>
                 <Link

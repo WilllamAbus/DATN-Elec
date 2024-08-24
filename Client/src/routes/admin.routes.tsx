@@ -85,7 +85,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "editProducts/:id", element: <AdminEditProducts /> },
       { path: "listProducts", element: <AdminListProducts /> },
       { path: "addBrands", element: <AdminAddBrands /> },
-      { path: "editBrands", element: <AdminEditBrands /> },
+      { path: "editBrands/:id", element: <AdminEditBrands /> },
       { path: "listBrands", element: <AdminListBrands /> },
       { path: "listSuppliers", element: <AdminListSuppliers /> },
       { path: "addSuppliers", element: <AdminAddSuppliers /> },

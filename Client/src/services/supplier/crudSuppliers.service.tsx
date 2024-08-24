@@ -1,4 +1,4 @@
-import instance from "../axois_V2";
+import instance from "../axios";
 
 export const listSuppliers = async () => {
   try {

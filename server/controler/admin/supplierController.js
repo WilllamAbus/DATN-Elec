@@ -115,24 +115,10 @@ const supplierController = {
     },
     update: async (req, res) => {
         try {
-            const adminRole = await Role.findOne({ name: 'admin' });
-    
-    
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
-    
-    
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể cập nhật nhà cung cấp" });
-            }
-    
     
             const { id } = req.params;
             const { name, description, address, phone } = req.body;
-            const image = req.file ? req.file.filename : undefined;
+            const image = req.file ? req.file : undefined;
     
     
     
@@ -141,11 +127,11 @@ const supplierController = {
             }
     
             let imageURL;
-            if (image) {
+            if (image) { 
+
                 if (!Buffer.isBuffer(image.buffer)) {
                     return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
                 }
-    
                 const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
                 const file = bucket.file(`suppliers/${filename}`);
                 const fileStream = file.createWriteStream({
@@ -162,9 +148,8 @@ const supplierController = {
                 fileStream.on('finish', async () => {
                     try {
                         await file.makePublic();
-                        const [metadata] = await file.getMetadata();
-                        imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
-                        await updateSupplierInDB();
+                            imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
+                            await updateSupplierInDB();
                     } catch (err) {
                         console.error('Lỗi khi lấy URL của hình ảnh:', err);
                         return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
@@ -180,7 +165,10 @@ const supplierController = {
                 const updatedData = { name, address, phone, description };
                 if (imageURL) {
                     updatedData.image = imageURL;
+                }else {
+                    console.log('Không có URL hình ảnh được cập nhật'); // Thêm log kiểm tra
                 }
+        
     
                 const updatedSuppliers = await modelSupplier.findByIdAndUpdate(id, updatedData, { new: true });
     
