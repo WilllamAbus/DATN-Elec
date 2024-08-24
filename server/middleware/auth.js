@@ -3,6 +3,8 @@ const Role = require("../model/role.model");
 const middlewareController = {
   verifyToken: (req, res, next) => {
     const token = req.headers["authorization"];
+  
+    
     if (token) {
       const accessToken = token.split(" ")[1];
       jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
@@ -19,9 +21,14 @@ const middlewareController = {
   },
   verifyTokenAdminAuth: async (req, res, next) => {
     await middlewareController.verifyToken(req, res, async () => {
+  
       const userRoles = req.user.roles;
+   
+      
+      
       const adminRole = await Role.findOne({ name: "admin" });
-
+ 
+      
       if (adminRole) {
         const adminRoleId = adminRole._id.toString();
         const hasAdminRole = userRoles.some(

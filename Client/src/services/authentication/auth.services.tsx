@@ -25,7 +25,7 @@ export const registerUser = async (user: {
 export const loginUser = async (user: { email: string; password: string }) => {
   try {
     const response = await instance.post(`${API_URL}/auth/login`, user);
-    console.log("API Response:", response.data);
+    // console.log("API Response:", response.data);
 
     const { accessToken } = response.data;
 
@@ -58,7 +58,7 @@ export const loginUser = async (user: { email: string; password: string }) => {
 export const getProfile = async () => {
   try {
     const response = await instance.get(`/auth/profile`);
-    console.log("Profile data:", response.data);
+    // console.log("Profile data:", response.data);
     return response.data;
   } catch (error: unknown) {
     const err = error as Error; // Type assertion

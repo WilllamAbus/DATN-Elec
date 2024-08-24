@@ -13,7 +13,7 @@ const getFileFirebase = async (filePath: string): Promise<string> => {
     const url = await getDownloadURL(fileRef); // Get the file's download URL
     return url;
   } catch (error) {
-    console.error("Error getting file from Firebase Storage:", error);
+    // console.error("Error getting file from Firebase Storage:", error);
     throw new Error('Error getting file from Firebase Storage');
   }
 };

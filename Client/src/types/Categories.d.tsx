@@ -5,7 +5,7 @@ export interface Category {
     pid: string;
     path: string;
     imgURL: string; 
-  
+    status: string
     createdAt: string;
     updatedAt: string;
     __v: number;

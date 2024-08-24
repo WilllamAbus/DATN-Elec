@@ -169,65 +169,65 @@ const productsController = {
         }
     },
     update : async (req, res) => {
-            try {
-                const { id } = req.params;
-                const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
-                const image = req.file ? req.file : undefined;
-        
-                if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
-                    return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
-                }
-        
-                let imageURL;
-                if (image) {
-                    if (!Buffer.isBuffer(image.buffer)) {
-                        return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
-                    }
-        
-                    const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
-                    const file = bucket.file(`products/${filename}`);
-                    const fileStream = file.createWriteStream({
-                        metadata: { contentType: image.mimetype },
-                    });
-        
-                    fileStream.on('error', err => {
-                        console.error('Lỗi khi tải lên Firebase Storage:', err);
-                        return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
-                    });
-        
-                    fileStream.on('finish', async () => {
-                        try {
-                            await file.makePublic();
-                            imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
-                            await updateProductInDB();
-                        } catch (err) {
-                            console.error('Lỗi khi lấy URL của hình ảnh:', err);
-                            return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
-                        }
-                    });
-        
-                    fileStream.end(image.buffer);
-                } else {
-                    await updateProductInDB();
-                }
-        
-                async function updateProductInDB() {
-                    const updatedData = { name, price, quantity, categoryId, createdAt, weight, brand, color, description, discount };
-                    if (imageURL) updatedData.image = imageURL;
-        
-                    const updatedProduct = await modelProduct.findByIdAndUpdate(id, updatedData, { new: true });
-        
-                    if (!updatedProduct) {
-                        return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-                    }
-        
-                    return res.status(200).json({ message: "Sản phẩm được cập nhật thành công", updatedProduct });
-                }
-            } catch (error) {
-                console.error('Lỗi khi cập nhật sản phẩm:', error);
-                return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        try {
+            const { id } = req.params;
+            const { name, price, quantity, categoryId, createdAt, discount, brand, color, description, weight } = req.body;
+            const image = req.file ? req.file : undefined;
+    
+            if (!name || !price || !quantity || !categoryId || !createdAt || !discount) {
+                return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
             }
-        },
+    
+            let imageURL;
+            if (image) {
+                if (!Buffer.isBuffer(image.buffer)) {
+                    return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
+                }
+    
+                const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
+                const file = bucket.file(`products/${filename}`);
+                const fileStream = file.createWriteStream({
+                    metadata: { contentType: image.mimetype },
+                });
+    
+                fileStream.on('error', err => {
+                    console.error('Lỗi khi tải lên Firebase Storage:', err);
+                    return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
+                });
+    
+                fileStream.on('finish', async () => {
+                    try {
+                        await file.makePublic();
+                        imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
+                        await updateProductInDB();
+                    } catch (err) {
+                        console.error('Lỗi khi lấy URL của hình ảnh:', err);
+                        return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
+                    }
+                });
+    
+                fileStream.end(image.buffer);
+            } else {
+                await updateProductInDB();
+            }
+    
+            async function updateProductInDB() {
+                const updatedData = { name, price, quantity, categoryId, createdAt, weight, brand, color, description, discount };
+                if (imageURL) updatedData.image = imageURL;
+    
+                const updatedProduct = await modelProduct.findByIdAndUpdate(id, updatedData, { new: true });
+    
+                if (!updatedProduct) {
+                    return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+                }
+    
+                return res.status(200).json({ message: "Sản phẩm được cập nhật thành công", updatedProduct });
+            }
+        } catch (error) {
+            console.error('Lỗi khi cập nhật sản phẩm:', error);
+            return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
     
     getAllCategoriesController: async (req, res) => {
         try {

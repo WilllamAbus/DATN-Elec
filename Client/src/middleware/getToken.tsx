@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
-
+import { useCookies } from "react-cookie";
 interface Permission {
     name: string;
     resources: string[];
@@ -53,12 +53,12 @@ interface Permission {
   };
   
   export  const getUserData = (): DecodedToken => {
-    const userData = window.localStorage.getItem("persist:root");
-
-    if (userData ) {
+    const [userDataCookie] = useCookies(["token"]);;
+    const tokenData = userDataCookie.token;
+    if (tokenData ) {
       try {
         // Parse the root state
-        const parsedData = JSON.parse(userData);
+        const parsedData = JSON.parse(tokenData);
         
         // Access the login data from parsedData
         const loginData = JSON.parse(parsedData.auth)?.login;
@@ -90,7 +90,8 @@ interface Permission {
 
   export  const getUserDataV2= (): DecodedToken => {
     const userDataV2 = localStorage.getItem("token");
-
+    // const [cookies] = useCookies(["token"]);
+    // const token = cookies.token;
     if (userDataV2 ) {
       try {
         // Parse the root state

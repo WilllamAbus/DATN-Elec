@@ -59,7 +59,7 @@ export const getProfileThunk = createAsyncThunk<
 >("auth/getProfile", async (_, { rejectWithValue }) => {
   try {
     const result = await getProfileService();
-    console.log("API result:", result);
+    // console.log("API result:", result);
     return result;
   } catch (error) {
     return rejectWithValue((error as Error).message);
