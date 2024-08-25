@@ -1,33 +1,43 @@
-import React from "react";
-import AdminFooter from "../../../components/Admin/footer";
-import AdminHeader from "../../../components/Admin/header";
-import AdminSidebar from "../../../components/Admin/sidebar";
-import AdminStyleSheet from "../../../components/Admin/stySheet";
-import AdminRecyBinOrder from "../../../components/Admin/feature/orders/softDeleteOrder"
-import AdminScript from "../../../components/Admin/script";
-import "../../../assets/css/admin.style.css";
+import React, { useState } from "react";
+import AdminRecyBinOrder from "../../../components/Admin/feature/orders/softDeleteOrder";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
+import ProductSummary from "../../../components/Admin/summary/ProductSummary";
+import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 const listOrders: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   return (
-    <>
-      <AdminStyleSheet />
+    <div>
+      <ReusableBreadcrumb items={breadcrumbItems.recycleBinOrder} />
+      <div className="mb-4 ml-4 col-span-full xl:mb-2">
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          Danh sách xóa mềm
+        </h1>
+      </div>
 
-      <div className="bg-gray-100 font-family-karla flex">
-      <AdminSidebar />
-        <div className="relative w-full flex flex-col h-screen overflow-y-hidden">
-          <AdminHeader />
-          <div className="w-full h-screen overflow-x-hidden border-t flex flex-col">
-            <AdminRecyBinOrder/>
-
-            <AdminFooter />
+      <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
+        <div className="mb-4 col-span-full xl:mb-2">
+          <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <ProductSummary />
+            <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+              <SearchFormProduct />
+            </div>
+            <div className="overflow-x-auto">
+              <AdminRecyBinOrder />
+              <PaginationComponent
+                currentPage={currentPage}
+                totalPages={5}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </div>
         </div>
-        <AdminScript />
-
-
-      </div>
-     
-     
-    </>
+      </section>
+    </div>
   );
 };
 

@@ -10,6 +10,7 @@ import Nav from "../../components/Admin/nav";
 
 const Admin: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(true);
+  const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   useSelector((state: RootState) => state.auth.profile);
   const navigate = useNavigate();
@@ -38,13 +39,15 @@ const Admin: React.FC = () => {
   if (!isAdmin) {
     return <Navigate to="/login" replace />;
   }
-
+  const handleSidebarClose = () => {
+    setIsOpenSidebar(false);
+  };
   return (
     <>
       <div className="bg-gray-50 dark:bg-gray-800 font-barlow">
       <Nav />
       <div className="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
-      <AdminSidebar />
+      <AdminSidebar isOpenMobie={isOpenSidebar} onClose={handleSidebarClose} />
         <div className="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop" />
         <div id="main-content" className="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
           <main>

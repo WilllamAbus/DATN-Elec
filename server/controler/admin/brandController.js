@@ -34,7 +34,7 @@ const brandController = {
             const brands = await modelBrand.find({ status: { $ne: 'disable' } })
             .populate('category_id', 'name')
             .populate('supplier_id','name');
-            // console.log(brands);
+            console.log(brands);
             res.status(200).json({ brands });
         } catch (error) {
             console.error('Error fetching brands with categories:', error);
@@ -150,28 +150,11 @@ const brandController = {
             res.status(500).json({ message: "Lỗi server" });
         }
     },
-    update: async (req, res) => {
+    update : async (req, res) => {
         try {
-            const adminRole = await Role.findOne({ name: 'admin' });
-    
-    
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
-    
-    
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể cập nhật thương hiệu" });
-            }
-    
-    
             const { id } = req.params;
-            const { name, description, category_id, supplier_id } = req.body;
-            const image = req.file ? req.file.filename : undefined;
-    
-    
+            const { name, category_id, supplier_id, description } = req.body;
+            const image = req.file ? req.file : undefined;
     
             if (!name || !description || !category_id || !supplier_id ) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
@@ -186,12 +169,10 @@ const brandController = {
                 const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
                 const file = bucket.file(`brands/${filename}`);
                 const fileStream = file.createWriteStream({
-                    metadata: {
-                        contentType: image.mimetype,
-                    },
+                    metadata: { contentType: image.mimetype },
                 });
     
-                fileStream.on('error', (err) => {
+                fileStream.on('error', err => {
                     console.error('Lỗi khi tải lên Firebase Storage:', err);
                     return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
                 });
@@ -199,7 +180,6 @@ const brandController = {
                 fileStream.on('finish', async () => {
                     try {
                         await file.makePublic();
-                        const [metadata] = await file.getMetadata();
                         imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
                         await updateBrandInDB();
                     } catch (err) {
@@ -215,23 +195,22 @@ const brandController = {
     
             async function updateBrandInDB() {
                 const updatedData = { name, category_id, supplier_id, description };
-                if (imageURL) {
-                    updatedData.image = imageURL;
+                if (imageURL) updatedData.image = imageURL;
+    
+                const updatedBrand = await modelBrand.findByIdAndUpdate(id, updatedData, { new: true });
+    
+                if (!updatedBrand) {
+                    return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 }
     
-                const updatedBrands = await modelSupplier.findByIdAndUpdate(id, updatedData, { new: true });
-    
-                if (!updatedBrands) {
-                    return res.status(404).json({ message: "Không tìm thấy thương hiệu" });
-                }
-    
-                return res.status(200).json({ message: "Thương hiệu được cập nhật thành công", updatedBrands });
+                return res.status(200).json({ message: "Sản phẩm được cập nhật thành công", updatedBrand });
             }
         } catch (error) {
-            console.error('Lỗi khi cập nhật nhà cung cấp:', error);
+            console.error('Lỗi khi cập nhật sản phẩm:', error);
             return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+
     hardDelete: async (req, res) => {
         const { id } = req.params;
         try {

@@ -9,8 +9,8 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { notify } from "../../../../ultils/success";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CommentRating } from "./rating";
 const MySwal = withReactContent(Swal);
 
 interface Comment {
@@ -67,9 +67,7 @@ const ListComment: React.FC = () => {
               ),
               Promise.all(
                 productIds.map((productId) =>
-                  axios.get(
-                    `http://localhost:4000/api/product/get-one/${productId}`
-                  )
+                  axios.get(`http://localhost:4000/api/product/get-one/${productId}`)
                 )
               ),
             ]);
@@ -166,10 +164,10 @@ const ListComment: React.FC = () => {
       id_comment: selectedCommentId,
     };
     try {
-      const response = await postRepComment(selectedCommentId,commentData);
+      const response = await postRepComment(selectedCommentId, commentData);
       console.log("Comment submitted:", response.data);
       reset();
-      notify()
+      notify();
       // alert("Comment submitted successfully!");
       window.location.reload();
     } catch (error) {
@@ -183,156 +181,152 @@ const ListComment: React.FC = () => {
     setSelectedCommentId("");
   };
 
-  const currentComment = comments.find(
-    (comment) => comment._id === selectedCommentId
-  );
+  const currentComment = comments.find((comment) => comment._id === selectedCommentId);
 
   return (
     <>
-      <main className="w-full flex-grow p-6">
-        <div className="w-full mt-12">
-          <p className="text-xl pb-3 flex items-center">
-            <i className="fas fa-list mr-3"></i> DANH SÁCH BÌNH LUẬN
-          </p>
-          <ToastContainer/>
-          <div className="bg-white">
-            <table className="text-left w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    STT
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Tên người bình luận
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Nội dung
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Tên sản phẩm
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Hình Ảnh
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Đánh giá
-                  </th>
-                  <th className="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comments.map((comment, index) => (
-                  <tr key={comment._id} className="hover:bg-grey-lighter">
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {index + 1}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {userNames[comment.id_user]?.name || "Anonymous"}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {comment.content}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {products[comment.id_product]?.name || "Unknown Product"}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      <img
-                        src={
-                          products[comment.id_product]?.image ||
-                          "placeholder.png"
-                        }
-                        alt="Product"
-                        width={50}
-                        height={50}
-                      />
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      {[...Array(5)].map((_, starIndex) => (
-                        <i
-                          key={starIndex}
-                          className={`fa fa-star ${
-                            starIndex < comment.rating ? "text-yellow-400" : "text-gray-400"
-                          }`}
-                        ></i>
-                      ))}
-                    </td>
-                    <td className="py-4 px-6 border-b border-grey-light">
-                      <button
-                        className="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
-                        onClick={() => openForm(comment._id)}
-                      >
-                        Trả lời
-                      </button>
-                      <button
-                        className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                        onClick={() => handleSoftDeleteProduct(comment._id)}
-                      >
-                        Xoá
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className="mt-6 flex gap-2">
-          <button
-            className="px-4 py-1 text-white font-light tracking-wider bg-gray-900 rounded"
-            type="button"
-          >
-            <a href="/admin/dashboard">Trở lại</a>
-          </button>
-        </div>
-      </main>
-      {showForm && currentComment && (
-        <div className="form-popup fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <form
-            className="form-container bg-white p-6 rounded shadow-lg"
-            onSubmit={handleSubmit(submitComment)}
-          >
-            <h1 className="text-xl font-bold mb-4">
-              Trả lời bình luận của{" "}
-              {userNames[currentComment.id_user]?.name || "Người dùng"}
-            </h1>
-            <label>
-              <b>Nội dung bình luận</b>
-            </label>
-            <input
-              type="text"
-              value={currentComment.content}
-              className="block w-full mb-4 p-2 border rounded"
-              disabled
-            />
-            <label>
-              <b>Phản hồi</b>
-            </label>
-            <textarea
-              {...register("content", { required: true })}
-              placeholder="..."
-              className="block w-full mb-4 p-2 border rounded"
-              rows={4}
-            />
-            <div className="flex justify-between">
-              <button
-                type="submit"
-                className="btn bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Gửi
-              </button>
-            </div>
-            <button
-              type="button"
-              className="cancel px-4 py-2 mb-40 rounded"
-              onClick={closeForm}
+      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" className="p-4">
+              Stt
+            </th>
+            <th scope="col" className="p-4">
+              Tên
+            </th>
+            <th scope="col" className="p-4">
+              Nội dung
+            </th>
+            <th scope="col" className="p-4">
+              Sản phẩm
+            </th>
+            <th scope="col" className="p-4">
+              Hình Ảnh
+            </th>
+            <th scope="col" className="p-4">
+              Đánh giá
+            </th>
+            <th scope="col" className="p-4">
+              Chức năng
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {comments.map((comment, index) => (
+            <tr
+              key={comment._id}
+              className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <i style={{ fontSize: "18px" }} className="fa">
-                &#xf00d;
-              </i>
-            </button>
-          </form>
+              <td className="px-4 py-3">{index + 1}</td>
+              <td className="px-4 py-3">{userNames[comment.id_user]?.name || "Anonymous"}</td>
+              <td className="px-4 py-3">{comment.content}</td>
+              <td className="px-4 py-3">
+                {products[comment.id_product]?.name || "Unknown Product"}
+              </td>
+              <td className="px-4 py-3">
+                <img
+                  src={products[comment.id_product]?.image || "placeholder.png"}
+                  alt="Product"
+                  width={50}
+                  height={50}
+                />
+              </td>
+              <td className="px-4 py-3">
+              <CommentRating rating={comment.rating} />
+
+              </td>
+              <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                <div className="flex items-center space-x-4">
+                  <button
+                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    onClick={() => openForm(comment._id)}
+                  >
+                    Trả lời
+                  </button>
+                  <button
+                    className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                    onClick={() => handleSoftDeleteProduct(comment._id)}
+                  >
+                    Xoá
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {showForm && currentComment && (
+        <div
+          id="crud-modal"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50"
+        >
+          <div className="relative w-full max-w-md p-4 max-h-full">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 border-b rounded-t md:p-5 dark:border-gray-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Trả lời bình luận của {userNames[currentComment.id_user]?.name || "Người dùng"}
+                </h3>
+                <button
+                  type="button"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  onClick={closeForm}
+                >
+                  <svg
+                    className="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span className="sr-only">Close modal</span>
+                </button>
+              </div>
+
+              <form className="p-4 md:p-5" onSubmit={handleSubmit(submitComment)}>
+                <div className="grid gap-4 mb-4">
+                  <div className="col-span-2">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Nội dung bình luận
+                    </label>
+                    <input
+                      type="text"
+                      value={currentComment.content}
+                      className="block w-full p-2.5 text-sm bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      disabled
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Phản hồi
+                    </label>
+                    <textarea
+                      {...register("content", { required: true })}
+                      placeholder="..."
+                      className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      rows={4}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  Gửi
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       )}
     </>

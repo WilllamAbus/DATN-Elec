@@ -1,566 +1,308 @@
-import React, { useEffect, useState } from "react";
+"use client";
+import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import AllProduct from "./product/allProduct";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  FunnelIcon,
+  MinusIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from "@heroicons/react/20/solid";
 
-import "../../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import { Link } from "react-router-dom";
-import { listProduct } from "../../../../services/product/crudProduct.service";
-import currencyFormatter from "currency-formatter";
-import Filter from "../../filter";
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
+const sortOptions = [
+  { name: "Most Popular", href: "#", current: true },
+  { name: "Best Rating", href: "#", current: false },
+  { name: "Newest", href: "#", current: false },
+  { name: "Price: Low to High", href: "#", current: false },
+  { name: "Price: High to Low", href: "#", current: false },
+];
+const subCategories = [
+  { name: "Totes", href: "#" },
+  { name: "Backpacks", href: "#" },
+  { name: "Travel Bags", href: "#" },
+  { name: "Hip Bags", href: "#" },
+  { name: "Laptop Sleeves", href: "#" },
+];
+const filters = [
+  {
+    id: "color",
+    name: "Color",
+    options: [
+      { value: "white", label: "White", checked: false },
+      { value: "beige", label: "Beige", checked: false },
+      { value: "blue", label: "Blue", checked: true },
+      { value: "brown", label: "Brown", checked: false },
+      { value: "green", label: "Green", checked: false },
+      { value: "purple", label: "Purple", checked: false },
+    ],
+  },
+  {
+    id: "category",
+    name: "Category",
+    options: [
+      { value: "new-arrivals", label: "New Arrivals", checked: false },
+      { value: "sale", label: "Sale", checked: false },
+      { value: "travel", label: "Travel", checked: true },
+      { value: "organization", label: "Organization", checked: false },
+      { value: "accessories", label: "Accessories", checked: false },
+    ],
+  },
+  {
+    id: "size",
+    name: "Size",
+    options: [
+      { value: "2l", label: "2L", checked: false },
+      { value: "6l", label: "6L", checked: false },
+      { value: "12l", label: "12L", checked: false },
+      { value: "18l", label: "18L", checked: false },
+      { value: "20l", label: "20L", checked: false },
+      { value: "40l", label: "40L", checked: true },
+    ],
+  },
+];
+
+function classNames(...classes: string[]): string {
+  return classes.filter(Boolean).join(" ");
 }
-const allListing: React.FC = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const productList = await listProduct();
-        setProducts(productList);
-      } catch (error) {
-        console.log(`lỗi: `, error);
-      }
-    };
 
-    fetchProducts();
-  }, []);
+export default function Example() {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <>
-      {/* <!-- breadcrumb --> */}
-      <div className="container py-4 flex items-center gap-3">
-        <a href="/" className="text-primary text-base">
-          <i className="fa-solid fa-house"></i>
-        </a>
-        <span className="text-sm text-gray-400">
-          <i className="fa-solid fa-chevron-right"></i>
-        </span>
-        <p className="text-gray-600 font-medium">Shop</p>
-      </div>
-      {/* <!-- ./breadcrumb --> */}
-
-      {/* <!-- shop wrapper --> */}
-      <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
-        <div className="text-center md:hidden">
-          <button
-            className="text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block md:hidden"
-            type="button"
-            data-drawer-target="drawer-example"
-            data-drawer-show="drawer-example"
-            aria-controls="drawer-example"
-          >
-            {/* <ion-icon name="grid-outline"></ion-icon> */}
-          </button>
-        </div>
-
-        <div
-          id="drawer-example"
-          className="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800"
-          aria-labelledby="drawer-label"
+    <div className="bg-white">
+      <ReusableBreadcrumbClient items={breadcrumbItemClient.allList} />
+      <div>
+        <Dialog
+          open={mobileFiltersOpen}
+          onClose={setMobileFiltersOpen}
+          className="relative z-40 lg:hidden"
         >
-          <h5
-            id="drawer-label"
-            className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
+          <DialogBackdrop
+            transition
+            className="fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+          />
+
+          <div className="fixed inset-0 z-40 flex">
+            <DialogPanel
+              transition
+              className="relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-[closed]:translate-x-full"
             >
-              <path
-             fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-            Info
-          </h5>
-          <button
-            type="button"
-            data-drawer-hide="drawer-example"
-            aria-controls="drawer-example"
-            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            <svg
-              aria-hidden="true"
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-               fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-               clipRule="evenodd"
-              ></path>
-            </svg>
-            <span className="sr-only">Close menu</span>
-          </button>
-          <div className="divide-y divide-gray-200 space-y-5">
-            <div>
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Categories
-              </h3>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="cat-1"
-                    id="cat-1"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Bedroom
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(15)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="cat-2"
-                    id="cat-2"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Sofa
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(9)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="cat-3"
-                    id="cat-3"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Office
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(21)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="cat-4"
-                    id="cat-4"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Outdoor
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(10)</div>
-                </div>
+              <div className="flex items-center justify-between px-4">
+                <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+                <button
+                  type="button"
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                >
+                  <span className="sr-only">Close menu</span>
+                  <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                </button>
               </div>
-            </div>
 
-            <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Brands
-              </h3>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-1"
-                    id="brand-1"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Cooking Color
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(15)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-2"
-                    id="brand-2"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Magniflex
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(9)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-3"
-                    id="brand-3"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Ashley
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(21)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-4"
-                    id="brand-4"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    M&D
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(10)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-5"
-                    id="brand-5"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Olympic
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(10)</div>
-                </div>
-              </div>
-            </div>
+              <form className="mt-4 border-t border-gray-200">
+                <h3 className="sr-only">Categories</h3>
+                <ul role="list" className="px-2 py-3 font-medium text-gray-900">
+                  {subCategories.map((category) => (
+                    <li key={category.name}>
+                      <a href={category.href} className="block px-2 py-3">
+                        {category.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
 
-            <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Price
-              </h3>
-              <div className="mt-4 flex items-center">
-                <input
-                  type="text"
-                  name="min"
-                  id="min"
-                  className="w-full border-gray-300 focus:border-primary 
-                    rounded focus:ring-0 px-3 py-1 text-gray-600 shadow-sm"
-                  placeholder="min"
-                />
-                <span className="mx-3 text-gray-500">-</span>
-                <input
-                  type="text"
-                  name="max"
-                  id="max"
-                  className="w-full border-gray-300
-                     focus:border-primary rounded focus:ring-0 px-3 py-1 text-gray-600 shadow-sm"
-                  placeholder="max"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <a
-              href="#"
-              className="px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-            >
-              Learn more
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            >
-              Get access{" "}
-              <svg
-                className="w-4 h-4 ml-2"
-                aria-hidden="true"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                fillRule="evenodd"
-                  d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hiddenb hidden md:block">
-          <div className="divide-y divide-gray-200 space-y-5">
-            <div>
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Danh mục
-              </h3>
-              <div className="space-y-2">
-                <form action="" method="post">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name=""
-                      id=""
-                      value=""
-                      className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                    />
-                    <label className="text-gray-600 ml-3 cursor-pointer"></label>
-                    {/* <!-- Hiển thị số lượng sản phẩm tương ứng với danh mục --> */}
-                  </div>
-                  {/* <!-- Thêm checkbox cho các danh mục sản phẩm khác tương tự ở đây --> */}
-                  <button type="submit" className="btn btn-primary">
-                    Filter
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Thương hiệu
-              </h3>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-1"
-                    id="brand-1"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Cooking Color
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(15)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-2"
-                    id="brand-2"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Magniflex
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(9)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-3"
-                    id="brand-3"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Ashley
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(21)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-4"
-                    id="brand-4"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    M&D
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(10)</div>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="brand-5"
-                    id="brand-5"
-                    className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                  />
-                  <label className="text-gray-600 ml-3 cusror-pointer">
-                    Olympic
-                  </label>
-                  <div className="ml-auto text-gray-600 text-sm">(10)</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <Filter />
-            </div>
-
-            {/* <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                size
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-xs"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    XS
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-sm"
-                    className="hidden"
-                  />
-                  <label
-                    className="text-xs border border-gray-200
-                                 rounded-sm h-6 w-6 flex items-center 
-                                 justify-center cursor-pointer shadow-sm 
-                                 text-gray-600"
+                {filters.map((section) => (
+                  <Disclosure
+                    key={section.id}
+                    as="div"
+                    className="border-t border-gray-200 px-4 py-6"
                   >
-                    S
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-m"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    M
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-l"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    L
-                  </label>
-                </div>
-                <div className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id="size-xl"
-                    className="hidden"
-                  />
-                  <label className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600">
-                    XL
-                  </label>
-                </div>
-              </div>
-            </div> */}
-
-            {/* <div className="pt-4">
-              <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-               Màu sắc
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="red"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="black"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-                <div className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id="white"
-                    className="hidden"
-                  />
-                  <label className="border border-gray-200 rounded-sm h-6 w-6  cursor-pointer shadow-sm block"></label>
-                </div>
-              </div>
-            </div> */}
+                    <h3 className="-mx-2 -my-3 flow-root">
+                      <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="ml-6 flex items-center">
+                          <PlusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 group-data-[open]:hidden"
+                          />
+                          <MinusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 [.group:not([data-open])_&]:hidden"
+                          />
+                        </span>
+                      </DisclosureButton>
+                    </h3>
+                    <DisclosurePanel className="pt-6">
+                      <div className="space-y-6">
+                        {section.options.map((option, optionIdx) => (
+                          <div key={option.value} className="flex items-center">
+                            <input
+                              defaultValue={option.value}
+                              defaultChecked={option.checked}
+                              id={`filter-mobile-${section.id}-${optionIdx}`}
+                              name={`${section.id}[]`}
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label
+                              htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
+                              className="ml-3 min-w-0 flex-1 text-gray-500"
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </DisclosurePanel>
+                  </Disclosure>
+                ))}
+              </form>
+            </DialogPanel>
           </div>
-        </div>
+        </Dialog>
 
-        <div className="col-span-3">
-          <div className="flex items-center mb-4">
-            <select
-              name="sort"
-              id="sort"
-              className="w-44 text-sm text-gray-600 py-3 px-4 border-gray-300 shadow-sm rounded focus:ring-primary focus:border-primary"
-            >
-              <option value="">Mặc định sắp xếp</option>
-              <option value="price-low-to-high">Giá thấp to cao</option>
-              <option value="price-high-to-low">Price cao to thấp</option>
-            </select>
+        <main className="max-w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-4">
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Bộ lọc tìm kiếm</h1>
 
-            <div className="flex gap-2 ml-auto">
-              <div className="border border-primary w-10 h-9 flex items-center justify-center text-white bg-primary rounded cursor-pointer">
-                <i className="fa-solid fa-grip-vertical"></i>
-              </div>
-              <div className="border border-gray-300 w-10 h-9 flex items-center justify-center text-gray-600 rounded cursor-pointer">
-                <i className="fa-solid fa-list"></i>
-              </div>
+            <div className="flex items-center">
+              <Menu as="div" className="relative inline-block text-left">
+                <div>
+                  <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                    Sắp xếp
+                    <ChevronDownIcon
+                      aria-hidden="true"
+                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                    />
+                  </MenuButton>
+                </div>
+
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                  <div className="py-1">
+                    {sortOptions.map((option) => (
+                      <MenuItem key={option.name}>
+                        <a
+                          href={option.href}
+                          className={classNames(
+                            option.current ? "font-medium text-gray-900" : "text-gray-500",
+                            "block px-4 py-2 text-sm data-[focus]:bg-gray-100"
+                          )}
+                        >
+                          {option.name}
+                        </a>
+                      </MenuItem>
+                    ))}
+                  </div>
+                </MenuItems>
+              </Menu>
+
+              <button
+                type="button"
+                className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
+              >
+                <span className="sr-only">View grid</span>
+                <Squares2X2Icon aria-hidden="true" className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileFiltersOpen(true)}
+                className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
+              >
+                <span className="sr-only">Filters</span>
+                <FunnelIcon aria-hidden="true" className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 grid-cols-2 gap-6">
-            {products.map((product, index) => (
-              <div
-                key={index}
-                className="bg-white shadow rounded overflow-hidden group"
-              >
-                <div className="relative">
-                  <Link to={`/detailProd/${product._id}`}>
-                    <img
-                      src={product.image}
-                      alt="product 1"
-                      style={{ width: "360px", height: "367px" }}
-                    />
-                    <div
-                      className="absolute inset-0 flex items-center 
-          justify-center gap-2 opacity-0 group-hover:opacity-100 transition"
-                    ></div>
-                  </Link>
-                </div>
-                <div className="pt-4 pb-3 px-4">
-                  <a href="/detailProd">
-                    <h4 className="uppercase font-medium text-xl mb-2 text-gray-800 hover:text-primary transition">
-                      {product.name}
-                    </h4>
-                  </a>
-                  <div className="flex items-baseline mb-1 space-x-2">
-                    {product.discount > 1 ? (
-                      <div>
-                        <p className="text-xl text-primary font-semibold">
-                          {formatCurrency(
-                            product.price * (1 - product.discount / 100)
-                          )}{" "}
-                          VNĐ
-                        </p>
-                        <p className="text-sm text-gray-400 line-through">
-                          {formatCurrency(product.price)} VNĐ
-                        </p>
+          <section aria-labelledby="products-heading" className="pb-24 pt-6">
+            <h2 id="products-heading" className="sr-only">
+              Products
+            </h2>
+
+            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+              {/* Filters */}
+              <form className="hidden lg:block">
+                <h3 className="sr-only">Categories</h3>
+                <ul
+                  role="list"
+                  className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900"
+                >
+                  {subCategories.map((category) => (
+                    <li key={category.name}>
+                      <a href={category.href}>{category.name}</a>
+                    </li>
+                  ))}
+                </ul>
+
+                {filters.map((section) => (
+                  <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
+                    <h3 className="-my-3 flow-root">
+                      <DisclosureButton className="group flex w-full items-center justify-between bg-bgf3f4f6 py-3 text-sm text-gray-400 hover:text-gray-500">
+                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="ml-6 flex items-center">
+                          <PlusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 group-data-[open]:hidden"
+                          />
+                          <MinusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 [.group:not([data-open])_&]:hidden"
+                          />
+                        </span>
+                      </DisclosureButton>
+                    </h3>
+                    <DisclosurePanel className="pt-6">
+                      <div className="space-y-4">
+                        {section.options.map((option, optionIdx) => (
+                          <div key={option.value} className="flex items-center">
+                            <input
+                              defaultValue={option.value}
+                              defaultChecked={option.checked}
+                              id={`filter-${section.id}-${optionIdx}`}
+                              name={`${section.id}[]`}
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label
+                              htmlFor={`filter-${section.id}-${optionIdx}`}
+                              className="ml-3 text-sm text-gray-600"
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
                       </div>
-                    ) : (
-                      <p className="text-xl text-primary font-semibold">
-                        {formatCurrency(product.price)} VNĐ
-                      </p>
-                    )}
+                    </DisclosurePanel>
+                  </Disclosure>
+                ))}
+              </form>
 
-                  </div>
-                  <a
-                href="#"
-                className="block w-full py-1 text-center text-white bg-bgAmberBtbAdd border border-primary rounded-b hover:bg-transparent hover:text-primary transition"
-              >
-                Thêm giỏ hàng
-              </a>
-                </div>
+              {/* Product grid */}
+              <div className="lg:col-span-3">
+                <AllProduct/>
               </div>
-            ))}
-          </div>
-        </div>
+              
+            </div>
+          </section>
+        </main>
       </div>
-    </>
+    </div>
   );
-};
-
-export default allListing;
+}
