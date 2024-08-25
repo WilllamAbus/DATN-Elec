@@ -40,7 +40,7 @@ const Header: React.FC = () => {
                     title=""
                     className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
                   >
-                    Tin công ngệ
+                    Tin công nghệ
                   </a>
                 </li>
                 <li className="shrink-0">
@@ -132,6 +132,32 @@ const Header: React.FC = () => {
                 </svg>
                 Yêu thích
               </button>
+
+              <button
+                id="userDropdownButton1"
+                data-dropdown-toggle="userDropdown1"
+                type="button"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
+                  />
+                </svg>
+                Thông báo
+              </button>
               <div
                 id="userDropdown1"
                 className="hidden z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"
@@ -217,27 +243,42 @@ const Header: React.FC = () => {
           >
             <ul className="text-gray-900 dark:text-white text-sm font-medium space-y-3">
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Home
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Best Sellers
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Gift Ideas
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Games
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Electronics
                 </a>
               </li>

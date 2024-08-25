@@ -11,7 +11,7 @@ export function UserBanner() {
         <img
           src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/banner%2Fbn-12.svg?alt=media&token=0f00b69c-a05c-45ba-ba13-697498631a49"
           alt="..."
-        />
+        /> 
         <img
           src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/banner%2Fbn-11.svg?alt=media&token=168572bc-5e4d-46a7-a96c-bb1302c5a1d3"
           alt="..."

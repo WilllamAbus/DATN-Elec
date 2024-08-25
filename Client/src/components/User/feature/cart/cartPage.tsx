@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import listOne from "../../../../assets/images/products/product14.jpg";
-import "../../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+// import "../../../../assets/css/user.style.css";
+// import "@fortawesome/fontawesome-free/css/all.min.css";
 import Modal from "../../MoalButton";
 import { getUserData, getUserDataV2 } from "../../../../middleware/getToken";
 import { Voucher, CartItem , CartState} from "../../../../types/Voucher.d";
@@ -246,7 +246,7 @@ const CartPage: React.FC = () => {
 
           <button
             onClick={handleCheckout}
-            className="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md 
+            className="block w-full py-3 px-4 text-center text-white bg-bgAmberBtbAdd border border-primary rounded-md 
                 hover:bg-transparent hover:text-primary transition font-medium"
           >
             Thanh toán

@@ -418,7 +418,7 @@ const authController = {
 
   getProfile: async (req, res) => {
     try {
-      console.log("User object:", req.user); // Thêm log để kiểm tra thông tin người dùng
+      // console.log("User object:", req.user); // Thêm log để kiểm tra thông tin người dùng
 
       const userId = req.user.id;
 

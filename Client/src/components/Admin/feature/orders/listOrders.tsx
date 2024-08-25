@@ -104,7 +104,7 @@ const ListOrders: React.FC = () => {
               dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
             onClick={() => order._id && handlesoftDeleteOrder(order._id)}
           >
-            Xoá
+            Hủy
           </button>
                   <Link
                     to={`/admin/listDetailOrder/${order._id}`}

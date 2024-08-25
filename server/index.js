@@ -12,6 +12,7 @@ const connectDb = require("./config/connectDb");
 const http = require("http");
 const socketIo = require("socket.io");
 const SocketServices = require("./services/serviceSocket");
+
 require("./controler/cronJob");
 //databse call
 connectDb();
@@ -19,6 +20,8 @@ connectDb();
 // midleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 app.use(
   cors({
     origin: process.env.URL_FE,
