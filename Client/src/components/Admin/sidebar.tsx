@@ -62,6 +62,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
                 <DropdownItem type="account" />
                 <NavItem type="categories" />
                 <NavItem type="comment" />
+                <NavItem type="supplier" />
+                <NavItem type="brand" />
               </ul>
               <div className="pt-2 space-y-2">
                 <ul className="pb-2 space-y-2">
