@@ -1,107 +1,122 @@
-import React , {  useState, ChangeEvent, FormEvent } from "react";
-// import { useNavigate } from 'react-router-dom';
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 
-
-const Filter :React.FC = () => {
-    const [selectedPrices, setSelectedPrice] = useState<string>("");
-  const [error, setError] = useState<string>('');
-
-  const handleSub = (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-   
-      if (selectedPrices.length > 0) {
-        setError('');
-          window.location.href=(`/filter/${selectedPrices}`);
+const Filter: React.FC = () => {
+    const [selectedPrice, setSelectedPrice] = useState<string>('all');
+    const navigate = useNavigate();
+    const location = useLocation();
+  
+    useEffect(() => {
+      // Extract the price parameter from the URL
+      const pathParts = location.pathname.split('/');
+      const priceParam = pathParts[pathParts.length - 1];
+      
+      // Update state based on URL path
+      if (priceParam === 'allList') {
+        setSelectedPrice('all');
       } else {
-          setError('Vui lòng chọn ít nhất một khoảng giá');
+        setSelectedPrice(priceParam);
       }
-  };
+    }, [location.pathname]);
+  
+    const handleCheckPrice = (e: ChangeEvent<HTMLInputElement>) => {
+      const price = e.target.value;
+  
+      if (price === 'all') {
+        navigate(`/allList`); // Navigate to the allList page
+      } else {
+        setSelectedPrice(price); // Update the selected value
+        navigate(`/filter/${price}`); // Navigate to the filtered URL
+      }
+    };
 
-  const handleCheckPrice = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedPrice(e.target.value);
-    setError(''); 
-  };
-    return (
-      <>
+  return (
+    <>
       <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-                Giá
-            </h3>
-            <form onSubmit={handleSub}>
-                <div className="space-y-2">
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            name="price"
-                            value="price-0"
-                            id="brand-1"
-                            className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckPrice}
-                        />
-                        <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-1">
-                            Dưới 500.000 VNĐ
-                        </label>
-                    </div>
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            name="price"
-                            value="price-1"
-                            id="brand-2"
-                            className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckPrice}
-                        />
-                        <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-2">
-                            500.000 VNĐ - 1.000.000 VNĐ
-                        </label>
-                    </div>
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            name="price"
-                            value="price-2"
-                            id="brand-3"
-                            className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckPrice}
-                        />
-                        <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-3">
-                            1.000.000 VNĐ - 3.000.000 VNĐ
-                        </label>
-                    </div>
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            name="price"
-                            value="price-3"
-                            id="brand-4"
-                            className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckPrice}
-                        />
-                        <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-4">
-                            3.000.000 VNĐ - 5.000.000 VNĐ
-                        </label>
-                    </div>
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            name="price"
-                            value="price-4"
-                            id="brand-5"
-                            className="text-primary focus:ring-0 rounded-sm cursor-pointer"
-                            onChange={handleCheckPrice}
-                        />
-                        <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="brand-5">
-                            Trên 5.000.000 VNĐ
-                        </label>
-                    </div>
-                </div>
-                <br />
-                <button type="submit" className="block w-full py-1 text-center text-white bg-primary">
-                    Lọc
-                </button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </form>
-      </>
-    );
+        Giá
+      </h3>
+      <div className="space-y-2">
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="all"
+            id="price-all"
+            checked={selectedPrice === 'all'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-all">
+            Tất cả sản phẩm
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="price-0"
+            id="price-0"
+            checked={selectedPrice === 'price-0'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-0">
+            Dưới 500.000 VNĐ
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="price-1"
+            id="price-1"
+            checked={selectedPrice === 'price-1'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-1">
+            500.000 VNĐ - 1.000.000 VNĐ
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="price-2"
+            id="price-2"
+            checked={selectedPrice === 'price-2'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-2">
+            1.000.000 VNĐ - 3.000.000 VNĐ
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="price-3"
+            id="price-3"
+            checked={selectedPrice === 'price-3'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-3">
+            3.000.000 VNĐ - 5.000.000 VNĐ
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            name="price"
+            value="price-4"
+            id="price-4"
+            checked={selectedPrice === 'price-4'}
+            onChange={handleCheckPrice}
+          />
+          <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-4">
+            Trên 5.000.000 VNĐ
+          </label>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default Filter;
