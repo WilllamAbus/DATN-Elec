@@ -1,29 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-import "../../../../../assets/css/user.style.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import listTwo from "../../../../../assets/images/products/product15.png";
-import Comment from "../../../../User/feature/details/comment/comment";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../../redux/store";
+import { addToWatchlistThunk } from "../../../../../redux/product/wathlist";
 import {
   getOneProduct,
   upViewProduct,
 } from "../../../../../services/product/crudProduct.service";
 import { getFileFirebase } from "../../../../../services/firebase/getFirebse.service";
 import currencyFormatter from "currency-formatter";
+import "../../../../../assets/css/user.style.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import Comment from "../../../../User/feature/details/comment/comment";
+
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
+
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<any | null>(null);
+  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const userId = useSelector(
+    (state: RootState) => state.auth.profile.profile?._id
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const watchlistStatus = useSelector(
+    (state: RootState) => state.watchlist.wathlist.status
+  );
+  const watchlistItems = useSelector(
+    (state: RootState) => state.watchlist.wathlist.items
+  );
+  console.log("wathlist", watchlistItems);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
-  const [product, setProduct] = useState<any | null>(null);
-  const [imgPreview, setImgPreview] = useState<string | null>(null);
-  const { id } = useParams<{ id: string }>();
+
+  const handleAddToWatchlist = async () => {
+    if (userId && id) {
+      try {
+        await dispatch(addToWatchlistThunk({ userId, productId: id })).unwrap();
+        setIsFavorite(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      }
+    } else {
+      console.log("User ID or Product ID is missing");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +79,6 @@ const ProductDetail: React.FC = () => {
         );
         if (!viewedProducts.includes(id)) {
           await upViewProduct(id);
-          // lưu id sản phẩm vào localStorage
           viewedProducts.push(id);
           localStorage.setItem(
             "viewedProducts",
@@ -57,7 +89,18 @@ const ProductDetail: React.FC = () => {
           setProduct(updatedProduct);
           console.log("Tăng lượt xem thành công");
         } else {
-          console.log("Lỗi");
+          console.log("Sản phẩm đã được xem");
+        }
+
+        if (Array.isArray(watchlistItems)) {
+          const isFavoriteProduct = watchlistItems.some((item) => {
+            const product = item.product || item.data?.product;
+            return product && product._id === id;
+          });
+          console.log("Is favorite:", isFavoriteProduct);
+          setIsFavorite(isFavoriteProduct);
+        } else {
+          console.log("Watchlist items is not an array");
         }
       } catch (error) {
         console.log(
@@ -67,65 +110,54 @@ const ProductDetail: React.FC = () => {
       }
     };
 
-
-    
     fetchData();
-  }, [id]);
+  }, [id, userId, dispatch, watchlistItems]);
 
   return (
     <>
       {/* breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
-        <a href="/" className="text-primary text-base">
+        <a href="/" className="text-primary text-base flex items-center">
           <i className="fa-solid fa-house"></i>
+          <span className="ml-2">Home</span>
         </a>
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-gray-400 mx-2">
           <i className="fa-solid fa-chevron-right"></i>
         </span>
         <p className="text-gray-600 font-medium">Product</p>
       </div>
 
-
-      <div className="container grid grid-cols-2 gap-6">
-        <div>
+      {/* product-detail */}
+      <div className="container grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex justify-center items-center">
           {imgPreview && (
-            <div>
-              <img src={imgPreview} alt="Image Preview" className="w-full" />
-            </div>
+            <img
+              src={imgPreview}
+              alt="Image Preview"
+              className="w-full max-w-md object-cover"
+            />
           )}
-       
         </div>
 
         <div>
-          <h2 className="text-3xl font-medium uppercase mb-2">
+          <h2 className="text-3xl font-semibold uppercase mb-2">
             {product?.name}
           </h2>
           <div className="flex items-center mb-4">
             <div className="flex gap-1 text-sm text-yellow-400">
-              <span>
-                <i className="fa-solid fa-star"></i>
-              </span>
-              <span>
-                <i className="fa-solid fa-star"></i>
-              </span>
-              <span>
-                <i className="fa-solid fa-star"></i>
-              </span>
-              <span>
-                <i className="fa-solid fa-star"></i>
-              </span>
-              <span>
-                <i className="fa-solid fa-star"></i>
-              </span>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <span key={index}>
+                  <i className="fa-solid fa-star"></i>
+                </span>
+              ))}
             </div>
-
             <div className="text-xs text-gray-500 ml-3">
-              {" "}
               ({product?.view} Lượt xem)
             </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-gray-800 font-semibold space-x-2">
+
+          <div className="space-y-2 mb-4">
+            <p className="text-gray-800 font-semibold">
               <span>Trạng thái: </span>
               {product?.quantity > 0 ? (
                 <span className="text-green-600">Còn Hàng</span>
@@ -134,255 +166,168 @@ const ProductDetail: React.FC = () => {
               )}
             </p>
           </div>
-          <div className="flex items-baseline mb-1 space-x-2 font-roboto mt-4">
-          {product?.discount > 1 ? (
-                <div>
-                    <p className="text-xl text-primary font-semibold">
-                        {formatCurrency(product?.price * (1 - product?.discount / 100))} VNĐ
-                    </p>
-                    <p className="text-sm text-gray-400 line-through">
-                        {formatCurrency(product?.price)}
-                    </p>
-                </div>
-            ) : (
+
+          <div className="flex items-baseline mb-4 space-x-2 font-roboto">
+            {product?.discount > 0 ? (
+              <div>
                 <p className="text-xl text-primary font-semibold">
-                    {formatCurrency(product?.price)} VNĐ
+                  {formatCurrency(
+                    product?.price * (1 - product?.discount / 100)
+                  )}{" "}
+                  VNĐ
                 </p>
+                <p className="text-sm text-gray-400 line-through">
+                  {formatCurrency(product?.price)} VNĐ
+                </p>
+              </div>
+            ) : (
+              <p className="text-xl text-primary font-semibold">
+                {formatCurrency(product?.price)} VNĐ
+              </p>
             )}
           </div>
 
-          <p className="mt-4 text-gray-600"></p>
-
+          {/* Size Selector */}
           <div className="pt-4">
-            <h3 className="text-sm text-gray-800 uppercase mb-1">Kích thước</h3>
+            <h3 className="text-sm text-gray-800 uppercase mb-2">Kích thước</h3>
             <div className="flex items-center gap-2">
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xs"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xs"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XS
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-sm"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-sm"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  S
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-m"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-m"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  M
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-l"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-l"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  L
-                </label>
-              </div>
-              <div className="size-selector">
-                <input
-                  type="radio"
-                  name="size"
-                  id="size-xl"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="size-xl"
-                  className="text-xs border border-gray-200 rounded-sm h-6 w-6 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                >
-                  XL
-                </label>
-              </div>
+              {["XS", "S", "M", "L", "XL"].map((size) => (
+                <div key={size} className="size-selector">
+                  <input
+                    type="radio"
+                    name="size"
+                    id={`size-${size.toLowerCase()}`}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor={`size-${size.toLowerCase()}`}
+                    className="text-xs border border-gray-200 rounded-sm h-8 w-8 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
+                  >
+                    {size}
+                  </label>
+                </div>
+              ))}
             </div>
           </div>
 
+          {/* Color Selector */}
           <div className="pt-4">
             <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
               Màu sắc
             </h3>
             <div className="flex items-center gap-2">
-              <div className="color-selector">
-                <input type="radio" name="color" id="red" className="hidden" />
-                <label
-                  htmlFor="red"
-                  className="border border-gray-200 rounded-sm h-6 w-6 cursor-pointer shadow-sm block"
-                  style={{ backgroundColor: "#fc3d57" }}
-                ></label>
-              </div>
-              <div className="color-selector">
-                <input
-                  type="radio"
-                  name="color"
-                  id="black"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="black"
-                  className="border border-gray-200 rounded-sm h-6 w-6 cursor-pointer shadow-sm block"
-                  style={{ backgroundColor: "#000" }}
-                ></label>
-              </div>
-              <div className="color-selector">
-                <input
-                  type="radio"
-                  name="color"
-                  id="white"
-                  className="hidden"
-                />
-                <label
-                  htmlFor="white"
-                  className="border border-gray-200 rounded-sm h-6 w-6 cursor-pointer shadow-sm block"
-                  style={{ backgroundColor: "#fff" }}
-                ></label>
-              </div>
+              {["#fc3d57", "#000", "#fff"].map((color) => (
+                <div key={color} className="color-selector">
+                  <input
+                    type="radio"
+                    name="color"
+                    id={color}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor={color}
+                    className="border border-gray-200 rounded-sm h-8 w-8 cursor-pointer shadow-sm block"
+                    style={{ backgroundColor: color }}
+                  ></label>
+                </div>
+              ))}
             </div>
           </div>
 
+          {/* Quantity Selector */}
           <div className="mt-4">
             <h3 className="text-sm text-gray-800 uppercase mb-1">Số lượng</h3>
             <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-              <div
-                className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
+              <button
+                className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none bg-gray-200 hover:bg-gray-300 transition"
                 onClick={decreaseQuantity}
               >
                 -
-              </div>
-              <div className="h-8 w-8 text-base flex items-center justify-center">
+              </button>
+              <div className="h-8 w-8 text-base flex items-center justify-center bg-gray-100">
                 {quantity}
               </div>
-              <div
-                className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
+              <button
+                className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none bg-gray-200 hover:bg-gray-300 transition"
                 onClick={increaseQuantity}
               >
                 +
-              </div>
+              </button>
             </div>
           </div>
 
-          <div className="mt-6 flex gap-3 border-b border-gray-200 pb-5 pt-5">
+          {/* Action Buttons */}
+          <div className="mt-6 flex gap-3 border-t border-gray-200 pt-5">
             <a
               href="/checkout"
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
+              className="bg-blue-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-blue-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Mua ngay
             </a>
             <a
               href="/cart"
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
+              className="bg-green-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-green-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
             </a>
-            <a
-              href=""
-              className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition"
+            {error && <p className="text-red-500">{error}</p>}
+            {/* Hiển thị thông báo lỗi */}
+            <button
+              onClick={handleAddToWatchlist}
+              disabled={watchlistStatus === "loading"}
+              className="bg-yellow-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-yellow-700 transition"
             >
-              <i className="fa-solid fa-bag-shopping"></i> Add WatchList
-            </a>
+              <i
+                className={`fa-solid fa-heart ${
+                  isFavorite ? "text-red-500" : "text-white"
+                }`}
+              ></i>{" "}
+              {watchlistStatus === "loading" ? "Adding..." : "Add to Watchlist"}
+            </button>
           </div>
 
+          {/* Social Media Share */}
           <div className="flex gap-3 mt-4">
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-facebook-f"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-twitter"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-linkedin-in"></i>
-            </a>
-            <a
-              href="#"
-              className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
-            >
-              <i className="fa-brands fa-pinterest"></i>
-            </a>
+            {["facebook-f", "twitter", "linkedin-in", "pinterest"].map(
+              (platform) => (
+                <a
+                  key={platform}
+                  href="#"
+                  className="text-gray-400 hover:text-gray-500 h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center"
+                >
+                  <i className={`fa-brands fa-${platform}`}></i>
+                </a>
+              )
+            )}
           </div>
         </div>
       </div>
-
-      {/* ./product-detail */}
 
       {/* description */}
       <div className="container pb-16">
-        <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium">
-          Product details
+        <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium text-xl">
+          Product Details
         </h3>
-        <div className="w-3/5 pt-6">
-          <div className="text-gray-600">
-            <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm mt-6">
-              <tbody>
-                <tr>
-                  <td className="py-2">Category</td>
-                  <td className="py-2">A</td>
+        <div className="pt-6">
+          <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
+            <tbody>
+              {[
+                ["Category", "A"],
+                ["Product Code", "B"],
+                ["Size", "C"],
+                ["Weight", "D"],
+                ["Color", "E"],
+                ["Material", "F"],
+              ].map(([label, value]) => (
+                <tr key={label}>
+                  <td className="py-2 border-b">{label}</td>
+                  <td className="py-2 border-b">{value}</td>
                 </tr>
-                <tr>
-                  <td className="py-2">Product Code</td>
-                  <td className="py-2">B</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Size</td>
-                  <td className="py-2">C</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Weight</td>
-                  <td className="py-2">D</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Color</td>
-                  <td className="py-2">E</td>
-                </tr>
-                <tr>
-                  <td className="py-2">Material</td>
-                  <td className="py-2">F</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-      {/* ./description */}
 
       {/* comments */}
       {/* <div className="container py-8">
@@ -448,26 +393,32 @@ const ProductDetail: React.FC = () => {
       {/* related-products */}
       <div className="container pb-16">
         <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
-          Related products
+          Related Products
         </h2>
-        <div className="grid grid-cols-4 gap-6">
-          {/* Related product cards */}
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <img src={listTwo} alt="related-product" className="w-full" />
-            <div className="p-4">
-              <h3 className="text-gray-800 font-medium">
-                Related Product Name
-              </h3>
-              <p className="text-gray-600">Related Product Price</p>
-              <button className="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">
-                View Details
-              </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, index) => (
+            <div
+              key={index}
+              className="border border-gray-200 rounded-lg overflow-hidden"
+            >
+              {/* <img
+                src={listTwo}
+                alt="related-product"
+                className="w-full h-48 object-cover"
+              /> */}
+              <div className="p-4">
+                <h3 className="text-gray-800 font-medium">
+                  Related Product Name
+                </h3>
+                <p className="text-gray-600">Related Product Price</p>
+                <button className="mt-4 bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition focus:outline-none">
+                  View Details
+                </button>
+              </div>
             </div>
-          </div>
-          {/* Repeat for other related products */}
+          ))}
         </div>
       </div>
-      {/* ./related-products */}
     </>
   );
 };

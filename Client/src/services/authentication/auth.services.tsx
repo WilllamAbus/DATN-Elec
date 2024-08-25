@@ -196,3 +196,58 @@ export const resetPassword = async (token: string, password: string) => {
     }
   }
 };
+export const addToWatchlist = async (userId: string, productId: string) => {
+  try {
+    const response = await instance.post(`${API_URL}/wathlist/add`, {
+      user: userId,
+      product: productId,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        `Error adding to watchlist: ${
+          error.response.data.message || error.message
+        }`
+      );
+    } else if (error instanceof Error) {
+      throw new Error(`Error adding to watchlist: ${error.message}`);
+    } else {
+      throw new Error("Error adding to watchlist: An unknown error occurred");
+    }
+  }
+};
+
+export const getWatchlist = async () => {
+  try {
+    const response = await instance.get(`${API_URL}/wathlist/`);
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error fetching watchlist: An unknown error occurred");
+    }
+  }
+};
+
+export const DeleteWatchlist = async (id: string) => {
+  try {
+    const response = await instance.delete(`${API_URL}/wathlist/delete/${id}`);
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(
+        "Error deleting from watchlist: An unknown error occurred"
+      );
+    }
+  }
+};

@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { logoutThunk } from "../../../../redux/auth/authThunk";
 import EditProfile from "./edit-profile";
 import Info from "./info";
+import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
@@ -16,7 +17,9 @@ import Cookies from "js-cookie";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [view, setView] = useState<"info" | "edit" | "password">("info");
+  const [view, setView] = useState<"info" | "edit" | "password" | "watchlist">(
+    "info"
+  );
 
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
@@ -141,6 +144,7 @@ const ProfileUse: React.FC = () => {
               <a
                 href="#"
                 className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
+                onClick={() => setView("watchlist")}
               >
                 <i className="fa-regular fa-heart mr-2"></i>
                 Yêu thích
@@ -162,6 +166,7 @@ const ProfileUse: React.FC = () => {
           {view === "info" && <Info profiles={profile} />}
           {view === "edit" && <EditProfile profile={profile} />}
           {view === "password" && <UpdatePassword profile={profile} />}
+          {view === "watchlist" && <Watchlist profiles={profile} />}
         </section>
       </div>
     </>

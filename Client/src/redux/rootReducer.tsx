@@ -10,6 +10,7 @@ import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
+import watchlistReducer from "./product/productSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
   authGoogle: persistReducer(authConfig, authGoogleReducer),
   categories: categoriesSlice,
+  watchlist: watchlistReducer,
   voucher: voucherReducer,
   checkout: checkoutSlice,
 });
