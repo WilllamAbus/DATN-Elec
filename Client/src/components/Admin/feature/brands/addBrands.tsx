@@ -102,6 +102,7 @@ const AddBrand: React.FC = () => {
     };
 
     return (
+        
         <main className="w-full flex-grow p-6">
             <div className="flex flex-wrap">
                 <div className="w-full mt-6 pl-0 lg:pl-2">
@@ -172,26 +173,7 @@ const AddBrand: React.FC = () => {
                                     </select>
                                     {errors.category_id && <span className="text-red-600">{errors.category_id.message}</span>}
                                 </div>
-                                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                                        Hình ảnh
-                                    </label>
-                                    <input
-                                        className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                        id="image"
-                                        type="file"
-                                        {...register("image")}
-                                        onChange={handleImageChange}
-
-                                    />
-                                    {errors.image && <span className="text-red-600">{errors.image.message}</span>}
-                                    {imgPreview && (
-                                        <div className="image-preview">
-                                            <img src={imgPreview} alt="Image Preview" />
-                                        </div>
-                                    )}
-
-                                </div>
+                              
 
                             </div>
                             <div className="flex flex-wrap -mx-3 mb-6">
@@ -215,6 +197,30 @@ const AddBrand: React.FC = () => {
                                 </div>
 
                             </div>
+                            <div className="flex flex-wrap -mx-3 mb-6">
+                            <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                                    <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                                        Hình ảnh
+                                    </label>
+                                    <input
+                                        className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                        id="image"
+                                        type="file"
+                                        {...register("image")}
+                                        onChange={handleImageChange}
+
+                                    />
+                                    {errors.image && <span className="text-red-600">{errors.image.message}</span>}
+                                    {imgPreview && (
+                                        <div className="image-preview">
+                                            <img src={imgPreview} alt="Image Preview" />
+                                        </div>
+                                    )}
+
+                                </div>
+
+                            </div>
+                          
                             <div className="mt-6 flex gap-2">
                                 <button
                                     id="addNewButton"

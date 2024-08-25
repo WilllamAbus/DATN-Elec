@@ -101,19 +101,19 @@ const brandList: React.FC = () => {
                   <td className="py-4 px-6 border-b border-grey-light">
                     <img
                       className="w-10 h-10 rounded-sm"
-                      src={brand.imgURL}
+                      src={brand.image}
                       alt="Student avatar"
                       style={{ width: "50px", height: "50px" }}
                     />
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">
                     <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
-                    {brand.category_id.name}
+                    {brand?.category_id?.name}
                     </span>
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">
                     <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
-                    {brand.supplier_id.name}
+                    {brand?.supplier_id?.name}
                     </span>
                   </td>
                   <td className="py-4 px-6 border-b border-grey-light">

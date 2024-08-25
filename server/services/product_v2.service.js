@@ -3,6 +3,7 @@ const _Category = require('../model/catgories.model');
 const _Discount = require("../model/discount.model");
 const _Format = require("../model/formatShopping.model");
 const _Condition = require("../model/condition-shop.model");
+const _Brand = require("../model/brands.model")
 const admin = require('firebase-admin');
 const dotenv = require("dotenv");
 const serviceAccount = require('../config/serviceAccount.json');
@@ -71,7 +72,9 @@ const productService = {
             product_format: productData.product_format,
             product_discount: productData.product_discount,
             product_quantity: productData.product_quantity, // Add quantity
-            product_price: productData.product_price, // Add price
+            product_price: productData.product_price,
+            product_brands:productData.product_brands
+             // Add price
             // Include any other fields as needed
         });
     
@@ -83,7 +86,7 @@ const productService = {
         await populateCondition(newProduct);
         await populateFormatShopping(newProduct);
         await populateDiscount(newProduct);
-    
+        await populateBrands(newProduct)
         return newProduct;
     },
     edditProductV2: async(id, updatedData, newImages)=>{
@@ -188,11 +191,11 @@ const productService = {
           console.error(error);
         }
       },
-      deletedListProduct:async (page = 1, pageSize = 10) => {
+      deletedListProduct:async (page = 1, pageSize = 4) => {
         try {
           // Validate page and pageSize parameters
           const pageNumber = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
-          const size = parseInt(pageSize, 5) > 0 ? parseInt(pageSize, 5) : 5;
+          const size = parseInt(pageSize, 4) > 0 ? parseInt(pageSize, 4) : 4;
       
           // Calculate the number of documents to skip
           const skip = (pageNumber - 1) * size;
@@ -249,7 +252,7 @@ const productService = {
         }
     },
 
-    getSuggestions : async (query, limit = 5) => {
+    getSuggestions : async (query, limit = 4) => {
         try {
             const suggestions = await Product_v2.find({
                 product_name: { $regex: query, $options: 'i' },
@@ -265,8 +268,8 @@ const productService = {
             throw new Error('Failed to fetch product suggestions');
         }
     },
-    searchProductAdmin: async(query, page = 1, pageSize = 10)=>{
-        const limit = parseInt(pageSize, 5); // Number of products per page
+    searchProductAdmin: async(query, page = 1, pageSize = 4)=>{
+        const limit = parseInt(pageSize, 4); // Number of products per page
         const skip = (parseInt(page, 10) - 1) * limit; // Number of products to skip
     
         try {
@@ -305,6 +308,7 @@ const productService = {
    populateCate: async (product) => {
         return await product.populate({
             path: 'product_type',
+            model: 'Categories',
             match: { status: { $ne: 'disable' } } // Apply filter to exclude disabled categories
         }).exec();
     },
@@ -329,7 +333,13 @@ const productService = {
             match: { status: { $ne: "disable" } } // Apply filter
           }).exec();;
     },
-
+    populateBrands: async(product)=>{
+        return await product.populate({
+            path: ' product_brands',
+            model: 'brands',
+            match: { status: { $ne: "disable" } } // Apply filter
+          }).exec();;
+    },
     deleteProduct: async (id) => {
     
         try {
@@ -379,7 +389,7 @@ const productService = {
             const discounts = await _Discount.find({}).exec();
             const discountReady = discounts.map(discount => ({
                 discount: discount._id,
-                name: discount.name,
+                discountPercent: discount.discountPercent,
                 _id: discount._id
             }));
             return { discountReady };
@@ -399,6 +409,20 @@ const productService = {
                 _id: category._id
             }));
             return { cateReady };
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            throw new Error('Server error');
+        }
+    },
+    getAllBrandService : async () => {
+        try {
+            const brand = await _Brand.find({}).exec();
+            const brandReady = brand.map(brands => ({
+                brands: brands._id,
+                name: brands.name,
+                _id: brands._id
+            }));
+            return { brandReady };
         } catch (error) {
             console.error('Error fetching categories:', error);
             throw new Error('Server error');

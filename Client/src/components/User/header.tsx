@@ -107,7 +107,7 @@ const Header: React.FC = () => {
                 Yêu thích
               </button>
 
-              <button
+              {/* <button
                 id="userDropdownButton1"
                 data-dropdown-toggle="userDropdown1"
                 type="button"
@@ -131,7 +131,7 @@ const Header: React.FC = () => {
                   />
                 </svg>
                 Thông báo
-              </button>
+              </button> */}
               <div
                 id="userDropdown1"
                 className="hidden z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"

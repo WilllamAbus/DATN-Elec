@@ -4,12 +4,19 @@ const inventorySchema = Schema(
   {
 product: { type: Schema.Types.ObjectId, ref: 'product_v2', required: true }, // Tham chiếu đến mô hình Product (Sản phẩm)
   quantity: { type: Number, required: true }, // Số lượng hàng tồn kho
-  location: { type: String, required: true }, // Vị trí lưu trữ (ví dụ: kho hàng, cửa hàng)
+  location: {
+    warehouse: { type: String, required: true }, // Kho hàng chính hoặc cửa hàng chính
+    section: { type: String, required: false }, // Khu vực hoặc tầng lưu trữ trong kho hoặc cửa hàng
+    aisle: { type: String, required: false }, // Lối đi hoặc khu vực lưu trữ cụ thể
+    shelf: { type: String, required: false }, // Giá hoặc kệ lưu trữ cụ thể
+    bin: { type: String, required: false } // Thùng hoặc hộp lưu trữ cụ thể
+  }, // Vị trí lưu trữ (ví dụ: kho hàng, cửa hàng)
 //   supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true }, // Tham chiếu đến mô hình Supplier (Nhà cung cấp)
   restockLevel: { type: Number, required: true }, // Mức độ tồn kho tại đó cần phải được bổ sung
   restockDate: { type: Date }, // Ngày bổ sung hàng tồn kho gần nhất
   batchNumber: { type: String, default: '' }, // Số lô hàng nhập sau (bổ sung giá trị mặc định là chuỗi rỗng)
-  batchDate: { type: Date }, // Ngày sản xuất hoặc ngày nhập kho của lô hàng
+  batchDate: { type: Date },
+  supplier:  { type: Schema.Types.ObjectId, ref: 'Supplier',  required: true }, // Ngày sản xuất hoặc ngày nhập kho của lô hàng
   reservations: [
     { type: Schema.Types.ObjectId, ref: 'resversation', default: [] }, // Danh sách các đặt chỗ liên quan đến sản phẩm này
   ],

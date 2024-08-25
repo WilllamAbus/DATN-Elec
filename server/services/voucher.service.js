@@ -124,7 +124,8 @@ const voucherService = {
     return await _Voucher.findByIdAndDelete(id);
   },
   getAllVoucher: async () => {
-    return await _Voucher.findWithCategory({ status: { $ne: "disable" } });
+    return await _Voucher.find({ status: { $ne: "disable" } })
+    .populate('cateReady.category', 'name');
   },
   softDeleteVoucher: async (id) => {
     try {

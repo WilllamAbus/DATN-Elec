@@ -75,4 +75,4 @@ const ordersSchema = new Schema({
 //   }
 // });
 
-module.exports = model('Orders', ordersSchema);
+module.exports = model('orders', ordersSchema);

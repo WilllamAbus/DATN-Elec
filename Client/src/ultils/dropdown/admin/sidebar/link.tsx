@@ -13,10 +13,12 @@ export const links: Record<string, Link[]> = {
   product: [
     { label: "Sản phẩm", to: "/admin/listProducts" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
+
   ],
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },
     { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
+  
   ],
 };
