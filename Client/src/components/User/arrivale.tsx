@@ -20,7 +20,7 @@ const Arrivale: React.FC = () => {
     fetchProducts();
   }, []);
   return (
-    <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+    <section className="bg-gray-50 shadow hover:shadow-lg py-8 antialiased dark:bg-gray-900 md:py-12">
       <div className="text-center">
         <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
           Bán chạy
@@ -265,7 +265,7 @@ const Arrivale: React.FC = () => {
                         d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
                       />
                     </svg>
-                    Add to cart
+                    Thêm giỏ hàng
                   </button>{" "}
                 </div>
               </div>
