@@ -30,4 +30,4 @@ const notificationSchema = Schema(
   }
 );
 
-module.exports = model("customerService", notificationSchema);
+module.exports = model("notification", notificationSchema);

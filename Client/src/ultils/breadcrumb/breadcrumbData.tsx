@@ -84,4 +84,29 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/recycleBinVoucher", label: "Danh sách xóa mềm" },
   ],
+  recycleBinOrder: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinOrder", label: "Danh sách xóa mềm" },
+  ],
+  listComments: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listComments", label: "Danh sách bình luận" },
+  ],
+  listVouchers: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listVouchers", label: "Danh sách giảm giá" },
+  ],
+  addVouchers: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addVouchers", label: "Thêm giảm giá" },
+  ],
+  editVouchers: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editVouchers", label: "cập nhật giảm giá" },
+  ],
 };

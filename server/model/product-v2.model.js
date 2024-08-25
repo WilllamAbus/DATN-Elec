@@ -12,6 +12,8 @@ const productV2Schema = new Schema(
       
       }
     ],
+
+    product_brands:{ type: Schema.Types.ObjectId, ref: 'Brand' },
     product_discount:{ type: Schema.Types.ObjectId, ref: 'discounts' },
     product_format:{type: Schema.Types.ObjectId, ref: 'formatShopping'},
     product_condition:{type: Schema.Types.ObjectId, ref: 'conditionShopping'},

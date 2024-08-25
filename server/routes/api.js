@@ -41,6 +41,11 @@ const productController = require("../controler/product_v2.controller");
 const commentController = require("../controler/comment.controller");
 /**@author repCommment */
 const repCommentController = require("../controler/repComment.controller");
+/**@author repCommment */
+
+/**Inventory */
+const inventoryController = require('../controler/inventory.controller');
+/**Inventory */
 
 const router = express.Router();
 // Test
@@ -245,7 +250,7 @@ router.patch(
 
 // productsV2
 router.delete(
-  "/products_v2/deleteCondition/:id",
+  "/products_v2/deleteProductV2/:id",
   middlewareController.verifyTokenAdminAuth,
   productController.deleteProduct
 );
@@ -262,7 +267,7 @@ router.put(
   productController.updateProduct
 );
 router.get("/products_v2/getAllProduct", productController.getAllProduct);
-router.delete(
+router.patch(
   "/products_v2/soft-deleteProduct/:id",
   middlewareController.verifyTokenAdminAuth,
   productController.softDeleteProduct
@@ -298,6 +303,8 @@ router.patch(
   middlewareController.verifyTokenAdminAuth,
   productController.restore
 );
+
+/**productsV2 */
 // Api tỉnh thành
 
 /**Comments */
@@ -342,4 +349,21 @@ router.get("/comment/:id", repCommentController.getRepComment);
 
 
 
+
+/**Inventory */
+
+router.post('/inventory', middlewareController.verifyTokenAdminAuth, inventoryController.createInventory);
+router.put('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.editInventory);
+router.get('/inventory/:id', inventoryController.getInventoryById);
+router.get('/inventories', inventoryController.getAllInventory);
+router.delete('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.deleteInventory);
+router.patch('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.softDeleteInventory);
+router.get('/deleted-inventories', inventoryController.deletedListInventory);
+router.patch('/restore-inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.restoreInventory);
+router.get('/products', inventoryController.getAllProductsV2);
+router.get('/suppliers', inventoryController.getAllSuppliers);
+router.get('/search-inventory', inventoryController.searchInventoryAdmin);
+router.get('/inventory-suggestions', inventoryController.getSuggestions);
+
+/**Inventory */
 module.exports = router;
