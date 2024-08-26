@@ -98,3 +98,22 @@ export const softDeleteBrand = async (id: string) => {
     throw error;
   }
 };
+
+export const getSoftDeletedBrands = async () => {
+  try {
+    const response = await instance.get("/brands/deleted-list");
+    return response.data.data || [];
+  } catch (error) {
+    console.error("Error fetching soft-deleted brands:", error);
+    throw error;
+  }
+};
+export const restoreBrand = async (id: string) => {
+  try {
+    const response = await instance.patch(`/brands/restore/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error restoring brands:", error);
+    throw error;
+  }
+};
