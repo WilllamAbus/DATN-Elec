@@ -118,13 +118,12 @@ const ProductDetail: React.FC = () => {
       {/* breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base flex items-center">
-          <i className="fa-solid fa-house"></i>
-          <span className="ml-2">Home</span>
+          <span className="ml-2">Sản phẩm</span>
         </a>
         <span className="text-sm text-gray-400 mx-2">
           <i className="fa-solid fa-chevron-right"></i>
         </span>
-        <p className="text-gray-600 font-medium">Product</p>
+        <p className="text-gray-600 font-medium">Chi tiết sản phẩm</p>
       </div>
 
       {/* product-detail */}
