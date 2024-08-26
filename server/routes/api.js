@@ -47,6 +47,8 @@ const repCommentController = require("../controler/repComment.controller");
 const inventoryController = require('../controler/inventory.controller');
 /**Inventory */
 
+// *TimeTrack*/
+const timeTrackController = require('../controler/timeTrack.controller');
 const router = express.Router();
 // Test
 router.get("/", homepage);
@@ -366,4 +368,14 @@ router.get('/search-inventory', inventoryController.searchInventoryAdmin);
 router.get('/inventory-suggestions', inventoryController.getSuggestions);
 
 /**Inventory */
+
+
+// *timeTrack*/
+router.post('/time-tracks', timeTrackController.create);  // POST /time-tracks
+router.get('/time-tracks/:id', timeTrackController.getTimeTrackById);  // GET /time-tracks/:id
+router.get('/time-tracks', timeTrackController.getAllTimeTrack);   // GET /time-tracks
+router.put('/time-tracks/:id', timeTrackController.update); // PUT /time-tracks/:id
+// PATCH /time-tracks/:id
+router.delete('/time-tracks/:id', timeTrackController.delete); // DELETE /time-tracks/:id
+/**Time Track */
 module.exports = router;

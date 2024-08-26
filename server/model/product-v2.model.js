@@ -13,7 +13,7 @@ const productV2Schema = new Schema(
       }
     ],
 
-    product_brands:{ type: Schema.Types.ObjectId, ref: 'Brand' },
+    product_brands:{ type: Schema.Types.ObjectId, ref: 'brands' },
     product_discount:{ type: Schema.Types.ObjectId, ref: 'discounts' },
     product_format:{type: Schema.Types.ObjectId, ref: 'formatShopping'},
     product_condition:{type: Schema.Types.ObjectId, ref: 'conditionShopping'},
@@ -21,8 +21,8 @@ const productV2Schema = new Schema(
     product_ratingAvg:{
         type:Number,
         default:4.5,
-        min:[1, 'Rating must be above 1'],
-        min:[5, 'Rating must be above 5'],
+        min:[1, 'Đánh giá không nhỏ hơn 1'],
+        max:[5, 'Đánh giá không lớn hơn  5'],
     },
     product_view: {
         type: Number,

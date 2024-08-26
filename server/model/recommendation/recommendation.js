@@ -28,7 +28,7 @@ const recommendationSchema = new Schema(
 
     modifieon: { type: Date, default: Date.now },
 
-    isActive: { type: Boolean, default: true },
+  
     status: { type: String, default: "active" },
     disabledAt: { type: Date, default: null },
   },
