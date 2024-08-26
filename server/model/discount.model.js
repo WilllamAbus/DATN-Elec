@@ -14,6 +14,7 @@ const discountSchema = new Schema(
 
   },
   {
+    collection:'discounts',
     timestamps:true
   }
  
@@ -21,4 +22,4 @@ const discountSchema = new Schema(
 
 
 
-module.exports = model("Discounts", discountSchema);
+module.exports = model("discounts", discountSchema);

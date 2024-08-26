@@ -6,4 +6,7 @@ export const labels: Record<string, string> = {
   supplier: "Nhà cung cấp",
   brand: "Thương hiệu",
   recycleBin: "Thùng rác",
+  categories: "Danh mục",
+  comment: "Tương tác",
+  homeAdmin: "Trang chủ",
 };

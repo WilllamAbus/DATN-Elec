@@ -58,7 +58,33 @@ const Header: React.FC = () => {
               <Link
                 to="/cart"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
+                  />
+                </svg>
+                <span className="hidden sm:flex">Thông báo</span>
+
+              </Link>
+
+              <Link
+                to="/cart"
+                type="button"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-5 h-5 lg:me-1"
@@ -85,7 +111,7 @@ const Header: React.FC = () => {
                 id="userDropdownButton1"
                 data-dropdown-toggle="userDropdown1"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -107,11 +133,11 @@ const Header: React.FC = () => {
                 Yêu thích
               </button>
 
-              <button
+              {/* <button
                 id="userDropdownButton1"
                 data-dropdown-toggle="userDropdown1"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -131,7 +157,7 @@ const Header: React.FC = () => {
                   />
                 </svg>
                 Thông báo
-              </button>
+              </button> */}
               <div
                 id="userDropdown1"
                 className="hidden z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"

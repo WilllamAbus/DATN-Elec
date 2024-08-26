@@ -1,5 +1,3 @@
-
-
 interface Link {
   label: string;
   to: string;
@@ -12,7 +10,7 @@ export const links: Record<string, Link[]> = {
   ],
   product: [
     { label: "Sản phẩm", to: "/admin/listProducts" },
-    { label: "Mã giảm giá", to: "/admin/listVouchers" },
+    { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
   supplier: [
     { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
@@ -26,5 +24,9 @@ export const links: Record<string, Link[]> = {
     { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
     { label: "Nhà cung cấp", to: "/admin/recycleBinSupplier" },
     { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
+    { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
   ],
+  categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
+  comment: [{ label: "Tương tác", to: "/admin/listComments" }],
+  homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
 };
