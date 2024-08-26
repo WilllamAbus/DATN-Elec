@@ -39,17 +39,18 @@ const AllProduct: React.FC = () => {
               </div>
               <div className="pt-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                  <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                    {" "}
-                    Up to 35% off{" "}
-                  </span>
+                {product.discount > 0 ? <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                    Giảm giá {product.discount}% 
+                  </span>: <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                  </span>}
                   <div className="flex items-center justify-end gap-1">
-                    <button
+                  <button
                       type="button"
                       data-tooltip-target="tooltip-quick-look"
-                      className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      <span className="sr-only"> Quick look </span>
+                     {product.view > 0 ? <span className="mr-2">({product.view})</span> : '' }
+
                       <svg
                         className="h-5 w-5"
                         aria-hidden="true"
@@ -70,6 +71,7 @@ const AllProduct: React.FC = () => {
                           d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                         />
                       </svg>
+                      <span className="sr-only"> Quick look </span>
                     </button>
                     <div
                       id="tooltip-quick-look"
@@ -177,8 +179,8 @@ const AllProduct: React.FC = () => {
                         </span>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-500 items-center m-3">
-                      {product.quantity > 0 ? `(${product.quantity})` : " "}
+                    <div className="text-xs text-gray-500 items-center m-2">
+                    {product.quantity > 0 ? `(Còn ${product.quantity} sản phẩm)` : " "}
                     </div>
                   </p>
                 </div>
@@ -226,9 +228,9 @@ const AllProduct: React.FC = () => {
                     {product.discount > 1 ? (
                       <div>
                         <p className="text-xs">
-                          {formatCurrency(product.price * (1 - product.discount / 100))} VNĐ
+                          {formatCurrency(product.price * (1 - product.discount / 100))} đ
                         </p>
-                        <p className="text-xs line-through">{formatCurrency(product.price)}</p>
+                        <p className="text-xs line-through">{formatCurrency(product.price)}đ</p>
                       </div>
                     ) : (
                       <p className="text-xs">{formatCurrency(product.price)}đ</p>
@@ -239,7 +241,7 @@ const AllProduct: React.FC = () => {
                   {" "}
                   <button
                     type="button"
-                    className="inline-flex items-center rounded-lg bg-yellow-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-yellow-500"
+                    className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
                   >
                     <svg
                       className="-ms-2 me-2 h-5 w-5"
@@ -258,7 +260,7 @@ const AllProduct: React.FC = () => {
                         d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
                       />
                     </svg>
-                    Add to cart
+                    Thêm vào giỏ hàng
                   </button>{" "}
                 </div>
               </div>
