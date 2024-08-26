@@ -71,3 +71,22 @@ export const softDeleteSupplier = async (id: string) => {
     throw error;
   }
 };
+
+export const getSoftDeletedSuppliers = async () => {
+  try {
+    const response = await instance.get("/suppliers/deleted-list");
+    return response.data.data || [];
+  } catch (error) {
+    console.error("Error fetching soft-deleted suppliers:", error);
+    throw error;
+  }
+};
+export const restoreSupplier = async (id: string) => {
+  try {
+    const response = await instance.patch(`/suppliers/restore/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error restoring suppliers:", error);
+    throw error;
+  }
+};

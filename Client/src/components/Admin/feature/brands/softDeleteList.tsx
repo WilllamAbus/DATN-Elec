@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { listBrands, softDeleteBrand } from "../../../../services/brand/crudBrands.service";
+import { useEffect, useState } from "react";
+import {
+  getSoftDeletedBrands,
+  hardDeleteBrand,
+  restoreBrand,
+} from "../../../../services/brand/crudBrands.service";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { Link } from "react-router-dom";
 
 const MySwal = withReactContent(Swal);
-const brandList: React.FC = () => {
+const softDeleteList: React.FC = () => {
   const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,8 +16,7 @@ const brandList: React.FC = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const brandList = await listBrands();
-        console.log(brandList);
+        const brandList = await getSoftDeletedBrands();
         setBrands(brandList);
       } catch (error) {
         setError("Error fetching brands.");
@@ -24,9 +26,8 @@ const brandList: React.FC = () => {
     };
 
     fetchBrands();
-
   }, []);
-  const handlesoftDeleteBrand = async (brandId: string) => {
+  const handleDelete = async (brandId: string) => {
     MySwal.fire({
       title: "Xóa thương hiệu?",
       text: "Bạn có chắc muốn xóa thương hiệu này không!",
@@ -39,11 +40,11 @@ const brandList: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await softDeleteBrand(brandId);
+          await hardDeleteBrand(brandId);
           setBrands(brands.filter((brand) => brand._id !== brandId));
           MySwal.fire({
             title: "Đã xóa!",
-            text: "Thương hiệu đã bị xóa.",
+            text: "Thương hiệu của bạn đã bị xóa.",
             icon: "success",
           });
         } catch (error) {
@@ -57,6 +58,38 @@ const brandList: React.FC = () => {
       }
     });
   };
+  const handleRestore = async (brandId: string) => {
+    MySwal.fire({
+      title: "Khôi phục thương hiệu?",
+      text: "Bạn có chắc muốn khôi phục thương hiệu này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await restoreBrand(brandId);
+          setBrands(brands.filter((brand) => brand._id !== brandId));
+          MySwal.fire({
+            title: "Đã khôi phục!",
+            text: "Thương hiệu của bạn đã được khôi phục.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error restoring brands:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi khôi phục thương hiệu.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -86,7 +119,7 @@ const brandList: React.FC = () => {
             Nhà cung cấp
           </th>
           <th scope="col" className="p-4">
-            Trạng thái
+            Trạng thái
           </th>
           <th scope="col" className="p-4">
             Chức năng
@@ -95,7 +128,10 @@ const brandList: React.FC = () => {
       </thead>
       <tbody>
         {brands.map((brand) => (
-          <tr key={brand._id} className="hover:bg-grey-lighter">
+          <tr
+            key={brand._id}
+            className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             <td className="p-4 w-4">
               <div className="flex items-center">
                 <input
@@ -117,13 +153,13 @@ const brandList: React.FC = () => {
                 {brand.name}
               </div>
             </th>
-            <td className="py-4 px-6">
-              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+            <td className="px-4 py-3">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
               {brand.category_id ? brand.category_id.name : 'No Category'}
               </span>
             </td>
-            <td className="py-4 px-6">
-              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+            <td className="px-4 py-3">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
               {brand.supplier_id ? brand.supplier_id.name : 'No Supplier'}
               </span>
             </td>
@@ -132,22 +168,25 @@ const brandList: React.FC = () => {
                 {brand.status === "active" ? "Hiển thị" : "Đã ẩn"}
               </span>
             </td>
-
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            <div className="flex items-center space-x-4">
-            <button
-                className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                onClick={() => handlesoftDeleteBrand(brand._id)}
-              >
-                Xoá
-              </button>
-              <Link
-                to={`/admin/editBrands/${brand._id}`}
-                className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Sửa
-              </Link>
-            </div>
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  data-modal-target="delete-modal"
+                  data-modal-toggle="delete-modal"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleDelete(brand._id)}
+                >
+                  Xoá
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleRestore(brand._id)}
+                >
+                  Khôi phục
+                </button>
+              </div>
             </td>
           </tr>
         ))}
@@ -156,4 +195,4 @@ const brandList: React.FC = () => {
   );
 };
 
-export default brandList;
+export default softDeleteList;

@@ -8,7 +8,9 @@ const {
   getOne,
   update,
   hardDelete,
-  softDelete
+  softDelete,
+  deletedList,
+  restore,
 } = require("../../../controler/admin/supplierController");
 
 const middlewareController = require("../../../middleware/auth");
@@ -28,12 +30,20 @@ router.put(
   upload.single("image"),
   update
 );
-router.delete("/hard-delete/:id", 
-  middlewareController.verifyToken, 
+router.delete("/hard-delete/:id",
+  middlewareController.verifyToken,
   hardDelete
 );
 router.patch("/soft-delete/:id",
-   middlewareController.verifyToken
-   , softDelete);
+  middlewareController.verifyToken,
+  softDelete);
+
+router.get("/deleted-list",
+  middlewareController.verifyToken,
+  deletedList);
+
+router.patch("/restore/:id",
+  middlewareController.verifyToken,
+  restore);
 
 module.exports = router;

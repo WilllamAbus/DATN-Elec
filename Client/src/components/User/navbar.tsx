@@ -71,7 +71,8 @@ const Navbar: React.FC = () => {
               Search
             </label>
             <div className="relative mt-1 lg:w-[32rem]">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
+                <button type="submit">
                 <svg
                   className="w-5 h-5 text-gray-500 dark:text-gray-400"
                   fill="currentColor"
@@ -84,13 +85,15 @@ const Navbar: React.FC = () => {
                     clipRule="evenodd"
                   />
                 </svg>
+                </button>
+                
               </div>
               <input
                 type="text"
                 name="email"
                 id="topbar-search"
-                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Search"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Nhập từ khóa tìm kiếm"
                 value={keyword}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
