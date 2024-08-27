@@ -73,24 +73,10 @@ const ProductDetail: React.FC = () => {
           const url = await getFileFirebase(product.image);
           setImgPreview(url);
         }
-
-        const viewedProducts = JSON.parse(
-          localStorage.getItem("viewedProducts") || "[]"
-        );
-        if (!viewedProducts.includes(id)) {
           await upViewProduct(id);
-          viewedProducts.push(id);
-          localStorage.setItem(
-            "viewedProducts",
-            JSON.stringify(viewedProducts)
-          );
-
           const updatedProduct = await getOneProduct(id);
           setProduct(updatedProduct);
-          console.log("Tăng lượt xem thành công");
-        } else {
-          console.log("Sản phẩm đã được xem");
-        }
+     
 
         if (Array.isArray(watchlistItems)) {
           const isFavoriteProduct = watchlistItems.some((item) => {
