@@ -6,7 +6,7 @@ const voucherSchema = new Schema(
     voucherNum: { type: Number, required: true },
     cateReady: [
       {
-        category: { type: Schema.Types.ObjectId, ref: 'categories' }, // Reference to Category model
+        category: { type: Schema.Types.ObjectId, ref: 'Category' }, // Reference to Category model
         name: { type: String, required: true }
       }
     ],

@@ -4,9 +4,6 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Link } from "react-router-dom";
 
-
-import "../../../../assets/css/admin.style.css";
-
 const MySwal = withReactContent(Swal);
 const brandList: React.FC = () => {
   const [brands, setBrands] = useState<any[]>([]);
@@ -120,17 +117,17 @@ const brandList: React.FC = () => {
                 {brand.name}
               </div>
             </th>
-            <td className="py-4 px-6 border-b border-grey-light">
+            <td className="py-4 px-6">
               <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
               {brand.category_id ? brand.category_id.name : 'No Category'}
               </span>
             </td>
-            <td className="py-4 px-6 border-b border-grey-light">
+            <td className="py-4 px-6">
               <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
               {brand.supplier_id ? brand.supplier_id.name : 'No Supplier'}
               </span>
             </td>
-            <td className="py-4 px-6 border-b border-grey-light">
+            <td className="py-4 px-6">
               <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
                 {brand.status === "active" ? "Hiển thị" : "Đã ẩn"}
               </span>

@@ -6,6 +6,9 @@ const userRoutes = require("./admin/auth/userRoutes");
 const brandRouter = require("./admin/brands/brands");
 const supplierRoutes = require('./admin/suppliers/suppliers');
 const productRouter_v2 = require("./admin/product_v2");
+const supplierRoutes = require("./admin/suppliers/suppliers");
+const WathListRouter = require("./product/product");
+const vnPayRouter = require('./admin/vnpay/order')
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -15,6 +18,10 @@ const routes = (app) => {
   app.use('/api/brands', brandRouter);
   app.use('/api/suppliers', supplierRoutes);
   app.use("/api/product_v2", productRouter_v2);
+  app.use("/api/brands", brandRouter);
+  app.use("/api/suppliers", supplierRoutes);
+  app.use("/api/wathlist", WathListRouter);
+  app.use("/api/vnpay", vnPayRouter);
 };
 
 module.exports = routes;

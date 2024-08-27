@@ -58,7 +58,7 @@ const Header: React.FC = () => {
               <Link
                 to="/cart"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -84,7 +84,7 @@ const Header: React.FC = () => {
               <Link
                 to="/cart"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-5 h-5 lg:me-1"
@@ -111,7 +111,7 @@ const Header: React.FC = () => {
                 id="userDropdownButton1"
                 data-dropdown-toggle="userDropdown1"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-yellow-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"

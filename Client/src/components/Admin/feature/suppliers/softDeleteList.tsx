@@ -1,0 +1,198 @@
+import { useEffect, useState } from "react";
+import {
+  getSoftDeletedSuppliers,
+  hardDeleteSupplier,
+  restoreSupplier,
+} from "../../../../services/supplier/crudSuppliers.service";
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
+const softDeleteListSupplier: React.FC = () => {
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const supplierList = await getSoftDeletedSuppliers();
+        setSuppliers(supplierList);
+      } catch (error) {
+        setError("Error fetching suppliers.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuppliers();
+  }, []);
+  const handleDelete = async (supplierId: string) => {
+    MySwal.fire({
+      title: "Xóa nhà cung cấp?",
+      text: "Bạn có chắc muốn xóa nhà cung cấp này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await hardDeleteSupplier(supplierId);
+          setSuppliers(suppliers.filter((supplier) => supplier._id !== supplierId));
+          MySwal.fire({
+            title: "Đã xóa!",
+            text: "Nhà cung cấp của bạn đã bị xóa.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting supplier:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi xóa nhà cung cấp.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+  const handleRestore = async (supplierId: string) => {
+    MySwal.fire({
+      title: "Khôi phục nhà cung cấp?",
+      text: "Bạn có chắc muốn khôi phục nhà cung cấp này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await restoreSupplier(supplierId);
+          setSuppliers(suppliers.filter((supplier) => supplier._id !== supplierId));
+          MySwal.fire({
+            title: "Đã khôi phục!",
+            text: "Nhà cung cấp của bạn đã được khôi phục.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error restoring supplier:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi khôi phục nhà cung cấp.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" className="p-4">
+            <div className="flex items-center">
+              <input
+                id="checkbox-all"
+                type="checkbox"
+                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="checkbox-all" className="sr-only">
+                checkbox
+              </label>
+            </div>
+          </th>
+          <th scope="col" className="p-4">
+            Tên nhà cung cấp
+          </th>
+          <th scope="col" className="p-4">
+            Địa chỉ
+          </th>
+          <th scope="col" className="p-4">
+            Số điện thoại
+          </th>
+          <th scope="col" className="p-4">
+            Trạng thái
+          </th>
+          <th scope="col" className="p-4">
+            Chức năng
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {suppliers.map((supplier) => (
+          <tr
+            key={supplier._id}
+            className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <td className="p-4 w-4">
+              <div className="flex items-center">
+                <input
+                  id="checkbox-table-search-1"
+                  type="checkbox"
+                  className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="checkbox-table-search-1" className="sr-only">
+                  checkbox
+                </label>
+              </div>
+            </td>
+            <th
+              scope="row"
+              className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              <div className="flex items-center mr-3">
+                <img src={supplier.image} className="h-8 w-auto mr-3" />
+                {supplier.name}
+              </div>
+            </th>
+            <td className="px-4 py-3">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                {supplier.address}
+              </span>
+            </td>
+            <td className="px-4 py-3">
+              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                {supplier.phone}
+              </span>
+            </td>
+            <td className="py-4 px-6">
+              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                {supplier.status === "active" ? "Hiển thị" : "Đã ẩn"}
+              </span>
+            </td>
+            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  data-modal-target="delete-modal"
+                  data-modal-toggle="delete-modal"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleDelete(supplier._id)}
+                >
+                  Xoá
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => handleRestore(supplier._id)}
+                >
+                  Khôi phục
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+export default softDeleteListSupplier;

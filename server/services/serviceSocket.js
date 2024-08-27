@@ -10,7 +10,8 @@ class SocketService {
         // event on here
         socket.on('chat message', msg => {
             console.log(`msg is:::${msg}`);
-            _io.emit('chat message', msg);  // Ensure _io is properly defined and initialized
+          _io.emit('chat message', msg); 
+
         });
 
         // on room...

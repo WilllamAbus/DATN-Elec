@@ -80,6 +80,16 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/recycleBin", label: "Danh sách xóa mềm" },
   ],
+  recycleBinSupplier: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinSupplier", label: "Danh sách xóa mềm nhà cung cấp" },
+  ],
+  recycleBinBrand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinBrand", label: "Danh sách xóa mềm thương hiệu" },
+  ],
   recycleBinCate: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },

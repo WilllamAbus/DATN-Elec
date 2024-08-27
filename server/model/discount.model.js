@@ -9,6 +9,7 @@ const discountSchema = new Schema(
     disabledAt: { type: Date, default: null },
   },
   {
+    collection:'discounts',
     timestamps:true
   }
  
