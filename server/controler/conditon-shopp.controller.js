@@ -1,19 +1,11 @@
 'use strict'
-//module
 const conditionService = require('../services/condition-shopp.service');
-
-
-
 
 const conditionController ={
     createCondition : async (req, res) => {
         try {
             const conditionData = req.body;
-        
-            // Call the service to create a Condition
             const newCondition = await conditionService.createCondition(conditionData );
-        
-            // Send a successful response
             res.status(201).json(newCondition);
           } catch (error) {
             console.error('Error creating Condition:', error.message);
@@ -23,12 +15,7 @@ const conditionController ={
 
       getAllCondition : async (req, res) => {
         try {
-       
-        
-            // Call the service function to get paginated Conditions
             const condition = await conditionService.getAllCondition();
-        
-            // Send the response
          
           res.status(200).json({data: condition});
           

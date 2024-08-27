@@ -8,7 +8,6 @@ const categorySchema = Schema(
     path: { type: String, required: true },
     imgURL: { type: String, required: true },
    
-  // Add this field
   },
   {
     collection: "categories",

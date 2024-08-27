@@ -118,7 +118,7 @@ const supplierList: React.FC = () => {
             </th>
             <td className="px-4 py-3">{supplier.address}</td>
             <td className="px-4 py-3">{supplier.phone}</td>
-            <td className="py-4 px-6 border-b border-grey-light">
+            <td className="py-4 px-6">
               <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
                 {supplier.status === "active" ? "Hiển thị" : "Đã ẩn"}
               </span>

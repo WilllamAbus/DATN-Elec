@@ -6,15 +6,12 @@ const productV2Schema = new Schema(
     product_imgage: { type: [String], required: true },
     product_description: { type: String, required: true },
     product_slug: String,
-    product_type: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "categories", // Reference to Category model
-      },
-    ],
-
-    product_brands: { type: Schema.Types.ObjectId, ref: "Brand" },
+    product_type: {
+      type: Schema.Types.ObjectId,
+      ref: "categories",
+    },
     product_discount: { type: Schema.Types.ObjectId, ref: "discounts" },
+    product_brand: { type: Schema.Types.ObjectId, ref: "brands" },
     product_format: { type: Schema.Types.ObjectId, ref: "formatShopping" },
     product_condition: {
       type: Schema.Types.ObjectId,
@@ -42,8 +39,8 @@ const productV2Schema = new Schema(
     disabledAt: { type: Date, default: null },
   },
   {
-    collection: "product_v2", // Name of the collection
-    timestamps: true, // Automatically add `createdAt` and `updatedAt` fields
+    collection: "product_v2",
+    timestamps: true,
   }
 );
 
@@ -52,4 +49,4 @@ productV2Schema.pre("save", function (next) {
   next();
 });
 
-module.exports = model("product_v2", productV2Schema);
+module.exports = model("product_v2.", productV2Schema);

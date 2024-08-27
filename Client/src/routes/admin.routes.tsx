@@ -10,6 +10,8 @@ const AdminListCategories = React.lazy(() => import("../page/Admin/categories/li
 const AdminAddProducts = React.lazy(() => import("../page/Admin/products/addProd"));
 const AdminEditProducts = React.lazy(() => import("../page/Admin/products/editProd"));
 const AdminListProducts = React.lazy(() => import("../page/Admin/products/listProd"));
+/**ProductsV2 */
+const AdminAddProductV2 = React.lazy(() => import("../page/Admin/productV2/add"));
 /**Brands */
 const AdminAddBrands = React.lazy(
   () => import("../page/Admin/brands/addBrands")
@@ -66,6 +68,9 @@ const AdminRecycleBinCate = React.lazy(() => import("../page/Admin/recycleBinCat
 const AdminRecycleBin = React.lazy(() => import("../page/Admin/recycleBin/SoftDeletedProduct"));
 const AdminRecycleBinOrder = React.lazy(() => import("../page/Admin/orders/recycleBinOrder"));
 const AdminRecycleBinVoucher = React.lazy(() => import("../page/Admin/vouchers/softDelVoucher"));
+const AdminRecycleBinSupplier = React.lazy(() => import("../page/Admin/recycleBinSupplier/SoftDeletedSupplier"));
+const AdminRecycleBinBrand = React.lazy(() => import("../page/Admin/recycleBinBrand/SoftDeletedBrand"));
+
 
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
@@ -81,6 +86,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "addCategories", element: <AdminAddCategories /> },
       { path: "editCategories/:id", element: <AdminEditCategories /> },
       { path: "listCategories", element: <AdminListCategories /> },
+      { path: "addproduct", element: <AdminAddProductV2 /> },
       { path: "addProducts", element: <AdminAddProducts /> },
       { path: "editProducts/:id", element: <AdminEditProducts /> },
       { path: "listProducts", element: <AdminListProducts /> },
@@ -110,6 +116,8 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinCate", element: <AdminRecycleBinCate /> },
       { path: "recycleBinOrder", element: <AdminRecycleBinOrder /> },
       { path: "recycleBinVoucher", element: <AdminRecycleBinVoucher /> },
+      { path: "recycleBinSupplier", element: <AdminRecycleBinSupplier /> },
+      { path: "recycleBinBrand", element: <AdminRecycleBinBrand /> },
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },

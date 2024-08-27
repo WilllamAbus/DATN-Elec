@@ -24,6 +24,12 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
   ],
+  //addproduct v2
+  addproduct: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addproduct", label: "Thêm sản phẩm" },
+  ],
   addSuppliers: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -73,6 +79,16 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/recycleBin", label: "Danh sách xóa mềm" },
+  ],
+  recycleBinSupplier: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinSupplier", label: "Danh sách xóa mềm nhà cung cấp" },
+  ],
+  recycleBinBrand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinBrand", label: "Danh sách xóa mềm thương hiệu" },
   ],
   recycleBinCate: [
     { href: "/", label: "Home" },

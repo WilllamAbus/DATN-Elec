@@ -293,7 +293,6 @@ export default function Example() {
                   </Disclosure>
                 ))}
               </form>
-
               {/* Product grid */}
               <div className="lg:col-span-3">
                 <AllProduct/>

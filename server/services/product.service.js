@@ -1,4 +1,4 @@
-const Product = require('../model/product.model'); // Đảm bảo đường dẫn đúng
+const Product = require('../model/product.model');
 
 const ProductService = {
   getProductLimitService: (page) => new Promise(async (resolve, reject) => {

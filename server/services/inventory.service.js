@@ -2,66 +2,109 @@
 
 const _Product_v2 = require('../model/product-v2.model')
 const _Supplier = require("../model/suppliers.model")
-const _Inventory = require('../model/inventory.model')
+const _Inventory = require('../model/inventories/inventory.model')
 
 
 const inventoryService = {
-    createInventory:async(inventoryData)=>{
-        const inventory = new _Inventory({
-            product: inventoryData.product,
-            quantity: inventoryData.quantity,
-            location: inventoryData.location,
-            restockLevel: inventoryData.restockLevel,
-            restockDate: inventoryData.restockDate,
-            batchNumber: inventoryData.batchNumber,
-            batchDate: inventoryData.batchDate,
-            supplier: inventoryData.supplier,
-            reservations: inventoryData.reservations,
-            auctionQuantity: inventoryData.auctionQuantity,
-    
-          });
-    
-          // Save the new Inventory document
-          await inventory.save();
-
-          await populateProductV2(inventory);
-          await populateSupplier(inventory);
-          return inventory
-    },
-    editInventory : async (inventoryId, updatedData) => {
+    createInventory : async (inventoryData) => {
         try {
-            // Find the inventory document by ID and update it with the new data
-            const inventory = await _Inventory.findByIdAndUpdate(
-                inventoryId, // The ID of the inventory to be updated
-                {
-                    $set: {
-                        product: updatedData.product,
-                        quantity: updatedData.quantity,
-                        location: updatedData.location,
-                        restockLevel: updatedData.restockLevel,
-                        restockDate: updatedData.restockDate,
-                        batchNumber: updatedData.batchNumber,
-                        batchDate: updatedData.batchDate,
-                        supplier: updatedData.supplier,
-                        reservations: updatedData.reservations,
-                        auctionQuantity: updatedData.auctionQuantity,
-                    }
-                },
-                { new: true } // Return the updated document
-            );
+            // Tìm bản ghi tồn kho hiện có (nếu có)
+            const existingInventory = await _Inventory.findOne({ product: inventoryData.product, location: inventoryData.location });
     
-            if (!inventory) {
-                throw new Error('Inventory not found');
+            let quantityInventory;
+            if (existingInventory) {
+                // Cộng dồn số lượng mới nhập với số lượng tồn kho hiện tại
+                quantityInventory = existingInventory.quantityInventory + inventoryData.quantity;
+            } else {
+                // Nếu không có bản ghi tồn kho trước đó, thì số lượng tồn kho bằng với số lượng nhập mới
+                quantityInventory = inventoryData.quantity;
             }
     
-            // Populate referenced fields after update
+            // Tính toán các giá trị cho inventoryPrice và totalValue
+            const inventoryPrice = inventoryData.newPrice * quantityInventory;
+            const totalValue = inventoryData.newPrice * quantityInventory;
+    
+            const inventory = new _Inventory({
+                product: inventoryData.product,
+                quantity: inventoryData.quantity, // Số lượng nhập mới
+                location: inventoryData.location,
+                restockLevel: inventoryData.restockLevel,
+                restockDate: inventoryData.restockDate,
+                batchNumber: inventoryData.batchNumber,
+                batchDate: inventoryData.batchDate,
+                supplier: inventoryData.supplier,
+                reservations: inventoryData.reservations || [],
+                newPrice: inventoryData.newPrice,
+                inventoryPrice: inventoryPrice,
+                quantityInventory: quantityInventory, // Số lượng tồn kho
+                totalValue: totalValue,
+              // Cập nhật thời gian gần nhất
+            });
+    
+            // Lưu trữ tài liệu Inventory mới
+            await inventory.save();
+    
+            // Populate để lấy thông tin chi tiết của product và supplier
             await populateProductV2(inventory);
             await populateSupplier(inventory);
     
             return inventory;
         } catch (error) {
-            console.error('Error updating inventory:', error);
-            throw new Error('Failed to update inventory');
+            console.error('Error creating inventory:', error);
+            throw new Error('Failed to create inventory');
+        }
+    },
+    editInventory : async (inventoryId, inventoryData) => {
+        try {
+            // Tìm bản ghi tồn kho hiện có
+            const existingInventory = await _Inventory.findById(inventoryId);
+            if (!existingInventory) {
+                throw new Error('Inventory record not found');
+            }
+    
+            // Tính toán số lượng tồn kho mới
+            let quantityInventory;
+            if (existingInventory) {
+                // Cập nhật số lượng tồn kho hiện tại
+                quantityInventory = existingInventory.quantityInventory - existingInventory.quantity + inventoryData.quantity;
+            } else {
+                quantityInventory = inventoryData.quantity;
+            }
+    
+            // Tính toán các giá trị cho inventoryPrice và totalValue
+            const inventoryPrice = inventoryData.newPrice * quantityInventory;
+            const totalValue = inventoryData.newPrice * quantityInventory;
+    
+            // Cập nhật thông tin tồn kho
+            existingInventory.product = inventoryData.product || existingInventory.product;
+            existingInventory.quantity = inventoryData.quantity; // Số lượng nhập mới
+            existingInventory.location = inventoryData.location || existingInventory.location;
+            existingInventory.restockLevel = inventoryData.restockLevel || existingInventory.restockLevel;
+            existingInventory.restockDate = inventoryData.restockDate || existingInventory.restockDate;
+            existingInventory.batchNumber = inventoryData.batchNumber || existingInventory.batchNumber;
+            existingInventory.batchDate = inventoryData.batchDate || existingInventory.batchDate;
+            existingInventory.supplier = inventoryData.supplier || existingInventory.supplier;
+            existingInventory.reservations = inventoryData.reservations || existingInventory.reservations;
+            existingInventory.newPrice = inventoryData.newPrice || existingInventory.newPrice;
+            existingInventory.inventoryPrice = inventoryPrice;
+            existingInventory.quantityInventory = quantityInventory; // Số lượng tồn kho
+            existingInventory.totalValue = totalValue;
+            existingInventory.isActive = inventoryData.isActive !== undefined ? inventoryData.isActive : existingInventory.isActive;
+            existingInventory.status = inventoryData.status || existingInventory.status;
+            existingInventory.disabledAt = inventoryData.disabledAt || existingInventory.disabledAt;
+            existingInventory.updatedAt = Date.now(); // Cập nhật thời gian gần nhất
+    
+            // Lưu trữ tài liệu Inventory đã cập nhật
+            await existingInventory.save();
+    
+            // Populate để lấy thông tin chi tiết của product và supplier
+            await populateProductV2(existingInventory);
+            await populateSupplier(existingInventory);
+    
+            return existingInventory;
+        } catch (error) {
+            console.error('Error editing inventory:', error);
+            throw new Error('Failed to edit inventory');
         }
     },
     

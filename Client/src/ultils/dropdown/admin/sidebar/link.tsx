@@ -12,6 +12,10 @@ export const links: Record<string, Link[]> = {
     { label: "Sản phẩm", to: "/admin/listProducts" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
+  productv2: [
+    { label: "Sản phẩm", to: "/admin/listProducts" },
+    { label: "Mã giảm giá", to: "/admin/listVouchers" },
+  ],
   supplier: [
     { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
   ],
@@ -21,7 +25,9 @@ export const links: Record<string, Link[]> = {
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },
-    { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
+    { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
+    { label: "Nhà cung cấp", to: "/admin/recycleBinSupplier" },
+    { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
     { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
   ],
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],

@@ -35,20 +35,15 @@ const productService = {
             const file = bucket.file(`products/${fileName}`, `productAuction/${fileName}`);
     
             try {
-                // Upload the image to Firebase Storage
                 await file.save(image.buffer, {
                     metadata: {
                         contentType: image.mimetype,
                     },
                 });
-    
-                // Make the file publicly accessible
                 await file.makePublic();
-    
-                // Generate the public URL for the uploaded image
+
                 const imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
-    
-                // Add the image URL to the array
+
                 imageUrls.push(imageURL);
     
             } catch (err) {
@@ -64,24 +59,17 @@ const productService = {
    
         const newProduct = new Product({
             product_name: productData.product_name,
-            product_imgage: imageUrls, // Save the array of image URLs
+            product_imgage: imageUrls,
             product_description: productData.product_description,
-            product_attributes: productData.product_attributes, // Include attributes like color, brand, etc.
+            product_attributes: productData.product_attributes,
             product_type: productData.product_type,
             product_condition: productData.product_condition,
             product_format: productData.product_format,
             product_discount: productData.product_discount,
-            product_quantity: productData.product_quantity, // Add quantity
+            product_quantity: productData.product_quantity, 
             product_price: productData.product_price,
-            product_brands:productData.product_brands
-             // Add price
-            // Include any other fields as needed
         });
-    
-        // Save the product to the database
         await newProduct.save();
-    
-        // Populate necessary fields before returning
         await populateCate(newProduct);
         await populateCondition(newProduct);
         await populateFormatShopping(newProduct);
@@ -91,20 +79,15 @@ const productService = {
     },
     edditProductV2: async(id, updatedData, newImages)=>{
         try {
-            // Find the existing product by ID
             const product = await Product_v2.findById(id);
     
             if (!product) {
                 throw new Error('Product not found');
             }
-    
-            // If new images are provided, upload them and update the product images
             if (newImages && newImages.length > 0) {
                 const imageUrls = await uploadImagesToFirebase(newImages);
-                product.product_imgage = imageUrls; // Replace with new image URLs
+                product.product_imgage = imageUrls;
             }
-    
-            // Update other product fields if provided
             product.product_name = updatedData.product_name || product.product_name;
             product.product_description = updatedData.product_description || product.product_description;
             product.product_attributes = updatedData.product_attributes || product.product_attributes;
@@ -114,11 +97,7 @@ const productService = {
             product.product_discount = updatedData.product_discount || product.product_discount;
             product.product_quantity = updatedData.product_quantity || product.product_quantity;
             product.product_price = updatedData.product_price || product.product_price;
-    
-            // Save the updated product to the database
             await product.save();
-    
-            // Populate necessary fields before returning the updated product
             await populateCate(product);
             await populateCondition(product);
             await populateFormatShopping(product);
@@ -131,16 +110,16 @@ const productService = {
         }
     },
     getAllProduct: async(page = 1, pageSize = 4)=>{
-        const limit = parseInt(pageSize, 4); // Number of products per page
-        const skip = (parseInt(page, 4) - 1) * limit; // Number of products to skip
+        const limit = parseInt(pageSize, 4); 
+        const skip = (parseInt(page, 4) - 1) * limit; 
     
         try {
-            const products = await Product_v2.find({ status: { $ne: 'disable' } }) // Filter out disabled products
+            const products = await Product_v2.find({ status: { $ne: 'disable' } })
                 .limit(limit)
                 .skip(skip)
                 .exec();
     
-            const totalProducts = await Product_v2.countDocuments({ status: { $ne: 'disable' } }); // Get the total number of products
+            const totalProducts = await Product_v2.countDocuments({ status: { $ne: 'disable' } }); 
             const totalPages = Math.ceil(totalProducts / limit);
     
             return {
@@ -160,24 +139,8 @@ const productService = {
 
     softDeleteProduct: async (id) => {
         try {
-            // const adminRole = await Role.findOne({ name: 'admin' });
-    
-    
-            // if (!adminRole) {
-            //     return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            // }
-    
-    
-            // const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-            // if (!isAdmin) {
-            //     return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể cập nhật sản phẩm" });
-            // }
-            const nowUtc = new Date();
-        
-            // Chuyển đổi thời gian UTC về múi giờ Việt Nam
-            // Múi giờ Việt Nam là UTC + 7 giờ
-            const offset = 7 * 60 * 60 * 1000; // 7 giờ tính bằng mili giây
+
+            const offset = 7 * 60 * 60 * 1000; 
             const now = new Date(nowUtc.getTime() + offset);
         
             const softDeleteProduct = await Product_v2.findByIdAndUpdate(
