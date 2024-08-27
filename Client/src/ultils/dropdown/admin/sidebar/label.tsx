@@ -1,5 +1,3 @@
-
-
 export const labels: Record<string, string> = {
   account: "Tài khoản",
   product: "Sản phẩm",
@@ -9,4 +7,5 @@ export const labels: Record<string, string> = {
   categories: "Danh mục",
   comment: "Tương tác",
   homeAdmin: "Trang chủ",
+  productv2: "Sản phẩmv2",
 };

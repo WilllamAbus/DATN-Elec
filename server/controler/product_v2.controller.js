@@ -7,7 +7,7 @@ const productController = {
     createProduct : async (req, res) => {
         try {
             const productData = req.body;
-            const images = req.files; // Assuming images are uploaded as files
+            const images = req.files;
             
             const newProduct = await productService.createProductV2(productData, images);
             
