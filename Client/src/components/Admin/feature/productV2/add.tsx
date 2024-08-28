@@ -1,147 +1,110 @@
-import React, { useEffect, useState } from "react";
-
+import React, { useState } from "react";
+import { NumericFormat } from "react-number-format";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Category } from "../../../../types/Categories.d";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { notify } from "../../../../ultils/success";
+import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
 import { ProductV2 } from "../../../../types/ProductV2";
-import { getListCategories } from "../../../../services/product/crudProduct.service";
-import { addProductV2 } from "../../../../services/product_v2/add";
-import { NumericFormat } from "react-number-format";
-import ColorSelect from "./ColorSelect/colorSelect";
-
-interface Option {
-  value: string;
-  label: string;
-  color: string;
-}
+import { addProductV2 } from "../../../../services/product_v2/admin/add";
 import {
-  selectBrand,
-  selectSupplier,
-  selectDiscount,
-  selectProductFormat,
-  selectConditionShopping,
-} from "../../../../services/product_v2/select";
+  ColorOption,
+  RamOption,
+  ScreenOption,
+  CPUOption,
+  CardOption,
+  BatteryOption,
+} from "./types";
 import {
-  Brand,
-  Supplier,
-  Discount,
-  ProductFormat,
-  ConditionShopping,
-} from "../../../../services/product_v2/types";
+  RamSelect,
+  ColorSelect,
+  ScreenSelect,
+  CpuSelect,
+  CardSelect,
+  BatterySelect,
+} from "./select";
+import {
+  handleRamChange,
+  handleColorChange,
+  handleScreenChange,
+  handleCPUChange,
+  handleCardChange,
+  handleBatteryChange,
+} from "./handlers";
+import { selectFetchData } from "./FetchData";
+import { DiscountSelect, CategorySelect, BrandSelect, SupplierSelect } from "./select";
+import { ApiResponse } from "../../../../services/product_v2/admin/types";
 import { MultiValue } from "react-select";
 const AddProduct: React.FC = () => {
   const {
     register,
     setValue,
+    getValues,
     handleSubmit,
     formState: { errors },
-  } = useForm<ProductV2>();
-  const [categories, setCategories] = useState<Category[]>([]);
+  } = useForm<ProductV2>({
+    defaultValues: {
+      product_attributes: [],
+    },
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
   const { imgPreview, handleImageChange } = useImageUpload();
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [productFormats, setProductFormats] = useState<ProductFormat[]>([]);
-  const [conditionShoppingList, setConditionShoppingList] = useState<ConditionShopping[]>([]);
-  const [selectedColors, setSelectedColors] = useState<MultiValue<Option>>([]);
+  const [selectedRam, setSelectedRam] = useState<MultiValue<RamOption>>([]);
+  const [selectedColors, setSelectedColors] = useState<MultiValue<ColorOption>>([]);
+  const [selectedScreen, setSelectedScreen] = useState<MultiValue<ScreenOption>>([]);
+  const [selectedCPU, setSelectedCPU] = useState<MultiValue<CPUOption>>([]);
+  const [selectedCard, setSelectedCard] = useState<MultiValue<CardOption>>([]);
+  const [selectedBattery, setSelectedBattery] = useState<MultiValue<BatteryOption>>([]);
+
+  const onColorChange = (selectedOptions: MultiValue<ColorOption>) => {
+    handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
+  };
+
+  const onRamChange = (selectedOptions: MultiValue<RamOption>) => {
+    handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
+  };
+  const onScreenChange = (selectedOptions: MultiValue<ScreenOption>) => {
+    handleScreenChange(selectedOptions, setSelectedScreen, setValue, getValues);
+  };
+  const onCPUChange = (selectedOptions: MultiValue<CPUOption>) => {
+    handleCPUChange(selectedOptions, setSelectedCPU, setValue, getValues);
+  };
+  const onCardChange = (selectedOptions: MultiValue<CardOption>) => {
+    handleCardChange(selectedOptions, setSelectedCard, setValue, getValues);
+  };
+  const onBatteryChange = (selectedOptions: MultiValue<BatteryOption>) => {
+    handleBatteryChange(selectedOptions, setSelectedBattery, setValue, getValues);
+  };
 
   const navigate = useNavigate();
-  const onColorChange = (selectedOptions: MultiValue<Option>) => {
-    setSelectedColors(selectedOptions);
-    const colors = selectedOptions.map((option) => option.value);
-    setValue("product_attributes", colors);
-  };
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getListCategories();
-        setCategories(data.cateReady || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const data = await selectBrand();
-        setBrands(data);
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-      }
-    };
-
-    fetchBrands();
-  }, []);
-  useEffect(() => {
-    const fetchSuppliers = async () => {
-      try {
-        const data = await selectSupplier();
-        setSuppliers(data);
-      } catch (error) {
-        console.error("Error fetching suppliers:", error);
-      }
-    };
-
-    fetchSuppliers();
-  }, []);
-  useEffect(() => {
-    const fetchDiscounts = async () => {
-      try {
-        const data = await selectDiscount();
-        setDiscounts(data);
-      } catch (error) {
-        console.error("Error fetching discounts:", error);
-      }
-    };
-
-    fetchDiscounts();
-  }, []);
-  useEffect(() => {
-    const fetchProductFormats = async () => {
-      try {
-        const formats = await selectProductFormat();
-        setProductFormats(formats);
-      } catch (error) {
-        console.error("Error fetching discounts:", error);
-      }
-    };
-
-    fetchProductFormats();
-  }, []);
-  useEffect(() => {
-    const fetchConditionShopping = async () => {
-      try {
-        const conditions = await selectConditionShopping();
-        setConditionShoppingList(conditions);
-      } catch (error) {
-        console.error("Error fetching discounts:", error);
-      }
-    };
-
-    fetchConditionShopping();
-  }, []);
+  const { brands, suppliers, discounts, productFormats, conditionShoppingList, categories } =
+    selectFetchData();
 
   const submitFormAdd: SubmitHandler<ProductV2> = async (data) => {
+    setIsLoading(true);
     try {
-      await addProductV2(data);
-      notify();
-      setTimeout(() => {
-        navigate("/admin/listProducts");
-      }, 2000);
+      const response: ApiResponse<ProductV2> = await addProductV2(data);
+      console.log(response);
+
+      if (response.success) {
+        notify(response.msg);
+        setTimeout(() => {
+          navigate("/admin/listProducts");
+        }, 2000);
+      } else {
+        notifyError(response.msg);
+      }
     } catch (error) {
-      console.error("Error:", error);
+      notifyError("Có lỗi xảy ra khi thêm sản phẩm.");
+    } finally {
+      setIsLoading(false);
     }
-    console.log("Data to send:", data);
   };
+
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
       <ToastContainer />
@@ -182,116 +145,28 @@ const AddProduct: React.FC = () => {
           </div>
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">Danh mục &amp; Giảm giá</h3>
-            <div className="mb-4">
-              <label
-                htmlFor="settings-language"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Danh mục sản phẩm
-              </label>
-              <select
-                id="product_type"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                {...register("product_type", { required: "ID danh mục không được bỏ trống" })}
-              >
-                <option value="">Chọn danh mục</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {errors.product_type && (
-                <span className="text-red-600">{errors.product_type.message}</span>
-              )}
-            </div>
-            <div className="mb-6">
-              <label
-                htmlFor="product_discount"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Chương trình giảm giá
-              </label>
-              <select
-                id="product_discount"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                {...register("product_discount")}
-              >
-                <option value="">Chọn chương trình giảm giá</option>
-                {discounts.map((discount) => (
-                  <option key={discount._id} value={discount._id}>
-                    {discount.discountPercent}
-                  </option>
-                ))}
-              </select>
-              {errors.product_discount && (
-                <span className="text-red-600">{errors.product_discount.message?.toString()}</span>
-              )}
-            </div>
+            <CategorySelect
+              categories={categories}
+              register={register}
+              error={errors.product_type}
+            />
+            <DiscountSelect
+              discounts={discounts}
+              register={register}
+              error={errors.product_discount}
+            />
           </div>
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">
               Thương hiệu &amp; Màu sắc
             </h3>
-            <div className="mb-4">
-              <label
-                htmlFor="settings-language"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Thương hiệu
-              </label>
-              <select
-                id="product_brand"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                {...register("product_brand")}
-              >
-                <option value="">Chọn thương hiệu</option>
-                {brands.map((brand) => (
-                  <option key={brand._id} value={brand._id}>
-                    {brand.name}
-                  </option>
-                ))}
-              </select>
-              {errors.product_brand && (
-                <span className="text-red-600">{errors.product_brand.message?.toString()}</span>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Màu sắc
-              </label>
-              <ColorSelect value={selectedColors} onChange={onColorChange}  />
-              {errors.product_attributes && (
-                <span className="text-red-600">
-                  {errors.product_attributes.message?.toString()}
-                </span>
-              )}
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="supplier-select"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Nhà cung cấp
-              </label>
-              <select
-                id="product_supplier"
-                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                {...register("product_supplier")}
-              >
-                <option value="">Chọn nhà cung cấp</option>
-                {suppliers.map((supplier) => (
-                  <option key={supplier._id} value={supplier._id}>
-                    {supplier.name}
-                  </option>
-                ))}
-              </select>
-              {errors.product_supplier && (
-                <span className="text-red-600">{errors.product_supplier.message?.toString()}</span>
-              )}
-            </div>
+            <BrandSelect brands={brands} register={register} error={errors.product_brand} />
 
-
+            <SupplierSelect
+              suppliers={suppliers}
+              register={register}
+              error={errors.product_supplier}
+            />
           </div>
         </div>
         <div className="col-span-full xl:col-auto">
@@ -301,10 +176,10 @@ const AddProduct: React.FC = () => {
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6 sm:col-span-3">
                 <label
-                  htmlFor="first-name"
+                  htmlFor="name"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Tên sản phẩm
+                  Tên sản phẩm
                 </label>
                 <input
                   type="text"
@@ -314,20 +189,17 @@ const AddProduct: React.FC = () => {
                   {...register("product_name", {
                     required: {
                       value: true,
-                      message: "Tên không được để trống",
-                    },
-                    minLength: {
-                      value: 5,
-                      message: "5 ký tự",
+                      message: "Tên không được để trống",
                     },
                   })}
                 />
                 {errors.product_name && (
-                  <span className="text-red-500 text-xs italic">
-                    {errors.product_name.message?.toString()}
-                  </span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.product_name.message}</span>
+                  </div>
                 )}
               </div>
+
               <div className="col-span-6 sm:col-span-3">
                 <label
                   htmlFor="product_price"
@@ -338,7 +210,6 @@ const AddProduct: React.FC = () => {
                 <NumericFormat
                   id="product_price"
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Green"
                   thousandSeparator="."
                   decimalSeparator=","
                   suffix=" đ"
@@ -349,20 +220,23 @@ const AddProduct: React.FC = () => {
                       message: "Giá sản phẩm không thể thấp hơn 1000",
                     },
                     max: {
-                      value: 1000000000,
-                      message: "Giá sản phẩm không thể vượt quá 1000000",
+                      value: 2000000000,
+                      message: "Giá sản phẩm không thể vượt quá 2000000000",
                     },
                     valueAsNumber: true,
                   })}
-                  onValueChange={(values: { floatValue: number | undefined }) => {
+                  onValueChange={(values) => {
                     const { floatValue } = values;
                     setValue("product_price", floatValue ?? 0);
                   }}
                 />
                 {errors.product_price && (
-                  <span className="text-red-600">{errors.product_price.message}</span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.product_price.message}</span>
+                  </div>
                 )}
               </div>
+
               <div className="col-span-6 sm:col-span-3">
                 <label
                   htmlFor="quantity"
@@ -376,36 +250,47 @@ const AddProduct: React.FC = () => {
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   {...register("product_quantity", {
                     required: "Số lượng không được bỏ trống",
-                    min: { value: 11, message: "Số lượng phải lớn hơn 11" },
+                    min: { value: 0, message: "Số lượng phải lớn hơn 0" },
                     validate: (value) => !isNaN(value) || "Số lượng sản phẩm phải là số",
                   })}
                 />
                 {errors.product_quantity && (
-                  <span className="text-red-500 text-xs italic">
-                    {errors.product_quantity.message?.toString()}
-                  </span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.product_quantity.message}</span>
+                  </div>
                 )}
               </div>
               <div className="col-span-6 sm:col-span-3">
                 <label
-                  htmlFor="weight"
+                  htmlFor="weight_g"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Khối lượng
+                  Khối lượng (kg)
                 </label>
-                <input
-                  type="text"
+                <NumericFormat
                   id="weight_g"
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  suffix=" kg"
+                  decimalScale={2}
+                  fixedDecimalScale={true}
                   {...register("weight_g", {
                     required: "Khối lượng không được bỏ trống",
-                    validate: (value) => !isNaN(value) || "Khối lượng sản phẩm phải là số",
+                    min: {
+                      value: 0.01,
+                      message: "Khối lượng phải lớn hơn 0",
+                    },
                   })}
+                  onValueChange={(values: { floatValue: number | undefined }) => {
+                    const { floatValue } = values;
+                    setValue("weight_g", floatValue ?? 0);
+                  }}
                 />
                 {errors.weight_g && (
-                  <span className="text-red-500 text-xs italic">
-                    {errors.weight_g.message?.toString()}
-                  </span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.weight_g.message}</span>
+                  </div>
                 )}
               </div>
 
@@ -441,7 +326,9 @@ const AddProduct: React.FC = () => {
                   {...register("createdAt", { required: "Ngày nhập không được bỏ trống" })}
                 />
                 {errors.createdAt && (
-                  <span className="text-red-600">{errors.createdAt.message}</span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.createdAt.message}</span>
+                  </div>
                 )}
               </div>
 
@@ -465,7 +352,9 @@ const AddProduct: React.FC = () => {
                   ))}
                 </select>
                 {errors.product_format && (
-                  <span className="text-red-600">{errors.product_format.message?.toString()}</span>
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.product_format.message}</span>
+                  </div>
                 )}
               </div>
               <div className="col-span-6 sm:col-span-3">
@@ -490,8 +379,74 @@ const AddProduct: React.FC = () => {
                   ))}
                 </select>
                 {errors.product_condition && (
+                  <div className="flex items-center mt-2 text-red-600">
+                    <span className="text-sm font-medium">{errors.product_condition.message}</span>
+                  </div>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Dung lượng RAM
+                </label>
+                <RamSelect value={selectedRam} onChange={onRamChange} />
+                {errors.product_attributes && (
                   <span className="text-red-600">
-                    {errors.product_condition.message?.toString()}
+                    {errors.product_attributes.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Màn hình
+                </label>
+                <ScreenSelect value={selectedScreen} onChange={onScreenChange} />
+                {errors.product_attributes && (
+                  <span className="text-red-600">
+                    {errors.product_attributes.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  CPU
+                </label>
+                <CpuSelect value={selectedCPU} onChange={onCPUChange} />
+                {errors.product_attributes && (
+                  <span className="text-red-600">
+                    {errors.product_attributes.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Màu sắc
+                </label>
+                <ColorSelect value={selectedColors} onChange={onColorChange} />
+                {errors.product_attributes && (
+                  <span className="text-red-600">
+                    {errors.product_attributes.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Card Đồ Họa
+                </label>
+                <CardSelect value={selectedCard} onChange={onCardChange} />
+                {errors.product_attributes && (
+                  <span className="text-red-600">
+                    {errors.product_attributes.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Pin
+                </label>
+                <BatterySelect value={selectedBattery} onChange={onBatteryChange} />
+                {errors.product_attributes && (
+                  <span className="text-red-600">
+                    {errors.product_attributes.message?.toString()}
                   </span>
                 )}
               </div>
@@ -707,9 +662,38 @@ const AddProduct: React.FC = () => {
             <div className="col-span-6 sm:col-full">
               <button
                 type="submit"
-                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
               >
-                Thêm sản phẩm
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <svg
+                      className="animate-spin mr-2 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
+                    </svg>
+                    Đang thêm...
+                  </div>
+                ) : (
+                  "Thêm sản phẩm"
+                )}
               </button>
             </div>
           </div>

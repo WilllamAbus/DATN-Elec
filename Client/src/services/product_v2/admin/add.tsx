@@ -1,8 +1,11 @@
-import instance from "../axios";
-import { ProductV2 } from "../../types/ProductV2";
-export const addProductV2 = async (product: ProductV2) => {
+import instance from "../../axios";
+import { ProductV2 } from "../../../types/ProductV2";
+import { ApiResponse } from "./types";
+import { AxiosError } from "axios";
+export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<ProductV2>> => {
+  
   try {
-    const formData = new FormData();
+    const formData = new FormData();   
     formData.append("product_name", product.product_name);
     formData.append("product_description", product.product_description);
     formData.append("product_type", product.product_type);
@@ -20,18 +23,34 @@ export const addProductV2 = async (product: ProductV2) => {
         formData.append("image", product.image[i]);
       }
     } else {
-      console.warn("No images provided");
+      console.warn("ko có ảnh");
     }
-
-    const response = await instance.post("/product_v2/add", formData, {
+    const response = await instance.post("/admin/product/add", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
     return response.data;
   } catch (error) {
-    console.error("Error adding product:", error);
-    throw error;
+
+    if (error instanceof AxiosError) {
+      console.error("Lỗi từ API:", error.response?.data);
+      return {
+        success: false,
+        err: error.response?.data.err || 1,
+        msg: error.response?.data.msg || "Đã xảy ra lỗi",
+        status: error.response?.status || 500,
+        error: error.message,
+      };
+    } else {
+      console.error("Lỗi không xác định khi thêm sản phẩm:", error);
+      return {
+        success: false,
+        err: 1,
+        msg: "Có lỗi xảy ra khi thêm sản phẩm",
+        status: 500,
+        error: "Đã xảy ra lỗi không mong muốn",
+      };
+    }
   }
 };

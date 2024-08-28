@@ -14,7 +14,7 @@ const useProductState = () => {
     product_supplier: "",
     product_quantity: 0,
     product_price: 0,
-    product_attributes: {},
+    product_attributes: [],
     weight_g: 0,
     image: undefined,
   });

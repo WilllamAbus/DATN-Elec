@@ -4,6 +4,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Sản phẩm" },
     { href: "/admin/listProducts", label: "Danh sách sản phẩm" },
   ],
+  listproduct: [
+    { href: "/admin", label: "Home" },
+    { href: "/admin", label: "Sản phẩm" },
+    { href: "/admin/listproduct", label: "Danh sách sản phẩm" },
+  ],
   listSuppliers: [
     { href: "/admin", label: "Home" },
     { href: "/admin", label: "Nhà cung cấp" },

@@ -1,4 +1,4 @@
-export interface ProductV2 {
+export interface Product {
   product_name: string;
   product_description: string;
   product_type: string;
@@ -10,7 +10,20 @@ export interface ProductV2 {
   product_condition: string;
   product_quantity: number;
   product_price: number;
-  product_attributes: { k: string; v: string }[]; 
+  product_attributes: { k: string; v: string }[];
   weight_g: number;
   image?: FileList;
+}
+export interface ProductAttribute {
+  k: string;
+  v: string;
+  _id: string; 
+}
+export interface HomeAllProductResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  products: Product[];
+  error?: string;
 }
