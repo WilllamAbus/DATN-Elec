@@ -1,13 +1,15 @@
 import instance from "../axios";
 
-export const listBrands = async () => {
+export const listBrands = async (page = 1, limit = 5) => {
   try {
     
-    const response = await instance.get("/brands/list");
-    if (response.data && response.data.brands) {
-      return response.data.brands;
-    } else {
-      console.error('Unexpected data format:', response.data);
+    const response = await instance.get(`/brands/list?page=${page}&limit=${limit}`);
+    if (response.data.success) {
+      return {
+        data: response.data.data,
+        totalPages: response.data.totalPages,
+      };
+    }else {
       throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách thương hiệu");
     }
   } catch (error) {
@@ -99,10 +101,17 @@ export const softDeleteBrand = async (id: string) => {
   }
 };
 
-export const getSoftDeletedBrands = async () => {
+export const getSoftDeletedBrands = async (page = 1, limit = 5) => {
   try {
-    const response = await instance.get("/brands/deleted-list");
-    return response.data.data || [];
+    const response = await instance.get(`/brands/deleted-list?page=${page}&limit=${limit}`);
+    if (response.data.success) {
+      return {
+        data: response.data.data,
+        totalPages: response.data.totalPages,
+      };
+    }else {
+      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách thương hiệu");
+    }
   } catch (error) {
     console.error("Error fetching soft-deleted brands:", error);
     throw error;

@@ -1,22 +1,21 @@
-'use strict';
-const modelSupplier = require('../../model/suppliers.model');
-const admin = require('firebase-admin');
-const serviceAccount = require('../../config/serviceAccount.json');
-const multer = require('multer');
-const Role = require('../../model/role.model');
+"use strict";
+const modelSupplier = require("../../model/suppliers.model");
+const admin = require("firebase-admin");
+const serviceAccount = require("../../config/serviceAccount.json");
+const multer = require("multer");
+const Role = require("../../model/role.model");
 const dotenv = require("dotenv");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const modelUser = require("../../model/users.model");
-
 
 dotenv.config();
 
 const STORE_BUCKET = process.env.STORE_BUCKET;
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: STORE_BUCKET
-    });
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: STORE_BUCKET,
+  });
 }
 
 const storage = admin.storage();
@@ -26,285 +25,412 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 
 const supplierController = {
+  listSuppliers: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+      const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+      
+      const count = await modelSupplier.countDocuments({
+        status: { $ne: "disable" },
+      });
+      const totalPages = Math.ceil(count / limit);
+      const suppliers = await modelSupplier.find({
+        status: { $ne: "disable" },
+      })
+        .skip((page - 1) * limit)
+        .limit(limit);
+      res.status(200).json({
+        success: true,
+        msg: "Lấy danh sách nhà cung cấp thành công",
+        data: suppliers,
+        totalPages: totalPages, 
+      });
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
+      res.status(500).json({
+        success: false,
+        msg: "Lỗi khi lấy danh sách nhà cung cấp",
+        error: error.message,
+      });
+    }
+  },
 
-    listSuppliers: async (req, res) => {
+  addSupplier: async (req, res) => {
+    try {
+      const adminRole = await Role.findOne({ name: "admin" });
+
+      if (!adminRole) {
+        return res
+          .status(500)
+          .json({ message: "Không tìm thấy vai trò quản trị viên" });
+      }
+
+      const isAdmin = req.user.roles.some(
+        (role) => role._id.toString() === adminRole._id.toString()
+      );
+
+      if (!isAdmin) {
+        return res
+          .status(401)
+          .json({ message: "Bạn không có quyền thêm mới nhà cung cấp" });
+      }
+
+      let { name, address, phone, description } = req.body;
+      const image = req.file;
+      console.log(image);
+
+      if (!name || !address || !phone || !description) {
+        return res
+          .status(400)
+          .json({ message: "Vui lòng nhập đầy đủ thông tin nhà cung cấp" });
+      }
+
+      let imageURL;
+      if (image) {
+        if (!Buffer.isBuffer(image.buffer)) {
+          return res
+            .status(400)
+            .json({ message: "Dữ liệu hình ảnh không hợp lệ" });
+        }
+
         try {
-            const suppliers = await modelSupplier.find({ status: { $ne: 'disable' } });
-            res.status(200).json({
-                success: true,
-                msg: "Lấy danh sách nhà cung cấp thành công",
-                data: suppliers
+          const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
+          const file = bucket.file(`suppliers/${filename}`);
+
+          await file.save(image.buffer, {
+            metadata: { contentType: image.mimetype },
+          });
+
+          await file.makePublic();
+          imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name
+            }/o/${encodeURIComponent(file.name)}?alt=media`;
+        } catch (err) {
+          console.error("Lỗi khi tải lên Firebase Storage:", err);
+          return res
+            .status(500)
+            .json({
+              message: "Không thể tải lên hình ảnh",
+              error: err.message,
             });
-        } catch (error) {
-            console.error('Lỗi khi lấy danh sách nhà cung cấp:', error);
-            res.status(500).json({
-                success: false,
-                msg: "Lỗi khi lấy danh sách nhà cung cấp",
-                error: error.message
-            });
         }
-    },
+      }
 
-    addSupplier: async (req, res) => {
-        try {
-            const adminRole = await Role.findOne({ name: 'admin' });
-    
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+      const data = { name, address, phone, description, image: imageURL };
+      const savedSupplier = await modelSupplier.create(data);
+      res
+        .status(201)
+        .json({ message: "Nhà cung cấp được tạo thành công", savedSupplier });
+    } catch (error) {
+      console.error("Lỗi khi thêm nhà cung cấp:", error);
+      res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+    }
+  },
+  getOne: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const supplier = await modelSupplier.findById(id);
 
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-    
-            if (!isAdmin) {
-                return res.status(401).json({ message: "Bạn không có quyền thêm mới nhà cung cấp" });
-            }
+      if (!supplier) {
+        return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
+      }
 
-            let { name, address, phone, description } = req.body;
-            const image = req.file;
-            console.log(image);
+      res.status(200).json(supplier);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Lỗi server" });
+    }
+  },
+  update: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, description, address, phone } = req.body;
+      const image = req.file ? req.file : undefined;
 
-            if (!name || !address || !phone || !description) {
-                return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin nhà cung cấp" });
-            }
+      if (!name || !description || !address || !phone) {
+        return res.status(400).json({ message: "Vui lòng nhập đủ thông tin" });
+      }
 
-            let imageURL;
-            if (image) {
-                if (!Buffer.isBuffer(image.buffer)) {
-                    return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
-                }
-
-                try {
-                    const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
-                    const file = bucket.file(`suppliers/${filename}`);
-                    
-                    await file.save(image.buffer, {
-                        metadata: { contentType: image.mimetype }
-                    });
-
-                    await file.makePublic();
-                    imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
-                } catch (err) {
-                    console.error('Lỗi khi tải lên Firebase Storage:', err);
-                    return res.status(500).json({ message: 'Không thể tải lên hình ảnh', error: err.message });
-                }
-            }
-
-            const data = { name, address, phone, description, image: imageURL };
-            const savedSupplier = await modelSupplier.create(data);
-            res.status(201).json({ message: "Nhà cung cấp được tạo thành công", savedSupplier });
-            
-        } catch (error) {
-            console.error('Lỗi khi thêm nhà cung cấp:', error);
-            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+      let imageURL;
+      if (image) {
+        if (!Buffer.isBuffer(image.buffer)) {
+          return res
+            .status(400)
+            .json({ message: "Dữ liệu hình ảnh không hợp lệ" });
         }
-    },
-    getOne: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const supplier = await modelSupplier.findById(id);
+        const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
+        const file = bucket.file(`suppliers/${filename}`);
+        const fileStream = file.createWriteStream({
+          metadata: {
+            contentType: image.mimetype,
+          },
+        });
 
-            if (!supplier) {
-                return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
-            }
+        fileStream.on("error", (err) => {
+          console.error("Lỗi khi tải lên Firebase Storage:", err);
+          return res
+            .status(500)
+            .json({ message: "Không thể tải lên hình ảnh" });
+        });
 
-            res.status(200).json(supplier);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Lỗi server" });
+        fileStream.on("finish", async () => {
+          try {
+            await file.makePublic();
+            imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name
+              }/o/${encodeURIComponent(file.name)}?alt=media`;
+            await updateSupplierInDB();
+          } catch (err) {
+            console.error("Lỗi khi lấy URL của hình ảnh:", err);
+            return res
+              .status(500)
+              .json({ message: "Không thể lấy URL của hình ảnh" });
+          }
+        });
+
+        fileStream.end(image.buffer);
+      } else {
+        await updateSupplierInDB();
+      }
+
+      async function updateSupplierInDB() {
+        const updatedData = { name, address, phone, description };
+        if (imageURL) {
+          updatedData.image = imageURL;
+        } else {
+          console.log("Không có URL hình ảnh được cập nhật"); // Thêm log kiểm tra
         }
-    },
-    update: async (req, res) => {
-        try {
-    
-            const { id } = req.params;
-            const { name, description, address, phone } = req.body;
-            const image = req.file ? req.file : undefined;
-    
-    
-    
-            if (!name || !description || !address || !phone ) {
-                return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
-            }
-    
-            let imageURL;
-            if (image) { 
 
-                if (!Buffer.isBuffer(image.buffer)) {
-                    return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
-                }
-                const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
-                const file = bucket.file(`suppliers/${filename}`);
-                const fileStream = file.createWriteStream({
-                    metadata: {
-                        contentType: image.mimetype,
-                    },
-                });
-    
-                fileStream.on('error', (err) => {
-                    console.error('Lỗi khi tải lên Firebase Storage:', err);
-                    return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
-                });
-    
-                fileStream.on('finish', async () => {
-                    try {
-                        await file.makePublic();
-                            imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media`;
-                            await updateSupplierInDB();
-                    } catch (err) {
-                        console.error('Lỗi khi lấy URL của hình ảnh:', err);
-                        return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
-                    }
-                });
-    
-                fileStream.end(image.buffer);
-            } else {
-                await updateSupplierInDB();
-            }
-    
-            async function updateSupplierInDB() {
-                const updatedData = { name, address, phone, description };
-                if (imageURL) {
-                    updatedData.image = imageURL;
-                }else {
-                    console.log('Không có URL hình ảnh được cập nhật'); // Thêm log kiểm tra
-                }
-        
-    
-                const updatedSuppliers = await modelSupplier.findByIdAndUpdate(id, updatedData, { new: true });
-    
-                if (!updatedSuppliers) {
-                    return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
-                }
-    
-                return res.status(200).json({ message: "Nhà cung cấp được cập nhật thành công", updatedSuppliers });
-            }
-        } catch (error) {
-            console.error('Lỗi khi cập nhật nhà cung cấp:', error);
-            return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        const updatedSuppliers = await modelSupplier.findByIdAndUpdate(
+          id,
+          updatedData,
+          { new: true }
+        );
+
+        if (!updatedSuppliers) {
+          return res
+            .status(404)
+            .json({ message: "Không tìm thấy nhà cung cấp" });
         }
-    },
-    hardDelete: async (req, res) => {
-        const { id } = req.params;
-        try {
-            const adminRole = await Role.findOne({ name: 'admin' });
 
+        return res
+          .status(200)
+          .json({
+            message: "Nhà cung cấp được cập nhật thành công",
+            updatedSuppliers,
+          });
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật nhà cung cấp:", error);
+      return res
+        .status(500)
+        .json({ message: "Lỗi máy chủ", error: error.message });
+    }
+  },
+  hardDelete: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const adminRole = await Role.findOne({ name: "admin" });
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+      if (!adminRole) {
+        return res
+          .status(500)
+          .json({ message: "Không tìm thấy vai trò quản trị viên" });
+      }
 
+      const isAdmin = req.user.roles.some(
+        (role) => role._id.toString() === adminRole._id.toString()
+      );
 
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+      if (!isAdmin) {
+        return res
+          .status(403)
+          .json({
+            message:
+              "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa nhà cung cấp",
+          });
+      }
 
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa nhà cung cấp" });
-            }
+      const hardDeletedSupplier = await modelSupplier.findByIdAndDelete(id);
+      if (!hardDeletedSupplier) {
+        return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
+      }
+      res.status(200).json({ message: "Nhà cung cấp đã được xóa thành công" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Lỗi server" });
+    }
+  },
+  softDelete: async (req, res) => {
+    try {
+      const adminRole = await Role.findOne({ name: "admin" });
 
-            const hardDeletedSupplier = await modelSupplier.findByIdAndDelete(id);
-            if (!hardDeletedSupplier) {
-                return res.status(404).json({ message: 'Không tìm thấy nhà cung cấp' });
-            }
-            res.status(200).json({ message: 'Nhà cung cấp đã được xóa thành công' });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Lỗi server' });
-        }
-    },
-    softDelete: async (req, res) => {
-        try {
-            const adminRole = await Role.findOne({ name: 'admin' });
+      if (!adminRole) {
+        return res
+          .status(500)
+          .json({ message: "Không tìm thấy vai trò quản trị viên" });
+      }
 
+      const isAdmin = req.user.roles.some(
+        (role) => role._id.toString() === adminRole._id.toString()
+      );
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+      if (!isAdmin) {
+        return res
+          .status(403)
+          .json({
+            message:
+              "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa nhà cung cấp",
+          });
+      }
 
+      const id = req.params.id;
+      // Cập nhật trạng thái của danh mục thành "Đã xóa"
+      const softDeletedSupplier = await modelSupplier.findByIdAndUpdate(
+        id,
+        { status: "disable" },
+        { new: true }
+      );
 
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+      if (!softDeletedSupplier) {
+        return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
+      }
 
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa nhà cung cấp" });
-            }
+      // Trả về phản hồi thành công
+      res
+        .status(200)
+        .json({ message: "Đã xóa thành công", data: softDeletedSupplier });
+    } catch (error) {
+      // Xử lý lỗi và trả về phản hồi lỗi server
+      res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+  },
+  restore: async (req, res) => {
+    try {
+      const adminRole = await Role.findOne({ name: "admin" });
 
-            const id = req.params.id;
-            // Cập nhật trạng thái của danh mục thành "Đã xóa"
-            const softDeletedSupplier= await modelSupplier.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+      if (!adminRole) {
+        return res
+          .status(500)
+          .json({ message: "Không tìm thấy vai trò quản trị viên" });
+      }
 
-            if (!softDeletedSupplier) {
-                return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
-            }
+      const isAdmin = req.user.roles.some(
+        (role) => role._id.toString() === adminRole._id.toString()
+      );
 
-            // Trả về phản hồi thành công
-            res.status(200).json({ message: 'Đã xóa thành công', data: softDeletedSupplier });
-        } catch (error) {
-            // Xử lý lỗi và trả về phản hồi lỗi server
-            res.status(500).json({ message: "Lỗi server", error: error.message });
-        }
-    },
-    restore: async (req, res) => {
-        try {
-            const adminRole = await Role.findOne({ name: 'admin' });
+      if (!isAdmin) {
+        return res
+          .status(403)
+          .json({
+            message:
+              "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục nhà cung cấp",
+          });
+      }
 
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ message: "Thiếu id nhà cung cấp" });
+      }
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+      // Cập nhật trạng thái của sản phẩm thành 'active'
+      const restoreSupplier = await modelSupplier.findByIdAndUpdate(
+        id,
+        { status: "active" },
+        { new: true }
+      );
 
+      if (!restoreSupplier) {
+        return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
+      }
 
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
+      // Trả về phản hồi thành công
+      res
+        .status(200)
+        .json({
+          message: "Nhà cung cấp đã được khôi phục thành công",
+          data: restoreSupplier,
+        });
+    } catch (error) {
+      // Xử lý lỗi và trả về phản hồi lỗi server
+      res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+  },
+  deletedList: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+      const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+      
+      const count = await modelSupplier.countDocuments({
+        status: { $ne: "disable" },
+      });
+      const totalPages = Math.ceil(count / limit);
 
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục nhà cung cấp" });
-            }
+      const deleteListSupplier =
+        (await modelSupplier.find({ status: "disable" })
+        .skip((page - 1) * limit)
+        .limit(limit)) || [];
 
+        res.status(200).json({
+          success: true,
+          msg: "Lấy danh sách nhà cung cấp thành công",
+          data: deleteListSupplier,
+          totalPages: totalPages, 
+        });
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+  },
+  search: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page, 10);
+      const limit = parseInt(req.query.limit, 2);
 
-            const { id } = req.params;
-            if (!id) {
-                return res.status(400).json({ message: "Thiếu id nhà cung cấp" });
-            }
+      if (isNaN(page) || page <= 0) {
+        return res.status(400).json({
+          message: "Số trang không hợp lệ",
+        });
+      }
 
-            // Cập nhật trạng thái của sản phẩm thành 'active'
-            const restoreSupplier = await modelSupplier.findByIdAndUpdate(id, { status: 'active' }, { new: true });
+      if (isNaN(limit) || limit <= 0) {
+        return res.status(400).json({
+          message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+        });
+      }
+      const keyword = req.params.keyword;
 
-            if (!restoreSupplier) {
-                return res.status(404).json({ message: "Không tìm thấy nhà cung cấp" });
-            }
+      if (!keyword || keyword.trim() === "") {
+        return res.status(400).json({
+          message: "Từ khóa tìm kiếm không hợp lệ",
+        });
+      }
 
-            // Trả về phản hồi thành công
-            res.status(200).json({ message: "Nhà cung cấp đã được khôi phục thành công", data: restoreSupplier });
-        } catch (error) {
-            // Xử lý lỗi và trả về phản hồi lỗi server
-            res.status(500).json({ message: "Lỗi server", error: error.message });
-        }
-    },
-    deletedList: async (req, res) => {
-        try {
-            const adminRole = await Role.findOne({ name: 'admin' });
+      // Tìm kiếm sản phẩm dựa trên từ khóa (không phân biệt chữ hoa/chữ thường)
+      const result = await modelSupplier
+        .find({
+          name: { $regex: keyword, $options: "i" },
+        })
+        .skip((page - 1) * limit)
+        .limit(limit);
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
+      if (result && result.length > 0) {
+        res.status(200).json({
+          data: result,
+        });
+      } else {
+        console.warn("Không tìm thấy kết quả nào cho từ khóa:", keyword);
+        res.status(404).json({
+          message: "Không tìm thấy kết quả nào",
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi trong quá trình tìm kiếm:", error);
+      res.status(500).json({
+        message: "Lỗi máy chủ",
+        error: error.message,
+      });
+    }
+  },
+};
 
-
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách nhà cung cấp đã bị xóa mềm" });
-            }
-
-
-            const deleteListSupplier = await modelSupplier.find({ status: 'disable' }) || [];
-
-            res.status(200).json({ data: deleteListSupplier });
-        } catch (error) {
-            res.status(500).json({ message: "Lỗi server", error: error.message });
-        }
-    },
-}
-
-
-
-
-supplierController.upload = upload.single('image');
+supplierController.upload = upload.single("image");
 
 module.exports = supplierController;
