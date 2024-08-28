@@ -49,7 +49,7 @@ const Listcomment: React.FC = () => {
           const user = response.data;
           console.log(user);
           
-          if (user && user._id && user.avatar && typeof user.name === 'string') {
+          if (user && user._id || user.avatar || typeof user.name === 'string') {
             map[user._id] = {
               name: user.name,
               avatar: user.avatar,
@@ -84,7 +84,7 @@ const Listcomment: React.FC = () => {
               <img
                 className="h-10 w-10 rounded-full"
                 src={userNames[comment.id_user]?.avatar || "default-avatar.png"}
-                alt="User Avatar"
+                alt="No avatar"
               />
             </div>
             <div className="flex-1">
