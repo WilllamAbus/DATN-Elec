@@ -42,12 +42,8 @@ router.put(
   update
 );
 router.get("/listcate", getAllCategoriesController);
-
-//search
 router.get("/search/:keyword", search);
-//up view
 router.put("/upView/:id", upView);
-//comment
 router.post('/comment', comment);
 router.get('/comment/:id', commentProduct);
 router.delete('/comment/:id', deleteComment);
@@ -55,7 +51,6 @@ router.get('/comment', commentAllProduct);
 router.get("/userID/:id", userID);
 router.post('/repComment/:id', repComment);
 router.get('/repComment/:id', getRepComment);
-//filer
 router.get("/filter/:price", price);
 router.patch("/soft-delete/:id", middlewareController.verifyToken, softDelete);
 router.get("/deleted-list", middlewareController.verifyToken, deletedList);

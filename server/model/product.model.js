@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-
-// Định nghĩa schema cho sản phẩm
 const productSchema = new Schema({
     name: {
         type: String,

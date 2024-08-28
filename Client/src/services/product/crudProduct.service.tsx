@@ -1,5 +1,18 @@
 import instance from "../axios";
 
+export const addProduct = async (product: FormData) => {
+  try {
+    const response = await instance.post("/product/add", product, {
+      headers: {
+        "Content-Type": "multipart/form-data",  
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding product:", error);
+    throw error;
+  }
+};
 export const listProduct = async () => {
   try {
     const response = await instance.get("/product/list");
@@ -17,19 +30,7 @@ export const listProduct = async () => {
   }
 };
 
-export const addProduct = async (product: FormData) => {
-  try {
-    const response = await instance.post("/product/add", product, {
-      headers: {
-        "Content-Type": "multipart/form-data",  
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error adding product:", error);
-    throw error;
-  }
-};
+
 
 export const hardDeleteProduct = async (id: string) => {
   try {
