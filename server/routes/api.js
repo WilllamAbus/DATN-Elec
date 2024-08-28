@@ -371,7 +371,8 @@ router.get('/inventory-suggestions', inventoryController.getSuggestions);
 
 
 // *timeTrack*/
-router.post('/time-tracks', timeTrackController.create);  // POST /time-tracks
+router.post('/time-tracks', timeTrackController.create);
+router.post('/time-tracks', timeTrackController.updateEndTime);   // POST /time-tracks
 router.get('/time-tracks/:id', timeTrackController.getTimeTrackById);  // GET /time-tracks/:id
 router.get('/time-tracks', timeTrackController.getAllTimeTrack);   // GET /time-tracks
 router.put('/time-tracks/:id', timeTrackController.update); // PUT /time-tracks/:id

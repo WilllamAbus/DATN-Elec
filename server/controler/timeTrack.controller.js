@@ -2,12 +2,19 @@ const TimeTrackService = require('../services/timeTrack.service');
 
 
 const timeTrackController = {
-    create: async (req, res) =>{
+    create: async (req, res) => {
         try {
-          const timeTrack = await TimeTrackService.createTimeTrack(req.body);
-          res.status(201).json(timeTrack);
+          const data = req.body;
+          // Tạo một bản ghi TimeTrack mới
+          const newTimeTrack = await TimeTrackService.createTimeTrack(data);
+          
+          // Bắt đầu cập nhật endTime trong thời gian thực sau khi tạo thành công
+          TimeTrackService.updateEndTimeInRealTime(newTimeTrack._id);
+      
+          res.status(201).json(newTimeTrack);
         } catch (error) {
-          res.status(500).json({ message: 'Error creating TimeTrack', error });
+          console.error('Error in createTimeTrack controller:', error);
+          res.status(500).json({ message: 'Error creating TimeTrack', error: error.message });
         }
       },
 
@@ -51,6 +58,29 @@ const timeTrackController = {
           res.status(200).json({ message: 'TimeTrack deleted successfully' });
         } catch (error) {
           res.status(500).json({ message: 'Error deleting TimeTrack', error });
+        }
+      },
+
+      updateEndTime: async (req, res) => {
+        try {
+          const { id } = req.params;
+          const { endTime } = req.body;
+    
+          if (!endTime) {
+            return res.status(400).json({ message: 'EndTime is required' });
+          }
+    
+          // Cập nhật endTime cho bản ghi TimeTrack
+          const updatedTimeTrack = await TimeTrackService.updateTimeTrack(id, { endTime });
+    
+          if (!updatedTimeTrack) {
+            return res.status(404).json({ message: 'TimeTrack not found' });
+          }
+    
+          res.status(200).json(updatedTimeTrack);
+        } catch (error) {
+          console.error('Error in updateEndTime controller:', error);
+          res.status(500).json({ message: 'Error updating endTime', error: error.message });
         }
       }
 }

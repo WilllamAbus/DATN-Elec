@@ -7,8 +7,11 @@ const brandRouter = require("./admin/brands/brands");
 const supplierRoutes = require('./admin/suppliers/suppliers');
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
+const productRouter_v2 = require("./admin/product_v2");
+// const supplierRoutes = require("./admin/suppliers/suppliers");
 const WathListRouter = require("./product/product");
 const vnPayRouter = require('./admin/vnpay/order')
+const auctionRouter = require('./admin/auctions/randBid.routes')
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -20,9 +23,10 @@ const routes = (app) => {
   app.use("/api/admin/product", adminProduct);
   app.use("/api/client/product", clientProduct);
   app.use("/api/brands", brandRouter);
+  // app.use("/api/suppliers", supplierRoutes);
   app.use("/api/wathlist", WathListRouter);
   app.use("/api/vnpay", vnPayRouter);
-
+  app.use('/api/auctions', auctionRouter)
 };
 
 module.exports = routes;
