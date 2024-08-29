@@ -77,6 +77,7 @@ const cartSlice = createSlice({
           ? String(action.payload)
           : "Failed to fetch carts";
       })
+
       .addCase(addProductToCart.fulfilled, (state, action) => {
         state.carts.push(action.payload);
       })

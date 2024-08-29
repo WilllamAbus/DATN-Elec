@@ -20,7 +20,7 @@ export const addProductToCart = createAsyncThunk(
   async ({
     userId,
     productId,
-    quantity,
+    quantity = 1,
   }: {
     userId: string;
     productId: string;
@@ -30,7 +30,6 @@ export const addProductToCart = createAsyncThunk(
     return response;
   }
 );
-
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItemQuantity",
   async ({

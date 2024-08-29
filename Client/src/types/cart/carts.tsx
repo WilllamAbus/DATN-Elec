@@ -6,12 +6,18 @@ export interface CartItem {
     image: string[];
     product_description: string;
     product_price: number;
+    product_type: string;
+    product_discount: number;
+    product_brand: string;
+    product_format: string;
+    product_condition: string;
+    product_quantity: number;
+    weight_g: number;
   };
   quantity: number;
   price: number;
   totalItemPrice: number;
 }
-
 export interface CartType {
   _id: string;
   user: {

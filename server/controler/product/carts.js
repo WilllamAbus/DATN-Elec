@@ -14,12 +14,9 @@ const CartController = {
           .status(400)
           .json({ message: "Danh sách sản phẩm không hợp lệ" });
       }
-
-      // Tìm giỏ hàng hiện tại của người dùng
       let cart = await Cart.findOne({ user: userId });
 
       if (!cart) {
-        // Nếu không có giỏ hàng, tạo mới giỏ hàng
         cart = new Cart({
           user: userId,
           items: [],
@@ -27,7 +24,6 @@ const CartController = {
         });
       }
 
-      // Cập nhật các mặt hàng trong giỏ hàng
       for (const item of items) {
         const product = await Product.findById(item.product);
         if (!product) {

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+import { addProductToCart } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
@@ -29,7 +30,18 @@ const ProductSection: React.FC = () => {
       }
     }
   };
-
+  const handleAddToCart = async (productId: string) => {
+    if (userId) {
+      try {
+        await dispatch(addProductToCart({ userId, productId })).unwrap();
+        console.log("Thêm Thành công");
+      } catch (err) {
+        console.error("Lỗi thêm giỏ hàng", err);
+      }
+    } else {
+      console.log("chưa login");
+    }
+  };
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -321,6 +333,7 @@ const ProductSection: React.FC = () => {
                   {" "}
                   <button
                     type="button"
+                    onClick={() => handleAddToCart(product._id)}
                     className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
                   >
                     <svg
