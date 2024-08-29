@@ -27,3 +27,11 @@ export interface HomeAllProductResponse {
   products: Product[];
   error?: string;
 }
+export interface ProductResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  product: Product | null;
+  error?: string;
+}
