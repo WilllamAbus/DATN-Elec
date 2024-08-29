@@ -201,9 +201,9 @@ const ProductDetail: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {products?.product_attributes?.length ? (
                 products.product_attributes
-                  .filter((attribute: ProductAttribute) =>
-                    attributesToShow.includes(attribute.k)
-                  )
+                .filter((attribute: ProductAttribute) =>
+                  ["Ram", "Color"].includes(attribute.k)
+                )
                   .map((attribute: ProductAttribute, index: number) => (
                     <div key={index} className="flex flex-col gap-1">
                       <strong className="text-gray-800">{attribute.k}:</strong>
