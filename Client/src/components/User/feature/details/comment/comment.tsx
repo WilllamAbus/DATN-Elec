@@ -61,6 +61,8 @@ const Comment = () => {
 
   useEffect(() => {
     setIsLoggedIn(!!userData.id); 
+    console.log(userData);
+    
   }, [userData]);
 
   const handleRatingClick = (rate: number) => {
@@ -116,6 +118,7 @@ const Comment = () => {
           </div>
         )}
         {/* Load comments */}
+        
         <Listcomment />
         {isLoggedIn ? (
           <form
@@ -131,7 +134,7 @@ const Comment = () => {
               />
               <button
                 type="submit"
-                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none"
               >
                 Gửi
               </button>
@@ -162,9 +165,9 @@ const Comment = () => {
         ) : (
           <div>
             <Link to="/login">
-            <button className="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
-              Đăng nhập để bình luận
-          </button>
+            <button className="bg-blue-600 border border-blue-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-blue-600 transition">
+                Đăng nhập để bình luận
+              </button>
           
             </Link>
     

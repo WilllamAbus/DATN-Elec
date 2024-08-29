@@ -30,12 +30,26 @@ const brandController = {
 
     listBrands: async (req, res) => {
         try {
+            const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+            const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+            
+            const count = await modelBrand.countDocuments({
+              status: { $ne: "disable" },
+            });
+            const totalPages = Math.ceil(count / limit);
+
             // Sử dụng populate để lấy thông tin danh mục
             const brands = await modelBrand.find({ status: { $ne: 'disable' } })
             .populate('category_id', 'name')
-            .populate('supplier_id','name');
-            console.log(brands);
-            res.status(200).json({ brands });
+            .populate('supplier_id','name')
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+            res.status(200).json({
+                success: true,
+                data: brands,
+                totalPages: totalPages,
+            });
         } catch (error) {
             console.error('Error fetching brands with categories:', error);
             res.status(500).json({ success: false, error: 'Server error' });
@@ -307,25 +321,26 @@ const brandController = {
     },
     deletedList: async (req, res) => {
         try {
-            const adminRole = await Role.findOne({ name: 'admin' });
+            const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+            const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+            
+            const count = await modelBrand.countDocuments({
+              status: { $ne: "disable" },
+            });
+            const totalPages = Math.ceil(count / limit);
 
-            if (!adminRole) {
-                return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
-            }
-
-
-            const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
-
-            if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xem danh sách thương hiệu đã bị xóa mềm" });
-            }
 
 
             const deleteListBrand = await modelBrand.find({ status: 'disable' })
             .populate('category_id', 'name')
-            .populate('supplier_id','name');
-
-            res.status(200).json({ data: deleteListBrand });
+            .populate('supplier_id','name')
+            .skip((page - 1) * limit)
+            .limit(limit);
+            res.status(200).json({
+                success: true,
+                data: deleteListBrand,
+                totalPages: totalPages,
+            });
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }

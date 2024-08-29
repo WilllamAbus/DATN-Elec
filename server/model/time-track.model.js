@@ -6,13 +6,13 @@ const { Schema, model } = require("mongoose");
 const timeTrackSchema = new Schema(
   {
  
-      Start_Time: {
+     startTime: {
         type: Date,
-        default: () => new Date(new Date().setSeconds(0, 0))  // Set time to the beginning of the minute
+       // Set time to the beginning of the minute
       },
-      End_Time: {
+     endTime: {
         type: Date,
-        default: '0000-00-00 00:00:00'
+       
       },
       status: { type: String, default: 'active' },
       disabledAt: { type: Date, default: null },

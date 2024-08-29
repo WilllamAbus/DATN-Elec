@@ -12,11 +12,17 @@ const ordersSchema = new Schema(
     ], // Reference to orderAuctions
 
     // Store IDs as strings
-    paymentId: { type: Schema.Types.Mixed, require: true }, // ID of the payment
-    shippingAddressId: { type: Schema.Types.Mixed, require: true }, // ID of the shipping address
+    paymentId: { type: Schema.Types.ObjectId, ref: "payment", require: true }, // ID of the payment
+    shippingAddressId: {
+      type: Schema.Types.ObjectId,
+      ref: "shipping",
+      require: true,
+    }, // ID of the shipping address
 
     // Array of voucher IDs as strings
-    voucherIds: [{ type: Schema.Types.Mixed, default: {} }], // IDs of applied vouchers
+    voucherIds: [
+      { type: Schema.Types.ObjectId, ref: "voucher", require: true },
+    ], // IDs of applied vouchers
 
     // Shipping details as embedded object
     formatShipping: {
@@ -34,16 +40,28 @@ const ordersSchema = new Schema(
 
     stateOrder: {
       type: String,
-      enum: ["Chờ xử lý", "Đang xử lý", "Đang vận chuyển"], // Order status
-
+      enum: ["Tiêu chuẩn"], // Example shipping types
       required: true,
     },
-    order_date: { type: Date, default: Date.now }, // Order date
-    createdAt: { type: Date, default: Date.now },
-
-    status: { type: String, default: "active" },
-    disabledAt: { type: Date, default: null }, // Disabled date if applicable
   },
+
+  //   // Calculated fields
+  //   totalAmount: { type: Number, required: true }, // Total amount before shipping
+  //   shippingFee: { type: Number, default: 31000 }, // Shipping fee
+  //   totalPriceWithShipping: { type: Number, required: true },
+
+  //   stateOrder: {
+  //     type: String,
+  //     enum: ["Chờ xử lý", "Đang xử lý", "Đang vận chuyển"], // Order status
+
+  //     required: true,
+  //   },
+  //   order_date: { type: Date, default: Date.now }, // Order date
+  //   createdAt: { type: Date, default: Date.now },
+
+  //   status: { type: String, default: "active" },
+  //   disabledAt: { type: Date, default: null }, // Disabled date if applicable
+  // },
 
   {
     collection: "orders",

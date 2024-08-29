@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { listProduct } from "../../services/product/crudProduct.service";
+import { homeAllProduct } from "../../services/product_v2/client/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
+import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
-
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
@@ -32,8 +33,8 @@ const ProductSection: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productList = await listProduct();
-        setProducts(productList);
+        const productList = await homeAllProduct();
+        setProducts(productList.products);
       } catch (error) {
         console.log(`Lỗi: `, error);
       }
@@ -43,33 +44,37 @@ const ProductSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+    <section className="bg-gray-50 py-2 antialiased dark:bg-gray-900 md:py-12">
       <div className="text-center">
         <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
           Sản phẩm dành cho bạn
         </h2>
       </div>
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4">
+        <div className="mb-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product, index) => (
             <div
               key={index}
-              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
-              <div className="h-56 w-full">
+              <div className="h-56 w-auto">
                 <Link to={`/detailProd/${product._id}`}>
-                  <img
-                    src={product.image}
-                    alt={`product ${index + 1}`}
-                    className="mx-auto h-full dark:hidden"
-                  />
+                  <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
+                    <a href="#">
+                      <img
+                        className="rounded-lg"
+                        src={product.image[0]}
+                        alt={`product ${index + 1}`}
+                      />
+                    </a>
+                  </figure>
                 </Link>
               </div>
               <div className="pt-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                  {product.discount > 0 ? (
+                  {product.product_discount.discountPercent > 0 ? (
                     <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                      Giảm giá {product.discount}%
+                      Giảm giá {product.product_discount.discountPercent}%
                     </span>
                   ) : (
                     <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
@@ -154,9 +159,9 @@ const ProductSection: React.FC = () => {
                 </div>
                 <a
                   href="#"
-                  className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
+                  className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
                 >
-                  {product.name}
+                  {product.product_name}
                 </a>
                 <div className="mt-2 flex items-center gap-2">
                   <div className="flex items-center">
@@ -219,8 +224,8 @@ const ProductSection: React.FC = () => {
                       ))}
                     </div>
                     <div className="text-xs text-gray-500 items-center m-3">
-                      {product.quantity > 0
-                        ? `(Còn ${product.quantity} sản phẩm)`
+                      {product.product_quantity > 0
+                        ? `(Còn ${product.product_quantity} sản phẩm)`
                         : " "}
                     </div>
                   </p>
@@ -267,26 +272,51 @@ const ProductSection: React.FC = () => {
                   </li>
                 </ul>
                 <div className="mt-4 flex items-center justify-between gap-6">
-                  <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
-                    {product.discount > 1 ? (
+                  <p className="text-xs leading-tight text-gray-900 dark:text-white">
+                    {product.product_discount.discountPercent > 1 ? (
                       <div>
-                        <p className="text-xs text-rose-700">
+                        <p className="text-xs font-medium text-rose-700">
                           {formatCurrency(
-                            product.price * (1 - product.discount / 100)
+                            product.product_price *
+                              (1 -
+                                product.product_discount.discountPercent / 100)
                           )}
                           đ
                         </p>
-                        <p className="text-xs line-through text-gray-400">
-                          {formatCurrency(product.price)}
+                        <p className="text-xs font-medium line-through text-gray-400">
+                          {formatCurrency(product.product_price)}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-xs">
-                        {formatCurrency(product.price)}đ
+                      <p className="text-xs font-medium text-rose-700">
+                        {formatCurrency(product.product_price)}đ
                       </p>
                     )}
                   </p>
                 </div>
+                <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                  <div className="mt-1 text-sm text-gray-800">
+                    {product.product_attributes
+                      .filter((attribute: ProductAttribute) =>
+                        attributesToShow.includes(attribute.k)
+                      )
+                      .map((attribute: ProductAttribute, index: number) => (
+                        <li key={index} className="mb-1">
+                          <strong>{attribute.k}: </strong>
+                          <span>{attribute.v}</span>
+                        </li>
+                      ))}
+                  </div>
+                </ul>
+                <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                  <div className="mt-1 text-sm text-gray-800">
+                    <li>
+                      <strong>Khối lượng:</strong>{" "}
+                      <span>{product.weight_g} kg</span>
+                    </li>
+                  </div>
+                </ul>
+
                 <div className="mt-4 flex items-center justify-between gap-6">
                   {" "}
                   <button

@@ -1,11 +1,14 @@
 import instance from "../axios";
 
-export const listSuppliers = async () => {
+export const listSuppliers = async (page = 1, limit = 5) => {
   try {
-    const response = await instance.get("/suppliers/list");
+    const response = await instance.get(`/suppliers/list?page=${page}&limit=${limit}`);
 
     if (response.data.success) {
-      return response.data.data;
+      return {
+        data: response.data.data,
+        totalPages: response.data.totalPages,
+      };
     } else {
       throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách nhà cung cấp");
     }
@@ -72,10 +75,17 @@ export const softDeleteSupplier = async (id: string) => {
   }
 };
 
-export const getSoftDeletedSuppliers = async () => {
+export const getSoftDeletedSuppliers = async (page = 1, limit = 5) => {
   try {
-    const response = await instance.get("/suppliers/deleted-list");
-    return response.data.data || [];
+    const response = await instance.get(`/suppliers/deleted-list?page=${page}&limit=${limit}`);
+    if (response.data.success) {
+      return {
+        data: response.data.data,
+        totalPages: response.data.totalPages,
+      };
+    } else {
+      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách nhà cung cấp");
+    }
   } catch (error) {
     console.error("Error fetching soft-deleted suppliers:", error);
     throw error;

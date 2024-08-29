@@ -101,20 +101,9 @@ const ProductDetail: React.FC = () => {
           const url = await getFileFirebase(product.image);
           setImgPreview(url);
         }
-
-        const viewedProducts = JSON.parse(
-          localStorage.getItem("viewedProducts") || "[]"
-        );
-        if (!viewedProducts.includes(id)) {
-          await upViewProduct(id);
-          viewedProducts.push(id);
-          localStorage.setItem(
-            "viewedProducts",
-            JSON.stringify(viewedProducts)
-          );
-          const updatedProduct = await getOneProduct(id);
-          setProduct(updatedProduct);
-        }
+        await upViewProduct(id);
+        const updatedProduct = await getOneProduct(id);
+        setProduct(updatedProduct);
 
         // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
         if (Array.isArray(watchlistItems)) {
