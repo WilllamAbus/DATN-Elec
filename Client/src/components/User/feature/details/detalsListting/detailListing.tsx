@@ -205,6 +205,7 @@ const ProductDetail: React.FC = () => {
                   ["Ram", "Color"].includes(attribute.k)
                 )
                   .map((attribute: ProductAttribute, index: number) => (
+                    
                     <div key={index} className="flex flex-col gap-1">
                       <strong className="text-gray-800">{attribute.k}:</strong>
                       <div className="flex flex-wrap gap-2">
