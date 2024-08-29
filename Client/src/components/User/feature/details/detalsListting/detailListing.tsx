@@ -41,19 +41,18 @@ const ProductDetail: React.FC = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
-  const handleAddToCart = async (productId: string) => {
-    if (userId) {
+  const handleAddToCart = async () => {
+    if (userId && id) {
       try {
-        await dispatch(
-          addProductToCart({ userId, productId, quantity })
-        ).unwrap();
-        console.log("Sản phẩm đã được thêm vào giỏ hàng");
+        await dispatch(addProductToCart({ userId, productId: id })).unwrap();
+        console.log("Thêm Thành công");
       } catch (err) {
-        console.error("Lỗi khi thêm sản phẩm vào giỏ hàng", err);
+        console.error("Lỗi thêm giỏ hàng", err);
       }
+    } else {
+      console.log("chưa login");
     }
   };
-
   const handleAddToWatchlist = async () => {
     if (userId && id) {
       try {
@@ -274,7 +273,7 @@ const ProductDetail: React.FC = () => {
             </a>
             <a
               // href="/cart"
-              onClick={() => handleAddToCart(product._id)}
+              onClick={() => handleAddToCart()}
               className="bg-green-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-green-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
