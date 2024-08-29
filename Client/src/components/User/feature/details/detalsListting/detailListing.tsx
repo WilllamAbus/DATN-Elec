@@ -6,11 +6,6 @@ import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
-import {
-  getOneProduct,
-  upViewProduct,
-} from "../../../../../services/product/crudProduct.service";
-import { getFileFirebase } from "../../../../../services/firebase/getFirebse.service";
 import { getProductByID } from "../../../../../services/product_v2/client/homeAllProduct";
 import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
