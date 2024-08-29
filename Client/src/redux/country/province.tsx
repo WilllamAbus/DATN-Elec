@@ -11,7 +11,7 @@ export const fetchProvinces = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const data = await getProvinces();
-      return data; // Giả sử data chứa cả ID và tên của các tỉnh thành
+      return data.data; // Giả sử data chứa cả ID và tên của các tỉnh thành
     } catch (error) {
       return thunkAPI.rejectWithValue("Error fetching provinces");
     }
@@ -24,7 +24,7 @@ export const fetchDistricts = createAsyncThunk(
   async (provinceId: string, thunkAPI) => {
     try {
       const data = await getDistricts(provinceId);
-      return data; // Giả sử data chứa cả ID và tên của các quận huyện
+      return data.data; // Giả sử data chứa cả ID và tên của các quận huyện
     } catch (error) {
       return thunkAPI.rejectWithValue("Error fetching districts");
     }
@@ -37,7 +37,7 @@ export const fetchWards = createAsyncThunk(
   async (districtId: string, thunkAPI) => {
     try {
       const data = await getWards(districtId);
-      return data; // Giả sử data chứa cả ID và tên của các phường xã
+      return data.data; // Giả sử data chứa cả ID và tên của các phường xã
     } catch (error) {
       return thunkAPI.rejectWithValue("Error fetching wards");
     }
