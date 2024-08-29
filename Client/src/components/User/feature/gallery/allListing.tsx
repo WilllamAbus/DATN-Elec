@@ -1,6 +1,7 @@
 "use client";
 import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
 import AllProduct from "./product/allProduct";
+import Filter from "../../filter" ;
 import { useState } from "react";
 import {
   Dialog,
@@ -292,6 +293,8 @@ export default function Example() {
                     </DisclosurePanel>
                   </Disclosure>
                 ))}
+                <br></br>
+                <Filter/>
               </form>
               {/* Product grid */}
               <div className="lg:col-span-3">
