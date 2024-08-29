@@ -1,6 +1,7 @@
 const ProductV2 = require('../../../model/product_v2');
 const Discount = require('../../../model/discount.model');
 const { uploadImage } = require('../../../utils/uploadImage');
+const { calculateDiscount } = require('./calculator/discount');
 const { 
   checkProductNameExists, 
   validateProductPrice,
@@ -37,23 +38,9 @@ const add = async (req, res) => {
         status: 400
       });
     }
-    const discount = await Discount.findById(req.body.product_discount);
-    if (!discount) {
-      return res.status(400).json({
-        success: false,
-        err: 4,
-        msg: 'Giảm giá không hợp lệ',
-        status: 400
-      });
-    }
-    const discountPercent = parseFloat(discount.discountPercent) || 0;
-    const discountAmount = (productPrice * discountPercent) / 100;
-    const productPriceUnit = productPrice - discountAmount;
+    const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
 
-    console.log('Parsed productPrice:', productPrice);
-    console.log('Discount Percent:', discountPercent);
-    console.log('Discount Amount:', discountAmount);
-    console.log('Product Price Unit:', productPriceUnit);
+
 
     let imageUrls = [];
     if (req.files && req.files.length) {
@@ -62,11 +49,20 @@ const add = async (req, res) => {
         imageUrls.push(imageUrl);
       }
     }
-    const productAttributes = JSON.parse(req.body.product_attributes).map(attr => ({
-      k: 'color',
-      v: attr, 
-      u: 'unit' 
+    let productAttributes = [];
+    if (typeof req.body.product_attributes === 'string') {
+      productAttributes = JSON.parse(req.body.product_attributes);
+    } else {
+      productAttributes = req.body.product_attributes;
+    }
+
+    productAttributes = productAttributes.map(attr => ({
+      k: attr.k,
+      v: attr.v,
     }));
+    
+    
+    
     const newProduct = new ProductV2({
       product_name: req.body.product_name,
       image: imageUrls,

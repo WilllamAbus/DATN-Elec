@@ -10,7 +10,7 @@ export interface ProductV2 {
   product_condition: string;
   product_quantity: number;
   product_price: number;
-  product_attributes: object;
+  product_attributes: { k: string; v: string }[]; 
   weight_g: number;
   image?: FileList;
 }

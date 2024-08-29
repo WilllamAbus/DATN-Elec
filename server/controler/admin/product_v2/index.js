@@ -1,10 +1,21 @@
 const { add } = require('./add');
-const { selectbrand, selectSupplier,selectDiscount,selectProductFormat,selectConditionShopping } = require('./select');
+const { list } = require('./list');
+const { softDelete } = require('./softdelete');
+
+const {
+   selectbrand,
+   selectSupplier,
+   selectDiscount,selectProductFormat,
+   selectConditionShopping
+   ,selectCategories } = require('./select');
 module.exports = {
+  list,
   add,
+  softDelete,
   selectbrand,
   selectSupplier,
   selectDiscount,
   selectProductFormat,
-  selectConditionShopping
+  selectConditionShopping,
+  selectCategories,
 };

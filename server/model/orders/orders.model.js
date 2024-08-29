@@ -9,11 +9,11 @@ const ordersSchema = new Schema(
       auctionDetails: [{ type: Schema.Types.ObjectId, ref: "orderAuctions", default: [] }], // Reference to orderAuctions
   
       // Store IDs as strings
-      paymentId:  {type: Schema.Types.Mixed, require:true, }, // ID of the payment
-      shippingAddressId:  {type: Schema.Types.Mixed, require:true, }, // ID of the shipping address
+      paymentId:  {type: Schema.Types.ObjectId, ref:'payment', require:true, }, // ID of the payment
+      shippingAddressId:  {type: Schema.Types.ObjectId, ref:'shipping', require:true, }, // ID of the shipping address
   
       // Array of voucher IDs as strings
-      voucherIds: [ {type: Schema.Types.Mixed,  default:{}}], // IDs of applied vouchers
+      voucherIds: [ {type: Schema.Types.ObjectId, ref:'voucher', require:true, }], // IDs of applied vouchers
   
       // Shipping details as embedded object
       formatShipping: {

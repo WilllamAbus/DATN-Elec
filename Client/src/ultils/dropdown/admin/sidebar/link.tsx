@@ -13,7 +13,7 @@ export const links: Record<string, Link[]> = {
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
   productv2: [
-    { label: "Sản phẩm", to: "/admin/listProducts" },
+    { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
   supplier: [

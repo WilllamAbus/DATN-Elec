@@ -1,17 +1,14 @@
-'use strict'
+"use strict";
 
-
-const _Category = require('../model/catgories.model');
-
+const _Category = require("../model/catgories.model");
 
 const upLoadImgBucket = {
-
   checkCategoryExists: async (name) => {
     try {
       const category = await _Category.findOne({ name });
       return !!category; // Return true if category exists, otherwise false
     } catch (error) {
-      throw new Error('Error checking category');
+      throw new Error("Error checking category");
     }
   },
 

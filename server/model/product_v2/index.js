@@ -6,7 +6,7 @@ const productV2Schema = new Schema({
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
   product_slug: { type: String, unique: true}, 
-  product_type: { type: Schema.Types.ObjectId, ref: 'categories', required: true },
+  product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_discount: {
     discountId: { type: Schema.Types.ObjectId, ref: 'discounts' }, 
     code: { type: String },
@@ -31,7 +31,7 @@ const productV2Schema = new Schema({
   product_price_unit: { type: Number, required: true },
   product_attributes: [{
     k: { type: String, required: true },
-    v: [{ type: String, required: true }],
+    v: { type: Schema.Types.Mixed, required: true }, 
     u: { type: String }
   }],
   weight_g: { type: Number, required: true },
