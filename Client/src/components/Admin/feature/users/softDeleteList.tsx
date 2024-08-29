@@ -10,7 +10,9 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { AvatarFallback } from "../../../../ultils/avatar/avataAdmin";
+
 const MySwal = withReactContent(Swal);
+
 const ListDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.deletedUsers);
@@ -39,8 +41,6 @@ const ListDelete: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await dispatch(restoreUserThunk(userId)).unwrap();
-
-          dispatch(getDeletedListThunk());
 
           MySwal.fire({
             title: "Đã Khôi phục!",
@@ -127,7 +127,9 @@ const ListDelete: React.FC = () => {
                   </label>
                 </div>
               </td>
-              <td className="py-4 px-6 border-b border-grey-light">{index + 1}</td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {index + 1}
+              </td>
               <th
                 scope="row"
                 className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -145,8 +147,12 @@ const ListDelete: React.FC = () => {
                   {user.name}
                 </div>
               </th>
-              <td className="py-4 px-6 border-b border-grey-light">{user.email}</td>
-              <td className="py-4 px-6 border-b border-grey-light">{user.roles.join(", ")}</td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {user.email}
+              </td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {user.roles.join(", ")}
+              </td>
               <td className="py-4 px-6 border-b border-grey-light">
                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
                   {user.status === "active" ? "Hiển thị" : "Đã ẩn"}
@@ -160,7 +166,6 @@ const ListDelete: React.FC = () => {
                   >
                     Khôi phục
                   </button>
-                 
                 </div>
               </td>
             </tr>

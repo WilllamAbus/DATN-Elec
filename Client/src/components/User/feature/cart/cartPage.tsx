@@ -1,258 +1,245 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCartList,
+  updateCartItem,
+} from "../../../../redux/cart/cartThunk";
+import { AppDispatch, RootState } from "../../../../redux/store";
+import { CartType } from "../../../../types/cart/carts";
 import { useNavigate } from "react-router-dom";
-import listOne from "../../../../assets/images/products/product14.jpg";
-// import "../../../../assets/css/user.style.css";
-// import "@fortawesome/fontawesome-free/css/all.min.css";
-import Modal from "../../MoalButton";
-import { getUserData, getUserDataV2 } from "../../../../middleware/getToken";
-import { Voucher, CartItem , CartState} from "../../../../types/Voucher.d";
-// Define an interface for cart item
-
+import { Button } from "flowbite-react";
+// import { updateItemQuantity } from "../../../../redux/cart/cartSlice";
 
 const CartPage: React.FC = () => {
-  const [cartState, setCartState] = useState<CartState>({
-    items: [],
-    totalPrice: 0,
-    shipping: 25000,
-    applyVoucher: false,
-    selectedVoucher: undefined,
-  });
-
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const userId = useSelector(
+    (state: RootState) => state.auth.profile.profile?._id
+  );
+  const carts = useSelector((state: RootState) => state.cart.carts);
+  const cartss = useSelector(
+    (state: RootState) => state.cart.carts[0].totalPrice
+  );
+  const cartStatus = useSelector((state: RootState) => state.cart.status);
+  const cartError = useSelector((state: RootState) => state.cart.error);
+  console.log(cartss);
 
   useEffect(() => {
-    // Retrieve cart and voucher from local storage
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const storedVoucher = JSON.parse(localStorage.getItem("selectedVoucher") || "null");
+    if (userId) {
+      dispatch(fetchCartList());
+    }
+  }, [dispatch, userId]);
 
-  
+  if (cartStatus === "loading") {
+    return <p>Loading...</p>;
+  }
 
-    // Update cart state with retrieved data
-    const updatedTotalPrice = calculateTotal(cart, storedVoucher);
-  
+  if (cartStatus === "failed") {
+    return <p>Error: {cartError}</p>;
+  }
 
-    setCartState({
-      items: cart,
-      selectedVoucher: storedVoucher || undefined,
-      applyVoucher: !!storedVoucher,
-      totalPrice: updatedTotalPrice,
-      shipping: 25000, // Assuming static shipping cost for this example
+  if (!Array.isArray(carts) || carts.length === 0) {
+    return <p>Giỏ hàng trống</p>;
+  }
+
+  const groupedCarts: CartType[] = [];
+  const groupedMap = new Map<string, CartType>();
+
+  carts.forEach((cart) => {
+    cart.items.forEach((item) => {
+      const key = item.product?._id?.toString();
+      if (key) {
+        if (!groupedMap.has(key)) {
+          groupedMap.set(key, { ...cart, items: [item] });
+        } else {
+          const existingCart = groupedMap.get(key)!;
+          const updatedItems = [...existingCart.items];
+
+          const itemIndex = updatedItems.findIndex(
+            (i) => i.product?._id?.toString() === item.product?._id?.toString()
+          );
+
+          if (itemIndex !== -1) {
+            updatedItems[itemIndex] = {
+              ...updatedItems[itemIndex],
+              quantity: updatedItems[itemIndex].quantity + item.quantity,
+              totalItemPrice:
+                updatedItems[itemIndex].totalItemPrice + item.totalItemPrice,
+            };
+          } else {
+            updatedItems.push(item);
+          }
+
+          existingCart.items = updatedItems;
+        }
+      }
     });
-  }, []);
+  });
 
-  const calculateTotal = (items: CartItem[], voucher?: Voucher) => {
-    // Calculate subtotal
-    const subtotal = items.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
+  groupedMap.forEach((value) => groupedCarts.push(value));
+
+  const totalCartPrice = groupedCarts.reduce((total, cart) => {
+    return (
+      total +
+      cart.items.reduce((itemTotal, item) => {
+        return itemTotal + item.totalItemPrice;
+      }, 0)
     );
- 
+  }, 0);
 
-    // Calculate discount
-    const discount = voucher ? voucher.voucherNum : 0;
-   
-
-    const totalPrice = subtotal - discount;
-
-
-    // Ensure totalPrice doesn't go below zero
-    return Math.max(totalPrice, 0);
-  };
-
-  const calculateGrandTotal = () => {
-    const grandTotal = cartState.totalPrice + cartState.shipping;
-    console.log("Grand Total:", grandTotal);
-    return grandTotal;
-  };
-
-  const handleRemoveItem = (id: string) => {
-    const updatedItems = cartState.items.filter((item) => item.id !== id);
-   
-
-    localStorage.setItem("cart", JSON.stringify(updatedItems));
-    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
- 
-
-    setCartState((prevState) => ({
-      ...prevState,
-      items: updatedItems,
-      totalPrice: newTotalPrice,
-    }));
-  };
-
-  const increaseQuantity = (id: string) => {
-    const updatedItems = cartState.items.map((item) =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+  const handleIncreaseQuantity = async (
+    cartId: string,
+    itemId: string,
+    currentQuantity: number
+  ) => {
+    const newQuantity = currentQuantity + 1;
+    console.log(
+      `Increasing quantity: cartId=${cartId}, itemId=${itemId}, currentQuantity=${currentQuantity}, newQuantity=${newQuantity}`
     );
-   
 
-    localStorage.setItem("cart", JSON.stringify(updatedItems));
-    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
-   
+    try {
+      await dispatch(
+        updateCartItem({
+          cartId,
+          itemId,
+          quantity: newQuantity,
+        })
+      ).unwrap();
 
-    setCartState((prevState) => ({
-      ...prevState,
-      items: updatedItems,
-      totalPrice: newTotalPrice,
-    }));
+      // Dispatch an action to update the item quantity in the Redux store
+      // This step may not be necessary if the `updateCartItem` is updating the store correctly.
+      // dispatch(updateItemQuantity({ cartId, itemId, quantity: newQuantity }));
+
+      // Force a re-render by updating local state if necessary
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+    }
   };
 
-  const decreaseQuantity = (id: string) => {
-    const updatedItems = cartState.items.map((item) =>
-      item.id === id && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
-    console.log("Updated Items after Decreasing Quantity:", updatedItems);
+  const handleDecreaseQuantity = async (
+    cartId: string,
+    itemId: string,
+    currentQuantity: number
+  ) => {
+    if (currentQuantity > 1) {
+      const newQuantity = currentQuantity - 1;
+      console.log(
+        `Decreasing quantity: cartId=${cartId}, itemId=${itemId}, currentQuantity=${currentQuantity}, newQuantity=${newQuantity}`
+      );
 
-    localStorage.setItem("cart", JSON.stringify(updatedItems));
-    const newTotalPrice = calculateTotal(updatedItems, cartState.selectedVoucher);
-    console.log("New Total Price after Decreasing Quantity:", newTotalPrice);
+      try {
+        await dispatch(
+          updateCartItem({
+            cartId,
+            itemId,
+            quantity: newQuantity,
+          })
+        ).unwrap();
 
-    setCartState((prevState) => ({
-      ...prevState,
-      items: updatedItems,
-      totalPrice: newTotalPrice,
-    }));
-  };
+        // Dispatch an action to update the item quantity in the Redux store
+        // This step may not be necessary if the `updateCartItem` is updating the store correctly.
+        // dispatch(updateItemQuantity({ cartId, itemId, quantity: newQuantity }));
 
-  const handleVoucherApply = (voucher: Voucher) => {
-    const newTotalPrice = calculateTotal(cartState.items, voucher);
-    console.log("Applying Voucher:", voucher);
-    console.log("New Total Price after Applying Voucher:", newTotalPrice);
-
-    setCartState((prevState) => ({
-      ...prevState,
-      applyVoucher: true,
-      selectedVoucher: voucher,
-      totalPrice: newTotalPrice,
-    }));
-    localStorage.setItem("selectedVoucher", JSON.stringify(voucher));
+        // Force a re-render by updating local state if necessary
+      } catch (error) {
+        console.error("Failed to update quantity:", error);
+      }
+    }
   };
 
   const handleCheckout = () => {
-    // Calculate and store the grand total in localStorage or state
-    const grandTotal = calculateGrandTotal();
-    console.log("Grand Total for Checkout:", grandTotal);
-
-    localStorage.setItem("cart", JSON.stringify(cartState.items));
-    localStorage.setItem("grandTotal", JSON.stringify(grandTotal));
-    const storedVoucher = JSON.parse(localStorage.getItem("selectedVoucher") || "null");
-    if (storedVoucher) {
-      localStorage.setItem("selectedVoucher", JSON.stringify(storedVoucher));
-    }
-    const userData = getUserData();
-
-    const userDataV2 = getUserDataV2();
-    if (userData ||userDataV2) {
-      const isAdmin = userData.roles.some(role => role.name === 'admin');
-      const isAdminV2 = userDataV2 .roles.some(role => role.name === 'admin');
-      if (isAdmin || isAdminV2) {
-        navigate('/login');
-      } else {
-        navigate('/checkout');
-      }
-    } else {
-      navigate('/login');
-    }
+    navigate("/checkout", { state: { groupedCarts, totalCartPrice } });
   };
 
   return (
     <>
-      {/* breadcrumb */}
+      {/* Breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
-        <a href="/" className="text-primary text-base">
+        <a href="/" className="text-primary text-base hover:underline">
           <i className="fa-solid fa-house"></i>
         </a>
         <span className="text-sm text-gray-400">
           <i className="fa-solid fa-chevron-right"></i>
         </span>
-        <p className="text-gray-600 font-medium">Cart</p>
       </div>
-      {/* ./breadcrumb */}
+      {/* ./Breadcrumb */}
 
-      {/* wrapper */}
+      {/* Wrapper */}
       <div className="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
-        <div className="col-span-8 border border-gray-200 p-4 rounded">
-          <h3 className="text-lg font-medium capitalize mb-4">Giỏ hàng</h3>
+        {/* Cart Items */}
+        <div className="col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white">
+          <h3 className="text-lg font-semibold capitalize mb-4">Giỏ hàng</h3>
           <div className="space-y-4">
-            {/* Product Items */}
-            {cartState.items.length > 0 ? (
-              cartState.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <img
-                      src={item.imgPreview || listOne}
-                      alt={`product ${item.name}`}
-                      className="w-28 h-10"
-                    />
-                  
-                  </div>
-                  <h5 className="text-gray-800 font-medium">{item.name}</h5>
-                  <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-                    <div
-                      className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
-                      onClick={() => decreaseQuantity(item.id)}
-                    >
-                      -
-                    </div>
-                    <div className="h-8 w-8 text-base flex items-center justify-center">
-                      {item.quantity}
-                    </div>
-                    <div
-                      className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none"
-                      onClick={() => increaseQuantity(item.id)}
-                    >
-                      +
-                    </div>
-                  </div>
-                  <p className="text-gray-800 font-medium">
-                    {(item.price * item.quantity).toLocaleString()} vnđ
-                  </p>
+            {groupedCarts.map((cart) => (
+              <div
+                key={cart._id}
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50"
+              >
+                <div className="flex items-center">
+                  <img
+                    src={cart.items[0].product.image[0] || "default-image-url"}
+                    alt={`product ${cart.items[0].product.product_name}`}
+                    className="w-24 h-24 object-cover rounded-md"
+                  />
+                </div>
+                <h5 className="text-gray-800 font-semibold">
+                  {cart.items[0].product.product_name}
+                </h5>
+                <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 rounded-md overflow-hidden">
                   <button
-                    className="ml-2 text-gray-600 hover:text-red-600 focus:outline-none"
-                    onClick={() => handleRemoveItem(item.id)}
+                    className="h-8 w-8 text-xl flex items-center justify-center bg-gray-200 hover:bg-gray-300"
+                    onClick={() =>
+                      handleDecreaseQuantity(
+                        cart._id,
+                        cart.items[0].product._id,
+                        cart.items[0].quantity
+                      )
+                    }
                   >
-                    <i className="fa-sharp fa-solid fa-trash"></i>
+                    -
+                  </button>
+                  <div className="h-8 w-8 text-base flex items-center justify-center bg-gray-100">
+                    {cart.items[0].quantity}
+                  </div>
+                  <button
+                    className="h-8 w-8 text-xl flex items-center justify-center bg-gray-200 hover:bg-gray-300"
+                    onClick={() =>
+                      handleIncreaseQuantity(
+                        cart._id,
+                        cart.items[0].product._id,
+                        cart.items[0].quantity
+                      )
+                    }
+                  >
+                    +
                   </button>
                 </div>
-              ))
-            ) : (
-              <p className="text-gray-600">Giỏ hàng trống</p>
-            )}
+                <p className="text-gray-800 font-semibold">
+                  {(
+                    cart.items[0].price * cart.items[0].quantity
+                  ).toLocaleString()}{" "}
+                  vnđ
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="col-span-4 border border-gray-200 p-4 rounded">
-          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">
+        {/* Summary */}
+        <div className="col-span-4 border border-gray-200 p-4 rounded-lg shadow-sm bg-white">
+          <h4 className="text-gray-800 text-lg mb-4 font-semibold uppercase">
             Tổng thanh toán
           </h4>
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
+          <div className="flex justify-between border-b border-gray-200 mb-3 pb-2 text-gray-800 font-semibold uppercase">
             <p>Thanh toán</p>
-            <p>{cartState.totalPrice.toLocaleString()} vnđ</p>
+            <p>{totalCartPrice.toLocaleString()} vnđ</p>
           </div>
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
-            <p>Vận chuyển</p>
-            <p>{cartState.shipping.toLocaleString()} vnđ</p>
-          </div>
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercase">
-            <p>Giảm giá</p>
-            <p>{(cartState.selectedVoucher?.voucherNum || 0).toLocaleString()} vnđ</p>
-          </div>
-          <div className="flex justify-between text-gray-800 font-medium py-3 uppercase">
-            <p className="font-semibold">Tổng cộng</p>
-            <p>{calculateGrandTotal().toLocaleString()} vnđ</p>
-          </div>
-
-          <button
+          <Button
             onClick={handleCheckout}
-            className="block w-full py-3 px-4 text-center text-white bg-bgAmberBtbAdd border border-primary rounded-md 
-                hover:bg-transparent hover:text-primary transition font-medium"
+            className="bg-blue-600 text-white hover:bg-primary-dark focus:ring-primary-light"
           >
             Thanh toán
-          </button>
-          <br />
-          <Modal onVoucherApply={handleVoucherApply} />
+          </Button>
         </div>
       </div>
     </>

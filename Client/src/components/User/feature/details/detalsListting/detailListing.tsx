@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { addToWatchlistThunk } from "../../../../../redux/product/wathlist";
+import {
+  addToWatchlistThunk,
+  deleteWatchlistThunk,
+} from "../../../../../redux/product/wathList/wathlist";
 import {
   getOneProduct,
   upViewProduct,
@@ -12,6 +15,7 @@ import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Comment from "../../../../User/feature/details/comment/comment";
+import { addProductToCart } from "../../../../../redux/cart/cartThunk";
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -28,33 +32,58 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
-  const watchlistStatus = useSelector(
-    (state: RootState) => state.watchlist.wathlist.status
-  );
   const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist.wathlist.items
+    (state: RootState) => state.watchlist.items
   );
-  console.log("wathlist", watchlistItems);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
+  const handleAddToCart = async (productId: string) => {
+    if (userId) {
+      try {
+        await dispatch(
+          addProductToCart({ userId, productId, quantity })
+        ).unwrap();
+        console.log("Sản phẩm đã được thêm vào giỏ hàng");
+      } catch (err) {
+        console.error("Lỗi khi thêm sản phẩm vào giỏ hàng", err);
+      }
+    }
+  };
+
   const handleAddToWatchlist = async () => {
     if (userId && id) {
       try {
-        await dispatch(addToWatchlistThunk({ userId, productId: id })).unwrap();
-        setIsFavorite(true);
+        let resultAction;
+
+        if (isFavorite) {
+          resultAction = await dispatch(deleteWatchlistThunk(id)).unwrap();
+          if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+            setIsFavorite(false);
+          } else {
+            console.log(resultAction);
+          }
+        } else {
+          resultAction = await dispatch(
+            addToWatchlistThunk({ userId, productId: id })
+          ).unwrap();
+          if (addToWatchlistThunk.fulfilled.match(resultAction)) {
+            setIsFavorite(true);
+          } else {
+            console.log(resultAction);
+          }
+        }
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
-        } else {
-          setError("An unknown error occurred");
         }
       }
     } else {
       console.log("User ID or Product ID is missing");
+      setError("User ID or Product ID is missing");
     }
   };
 
@@ -65,7 +94,6 @@ const ProductDetail: React.FC = () => {
         return;
       }
       try {
-        console.log("Fetching product with ID:", id);
         const product = await getOneProduct(id);
         setProduct(product);
 
@@ -84,23 +112,16 @@ const ProductDetail: React.FC = () => {
             "viewedProducts",
             JSON.stringify(viewedProducts)
           );
-
           const updatedProduct = await getOneProduct(id);
           setProduct(updatedProduct);
-          console.log("Tăng lượt xem thành công");
-        } else {
-          console.log("Sản phẩm đã được xem");
         }
 
+        // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
         if (Array.isArray(watchlistItems)) {
-          const isFavoriteProduct = watchlistItems.some((item) => {
-            const product = item.product || item.data?.product;
-            return product && product._id === id;
-          });
-          console.log("Is favorite:", isFavoriteProduct);
+          const isFavoriteProduct = watchlistItems.some(
+            (item) => item.product && item.product._id === id
+          );
           setIsFavorite(isFavoriteProduct);
-        } else {
-          console.log("Watchlist items is not an array");
         }
       } catch (error) {
         console.log(
@@ -112,7 +133,6 @@ const ProductDetail: React.FC = () => {
 
     fetchData();
   }, [id, userId, dispatch, watchlistItems]);
-
   return (
     <>
       {/* breadcrumb */}
@@ -264,24 +284,23 @@ const ProductDetail: React.FC = () => {
               <i className="fa-solid fa-bag-shopping"></i> Mua ngay
             </a>
             <a
-              href="/cart"
+              // href="/cart"
+              onClick={() => handleAddToCart(product._id)}
               className="bg-green-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-green-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
             </a>
             {error && <p className="text-red-500">{error}</p>}
-            {/* Hiển thị thông báo lỗi */}
             <button
               onClick={handleAddToWatchlist}
-              disabled={watchlistStatus === "loading"}
-              className="bg-yellow-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-yellow-700 transition"
+              className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
-                className={`fa-solid fa-heart ${
-                  isFavorite ? "text-red-500" : "text-white"
+                className={`fas fa-heart ${
+                  isFavorite ? "text-red-500" : "text-gray-500"
                 }`}
-              ></i>{" "}
-              {watchlistStatus === "loading" ? "Adding..." : "Add to Watchlist"}
+              ></i>
+              <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>
           </div>
 
@@ -344,12 +363,12 @@ const ProductDetail: React.FC = () => {
                                     <p className="font-medium text-gray-800"></p>
                                     <p className="text-gray-600">Sản Phẩm Tốt!!!</p>
                                 </div>
-                          <p className="text-yellow-400">    
+                          <p className="text-yellow-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                            </p>
                             </div>
                  </div>
@@ -362,12 +381,12 @@ const ProductDetail: React.FC = () => {
                                     <p className="font-medium text-gray-800"></p>
                                     <p className="text-gray-600">Good!!!</p>
                                 </div>
-                          <p className="text-yellow-400">    
+                          <p className="text-yellow-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                            </p>
                             </div>
                  </div>
@@ -377,12 +396,12 @@ const ProductDetail: React.FC = () => {
                         <input type="text" name="contents" placeholder="Enter your comment..." className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md" />
                         <button type="submit" className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">Submit</button>
                     </div>
-                    <div className="text-gray-400">    
+                    <div className="text-gray-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                     </div>
                 </form>
             </div> */}

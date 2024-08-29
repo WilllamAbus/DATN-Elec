@@ -234,9 +234,11 @@ export const getWatchlist = async () => {
   }
 };
 
-export const DeleteWatchlist = async (id: string) => {
+export const DeleteWatchlist = async (productId: string) => {
   try {
-    const response = await instance.delete(`${API_URL}/wathlist/delete/${id}`);
+    const response = await instance.delete(
+      `${API_URL}/wathlist/delete/${productId}`
+    );
 
     return response.data;
   } catch (error) {

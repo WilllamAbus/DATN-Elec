@@ -4,7 +4,7 @@ import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { addToWatchlistThunk } from "../../redux/product/wathlist";
+import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -13,7 +13,7 @@ function formatCurrency(value: number) {
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  useSelector((state: RootState) => state.watchlist.wathlist.items);
+  useSelector((state: RootState) => state.watchlist.items);
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
@@ -69,7 +69,7 @@ const ProductSection: React.FC = () => {
                 <div className="mb-4 flex items-center justify-between gap-4">
                   {product.discount > 0 ? (
                     <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                      Giảm giá {product.discount}% 
+                      Giảm giá {product.discount}%
                     </span>
                   ) : (
                     <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
@@ -80,7 +80,11 @@ const ProductSection: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                     {product.view > 0 ? <span className="mr-2">({product.view})</span> : '' }
+                      {product.view > 0 ? (
+                        <span className="mr-2">({product.view})</span>
+                      ) : (
+                        ""
+                      )}
 
                       <svg
                         className="h-5 w-5"
@@ -215,7 +219,9 @@ const ProductSection: React.FC = () => {
                       ))}
                     </div>
                     <div className="text-xs text-gray-500 items-center m-3">
-                      {product.quantity > 0 ? `(Còn ${product.quantity} sản phẩm)` : " "}
+                      {product.quantity > 0
+                        ? `(Còn ${product.quantity} sản phẩm)`
+                        : " "}
                     </div>
                   </p>
                 </div>
