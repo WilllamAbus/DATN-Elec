@@ -110,7 +110,7 @@ const timeTrackService = {
       try {
         // Lấy thời gian hiện tại theo múi giờ Hồ Chí Minh và chuyển đổi sang UTC
         const endTime = moment().tz('Asia/Ho_Chi_Minh').utc().toDate();
-        console.log('Updating endTime to:', endTime);
+        // console.log('Updating endTime to:', endTime);
   
         // Cập nhật endTime trong cơ sở dữ liệu
         const updatedTimeTrack = await timeTrackService.updateTimeTrack(timeTrackId, { endTime });
@@ -129,7 +129,7 @@ const timeTrackService = {
     // Dừng interval sau 10 giây (hoặc điều chỉnh theo nhu cầu)
     setTimeout(() => {
       clearInterval(interval);
-      console.log('Stopped real-time update');
+      // console.log('Stopped real-time update');
     }, 10000);
   },
 
@@ -139,7 +139,7 @@ const timeTrackService = {
         const timeTrack = await Time_Track.findById(id);
         if (!timeTrack) {
           clearInterval(interval);
-          console.log('TimeTrack not found. Stopped updating.');
+          // console.log('TimeTrack not found. Stopped updating.');
           return;
         }
 
@@ -152,7 +152,7 @@ const timeTrackService = {
         if (moment(timeTrack.endTime, 'DD/MM/YYYY HH:mm:ss').isBefore(moment())) {
           await Time_Track.findByIdAndDelete(id);
           clearInterval(interval);
-          console.log('TimeTrack deleted as endTime has passed.');
+          // console.log('TimeTrack deleted as endTime has passed.');
         }
       } catch (error) {
         console.error('Error updating startTime in real-time:', error);
