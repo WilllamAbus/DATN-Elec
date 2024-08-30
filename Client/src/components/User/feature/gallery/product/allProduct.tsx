@@ -5,7 +5,7 @@ import currencyFormatter from "currency-formatter";
 // import Sidebar from "../sidebar";
 import "../../../../../assets/css/user.style.css"
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
-import { addToWatchlistThunk } from "../../../../../redux/product/wathlist";
+import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/rootReducer";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen","CPU","Pin"];
@@ -17,7 +17,7 @@ const AllProduct: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const id:string = `66c0e5b0a772066cc0854614`;
   const dispatch = useDispatch<AppDispatch>();
-  useSelector((state: RootState) => state.watchlist.wathlist.items);
+  useSelector((state: RootState) => state.watchlist.items);
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   const handleAddToWatchlist = async (productId: string) => {
     if (userId) {
