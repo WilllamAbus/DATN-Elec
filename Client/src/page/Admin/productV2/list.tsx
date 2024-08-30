@@ -1,17 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import AdminFetAddProduct from "../../../components/Admin/feature/productV2/list";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
-import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import ProductSummary from "../../../components/Admin/summary/ProductSummary";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 import AddProductButton from "../../../components/Admin/buttonAdd";
 const listProd: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-  
   return (
     <div>
       <ReusableBreadcrumb items={breadcrumbItems.listproduct} />
@@ -31,11 +25,6 @@ const listProd: React.FC = () => {
             </div>
             <div className="overflow-x-auto">
               <AdminFetAddProduct />
-              <PaginationComponent
-                currentPage={currentPage}
-                totalPages={5}
-                onPageChange={handlePageChange}
-              />
             </div>
           </div>
         </div>

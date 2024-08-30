@@ -11,6 +11,7 @@ import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import watchlistReducer from "./product/productSlice";
+import productAdminReducer from "./product/admin";
 const authConfig = {
   key: "auth",
   storage,
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   watchlist: watchlistReducer,
   voucher: voucherReducer,
   checkout: checkoutSlice,
+  products: productAdminReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

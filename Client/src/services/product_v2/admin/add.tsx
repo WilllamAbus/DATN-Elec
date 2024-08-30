@@ -28,6 +28,7 @@ export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<Prod
     const response = await instance.post("/admin/product/add", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        
       },
     });
     return response.data;

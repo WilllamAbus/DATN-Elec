@@ -9,7 +9,10 @@ import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
 import { ProductV2 } from "../../../../types/ProductV2";
-import { addProductV2 } from "../../../../services/product_v2/admin/add";
+import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../../redux/store";
+import { add } from "../../../../redux/product/admin/Thunk";
 import {
   ColorOption,
   RamOption,
@@ -36,7 +39,6 @@ import {
 } from "./handlers";
 import { selectFetchData } from "./FetchData";
 import { DiscountSelect, CategorySelect, BrandSelect, SupplierSelect } from "./select";
-import { ApiResponse } from "../../../../services/product_v2/admin/types";
 import { MultiValue } from "react-select";
 const AddProduct: React.FC = () => {
   const {
@@ -51,7 +53,7 @@ const AddProduct: React.FC = () => {
     },
   });
   const [isLoading, setIsLoading] = useState(false);
-
+  const dispatch: AppDispatch = useDispatch();
   const { imgPreview, handleImageChange } = useImageUpload();
   const [selectedRam, setSelectedRam] = useState<MultiValue<RamOption>>([]);
   const [selectedColors, setSelectedColors] = useState<MultiValue<ColorOption>>([]);
@@ -59,11 +61,9 @@ const AddProduct: React.FC = () => {
   const [selectedCPU, setSelectedCPU] = useState<MultiValue<CPUOption>>([]);
   const [selectedCard, setSelectedCard] = useState<MultiValue<CardOption>>([]);
   const [selectedBattery, setSelectedBattery] = useState<MultiValue<BatteryOption>>([]);
-
   const onColorChange = (selectedOptions: MultiValue<ColorOption>) => {
     handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
   };
-
   const onRamChange = (selectedOptions: MultiValue<RamOption>) => {
     handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
   };
@@ -87,23 +87,18 @@ const AddProduct: React.FC = () => {
   const submitFormAdd: SubmitHandler<ProductV2> = async (data) => {
     setIsLoading(true);
     try {
-      const response: ApiResponse<ProductV2> = await addProductV2(data);
-      console.log(response);
-
-      if (response.success) {
-        notify(response.msg);
-        setTimeout(() => {
-          navigate("/admin/listProducts");
-        }, 2000);
-      } else {
-        notifyError(response.msg);
-      }
+      const actionResult = await dispatch(add(data)).unwrap();
+      notify(actionResult.msg);
+      setTimeout(() => {
+        navigate("/admin/listproduct");
+      }, 2000);
     } catch (error) {
-      notifyError("Có lỗi xảy ra khi thêm sản phẩm.");
+      notifyError((error as ApiResponse<null>).msg);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
@@ -342,7 +337,7 @@ const AddProduct: React.FC = () => {
                 <select
                   id="product_format"
                   className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  {...register("product_format", { required: "Vui lòng chọn định dạng sản phẩm" })}
+                  {...register("product_format")}
                 >
                   <option value="">Chọn định dạng sản phẩm</option>
                   {productFormats.map((format) => (

@@ -1,4 +1,5 @@
 export interface ProductV2 {
+  _id: string;
   product_name: string;
   product_description: string;
   product_type: string;

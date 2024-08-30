@@ -2,7 +2,7 @@ export interface Product {
   _id: string;
   product_name: string;
   product_description: string;
-  product_type: { name: string }; 
+  product_type: { name: string };
   createdAt: string;
   product_discount: number;
   product_supplier: string;
@@ -31,5 +31,13 @@ export interface SoftDeleteResponse {
   msg: string;
   status: number;
   data?: any;
+  error?: string;
+}
+export interface GetOneResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  product?: Product;
   error?: string;
 }

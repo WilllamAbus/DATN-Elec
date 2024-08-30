@@ -48,7 +48,7 @@ export const breadcrumbItems = {
   editProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
-    { href: "/admin/editProducts", label: "Cập nhật sản phẩm" },
+    { href: "/admin/editproduct", label: "Cập nhật sản phẩm" },
   ],
   editSuppliers: [
     { href: "/", label: "Home" },

@@ -15,10 +15,10 @@ const productV2Schema = new Schema({
     status: { type: String },
     disabledAt: { type: Date }
   },
-  product_brand: { type: Schema.Types.ObjectId, ref: 'brands', required: true },
+  product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_format: { type: Schema.Types.ObjectId, ref: 'formatShopping', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
-  product_supplier: { type: Schema.Types.ObjectId, ref: 'suppliers', required: true },
+  product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
   product_quantity: { type: Number, required: true },
   product_ratingAvg: {
     type: Number,
