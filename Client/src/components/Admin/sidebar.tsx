@@ -1,6 +1,10 @@
 import React from "react";
 import DropdownItem from "../../ultils/dropdown/admin/sidebar";
 import NavItem from "../../ultils/dropdown/admin/sidebar/LinkDropdownSiderbar";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../redux/store";
+import { logoutThunk } from "../../redux/auth/authThunk";
+import Cookies from "js-cookie";
 
 interface SidebarProps {
   isOpenMobie: boolean;
@@ -8,6 +12,21 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutThunk()).unwrap();
+
+      Cookies.remove("token");
+      Cookies.remove("refreshToken");
+      localStorage.removeItem("userProfile");
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
   return (
     <>
       <div
@@ -72,6 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
                   <li>
                     <button
                       type="button"
+                      onClick={handleLogout}
                       className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                       aria-controls="dropdown-auth"
                       data-collapse-toggle="dropdown-auth"

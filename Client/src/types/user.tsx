@@ -42,6 +42,7 @@ export interface UserProfile {
   phone: string;
   avatar: string;
   address: string;
+  addressID: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -64,6 +65,7 @@ export interface UpdateUser {
   phone: string;
   avatar: string;
   address: string;
+  addressID: string;
 }
 export interface Permission {
   name: string;

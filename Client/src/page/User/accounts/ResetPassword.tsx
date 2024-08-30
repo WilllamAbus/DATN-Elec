@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { AppDispatch } from "../../../redux/store";
 import { resetPasswordThunk } from "../../../redux/auth/authThunk";
 import { useDispatch } from "react-redux";
+import { Alert, Button, Label, TextInput } from "flowbite-react";
 
 const ResetPassword: React.FC = () => {
   const [password, setPassword] = useState("");
@@ -32,52 +33,66 @@ const ResetPassword: React.FC = () => {
   return (
     <>
       <div className="contain py-16">
-        <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
-          <h2 className="text-2xl uppercase font-medium mb-1">Quên mật khẩu</h2>
-          <p className="text-gray-600 mb-6 text-sm">Welcome back customer</p>
+        <div className="max-w-lg mx-auto shadow-lg px-8 py-10 rounded-lg overflow-hidden bg-white">
+          <h2 className="text-2xl uppercase font-medium mb-4 text-center">
+            Quên mật khẩu
+          </h2>
+          <p className="text-gray-600 mb-8 text-sm text-center">
+            Vui lòng nhập mật khẩu mới của bạn
+          </p>
           <form onSubmit={handleSubmit}>
-            <div className="space-y-2">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="password" className="text-gray-600 mb-2 block">
-                  Mật khẩu mới
-                </label>
-                <input
+                <Label
+                  htmlFor="password"
+                  value="Mật khẩu mới"
+                  className="text-gray-600"
+                />
+                <TextInput
                   type="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                  placeholder="youremail@domain.com"
+                  className="block w-full"
+                  placeholder="Nhập mật khẩu mới"
                 />
               </div>
               <div>
-                <label
+                <Label
                   htmlFor="confirmPassword"
-                  className="text-gray-600 mb-2 block"
-                >
-                  Xác nhận lại mật khẩu
-                </label>
-                <input
+                  value="Xác nhận mật khẩu"
+                  className="text-gray-600"
+                />
+                <TextInput
                   type="password"
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-primary placeholder-gray-400"
-                  placeholder="youremail@domain.com"
+                  className="block w-full"
+                  placeholder="Nhập lại mật khẩu mới"
                 />
               </div>
             </div>
-            <div className="mt-4">
-              <button
+            <div className="mt-8">
+              <Button
                 type="submit"
-                className="block w-full py-2 text-center text-white bg-primary border border-primary rounded hover:bg-transparent hover:text-primary transition uppercase font-roboto font-medium"
+                className="w-full"
+                gradientDuoTone="cyanToBlue"
               >
                 XÁC NHẬN
-              </button>
-              {message && <p className="text-green-600 mt-2">{message}</p>}
-              {error && <p className="text-red-600 mt-2">{error}</p>}
+              </Button>
+              {message && (
+                <Alert color="success" className="mt-4">
+                  {message}
+                </Alert>
+              )}
+              {error && (
+                <Alert color="failure" className="mt-4">
+                  {error}
+                </Alert>
+              )}
             </div>
           </form>
         </div>

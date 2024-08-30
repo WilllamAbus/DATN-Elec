@@ -2,16 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { addToWatchlistThunk } from "../../../../../redux/product/wathlist";
 import {
-  getOneProduct,
-  upViewProduct,
-} from "../../../../../services/product/crudProduct.service";
-import { getFileFirebase } from "../../../../../services/firebase/getFirebse.service";
+  addToWatchlistThunk,
+  deleteWatchlistThunk,
+} from "../../../../../redux/product/wathList/wathlist";
+import { getProductByID } from "../../../../../services/product_v2/client/homeAllProduct";
+import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Comment from "../../../../User/feature/details/comment/comment";
+import { addProductToCart } from "../../../../../redux/cart/cartThunk";
+const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -19,8 +21,18 @@ function formatCurrency(value: number) {
 
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
-  const [product, setProduct] = useState<any | null>(null);
-  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const [products, setProduct] = useState<any | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedValues, setSelectedValues] = useState<
+    Record<string, string | null>
+  >({});
+
+  const handleChange = (attributeKey: string, value: string) => {
+    setSelectedValues((prev) => ({
+      ...prev,
+      [attributeKey]: value,
+    }));
+  };
   const { id } = useParams<{ id: string }>();
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
@@ -28,34 +40,62 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
-  const watchlistStatus = useSelector(
-    (state: RootState) => state.watchlist.wathlist.status
-  );
   const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist.wathlist.items
+    (state: RootState) => state.watchlist.items
   );
-  console.log("wathlist", watchlistItems);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
+  const handleAddToCart = async () => {
+    if (userId && id) {
+      try {
+        await dispatch(addProductToCart({ userId, productId: id })).unwrap();
+        console.log("Thêm Thành công");
+      } catch (err) {
+        console.error("Lỗi thêm giỏ hàng", err);
+      }
+    } else {
+      console.log("chưa login");
+    }
+  };
   const handleAddToWatchlist = async () => {
     if (userId && id) {
       try {
-        await dispatch(addToWatchlistThunk({ userId, productId: id })).unwrap();
-        setIsFavorite(true);
+        let resultAction;
+
+        if (isFavorite) {
+          resultAction = await dispatch(deleteWatchlistThunk(id)).unwrap();
+          if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+            setIsFavorite(false);
+          } else {
+            console.log(resultAction);
+          }
+        } else {
+          resultAction = await dispatch(
+            addToWatchlistThunk({ userId, productId: id })
+          ).unwrap();
+          if (addToWatchlistThunk.fulfilled.match(resultAction)) {
+            setIsFavorite(true);
+          } else {
+            console.log(resultAction);
+          }
+        }
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
-        } else {
-          setError("An unknown error occurred");
         }
       }
     } else {
       console.log("User ID or Product ID is missing");
+      setError("User ID or Product ID is missing");
     }
+  };
+  //chuyển ảnh
+  const changeMainImage = (index: number) => {
+    setCurrentIndex(index);
   };
 
   useEffect(() => {
@@ -66,27 +106,24 @@ const ProductDetail: React.FC = () => {
       }
       try {
         console.log("Fetching product with ID:", id);
-        const product = await getOneProduct(id);
-        setProduct(product);
+        const productID = await getProductByID(id);
+        setProduct(productID.product);
+        console.log(productID.product);
 
-        if (product.image) {
-          const url = await getFileFirebase(product.image);
-          setImgPreview(url);
-        }
-          await upViewProduct(id);
-          const updatedProduct = await getOneProduct(id);
-          setProduct(updatedProduct);
-     
+        // if (productID.image[0]) {
+        //   const url = await getFileFirebase(productID.image);
+        //   setImgPreview(url);
+        // }
+        // await upViewProduct(id);
+        // const updatedProduct = await getProductByID(id);
+        // setProduct(updatedProduct);
 
+        // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
         if (Array.isArray(watchlistItems)) {
-          const isFavoriteProduct = watchlistItems.some((item) => {
-            const product = item.product || item.data?.product;
-            return product && product._id === id;
-          });
-          console.log("Is favorite:", isFavoriteProduct);
+          const isFavoriteProduct = watchlistItems.some(
+            (item) => item.product && item.product._id === id
+          );
           setIsFavorite(isFavoriteProduct);
-        } else {
-          console.log("Watchlist items is not an array");
         }
       } catch (error) {
         console.log(
@@ -95,10 +132,8 @@ const ProductDetail: React.FC = () => {
         );
       }
     };
-
     fetchData();
   }, [id, userId, dispatch, watchlistItems]);
-
   return (
     <>
       {/* breadcrumb */}
@@ -113,20 +148,30 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* product-detail */}
-      <div className="container grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="flex justify-center items-center">
-          {imgPreview && (
-            <img
-              src={imgPreview}
-              alt="Image Preview"
-              className="w-full max-w-md object-cover"
-            />
-          )}
+      <div className="container grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+        <div>
+          <div className="flex justify-center items-center mb-4">
+            <img src={products?.image[currentIndex]} alt="Ảnh chính" />
+          </div>
+          <div className="flex justify-center gap-4">
+            {products?.image
+              .slice(0, 4)
+              .map((imgSrc: string | undefined, index: number) => (
+                <img
+                  key={index}
+                  src={imgSrc}
+                  className={`w-20 h-16 object-cover cursor-pointer border border-gray-300 rounded ${
+                    index === currentIndex ? "border-blue-500" : ""
+                  }`}
+                  onClick={() => changeMainImage(index)}
+                />
+              ))}
+          </div>
         </div>
 
         <div>
           <h2 className="text-3xl font-semibold uppercase mb-2">
-            {product?.name}
+            {products?.product_name}
           </h2>
           <div className="flex items-center mb-4">
             <div className="flex gap-1 text-sm text-yellow-400">
@@ -137,14 +182,14 @@ const ProductDetail: React.FC = () => {
               ))}
             </div>
             <div className="text-xs text-gray-500 ml-3">
-              ({product?.view} Lượt xem)
+              ({products?.product_view} Lượt xem)
             </div>
           </div>
 
           <div className="space-y-2 mb-4">
             <p className="text-gray-800 font-semibold">
               <span>Trạng thái: </span>
-              {product?.quantity > 0 ? (
+              {products?.product_quantity > 0 ? (
                 <span className="text-green-600">Còn Hàng</span>
               ) : (
                 <span className="text-red-600">Hết Hàng</span>
@@ -153,75 +198,81 @@ const ProductDetail: React.FC = () => {
           </div>
 
           <div className="flex items-baseline mb-4 space-x-2 font-roboto">
-            {product?.discount > 0 ? (
+            {products?.product_discount.discountPercent > 0 ? (
               <div>
-                <p className="text-xl text-primary font-semibold">
+                <p className="text-xl text-red-600 font-semibold">
                   {formatCurrency(
-                    product?.price * (1 - product?.discount / 100)
-                  )}{" "}
-                  VNĐ
+                    products?.product_price *
+                      (1 - products?.product_discount.discountPercent / 100)
+                  )}
+                  đ
                 </p>
                 <p className="text-sm text-gray-400 line-through">
-                  {formatCurrency(product?.price)} VNĐ
+                  {formatCurrency(products?.product_price)}đ
                 </p>
               </div>
             ) : (
               <p className="text-xl text-primary font-semibold">
-                {formatCurrency(product?.price)} VNĐ
+                {formatCurrency(products?.product_price)}đ
               </p>
             )}
           </div>
-
-          {/* Size Selector */}
-          <div className="pt-4">
-            <h3 className="text-sm text-gray-800 uppercase mb-2">Kích thước</h3>
-            <div className="flex items-center gap-2">
-              {["XS", "S", "M", "L", "XL"].map((size) => (
-                <div key={size} className="size-selector">
-                  <input
-                    type="radio"
-                    name="size"
-                    id={`size-${size.toLowerCase()}`}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor={`size-${size.toLowerCase()}`}
-                    className="text-xs border border-gray-200 rounded-sm h-8 w-8 flex items-center justify-center cursor-pointer shadow-sm text-gray-600"
-                  >
-                    {size}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Color Selector */}
-          <div className="pt-4">
+          {/* optin Selector */}
+          <div className="pt-2">
             <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
-              Màu sắc
+              Các phiên bản
             </h3>
-            <div className="flex items-center gap-2">
-              {["#fc3d57", "#000", "#fff"].map((color) => (
-                <div key={color} className="color-selector">
-                  <input
-                    type="radio"
-                    name="color"
-                    id={color}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor={color}
-                    className="border border-gray-200 rounded-sm h-8 w-8 cursor-pointer shadow-sm block"
-                    style={{ backgroundColor: color }}
-                  ></label>
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-2">
+              {products?.product_attributes?.length ? (
+                products.product_attributes
+                  .filter((attribute: ProductAttribute) =>
+                    ["Ram", "Color"].includes(attribute.k)
+                  )
+                  .map((attribute: ProductAttribute, index: number) => (
+                    <div key={index} className="flex flex-col gap-1">
+                      <strong className="text-gray-800">{attribute.k}:</strong>
+                      <div className="flex flex-wrap gap-2">
+                        {attribute.v.split(",").map((value, i) => (
+                          <div key={i} className="flex items-center">
+                            <input
+                              type="radio"
+                              id={`${attribute.k}-${i}`}
+                              name={attribute.k} // Same name for all radios in the same group
+                              value={value.trim()}
+                              checked={
+                                selectedValues[attribute.k] === value.trim()
+                              }
+                              onChange={() =>
+                                handleChange(attribute.k, value.trim())
+                              }
+                              className="hidden"
+                            />
+                            <label
+                              htmlFor={`${attribute.k}-${i}`}
+                              className={`border rounded-sm h-8 w-32 flex items-center justify-center cursor-pointer text-gray-600 ${
+                                selectedValues[attribute.k] === value.trim()
+                                  ? "border-blue-500"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              {value.trim()}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+              ) : (
+                <div>Không có thuộc tính sản phẩm</div>
+              )}
             </div>
           </div>
 
           {/* Quantity Selector */}
           <div className="mt-4">
-            <h3 className="text-sm text-gray-800 uppercase mb-1">Số lượng</h3>
+            <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
+              Số lượng
+            </h3>
             <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
               <button
                 className="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none bg-gray-200 hover:bg-gray-300 transition"
@@ -250,24 +301,23 @@ const ProductDetail: React.FC = () => {
               <i className="fa-solid fa-bag-shopping"></i> Mua ngay
             </a>
             <a
-              href="/cart"
+              // href="/cart"
+              onClick={() => handleAddToCart()}
               className="bg-green-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-green-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
             </a>
             {error && <p className="text-red-500">{error}</p>}
-            {/* Hiển thị thông báo lỗi */}
             <button
               onClick={handleAddToWatchlist}
-              disabled={watchlistStatus === "loading"}
-              className="bg-yellow-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-yellow-700 transition"
+              className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
-                className={`fa-solid fa-heart ${
-                  isFavorite ? "text-red-500" : "text-white"
+                className={`fas fa-heart ${
+                  isFavorite ? "text-red-500" : "text-gray-500"
                 }`}
-              ></i>{" "}
-              {watchlistStatus === "loading" ? "Adding..." : "Add to Watchlist"}
+              ></i>
+              <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>
           </div>
 
@@ -291,11 +341,25 @@ const ProductDetail: React.FC = () => {
       {/* description */}
       <div className="container pb-16">
         <h3 className="border-b border-gray-200 font-roboto text-gray-800 pb-3 font-medium text-xl">
-          Product Details
+          Thông tin chi tiết
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            <tbody>
+            {products?.product_attributes
+              .filter((attribute: ProductAttribute) =>
+                attributesToShow.includes(attribute.k)
+              )
+              .map((attribute: ProductAttribute, index: number) => (
+                <li key={index} className="mb-1">
+                  <strong>{attribute.k}: </strong>
+                  <span>{attribute.v}</span>
+                </li>
+              ))}
+            <li>
+              <strong>Khối lượng:</strong> <span>{products?.weight_g} kg</span>
+            </li>
+
+            {/* <tbody>
               {[
                 ["Category", "A"],
                 ["Product Code", "B"],
@@ -309,7 +373,7 @@ const ProductDetail: React.FC = () => {
                   <td className="py-2 border-b">{value}</td>
                 </tr>
               ))}
-            </tbody>
+            </tbody> */}
           </table>
         </div>
       </div>
@@ -330,12 +394,12 @@ const ProductDetail: React.FC = () => {
                                     <p className="font-medium text-gray-800"></p>
                                     <p className="text-gray-600">Sản Phẩm Tốt!!!</p>
                                 </div>
-                          <p className="text-yellow-400">    
+                          <p className="text-yellow-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                            </p>
                             </div>
                  </div>
@@ -348,12 +412,12 @@ const ProductDetail: React.FC = () => {
                                     <p className="font-medium text-gray-800"></p>
                                     <p className="text-gray-600">Good!!!</p>
                                 </div>
-                          <p className="text-yellow-400">    
+                          <p className="text-yellow-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                            </p>
                             </div>
                  </div>
@@ -363,12 +427,12 @@ const ProductDetail: React.FC = () => {
                         <input type="text" name="contents" placeholder="Enter your comment..." className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md" />
                         <button type="submit" className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">Submit</button>
                     </div>
-                    <div className="text-gray-400">    
+                    <div className="text-gray-400">
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
                             <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p> 
+                            <p  className="fa fa-star"></p>
                     </div>
                 </form>
             </div> */}

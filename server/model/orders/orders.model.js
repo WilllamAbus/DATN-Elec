@@ -1,46 +1,67 @@
 const { Schema, model } = require("mongoose");
- // Import formatShoppingSchema từ mô hình của bạn
+// Import formatShoppingSchema từ mô hình của bạn
 
 const ordersSchema = new Schema(
- 
-    {
-      user: { type: Schema.Types.ObjectId, ref: "users", required: true }, // Reference to user
-      cartDetails: [{ type: Schema.Types.ObjectId, ref: "orderCarts", default: [] }], // Reference to orderCarts
-      auctionDetails: [{ type: Schema.Types.ObjectId, ref: "orderAuctions", default: [] }], // Reference to orderAuctions
-  
-      // Store IDs as strings
-      paymentId:  {type: Schema.Types.Mixed, require:true, }, // ID of the payment
-      shippingAddressId:  {type: Schema.Types.Mixed, require:true, }, // ID of the shipping address
-  
-      // Array of voucher IDs as strings
-      voucherIds: [ {type: Schema.Types.Mixed,  default:{}}], // IDs of applied vouchers
-  
-      // Shipping details as embedded object
-      formatShipping: {
-        type: {
-          type: String,
-          enum: ["Tiêu chuẩn"], // Example shipping types
-          required: true,
-        },
-      },
-  
-      // Calculated fields
-      totalAmount: { type: Number, required: true }, // Total amount before shipping
-      shippingFee: { type: Number, default: 31000 }, // Shipping fee
-      totalPriceWithShipping: { type: Number, required: true }, 
-    
-      stateOrder: {
+  {
+    user: { type: Schema.Types.ObjectId, ref: "users", required: true }, // Reference to user
+    cartDetails: [
+      { type: Schema.Types.ObjectId, ref: "orderCarts", default: [] },
+    ], // Reference to orderCarts
+    auctionDetails: [
+      { type: Schema.Types.ObjectId, ref: "orderAuctions", default: [] },
+    ], // Reference to orderAuctions
+
+    // Store IDs as strings
+    paymentId: { type: Schema.Types.ObjectId, ref: "payment", require: true }, // ID of the payment
+    shippingAddressId: {
+      type: Schema.Types.ObjectId,
+      ref: "shipping",
+      require: true,
+    }, // ID of the shipping address
+
+    // Array of voucher IDs as strings
+    voucherIds: [
+      { type: Schema.Types.ObjectId, ref: "voucher", require: true },
+    ], // IDs of applied vouchers
+
+    // Shipping details as embedded object
+    formatShipping: {
+      type: {
         type: String,
-        enum: [ "Xác nhận", "Hủy bỏ"], // Order status
-      
+        enum: ["Tiêu chuẩn"], // Example shipping types
         required: true,
       },
-      order_date: { type: Date, default: Date.now }, // Order date
-      createdAt: { type: Date, default: Date.now },
- 
-      status: { type: String, default: "active" },
-      disabledAt: { type: Date, default: null }, // Disabled date if applicable
     },
+
+    // Calculated fields
+    totalAmount: { type: Number, required: true }, // Total amount before shipping
+    shippingFee: { type: Number, default: 31000 }, // Shipping fee
+    totalPriceWithShipping: { type: Number, required: true },
+
+    stateOrder: {
+      type: String,
+      enum: ["Tiêu chuẩn"], // Example shipping types
+      required: true,
+    },
+  },
+
+  //   // Calculated fields
+  //   totalAmount: { type: Number, required: true }, // Total amount before shipping
+  //   shippingFee: { type: Number, default: 31000 }, // Shipping fee
+  //   totalPriceWithShipping: { type: Number, required: true },
+
+  //   stateOrder: {
+  //     type: String,
+  //     enum: ["Chờ xử lý", "Đang xử lý", "Đang vận chuyển"], // Order status
+
+  //     required: true,
+  //   },
+  //   order_date: { type: Date, default: Date.now }, // Order date
+  //   createdAt: { type: Date, default: Date.now },
+
+  //   status: { type: String, default: "active" },
+  //   disabledAt: { type: Date, default: null }, // Disabled date if applicable
+  // },
 
   {
     collection: "orders",

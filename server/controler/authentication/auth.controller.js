@@ -351,7 +351,7 @@ const authController = {
   updateProfile: async (req, res) => {
     try {
       const id = req.user.id;
-      const { name, address, phone, gender, birthday } = req.body;
+      const { name, address, phone, gender, birthday, addressID } = req.body;
       const avatar = req.file ? req.file : undefined;
       let avatarURL;
       if (avatar) {
@@ -365,6 +365,7 @@ const authController = {
 
         fileStream.on("finish", async () => {
           try {
+            console.log("User object:", req.user);
             await file.makePublic();
             const encodedFilename = encodeURIComponent(file.name);
             avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
@@ -396,7 +397,7 @@ const authController = {
       } else {
         const updatedUser = await User.findByIdAndUpdate(
           id,
-          { name, address, phone, gender, birthday },
+          { name, address, phone, gender, birthday, addressID },
           { new: true }
         );
 
@@ -418,8 +419,6 @@ const authController = {
 
   getProfile: async (req, res) => {
     try {
-      // console.log("User object:", req.user); // Thêm log để kiểm tra thông tin người dùng
-
       const userId = req.user.id;
 
       if (!userId) {

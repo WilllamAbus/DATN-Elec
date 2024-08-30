@@ -231,16 +231,23 @@ const Arrivale: React.FC = () => {
                   </li>
                 </ul>
                 <div className="mt-4 flex items-center justify-between gap-6">
-                  <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
+                <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
                     {product.discount > 1 ? (
                       <div>
-                        <p className="text-xs">
-                          {formatCurrency(product.price * (1 - product.discount / 100))} đ
+                        <p className="text-xs text-rose-700">
+                          {formatCurrency(
+                            product.price * (1 - product.discount / 100)
+                          )}
+                          đ
                         </p>
-                        <p className="text-xs line-through">{formatCurrency(product.price)}đ</p>
+                        <p className="text-xs line-through text-gray-400">
+                          {formatCurrency(product.price)}đ
+                        </p>
                       </div>
                     ) : (
-                      <p className="text-xs">{formatCurrency(product.price)}đ</p>
+                      <p className="text-xs">
+                        {formatCurrency(product.price)}đ
+                      </p>
                     )}
                   </p>
                 </div>

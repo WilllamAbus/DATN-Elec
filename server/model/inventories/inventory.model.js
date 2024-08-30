@@ -10,7 +10,7 @@ const inventorySchema = Schema(
     // Giá mỗi đơn vị sản phẩm
     price: { type: Number, required: true }, // Giá của sản phẩm (đơn giá)
     // Tổng giá trị tồn kho
-    totalPrice: { type: Number, required: true },   //lấy số luongj nhân price
+    totalPrice: { type: Number, required: true }, // Tổng giá trị = số lượng * giá
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

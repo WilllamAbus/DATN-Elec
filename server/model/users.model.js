@@ -8,6 +8,7 @@ const userSchema = new Schema(
     password: { type: String },
     email: { type: String, required: true, unique: true },
     address: { type: String, require: true },
+    addressID: { type: String, require: true },
     birthday: { type: Date, require: true },
     gender: { type: String, enum: ["Nam", "Nữ"] },
     phone: { type: String, require: true },

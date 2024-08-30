@@ -10,8 +10,11 @@ import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
-import watchlistReducer from "./product/productSlice";
 import productAdminReducer from "./product/admin";
+import watchlistReducer from "./product/wathList/wathlistSlice";
+import cartRenducer from "./cart/cartSlice";
+import countryRenducer from "./country/provinceSlice";
+import VnpayRenducer from "./pay/vnpaySlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -26,6 +29,9 @@ const rootReducer = combineReducers({
   voucher: voucherReducer,
   checkout: checkoutSlice,
   products: productAdminReducer,
+  cart: cartRenducer,
+  country: countryRenducer,
+  Vnpay: VnpayRenducer,
 });
 
 export type AppDispatch = typeof store.dispatch;
