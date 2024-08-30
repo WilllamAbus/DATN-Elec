@@ -61,8 +61,6 @@ const add = async (req, res) => {
       v: attr.v,
     }));
     
-    
-    
     const newProduct = new ProductV2({
       product_name: req.body.product_name,
       image: imageUrls,
@@ -88,6 +86,9 @@ const add = async (req, res) => {
     });
 
     await newProduct.save();
+
+
+    //
 
     return res.status(201).json({
       success:true,
