@@ -30,3 +30,18 @@ export const getProductByID = async (id: string): Promise<ProductResponse> => {
     };
   }
 };
+export const getProductShopping = async (id: string): Promise<HomeAllProductResponse> => {
+  try {
+    const response = await instance.get<HomeAllProductResponse>(`/client/product/shopping/${id}`);
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      err: 1,
+      msg: "Lỗi",
+      status: 500,
+      products: [],
+      error: error.message,
+    };
+  }
+};

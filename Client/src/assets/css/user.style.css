@@ -1,0 +1,29 @@
+#box-sp {
+    position: absolute;
+    top: 210px;
+    left: 390px;
+}
+
+@media (max-width: 767px) { 
+    #box-sp {
+        position: static; 
+        top: auto;
+        left: auto;
+    }
+}
+/* Đảm bảo rằng phần tử không bị cắt xén khi phóng to */
+html {
+    font-size: 100%; /* Có thể điều chỉnh nếu cần */
+}
+
+/* Đặt các quy tắc responsive cho các phần tử cụ thể */
+.container {
+    max-width: 1200px; /* Giới hạn chiều rộng tối đa của phần tử */
+    margin: 0 auto; /* Căn giữa phần tử */
+}
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 20px; /* Thêm khoảng cách bên trong để tránh cắt xén */
+    }
+}

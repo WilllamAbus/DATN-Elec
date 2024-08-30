@@ -1,6 +1,8 @@
 
-const {homeAllProduct,getID } = require('./home');
+const {homeAllProduct,getID,shopping,auction} = require('./home');
 module.exports = {
   homeAllProduct,
-  getID
+  getID,
+  shopping,
+  auction 
 };

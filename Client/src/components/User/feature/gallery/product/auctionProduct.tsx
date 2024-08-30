@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { homeAllProduct } from "../../services/product_v2/client/homeAllProduct";
+import { getProductShopping } from "../../../../../services/product_v2/client/homeAllProduct";
+import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
-import { Link, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
-import { addToWatchlistThunk } from "../../redux/product/wathlist";
+// import Sidebar from "../sidebar";
+import "../../../../../assets/css/user.style.css"
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+import { addToWatchlistThunk } from "../../../../../redux/product/wathlist";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../../redux/rootReducer";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen","CPU","Pin"];
-
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
-const ProductSection: React.FC = () => {
+
+const AuctionProduct: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const id:string = `66c0e8867e31440b4966b68c`;
   const dispatch = useDispatch<AppDispatch>();
-  const [visibleCount, setVisibleCount] = useState(4); 
   useSelector((state: RootState) => state.watchlist.wathlist.items);
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
-  useParams<{ id: string }>();
-  const handleShowMore = () => {
-    setVisibleCount(products.length); // Show all products
-  };
   const handleAddToWatchlist = async (productId: string) => {
     if (userId) {
       try {
@@ -30,30 +28,35 @@ const ProductSection: React.FC = () => {
       }
     }
   };
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productList = await homeAllProduct();
-        setProducts(productList.products);
+        // Lấy danh sách sản phẩm từ API
+        const response = await getProductShopping(id);
+        if (response.success) {
+          // Cập nhật sản phẩm vào state
+          setProducts(response.products);
+        } else {
+          console.log(`Lỗi khi lấy sản phẩm: ${response.msg}`);
+        }
       } catch (error) {
         console.log(`Lỗi: `, error);
       }
     };
 
     fetchProducts();
-  }, []);
-
+  }, [id]);
   return (
-    <section className="bg-gray-50 py-2 antialiased dark:bg-gray-900 md:py-12">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
-          Sản phẩm dành cho bạn
-        </h2>
-      </div>
-      <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <div className="mb-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {products.slice(0, visibleCount).map((product, index) => (
+      <>
+      
+      <section className="bg-bgf3f4f6 rounded-lg py-8 antialiased dark:bg-gray-900 md:py-12" >
+      {/* <Sidebar/> */}
+        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 ">
+          <h1 className="text-center text-4xl"> Đấu giá</h1>
+
+          <div className="container mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4"  >
+            
+          {products.map((product, index) => (
             <div
               key={index}
               className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -335,21 +338,21 @@ const ProductSection: React.FC = () => {
               </div>
             </div>
           ))}
+          </div>
         </div>
-      </div>
-      {visibleCount < products.length && (
-      <div className="w-full text-center">
-        <button
-          type="button"
-          className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-          onClick={handleShowMore}
-       >
-          Xem tiếp
-        </button>
-      </div>
-      )}
-    </section>
+        <div className="w-full text-center">
+          <button
+            type="button"
+            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+          >
+            Xem tiếp
+          </button>
+        </div>
+      </section>
+      </>
+   
   );
 };
 
-export default ProductSection;
+export default AuctionProduct;
+
