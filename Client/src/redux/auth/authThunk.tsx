@@ -221,8 +221,8 @@ export const softDeleteUserThunk = createAsyncThunk(
   "auth/softDeleteUser",
   async (userId: string, { rejectWithValue }) => {
     try {
-      const result = await softDeleteUser(userId);
-      return result;
+      await softDeleteUser(userId);
+      return userId;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -272,12 +272,24 @@ export const getlistRoleThunk = createAsyncThunk<Role[]>(
   }
 );
 // Thunk để khôi phục người dùng
+// export const restoreUserThunk = createAsyncThunk(
+//   "auth/restoreUser",
+//   async (userId: string, { rejectWithValue }) => {
+//     try {
+//       const result = await restore(userId);
+//       return result.data;
+//     } catch (error) {
+//       return rejectWithValue((error as Error).message);
+//     }
+//   }
+// );
+
 export const restoreUserThunk = createAsyncThunk(
   "auth/restoreUser",
   async (userId: string, { rejectWithValue }) => {
     try {
-      const result = await restore(userId);
-      return result;
+      await restore(userId);
+      return userId;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

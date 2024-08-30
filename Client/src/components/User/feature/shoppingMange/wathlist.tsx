@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   deleteWatchlistThunk,
   getWatchlistThunk,
-} from "../../../../redux/product/wathlist";
+} from "../../../../redux/product/wathList/wathlist";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { UserProfile } from "../../../../types/user";
 
@@ -11,19 +11,17 @@ interface InfoProps {
   profiles: UserProfile | null;
 }
 
-const Watchlist: React.FC<InfoProps> = ({}) => {
+const Watchlist: React.FC<InfoProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
-  const watchlist = useSelector(
-    (state: RootState) => state.watchlist.wathlist.items
-  );
+  const watchlist = useSelector((state: RootState) => state.watchlist.items);
   const watchlistStatus = useSelector(
-    (state: RootState) => state.watchlist.wathlist.status
+    (state: RootState) => state.watchlist.status
   );
   const watchlistError = useSelector(
-    (state: RootState) => state.watchlist.wathlist.error
+    (state: RootState) => state.watchlist.error
   );
 
   useEffect(() => {
@@ -32,13 +30,16 @@ const Watchlist: React.FC<InfoProps> = ({}) => {
     }
   }, [dispatch, userId]);
 
-  const handleDelete = async (id: string) => {
-    const resultAction = await dispatch(deleteWatchlistThunk(id));
-
-    if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
-      dispatch(getWatchlistThunk());
-    } else {
-      console.error("Error deleting item:", resultAction.payload);
+  const handleDelete = async (productId: string) => {
+    try {
+      const resultAction = await dispatch(
+        deleteWatchlistThunk(productId)
+      ).unwrap();
+      if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+        console.log("Successfully deleted item:", resultAction);
+      }
+    } catch (error) {
+      console.error("Failed to delete item:", error);
     }
   };
 
@@ -47,12 +48,12 @@ const Watchlist: React.FC<InfoProps> = ({}) => {
   }
 
   if (watchlistStatus === "failed") {
-    return <p> {watchlistError}</p>;
+    return <p>{watchlistError}</p>;
   }
 
-  //   if (!Array.isArray(watchlist) || watchlist.length === 0) {
-  //     return <p>Bạn chưa có sản phẩm nào trong danh sách yêu thích.</p>;
-  //   }
+  if (!Array.isArray(watchlist) || watchlist.length === 0) {
+    return <p>Bạn chưa có sản phẩm nào trong danh sách yêu thích.</p>;
+  }
 
   return (
     <div>
@@ -85,7 +86,7 @@ const Watchlist: React.FC<InfoProps> = ({}) => {
                 </div>
                 <button
                   className="ml-4 bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-3 py-1 text-sm"
-                  onClick={() => handleDelete(item._id)}
+                  onClick={() => handleDelete(item.product._id)}
                 >
                   Xóa
                 </button>

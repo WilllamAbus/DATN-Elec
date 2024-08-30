@@ -1,5 +1,6 @@
 
-const {homeAllProduct } = require('./home');
+const {homeAllProduct,getID } = require('./home');
 module.exports = {
-  homeAllProduct
+  homeAllProduct,
+  getID
 };

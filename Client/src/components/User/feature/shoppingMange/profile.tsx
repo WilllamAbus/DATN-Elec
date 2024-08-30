@@ -11,15 +11,16 @@ import EditProfile from "./edit-profile";
 import Info from "./info";
 import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
+import CountrySelector from "./address";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [view, setView] = useState<"info" | "edit" | "password" | "watchlist">(
-    "info"
-  );
+  const [view, setView] = useState<
+    "info" | "edit" | "address" | "password" | "watchlist"
+  >("info");
 
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
@@ -30,7 +31,11 @@ const ProfileUse: React.FC = () => {
   const profileError = useAppSelector(
     (state: RootState) => state.auth.profile.error
   );
+  const [, setAddress] = useState<string>("");
 
+  (newAddress: string) => {
+    setAddress(newAddress);
+  };
   useAuth();
 
   useEffect(() => {
@@ -134,6 +139,16 @@ const ProfileUse: React.FC = () => {
                 <i className="fa fa-edit mr-2"></i>
                 Cập nhật thông tin
               </a>
+              <a
+                href="#"
+                className={`relative text-base block capitalize transition ${
+                  view === "edit" ? "text-primary" : "text-gray-600"
+                }`}
+                onClick={() => setView("address")}
+              >
+                <i className="fa fa-edit mr-2"></i>
+                Địa chỉ
+              </a>
               <Link
                 to="/listCart"
                 className="relative text-base block font-medium capitalize text-gray-600 transition hover:text-primary"
@@ -165,6 +180,13 @@ const ProfileUse: React.FC = () => {
         <section className="col-span-9 bg-white shadow-sm rounded-lg p-6">
           {view === "info" && <Info profiles={profile} />}
           {view === "edit" && <EditProfile profile={profile} />}
+          {view === "address" && (
+            <CountrySelector
+              address={profile?.address || ""}
+              onAddressChange={() => {}}
+              profile={profile}
+            />
+          )}
           {view === "password" && <UpdatePassword profile={profile} />}
           {view === "watchlist" && <Watchlist profiles={profile} />}
         </section>
