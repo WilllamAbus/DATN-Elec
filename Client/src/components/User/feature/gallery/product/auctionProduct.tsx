@@ -13,9 +13,9 @@ function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
 
-const AllProduct: React.FC = () => {
+const AuctionProduct: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
-  const id:string = `66c0e5b0a772066cc0854614`;
+  const id:string = `66c0e8867e31440b4966b68c`;
   const dispatch = useDispatch<AppDispatch>();
   useSelector((state: RootState) => state.watchlist.wathlist.items);
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
@@ -52,8 +52,8 @@ const AllProduct: React.FC = () => {
       <section className="bg-bgf3f4f6 rounded-lg py-8 antialiased dark:bg-gray-900 md:py-12" >
       {/* <Sidebar/> */}
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 ">
-         
-          <h1 className="text-center text-4xl"> Mua sắm</h1>
+          <h1 className="text-center text-4xl"> Đấu giá</h1>
+
           <div className="container mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4"  >
             
           {products.map((product, index) => (
@@ -354,5 +354,5 @@ const AllProduct: React.FC = () => {
   );
 };
 
-export default AllProduct;
+export default AuctionProduct;
 
