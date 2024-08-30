@@ -4,9 +4,10 @@ import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { addToWatchlistThunk } from "../../redux/product/wathlist";
+import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
-const attributesToShow = ["Ram", "Color", "Storage", "Screen","CPU","Pin"];
+import { addProductToCart } from "../../redux/cart/cartThunk";
+const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -14,8 +15,10 @@ function formatCurrency(value: number) {
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  useSelector((state: RootState) => state.watchlist.wathlist.items);
-  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  useSelector((state: RootState) => state.watchlist.items);
+  const userId = useSelector(
+    (state: RootState) => state.auth.profile.profile?._id
+  );
   useParams<{ id: string }>();
 
   const handleAddToWatchlist = async (productId: string) => {
@@ -27,7 +30,18 @@ const ProductSection: React.FC = () => {
       }
     }
   };
-
+  const handleAddToCart = async (productId: string) => {
+    if (userId) {
+      try {
+        await dispatch(addProductToCart({ userId, productId })).unwrap();
+        console.log("Thêm Thành công");
+      } catch (err) {
+        console.error("Lỗi thêm giỏ hàng", err);
+      }
+    } else {
+      console.log("chưa login");
+    }
+  };
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -83,7 +97,11 @@ const ProductSection: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      {product.view > 0 ? <span className="mr-2">({product.view})</span> : ""}
+                      {product.view > 0 ? (
+                        <span className="mr-2">({product.view})</span>
+                      ) : (
+                        ""
+                      )}
 
                       <svg
                         className="h-5 w-5"
@@ -205,7 +223,9 @@ const ProductSection: React.FC = () => {
                       <path d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z" />
                     </svg>
                   </div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">5.0</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    5.0
+                  </p>
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     {" "}
                     <div className="flex gap-1 text-sm text-yellow-400">
@@ -258,7 +278,9 @@ const ProductSection: React.FC = () => {
                         d="M8 7V6c0-.6.4-1 1-1h11c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1h-1M3 18v-7c0-.6.4-1 1-1h11c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1Zm8-3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
                       />
                     </svg>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Giá tốt</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Giá tốt
+                    </p>
                   </li>
                 </ul>
                 <div className="mt-4 flex items-center justify-between gap-6">
@@ -268,7 +290,8 @@ const ProductSection: React.FC = () => {
                         <p className="text-xs font-medium text-rose-700">
                           {formatCurrency(
                             product.product_price *
-                              (1 - product.product_discount.discountPercent / 100)
+                              (1 -
+                                product.product_discount.discountPercent / 100)
                           )}
                           đ
                         </p>
@@ -277,7 +300,9 @@ const ProductSection: React.FC = () => {
                         </p>
                       </div>
                     ) : (
-                      <p className="text-xs font-medium text-rose-700">{formatCurrency(product.product_price)}đ</p>
+                      <p className="text-xs font-medium text-rose-700">
+                        {formatCurrency(product.product_price)}đ
+                      </p>
                     )}
                   </p>
                 </div>
@@ -298,7 +323,8 @@ const ProductSection: React.FC = () => {
                 <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                   <div className="mt-1 text-sm text-gray-800">
                     <li>
-                      <strong>Khối lượng:</strong> <span>{product.weight_g} kg</span>
+                      <strong>Khối lượng:</strong>{" "}
+                      <span>{product.weight_g} kg</span>
                     </li>
                   </div>
                 </ul>
@@ -307,6 +333,7 @@ const ProductSection: React.FC = () => {
                   {" "}
                   <button
                     type="button"
+                    onClick={() => handleAddToCart(product._id)}
                     className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
                   >
                     <svg

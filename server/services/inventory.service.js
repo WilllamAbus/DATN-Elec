@@ -8,52 +8,62 @@ const _Inventory = require('../model/inventories/inventory.model')
 const inventoryService = {
     createInventory : async (inventoryData) => {
         try {
-            // Tìm bản ghi tồn kho hiện có (nếu có)
-            const existingInventory = await _Inventory.findOne({ product: inventoryData.product, location: inventoryData.location });
-    
-            let quantityInventory;
-            if (existingInventory) {
-                // Cộng dồn số lượng mới nhập với số lượng tồn kho hiện tại
-                quantityInventory = existingInventory.quantityInventory + inventoryData.quantity;
-            } else {
-                // Nếu không có bản ghi tồn kho trước đó, thì số lượng tồn kho bằng với số lượng nhập mới
-                quantityInventory = inventoryData.quantity;
-            }
-    
-            // Tính toán các giá trị cho inventoryPrice và totalValue
-            const inventoryPrice = inventoryData.newPrice * quantityInventory;
-            const totalValue = inventoryData.newPrice * quantityInventory;
-    
+          // Tìm bản ghi tồn kho hiện có dựa trên product và supplier
+          const existingInventory = await _Inventory.findOne({
+            product: inventoryData.product,
+            supplier: inventoryData.supplier,
+          });
+      
+          let quantityInventory;
+          let inventoryPrice;
+          let totalPrice;
+      
+          if (existingInventory) {
+            // Cộng dồn số lượng mới nhập với số lượng tồn kho hiện tại
+            quantityInventory = existingInventory.quantity + inventoryData.quantity;
+      
+            // Cập nhật giá trị tồn kho mới
+            inventoryPrice = inventoryData.price;
+      
+            // Cập nhật tổng giá trị tồn kho
+            totalPrice = inventoryPrice * quantityInventory;
+      
+            // Cập nhật các thông tin của bản ghi đã tồn tại
+            existingInventory.quantity = quantityInventory;
+            existingInventory.price = inventoryPrice;
+            existingInventory.totalPrice = totalPrice;
+            existingInventory.updatedAt = Date.now();
+      
+            // Lưu lại bản ghi đã cập nhật
+            await existingInventory.save();
+      
+            return existingInventory;
+          } else {
+            // Nếu không có bản ghi tồn kho trước đó, thì tạo bản ghi mới với số lượng nhập mới
+            quantityInventory = inventoryData.quantity;
+            inventoryPrice = inventoryData.price;
+            totalPrice = inventoryPrice * quantityInventory;
+      
             const inventory = new _Inventory({
-                product: inventoryData.product,
-                quantity: inventoryData.quantity, // Số lượng nhập mới
-                location: inventoryData.location,
-                restockLevel: inventoryData.restockLevel,
-                restockDate: inventoryData.restockDate,
-                batchNumber: inventoryData.batchNumber,
-                batchDate: inventoryData.batchDate,
-                supplier: inventoryData.supplier,
-                reservations: inventoryData.reservations || [],
-                newPrice: inventoryData.newPrice,
-                inventoryPrice: inventoryPrice,
-                quantityInventory: quantityInventory, // Số lượng tồn kho
-                totalValue: totalValue,
-              // Cập nhật thời gian gần nhất
+              product: inventoryData.product,
+              quantity: quantityInventory,
+              price: inventoryPrice,
+              totalPrice: totalPrice,
+              supplier: inventoryData.supplier,
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
             });
-    
+      
             // Lưu trữ tài liệu Inventory mới
             await inventory.save();
-    
-            // Populate để lấy thông tin chi tiết của product và supplier
-            await populateProductV2(inventory);
-            await populateSupplier(inventory);
-    
+      
             return inventory;
+          }
         } catch (error) {
-            console.error('Error creating inventory:', error);
-            throw new Error('Failed to create inventory');
+          console.error('Error creating inventory:', error);
+          throw new Error('Failed to create inventory');
         }
-    },
+      },
     editInventory : async (inventoryId, inventoryData) => {
         try {
             // Tìm bản ghi tồn kho hiện có

@@ -20,6 +20,7 @@ import {
   resetPasswordThunk,
   loginUserThunk,
   logoutThunk,
+  softDeleteUserThunk,
   forgotPasswordThunk,
   resendEmailThunk,
   fetchUserById,
@@ -333,21 +334,21 @@ const authSlice = createSlice({
           action.error.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.";
       })
 
-      .addCase(restoreUserThunk.pending, (state) => {
-        state.restoreUserStatus = "loading";
-        state.restoreUserError = null;
-      })
-      .addCase(restoreUserThunk.fulfilled, (state) => {
-        state.restoreUserStatus = "succeeded";
-        state.restoreUserError = null;
-        // Cập nhật lại danh sách người dùng đã bị xóa mềm nếu cần
-        // dispatch(getDeletedListThunk()); // Optional
+      .addCase(restoreUserThunk.fulfilled, (state, action) => {
+        const userId = action.payload;
+        if (userId) {
+          state.deletedUsers = state.deletedUsers.filter(
+            (user) => user._id !== userId
+          );
+        } else {
+          console.error("Ko Hợp lệ . Lỗi");
+        }
       })
       .addCase(restoreUserThunk.rejected, (state, action) => {
-        state.restoreUserStatus = "failed";
-        state.restoreUserError =
+        state.deletedUsersError =
           (action.payload as string) || "An unknown error occurred";
       })
+
       .addCase(verifyEmailThunk.pending, (state) => {
         state.EmailVerification.status = "loading";
         state.EmailVerification.error = null;
@@ -379,7 +380,21 @@ const authSlice = createSlice({
         state.activeUsersError =
           (action.payload as string) || "An unknown error occurred";
       })
+      .addCase(softDeleteUserThunk.fulfilled, (state, action) => {
+        const userId = action.payload;
+        if (userId) {
+          state.activeUsers = state.activeUsers.filter(
+            (user) => user._id !== userId
+          );
+        } else {
+          console.error("Invalid payload in softDeleteUserThunk fulfilled");
+        }
+      })
 
+      .addCase(softDeleteUserThunk.rejected, (state, action) => {
+        state.activeUsersError =
+          (action.payload as string) || "An unknown error occurred";
+      })
       .addCase(getDeletedListThunk.pending, (state) => {
         state.deletedUsersStatus = "loading";
         state.deletedUsersError = null;

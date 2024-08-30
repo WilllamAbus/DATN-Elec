@@ -21,6 +21,28 @@ const homeAllProduct = async (req, res) => {
   }
 };
 
+const getID = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await modelProduct.findById(id);
+    return res.status(200).json({
+      success: true,
+      err: 0,
+      msg: 'OK',
+      status: 200,
+      product, 
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      err: 3,
+      msg: 'Lỗi hệ thống',
+      status: 500,
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   homeAllProduct,
+  getID
 };

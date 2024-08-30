@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const path = require('path');
-const logger = require('morgan');
+const path = require("path");
+const logger = require("morgan");
 const apiGeneral = require("./routes/api");
 const routes = require("./routes/index");
 require("dotenv").config();
@@ -17,20 +17,19 @@ const SocketServices = require("./services/serviceSocket");
 connectDb();
 
 // Setup view engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
 
 // Middleware
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Serve HTML file from socket.io folder
-
 
 // CORS setup
 app.use(
@@ -68,17 +67,17 @@ io.on("connection", (socket) => {
 
 // Set up routes
 app.use("/api", apiGeneral);
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'soket.io', 'socket.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "soket.io", "socket.html"));
 });
 routes(app);
 
 // Error handler
 app.use((err, req, res, next) => {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.status(err.status || 500);
-    res.render('error');
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+  res.status(err.status || 500);
+  res.render("error");
 });
 
 // Start server

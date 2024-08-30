@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
-import { getActiveListThunk, softDeleteUserThunk } from "../../../../redux/auth/authThunk";
+import {
+  getActiveListThunk,
+  softDeleteUserThunk,
+} from "../../../../redux/auth/authThunk";
 import { Link } from "react-router-dom";
 import "../../../../assets/css/admin.style.css";
 import withReactContent from "sweetalert2-react-content";
@@ -7,39 +10,41 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import { AvatarFallback } from "../../../../ultils/avatar/avataAdmin";
+
 const MySwal = withReactContent(Swal);
 
 const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.activeUsers);
-  const userListStatus = useSelector((state: RootState) => state.auth.activeUsersStatus);
-  const userListError = useSelector((state: RootState) => state.auth.activeUsersError);
+  const userListStatus = useSelector(
+    (state: RootState) => state.auth.activeUsersStatus
+  );
+  const userListError = useSelector(
+    (state: RootState) => state.auth.activeUsersError
+  );
+
   useEffect(() => {
     dispatch(getActiveListThunk());
   }, [dispatch]);
-  console.log("Users:", users);
-  console.log("User List Status:", userListStatus);
-  console.log("User List Error:", userListError);
 
   const handlesoftDelete = async (userId: string) => {
     MySwal.fire({
       title: "Khóa người dùng?",
-      text: "Bạn có chắc muốn khóa người dùng này không!",
+      text: "Bạn có chắc muốn khóa người dùng này không!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
           await dispatch(softDeleteUserThunk(userId)).unwrap();
 
-          dispatch(getActiveListThunk());
-
+          // Không cần gọi lại getActiveListThunk nếu dữ liệu đã được cập nhật trong slice
           MySwal.fire({
-            title: "Đã Khóa!",
+            title: "Đã Khóa!",
             text: "Người dùng đã bị khóa.",
             icon: "success",
           });
@@ -66,7 +71,6 @@ const UserList: React.FC = () => {
   if (!Array.isArray(users)) {
     return <p>Invalid data format</p>;
   }
-
   return (
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -123,7 +127,9 @@ const UserList: React.FC = () => {
                   </label>
                 </div>
               </td>
-              <td className="py-4 px-6 border-b border-grey-light">{index + 1}</td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {index + 1}
+              </td>
               <th
                 scope="row"
                 className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -141,8 +147,13 @@ const UserList: React.FC = () => {
                   {user.name}
                 </div>
               </th>
-              <td className="py-4 px-6 border-b border-grey-light">{user.email}</td>
-              <td className="py-4 px-6 border-b border-grey-light">{user.roles.join(", ")}</td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {user.email}
+              </td>
+              <td className="py-4 px-6 border-b border-grey-light">
+                {user.roles.includes("admin") ? "Quản trị" : "Người dùng"}
+              </td>
+
               <td className="py-4 px-6 border-b border-grey-light">
                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
                   {user.status === "active" ? "Hiển thị" : "Đã ẩn"}
