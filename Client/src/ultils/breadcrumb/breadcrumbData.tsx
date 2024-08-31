@@ -24,10 +24,22 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listCategories", label: "Danh sách danh mục" },
   ],
+  
+  listInbounds: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInbound", label: "Danh sách lô hàng" },
+  ],
   addProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
+  ],
+  
+  addInbounds: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInbound", label: "Thêm lô hàng" },
   ],
   //addproduct v2
   addproduct: [

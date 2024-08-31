@@ -78,6 +78,14 @@ const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
 const AdminListDeleted = React.lazy(() => import("../page/Admin/users/listDelete"));
 const AdminEditUser = React.lazy(() => import("../page/Admin/users/editUser"));
 
+// Inbound
+const AdminListInbound = React.lazy(
+  () => import("../page/Admin/inbound/listInbound")
+);
+const AdminAddInbound = React.lazy(
+  () => import("../page/Admin/inbound/addInbound")
+);
+
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -98,6 +106,9 @@ const AdminRoutes: RouteObject[] = [
       { path: "listSuppliers", element: <AdminListSuppliers /> },
       { path: "addSuppliers", element: <AdminAddSuppliers /> },
       { path: "editSuppliers/:id", element: <AdminEditSuppliers /> },
+      { path: "listInbound", element: <AdminListInbound /> },
+      { path: "addInbound", element: <AdminAddInbound /> },
+
       { path: "addBuyingFormat", element: <AdminAddBuyingFormat /> },
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },

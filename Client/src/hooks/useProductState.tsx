@@ -3,6 +3,7 @@ import { ProductV2 } from "../types/ProductV2";
 
 const useProductState = () => {
   const [product, setProduct] = useState<ProductV2>({
+    _id: "",
     product_name: "",
     product_description: "",
     product_type: "",

@@ -46,6 +46,11 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.comment,
     label: labels.comment,
   },
+  inbound: {
+    icon: icons.inbound,
+    links: links.inbound,
+    label: labels.inbound,
+  },
   homeAdmin: {
     icon: icons.homeAdmin,
     links: links.homeAdmin,

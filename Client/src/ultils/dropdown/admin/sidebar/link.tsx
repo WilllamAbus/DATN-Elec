@@ -33,4 +33,6 @@ export const links: Record<string, Link[]> = {
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
+  inbound: [{ label: "Nhập hàng", to: "/admin/listInbound" }],
+
 };

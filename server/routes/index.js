@@ -10,7 +10,9 @@ const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
-const productRouter_v2 = require("./admin/product_v2");
+// const productRouter_v2 = require("./admin/product_v2");
+const inboundRouter = require("./admin/inboundshipments");
+const inventoryRouter = require("./admin/inventory");
 // const supplierRoutes = require("./admin/suppliers/suppliers");
 const auctionRouter = require("./admin/auctions/randBid.routes");
 const routes = (app) => {
@@ -20,7 +22,7 @@ const routes = (app) => {
   app.use("/api/product", productRouter);
   app.use("/api/admin", userRoutes);
   app.use("/api/suppliers", supplierRoutes);
-  app.use("/api/product_v2", productRouter_v2);
+  // app.use("/api/product_v2", productRouter_v2);
   app.use("/api/vnpay", vnpayRouter);
   app.use("/api/cart", CartRouter);
   app.use("/api/brands", brandRouter);
@@ -31,6 +33,9 @@ const routes = (app) => {
   // app.use("/api/suppliers", supplierRoutes);
   app.use("/api/wathlist", WathListRouter);
   app.use("/api/auctions", auctionRouter);
+  app.use("/api/inbound", inboundRouter);
+  app.use("/api/inventory", inventoryRouter);
+
 };
 
 module.exports = routes;

@@ -8,4 +8,5 @@ export const labels: Record<string, string> = {
   comment: "Tương tác",
   homeAdmin: "Trang chủ",
   productv2: "Sản phẩmv2",
+  inbound: "Nhập hàng"
 };
