@@ -12,7 +12,12 @@ import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Comment from "../../../../User/feature/details/comment/comment";
-import { addProductToCart } from "../../../../../redux/cart/cartThunk";
+import {
+  addProductToCart,
+  fetchCartList,
+} from "../../../../../redux/cart/cartThunk";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
@@ -41,8 +46,9 @@ const ProductDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist.items
+    (state: RootState) => state.watchlist.items[0]
   );
+  console.log(watchlistItems);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
@@ -53,6 +59,9 @@ const ProductDetail: React.FC = () => {
     if (userId && id) {
       try {
         await dispatch(addProductToCart({ userId, productId: id })).unwrap();
+        toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
+        dispatch(fetchCartList());
+
         console.log("Thêm Thành công");
       } catch (err) {
         console.error("Lỗi thêm giỏ hàng", err);
@@ -67,25 +76,42 @@ const ProductDetail: React.FC = () => {
         let resultAction;
 
         if (isFavorite) {
+          // Xóa sản phẩm khỏi danh sách yêu thích
           resultAction = await dispatch(deleteWatchlistThunk(id)).unwrap();
           if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+            // Cập nhật trạng thái nếu xóa thành công
             setIsFavorite(false);
           } else {
-            console.log(resultAction);
+            // Xử lý nếu không thành công
+            console.error("Failed to remove from watchlist:", resultAction);
+            setError("Failed to remove from watchlist.");
           }
         } else {
+          // Thêm sản phẩm vào danh sách yêu thích
           resultAction = await dispatch(
             addToWatchlistThunk({ userId, productId: id })
           ).unwrap();
           if (addToWatchlistThunk.fulfilled.match(resultAction)) {
+            // Cập nhật trạng thái nếu thêm thành công
             setIsFavorite(true);
           } else {
-            console.log(resultAction);
+            // Xử lý nếu không thành công
+            console.error("Failed to add to watchlist:", resultAction);
+            setError("Failed to add to watchlist.");
           }
         }
       } catch (err) {
         if (err instanceof Error) {
+          // Xử lý lỗi từ hàm async
+          console.error(
+            "Error occurred while handling watchlist:",
+            err.message
+          );
           setError(err.message);
+        } else {
+          // Xử lý các lỗi không phải từ Error
+          console.error("An unknown error occurred:", err);
+          setError("An unknown error occurred.");
         }
       }
     } else {
@@ -93,6 +119,7 @@ const ProductDetail: React.FC = () => {
       setError("User ID or Product ID is missing");
     }
   };
+
   //chuyển ảnh
   const changeMainImage = (index: number) => {
     setCurrentIndex(index);
@@ -309,7 +336,7 @@ const ProductDetail: React.FC = () => {
             </a>
             {error && <p className="text-red-500">{error}</p>}
             <button
-              onClick={handleAddToWatchlist}
+              onClick={() => handleAddToWatchlist()}
               className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
@@ -467,6 +494,7 @@ const ProductDetail: React.FC = () => {
             </div>
           ))}
         </div>
+        <ToastContainer />
       </div>
     </>
   );

@@ -1,5 +1,6 @@
-export interface CartItem {
+export interface WatchlistItem {
   _id: string;
+  user: string;
   product: {
     _id: string;
     product_name: string;
@@ -18,27 +19,6 @@ export interface CartItem {
     weight_g: number;
     image: string[];
   };
-  quantity: number;
-  price: number;
-  totalItemPrice: number;
-}
-export interface CartType {
-  _id: string;
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    address: string;
-    phone: string;
-  };
-  items: CartItem[];
-  totalPrice: number;
-  stateNotifi: string;
-  isActive: boolean;
-  status: string;
-  disabledAt: string | null;
-  modifieon: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }

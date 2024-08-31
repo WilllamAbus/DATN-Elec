@@ -69,20 +69,24 @@ const Watchlist: React.FC<InfoProps> = () => {
                 <div className="flex-shrink-0">
                   <img
                     className="w-12 h-12 rounded-full object-cover"
-                    src={product.image}
-                    alt={product.name}
+                    src={product.image[0]}
+                    alt={product.product_name}
                   />
                 </div>
                 <div className="flex-1 min-w-0 text-center">
                   <p className="text-sm font-semibold text-gray-900 truncate dark:text-white">
-                    {product.name}
+                    {product.product_name}
                   </p>
                   <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                    {product.brand} - {product.color}
+                    {product.product_attributes[0].k} -{" "}
+                    {product.product_attributes[0].v}
                   </p>
                 </div>
                 <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                  {product.price.toLocaleString()} VND
+                  {product.product_price_unit.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
                 </div>
                 <button
                   className="ml-4 bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-3 py-1 text-sm"

@@ -198,10 +198,12 @@ export const resetPassword = async (token: string, password: string) => {
 };
 export const addToWatchlist = async (userId: string, productId: string) => {
   try {
-    const response = await instance.post(`${API_URL}/wathlist/add`, {
-      user: userId,
-      product: productId,
-    });
+    const response = await instance.post(
+      `${API_URL}/wathlist/add/${productId}`,
+      {
+        user: userId,
+      }
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

@@ -1,20 +1,32 @@
+// features/cart/cartThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getCartList,
   addToCart,
   getCartById,
   updateCart,
-  deleteCart,
+  // deleteProductCart,
+  deleteCart as deleteCartService,
 } from "../../services/cart/cart";
+import { CartType } from "../../types/cart/carts";
+// Lấy danh sách giỏ hàng
+// export const fetchCartList = createAsyncThunk(
+//   "cart/fetchCartList",
+//   async () => {
+//     const response = await getCartList();
+//     console.log(response);
 
-export const fetchCartList = createAsyncThunk(
-  "cart/fetchCartList",
+//     return response.data; // Trả về data từ response
+//   }
+// );
+export const fetchCartList = createAsyncThunk<CartType[]>(
+  "categories/fetchAll",
   async () => {
-    const response = await getCartList();
-    return response;
+    return await getCartList();
   }
 );
 
+// Thêm sản phẩm vào giỏ hàng
 export const addProductToCart = createAsyncThunk(
   "cart/addProductToCart",
   async ({
@@ -27,9 +39,11 @@ export const addProductToCart = createAsyncThunk(
     quantity?: number;
   }) => {
     const response = await addToCart(userId, productId, quantity);
-    return response;
+    return response.data; // Trả về data từ response
   }
 );
+
+// Cập nhật số lượng sản phẩm trong giỏ hàng
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItemQuantity",
   async ({
@@ -56,18 +70,31 @@ export const updateCartItem = createAsyncThunk(
   }
 );
 
+// Lấy giỏ hàng theo ID
 export const fetchCartById = createAsyncThunk(
   "cart/fetchCartById",
   async (cartId: string) => {
     const response = await getCartById(cartId);
-    return response;
+    return response.data; // Trả về data từ response
   }
 );
 
-export const removeCart = createAsyncThunk(
-  "cart/removeCart",
-  async (cartId: string) => {
-    const response = await deleteCart(cartId);
-    return response;
+// Thunk để xóa sản phẩm khỏi giỏ hàng
+export const deleteCart = createAsyncThunk(
+  "cart/deleteCart",
+  async (
+    { cartId, productId }: { cartId: string; productId: string },
+    thunkAPI
+  ) => {
+    try {
+      await deleteCartService(cartId, productId);
+      return { cartId, productId }; // Trả về cartId và productId để cập nhật state
+    } catch (error) {
+      if (error instanceof Error) {
+        return thunkAPI.rejectWithValue(error.message);
+      } else {
+        return thunkAPI.rejectWithValue("Unknown error occurred");
+      }
+    }
   }
 );

@@ -11,6 +11,6 @@ router.delete(
   middlewareController.verifyToken,
   DeleteWatchlist
 );
-router.post("/add", middlewareController.verifyToken, addWatchlist);
+router.post("/add/:productId", middlewareController.verifyToken, addWatchlist);
 router.get("/", middlewareController.verifyToken, getWatchlist);
 module.exports = router;

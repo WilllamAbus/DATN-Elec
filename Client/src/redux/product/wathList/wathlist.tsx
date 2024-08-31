@@ -27,7 +27,6 @@ export const addToWatchlistThunk = createAsyncThunk<
     }
   }
 });
-
 export const getWatchlistThunk = createAsyncThunk<
   any[],
   void,

@@ -199,12 +199,12 @@ const CartController = {
 
       // Cập nhật tổng giá giỏ hàng
       cart.totalPrice = totalPrice;
-      cart.modifieon = Date.now(); // Sửa lỗi đánh dấu thời gian
+      cart.modifieon = Date.now();
       await cart.save();
 
       res.status(200).json(cart);
     } catch (error) {
-      console.error(error); // Log lỗi để dễ dàng kiểm tra
+      console.error(error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -212,18 +212,48 @@ const CartController = {
   deleteCart: async (req, res) => {
     try {
       const userId = req.user.id;
-      const deletedCart = await Cart.findOneAndDelete({
-        _id: req.params.id,
-        user: userId,
-      });
+      const cartId = req.params.cartId;
+      const productId = req.params.productId;
 
-      if (!deletedCart) {
+      // Tìm giỏ hàng của người dùng
+      const cart = await Cart.findOne({ _id: cartId, user: userId });
+
+      if (!cart) {
         return res.status(404).json({
           message: "Giỏ hàng không tồn tại hoặc không thuộc người dùng",
         });
       }
 
-      res.status(200).json({ message: "Giỏ hàng đã được xóa" });
+      if (productId) {
+        const updatedItems = cart.items.filter(
+          (item) => item.product.toString() !== productId
+        );
+
+        if (updatedItems.length === cart.items.length) {
+          return res
+            .status(404)
+            .json({ message: "Sản phẩm không tồn tại trong giỏ hàng" });
+        }
+
+        cart.items = updatedItems;
+
+        cart.totalPrice = cart.items.reduce(
+          (total, item) => total + item.totalItemPrice,
+          0
+        );
+
+        await cart.save();
+
+        return res
+          .status(200)
+          .json({ message: "Sản phẩm đã được xóa khỏi giỏ hàng", cart });
+      } else {
+        await Cart.findOneAndDelete({ _id: cartId, user: userId });
+
+        return res
+          .status(200)
+          .json({ message: "Giỏ hàng đã được xóa thành công" });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

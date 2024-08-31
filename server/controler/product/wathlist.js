@@ -1,45 +1,49 @@
 const WathList = require("../../model/wathlist");
-const Product = require("../../model/product.model");
+const Product = require("../../model/product_v2/index");
 const User = require("../../model/users.model");
 const mongoose = require("mongoose");
 
 const WathListController = {
   addWatchlist: async (req, res) => {
     try {
-      const { user, product } = req.body;
+      const userId = req.user.id; // Giả sử bạn đang sử dụng middleware để thêm `user` vào `req`
+      const { productId } = req.params;
 
-      if (!user || !product) {
+      if (!userId || !productId) {
         return res.status(400).json({
           success: false,
           message: "User và Product là bắt buộc",
         });
       }
 
-      const ErrdUser = await User.findById(user);
-      if (!ErrdUser) {
+      const foundUser = await User.findById(userId);
+      if (!foundUser) {
         return res.status(404).json({
           success: false,
           message: "Người dùng không tồn tại",
         });
       }
 
-      const ErrdProduct = await Product.findById(product);
-      if (!ErrdProduct) {
+      const foundProduct = await Product.findById(productId);
+      if (!foundProduct) {
         return res.status(404).json({
           success: false,
           message: "Sản phẩm không tồn tại",
         });
       }
 
-      const ErrWatchlist = await WathList.findOne({ user, product });
-      if (ErrWatchlist) {
+      const existingWatchlist = await WathList.findOne({
+        user: userId,
+        product: productId,
+      });
+      if (existingWatchlist) {
         return res.status(400).json({
           success: false,
           message: "Sản phẩm đã có trong danh sách yêu thích",
         });
       }
 
-      let newWatchlist = new WathList({ user, product });
+      let newWatchlist = new WathList({ user: userId, product: productId });
       await newWatchlist.save();
       newWatchlist = await newWatchlist.populate("product");
 

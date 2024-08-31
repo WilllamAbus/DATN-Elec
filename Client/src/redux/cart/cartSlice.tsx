@@ -3,8 +3,8 @@ import {
   fetchCartList,
   addProductToCart,
   fetchCartById,
-  removeCart,
   updateCartItem,
+  deleteCart,
 } from "./cartThunk";
 import { CartType } from "../../types/cart/carts";
 
@@ -48,12 +48,6 @@ const cartSlice = createSlice({
           state.carts[cartIndex].totalPrice = state.carts[
             cartIndex
           ].items.reduce((total, item) => total + item.totalItemPrice, 0);
-
-          // Log the updated quantity and state for debugging
-          console.log(
-            `Updated quantity for item ${itemId} in cart ${cartId}: ${quantity}`
-          );
-          console.log("Current state:", state.carts);
         }
       }
     },
@@ -63,6 +57,14 @@ const cartSlice = createSlice({
       .addCase(fetchCartList.pending, (state) => {
         state.status = "loading";
       })
+      // .addCase(
+      //   fetchCartList.fulfilled,
+      //   (state, action: PayloadAction<CartType[]>) => {
+      //     state.status = "succeeded";
+      //     state.carts = action.payload;
+      //     state.error = null; // Clear any existing message
+      //   }
+      // )
       .addCase(fetchCartList.fulfilled, (state, action) => {
         state.status = "succeeded";
         if (Array.isArray(action.payload)) {
@@ -77,7 +79,6 @@ const cartSlice = createSlice({
           ? String(action.payload)
           : "Failed to fetch carts";
       })
-
       .addCase(addProductToCart.fulfilled, (state, action) => {
         state.carts.push(action.payload);
       })
@@ -85,6 +86,7 @@ const cartSlice = createSlice({
         const { cartId, itemId, quantity } = action.payload;
 
         const cartIndex = state.carts.findIndex((cart) => cart._id === cartId);
+
         if (cartIndex !== -1) {
           const itemIndex = state.carts[cartIndex].items.findIndex(
             (item) => item._id === itemId
@@ -98,12 +100,6 @@ const cartSlice = createSlice({
             state.carts[cartIndex].totalPrice = state.carts[
               cartIndex
             ].items.reduce((total, item) => total + item.totalItemPrice, 0);
-
-            // Log the updated quantity and state for debugging
-            console.log(
-              `Updated quantity for item ${itemId} in cart ${cartId}: ${quantity}`
-            );
-            console.log("Current state:", state.carts);
           }
         }
       })
@@ -117,10 +113,35 @@ const cartSlice = createSlice({
           state.carts.push(action.payload);
         }
       })
-      .addCase(removeCart.fulfilled, (state, action) => {
-        state.carts = state.carts.filter(
-          (cart) => cart._id !== action.payload._id
-        );
+
+      .addCase(deleteCart.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        deleteCart.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ cartId: string; productId: string }>
+        ) => {
+          state.status = "succeeded";
+
+          const { cartId, productId } = action.payload;
+          const cart = state.carts.find((cart) => cart._id === cartId);
+          if (cart) {
+            cart.items = cart.items.filter(
+              (item) => item.product._id !== productId
+            );
+            cart.totalPrice = cart.items.reduce(
+              (total, item) => total + item.totalItemPrice,
+              0
+            );
+          }
+        }
+      )
+      .addCase(deleteCart.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          action.error.message || "Failed to delete product from cart";
       });
   },
 });

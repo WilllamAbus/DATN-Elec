@@ -4,31 +4,7 @@ import {
   getWatchlistThunk,
   deleteWatchlistThunk,
 } from "./wathlist";
-
-interface WatchlistItem {
-  _id: string;
-  user: string;
-  product: {
-    _id: string;
-    name: string;
-    status: string;
-    price: number;
-    image: string;
-    quantity: number;
-    categoryid: string;
-    weight: number;
-    brand: string;
-    color: string;
-    description: string;
-    discount: string;
-    rating: number;
-    view: number;
-    createdAt: string;
-    updatedAt: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+import { WatchlistItem } from "../../../types/cart/profile/wathlist";
 
 interface WatchlistState {
   items: WatchlistItem[];

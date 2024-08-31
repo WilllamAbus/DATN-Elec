@@ -10,7 +10,7 @@ const watchlistSchema = new Schema(
     },
     product: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "product_v2",
       required: true,
     },
     createdAt: {
