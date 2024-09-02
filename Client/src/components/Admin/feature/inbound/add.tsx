@@ -1,8 +1,7 @@
 import { useForm } from "react-hook-form";
-import { addInbound, getAllProduct, getAllSupplier } from "../../../../services/inbound/crudInbound.service";
+import { addInbound, getListProducts, getListSuppliers } from "../../../../services/inbound/crudInbound.service";
 import { useNavigate } from "react-router-dom";
-import React, { useEffect,useState } from "react";
-import "../../../../assets/css/admin.style.css";
+import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
@@ -19,7 +18,7 @@ interface IFormInput {
 
 }
 
-const AddSupplier: React.FC = () => {
+const AddInbound: React.FC = () => {
     const {
         register,
         handleSubmit,
@@ -46,18 +45,16 @@ const AddSupplier: React.FC = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const productReady  = await getAllProduct();
-                console.log(productReady);
-                setProducts(productReady || []);
+                const data = await getListProducts();
+                setProducts(data.productReady || []);
             } catch (error) {
                 console.error("Error fetching products:", error);
             }
         };
         const fetchSuppliers = async () => {
             try {
-                const supplierReady  = await getAllSupplier();
-                console.log(supplierReady);
-                setSuppliers(supplierReady || []);
+                const data = await getListSuppliers();
+                setSuppliers(data.supplierReady || []);
             } catch (error) {
                 console.error("Error fetching suppliers:", error);
             }
@@ -65,18 +62,17 @@ const AddSupplier: React.FC = () => {
         fetchSuppliers();
         fetchProducts();
     }, []);
-
     const submitFormAdd = async (data: IFormInput) => {
         try {
-            const formData = new FormData();
-            formData.append("product_id", data.product_id || "");
-            formData.append("inbound_supplier", data.inbound_supplier || "");
-            formData.append("inbound_description", data.inbound_description || "");
-            formData.append("inbound_quantity", String(data.inbound_quantity));
-            formData.append("inbound_price", String(data.inbound_price));
-
-
-            await addInbound(formData);
+            const payload = {
+                product_id: data.product_id,
+                inbound_supplier: data.inbound_supplier,
+                inbound_description: data.inbound_description || '',
+                inbound_quantity: data.inbound_quantity,
+                inbound_price: data.inbound_price,
+            };
+    
+            await addInbound(payload); // Gửi JSON
             notify();
             setTimeout(() => {
                 navigate("/admin/listInbound");
@@ -115,11 +111,15 @@ const AddSupplier: React.FC = () => {
                                     {...register("product_id", { required: "Sản phẩm không được bỏ trống" })}
                                 >
                                     <option value="">Chọn sản phẩm</option>
-                                    {products.map((product) => (
-                                        <option key={product._id} value={product._id}>
-                                            {product.product_name}
-                                        </option>
-                                    ))}
+                                    {products.length > 0 ? (
+                                        products.map((product, index) => (
+                                            <option key={product._id || index} value={product._id}>
+                                                {product.product_name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option disabled>Không có sản phẩm nào</option>
+                                    )}
                                 </select>
                                 {errors.product_id && (
                                     <span className="text-red-500 text-xs italic">
@@ -140,11 +140,15 @@ const AddSupplier: React.FC = () => {
                                     {...register("inbound_supplier", { required: "Nhà cung cấp không được bỏ trống" })}
                                 >
                                     <option value="">Chọn nhà cung cấp</option>
-                                    {suppliers.map((supplier) => (
-                                        <option key={supplier._id} value={supplier._id}>
-                                            {supplier.name}
-                                        </option>
-                                    ))}
+                                    {suppliers.length > 0 ? (
+                                        suppliers.map((supplier, index) => (
+                                            <option key={supplier._id || index} value={supplier._id}>
+                                                {supplier.name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option disabled>Không có sản phẩm nào</option>
+                                    )}
                                 </select>
                                 {errors.inbound_supplier && (
                                     <span className="text-red-500 text-xs italic">
@@ -166,7 +170,8 @@ const AddSupplier: React.FC = () => {
                                     {...register("inbound_quantity",
                                         {
                                             required: "Số lượng không được bỏ trống",
-                                            validate: value => !isNaN(value) || "Số lượng phải là số"
+                                            valueAsNumber: true,
+                                            validate: value => value > 0 || "Số lượng phải lớn hơn 0"
                                         })}
                                     onInput={handleInput}
                                     onPaste={handlePaste}
@@ -191,7 +196,8 @@ const AddSupplier: React.FC = () => {
                                     {...register("inbound_price",
                                         {
                                             required: "Giá tiền không được bỏ trống",
-                                            validate: value => !isNaN(value) || "Giá tiền phải là số"
+                                            valueAsNumber: true,
+                                            validate: value => value > 0 || "Giá tiền phải lớn hơn 0"
                                         })}
                                     onInput={handleInput}
                                     onPaste={handlePaste}
@@ -398,7 +404,7 @@ const AddSupplier: React.FC = () => {
                                     Publish post
                                 </label>
                                 <textarea
-                                    id="description"
+                                    id="inbound_description"
                                     rows={8}
                                     className="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
                                     placeholder="Nhập mô tả nhà cung cấp..."
@@ -425,4 +431,4 @@ const AddSupplier: React.FC = () => {
     );
 };
 
-export default AddSupplier;
+export default AddInbound;
