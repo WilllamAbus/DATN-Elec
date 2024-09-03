@@ -2,15 +2,16 @@ const { Schema, model } = require("mongoose");
 
 const inventorySchema = Schema(
   {
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-    //số lượng lấy khi thêm product sẽ thêm vào đây luôn
-    quantity: { type: Number, required: true },//khi số lượng này nhỏ hơn 10 sẽ thông báo cần nhập hàng
-    //supplier này cũng từ product qua
+product: { type: Schema.Types.ObjectId, ref: "product_v2", required: true },
+    quantityShelf: {type:Number}, // totalQuantity - quantityStock  số lượng này sẽ là số lượng đưa qua product
+    quantityStock: {type:Number},
+    totalQuantity : {type: Number, required: true}, // số lượng từ inbound
     supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
     // Giá mỗi đơn vị sản phẩm
-    price: { type: Number, required: true }, // Giá của sản phẩm (đơn giá)
+    price: { type: Number, required: true }, // giá từ inbound
     // Tổng giá trị tồn kho
-    totalPrice: { type: Number, required: true }, // Tổng giá trị = số lượng * giá
+    totalPrice: { type: Number, required: true },   //lấy số lượng nhân price
+    status: { type: String, default: 'active' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

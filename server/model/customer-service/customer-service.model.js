@@ -2,11 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const customerServiceSchema = Schema(
   {
-    auction: { type: Schema.Types.ObjectId, ref: 'auctions', default:[] },
-    refundItem: { type: Schema.Types.ObjectId, ref: 'refundItems', default:[] },
-    billings: { type: Schema.Types.ObjectId, ref: 'billings', default:[] },// Reference to the auction document
+    bidding: { type: Schema.Types.ObjectId, ref: 'bidding', default:null },
+
     serviceRequest: { type: Schema.Types.ObjectId, ref: 'services', required: true }, // Reference to the specific service
-    reason: { type: String, required: false }, // Reason for the service request
+    reason: { type: String }, 
     status: { 
       type: String, 
       enum: ['Mở', 'Đang xử lý', 'Giải pháp', 'Đóng'], 
@@ -17,9 +16,9 @@ const customerServiceSchema = Schema(
     priority: { 
       type: String, 
       enum: ['Thấp', 'Tham chiếu', 'Cao'], 
-      default: 'medium' 
+      default: 'Tham chiếu' 
     }, // Priority level of the service request
-    resolutionDetails: { type: String, default: '' }, // Details about how the issue was resolved
+    resolutionDetails: { type: String, default: 'none' }, // Details about how the issue was resolved
     notes: { type: String, default: '' }, // Additional notes related to the service request
     modifieon: { type: Date, default: Date.now }, // Ngày cập nhật giỏ hàng
     stateNotifi: { type: String, default: 'has' },

@@ -3,9 +3,9 @@ const randBidService = require("../../../services/orders/auctions/priceRandBid.s
 const randBinController = {
   postRandBid: async (req, res) => {
     // Lấy productId từ URL params
-    const { productId } = req.params;
+  
     // Lấy bidInput từ request body
-    const { bidInput } = req.body;
+    const {productId, bidInput } = req.body;
 
     try {
       // Lấy thông tin sản phẩm và các giá trị đấu giá từ dịch vụ

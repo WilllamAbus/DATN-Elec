@@ -1,5 +1,8 @@
 "use client";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import {
+  breadcrumbItemClient,
+  ReusableBreadcrumbClient,
+} from "../../../../ultils/breadcrumb";
 import AllProduct from "./product/allProduct";
 import { ChangeEvent, useEffect, useState } from "react";
 import {
@@ -190,7 +193,9 @@ export default function Example() {
                   >
                     <h3 className="-mx-2 -my-3 flow-root">
                       <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="font-medium text-gray-900">
+                          {section.name}
+                        </span>
                         <span className="ml-6 flex items-center">
                           <PlusIcon
                             aria-hidden="true"
@@ -234,7 +239,9 @@ export default function Example() {
 
         <main className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-4">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Bộ lọc tìm kiếm</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              Bộ lọc tìm kiếm
+            </h1>
 
             <div className="flex items-center">
               <Menu as="div" className="relative inline-block text-left">
@@ -258,7 +265,9 @@ export default function Example() {
                         <a
                           href={option.href}
                           className={classNames(
-                            option.current ? "font-medium text-gray-900" : "text-gray-500",
+                            option.current
+                              ? "font-medium text-gray-900"
+                              : "text-gray-500",
                             "block px-4 py-2 text-sm data-[focus]:bg-gray-100"
                           )}
                         >
@@ -309,10 +318,16 @@ export default function Example() {
                 </ul>
 
                 {filters.map((section) => (
-                  <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
+                  <Disclosure
+                    key={section.id}
+                    as="div"
+                    className="border-b border-gray-200 py-6"
+                  >
                     <h3 className="-my-3 flow-root">
                       <DisclosureButton className="group flex w-full items-center justify-between bg-bgf3f4f6 py-3 text-sm text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="font-medium text-gray-900">
+                          {section.name}
+                        </span>
                         <span className="ml-6 flex items-center">
                           <PlusIcon
                             aria-hidden="true"
@@ -347,35 +362,38 @@ export default function Example() {
                         ))}
                       </div>
                       <div className="border-b border-gray-200 py-6">
-          <h3 className="text-xl text-gray-800 mb-3 font-medium">Giá</h3>
-          <div className="space-y-2">
-            {filterPrice.map((price) => (
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  name={price.name}
-                  value={price.value}
-                  id={price.id}
-                  checked={selectedPrice === price.value}
-                  onChange={handleCheckPrice}
-                />
-                <label className="text-gray-600 ml-3 cursor-pointer" htmlFor="price-all">
-                  {price.title}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
+                        <h3 className="text-xl text-gray-800 mb-3 font-medium">
+                          Giá
+                        </h3>
+                        <div className="space-y-2">
+                          {filterPrice.map((price) => (
+                            <div className="flex items-center">
+                              <input
+                                type="radio"
+                                name={price.name}
+                                value={price.value}
+                                id={price.id}
+                                checked={selectedPrice === price.value}
+                                onChange={handleCheckPrice}
+                              />
+                              <label
+                                className="text-gray-600 ml-3 cursor-pointer"
+                                htmlFor="price-all"
+                              >
+                                {price.title}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </DisclosurePanel>
                   </Disclosure>
                 ))}
-               
               </form>
               {/* Product grid */}
               <div className="lg:col-span-3">
-                <AllProduct/>
+                <AllProduct />
               </div>
-              
             </div>
           </section>
         </main>

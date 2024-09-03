@@ -4,8 +4,8 @@ const BiddingController = {
   // Hàm để xử lý yêu cầu tạo đấu giá
   createBid: async (req, res) => {
     try {
-      const { productId } = req.params; // Lấy productId từ req.params
-      const { bidInput } = req.body; // Lấy bidInput từ req.body
+      // const {productId} = req.params;
+      const {productId, bidInput} = req.body; // Lấy bidInput từ req.body
       const userId = req.user.id; // Giả định rằng thông tin người dùng có trong req.user sau khi xác thực
 
       // Gọi service để tạo đấu giá
@@ -29,7 +29,20 @@ const BiddingController = {
         .json({ message: `Không thể tạo lượt đấu giá: ${error.message}` });
     }
   },
+  getBidsByUser : async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const result = await biddingService.getBidsByUser(userId);
 
+        res.status(200).json( {
+success: true,
+          message: "Lượt đấu giá đã được xóa thành công.",
+          data: result
+        } );
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+},
   getAllBids: async (req, res) => {
     try {
       const { page = 1, limit = 10 } = req.query;

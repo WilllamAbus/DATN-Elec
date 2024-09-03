@@ -7,9 +7,9 @@ const auctionControlller = {
   
   
     try {
-      const { productId, timeTrackID } = req.params;
+      
      
-
+      const { timeTrackID, productId } = req.body;
      
       
       const updatedAuction = await autionService.completeAuction(productId, timeTrackID);
@@ -57,7 +57,22 @@ getAllAuctions: async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 },
+getAuctionDetails: async (req, res) => {
+  const { auctionId, productId } = req.body;
 
+  try {
+    // Validate input
+    if (!auctionId || !productId) {
+      return res.status(400).json({ error: "Auction ID and Product ID are required." });
+    }
+
+    // Get auction details from the service
+    const details = await autionService.getAuctionDetails(auctionId, productId);
+    res.status(200).json(details);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+},
 // Get auction by ID
 getAuctionById: async (req, res) => {
   try {
@@ -92,7 +107,7 @@ deleteAuction: async (req, res) => {
 // Soft delete auction by ID
 softDeleteAuction: async (req, res) => {
   try {
-    const { auctionId } = req.params;
+    const { auctionId } = req.body;
     const result = await autionService.softDelete(auctionId);
     res.status(200).json(result);
   } catch (error) {

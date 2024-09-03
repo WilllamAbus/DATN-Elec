@@ -1,19 +1,19 @@
 import axios from "axios";
 const API_URL = 'http://localhost:4000/api/product';
-export const commentProduct = async (id: string) => {
-  try {
-    const response = await axios.get(`${API_URL}/comment/${id}`);
-    if (response.data && Array.isArray(response.data)) {
-      return response.data;
-    } else {
-      console.error("Unexpected data format:", response.data);
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching product comments:", error);
-    throw error;
-  }
-};
+// export const commentProduct = async (id: string) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/comment/${id}`);
+//     if (response.data && Array.isArray(response.data)) {
+//       return response.data;
+//     } else {
+//       console.error("Unexpected data format:", response.data);
+//       return [];
+//     }
+//   } catch (error) {
+//     console.error("Error fetching product comments:", error);
+//     throw error;
+//   }
+// };
 export const commentAllProduct = async () => {
   try {
     const response = await axios.get(`${API_URL}/comment`);

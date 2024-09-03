@@ -12,18 +12,22 @@ const biddingService = {
     createBid:  async (productId, userId, bidInput) => {
         try {
           // Tìm sản phẩm và chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
-          const product = await Product_v2.findOne({ _id: productId, status: { $ne: "disable" } })
-            .populate('product_format', 'formats')
-            .select('product_name product_price_unit product_format')
-            .lean();
-            
-      
-            
-            const format = product.product_format.formats.trim();
-
-            if (format !== "Đấu giá") {
-              return null;
-            }
+          const product = await Product_v2.findById({ _id: productId, status: { $ne: "disable" } })
+          .select('product_name product_price_unit product_format')
+          .populate('product_format', 'formats')
+          .lean();
+        
+        if (!product) {
+          throw new Error('Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.');
+        }
+        
+        // Kiểm tra xem `product_format` có tồn tại không và lấy thông tin định dạng
+        const format = product.product_format.formats.trim();
+   
+    
+        if (format !== "Đấu giá") {
+          return null;
+        }
       
           // Tìm thông tin priceRangeBid chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
           const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
@@ -61,6 +65,8 @@ const biddingService = {
             bidAmount: bidInput,
             priceRange: priceRangeBid._id,
             bidTime: bidTimeHCM,
+            stateBidding: 'Xử lý',
+
             auctionId:  null, // Liên kết với phiên đấu giá
           });
       
@@ -71,7 +77,25 @@ const biddingService = {
           throw new Error(`Không thể tạo đấu giá: ${error.message}`);
         }
     },
-
+    getBidsByUser : async (userId) => {
+      try {
+          const query = { bidder: userId, status: { $ne: 'disable' } };
+  
+          const bids = await Bidding.find(query)
+              .populate('product_bidding.productId', 'product_name product_price_unit product_image') // Populate product info including image array
+              .populate('priceRange', 'minBid midBid maxBid') // Populate price range info
+              .sort({ bidTime: -1 }) // Sort by the most recent bid time
+              .lean();
+  
+          return {
+              totalBids: bids.length,
+              bids,
+          };
+      } catch (error) {
+          console.error('Error fetching bids by user:', error.message);
+          throw new Error(`Không thể lấy danh sách lượt đấu giá của người dùng: ${error.message}`);
+      }
+  },
     updateBiddingAuctionId : async (oldAuctionId, newAuctionId) => {
         try {
           await Bidding.updateMany(

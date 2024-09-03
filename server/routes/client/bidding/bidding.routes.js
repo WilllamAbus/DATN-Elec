@@ -7,17 +7,18 @@ const middlewareController = require("../../../middleware/auth");
 
 
 
-router.post('/createBiding/:productId',middlewareController.verifyToken, biddingController.createBid);
+router.post('/createBiding',middlewareController.verifyToken, biddingController.createBid);
 
 router.get('/bidAlls', biddingController.getAllBids);
 
 
 router.get('/getBidID/:bidId', biddingController.getBidById);
 
-router.patch('/softDeteBid/:bidId', biddingController.softDeleteBid);
+router.patch('/softDeteBid/:bidId',middlewareController.verifyTokenAdminAuth, biddingController.softDeleteBid);
 
 
-router.post('/deleteBidd', biddingController.deleteBids);
-router.patch('/restoreBidd/:bidId', biddingController.restoreBid);
+router.post('/deleteBidd',middlewareController.verifyTokenAdminAuth, biddingController.deleteBids);
+router.patch('/restoreBidd/:bidId',middlewareController.verifyTokenAdminAuth, biddingController.restoreBid);
 router.get('/soft-deleted-bids', biddingController.getSoftDeletedBids);
+router.get('/bids',middlewareController.verifyToken, biddingController.getBidsByUser);
 module.exports = router;
