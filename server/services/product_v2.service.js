@@ -214,7 +214,6 @@ const productService = {
             throw new Error('Error fetching search results');
         }
     },
-
     getSuggestions : async (query, limit = 4) => {
         try {
             const suggestions = await Product_v2.find({
@@ -392,22 +391,34 @@ const productService = {
         }
     },
 
-    incrementProductView : async (id) => {
+    incrementProductView: async (req, res) => {
         try {
+            const { id } = req.params;
             const product = await Product_v2.findById(id);
-    
+
             if (!product) {
-                throw new Error('Product not found');
+                console.error('Product not found');
+                return res.status(404).json({
+                    message: 'Product not found'
+                });
             }
-    
-            product.view = (product.view || 0) + 1;
+
+            product. product_view = (product. product_view || 0) + 1;
             await product.save();
-    
-            return product;
+
+            res.status(200).json({
+                message: 'View count incremented successfully',
+                data: product
+            });
         } catch (error) {
-            throw new Error(`Error during view count increment: ${error.message}`);
+            console.error('Error during view count increment:', error);
+            res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
         }
     },
+    
 
 
     filterProductsByPrice : async (price) => {

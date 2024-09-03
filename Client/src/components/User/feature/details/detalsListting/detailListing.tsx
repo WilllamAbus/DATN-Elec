@@ -6,7 +6,7 @@ import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
-import { getProductByID } from "../../../../../services/product_v2/client/homeAllProduct";
+import { getProductByID} from "../../../../../services/product_v2/client/homeAllProduct";
 import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
@@ -106,7 +106,7 @@ const ProductDetail: React.FC = () => {
       }
       try {
         console.log("Fetching product with ID:", id);
-        const productID = await getProductByID(id);
+        const productID = await getProductByID(id); 
         setProduct(productID.product);
         console.log(productID.product);
 
@@ -151,7 +151,7 @@ const ProductDetail: React.FC = () => {
       <div className="container grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
         <div>
           <div className="flex justify-center items-center mb-4">
-            <img src={products?.image[currentIndex]} alt="Ảnh chính" />
+            <img src={products?.image?.[currentIndex]} alt="Ảnh chính" />
           </div>
           <div className="flex justify-center gap-4">
             {products?.image

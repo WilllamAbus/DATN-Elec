@@ -2,10 +2,10 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import {
-  breadcrumbItemClient,
-  ReusableBreadcrumbClient,
-} from "../../../../ultils/breadcrumb";
+// import {
+//   breadcrumbItemClient,
+//   ReusableBreadcrumbClient,
+// } from "../../../../ultils/breadcrumb";
 import {
   Dialog,
   DialogBackdrop,
@@ -24,7 +24,7 @@ import {
   FunnelIcon,
   MinusIcon,
   PlusIcon,
-  Squares2X2Icon,
+  // Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 
 const sortOptions = [
@@ -142,131 +142,100 @@ const Sidebar: React.FC = () => {
     },
   ];
   return (
-    <>
-    <ReusableBreadcrumbClient items={breadcrumbItemClient.allList} />
+ <>
   
     {/* Mobile Filters */}
-    <div className="flex justify-start"> 
-      <Dialog
-        open={mobileFiltersOpen}
-        onClose={setMobileFiltersOpen}
-        className="relative z-40 lg:hidden"
-      >
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
-        />
-  
-        <div className="fixed inset-0 z-40 flex justify-start"> {/* Updated to justify-start for left alignment */}
-          <DialogPanel
+    <Dialog
+          open={mobileFiltersOpen}
+          onClose={setMobileFiltersOpen}
+          className="relative z-40 lg:hidden"
+        >
+          <DialogBackdrop
             transition
-            className="relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-[closed]:translate-x-full"
-          >
-            <div className="flex items-center justify-between px-4">
-              <h2 className="text-lg font-medium text-gray-900">Filters</h2>
-              <button
-                type="button"
-                onClick={() => setMobileFiltersOpen(false)}
-                className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-              >
-                <span className="sr-only">Close menu</span>
-                <XMarkIcon aria-hidden="true" className="h-6 w-6" />
-              </button>
-            </div>
-  
-            {/* Mobile Filters Form */}
-            <form className="mt-4 border-t border-gray-200">
-              <h3 className="sr-only">Categories</h3>
-              <ul role="list" className="px-2 py-3 font-medium text-gray-900">
-                {subCategories.map((category) => (
-                  <li key={category.name}>
-                    <a href={category.href} className="block px-2 py-3">
-                      {category.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-  
-              {filters.map((section) => (
-                <Disclosure
-                  key={section.id}
-                  as="div"
-                  className="border-t border-gray-200 px-4 py-6"
+            className="fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+          />
+
+          <div className="fixed inset-0 z-40 flex">
+            <DialogPanel
+              transition
+              className="relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-[closed]:translate-x-full"
+            >
+              <div className="flex items-center justify-between px-4">
+                <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+                <button
+                  type="button"
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
                 >
-                  <h3 className="-mx-2 -my-3 flow-root">
-                    <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                      <span className="font-medium text-gray-900">
-                        {section.name}
-                      </span>
-                      <span className="ml-6 flex items-center">
-                        <PlusIcon
-                          aria-hidden="true"
-                          className="h-5 w-5 group-data-[open]:hidden"
-                        />
-                        <MinusIcon
-                          aria-hidden="true"
-                          className="h-5 w-5 [.group:not([data-open])_&]:hidden"
-                        />
-                      </span>
-                    </DisclosureButton>
-                  </h3>
-                  <DisclosurePanel className="pt-6">
-                    <div className="space-y-6">
-                      {section.options.map((option, optionIdx) => (
-                        <div key={option.value} className="flex items-center">
-                          <input
-                            defaultValue={option.value}
-                            defaultChecked={option.checked}
-                            id={`filter-mobile-${section.id}-${optionIdx}`}
-                            name={`${section.id}[]`}
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                          />
-                          <label
-                            htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                            className="ml-3 min-w-0 flex-1 text-gray-500"
-                          >
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </DisclosurePanel>
-                </Disclosure>
-              ))}
-  
-              {/* Price Filter Section */}
-              <div className="border-t border-gray-200 px-4 py-6">
-                <span className="font-medium text-gray-900">Giá</span>
-                <div className="px-2 py-3 font-medium text-gray-900">
-                  {filterPrice.map((price) => (
-                    <div className="block px-2 py-3">
-                      <input
-                        type="radio"
-                        name={price.name}
-                        value={price.value}
-                        id={price.id}
-                        checked={selectedPrice === price.value}
-                        onChange={handleCheckPrice}
-                      />
-                      <label
-                        className="text-gray-600 ml-3 cursor-pointer"
-                        htmlFor="price-all"
-                      >
-                        {price.title}
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                  <span className="sr-only">Close menu</span>
+                  <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                </button>
               </div>
-            </form>
-          </DialogPanel>
-        </div>
-      </Dialog>
-    </div>
+
+              <form className="mt-4 border-t border-gray-200">
+                <h3 className="sr-only">Categories</h3>
+                <ul role="list" className="px-2 py-3 font-medium text-gray-900">
+                  {subCategories.map((category) => (
+                    <li key={category.name}>
+                      <a href={category.href} className="block px-2 py-3">
+                        {category.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                {filters.map((section) => (
+                  <Disclosure
+                    key={section.id}
+                    as="div"
+                    className="border-t border-gray-200 px-4 py-6"
+                  >
+                    <h3 className="-mx-2 -my-3 flow-root">
+                      <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="ml-6 flex items-center">
+                          <PlusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 group-data-[open]:hidden"
+                          />
+                          <MinusIcon
+                            aria-hidden="true"
+                            className="h-5 w-5 [.group:not([data-open])_&]:hidden"
+                          />
+                        </span>
+                      </DisclosureButton>
+                    </h3>
+                    <DisclosurePanel className="pt-6">
+                      <div className="space-y-6">
+                        {section.options.map((option, optionIdx) => (
+                          <div key={option.value} className="flex items-center">
+                            <input
+                              defaultValue={option.value}
+                              defaultChecked={option.checked}
+                              id={`filter-mobile-${section.id}-${optionIdx}`}
+                              name={`${section.id}[]`}
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label
+                              htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
+                              className="ml-3 min-w-0 flex-1 text-gray-500"
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </DisclosurePanel>
+                  </Disclosure>
+                ))}
+              </form>
+            </DialogPanel>
+          </div>
+     </Dialog>
   
     {/* Filter Header */}
-    <main className="max-w-full px-4 sm:px-6 lg:px-8">
+    <main className="block items-center">
     <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-4">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">Bộ lọc tìm kiếm</h1>
 
@@ -303,14 +272,6 @@ const Sidebar: React.FC = () => {
                   </div>
                 </MenuItems>
               </Menu>
-
-              <button
-                type="button"
-                className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
-              >
-                <span className="sr-only">View grid</span>
-                <Squares2X2Icon aria-hidden="true" className="h-5 w-5" />
-              </button>
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
@@ -320,21 +281,21 @@ const Sidebar: React.FC = () => {
                 <FunnelIcon aria-hidden="true" className="h-5 w-5" />
               </button>
             </div>
-          </div>
+     </div>
   
     {/* Hidden Screen Reader Only Products Heading */}
     <h2 id="products-heading" className="sr-only">Products</h2>
   
     {/* Main Grid Layout */}
-    <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-10 items-center">
       {/* Desktop Filters */}
-      <form className="hidden lg:block">
+      <form className=" border-gray-200 py-6">
         <h3 className="sr-only">Categories</h3>
         <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
           {subCategories.map((category) => (
             <li key={category.name}>
               <a href={category.href}>{category.name}</a>
-            </li>
+            </li> 
           ))}
         </ul>
   
@@ -382,7 +343,7 @@ const Sidebar: React.FC = () => {
         ))}
   
         {/* Price Filter Section */}
-        <div className="border-b border-gray-200 py-6">
+        <div className="border-b border-gray-200 py-5">
           <h3 className="text-xl text-gray-800 mb-3 font-medium">Giá</h3>
           <div className="space-y-2">
             {filterPrice.map((price) => (
@@ -403,11 +364,11 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </form>
-      {/* Product grid */}
     </div>
     </main>
     
   </>
+   
   
   );
 };
