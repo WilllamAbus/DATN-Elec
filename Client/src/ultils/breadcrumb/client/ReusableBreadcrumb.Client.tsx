@@ -12,7 +12,7 @@ interface ReusableBreadcrumbProps {
 
 const ReusableBreadcrumbClient = ({ items }: ReusableBreadcrumbProps) => {
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-3 -mt-2 antialiased left-0">
+    <section className="max-w-full bg-gray-50 dark:bg-gray-900 p-1 sm:p-3 -mt-2 antialiased left-0">
       <Breadcrumb
         aria-label="Solid background breadcrumb example"
         className="bg-gray-50 px-5 py-3 dark:bg-gray-800"
