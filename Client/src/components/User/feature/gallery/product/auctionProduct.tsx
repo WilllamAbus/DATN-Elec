@@ -48,6 +48,7 @@ const AuctionProduct: React.FC = () => {
   return (
       <>
        <div className="container py-4 flex items-center gap-3">
+        
         <a href="/" className="text-primary text-base flex items-center">
           <span className="ml-2">Trang chủ</span>
         </a>
