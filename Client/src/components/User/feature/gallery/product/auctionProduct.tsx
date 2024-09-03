@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getProductShopping } from "../../../../../services/product_v2/client/homeAllProduct";
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
-import Sidebar from "../sidebar";
+// import Sidebar from "../sidebar";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
 import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
