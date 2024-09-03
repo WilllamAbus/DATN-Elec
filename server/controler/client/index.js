@@ -1,8 +1,9 @@
 
-const {homeAllProduct,getID,shopping,auction} = require('./home');
+const {homeAllProduct,getID,shopping,auction,upView} = require('./home');
 module.exports = {
   homeAllProduct,
   getID,
   shopping,
-  auction 
+  auction,
+  upView
 };

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getProductShopping } from "../../../../../services/product_v2/client/homeAllProduct";
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
-// import Sidebar from "../sidebar";
-import "../../../../../assets/css/user.style.css"
+import Sidebar from "../sidebar";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
 import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,7 +61,7 @@ const AuctionProduct: React.FC = () => {
               key={index}
               className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
-              <div className="h-56 w-auto">
+            <div className="h-56 w-auto">
                 <Link to={`/detailProd/${product._id}`}>
                   <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
                     <a href="#">
@@ -339,7 +338,7 @@ const AuctionProduct: React.FC = () => {
               </div>
             </div>
           ))}
-          </div>
+            </div>
         </div>
         <div className="w-full text-center">
           <button
