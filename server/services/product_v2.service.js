@@ -394,30 +394,37 @@ const productService = {
     incrementProductView: async (req, res) => {
         try {
             const { id } = req.params;
+    
+            // Tìm sản phẩm theo ID
             const product = await Product_v2.findById(id);
-
+    
             if (!product) {
-                console.error('Product not found');
+                console.error('Product not found with id:', id);
                 return res.status(404).json({
+                    success: false,
                     message: 'Product not found'
                 });
             }
-
-            product. product_view = (product. product_view || 0) + 1;
+    
+            // Tăng số lượng lượt xem của sản phẩm
+            product.product_view = (product.product_view || 0) + 1;
             await product.save();
-
+    
             res.status(200).json({
+                success: true,
                 message: 'View count incremented successfully',
                 data: product
             });
         } catch (error) {
             console.error('Error during view count increment:', error);
             res.status(500).json({
+                success: false,
                 message: 'Internal Server Error',
                 error: error.message
             });
         }
     },
+    
     
 
 

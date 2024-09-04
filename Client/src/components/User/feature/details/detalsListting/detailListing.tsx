@@ -6,7 +6,7 @@ import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
-import { getProductByID} from "../../../../../services/product_v2/client/homeAllProduct";
+import { getProductByID,upViewProduct} from "../../../../../services/product_v2/client/homeAllProduct";
 import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
@@ -104,6 +104,9 @@ const ProductDetail: React.FC = () => {
         console.log("Không có ID sản phẩm nào được cung cấp");
         return;
       }
+      await upViewProduct(id);
+      const updatedProduct = await getProductByID(id);
+      setProduct(updatedProduct);
       try {
         console.log("Fetching product with ID:", id);
         const productID = await getProductByID(id); 
@@ -114,9 +117,7 @@ const ProductDetail: React.FC = () => {
         //   const url = await getFileFirebase(productID.image);
         //   setImgPreview(url);
         // }
-        // await upViewProduct(id);
-        // const updatedProduct = await getProductByID(id);
-        // setProduct(updatedProduct);
+       
 
         // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
         if (Array.isArray(watchlistItems)) {
@@ -154,8 +155,7 @@ const ProductDetail: React.FC = () => {
             <img src={products?.image?.[currentIndex]} alt="Ảnh chính" />
           </div>
           <div className="flex justify-center gap-4">
-            {products?.image
-              .slice(0, 4)
+            {products?.image?.slice(0, 4)
               .map((imgSrc: string | undefined, index: number) => (
                 <img
                   key={index}
@@ -198,12 +198,12 @@ const ProductDetail: React.FC = () => {
           </div>
 
           <div className="flex items-baseline mb-4 space-x-2 font-roboto">
-            {products?.product_discount.discountPercent > 0 ? (
+            {products?.product_discount?.discountPercent > 0 ? (
               <div>
                 <p className="text-xl text-red-600 font-semibold">
                   {formatCurrency(
                     products?.product_price *
-                      (1 - products?.product_discount.discountPercent / 100)
+                      (1 - products?.product_discount?.discountPercent / 100)
                   )}
                   đ
                 </p>
@@ -224,8 +224,7 @@ const ProductDetail: React.FC = () => {
             </h3>
             <div className="flex flex-wrap gap-2">
               {products?.product_attributes?.length ? (
-                products.product_attributes
-                  .filter((attribute: ProductAttribute) =>
+                products.product_attributes?.filter((attribute: ProductAttribute) =>
                     ["Ram", "Color"].includes(attribute.k)
                   )
                   .map((attribute: ProductAttribute, index: number) => (
@@ -345,8 +344,7 @@ const ProductDetail: React.FC = () => {
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            {products?.product_attributes
-              .filter((attribute: ProductAttribute) =>
+            {products?.product_attributes?.filter((attribute: ProductAttribute) =>
                 attributesToShow.includes(attribute.k)
               )
               .map((attribute: ProductAttribute, index: number) => (

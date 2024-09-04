@@ -203,22 +203,29 @@ const productController = {
 
     upView: async (req, res) => {
         try {
-            console.log('Request params:', req.params);  // Ghi log giá trị req.params
-    
+            // Lấy product_id từ tham số URL
             const { id } = req.params;
+    
+            // Kiểm tra nếu không có product_id
             if (!id) {
-                console.error('ID parameter is missing in the request');
-                return res.status(400).json({ message: 'ID parameter is required' });
+                return res.status(400).json({
+                    success: false,
+                    err: 1,
+                    msg: 'Thiếu product_id',
+                    status: 400,
+                });
             }
     
-            const updatedProduct = await productService.incrementProductView(id);
+            // Tăng lượt xem sản phẩm
+            const upView = await productService.incrementProductView(id);
     
-            return res.status(200).json(updatedProduct);
+            // Trả về kết quả sau khi tăng lượt xem
+            res.status(200).json({ success: true, upView });
         } catch (error) {
-            console.error('Error during view count increment:', error);
-            return res.status(500).json({ message: `Error during view count increment: ${error.message}` });
+            res.status(500).json({ success: false, error: error.message });
         }
     },
+    
 
 
     price: async (req, res) => {

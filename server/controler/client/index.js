@@ -1,5 +1,5 @@
 
-const {homeAllProduct,getID,auction,upView,shopping } = require('./home');
+const {homeAllProduct,getID,auction,upView,shopping,search } = require('./home');
 const {getLimitProductClient} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 module.exports = {
@@ -10,6 +10,6 @@ module.exports = {
   getProductsByCategory,
   shopping,
   auction,
-  upView
-
+  upView,
+   search
 };

@@ -84,7 +84,7 @@ const AllProduct: React.FC = () => {
             {products.map((product, index) => (
             <div
               key={index}
-              className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              className="rounded-md border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
             <div className="h-56 w-auto">
                 <Link to={`/detailProd/${product._id}`}>
@@ -114,7 +114,7 @@ const AllProduct: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      {product.view > 0 ? <span className="mr-2">({product.view})</span> : ""}
+                      {product.product_view > 0 ? <span className="mr-2">({product.product_view})</span> : ""}
 
                       <svg
                         className="h-5 w-5"

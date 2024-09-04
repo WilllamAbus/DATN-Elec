@@ -149,20 +149,62 @@ const auction = async (req, res) => {
 const upView = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id) {
-      return res.status(400).json({ message: 'ID parameter is required' });
-    }
+
+    // Tìm sản phẩm theo ID
     const product = await modelProduct.findById(id);
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+        console.error('Product not found with id:', id);
+        return res.status(404).json({
+            success: false,
+            message: 'Product not found'
+        });
     }
-    return res.status(200).json(product);
-  } catch (error) {
-    console.error('Error during product retrieval:', error);
-    return res.status(500).json({ message: `Error during product retrieval: ${error.message}` });
-  }
+
+    // Tăng số lượng lượt xem của sản phẩm
+    product.product_view = (product.product_view || 0) + 1;
+    await product.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'View count incremented successfully',
+        data: product
+    });
+} catch (error) {
+    console.error('Error during view count increment:', error);
+    res.status(500).json({
+        success: false,
+        message: 'Internal Server Error',
+        error: error.message
+    });
+}
 };
 
+const search = async (req, res) => {
+  try {
+      const { keyword } = req.params;
+      const result = await modelProduct.find({ product_name: { $regex: keyword, $options: 'i' } });
+      if (result.length > 0) {
+          res.status(200).json({
+              success: true,
+              data: result
+          });
+      } else {
+          console.error("No results found for keyword:", keyword);
+          res.status(404).json({
+              success: false,
+              message: "No results found"
+          });
+      }
+  } catch (error) {
+      console.error('Error during search:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Internal Server Error',
+          error: error.message
+      });
+  }
+};
 
 
 module.exports = {
@@ -170,5 +212,6 @@ module.exports = {
   getID,
   shopping,
   auction,
-  upView
+  upView,
+  search
 };
