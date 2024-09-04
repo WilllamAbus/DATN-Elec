@@ -31,6 +31,7 @@ const search: React.FC = () => {
   return (
     <>
         <h1 className="text-center text-3xl">Từ khóa tìm kiếm: {keyword}</h1>
+        
         {/* <!-- products --> */}
         <div className="col-span-4">
                     
