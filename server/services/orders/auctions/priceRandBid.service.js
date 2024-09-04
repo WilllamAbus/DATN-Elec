@@ -52,7 +52,7 @@ const pricRangeBidService = {
 
   getProductPriceRange: async (productId) => {
     try {
-      const product = await Product_v2.findOne({
+      const product = await Product_v2.findById({
         _id: productId,
         status: { $ne: "disable" },
       }).populate("product_format");

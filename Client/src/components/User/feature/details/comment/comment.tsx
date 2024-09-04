@@ -5,7 +5,7 @@ import "../../../../../assets/css/user.style.css";
 import { Link, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; 
 import axios from "axios"; 
-import Listcomment from "./listComment";
+// import Listcomment from "./listComment";
 
 interface FormValues {
   content: string;
@@ -119,7 +119,7 @@ const Comment = () => {
         )}
         {/* Load comments */}
         
-        <Listcomment />
+        {/* <Listcomment /> */}
         {isLoggedIn ? (
           <form
             className="mt-6"

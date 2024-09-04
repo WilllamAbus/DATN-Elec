@@ -51,12 +51,12 @@ const Navbar: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                <Link
+                    to="auction"
                     className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
                   >
-                    Đấu giá
-                  </a>
+                    Đấu giá
+                  </Link>
                 </li>
                 <li>
                   <a

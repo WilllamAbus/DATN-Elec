@@ -203,19 +203,20 @@ const productController = {
 
     upView: async (req, res) => {
         try {
+            console.log('Request params:', req.params);  // Ghi log giá trị req.params
+    
             const { id } = req.params;
-            const product = await productService.incrementProductView(id);
-
-            res.status(200).json({
-                message: 'View count incremented successfully',
-                data: product
-            });
+            if (!id) {
+                console.error('ID parameter is missing in the request');
+                return res.status(400).json({ message: 'ID parameter is required' });
+            }
+    
+            const updatedProduct = await productService.incrementProductView(id);
+    
+            return res.status(200).json(updatedProduct);
         } catch (error) {
             console.error('Error during view count increment:', error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
+            return res.status(500).json({ message: `Error during view count increment: ${error.message}` });
         }
     },
 

@@ -11,10 +11,19 @@ const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
 const clientCategỏy = require("./client/category");
 const WathListRouter = require("./product/product");
+
+// const supplierRoutes = require("./admin/suppliers/suppliers");
+// const WathListRouter = require("./product/product");
+
 const vnPayRouter = require('./admin/vnpay/order')
 const randBidRouter = require('./admin/randBid/randBid.routes')
 const biddingRouter = require('./client/bidding/bidding.routes')
 const auctionsRouter = require('./client/auctions/auctions.routes')
+const orderAucRouter = require('./client/orderAndDetail/orderAndDetail.routes')
+const orderDetailAuction = require('./client/details/orderDetail.routes')
+const customerServiceRouter = require('./client/customer-service/deleteBidding.routes')
+const notificationRouter = require('./client/notification/notification.routes')
+const interactionRouter = require('./client/interaction/interation.routes')
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -35,6 +44,11 @@ const routes = (app) => {
   app.use('/api/client/bidding', biddingRouter)
   app.use('/api/client/auctions', auctionsRouter)
   app.use('/api/client/category', clientCategỏy)
+  app.use('/api/client/orderAuc', orderAucRouter)
+  app.use('/api/client/orderDetailAuc',orderDetailAuction)
+  app.use('/api/client/customer-service',customerServiceRouter)
+  app.use('/api/notification',notificationRouter)
+  app.use('/api/interaction',interactionRouter)
 };
 
 module.exports = routes;

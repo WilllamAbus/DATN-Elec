@@ -15,12 +15,13 @@ function formatCurrency(value: number) {
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
+  const [visibleCount, setVisibleCount] = useState(4); 
   useSelector((state: RootState) => state.watchlist.items);
-  const userId = useSelector(
-    (state: RootState) => state.auth.profile.profile?._id
-  );
+  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   useParams<{ id: string }>();
-
+  const handleShowMore = () => {
+    setVisibleCount(products.length); // Show all products
+  };
   const handleAddToWatchlist = async (productId: string) => {
     if (userId) {
       try {
@@ -64,7 +65,7 @@ const ProductSection: React.FC = () => {
       </div>
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <div className="mb-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {products.map((product, index) => (
+        {products.slice(0, visibleCount).map((product, index) => (
             <div
               key={index}
               className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -361,14 +362,17 @@ const ProductSection: React.FC = () => {
           ))}
         </div>
       </div>
+      {visibleCount < products.length && (
       <div className="w-full text-center">
         <button
           type="button"
           className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-        >
+          onClick={handleShowMore}
+       >
           Xem tiếp
         </button>
       </div>
+      )}
     </section>
   );
 };

@@ -1,8 +1,10 @@
 "use client";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import {
+  breadcrumbItemClient,
+  ReusableBreadcrumbClient,
+} from "../../../../ultils/breadcrumb";
 import AllProduct from "./product/allProduct";
-import Filter from "../../filter" ;
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -23,6 +25,7 @@ import {
   PlusIcon,
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -82,7 +85,63 @@ function classNames(...classes: string[]): string {
 
 export default function Example() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState<string>("all");
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  useEffect(() => {
+    const pathParts = location.pathname.split("/");
+    const priceParam = pathParts[pathParts.length - 1];
+
+    if (priceParam === "allList") {
+      setSelectedPrice("all");
+    } else {
+      setSelectedPrice(priceParam);
+    }
+  }, [location.pathname]);
+
+  const handleCheckPrice = (e: ChangeEvent<HTMLInputElement>) => {
+    const price = e.target.value;
+    if (price === "all") {
+      navigate(`/allList`);
+    } else {
+      setSelectedPrice(price);
+      navigate(`/filter/${price}`);
+    }
+  };
+  const filterPrice = [
+    { value: "all", name: "price", id: "price-all", title: "Tất cả sản phẩm" },
+    {
+      value: "price-0",
+      name: "price",
+      id: "price-0",
+      title: "Dưới 500.000 VNĐ",
+    },
+    {
+      value: "price-1",
+      name: "price",
+      id: "price-1",
+      title: "500.000 VNĐ - 1.000.000 VNĐ",
+    },
+    {
+      value: "price-2",
+      name: "price",
+      id: "price-2",
+      title: "1.000.000 VNĐ - 3.000.000 VNĐ",
+    },
+    {
+      value: "price-3",
+      name: "price",
+      id: "price-3",
+      title: "3.000.000 VNĐ - 5.000.000 VNĐ",
+    },
+    {
+      value: "price-4",
+      name: "price",
+      id: "price-4",
+      title: "Trên 5.000.000 VNĐ",
+    },
+  ];
   return (
     <div className="bg-white">
       <ReusableBreadcrumbClient items={breadcrumbItemClient.allList} />
@@ -134,7 +193,9 @@ export default function Example() {
                   >
                     <h3 className="-mx-2 -my-3 flow-root">
                       <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="font-medium text-gray-900">
+                          {section.name}
+                        </span>
                         <span className="ml-6 flex items-center">
                           <PlusIcon
                             aria-hidden="true"
@@ -178,7 +239,9 @@ export default function Example() {
 
         <main className="max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-4">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Bộ lọc tìm kiếm</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              Bộ lọc tìm kiếm
+            </h1>
 
             <div className="flex items-center">
               <Menu as="div" className="relative inline-block text-left">
@@ -202,7 +265,9 @@ export default function Example() {
                         <a
                           href={option.href}
                           className={classNames(
-                            option.current ? "font-medium text-gray-900" : "text-gray-500",
+                            option.current
+                              ? "font-medium text-gray-900"
+                              : "text-gray-500",
                             "block px-4 py-2 text-sm data-[focus]:bg-gray-100"
                           )}
                         >
@@ -253,10 +318,16 @@ export default function Example() {
                 </ul>
 
                 {filters.map((section) => (
-                  <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
+                  <Disclosure
+                    key={section.id}
+                    as="div"
+                    className="border-b border-gray-200 py-6"
+                  >
                     <h3 className="-my-3 flow-root">
                       <DisclosureButton className="group flex w-full items-center justify-between bg-bgf3f4f6 py-3 text-sm text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="font-medium text-gray-900">
+                          {section.name}
+                        </span>
                         <span className="ml-6 flex items-center">
                           <PlusIcon
                             aria-hidden="true"
@@ -290,17 +361,39 @@ export default function Example() {
                           </div>
                         ))}
                       </div>
+                      <div className="border-b border-gray-200 py-6">
+                        <h3 className="text-xl text-gray-800 mb-3 font-medium">
+                          Giá
+                        </h3>
+                        <div className="space-y-2">
+                          {filterPrice.map((price) => (
+                            <div className="flex items-center">
+                              <input
+                                type="radio"
+                                name={price.name}
+                                value={price.value}
+                                id={price.id}
+                                checked={selectedPrice === price.value}
+                                onChange={handleCheckPrice}
+                              />
+                              <label
+                                className="text-gray-600 ml-3 cursor-pointer"
+                                htmlFor="price-all"
+                              >
+                                {price.title}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </DisclosurePanel>
                   </Disclosure>
                 ))}
-                <br></br>
-                <Filter/>
               </form>
               {/* Product grid */}
               <div className="lg:col-span-3">
-                <AllProduct/>
+                <AllProduct />
               </div>
-              
             </div>
           </section>
         </main>

@@ -1,52 +1,29 @@
 const { Schema, model } = require("mongoose");
- // Import formatShoppingSchema từ mô hình của bạn
+// Import formatShoppingSchema từ mô hình của bạn
 
 const orderAuctionSchema = new Schema(
- 
-    {
-      user: { type: Schema.Types.ObjectId, ref: "users", required: true }, // Reference to user
+  {
+    shippingAddress: {
+      userID: { type: Schema.Types.ObjectId, ref: "users", required: true },
+      recipientName: { type: String }, // Tên người nhận
+      phoneNumber: { type: String }, // Số điện thoại người nhận
+      address: { type: String },
+      email: { type: String },
+      addressID: { type: String },
+    },
    
-      auctionDetails: [{ type: Schema.Types.ObjectId, ref: "orderAuctions", default: [] }], // Reference to orderAuctions
-  
-      // Store IDs as strings
-    
-      shippingAddressId:  {type: Schema.Types.ObjectId, ref:'shipping', require:true, }, // ID of the shipping address
-  
-      // Array of voucher IDs as strings
- 
-// Số tiền thanh toán
-    payment_date: { type: Date, default: Date.now }, // Ngày thanh toán, mặc định là ngày hiện tại
-    payment_method: {
+
+    stateOrder: {
       type: String,
-      enum: ["MoMo", "Thanh toán trực tiếp", 'vnPay'], // Chỉ định các giá trị hợp lệ cho payment_method
-      required: true,
-    },
-      // Shipping details as embedded object
-      formatShipping: {
-        type: {
-          type: String,
-          enum: ["Tiêu chuẩn"], // Example shipping types
-          required: true,
-        },
-      },
-  
-      // Calculated fields
-      amount: { type: Number, required: true }, // Total amount before shipping
-      shippingFee: { type: Number, default: 31000 }, // Shipping fee
-      totalPriceWithShipping: { type: Number, required: true }, 
+      enum: ["Chờ giao hàng", "Hủy bỏ", "Xác nhận", 'Nhận hàng'], // Order status
     
-      stateOrder: {
-        type: String,
-        enum: [ "Xác nhận", "Hủy bỏ"], // Order status
-      
-        required: true,
-      },
-      order_date: { type: Date, default: Date.now }, // Order date
-      createdAt: { type: Date, default: Date.now },
- 
-      status: { type: String, default: "active" },
-      disabledAt: { type: Date, default: null }, // Disabled date if applicable
     },
+    order_date: { type: Date, default: Date.now }, // Order date
+    createdAt: { type: Date, default: Date.now },
+
+    status: { type: String, default: "active" },
+    disabledAt: { type: Date, default: null }, // Disabled date if applicable
+  },
 
   {
     collection: "orderAuctions",

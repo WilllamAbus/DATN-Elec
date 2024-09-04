@@ -13,10 +13,10 @@ const timeTrackService = {
    */
       createTimeTrack: async (data) => {
         try {
-          
+          const timeZone = 'Asia/Ho_Chi_Minh';
           // Lấy thời gian hiện tại theo thời gian thực
           const startTime = moment().tz(currentTimeInHCM).toDate();
-          const endTime = moment().tz(currentTimeInHCM).add(1, 'hour').toDate(); // Ví dụ, endTime là sau 1 giờ
+          const endTime = moment().tz(data.endTime, timeZone).toDate(); // Ví dụ, endTime là sau 1 giờ
             
           // Tạo một instance mới của Time_Track với thời gian thực
           const timeTrack = new Time_Track({
@@ -113,14 +113,10 @@ const timeTrackService = {
         // console.log('Updating endTime to:', endTime);
   
         // Cập nhật endTime trong cơ sở dữ liệu
-        const updatedTimeTrack = await timeTrackService.updateTimeTrack(timeTrackId, { endTime });
+       await timeTrackService.updateTimeTrack(timeTrackId, { endTime });
   
         // Kiểm tra kết quả cập nhật
-        if (updatedTimeTrack) {
-          console.log('Real-time updated TimeTrack:', updatedTimeTrack);
-        } else {
-          console.log('No TimeTrack updated');
-        }
+       
       } catch (error) {
         console.error('Error updating endTime in real-time:', error);
       }
