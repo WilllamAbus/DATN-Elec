@@ -98,8 +98,8 @@ const ProductSection: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      {product.view > 0 ? (
-                        <span className="mr-2">({product.view})</span>
+                      {product.product_view > 0 ? (
+                        <span className="mr-2">({product.product_view})</span>
                       ) : (
                         ""
                       )}
