@@ -13,4 +13,4 @@ router.delete(
 );
 router.post("/add", middlewareController.verifyToken, addWatchlist);
 router.get("/", middlewareController.verifyToken, getWatchlist);
-module.exports = router;
+module.exports = router; 

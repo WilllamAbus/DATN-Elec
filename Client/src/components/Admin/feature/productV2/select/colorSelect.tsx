@@ -1,6 +1,6 @@
 import React from "react";
 import chroma from "chroma-js";
-import Select, { StylesConfig, MultiValue, ActionMeta } from "react-select";
+import Select, { StylesConfig, SingleValue } from "react-select";
 
 const colorOptions = [
   { value: "black", label: "Màu đen", color: "#000000" },
@@ -38,7 +38,7 @@ const getColorStyles = (
   };
 };
 
-const colourStyles: StylesConfig<(typeof colorOptions)[0], true> = {
+const colourStyles: StylesConfig<{ value: string; label: string; color: string }, false> = {
   control: (styles) => ({ ...styles, backgroundColor: "white" }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
     ...styles,
@@ -52,39 +52,23 @@ const colourStyles: StylesConfig<(typeof colorOptions)[0], true> = {
         : undefined,
     },
   }),
-  multiValue: (styles, { data }) => ({
-    ...styles,
-    backgroundColor: chroma(data.color).alpha(0.1).css(),
-  }),
-  multiValueLabel: (styles, { data }) => ({
+  singleValue: (styles, { data }) => ({
     ...styles,
     color: data.color,
-  }),
-  multiValueRemove: (styles, { data }) => ({
-    ...styles,
-    color: data.color,
-
-    ":hover": {
-      backgroundColor: data.color,
-      color: "white",
-    },
   }),
 };
 
 interface ColorSelectProps {
-  onChange: (
-    selectedOptions: MultiValue<(typeof colorOptions)[0]>,
-    actionMeta: ActionMeta<(typeof colorOptions)[0]>
-  ) => void;
-  value: MultiValue<(typeof colorOptions)[0]>;
+  onChange: (selectedOption: SingleValue<{ value: string; label: string; color: string }>) => void;
+  value: SingleValue<{ value: string; label: string; color: string }>;
   className?: string;
 }
 
 const ColorSelect: React.FC<ColorSelectProps> = ({ onChange, value, className }) => (
   <Select
     classNamePrefix="react-select"
-    closeMenuOnSelect={false}
-    isMulti
+    closeMenuOnSelect={true}
+    isMulti={false}
     options={colorOptions}
     styles={colourStyles}
     value={value}

@@ -1,12 +1,18 @@
 const Product = require('../model/product_v2');
 
 const ProductService = {
-  getProductLimitService: (page) => new Promise(async (resolve, reject) => {
+  getProductLimitService: (page, search) => new Promise(async (resolve, reject) => {
     try {
       const limit = parseInt(process.env.LIMIT, 10) || 3;
       const offset = (!page || +page <= 1) ? 0 : (+page - 1) * limit;
+      const searchQuery = search
+        ? {
+            status: { $ne: 'disable' },
+            product_name: { $regex: search, $options: 'i' }
+          }
+        : { status: { $ne: 'disable' } };
 
-      const products = await Product.find({ status: { $ne: 'disable' } }) // Thêm điều kiện ở đây
+      const products = await Product.find(searchQuery)
         .skip(offset)
         .limit(limit)
         .populate('product_type', 'name')  
@@ -17,7 +23,7 @@ const ProductService = {
         .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
         .lean();
 
-      const total = await Product.countDocuments({ status: { $ne: 'disable' } }); 
+      const total = await Product.countDocuments(searchQuery); 
 
       resolve({
         success: true,
@@ -34,11 +40,10 @@ const ProductService = {
       reject({
         success: false,
         err: 1,
-        msg: 'Failed to fetch products: ' + error.message,
+        msg: 'chưa có sản phẩm: ' + error.message,
         status: 500
       });
     }
   }),
 };
-
 module.exports = ProductService;

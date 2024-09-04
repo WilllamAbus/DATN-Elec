@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "flowbite";
 import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "../../ultils/dropdown/client/nav/dropdown.LogoUser.nav";
 import UserMenuDropdown from "../../ultils/dropdown/client/nav/toggleDropdown";
+import { listCateNavItemThunk } from "../../redux/clientcate/client/Thunk/";
 import logoNav from "../../assets/images/logoHeader/logo.svg";
+import { useAppDispatch } from "../../redux/rootReducer";
+import cateDropdownItems from './listCateNav/path/hookspathnav';
 const Navbar: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [keyword, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  useEffect(() => {
+    dispatch(listCateNavItemThunk());
+  }, [dispatch]);
+  const dropdownItems = cateDropdownItems();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,11 +25,6 @@ const Navbar: React.FC = () => {
       console.log("Vui lòng nhập từ khóa tìm kiếm");
     }
   };
-  const dropdownItems = [
-    { label: "Laptop", href: "#" },
-    { label: "iPhone", href: "#" },
-    { label: "Camera", href: "#" },
-  ];
 
   return (
     <header>
@@ -73,20 +76,19 @@ const Navbar: React.FC = () => {
             <div className="relative mt-1 lg:w-[32rem]">
               <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
                 <button type="submit">
-                <svg
-                  className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                  <svg
+                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
-                
               </div>
               <input
                 type="text"

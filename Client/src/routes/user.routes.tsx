@@ -14,6 +14,7 @@ const VerifyEmail = React.lazy(() => import("../page/User/accounts/VerifyEmail")
 const ResetPassword = React.lazy(() => import("../page/User/accounts/ResetPassword"));
 const UserAllList = React.lazy(() => import("../page/User/shopping/gallery/allListing"));
 const UserMyList = React.lazy(() => import("../page/User/shopping/gallery/listTing"));
+const UserListPage = React.lazy(() => import("../page/User/shopping/listPage/listPage"));
 const UserAuction = React.lazy(() => import("../page/User/shopping/gallery/auction"));
 const UserdetailsProd = React.lazy(() => import("../page/User/shopping/details/detail"));
 const UserdetailsAuc = React.lazy(() => import("../page/User/shopping/auction/auctionDetails"));
@@ -44,6 +45,7 @@ const UserRoutes: RouteObject[] = [
       { path: "reciveCode", element: <UserReciveCode /> },
       { path: "allList", element: <UserAllList /> },
       { path: "listTing", element: <UserMyList /> },
+      { path: "productlist/:categoryId", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
       { path: "detailProd/:id", element: <UserdetailsProd /> },
       { path: "detailAuc", element: <UserdetailsAuc /> },

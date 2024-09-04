@@ -9,7 +9,7 @@ const initialState: ProductStateSoftDele = {
 };
 
 const softDeleteSlice = createSlice({
-  name: 'products',
+  name: 'products/softdelete',
   initialState,
   reducers: {},
   extraReducers: (builder) => {

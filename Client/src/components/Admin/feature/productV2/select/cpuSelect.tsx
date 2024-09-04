@@ -1,5 +1,6 @@
 import React from "react";
-import Select, { StylesConfig, MultiValue } from "react-select";
+import Select, { StylesConfig, SingleValue, ActionMeta } from "react-select";
+
 const cpuOptions = [
   { value: "i5_12450h_2ghz", label: "Intel Core i5-12450H, 2GHz" },
   { value: "i7_13700k_3ghz", label: "Intel Core i7-13700K, 3GHz" },
@@ -13,7 +14,7 @@ const cpuOptions = [
   { value: "i5_1135g7_2_4ghz", label: "Intel Core i5-1135G7, 2.4GHz" }
 ];
 
-const cpuStyles: StylesConfig<(typeof cpuOptions)[0], true> = {
+const cpuStyles: StylesConfig<(typeof cpuOptions)[0], false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -38,35 +39,22 @@ const cpuStyles: StylesConfig<(typeof cpuOptions)[0], true> = {
         : undefined,
     },
   }),
-  multiValue: (styles) => ({
-    ...styles,
-    backgroundColor: "#f0f0f0",
-  }),
-  multiValueLabel: (styles) => ({
-    ...styles,
-    color: "black",
-  }),
-  multiValueRemove: (styles) => ({
-    ...styles,
-    color: "black",
-    ":hover": {
-      backgroundColor: "#d3d3d3",
-      color: "black",
-    },
-  }),
 };
 
 interface CpuSelectProps {
-  onChange: (selectedOptions: MultiValue<{ value: string; label: string }>) => void;
-  value: MultiValue<{ value: string; label: string }>;
+  onChange: (
+    selectedOption: SingleValue<(typeof cpuOptions)[0]>,
+    actionMeta: ActionMeta<(typeof cpuOptions)[0]>
+  ) => void;
+  value: SingleValue<(typeof cpuOptions)[0]>;
   className?: string;
 }
 
 const CpuSelect: React.FC<CpuSelectProps> = ({ onChange, value, className }) => (
   <Select
     classNamePrefix="react-select"
-    closeMenuOnSelect={false}
-    isMulti
+    closeMenuOnSelect={true}
+    isMulti={false}
     options={cpuOptions}
     styles={cpuStyles}
     value={value}

@@ -1,4 +1,4 @@
-// src/redux/rootReducer.ts
+
 
 import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
@@ -11,6 +11,8 @@ import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
+import productClientReducer from "./product/client";
+import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
 import countryRenducer from "./country/provinceSlice";
@@ -29,6 +31,8 @@ const rootReducer = combineReducers({
   voucher: voucherReducer,
   checkout: checkoutSlice,
   products: productAdminReducer,
+  productClient: productClientReducer,
+  cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,
   Vnpay: VnpayRenducer,

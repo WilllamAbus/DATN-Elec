@@ -1,22 +1,23 @@
-import { MultiValue } from "react-select";
+import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
 import { BatteryOption } from "../types";
+
 export const handleBatteryChange = (
-  selectedOptions: MultiValue<BatteryOption>,
-  setSelectedBattery: React.Dispatch<React.SetStateAction<MultiValue<BatteryOption>>>,
+  selectedOption: SingleValue<BatteryOption>,
+  setSelectedBattery: React.Dispatch<React.SetStateAction<SingleValue<BatteryOption>>>,
   setValue: UseFormSetValue<ProductV2>,
   getValues: () => ProductV2
 ) => {
-  setSelectedBattery(selectedOptions);
-  const batteryValues = selectedOptions.map((option) => option.label).join(', ');
+  setSelectedBattery(selectedOption);
+  const batteryValue = selectedOption ? selectedOption.label : "";
   const currentAttributes = getValues().product_attributes || [];
   const updatedAttributes = currentAttributes
-    .filter(attr => attr.k !== "Battery") 
+    .filter((attr) => attr.k !== "Battery")
     .concat({
       k: "Pin",
-      v: batteryValues
+      v: batteryValue,
     });
-  
+
   setValue("product_attributes", updatedAttributes);
 };

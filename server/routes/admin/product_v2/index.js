@@ -5,6 +5,7 @@ const middlewareController = require('../../../middleware/auth');
 const {
    list,
    add,
+   addVariant,
    softDelete,
    update,
    selectbrand,
@@ -14,11 +15,13 @@ const {
    selectProductFormat,
    selectConditionShopping,
    selectCategories,
-   hardDelete,
    getOne,
-   getProductLimit} = require('../../../controler/admin/product_v2');
+   getProductLimit,
+   deletedList,
+   hardDelete} = require('../../../controler/admin/product_v2');
 router.get('/list',list);
 router.post('/add', upload.array('image'), add);
+router.post('/:product_id/variants', upload.array('image'), addVariant);
 router.patch('/softDelete/:id',middlewareController.verifyToken,softDelete);
 router.get('/selectbrand',selectbrand);
 router.get('/selectsupplier',selectSupplier);
@@ -29,6 +32,7 @@ router.get('/selectCategories',selectCategories);
 router.get("/getone/:id", getOne);
 router.patch("/restore/:id", middlewareController.verifyToken,restore);
 router.delete("/hardDelete/:id",middlewareController.verifyToken,hardDelete);
+router.get("/deletedlist", middlewareController.verifyToken, deletedList);
 router.get('/limit', getProductLimit)
 router.put(
    "/update/:id",

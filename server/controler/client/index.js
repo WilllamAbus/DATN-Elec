@@ -1,6 +1,11 @@
 
 const {homeAllProduct,getID } = require('./home');
+const {getLimitProductClient} = require('./product');
+const {listcatenav,getProductsByCategory} = require('./navbar');
 module.exports = {
   homeAllProduct,
-  getID
+  getID,
+  listcatenav,
+  getLimitProductClient,
+  getProductsByCategory
 };

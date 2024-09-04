@@ -1,11 +1,13 @@
 const { add } = require('./add');
+const { addVariant } = require('./addVariant');
 const { list } = require('./list');
 const { softDelete } = require('./softdelete');
 const { getOne } = require('./getOne');
 const { update } = require('./update');
-const { hardDelete } = require('./hardDelete ');
+const { hardDelete } = require('./hardDelete');
 const { restore } = require('./restore');
 const { getProductLimit } = require('./pagi');
+const { deletedList } = require('./deletedList ');
 const {
    selectbrand,
    selectSupplier,
@@ -22,10 +24,12 @@ module.exports = {
   restore,
   selectbrand,
   selectSupplier,
-  hardDelete,
   selectDiscount,
   selectProductFormat,
   selectConditionShopping,
   selectCategories,
-  getProductLimit
+  getProductLimit,
+  deletedList,
+  addVariant
+
 };

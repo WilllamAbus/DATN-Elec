@@ -49,7 +49,7 @@ const restore = async (req, res) => {
     res.status(200).json({
       success: true,
       err: 0,
-      msg: "Sản phẩm đã được khôi phục thành công",
+      msg: "Sản phẩm đã được khôi phục thành công ok",
       status: 200,
       data: restoreProduct
     });

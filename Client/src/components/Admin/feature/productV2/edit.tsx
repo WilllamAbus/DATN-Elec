@@ -38,7 +38,7 @@ import {
 } from "./handlers";
 import { selectFetchData } from "./FetchData";
 import { DiscountSelect, CategorySelect, BrandSelect, SupplierSelect } from "./select";
-import { MultiValue } from "react-select";
+import { SingleValue} from "react-select";
 const EditProduct: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -56,28 +56,28 @@ const EditProduct: React.FC = () => {
   const product = useSelector((state: RootState) => state.products.getone.product);
   const fetchStatus = useSelector((state: RootState) => state.products.getone.status);
   const fetchError = useSelector((state: RootState) => state.products.getone.error);
-  const [selectedRam, setSelectedRam] = useState<MultiValue<RamOption>>([]);
-  const [selectedColors, setSelectedColors] = useState<MultiValue<ColorOption>>([]);
-  const [selectedScreen, setSelectedScreen] = useState<MultiValue<ScreenOption>>([]);
-  const [selectedCPU, setSelectedCPU] = useState<MultiValue<CPUOption>>([]);
-  const [selectedCard, setSelectedCard] = useState<MultiValue<CardOption>>([]);
-  const [selectedBattery, setSelectedBattery] = useState<MultiValue<BatteryOption>>([]);
-  const onColorChange = (selectedOptions: MultiValue<ColorOption>) => {
+  const [selectedRam, setSelectedRam] = useState<SingleValue<RamOption>>(null);
+  const [selectedColors, setSelectedColors] = useState<SingleValue<ColorOption>>(null);
+  const [selectedScreen, setSelectedScreen] = useState<SingleValue<ScreenOption>>(null);
+  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPUOption>>(null);
+  const [selectedCard, setSelectedCard] = useState<SingleValue<CardOption>>(null);
+  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BatteryOption>>(null);
+  const onColorChange = (selectedOptions: SingleValue<ColorOption>) => {
     handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
   };
-  const onRamChange = (selectedOptions: MultiValue<RamOption>) => {
+  const onRamChange = (selectedOptions: SingleValue<RamOption>) => {
     handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
   };
-  const onScreenChange = (selectedOptions: MultiValue<ScreenOption>) => {
+  const onScreenChange = (selectedOptions: SingleValue<ScreenOption>) => {
     handleScreenChange(selectedOptions, setSelectedScreen, setValue, getValues);
   };
-  const onCPUChange = (selectedOptions: MultiValue<CPUOption>) => {
+  const onCPUChange = (selectedOptions: SingleValue<CPUOption>) => {
     handleCPUChange(selectedOptions, setSelectedCPU, setValue, getValues);
   };
-  const onCardChange = (selectedOptions: MultiValue<CardOption>) => {
+  const onCardChange = (selectedOptions: SingleValue<CardOption>) => {
     handleCardChange(selectedOptions, setSelectedCard, setValue, getValues);
   };
-  const onBatteryChange = (selectedOptions: MultiValue<BatteryOption>) => {
+  const onBatteryChange = (selectedOptions: SingleValue<BatteryOption>) => {
     handleBatteryChange(selectedOptions, setSelectedBattery, setValue, getValues);
   };
 
@@ -114,7 +114,6 @@ const EditProduct: React.FC = () => {
     if (fetchStatus === "succeeded" && product) {
       setValue("product_name", product.product_name);
       setValue("product_price", product.product_price);
-      setValue("product_quantity", product.product_quantity);
       setValue("createdAt", product.createdAt);
       setValue("weight_g", product.weight_g);
       setValue("product_brand", product.product_brand.name);
@@ -274,29 +273,7 @@ const EditProduct: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="quantity"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Số lượng
-                </label>
-                <input
-                  type="text"
-                  id="product_quantity"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  {...register("product_quantity", {
-                    required: "Số lượng không được bỏ trống",
-                    min: { value: 0, message: "Số lượng phải lớn hơn 0" },
-                    validate: (value) => !isNaN(value) || "Số lượng sản phẩm phải là số",
-                  })}
-                />
-                {errors.product_quantity && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.product_quantity.message}</span>
-                  </div>
-                )}
-              </div>
+
               <div className="col-span-6 sm:col-span-3">
                 <label
                   htmlFor="weight_g"
@@ -332,23 +309,6 @@ const EditProduct: React.FC = () => {
                 )}
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="launch-year"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Thời điểm ra mắt
-                </label>
-                <input
-                  type="number"
-                  id="launch-year"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="2024"
-                  min="2020"
-                  max="2024"
-                  step="1"
-                />
-              </div>
               <div className="col-span-6 sm:col-span-3">
                 <label
                   htmlFor="birthday"
