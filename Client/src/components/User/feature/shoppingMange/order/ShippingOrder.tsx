@@ -12,24 +12,20 @@ const ShippingOrders: React.FC = () => {
   );
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
-  // Toggle hiển thị tất cả đơn hàng
   const toggleShowAll = () => {
     setShowAll(!showAll);
   };
 
-  // Fetch dữ liệu đơn hàng khi component mount
   useEffect(() => {
     dispatch(shippingOrdersThunk());
   }, [dispatch]);
 
-  // Log trạng thái và lỗi khi thay đổi
   useEffect(() => {
     console.log("Orders:", orders);
     console.log("Status:", status);
     console.log("Error:", error);
   }, [orders, status, error]);
 
-  // Xử lý hủy đơn hàng
   const handleRepurchase = (productId: string) => {
     navigate(`/detailProd/${productId}`);
   };
@@ -137,8 +133,6 @@ const ShippingOrders: React.FC = () => {
           </div>
         ))
       ) : (
-        // Thông báo không có đơn hàng
-
         <a
           href="/"
           className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"

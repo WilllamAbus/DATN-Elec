@@ -15,24 +15,20 @@ const OrderList: React.FC = () => {
   );
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
-  // Toggle hiển thị tất cả đơn hàng
   const toggleShowAll = () => {
     setShowAll(!showAll);
   };
 
-  // Fetch dữ liệu đơn hàng khi component mount
   useEffect(() => {
     dispatch(fetchUserOrdersThunk());
   }, [dispatch]);
 
-  // Log trạng thái và lỗi khi thay đổi
   useEffect(() => {
     console.log("Orders:", orders);
     console.log("Status:", status);
     console.log("Error:", error);
   }, [orders, status, error]);
 
-  // Xử lý hủy đơn hàng
   const handleCancelOrder = (orderId: string) => {
     dispatch(cancelOrderThunk({ orderId }));
   };
@@ -157,7 +153,6 @@ const OrderList: React.FC = () => {
           </div>
         ))
       ) : (
-        // Thông báo không có đơn hàng
         <button className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700">
           Tiếp tục mua sắm
         </button>

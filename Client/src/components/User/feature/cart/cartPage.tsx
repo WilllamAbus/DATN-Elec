@@ -216,8 +216,6 @@ const CartPage: React.FC = () => {
     groupedCarts.push(cart);
   });
 
-  // groupedMap.forEach((value) => groupedCarts.push(value));
-
   return (
     <div className="container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
       <div className="grid md:grid-cols-3 gap-4">
