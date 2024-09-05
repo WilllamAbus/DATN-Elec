@@ -4,7 +4,10 @@ import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
+import {
+  addToWatchlistThunk,
+  deleteWatchlistThunk,
+} from "../../redux/product/wathList/wathlist";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
 import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
@@ -20,17 +23,62 @@ const ProductSection: React.FC = () => {
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
+  const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   useParams<{ id: string }>();
   const handleShowMore = () => {
     setVisibleCount(products.length); // Show all products
   };
+
   const handleAddToWatchlist = async (productId: string) => {
-    if (userId) {
+    if (userId && productId) {
       try {
-        await dispatch(addToWatchlistThunk({ userId, productId })).unwrap();
+        let resultAction;
+
+        if (isFavorite) {
+          resultAction = await dispatch(
+            deleteWatchlistThunk(productId)
+          ).unwrap();
+          console.log("Delete result action:", resultAction);
+
+          if (
+            !resultAction ||
+            typeof resultAction !== "object" ||
+            !resultAction._id
+          ) {
+            setIsFavorite(false);
+          } else {
+            setIsFavorite(false);
+          }
+        } else {
+          resultAction = await dispatch(
+            addToWatchlistThunk({ userId, productId })
+          ).unwrap();
+          console.log("Add result action:", resultAction);
+
+          if (
+            !resultAction ||
+            typeof resultAction !== "object" ||
+            !resultAction._id
+          ) {
+            setError("Lỗi khi thêm vào DS theo doi");
+            setIsFavorite(false);
+          } else {
+            setIsFavorite(true);
+          }
+        }
       } catch (err) {
-        console.error("Error adding product to watchlist", err);
+        if (err instanceof Error) {
+          console.error("lỗi xử lý ds theo dõi:", err.message);
+          setError(err.message);
+        } else {
+          console.error("Đã xảy ra lỗi không xác định:", err);
+          setError("Đã xảy ra lỗi không xác định.");
+        }
       }
+    } else {
+      console.log("User ID or Product ID is missing");
+      setError("User ID or Product ID is missing");
     }
   };
   const handleAddToCart = async (productId: string) => {
@@ -46,6 +94,7 @@ const ProductSection: React.FC = () => {
       console.log("chưa login");
     }
   };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -139,6 +188,8 @@ const ProductSection: React.FC = () => {
                       fcdsf Quick look
                       <div className="tooltip-arrow" data-popper-arrow="" />
                     </div>
+                    {error && <p className="text-red-500">{error}</p>}
+
                     <button
                       type="button"
                       onClick={() => handleAddToWatchlist(product._id)}
@@ -147,7 +198,10 @@ const ProductSection: React.FC = () => {
                     >
                       <span className="sr-only"> Add to Favorites </span>
                       <svg
-                        className="h-5 w-5"
+                        className={`h-5 w-5 ${
+                          isFavorite ? "text-red-500" : "text-gray-500"
+                        }`}
+                        // className="h-5 w-5"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

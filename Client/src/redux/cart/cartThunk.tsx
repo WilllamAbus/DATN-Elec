@@ -44,21 +44,49 @@ export const addProductToCart = createAsyncThunk(
 );
 
 // Cập nhật số lượng sản phẩm trong giỏ hàng
+// export const updateCartItem = createAsyncThunk(
+//   "cart/updateCartItemQuantity",
+//   async ({
+//     cartId,
+//     itemId,
+//     quantity,
+//   }: {
+//     cartId: string;
+//     itemId: string;
+//     quantity: number;
+//   }) => {
+//     const response = await updateCart(cartId, [
+//       {
+//         product: itemId,
+//         quantity,
+//       },
+//     ]);
+//     console.log("Update Cart Response:", response); // Kiểm tra phản hồi từ API
+//     return {
+//       cartId,
+//       itemId,
+//       quantity,
+//     };
+//   }
+// );
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItemQuantity",
   async ({
     cartId,
     itemId,
     quantity,
+    isSelected = false, // Thêm giá trị mặc định cho selected
   }: {
     cartId: string;
     itemId: string;
     quantity: number;
+    isSelected?: boolean;
   }) => {
     const response = await updateCart(cartId, [
       {
         product: itemId,
         quantity,
+        isSelected,
       },
     ]);
     console.log("Update Cart Response:", response); // Kiểm tra phản hồi từ API
@@ -66,6 +94,7 @@ export const updateCartItem = createAsyncThunk(
       cartId,
       itemId,
       quantity,
+      isSelected,
     };
   }
 );

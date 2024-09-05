@@ -21,6 +21,7 @@ export interface CartItem {
   quantity: number;
   price: number;
   totalItemPrice: number;
+  isSelected?: boolean; // Thêm trường selected để đánh dấu sản phẩm đã chọn hay chưa
 }
 export interface CartType {
   _id: string;

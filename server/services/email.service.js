@@ -80,3 +80,23 @@ module.exports.sendRandomPasswordEmail = async (email, randomPassword) => {
     throw error;
   }
 };
+module.exports.sendOrderConfirmationEmail = async (email, orderDetails) => {
+  try {
+    const emailTemplate = await ejs.renderFile(
+      path.join(__dirname, "..", "views", "orderEmail.ejs"),
+      orderDetails
+    );
+
+    const info = await transporter.sendMail({
+      from: "DuPiNDuPi <noreply@gmail.com>",
+      to: email,
+      subject: "Xác nhận đơn hàng của bạn",
+      html: emailTemplate,
+    });
+
+    return info;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

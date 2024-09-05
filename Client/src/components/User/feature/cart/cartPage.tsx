@@ -146,6 +146,7 @@ const CartPage: React.FC = () => {
   const handleCheckout = () => {
     navigate("/checkout", { state: { groupedCarts, totalCartPrice } });
   };
+
   const handleDeleteProduct = async (cartId: string, productId: string) => {
     try {
       await dispatch(deleteCart({ cartId, productId })).unwrap();
@@ -154,6 +155,7 @@ const CartPage: React.FC = () => {
       toast.error("Xóa sản phẩm thất bại.");
     }
   };
+
   if (cartStatus === "loading") {
     return <p>Loading...</p>;
   }
@@ -343,9 +345,9 @@ const CartPage: React.FC = () => {
                 <div className="ml-auto">
                   <h4 className="text-base font-bold text-gray-800">
                     {cart.items[0].product.product_price_unit.toLocaleString(
-                      "vi-VN"
+                      "vi-VN",
+                      { style: "currency", currency: "VND" }
                     )}{" "}
-                    VND
                   </h4>
                 </div>
               </div>
@@ -398,6 +400,7 @@ const CartPage: React.FC = () => {
             <Button
               onClick={handleCheckout}
               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
+              disabled={!groupedCarts.length}
             >
               Thanh toán
             </Button>
@@ -414,289 +417,3 @@ const CartPage: React.FC = () => {
 };
 
 export default CartPage;
-// import React, { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   fetchCartList,
-//   updateCartItem,
-//   // deleteProductFromCart,
-// } from "../../../../redux/cart/cartThunk";
-// import { AppDispatch, RootState } from "../../../../redux/store";
-// import { CartType } from "../../../../types/cart/carts";
-// import { useNavigate } from "react-router-dom";
-// import { Button } from "flowbite-react";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-
-// const CartPage: React.FC = () => {
-//   const dispatch = useDispatch<AppDispatch>();
-//   const navigate = useNavigate();
-//   const userId = useSelector(
-//     (state: RootState) => state.auth.profile.profile?._id
-//   );
-//   const carts = useSelector((state: RootState) => state.cart.carts);
-//   const cartStatus = useSelector((state: RootState) => state.cart.status);
-//   const cartError = useSelector((state: RootState) => state.cart.error);
-//   console.log(carts);
-
-//   const [itemQuantities, setItemQuantities] = useState<{
-//     [key: string]: number;
-//   }>({});
-//   const [totalCartPrice, setTotalCartPrice] = useState(0);
-
-//   useEffect(() => {
-//     if (userId) {
-//       dispatch(fetchCartList());
-//     }
-//   }, [dispatch, userId]);
-
-//   useEffect(() => {
-//     if (carts) {
-//       const newItemQuantities: { [key: string]: number } = {};
-//       carts.forEach((cart) => {
-//         cart.items?.forEach((item) => {
-//           newItemQuantities[item.product._id] = item.quantity;
-//         });
-//       });
-//       setItemQuantities(newItemQuantities);
-//     }
-//   }, [carts]);
-
-//   useEffect(() => {
-//     if (carts) {
-//       const total = carts.reduce((total, cart) => {
-//         return (
-//           total +
-//           (cart.items?.reduce((itemTotal, item) => {
-//             const quantity = itemQuantities[item.product._id] || item.quantity;
-//             return itemTotal + (item.product.product_price || 0) * quantity;
-//           }, 0) || 0)
-//         );
-//       }, 0);
-//       setTotalCartPrice(total);
-//     }
-//   }, [carts, itemQuantities]);
-
-//   const handleQuantityChange = async (
-//     cartId: string,
-//     itemId: string,
-//     newQuantity: number
-//   ) => {
-//     const item = carts
-//       .flatMap((cart) => cart.items || [])
-//       .find((i) => i.product._id === itemId);
-
-//     if (item) {
-//       const stock = item.product.product_quantity;
-//       if (newQuantity > stock) {
-//         toast.error(
-//           `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
-//         );
-//         return;
-//       }
-//     }
-
-//     const validQuantity = Math.max(1, newQuantity);
-//     try {
-//       await dispatch(
-//         updateCartItem({
-//           cartId,
-//           itemId,
-//           quantity: validQuantity,
-//         })
-//       ).unwrap();
-//       setItemQuantities((prevQuantities) => ({
-//         ...prevQuantities,
-//         [itemId]: validQuantity,
-//       }));
-//     } catch (error) {
-//       console.error("Failed to update quantity:", error);
-//       toast.error("Cập nhật số lượng thất bại.");
-//     }
-//   };
-
-//   const handleBlur = async (
-//     cartId: string,
-//     itemId: string,
-//     currentQuantity: string
-//   ) => {
-//     const newQuantity =
-//       currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
-
-//     const item = carts
-//       .flatMap((cart) => cart.items || [])
-//       .find((i) => i.product._id === itemId);
-
-//     if (item) {
-//       const stock = item.product.product_quantity;
-
-//       if (newQuantity > stock) {
-//         toast.error(
-//           `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
-//         );
-//         setItemQuantities((prevQuantities) => ({
-//           ...prevQuantities,
-//           [itemId]: item.quantity,
-//         }));
-//         return;
-//       }
-//     }
-
-//     await handleQuantityChange(cartId, itemId, newQuantity);
-//   };
-
-//   const handleDecreaseQuantity = (
-//     cartId: string,
-//     itemId: string,
-//     currentQuantity: number
-//   ) => {
-//     const newQuantity = Math.max(1, currentQuantity - 1);
-//     handleQuantityChange(cartId, itemId, newQuantity);
-//   };
-
-//   const handleIncreaseQuantity = (
-//     cartId: string,
-//     itemId: string,
-//     currentQuantity: number
-//   ) => {
-//     handleQuantityChange(cartId, itemId, currentQuantity + 1);
-//   };
-
-//   const handleCheckout = () => {
-//     navigate("/checkout", { state: { groupedCarts, totalCartPrice } });
-//   };
-
-//   // const handleDeleteProduct = async (cartId: string, productId: string) => {
-//   //   try {
-//   //     await dispatch(deleteProductFromCart({ cartId, productId })).unwrap();
-//   //     toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
-//   //   } catch (error) {
-//   //     toast.error("Xóa sản phẩm thất bại.");
-//   //   }
-//   // };
-
-//   if (cartStatus === "loading") {
-//     return <p>Loading...</p>;
-//   }
-
-//   if (cartStatus === "failed") {
-//     toast.error(`Error: ${cartError}`);
-//     return <p>Error: {cartError}</p>;
-//   }
-
-//   if (!Array.isArray(carts) || carts.length === 0) {
-//     return <p>Giỏ hàng trống</p>;
-//   }
-
-//   const groupedMap = new Map<string, CartType>();
-//   const groupedCarts: CartType[] = [];
-//   const filteredCarts = carts.filter(
-//     (cart): cart is CartType =>
-//       cart !== null && cart !== undefined && Array.isArray(cart.items)
-//   );
-
-//   filteredCarts.forEach((cart) => {
-//     cart.items.forEach((item) => {
-//       const key = item.product._id;
-//       if (key) {
-//         if (!groupedMap.has(key)) {
-//           groupedMap.set(key, { ...cart, items: [item] });
-//         } else {
-//           const existingCart = groupedMap.get(key)!;
-//           const updatedItems = [...existingCart.items];
-
-//           const itemIndex = updatedItems.findIndex(
-//             (i) => i.product._id === item.product._id
-//           );
-
-//           if (itemIndex !== -1) {
-//             updatedItems[itemIndex] = {
-//               ...updatedItems[itemIndex],
-//               quantity: updatedItems[itemIndex].quantity + item.quantity,
-//               totalItemPrice:
-//                 updatedItems[itemIndex].totalItemPrice + item.totalItemPrice,
-//             };
-//           } else {
-//             updatedItems.push(item);
-//           }
-
-//           existingCart.items = updatedItems;
-//         }
-//       }
-//     });
-//   });
-
-//   groupedMap.forEach((cart) => {
-//     groupedCarts.push(cart);
-//   });
-
-//   return (
-//     <div className="cart-page">
-//       {groupedCarts.map((cart) => (
-//         <div key={cart._id} className="cart">
-//           {cart.items?.map((item) => (
-//             <div key={item.product._id} className="cart-item">
-//               <h3>{item.product.product_name}</h3>
-//               <p>
-//                 {item.product.product_price} x{" "}
-//                 <input
-//                   type="number"
-//                   value={itemQuantities[item.product._id] || item.quantity}
-//                   onChange={(e) =>
-//                     setItemQuantities((prev) => ({
-//                       ...prev,
-//                       [item.product._id]: Number(e.target.value),
-//                     }))
-//                   }
-//                   onBlur={(e) =>
-//                     handleBlur(cart._id, item.product._id, e.target.value)
-//                   }
-//                   min={1}
-//                 />
-//               </p>
-//               <p>
-//                 Total:{" "}
-//                 {(item.product.product_price || 0) *
-//                   (itemQuantities[item.product._id] || item.quantity)}
-//               </p>
-//               <Button
-//                 onClick={() =>
-//                   handleDecreaseQuantity(
-//                     cart._id,
-//                     item.product._id,
-//                     itemQuantities[item.product._id] || item.quantity
-//                   )
-//                 }
-//               >
-//                 -1
-//               </Button>
-//               <Button
-//                 onClick={() =>
-//                   handleIncreaseQuantity(
-//                     cart._id,
-//                     item.product._id,
-//                     itemQuantities[item.product._id] || item.quantity
-//                   )
-//                 }
-//               >
-//                 +1
-//               </Button>
-//               <Button
-//               // onClick={() => handleDeleteProduct(cart._id, item.product._id)}
-//               >
-//                 Delete
-//               </Button>
-//             </div>
-//           ))}
-//         </div>
-//       ))}
-//       <div className="cart-summary">
-//         <p>Total Price: {totalCartPrice}</p>
-//         <Button onClick={handleCheckout}>Checkout</Button>
-//       </div>
-//       <ToastContainer />
-//     </div>
-//   );
-// };
-
-// export default CartPage;

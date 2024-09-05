@@ -223,7 +223,6 @@ export const addToWatchlist = async (userId: string, productId: string) => {
 export const getWatchlist = async () => {
   try {
     const response = await instance.get(`${API_URL}/wathlist/`);
-
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -241,7 +240,6 @@ export const DeleteWatchlist = async (productId: string) => {
     const response = await instance.delete(
       `${API_URL}/wathlist/delete/${productId}`
     );
-
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

@@ -23,13 +23,21 @@ export const addToCart = async (
   return response.data;
 };
 
+// export const updateCart = async (
+//   cartId: string,
+//   items: { product: string; quantity: number }[]
+// ) => {
+//   const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
+//   return response.data;
+// };
 export const updateCart = async (
   cartId: string,
-  items: { product: string; quantity: number }[]
+  items: { product: string; quantity: number; isSelected?: boolean }[]
 ) => {
   const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
   return response.data;
 };
+
 export const getCartById = async (cartId: string) => {
   const response = await instance.get(`${API_URL}/cart/${cartId}`);
   return response.data;

@@ -16,6 +16,7 @@ const vnPayRouter = require("./admin/vnpay/order");
 const randBidRouter = require("./admin/randBid/randBid.routes");
 const biddingRouter = require("./client/bidding/bidding.routes");
 const auctionsRouter = require("./client/auctions/auctions.routes");
+const orderCart = require("./client/orders/order");
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -34,6 +35,7 @@ const routes = (app) => {
   // app.use("/api/suppliers", supplierRoutes);
   app.use("/api/wathlist", WathListRouter);
   app.use("/api/vnpay", vnPayRouter);
+  app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
   app.use("/api/client/bidding", biddingRouter);
   app.use("/api/client/auctions", auctionsRouter);
