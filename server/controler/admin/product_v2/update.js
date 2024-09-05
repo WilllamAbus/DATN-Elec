@@ -9,9 +9,8 @@ const {
 
 const update = async (req, res) => {
   try {
-    const productId = req.params.id; // Lấy ID sản phẩm từ tham số URL
+    const productId = req.params.id;
 
-    // Tìm sản phẩm theo ID
     const existingProduct = await ProductV2.findById(productId);
     if (!existingProduct) {
       return res.status(404).json({
@@ -22,7 +21,6 @@ const update = async (req, res) => {
       });
     }
 
-    // Kiểm tra sự tồn tại của tên sản phẩm (nếu tên sản phẩm đã thay đổi)
     if (req.body.product_name && req.body.product_name !== existingProduct.product_name) {
       const nameExists = await checkProductNameExists(req.body.product_name);
       if (nameExists) {
@@ -35,7 +33,6 @@ const update = async (req, res) => {
       }
     }
 
-    // Validate giá sản phẩm
     const productPrice = parseFloat(req.body.product_price);
     if (!validateProductPrice(productPrice)) {
       return res.status(400).json({
@@ -46,7 +43,7 @@ const update = async (req, res) => {
       });
     }
 
-    // Kiểm tra tính hợp lệ của tên sản phẩm
+
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
         success: false,
@@ -56,10 +53,10 @@ const update = async (req, res) => {
       });
     }
 
-    // Tính toán giảm giá
+
     const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
 
-    let imageUrls = existingProduct.image; // Giữ lại các ảnh hiện tại nếu không có ảnh mới
+    let imageUrls = existingProduct.image; 
     if (req.files && req.files.length) {
       imageUrls = [];
       for (const file of req.files) {
@@ -80,7 +77,7 @@ const update = async (req, res) => {
       v: attr.v,
     }));
 
-    // Cập nhật sản phẩm
+
     existingProduct.product_name = req.body.product_name || existingProduct.product_name;
     existingProduct.image = imageUrls;
     existingProduct.product_description = req.body.product_description || existingProduct.product_description;
@@ -96,7 +93,6 @@ const update = async (req, res) => {
     existingProduct.product_brand = req.body.product_brand || existingProduct.product_brand;
     existingProduct.product_format = req.body.product_format || existingProduct.product_format;
     existingProduct.product_condition = req.body.product_condition || existingProduct.product_condition;
-    existingProduct.product_quantity = req.body.product_quantity || existingProduct.product_quantity;
     existingProduct.product_price = productPrice; 
     existingProduct.product_price_unit = productPriceUnit;
     existingProduct.product_attributes = productAttributes;

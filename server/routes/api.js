@@ -47,6 +47,8 @@ const repCommentController = require("../controler/repComment.controller");
 const inventoryController = require('../controler/inventory.controller');
 /**Inventory */
 
+/**api-service */
+const ServiceController = require('../controler/orders/services/api-service.controller');
 // *TimeTrack*/
 const timeTrackController = require('../controler/timeTrack.controller');
 const router = express.Router();
@@ -381,5 +383,16 @@ router.delete('/time-tracks/:id', timeTrackController.delete); // DELETE /time-t
 /**Time Track */
 
 
+/**api service */
 
+router.post('/createServcie', ServiceController.createService);
+router.get('/services', ServiceController.getAllServices);
+router.get('/services/:id', ServiceController.getServiceById);
+router.put('/services/:id', ServiceController.updateService);
+router.delete('/services/:id', ServiceController.deleteService);
+router.patch('/services/soft-delete/:id', ServiceController.softDeleteService);
+router.get('/services/deleted', ServiceController.getDeletedServices);
+router.patch('/services/restore/:id', ServiceController.restoreService);
+
+/**api service */
 module.exports = router;

@@ -1,12 +1,17 @@
 import { AppDispatch } from "../../../../../redux/store";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { list, softDelete } from "../../../../../redux/product/admin/Thunk";
+import { fetchPaginatedProducts, softDelete } from "../../../../../redux/product/admin/Thunk";
 
 const MySwal = withReactContent(Swal);
 
-export const handleSoftDeleteProduct = (productId: string, dispatch: AppDispatch) => {
-  
+export const handleSoftDeleteProduct = (
+  productId: string, 
+  dispatch: AppDispatch, 
+  currentPage: number, 
+  searchTerm: string
+) => {
+
   MySwal.fire({
     title: "Xóa sản phẩm?",
     text: "Bạn có chắc muốn xóa sản phẩm này không!",
@@ -26,7 +31,7 @@ export const handleSoftDeleteProduct = (productId: string, dispatch: AppDispatch
         } else {
           const successMsg = action.payload?.msg || "Sản phẩm của bạn đã bị xóa.";
           notify(successMsg);
-          dispatch(list());
+          dispatch(fetchPaginatedProducts({ page: currentPage, search: searchTerm }));
         }
       } catch (error) {
         notifyError("Đã xảy ra sự cố khi xóa sản phẩm.");
@@ -34,6 +39,7 @@ export const handleSoftDeleteProduct = (productId: string, dispatch: AppDispatch
     }
   });
 };
+
 const notify = (message: string) => {
   MySwal.fire({
     title: "Đã xóa!",
@@ -44,6 +50,7 @@ const notify = (message: string) => {
     },
   });
 };
+
 const notifyError = (message: string) => {
   MySwal.fire({
     title: "Lỗi!",

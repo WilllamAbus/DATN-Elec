@@ -4,12 +4,12 @@ import { LimitCrudProductResponse } from "../types/pagi";
 
 export const fetchPaginatedProducts = createAsyncThunk<
   LimitCrudProductResponse,
-  { page: number },
+  { page: number; search?: string },
   { rejectValue: string }
->("products/fetchPaginated", async ({ page }, { rejectWithValue }) => {
+>("products/fetchPaginated", async ({ page, search }, { rejectWithValue }) => {
   try {
-    const response = await pagiCrudProduct(page);
-    if (response.success) { 
+    const response = await pagiCrudProduct(page, search);
+    if (response.success) {
       return response;
     } else {
       return rejectWithValue(response.msg);

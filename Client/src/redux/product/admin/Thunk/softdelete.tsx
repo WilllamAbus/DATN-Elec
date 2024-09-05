@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { softDeleteProduct } from '../../../../services/product_v2/admin'; // Đảm bảo đường dẫn chính xác
+import { softDeleteProduct } from '../../../../services/product_v2/admin'; // Đảm bảo đường dẫn chính 
 import { SoftDeleteResponse } from '../types/softdelete';
 
 export const softDelete = createAsyncThunk<SoftDeleteResponse, string, { rejectValue: SoftDeleteResponse }>(

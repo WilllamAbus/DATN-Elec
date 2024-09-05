@@ -31,6 +31,10 @@ class SocketService {
         });
     }
 
+    emitNotification(notificationData) {
+        global._io.emit('notification', notificationData);
+    }
+
     
 }
 

@@ -36,3 +36,16 @@ export interface LimitCrudProductResponse {
   };
   pagination: Pagination;
 }
+
+
+export interface LimitDeletedListResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: {
+    total: number;
+    products: Product[];
+  };
+  pagination: Pagination;
+}

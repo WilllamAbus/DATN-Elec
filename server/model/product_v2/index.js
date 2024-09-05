@@ -5,7 +5,7 @@ const productV2Schema = new Schema({
   product_name: { type: String, required: true },
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
-  product_slug: { type: String, unique: true}, 
+  product_slug: { type: String, unique: true }, 
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_discount: {
     discountId: { type: Schema.Types.ObjectId, ref: 'discounts' }, 
@@ -19,7 +19,6 @@ const productV2Schema = new Schema({
   product_format: { type: Schema.Types.ObjectId, ref: 'formatShopping', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
-  product_quantity: { type: Number, required: true },
   product_ratingAvg: {
     type: Number,
     default: 4.5,
@@ -44,14 +43,27 @@ const productV2Schema = new Schema({
     rating: { type: Number, min: 1, max: 5, required: true },
     createdAt: { type: Date, default: Date.now }
   }],
+  variants: [{
+    variant_name: { type: String, required: true }, 
+    variant_description: { type: String }, 
+    variant_price: { type: Number, required: true },
+    variant_attributes: [{
+      k: { type: String, required: true }, 
+      v: { type: String, required: true }, 
+    }],
+    variant_image: { type: [String] },
+    sku: { type: String, unique: true }, 
+    variant_color: { type: String },
+    isActive: { type: Boolean, default: true }, 
+  }]
 }, {
   collection: "product_v2",
   timestamps: true
 });
 
 productV2Schema.pre('save', function(next){
-  this.product_slug = slugify(this.product_name, {lower: true})
-  next()
-})
+  this.product_slug = slugify(this.product_name, { lower: true });
+  next();
+});
 
 module.exports = model("product_v2", productV2Schema);

@@ -1,11 +1,10 @@
-
 const ProductService = require('../../../services/product.service');
 
 const getProductLimit = async (req, res) => {
-  const { page } = req.query;
+  const { page, search } = req.query;
 
   try {
-    const response = await ProductService.getProductLimitService(page);
+    const response = await ProductService.getProductLimitService(page, search);
     if (response.err) {
       return res.status(400).json({
         success: false,

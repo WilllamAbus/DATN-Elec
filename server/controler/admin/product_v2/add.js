@@ -29,7 +29,6 @@ const add = async (req, res) => {
         status: 400
       });
     }
-    console.log('Parsed productPrice:', productPrice);
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
         success: false,
@@ -39,8 +38,6 @@ const add = async (req, res) => {
       });
     }
     const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
-
-
 
     let imageUrls = [];
     if (req.files && req.files.length) {
@@ -77,7 +74,6 @@ const add = async (req, res) => {
       product_brand: req.body.product_brand,
       product_format: req.body.product_format,
       product_condition: req.body.product_condition,
-      product_quantity: req.body.product_quantity,
       product_price: productPrice, 
       product_price_unit: productPriceUnit, 
       product_attributes: productAttributes, 
@@ -86,9 +82,6 @@ const add = async (req, res) => {
     });
 
     await newProduct.save();
-
-
-    //
 
     return res.status(201).json({
       success:true,

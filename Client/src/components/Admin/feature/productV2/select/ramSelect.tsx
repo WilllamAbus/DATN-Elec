@@ -1,5 +1,5 @@
 import React from "react";
-import Select, { StylesConfig, MultiValue } from "react-select";
+import Select, { StylesConfig, SingleValue } from "react-select";
 
 const ramOptions = [
   { value: "2gb", label: "2GB" },
@@ -14,7 +14,7 @@ const ramOptions = [
   { value: "128gb", label: "128GB" },
 ];
 
-const ramStyles: StylesConfig<(typeof ramOptions)[0], true> = {
+const ramStyles: StylesConfig<typeof ramOptions[0], false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -24,9 +24,9 @@ const ramStyles: StylesConfig<(typeof ramOptions)[0], true> = {
     backgroundColor: isDisabled
       ? undefined
       : isSelected
-      ? "#d3d3d3" // Background color when selected
+      ? "#d3d3d3" 
       : isFocused
-      ? "#f0f0f0" // Background color when focused
+      ? "#f0f0f0" 
       : undefined,
     color: isDisabled ? "#ccc" : isSelected ? "black" : "black",
     cursor: isDisabled ? "not-allowed" : "default",
@@ -34,40 +34,28 @@ const ramStyles: StylesConfig<(typeof ramOptions)[0], true> = {
       ...styles[":active"],
       backgroundColor: !isDisabled
         ? isSelected
-          ? "#d3d3d3" // Background color when selected and active
-          : "#e0e0e0" // Background color when active
+          ? "#d3d3d3" 
+          : "#e0e0e0" 
         : undefined,
     },
   }),
-  multiValue: (styles) => ({
-    ...styles,
-    backgroundColor: "#f0f0f0",
-  }),
-  multiValueLabel: (styles) => ({
+  singleValue: (styles) => ({
     ...styles,
     color: "black",
-  }),
-  multiValueRemove: (styles) => ({
-    ...styles,
-    color: "black",
-    ":hover": {
-      backgroundColor: "#d3d3d3",
-      color: "black",
-    },
   }),
 };
 
 interface RamSelectProps {
-  onChange: (selectedOptions: MultiValue<{ value: string; label: string }>) => void;
-  value: MultiValue<{ value: string; label: string }>;
+  onChange: (selectedOption: SingleValue<{ value: string; label: string }>) => void;
+  value: SingleValue<{ value: string; label: string }>;
   className?: string;
 }
 
 const RamSelect: React.FC<RamSelectProps> = ({ onChange, value, className }) => (
   <Select
     classNamePrefix="react-select"
-    closeMenuOnSelect={false}
-    isMulti
+    closeMenuOnSelect
+    isMulti={false} 
     options={ramOptions}
     styles={ramStyles}
     value={value}

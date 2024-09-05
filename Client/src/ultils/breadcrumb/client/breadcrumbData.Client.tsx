@@ -1,8 +1,11 @@
 export const breadcrumbItemClient = {
   allList: [
-    { href: "/", label: "Home" },
-    { href: "/allList", label: "Sản phẩm" },
+    { href: "/", label: "Trang chủ" },
     { href: "/allList", label: "Trang sản phẩm" },
+  ],
+  productlist: [
+    { href: "/", label: "Trang chủ" },
+    { href: "/productlist", label: "Laptop" },
   ],
 
 };

@@ -1,4 +1,4 @@
-export interface ProductList {
+export interface Product {
   _id: string;
   product_name: string;
   product_description: string;
@@ -17,7 +17,7 @@ export interface ProductList {
   status: string;
 }
 export interface ProductStateList {
-  products: ProductList[];
+  products: Product[];
   status: 'idle' | 'loading' | 'success' | 'fail';
   error: string | null;
 }
@@ -26,6 +26,16 @@ export interface ListProductResponse {
   err: number;
   msg: string;
   status: number;
-  products: ProductList[];
+  products: Product[];
   error?: string; 
+}
+
+
+export interface DeletedListResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  products: Product[];
+  error?: string;
 }

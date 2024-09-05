@@ -3,11 +3,11 @@ import { getProductShopping } from "../../../../../services/product_v2/client/ho
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
 // import Sidebar from "../sidebar";
-import "../../../../../assets/css/user.style.css";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
 import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/rootReducer";
+// import Sidebar from "../sidebar"
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -51,7 +51,6 @@ const AuctionProduct: React.FC = () => {
   return (
     <>
       <section className="bg-bgf3f4f6 rounded-lg py-8 antialiased dark:bg-gray-900 md:py-12">
-        {/* <Sidebar/> */}
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 ">
           <h1 className="text-center text-4xl"> Đấu giá</h1>
 
@@ -124,7 +123,7 @@ const AuctionProduct: React.FC = () => {
                         className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
                         data-popper-placement="top"
                       >
-                        fcdsf Quick look
+                        Quick look
                         <div className="tooltip-arrow" data-popper-arrow="" />
                       </div>
                       <button

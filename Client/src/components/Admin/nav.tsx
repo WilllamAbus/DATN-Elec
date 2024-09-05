@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LogoLink, DropdownLogoAdminNav, SearchFormNav } from "./index";
+import { LogoLink, DropdownLogoAdminNav } from "./index";
 import Sidebar from "./sidebar"; 
 
 const NavAdmin: React.FC = () => {
@@ -50,7 +50,6 @@ const NavAdmin: React.FC = () => {
                 </svg>
               </button>
               <LogoLink />
-              <SearchFormNav />
             </div>
             <div className="flex items-center">
               <div className="flex justify-between items-center lg:order-2">

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { getProductShopping } from "../../../../../services/product_v2/client/homeAllProduct";
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
-// import Sidebar from "../sidebar";
-import "../../../../../assets/css/user.style.css"
+import Sidebar from "../sidebar";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
 import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/rootReducer";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen","CPU","Pin"];
+import "@fortawesome/fontawesome-free/css/all.min.css";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
@@ -47,21 +47,46 @@ const AllProduct: React.FC = () => {
     fetchProducts();
   }, [id]);
   return (
-      <>
-      
-      <section className="bg-bgf3f4f6 rounded-lg py-8 antialiased dark:bg-gray-900 md:py-12" >
-      {/* <Sidebar/> */}
-        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 ">
-         
-          <h1 className="text-center text-4xl"> Mua sắm</h1>
-          <div className="container mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4"  >
-            
-          {products.map((product, index) => (
+    <>
+      {/* <!-- shop wrapper --> */}
+      <div className="container py-4 flex items-center gap-3">
+        <a href="/" className="text-primary text-base flex items-center">
+          <span className="ml-2">Trang chủ</span>
+        </a>
+        <span className="text-sm text-gray-400 mx-2">
+          <i className="fa-solid fa-chevron-right"></i>
+        </span>
+        <p className="text-gray-600 font-medium">Sản phẩm</p>
+      </div>
+      {/* <h1 className="text-center text-3xl">Mua sắm</h1> */}
+      <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
+        <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hidden md:block hidden">
+          <div className="divide-y divide-gray-200 space-y-5">
+            <div className="pt-4 block">
+              <Sidebar />
+            </div>
+          </div>
+        </div>
+        <div className="text-center md:hidden">
+          <button
+            className="text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block"
+            type="button"
+            data-drawer-target="drawer-example"
+            data-drawer-show="drawer-example"
+            aria-controls="drawer-example"
+          >
+            {/* Mobile sidebar toggle button content */}
+          </button>
+        </div>
+        {/* <!-- products --> */}
+        <div className="col-span-3">
+            <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
+            {products.map((product, index) => (
             <div
               key={index}
-              className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              className="rounded-md border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
-              <div className="h-56 w-auto">
+            <div className="h-56 w-auto">
                 <Link to={`/detailProd/${product._id}`}>
                   <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
                     <a href="#">
@@ -89,7 +114,7 @@ const AllProduct: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      {product.view > 0 ? <span className="mr-2">({product.view})</span> : ""}
+                      {product.product_view > 0 ? <span className="mr-2">({product.product_view})</span> : ""}
 
                       <svg
                         className="h-5 w-5"
@@ -338,19 +363,13 @@ const AllProduct: React.FC = () => {
               </div>
             </div>
           ))}
-          </div>
+            </div>
         </div>
-        <div className="w-full text-center">
-          <button
-            type="button"
-            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-          >
-            Xem tiếp
-          </button>
-        </div>
-      </section>
-      </>
-   
+        {/* 
+        <!-- ./products --> */}
+      </div>
+      {/* <!-- ./shop wrapper --> */}
+    </>
   );
 };
 

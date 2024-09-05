@@ -4,4 +4,7 @@ export { handleRamChange } from './ram';
 export { handleScreenChange } from './screen';
 export { handleCPUChange } from './cpu';
 export { handleCardChange } from './card';
-export { handleBatteryChange } from './battery ';
+export { handleBatteryChange } from './battery';
+export { restoreProduct } from './restore';
+export { hardDeleteProduct } from './hardDelete';
+export { handleSoftDeleteProduct } from './softDelete';

@@ -45,3 +45,25 @@ export const getProductShopping = async (id: string): Promise<HomeAllProductResp
     };
   }
 };
+export const upViewProduct = async (id: string) => {
+  const response = await instance.put(
+    `/client/product/upView/${id}`,
+    {},
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+export const searchProduct = async (keyword:string)=> {
+  try{
+    const response = await instance.get(`/client/product/search/${keyword}`);
+    return response.data;
+  }catch (error){
+    console.log(error);
+    
+  }
+  
+}

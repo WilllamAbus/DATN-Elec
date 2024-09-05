@@ -8,10 +8,7 @@ const multer = require('multer');
 const dotenv = require("dotenv");
 const { v4: uuidv4 } = require('uuid');
 const Role = require('../../model/role.model');
-
-
 dotenv.config();
-
 const STORE_BUCKET = process.env.STORE_BUCKET;
 if (!admin.apps.length) {
     admin.initializeApp({
@@ -30,15 +27,12 @@ const brandController = {
 
     listBrands: async (req, res) => {
         try {
-            const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
-            const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
-            
+            const page = parseInt(req.query.page, 10) || 1; 
+            const limit = parseInt(req.query.limit, 5) || 5; 
             const count = await modelBrand.countDocuments({
               status: { $ne: "disable" },
             });
             const totalPages = Math.ceil(count / limit);
-
-            // Sử dụng populate để lấy thông tin danh mục
             const brands = await modelBrand.find({ status: { $ne: 'disable' } })
             .populate('category_id', 'name')
             .populate('supplier_id','name')

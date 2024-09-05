@@ -41,3 +41,30 @@ export interface GetOneResponse {
   product?: Product;
   error?: string;
 }
+export interface DeletedListResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  products: Product[];
+  error?: string;
+}
+
+export interface HardDeleteResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  error?: string;
+  data?: Product;
+}
+
+
+export interface RestoreResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  error?: string;
+  data?: Product;
+}

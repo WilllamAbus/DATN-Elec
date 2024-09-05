@@ -15,7 +15,6 @@ export const editProductV2 = async (product: ProductV2, productId: string): Prom
     formData.append("product_brand", product.product_brand);
     formData.append("product_format", product.product_format);
     formData.append("product_condition", product.product_condition);
-    formData.append("product_quantity", product.product_quantity.toString());
     formData.append("product_price", product.product_price.toString());
     formData.append("product_attributes", JSON.stringify(product.product_attributes));
     formData.append("weight_g", product.weight_g.toString());

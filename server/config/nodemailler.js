@@ -49,17 +49,15 @@ exports.sendMail = async (userEmail, orderDetails) => {
       from: "haotri335@gmail.com",
       to: `${userEmail}`,
       subject: "XÁC NHẬN THANH TOÁN",
-      html: `
-
-</style>
-<body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
+    html: `
+  <body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
 
 
 <div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Open Sans, Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
 For what reason would it be advisable for me to think about business content? That might be little bit risky to have crew member like them. 
 </div>
-
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <!-- Header and other content here -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
         <td align="center" style="background-color: #eeeeee;" bgcolor="#eeeeee">
         
@@ -71,7 +69,7 @@ For what reason would it be advisable for me to think about business content? Th
                     <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
                         <tr>
                             <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
-                                <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">DUPINDUPI</h1>
+                                <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">E-COM</h1>
                             </td>
                         </tr>
                     </table>
@@ -149,7 +147,7 @@ For what reason would it be advisable for me to think about business content? Th
                             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
-                                        TỔNG CỘNG
+                                        THANH TOÁN
                                     </td>
                                     <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                           ${orderDetails.totalPrice.toLocaleString(
@@ -161,6 +159,32 @@ For what reason would it be advisable for me to think about business content? Th
                                      )}
                                     </td>
                                 </tr>
+
+                                 <tr>
+                                    <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                                        SỐ ĐIỆN THOẠI 
+                                    </td>
+                                    <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                                      ${orderDetails.shipping.sdt}
+                                    </td>
+                            
+                            </table>
+                        </td>
+                    </tr>
+                       <tr>
+                       
+                        <td align="left" style="padding-top: 20px;">
+                            <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td width="35%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                                           ĐỊA CHỈ
+                                    </td>
+                                    <td width="65%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                                        ${orderDetails.shipping.address}
+                                    </td>
+                                </tr>
+
+                           
                             </table>
                         </td>
                     </tr>
@@ -168,39 +192,7 @@ For what reason would it be advisable for me to think about business content? Th
                 
                 </td>
             </tr>
-             <tr>
-                <td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-                    <tr>
-                        <td align="center" valign="top" style="font-size:0;">
-                            <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-
-                                <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                    <tr>
-                                        <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                            <p style="font-weight: 800;">Địa chỉ giao đến</p>
-                                            <p>${orderDetails.shipping.address}<br>${orderDetails.shipping.city}</p>
-    
-
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-                                <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-                                    <tr>
-                                        <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                            <p style="font-weight: 800;">Số điện của bạn</p>
-                                            <p>${orderDetails.shipping.sdt}</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                </td>
-            </tr>
+       
             <tr>
                 <td align="center" style=" padding: 35px; background-color: #ff7361;" bgcolor="#1b9ba3">
                 <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
@@ -220,6 +212,9 @@ For what reason would it be advisable for me to think about business content? Th
         </td>
     </tr>
 </table>
+  
+  </body>
+  
       `,
     };
 
@@ -234,3 +229,34 @@ For what reason would it be advisable for me to think about business content? Th
   }
 };
 
+
+
+// <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                                           
+// </td>
+
+
+// <tr>
+// <td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
+// <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
+//     <tr>
+//         <td align="center" valign="top" style="font-size:0;">
+//             <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+
+//                 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+//                     <tr>
+//                         <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+//                             <p style="font-weight: 800;">Địa chỉ giao đến</p>
+                         
+
+
+//                         </td>
+//                     </tr>
+//                 </table>
+//             </div>
+      
+//         </td>
+//     </tr>
+// </table>
+// </td>
+// </tr>

@@ -203,21 +203,29 @@ const productController = {
 
     upView: async (req, res) => {
         try {
+            // Lấy product_id từ tham số URL
             const { id } = req.params;
-            const product = await productService.incrementProductView(id);
-
-            res.status(200).json({
-                message: 'View count incremented successfully',
-                data: product
-            });
+    
+            // Kiểm tra nếu không có product_id
+            if (!id) {
+                return res.status(400).json({
+                    success: false,
+                    err: 1,
+                    msg: 'Thiếu product_id',
+                    status: 400,
+                });
+            }
+    
+            // Tăng lượt xem sản phẩm
+            const upView = await productService.incrementProductView(id);
+    
+            // Trả về kết quả sau khi tăng lượt xem
+            res.status(200).json({ success: true, upView });
         } catch (error) {
-            console.error('Error during view count increment:', error);
-            res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
+            res.status(500).json({ success: false, error: error.message });
         }
     },
+    
 
 
     price: async (req, res) => {

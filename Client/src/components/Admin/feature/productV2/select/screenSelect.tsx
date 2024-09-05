@@ -1,6 +1,5 @@
 import React from "react";
-import Select, { StylesConfig, MultiValue } from "react-select";
-
+import Select, { StylesConfig, SingleValue, ActionMeta } from "react-select";
 
 const screenOptions = [
   { value: "13in_1080p_60hz", label: '13.0" Full HD (1080p), 60Hz' },
@@ -16,7 +15,7 @@ const screenOptions = [
   { value: "15in_curved", label: '15.6" Full HD (1080p), Curved, 60Hz' },
 ];
 
-const screenStyles: StylesConfig<(typeof screenOptions)[0], true> = {
+const screenStyles: StylesConfig<(typeof screenOptions)[0], false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -26,9 +25,9 @@ const screenStyles: StylesConfig<(typeof screenOptions)[0], true> = {
     backgroundColor: isDisabled
       ? undefined
       : isSelected
-      ? "#d3d3d3" // Background color when selected
+      ? "#d3d3d3"
       : isFocused
-      ? "#f0f0f0" // Background color when focused
+      ? "#f0f0f0" 
       : undefined,
     color: isDisabled ? "#ccc" : isSelected ? "black" : "black",
     cursor: isDisabled ? "not-allowed" : "default",
@@ -36,40 +35,27 @@ const screenStyles: StylesConfig<(typeof screenOptions)[0], true> = {
       ...styles[":active"],
       backgroundColor: !isDisabled
         ? isSelected
-          ? "#d3d3d3" // Background color when selected and active
-          : "#e0e0e0" // Background color when active
+          ? "#d3d3d3" 
+          : "#e0e0e0" 
         : undefined,
-    },
-  }),
-  multiValue: (styles) => ({
-    ...styles,
-    backgroundColor: "#f0f0f0",
-  }),
-  multiValueLabel: (styles) => ({
-    ...styles,
-    color: "black",
-  }),
-  multiValueRemove: (styles) => ({
-    ...styles,
-    color: "black",
-    ":hover": {
-      backgroundColor: "#d3d3d3",
-      color: "black",
     },
   }),
 };
 
 interface ScreenSelectProps {
-  onChange: (selectedOptions: MultiValue<{ value: string; label: string }>) => void;
-  value: MultiValue<{ value: string; label: string }>;
+  onChange: (
+    selectedOption: SingleValue<{ value: string; label: string }>,
+    actionMeta: ActionMeta<{ value: string; label: string }>
+  ) => void;
+  value: SingleValue<{ value: string; label: string }>;
   className?: string;
 }
 
 const ScreenSelect: React.FC<ScreenSelectProps> = ({ onChange, value, className }) => (
   <Select
     classNamePrefix="react-select"
-    closeMenuOnSelect={false}
-    isMulti
+    closeMenuOnSelect={true}
+    isMulti={false}
     options={screenOptions}
     styles={screenStyles}
     value={value}

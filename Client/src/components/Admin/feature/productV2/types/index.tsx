@@ -10,3 +10,4 @@ export type {
   ProductUpdate,
   UpdateProductResponse,
 } from "./editproduct";
+export type { LimitDeletedListResponse,Product } from "./pagination";
