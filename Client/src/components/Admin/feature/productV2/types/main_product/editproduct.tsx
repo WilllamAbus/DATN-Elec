@@ -1,4 +1,3 @@
-
 export interface ProductGetOne {
   _id: string;
   product_name: string;
@@ -39,9 +38,10 @@ export interface ProductUpdate {
   product_condition: string;
   product_quantity: number;
   product_price: number;
-  product_attributes: { k: string; v: string }[]; 
+  product_attributes: { k: string; v: string }[];
   weight_g: number;
   image?: FileList;
+  hasVariants: boolean;
 }
 
 export interface UpdateProductResponse {

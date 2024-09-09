@@ -9,6 +9,7 @@ const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
+const clientSidebarAuction = require("./client/sidebar/auction");
 const clientCategỏy = require("./client/category");
 const WathListRouter = require("./product/product");
 
@@ -37,6 +38,7 @@ const routes = (app) => {
   app.use("/api/suppliers", supplierRoutes);
   app.use("/api/admin/product", adminProduct);
   app.use("/api/client/product", clientProduct);
+  app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);
   app.use("/api/vnpay", vnPayRouter);

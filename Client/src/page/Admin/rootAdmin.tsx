@@ -45,19 +45,24 @@ const Admin: React.FC = () => {
   return (
     <>
       <div className="bg-gray-50 dark:bg-gray-800 font-barlow">
-      <Nav />
-      <div className="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
-      <AdminSidebar isOpenMobie={isOpenSidebar} onClose={handleSidebarClose} />
-        <div className="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop" />
-        <div id="main-content" className="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
-          <main>
-            <Outlet />
-          </main>
-          <AdminFooter />
+        <Nav />
+        <div className="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
+          <AdminSidebar isOpenMobie={isOpenSidebar} onClose={handleSidebarClose} />
+          <div
+            className="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90"
+            id="sidebarBackdrop"
+          />
+          <div
+            id="main-content"
+            className="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900"
+          >
+            <main>
+              <Outlet />
+            </main>
+            <AdminFooter />
+          </div>
         </div>
-      </div >
-    </div>
-
+      </div>
     </>
   );
 };

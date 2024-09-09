@@ -20,7 +20,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
-      <nav className="bg-primary-901 dark:bg-gray-800 antialiased">
+      <nav className="bg-primary-901 dark:bg-gray-800 antialiased px-6">
         <div className="max-w-screen-2xl px-8 mx-auto 2xl:px-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
@@ -78,7 +78,6 @@ const Header: React.FC = () => {
                   />
                 </svg>
                 <span className="hidden sm:flex">Thông báo</span>
-
               </Link>
 
               <Link
@@ -111,12 +110,25 @@ const Header: React.FC = () => {
                 type="button"
                 className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
-               <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 11H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h4.5M7 11V7a3 3 0 0 1 6 0v1.5m2.5 5.5v1.5l1 1m3.5-1a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/>
-</svg>
+                <svg
+                  className="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9.5 11H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h4.5M7 11V7a3 3 0 0 1 6 0v1.5m2.5 5.5v1.5l1 1m3.5-1a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
+                  />
+                </svg>
 
                 <span className="hidden sm:flex">Phiên đấu giá</span>
-                
               </Link>
               <button
                 id="userDropdownButton1"
@@ -228,42 +240,27 @@ const Header: React.FC = () => {
           >
             <ul className="text-gray-900 dark:text-white text-sm font-medium space-y-3">
               <li>
-                <a
-                  href="#"
-                  className="hover:text-primary-700 dark:hover:text-primary-500"
-                >
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
                   Home
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-primary-700 dark:hover:text-primary-500"
-                >
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
                   Best Sellers
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-primary-700 dark:hover:text-primary-500"
-                >
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
                   Gift Ideas
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-primary-700 dark:hover:text-primary-500"
-                >
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
                   Games
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-primary-700 dark:hover:text-primary-500"
-                >
+                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
                   Electronics
                 </a>
               </li>

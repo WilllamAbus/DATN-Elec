@@ -1,2 +1,3 @@
 import { listPage } from "./listPage";
-export { listPage};
+import { listPageAuction } from "./listPageAuctionProuct";
+export { listPage, listPageAuction };

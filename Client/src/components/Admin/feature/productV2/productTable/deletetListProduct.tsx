@@ -2,7 +2,7 @@ import React from "react";
 import { truncateText } from "../truncate/truncateText";
 import { hardDeleteProduct,restoreProduct } from "../handlers";
 import { AppDispatch } from "../../../../../redux/store";
-import { Product } from "../types"; 
+import { Product } from "../types/main_product"; 
 interface ProductTableProps {
   products: Product[];
   dispatch: AppDispatch;

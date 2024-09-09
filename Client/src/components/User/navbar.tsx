@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "flowbite";
 import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "../../ultils/dropdown/client/nav/dropdown.LogoUser.nav";
 import UserMenuDropdown from "../../ultils/dropdown/client/nav/toggleDropdown";
 import { listCateNavItemThunk } from "../../redux/clientcate/client/Thunk/";
 import logoNav from "../../assets/images/logoHeader/logo.svg";
 import { useAppDispatch } from "../../redux/rootReducer";
-import cateDropdownItems from './listCateNav/path/hookspathnav';
+import cateDropdownItems from "./listCateNav/path/hookspathnav";
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [keyword, setSearchTerm] = useState("");
@@ -51,7 +50,7 @@ const Navbar: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                <Link
+                  <Link
                     to="auction"
                     className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
                   >

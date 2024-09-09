@@ -2,6 +2,8 @@
 const {homeAllProduct,getID,auction,upView,shopping } = require('./home');
 const {getLimitProductClient} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
+const {listPageAuction} = require('./page-auction-product');
+const {getAllBrandPageAuction} = require('./sidebar');
 module.exports = {
   homeAllProduct,
   getID,
@@ -10,6 +12,7 @@ module.exports = {
   getProductsByCategory,
   shopping,
   auction,
-  upView
-
+  upView,
+  listPageAuction,
+  getAllBrandPageAuction
 };
