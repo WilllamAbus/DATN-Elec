@@ -11,12 +11,9 @@ const orderAuctionSchema = new Schema(
       email: { type: String },
       addressID: { type: String },
     },
-   
-
     stateOrder: {
       type: String,
-      enum: ["Chờ giao hàng", "Hủy bỏ", "Xác nhận", 'Nhận hàng'], // Order status
-    
+      enum: ["Chờ giao hàng", "Hủy bỏ", "Xác nhận", "Nhận hàng"], // Order status
     },
     order_date: { type: Date, default: Date.now }, // Order date
     createdAt: { type: Date, default: Date.now },

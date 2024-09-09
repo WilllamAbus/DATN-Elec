@@ -6,25 +6,56 @@ import { listCateNavItemThunk } from "../../redux/clientcate/client/Thunk/";
 import logoNav from "../../assets/images/logoHeader/logo.svg";
 import { useAppDispatch } from "../../redux/rootReducer";
 import cateDropdownItems from "./listCateNav/path/hookspathnav";
+import { searchProduct } from "../../services/product_v2/client/homeAllProduct";
+
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const [keyword, setSearchTerm] = useState("");
+  const [keyword, setKeyword] = useState<string>(""); 
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]); 
   const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(listCateNavItemThunk());
   }, [dispatch]);
+
   const dropdownItems = cateDropdownItems();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (keyword.trim()) {
-      navigate(`/search/${keyword}`);
-    } else {
-      console.log("Vui lòng nhập từ khóa tìm kiếm");
+  const dataSearch = async (keyword: string) => {
+    try {
+      if (!keyword.trim()) {
+        setFilteredProducts([]);
+        return;
+      }
+  
+      const result = await searchProduct(keyword);
+      const filteredProducts = result.data.filter((product: any) => {
+        return (
+          product &&
+          product.product_name &&
+          product.product_name.toLowerCase().includes(keyword.toLowerCase())
+        );
+      });
+  
+      setFilteredProducts(filteredProducts);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
     }
   };
+  
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setKeyword(value); 
+    dataSearch(value);
+   
+  };
+  const handleSubmit = () => {
+    const trimmedKeyword = keyword.trim();
+    const encodedKeyword = encodeURIComponent(trimmedKeyword);
+    if (encodedKeyword) {
+      navigate(`/search/${encodedKeyword}`);
+    }
+  };
   return (
     <header>
       <nav className="fixed z-30 w-full bg-primary-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
@@ -68,7 +99,11 @@ const Navbar: React.FC = () => {
               </ul>
             </div>
           </div>
-          <form onSubmit={handleSearch} className="hidden lg:block lg:pl-3.5">
+
+          <form
+            className="hidden lg:block lg:pl-3.5"
+            onSubmit={handleSubmit}
+          >
             <label htmlFor="topbar-search" className="sr-only">
               Search
             </label>
@@ -91,15 +126,30 @@ const Navbar: React.FC = () => {
               </div>
               <input
                 type="text"
-                name="email"
                 id="topbar-search"
                 className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Nhập từ khóa tìm kiếm"
                 value={keyword}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearch}
               />
             </div>
+
+            {/* Render filtered products */}
+            {filteredProducts.length > 0 && (
+  <div className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
+    {filteredProducts.map((result) => (
+      <div
+        key={result.id}
+        onClick={() => window.location.href=(`/search/${encodeURIComponent(result.product_name)}`)} // Điều hướng tới trang sản phẩm
+        className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
+      >
+        {result.product_name}
+      </div>
+    ))}
+  </div>
+)}
           </form>
+
           <div className="flex justify-between items-center lg:order-2">
             <UserMenuDropdown />
             <button
@@ -126,11 +176,13 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </nav>
+
       <nav className="bg-white dark:bg-gray-900">
         <ul
           id="toggleMobileMenu"
           className="hidden flex-col mt-0 pt-16 w-full text-sm font-medium lg:hidden"
         >
+          {/* Mobile navigation menu */}
           <li className="block border-b dark:border-gray-700">
             <a
               href="#"
@@ -155,62 +207,6 @@ const Navbar: React.FC = () => {
             >
               Profile
             </a>
-          </li>
-          <li className="block border-b dark:border-gray-700">
-            <a
-              href="#"
-              className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-            >
-              Settings
-            </a>
-          </li>
-          <li className="block border-b dark:border-gray-700">
-            <button
-              type="button"
-              data-collapse-toggle="dropdownMobileNavbar"
-              className="flex justify-between items-center py-3 px-4 w-full text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-            >
-              Dropdown{" "}
-              <svg
-                className="w-6 h-6 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            <ul id="dropdownMobileNavbar" className="hidden">
-              <li className="block border-t border-b dark:border-gray-700">
-                <a
-                  href="#"
-                  className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-                >
-                  Item 1
-                </a>
-              </li>
-              <li className="block border-b dark:border-gray-700">
-                <a
-                  href="#"
-                  className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-                >
-                  Item 2
-                </a>
-              </li>
-              <li className="block">
-                <a
-                  href="#"
-                  className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-                >
-                  Item 3
-                </a>
-              </li>
-            </ul>
           </li>
         </ul>
       </nav>

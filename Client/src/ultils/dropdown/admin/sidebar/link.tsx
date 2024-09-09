@@ -16,12 +16,9 @@ export const links: Record<string, Link[]> = {
     { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
   ],
-  supplier: [
-    { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
-  ],
-  brand: [
-    { label: "Thương hiệu", to: "/admin/listBrands" },
-  ],
+  orderCart: [{ label: "Đơn hàng", to: "/admin/orderCart" }],
+  supplier: [{ label: "Nhà cung cấp", to: "/admin/listSuppliers" }],
+  brand: [{ label: "Thương hiệu", to: "/admin/listBrands" }],
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },

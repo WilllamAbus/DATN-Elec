@@ -48,14 +48,18 @@ export const getWatchlistThunk = createAsyncThunk<
 });
 
 export const deleteWatchlistThunk = createAsyncThunk<
-  string,
+  any,
   string,
   { rejectValue: string }
 >("watchlist/deleteWatchlist", async (productId, thunkAPI) => {
   try {
-    await DeleteWatchlist(productId);
-    return productId;
+    const response = await DeleteWatchlist(productId);
+    return response.data;
   } catch (error) {
-    return thunkAPI.rejectWithValue((error as Error).message);
+    if (error instanceof Error) {
+      return thunkAPI.rejectWithValue(error.message);
+    } else {
+      return thunkAPI.rejectWithValue("An unknown error occurred");
+    }
   }
 });

@@ -1,5 +1,3 @@
-
-
 import { icons } from "./icon";
 import { labels } from "./label";
 import { links } from "./link";
@@ -50,5 +48,10 @@ export const dropdownData: Record<string, DropdownData> = {
     icon: icons.homeAdmin,
     links: links.homeAdmin,
     label: labels.homeAdmin,
+  },
+  orderCart: {
+    icon: icons.orderCart,
+    links: links.orderCart,
+    label: labels.orderCart,
   },
 };

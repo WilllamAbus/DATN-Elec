@@ -4,9 +4,12 @@ import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { addToWatchlistThunk } from "../../redux/product/wathList/wathlist";
+import {
+  addToWatchlistThunk,
+  deleteWatchlistThunk,
+} from "../../redux/product/wathList/wathlist";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
-import { addProductToCart } from "../../redux/cart/cartThunk";
+import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
@@ -15,26 +18,74 @@ function formatCurrency(value: number) {
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
-  const [visibleCount, setVisibleCount] = useState(4); 
+  const [visibleCount, setVisibleCount] = useState(4);
   useSelector((state: RootState) => state.watchlist.items);
-  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  const userId = useSelector(
+    (state: RootState) => state.auth.profile.profile?._id
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   useParams<{ id: string }>();
   const handleShowMore = () => {
     setVisibleCount(products.length); // Show all products
   };
+
   const handleAddToWatchlist = async (productId: string) => {
-    if (userId) {
+    if (userId && productId) {
       try {
-        await dispatch(addToWatchlistThunk({ userId, productId })).unwrap();
+        let resultAction;
+
+        if (isFavorite) {
+          resultAction = await dispatch(
+            deleteWatchlistThunk(productId)
+          ).unwrap();
+          console.log("Delete result action:", resultAction);
+
+          if (
+            !resultAction ||
+            typeof resultAction !== "object" ||
+            !resultAction._id
+          ) {
+            setIsFavorite(false);
+          } else {
+            setIsFavorite(false);
+          }
+        } else {
+          resultAction = await dispatch(
+            addToWatchlistThunk({ userId, productId })
+          ).unwrap();
+          console.log("Add result action:", resultAction);
+
+          if (
+            !resultAction ||
+            typeof resultAction !== "object" ||
+            !resultAction._id
+          ) {
+            setError("Lỗi khi thêm vào DS theo doi");
+            setIsFavorite(false);
+          } else {
+            setIsFavorite(true);
+          }
+        }
       } catch (err) {
-        console.error("Error adding product to watchlist", err);
+        if (err instanceof Error) {
+          console.error("lỗi xử lý ds theo dõi:", err.message);
+          setError(err.message);
+        } else {
+          console.error("Đã xảy ra lỗi không xác định:", err);
+          setError("Đã xảy ra lỗi không xác định.");
+        }
       }
+    } else {
+      console.log("User ID or Product ID is missing");
+      setError("User ID or Product ID is missing");
     }
   };
   const handleAddToCart = async (productId: string) => {
     if (userId) {
       try {
         await dispatch(addProductToCart({ userId, productId })).unwrap();
+        dispatch(fetchCartList());
         console.log("Thêm Thành công");
       } catch (err) {
         console.error("Lỗi thêm giỏ hàng", err);
@@ -43,6 +94,7 @@ const ProductSection: React.FC = () => {
       console.log("chưa login");
     }
   };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -65,7 +117,7 @@ const ProductSection: React.FC = () => {
       </div>
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <div className="mb-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {products.slice(0, visibleCount).map((product, index) => (
+          {products.slice(0, visibleCount).map((product, index) => (
             <div
               key={index}
               className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -98,8 +150,8 @@ const ProductSection: React.FC = () => {
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                      {product.view > 0 ? (
-                        <span className="mr-2">({product.view})</span>
+                      {product.product_view > 0 ? (
+                        <span className="mr-2">({product.product_view})</span>
                       ) : (
                         ""
                       )}
@@ -136,6 +188,8 @@ const ProductSection: React.FC = () => {
                       fcdsf Quick look
                       <div className="tooltip-arrow" data-popper-arrow="" />
                     </div>
+                    {error && <p className="text-red-500">{error}</p>}
+
                     <button
                       type="button"
                       onClick={() => handleAddToWatchlist(product._id)}
@@ -144,7 +198,10 @@ const ProductSection: React.FC = () => {
                     >
                       <span className="sr-only"> Add to Favorites </span>
                       <svg
-                        className="h-5 w-5"
+                        className={`h-5 w-5 ${
+                          isFavorite ? "text-red-500" : "text-gray-500"
+                        }`}
+                        // className="h-5 w-5"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -363,15 +420,15 @@ const ProductSection: React.FC = () => {
         </div>
       </div>
       {visibleCount < products.length && (
-      <div className="w-full text-center">
-        <button
-          type="button"
-          className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-          onClick={handleShowMore}
-       >
-          Xem tiếp
-        </button>
-      </div>
+        <div className="w-full text-center">
+          <button
+            type="button"
+            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+            onClick={handleShowMore}
+          >
+            Xem tiếp
+          </button>
+        </div>
       )}
     </section>
   );

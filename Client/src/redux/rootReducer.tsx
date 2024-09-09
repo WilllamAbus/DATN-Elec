@@ -17,6 +17,7 @@ import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
 import countryRenducer from "./country/provinceSlice";
 import VnpayRenducer from "./pay/vnpaySlice";
+import orderRenducer from "./order/orderSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   cart: cartRenducer,
   country: countryRenducer,
   Vnpay: VnpayRenducer,
+  order: orderRenducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

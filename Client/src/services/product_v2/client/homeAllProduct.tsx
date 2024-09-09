@@ -46,21 +46,21 @@ export const getProductShopping = async (id: string): Promise<HomeAllProductResp
   }
 };
 export const upViewProduct = async (id: string) => {
-  try {
-    if (!id) {
-      throw new Error("Product ID is required.");
+  const response = await instance.put(
+    `/client/product/upView/${id}`,
+    {},
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     }
-
-    const response = await instance.put(
-      `/client/product/upView/${id}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
+  );
+  return response.data;
+};
+export const searchProduct = async (keyword: string) => {
+  try {
+    const encodedKeyword = encodeURIComponent(keyword);
+    const response = await instance.get(`/client/product/search/${encodedKeyword}`);
     return response.data;
   } catch (error) {
     console.log(error);
