@@ -30,15 +30,12 @@ const search: React.FC = () => {
   }, [keyword]);
   return (
     <>
-        <h1 className="text-center text-3xl">Từ khóa tìm kiếm: {keyword}</h1>
+        <h1 className="text-center text-3xl">Sản phẩm có từ khóa: {keyword}</h1>
         
         {/* <!-- products --> */}
-        <div className="col-span-4">
-                    
-         
 
           {(keyword ?? "").length > 0 && (
-            <div className="grid md:grid-cols-4 grid-cols-2 gap-2">
+            <div className="grid md:grid-cols-4 grid-cols-2 ">
               {products.length > 0 ? (
                 products.map((product, index) => (
                   <div
@@ -47,7 +44,7 @@ const search: React.FC = () => {
                   >
                   <div className="h-56 w-auto">
                       <Link to={`/detailProd/${product._id}`}>
-                        <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
+                      <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
                           <a href="#">
                             <img
                               className="rounded-lg"
@@ -329,7 +326,7 @@ const search: React.FC = () => {
               )}
             </div>
           )}
-        </div>
+        
     </>
   );
 };
