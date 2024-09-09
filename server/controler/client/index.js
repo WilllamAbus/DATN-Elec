@@ -14,5 +14,6 @@ module.exports = {
   auction,
   upView,
   listPageAuction,
-  getAllBrandPageAuction
+  getAllBrandPageAuction,
+  search
 };

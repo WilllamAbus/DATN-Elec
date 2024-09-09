@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { homeAllProduct,listPageAuction, getID, getLimitProductClient,shopping,auction,upView } = require('../../../controler/client');
+const { homeAllProduct,listPageAuction, getID, getLimitProductClient,shopping,auction,upView,search } = require('../../../controler/client');
 const { getProductsByCategory } = require('../../../controler/client');
 router.get('/homeAllProduct', homeAllProduct);
 router.get('/auction-product', listPageAuction);
