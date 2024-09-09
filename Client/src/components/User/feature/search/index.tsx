@@ -31,9 +31,7 @@ const search: React.FC = () => {
   return (
     <>
         <h1 className="text-center text-3xl m-3">Sản phẩm có từ khóa: {keyword}</h1>
-        
         {/* <!-- products --> */}
-
           {(keyword ?? "").length > 0 && (
             <div className="grid md:grid-cols-6 gap-2 ">
               {products.length > 0 ? (
