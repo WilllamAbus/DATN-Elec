@@ -8,8 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { RootState } from "../../../../../redux/store";
 
-import {  ShippingAddress } from "../../../../../types/order/order";
-import { Controller, useForm} from "react-hook-form";
+import { shipping } from "../../../../../types/order/order";
+import { Controller, useForm } from "react-hook-form";
 
 // Define the type for form data
 type FormData = {
@@ -17,18 +17,17 @@ type FormData = {
 };
 
 const CheckoutPage: React.FC = () => {
-//   const dispatch = useDispatch<AppDispatch>();
+  //   const dispatch = useDispatch<AppDispatch>();
 
-//   const userId = useSelector(
-//     (state: RootState) => state.auth.profile.profile?._id
-//   );
+  //   const userId = useSelector(
+  //     (state: RootState) => state.auth.profile.profile?._id
+  //   );
   const carts = useSelector((state: RootState) => state.cart.carts);
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
 
-  const { control,  } = useForm<FormData>();
+  const { control } = useForm<FormData>();
 
-  const [, setShippingAddress] =
-    useState<ShippingAddress | null>(null);
+  const [, setShippingAddress] = useState<shipping | null>(null);
   const [voucherCode, setVoucherCode] = useState<string>("");
 
   useEffect(() => {
@@ -39,8 +38,8 @@ const CheckoutPage: React.FC = () => {
         address: profile.address,
         disabledAt: null,
         modifieon: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        // createdAt: new Date().toISOString(),
+        // updatedAt: new Date().toISOString(),
       });
     }
   }, [profile]);
@@ -76,7 +75,7 @@ const CheckoutPage: React.FC = () => {
         <div className="col-span-8 border border-gray-200 p-4 rounded-lg">
           <h3 className="text-lg font-medium capitalize mb-4">Checkout</h3>
           <div className="space-y-4">
-            <form >
+            <form>
               <div>
                 <Label htmlFor="name" value="Tên người nhận" />
                 <input
