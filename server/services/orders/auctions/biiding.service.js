@@ -3,16 +3,17 @@
 const Bidding = require('../../../model/orders/bidding.model'); // Model Bidding đã được định nghĩa
 const Product_v2 = require('../../../model/product_v2'); // Model sản phẩm
 const PriceRangeBid = require('../../../model/orders/priceRange.model'); // Model PriceRangeBid
+const Time_Track = require('../../../model/time-track.model')
 
 /** */
 
 const moment = require('moment-timezone');
 
 const biddingService = {
-    createBid:  async (productId, userId, bidInput) => {
-        try {
-          // Tìm sản phẩm và chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
-          const product = await Product_v2.findById({ _id: productId, status: { $ne: "disable" } })
+   createBid : async (productId, userId,  bidAmount) => {
+    try {
+        // Find product and only get necessary fields
+        const product = await Product_v2.findById({ _id: productId, status: { $ne: "disable" } })
           .select('product_name product_price_unit product_format')
           .populate('product_format', 'formats')
           .lean();
@@ -21,76 +22,174 @@ const biddingService = {
           throw new Error('Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.');
         }
         
-        // Kiểm tra xem `product_format` có tồn tại không và lấy thông tin định dạng
+        // Check if product_format exists and get format
         const format = product.product_format.formats.trim();
-   
-    
         if (format !== "Đấu giá") {
           return null;
         }
       
-          // Tìm thông tin priceRangeBid chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
-          const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
+        // Find priceRangeBid and only get necessary fields
+        const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
           .select('minBid midBid maxBid')
           .lean();
-      
     
-      
-      if (!priceRangeBid) {
+        if (!priceRangeBid) {
           throw new Error('Không tìm thấy thông tin giá thầu cho sản phẩm.');
+        }
+    
+        const { minBid, midBid, maxBid } = priceRangeBid;
+
+        // Điều chỉnh lại công thức để tính maxAllowedBid với 7% thay vì 10%
+        const maxAllowedBid = minBid + (minBid * 0.07); // 7% above minBid
+        
+        // Chuyển đổi bidAmount sang kiểu số
+        const bidAmountNumber = Number(bidAmount);
+        
+        // Kiểm tra xem bidAmount có hợp lệ không
+        if (bidAmount === undefined || bidAmount === null || isNaN(bidAmountNumber)) {
+          throw new Error(`Giá đấu giá phải được cung cấp.`);
+        }
+        
+        // Kiểm tra nếu bidAmountNumber không phải là minBid, midBid, maxBid 
+        // và không nằm trong phạm vi từ minBid đến maxAllowedBid
+        if (![minBid, midBid, maxBid].includes(bidAmountNumber) && !(bidAmountNumber > minBid && bidAmountNumber <= maxAllowedBid)) {
+          throw new Error(`Giá đấu giá phải là ${minBid}, ${midBid}, ${maxBid}, hoặc không vượt quá 7% giá trị minBid (${maxAllowedBid.toFixed(2)}).`);
+        }
+        
+    
+        // Find timeTrack
+        const timeTrack = await Time_Track.findOne({ productId })
+          .select('_id')
+          .lean();
+    
+        if (!timeTrack) {
+          throw new Error('Không tìm thấy thông tin thời gian đấu giá.');
+        }
+        
+        // Get current time in HCM timezone
+        const bidTimeHCM = moment().tz('Asia/Ho_Chi_Minh').toDate();
+    
+        // Create and save new bid
+        const newBid = new Bidding({
+          product_bidding: {
+            productId: product._id,
+            product_name: product.product_name,
+          },
+          bidder: userId,
+          bidAmount: bidAmountNumber,
+          priceRange: priceRangeBid._id,
+          bidTime: bidTimeHCM,
+          stateBidding: 'Xử lý',
+          bidEndTime: timeTrack._id,
+          auctionId: null, 
+        });
+    
+        return await newBid.save();
+      } catch (error) {
+        console.error('Error creating bid:', error.message);
+        throw new Error(`Không thể tạo đấu giá: ${error.message}`);
       }
-          const { minBid, midBid, maxBid } = priceRangeBid;
-          const maxAllowedBid = minBid + (minBid * 0.1); // Tính giá trị lớn nhất được phép đấu giá
-      
-          // Kiểm tra giá trị nhập có hợp lệ không
-          if (bidInput === undefined || bidInput === null) {
-            throw new Error(`Giá đấu giá phải được cung cấp. Nó phải là ${minBid}, ${midBid}, hoặc ${maxBid}, hoặc không vượt quá 10% giá trị minBid (${maxAllowedBid.toFixed(2)})`);
-        } else {
-            // Kiểm tra giá trị nhập có hợp lệ không
-            if (![minBid, midBid, maxBid].includes(bidInput) && !(bidInput > minBid && bidInput <= maxAllowedBid)) {
+      },
+      updateBidAmountService : async (userId, productId, bidAmount) => {
+        try {
+            // Step 1: Check if the product exists and is not disabled
+            const product = await Product_v2.findOne({ _id: productId, status: { $ne: "disable" } })
+                .select('product_name product_price_unit product_format')
+                .populate('product_format', 'formats')
+                .lean();
+    
+            if (!product) {
+                throw new Error('Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.');
+            }
+    
+            // Step 2: Check if product_format is "Đấu giá"
+            const format = product.product_format.formats.trim();
+            if (format !== "Đấu giá") {
+                return null; // Not an auction product, no update needed
+            }
+    
+            // Step 3: Find price range for bidding
+            const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
+                .select('minBid midBid maxBid')
+                .lean();
+    
+            if (!priceRangeBid) {
+                throw new Error('Không tìm thấy thông tin giá thầu cho sản phẩm.');
+            }
+    
+            const { minBid, midBid, maxBid } = priceRangeBid;
+            const maxAllowedBid = minBid + (minBid * 0.1); // 10% above minBid
+    
+            // Step 4: Convert bidAmount to a number and validate
+            const bidAmountNumber = Number(bidAmount);
+    
+            if (bidAmount === undefined || bidAmount === null || isNaN(bidAmountNumber)) {
+                throw new Error(`Giá đấu giá phải được cung cấp.`);
+            }
+    
+            // Step 5: Validate if bidAmount is within the allowed range
+            if (![minBid, midBid, maxBid].includes(bidAmountNumber) &&
+                !(bidAmountNumber > minBid && bidAmountNumber <= maxAllowedBid)) {
                 throw new Error(`Giá đấu giá phải là ${minBid}, ${midBid}, ${maxBid}, hoặc không vượt quá 10% giá trị minBid (${maxAllowedBid.toFixed(2)})`);
             }
-        }
-      
-          // Lấy thời gian hiện tại theo múi giờ HCM
-          const bidTimeHCM = moment().tz('Asia/Ho_Chi_Minh').toDate();
-      
-          // Tạo và lưu một lượt đấu giá mới
-          const newBid = new Bidding({
-            product_bidding: {
-              productId: product._id,
-              product_name: product.product_name,
-            },
-            bidder: userId,
-            bidAmount: bidInput,
-            priceRange: priceRangeBid._id,
-            bidTime: bidTimeHCM,
-            stateBidding: 'Xử lý',
-
-            auctionId:  null, // Liên kết với phiên đấu giá
-          });
-      
-          return await newBid.save();
-      
+       // Find timeTrack
+       const timeTrack = await Time_Track.findOne({ productId })
+       .select('_id')
+       .lean();
+ 
+     if (!timeTrack) {
+       throw new Error('Không tìm thấy thông tin thời gian đấu giá.');
+     }
+     
+     // Get current time in HCM timezone
+     const bidTimeHCM = moment().tz('Asia/Ho_Chi_Minh').toDate();
+            // Step 6: Update the bid amount in the Bidding model, filter by userId and productId
+            const updatedBid = await Bidding.findOneAndUpdate(
+                { 'product_bidding.productId': productId }, // Filter by productId and userId
+                { $set: {
+                    
+                     product_bidding: {
+                        productId: product._id,
+                        product_name: product.product_name,
+                      },
+                      bidder: userId,
+                      bidAmount: bidAmountNumber,
+                      priceRange: priceRangeBid._id,
+                      bidTime: bidTimeHCM,
+                      stateBidding: 'Xử lý',
+                      bidEndTime: timeTrack._id,
+                      auctionId: null, 
+                    } },   // Update bidAmount
+                                          // Return updated document
+            );
+    
+            return updatedBid;
         } catch (error) {
-          console.error('Error creating bid:', error.message);
-          throw new Error(`Không thể tạo đấu giá: ${error.message}`);
+            throw new Error(error.message);
         }
     },
     getBidsByUser : async (userId) => {
       try {
-          const query = { bidder: userId, status: { $ne: 'disable' } };
-  
+        const query = {
+          bidder: userId,
+          status: { $ne: 'disable' },
+          stateBidding: 'Xử lý' // Lọc theo stateBidding
+        };
+      
+        
           const bids = await Bidding.find(query)
-              .populate('product_bidding.productId', 'product_name product_price_unit product_image') // Populate product info including image array
-              .populate('priceRange', 'minBid midBid maxBid') // Populate price range info
+              .populate('product_bidding.productId', 
+                'product_name product_price_unit image') // Populate product info including image array
+              .populate('priceRange', 'minBid midBid maxBid')
+              .populate('bidEndTime', 'endTimeBid') // Populate price range info
               .sort({ bidTime: -1 }) // Sort by the most recent bid time
               .lean();
-  
-          return {
-              totalBids: bids.length,
-              bids,
-          };
+          
+                
+              return {
+                totalBids: bids.length, // Use bids.length here
+                bids,
+            };
       } catch (error) {
           console.error('Error fetching bids by user:', error.message);
           throw new Error(`Không thể lấy danh sách lượt đấu giá của người dùng: ${error.message}`);
@@ -98,7 +197,7 @@ const biddingService = {
   },
     updateBiddingAuctionId : async (oldAuctionId, newAuctionId) => {
         try {
-          await Bidding.updateMany(
+          await Bidding.updateOne(
             { auctionId: oldAuctionId }, // Tìm các lượt đấu giá liên kết với phiên đấu giá cũ
             { $set: { auctionId: newAuctionId } } // Cập nhật các lượt đấu giá với auctionId mới
           );

@@ -1,70 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../redux/store';
-import { fetchVouchers } from '../../redux/discount/voucherThunk';
-import { Voucher } from '../../types/Voucher.d'; // Ensure this path is correct
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { createBidThunk } from "../../redux/bidding/biddingThunk";
+import { fetchRandBid } from "../../redux/timeTrackProduct/getRandBidV2/getRandBidThunk";
+import currencyFormatter from "currency-formatter";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { NumericFormat } from "react-number-format";
+import socketService from "../../services/socket/socketService";
 
-interface ModalProps {
-  onVoucherApply: (voucher: Voucher) => void;
-}
-
-const formatPrices = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price) + ' vnđ';
-};
-
-const Modal: React.FC<ModalProps> = ({ onVoucherApply }) => {
+const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const dispatch: AppDispatch = useDispatch();
-  const { vouchers, loading, error } = useSelector((state: RootState) => state.voucher);
-  
-  useEffect(() => {
-    dispatch(fetchVouchers());
-  }, [dispatch]);
+  const [bidAmount, setBidAmount] = useState<number | undefined>(undefined);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  const { bid } = useSelector((state: RootState) => state.randBidPrice);
+  const bidStatus = useSelector((state: RootState) => state.bidding.status);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
+    if (!isOpen) {
+      dispatch(fetchRandBid(productId));
+    }
   };
 
-  const closeModal = () => {
-    setIsOpen(false);
+  const closeModal = () => setIsOpen(false);
+
+  const handleBidClick = (amount: number | undefined) => {
+    if (amount !== undefined) {
+      setBidAmount(amount);
+      handleSubmit(amount);
+    } else {
+      toast.error("Lỗi xác nhận giá thầu. Làm ơn thử lại");
+    }
   };
 
+  const handleBidAmountChange = (values: any) => setBidAmount(values.floatValue);
 
+  const handleSubmit = (amount?: number) => {
+    const finalBidAmount = amount ?? bidAmount;
 
-  const handleApplyVoucher = async (voucher: Voucher) => {
-   try {
-    onVoucherApply(voucher);
-    // await dispatch(softDeleteVoucherThunk(voucher._id)).unwrap();
-  
-    closeModal();
-   } catch (error) {
-    console.error("Error deleting Voucher:", error);
-   }
-  
+    if (!userId) {
+      toast.error("Bạn chưa đăng nhập");
+      return;
+    }
+
+    if (finalBidAmount === undefined) {
+      toast.error("Giá thầu là bắt buộc");
+      return;
+    }
+
+    const minBid = bid?.minBid ?? 0;
+    // const maxBid = bid?.maxBid ?? 0;
+    const maxAllowedBid = minBid * 1.07; // 7% more than minBid
+
+    const isValidBid = finalBidAmount >= minBid && finalBidAmount <= maxAllowedBid;
+
+    if (isValidBid && userId) {
+      console.log({ productId, userId, bidInput: finalBidAmount });
+
+      dispatch(createBidThunk({ productId, userId, bidAmount: finalBidAmount }))
+        .then(() => {
+          socketService.emitCreateBidding(productId, { userId, bidAmount: finalBidAmount });
+          toast.success("Đấu giá thành công!");
+          navigate("/viewBids");
+        })
+        .catch((error) => {
+          toast.error(`Error: ${error.message}`);
+        });
+    } else {
+      toast.error(`Giá thầu phải lớn hơn hoặc bằng ${currencyFormatter.format(minBid, { code: "VND", symbol: "" })}
+        và không vượt quá ${currencyFormatter.format(maxAllowedBid, { code: "VND", symbol: "" })}.`);
+    }
   };
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
 
   return (
     <>
       <button
         id="open-modal"
-        className="block text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
+        style={{ width: 250 }}
+        className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
         type="button"
         onClick={toggleModal}
       >
-        Mã giảm giá
+        Đặt giá thầu
       </button>
 
       {isOpen && (
@@ -76,72 +97,65 @@ const Modal: React.FC<ModalProps> = ({ onVoucherApply }) => {
         >
           <div className="relative w-90 p-4 bg-white rounded-lg shadow dark:bg-gray-700">
             <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Vouchers
-              </h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Đặt thầu</h3>
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 onClick={closeModal}
               >
-                <svg
-                  className="w-3 h-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                  />
+                <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                 </svg>
                 <span className="sr-only">Đóng</span>
               </button>
             </div>
-            <div className="p-4 space-y-4">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MÃ GIẢM</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GIÁ GIẢM</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">HÀNH ĐỘNG</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-600">
-                  {vouchers.map((voucher) => (
-                    <tr key={voucher._id} className="hover:bg-gray-100 dark:hover:bg-gray-600">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{voucher.code}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{formatPrices(voucher.voucherNum)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        <button
-                          type="button"
-                          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1"
-                          onClick={() => handleApplyVoucher(voucher)}
-                        >
-                          Áp dụng
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex items-center p-4 border-t border-gray-200 rounded-b dark:border-gray-600">
-              <button
-                type="button"
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
-                onClick={closeModal}
-              >
-                Đóng
-              </button>
+            <div className="relative p-5 text-center bg-white rounded-lg shadow dark:bg-gray-800 max-w-3xl mx-auto">
+            <div className="flex justify-center items-center space-x-8">
+  {[
+    { label: "Giá thấp nhất (VNĐ)", value: bid?.minBid },
+    { label: "Giá trung bình (VNĐ)", value: bid?.midBid },
+    { label: "Giá cao nhất (VNĐ)", value: (bid?.minBid ?? 0) * 1.07 },
+  ].map((item, index) => (
+    <div key={index} className="flex flex-col items-center w-1/3">
+      <label className="text-sm text-gray-500 dark:text-gray-300 mb-1">{item.label}</label>
+      <button
+        type="button"
+        className="w-full py-3 px-6 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+        onClick={() => handleBidClick(item.value)}
+      >
+        {currencyFormatter.format(item.value ?? 0, { code: "VND", symbol: "" })}
+      </button>
+    </div>
+  ))}
+</div>
+
+              <br />
+              <hr className="mb-4 border-gray-300 dark:border-gray-600" />
+              <br />
+              <div className="flex justify-center items-center space-x-4 mb-4 w-full">
+                <NumericFormat
+                  placeholder="Nhập thầu"
+                  value={bidAmount}
+                  onValueChange={handleBidAmountChange}
+                  thousandSeparator=","
+                  allowNegative={false}
+                  className="w-2/3 py-3 px-6 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:focus:ring-gray-600"
+                />
+                <button
+                  type="button"
+                  className="w-1/3 py-3 px-6 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-900"
+                  onClick={() => handleSubmit()}
+                >
+                  Xem thầu
+                </button>
+              </div>
+              {bidStatus === 'loading' && <p>Loading...</p>}
             </div>
           </div>
         </div>
       )}
+
+      <ToastContainer />
     </>
   );
 };

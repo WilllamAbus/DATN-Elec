@@ -1,20 +1,11 @@
 const ProductV2 = require('../../../model/product_v2');
+const ProductVariant = require('../../../model/product_v2/productVariant'); 
 const { uploadImage } = require('../../../utils/uploadImage');
 
 const addVariant = async (req, res) => {
   try {
     const { product_id } = req.params;
-    const {
-      variant_name,
-      variant_description,
-      variant_price,
-      variant_quantity,
-      variant_attributes,
-      variant_image,
-      sku,
-      variant_color,
-      isActive
-    } = req.body;
+    const { variant_name, variant_description, variant_price, variant_attributes, image } = req.body;
 
     const product = await ProductV2.findById(product_id);
     if (!product) {
@@ -35,40 +26,71 @@ const addVariant = async (req, res) => {
       });
     }
 
-    const existingColorAttribute = product.product_attributes.find(attr => attr.k === 'Color' && attr.v === variant_color);
-    if (existingColorAttribute) {
+    const existingVariantByName = await ProductVariant.findOne({ variant_name, product: product_id });
+    if (existingVariantByName) {
       return res.status(400).json({
         success: false,
         err: 1,
-        msg: 'Màu sắc của biến thể không được trùng với màu sắc của sản phẩm gốc',
+        msg: `Tên biến thể '${variant_name}' đã tồn tại cho sản phẩm này`,
         status: 400
       });
     }
 
+    const attributeKeys = new Set();
+    if (Array.isArray(variant_attributes)) {
+      variant_attributes.forEach(attr => attributeKeys.add(`${attr.k}:${attr.v}`));
+    }
+
+    for (const existingVariantId of product.variants) {
+      const existingVariant = await ProductVariant.findById(existingVariantId);
+      if (existingVariant) {
+        const existingAttributes = existingVariant.variant_attributes.map(attr => `${attr.k}:${attr.v}`);
+        const existingSet = new Set(existingAttributes);
+        
+        for (const keyValue of attributeKeys) {
+          if (existingSet.has(keyValue)) {
+            return res.status(400).json({
+              success: false,
+              err: 1,
+              msg: `Thuộc tính với giá trị '${keyValue}' đã tồn tại trong một biến thể khác`,
+              status: 400
+            });
+          }
+        }
+      }
+    }
+
     let imageUrls = [];
-    if (variant_image && variant_image.length) {
-      for (const file of variant_image) {
+    if (req.files && req.files.length) {
+      for (const file of req.files) {
         const imageUrl = await uploadImage(file);
         imageUrls.push(imageUrl);
       }
     }
+    let parsedAttributes = [];
+    if (typeof variant_attributes === 'string') {
+      parsedAttributes = JSON.parse(variant_attributes);
+    } else {
+      parsedAttributes = variant_attributes;
+    }
 
-    const newVariant = {
+    parsedAttributes = parsedAttributes.map(attr => ({
+      k: attr.k,
+      v: attr.v,
+    }));
+    
+    const newVariant = new ProductVariant({
       variant_name,
       variant_description,
       variant_price,
-      variant_quantity,
-      variant_attributes: variant_attributes.map(attr => ({
-        k: attr.k,
-        v: attr.v
-      })),
-      variant_image: imageUrls,
-      sku,
-      variant_color,
-      isActive
-    };
+      variant_attributes: parsedAttributes, 
+      image: imageUrls,
+      product: product_id 
+    });
 
-    product.variants.push(newVariant);
+    await newVariant.save();
+
+    product.variants.push(newVariant._id);
 
     await product.save();
 

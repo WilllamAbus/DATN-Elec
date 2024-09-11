@@ -58,9 +58,13 @@ const randBinController = {
     }
   },
   getRandBid: async (req, res) => {
-    const { productId } = req.params;
+
 
     try {
+      const { productId } = req.params;
+
+      console.log('productId:', productId);
+      
       // Truy vấn sản phẩm để lấy các giá trị minBid, midBid, maxBid
       const product = await randBidService.getProductPriceRange(productId);
 

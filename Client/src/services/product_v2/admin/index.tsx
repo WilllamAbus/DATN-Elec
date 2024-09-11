@@ -7,6 +7,7 @@ import { getDeletedList } from "./deletedList";
 import { pagiCrudProduct } from "./pagination/pagiCrudProduct";
 import { hardDeleteProduct } from "./hardDelete";
 import { restoreProduct } from "./restore";
+import { addVariant } from "./addVariant";
 export {
   listProduct,
   addProductV2,
@@ -16,5 +17,6 @@ export {
   pagiCrudProduct,
   getDeletedList,
   hardDeleteProduct,
-  restoreProduct
+  restoreProduct,
+  addVariant
 };

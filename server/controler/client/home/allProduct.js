@@ -63,7 +63,7 @@ const shopping = async (req, res) => {
     const objectId = new mongoose.Types.ObjectId(product_format);
 
     // Tìm tất cả sản phẩm có product_format tương ứng với ObjectId
-    const products = await modelProduct.find({ product_format: objectId });
+    const products = await modelProduct.find({ product_format: objectId, status: { $ne: "disable" } });
 
     // Nếu không tìm thấy sản phẩm nào
     if (products.length === 0) {

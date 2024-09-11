@@ -6,12 +6,14 @@ import {
   getOneSlice,
   updateSlice,
   paginatedProductSlice,
-  deletedProductSlice
+  deletedProductSlice,
+  addVariantSlice
 } from "./Slicle";
 const productsReducer = combineReducers({
   list: listSclice,
   softDelete: softDeleteSlice,
   add: addSlice,
+  addVariant: addVariantSlice,
   getone: getOneSlice,
   update: updateSlice,
   pagilistActive: paginatedProductSlice,

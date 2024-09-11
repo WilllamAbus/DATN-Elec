@@ -57,6 +57,8 @@ const add = async (req, res) => {
       k: attr.k,
       v: attr.v,
     }));
+    const hasVariants = req.body.hasVariants;
+    console.log("Has Variants (backend):", hasVariants);
     
     const newProduct = new ProductV2({
       product_name: req.body.product_name,
@@ -79,6 +81,7 @@ const add = async (req, res) => {
       product_attributes: productAttributes, 
       weight_g: req.body.weight_g,
       product_supplier: req.body.product_supplier,
+      hasVariants: hasVariants
     });
 
     await newProduct.save();

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { getProductsByCategoryThunk } from "../../../../redux/product/client/Thunk";
@@ -10,7 +9,7 @@ import { truncateText } from "./truncate/truncateText";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
 import styles from "./css/section.module.css";
 import { HeartIcon, StarIcon } from "./svg";
-import Top from "./filter/top";
+
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
@@ -44,33 +43,29 @@ export default function ListPage() {
 
   return (
     <div className="bg-white">
-      <ReusableBreadcrumbClient items={breadcrumbItemClient.productlist} />
-      <Top/>
       {isLoading ? (
         <ProductSkeletonList length={12} />
       ) : (
         <section className={styles.sectionContainer}>
           <div className={styles.container}>
-
             <div className={styles.gridContainer}>
               {products.map((product, index) => (
                 <div
                   key={index}
                   className="relative w-full flex-col overflow-hidden rounded-s-sm border border-gray-100 bg-white shadow-md"
                 >
-                  <div className="h-56 w-auto">
+                  <div className="relative w-full h-56">
                     <Link to={`/detailProd/${product._id}`}>
-                      <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
-                        <a href="#">
-                          <img
-                            className="rounded-lg"
-                            src={product.image[0]}
-                            alt={`product ${index + 1}`}
-                          />
-                        </a>
+                      <figure className="relative transition-all duration-300 cursor-pointer filter grayscale-0">
+                        <img
+                          className="object-cover w-full h-full rounded-lg"
+                          src={product.image[0]}
+                          alt={`product ${index + 1}`}
+                        />
                       </figure>
                     </Link>
                   </div>
+
                   <div className="pt-1 mb-10">
                     <div className="mb-4 px-2 flex items-center justify-between gap-4">
                       {product.product_discount.discountPercent > 0 ? (
@@ -90,10 +85,7 @@ export default function ListPage() {
                         </button>
                       </div>
                     </div>
-                    <a
-                      href="#"
-                      className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
-                    >
+                    <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
                       <div className="mt-1 px-2 pb-1">
                         <a href="#">
                           <h5 className="text-sm tracking-tight text-slate-900 font-medium">
@@ -101,7 +93,8 @@ export default function ListPage() {
                           </h5>
                         </a>
                       </div>
-                    </a>
+                    </div>
+
                     <div className="px-2 flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {product.product_ratingAvg ? product.product_ratingAvg.toFixed(1) : "N/A"}

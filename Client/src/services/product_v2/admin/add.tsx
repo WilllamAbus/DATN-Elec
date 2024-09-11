@@ -3,9 +3,8 @@ import { ProductV2 } from "../../../types/ProductV2";
 import { ApiResponse } from "./types";
 import { AxiosError } from "axios";
 export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<ProductV2>> => {
-  
   try {
-    const formData = new FormData();   
+    const formData = new FormData();
     formData.append("product_name", product.product_name);
     formData.append("product_description", product.product_description);
     formData.append("product_type", product.product_type);
@@ -17,6 +16,7 @@ export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<Prod
     formData.append("product_price", product.product_price.toString());
     formData.append("product_attributes", JSON.stringify(product.product_attributes));
     formData.append("weight_g", product.weight_g.toString());
+    formData.append("hasVariants", product.hasVariants.toString());
     if (product.image && product.image.length > 0) {
       for (let i = 0; i < product.image.length; i++) {
         formData.append("image", product.image[i]);
@@ -27,12 +27,10 @@ export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<Prod
     const response = await instance.post("/admin/product/add", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        
       },
     });
     return response.data;
   } catch (error) {
-
     if (error instanceof AxiosError) {
       console.error("Lỗi từ API:", error.response?.data);
       return {

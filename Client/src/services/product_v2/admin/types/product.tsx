@@ -15,6 +15,7 @@ export interface Product {
   weight_g: number;
   image: string[];
   status: string;
+  hasVariants: boolean;
 }
 export interface ListProductResponse {
   success: boolean;
@@ -58,7 +59,6 @@ export interface HardDeleteResponse {
   error?: string;
   data?: Product;
 }
-
 
 export interface RestoreResponse {
   success: boolean;

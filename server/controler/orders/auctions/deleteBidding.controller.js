@@ -5,7 +5,8 @@ const deleBiddingController = {
     try {
       // Extracting parameters from the request body
       const { userId, biddingId, serviceRequestId, reason, notes } = req.body;
-
+    
+      
       // Validate required fields
       if (!userId || !biddingId || !serviceRequestId) {
         return res.status(400).json({ success: false, message: 'Missing required fields.' });

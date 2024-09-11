@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductUpdate } from "./types/index";
+import { ProductUpdate } from "./types/main_product";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
@@ -19,7 +19,7 @@ import {
   CPUOption,
   CardOption,
   BatteryOption,
-} from "./types";
+} from "./types/main_product";
 import {
   RamSelect,
   ColorSelect,
@@ -37,8 +37,9 @@ import {
   handleBatteryChange,
 } from "./handlers";
 import { selectFetchData } from "./FetchData";
-import { DiscountSelect, CategorySelect, BrandSelect, SupplierSelect } from "./select";
-import { SingleValue} from "react-select";
+import { SingleValue } from "react-select";
+import BrandSupplierSelect from "./Form/Brand_Supplier";
+import CategoryDiscountSelect from "./Form/cate_Discount";
 const EditProduct: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -174,37 +175,29 @@ const EditProduct: React.FC = () => {
                     onChange={handleImageChange}
                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                   />
-
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h3 className="mb-4 text-xl font-semibold dark:text-white">Danh mục &amp; Giảm giá</h3>
-            <CategorySelect
-              categories={categories}
-              register={register}
-              error={errors.product_type}
-            />
-            <DiscountSelect
-              discounts={discounts}
-              register={register}
-              error={errors.product_discount}
-            />
-          </div>
-          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h3 className="mb-4 text-xl font-semibold dark:text-white">
-              Thương hiệu &amp; Màu sắc
-            </h3>
-            <BrandSelect brands={brands} register={register} error={errors.product_brand} />
-
-            <SupplierSelect
-              suppliers={suppliers}
-              register={register}
-              error={errors.product_supplier}
-            />
-          </div>
+          <CategoryDiscountSelect
+            categories={categories}
+            discounts={discounts}
+            register={register}
+            errors={{
+              product_type: errors.product_type?.message,
+              product_discount: errors.product_discount?.message,
+            }}
+          />
+          <BrandSupplierSelect
+            brands={brands}
+            suppliers={suppliers}
+            register={register}
+            errors={{
+              product_brand: errors.product_brand?.message,
+              product_supplier: errors.product_supplier?.message,
+            }}
+          />
         </div>
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">

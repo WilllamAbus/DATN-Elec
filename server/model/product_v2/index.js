@@ -15,6 +15,7 @@ const productV2Schema = new Schema({
     status: { type: String },
     disabledAt: { type: Date }
   },
+  hasVariants: { type: String, default: "false" },
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_format: { type: Schema.Types.ObjectId, ref: 'formatShopping', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
@@ -33,6 +34,7 @@ const productV2Schema = new Schema({
     v: { type: Schema.Types.Mixed, required: true }, 
     u: { type: String }
   }],
+  product_color: { type: String,},
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
   status: { type: String, default: 'active' },
@@ -43,19 +45,7 @@ const productV2Schema = new Schema({
     rating: { type: Number, min: 1, max: 5, required: true },
     createdAt: { type: Date, default: Date.now }
   }],
-  variants: [{
-    variant_name: { type: String, required: true }, 
-    variant_description: { type: String }, 
-    variant_price: { type: Number, required: true },
-    variant_attributes: [{
-      k: { type: String, required: true }, 
-      v: { type: String, required: true }, 
-    }],
-    variant_image: { type: [String] },
-    sku: { type: String, unique: true }, 
-    variant_color: { type: String },
-    isActive: { type: Boolean, default: true }, 
-  }]
+  variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }] 
 }, {
   collection: "product_v2",
   timestamps: true

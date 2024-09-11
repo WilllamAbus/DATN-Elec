@@ -11,16 +11,16 @@ export interface ProductAdd {
   product_condition: string;
   product_quantity: number;
   product_price: number;
-  product_attributes: { k: string; v: string }[]; 
+  product_attributes: { k: string; v: string }[];
   weight_g: number;
   image?: FileList;
+  hasVariants: boolean;
 }
 export interface ProductStateAdd {
   products: ProductAdd[];
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
 }
-
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -30,4 +30,3 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
-

@@ -5,7 +5,6 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./routes/**/*.{js,ts,jsx,tsx}",
-    "./assets/**/*.{js,ts,jsx,tsx}",
     "./public/**/*.html",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./index.html",
@@ -15,6 +14,8 @@ export default {
   ],
   darkMode: 'class',
   safelist: [
+    'bg-blue-700',
+    'hover:bg-blue-800',
     'w-64',
     'w-1/2',
     'rounded-l-lg',

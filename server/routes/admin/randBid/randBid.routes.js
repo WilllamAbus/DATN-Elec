@@ -7,6 +7,6 @@ const middlewareController = require("../../../middleware/auth");
 
 
 
-router.get('/create', randBinController.getRandBid);
+router.get('/getRandBid/:productId', randBinController.getRandBid);
 router.post('/create',middlewareController.verifyToken, randBinController.postRandBid);
 module.exports = router;

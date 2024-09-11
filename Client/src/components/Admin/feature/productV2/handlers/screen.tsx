@@ -1,7 +1,7 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
-import { ScreenOption } from "../types";
+import { ScreenOption } from "../types/main_product";
 
 export const handleScreenChange = (
   selectedOption: SingleValue<ScreenOption>,
