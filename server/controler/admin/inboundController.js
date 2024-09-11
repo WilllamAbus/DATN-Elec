@@ -2,6 +2,7 @@
 const modelInbound = require("../../model/inboundShipments.model");
 const modelProduct = require("../../model/product_v2");
 const modelSupplier = require("../../model/suppliers.model");
+const modelInventory = require("../../model/inventory/inventory.model");
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccount.json");
@@ -32,9 +33,7 @@ const inboundController = {
             const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
             const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
 
-            const count = await modelSupplier.countDocuments({
-                status: { $ne: "disable" },
-            });
+            const count = await modelInbound.countDocuments({ });
             const totalPages = Math.ceil(count / limit);
             const inbounds = await modelInbound.find({})
                 .populate('product_id', 'product_name')
@@ -88,10 +87,37 @@ const inboundController = {
             const data = { product_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price };
             const savedInbound = await modelInbound.create(data);
 
-            
+            // Tìm kiếm sản phẩm trong inventory
+            const existingInventory = await modelInventory.findOne({
+                product: product_id,
+                supplier: inbound_supplier
+            });
+
+            if (existingInventory) {
+                // Cập nhật bản ghi inventory hiện có
+                existingInventory.totalQuantity += inbound_quantity;
+                existingInventory.quantityStock += inbound_quantity;
+                existingInventory.price = inbound_price;
+                existingInventory.totalPrice = existingInventory.quantityStock * inbound_price;
+                await existingInventory.save();
+            } else {
+                // Tạo mới bản ghi inventory
+                const inventoryData = {
+                    product: product_id,
+                    supplier: inbound_supplier,
+                    totalQuantity: inbound_quantity,
+                    quantityStock: inbound_quantity,
+                    quantityShelf: 0,
+                    price: inbound_price,
+                    totalPrice: inbound_quantity * inbound_price,
+                    status: 'active'
+                };
+                await modelInventory.create(inventoryData);
+            }
+
             res
                 .status(201)
-                .json({ message: "Lô hàng được tạo thành công", savedInbound });
+                .json({ message: "Lô hàng được tạo thành công và cập nhật kho hàng", savedInbound });
         } catch (error) {
             console.error("Lỗi khi thêm lô hàng:", error);
             res.status(500).json({ message: "Lỗi máy chủ", error: error.message });

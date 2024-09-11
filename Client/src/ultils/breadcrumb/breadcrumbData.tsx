@@ -30,6 +30,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listInbound", label: "Danh sách lô hàng" },
   ],
+  listInventory: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInventory", label: "Danh sách kho hàng" },
+  ],
   addProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -40,6 +45,12 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInbound", label: "Thêm lô hàng" },
+  ],
+    
+  addInventory: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInventory", label: "Cập nhật kho hàng lên kệ" },
   ],
   editInbounds: [
     { href: "/", label: "Home" },

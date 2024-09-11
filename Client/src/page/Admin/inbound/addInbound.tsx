@@ -1,10 +1,10 @@
 import React from "react";
-import AdminFetAddSuppliers from "../../../components/Admin/feature/inbound/add";
+import AdminFetAddInbounds from "../../../components/Admin/feature/inbound/add";
 
-const addSuppliers: React.FC = () => {
+const addInbounds: React.FC = () => {
   return (
-          <AdminFetAddSuppliers />
+          <AdminFetAddInbounds />
   );
 };
 
-export default addSuppliers;
+export default addInbounds;

@@ -89,6 +89,14 @@ const AdminEditInbound = React.lazy(
   () => import("../page/Admin/inbound/editInbound")
 );
 
+//Inventory
+const AdminAddInventory = React.lazy(
+  () => import("../page/Admin/inventory/addInventory")
+);
+const AdminListInventory = React.lazy(
+  () => import("../page/Admin/inventory/listInventory")
+);
+
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -111,6 +119,8 @@ const AdminRoutes: RouteObject[] = [
       { path: "editSuppliers/:id", element: <AdminEditSuppliers /> },
       { path: "listInbound", element: <AdminListInbound /> },
       { path: "addInbound", element: <AdminAddInbound /> },
+      { path: "listInventory", element: <AdminListInventory /> },
+      { path: "addInventory", element: <AdminAddInventory /> },
       { path: "editInbound/:id", element: <AdminEditInbound /> },
       { path: "addBuyingFormat", element: <AdminAddBuyingFormat /> },
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },

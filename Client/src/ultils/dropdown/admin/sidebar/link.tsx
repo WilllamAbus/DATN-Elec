@@ -15,6 +15,7 @@ export const links: Record<string, Link[]> = {
   productv2: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
+    { label: "Kho hàng", to: "/admin/listInventory" },
   ],
   supplier: [
     { label: "Nhà cung cấp", to: "/admin/listSuppliers" },
