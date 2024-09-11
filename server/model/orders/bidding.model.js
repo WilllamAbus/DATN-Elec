@@ -10,7 +10,7 @@ const biddingSchema = Schema(
         bidder: { type: Schema.Types.ObjectId, ref: 'users', required: true }, // Người dùng thực hiện đấu giá
         bidAmount: { type: Number, required: true }, // Số tiền đấu giá
         bidTime: { type: Date },
-        // bidEndTime: {  type: Schema.Types.ObjectId, ref: 'timetrack', required: true  }, // Thời gian kết thúc đấu giá // Thời gian thực hiện đấu giá
+        bidEndTime: {  type: Schema.Types.ObjectId, ref: 'timetrack', required: true  }, // Thời gian kết thúc đấu giá // Thời gian thực hiện đấu giá
         biddingQuantity: { type: Number, default: 1 },
         priceRange: {
           type: Schema.Types.ObjectId, 

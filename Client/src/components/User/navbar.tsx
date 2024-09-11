@@ -93,7 +93,7 @@ const Navbar: React.FC = () => {
                     href="#"
                     className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
                   >
-                    Sự kiện
+                    Dịch vụ
                   </a>
                 </li>
               </ul>

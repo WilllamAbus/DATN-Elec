@@ -26,7 +26,9 @@ const UserListCart = React.lazy(() => import("../page/User/shoppingMange/manageC
 const UserWatchList = React.lazy(() => import("../page/User/watchList/watchList"));
 const UserSearch = React.lazy(() => import("../page/User/shopping/search/index"));
 const UserFilter = React.lazy(() => import("../page/User/shopping/filter/index"));
-
+const UserViewBids = React.lazy(() => import("../page/User/shopping/auction/biddings/viewBid"));
+const UserCheckoutAuctPages = React.lazy(() => import("../page/User/shopping/auction/biddings/checkoutAuctios"))
+const UserConfirmAucPage = React.lazy(() => import("../page/User/shopping/auction/biddings/completAuctions"))
 const UserRoutes: RouteObject[] = [
   {
     path: "/",
@@ -48,7 +50,7 @@ const UserRoutes: RouteObject[] = [
       { path: "productlist/:categoryId", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
       { path: "detailProd/:id", element: <UserdetailsProd /> },
-      { path: "detailAuc", element: <UserdetailsAuc /> },
+      { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },
       { path: "search/:keyword", element: <UserSearch /> },
       { path: "filter/:price", element: <UserFilter /> },
@@ -57,6 +59,9 @@ const UserRoutes: RouteObject[] = [
       { path: "profile", element: <UserProdfile /> },
       { path: "listCart", element: <UserListCart /> },
       { path: "watchList", element: <UserWatchList /> },
+      { path: "viewBids", element: <UserViewBids /> },
+      { path: "checkoutAuc", element: <UserCheckoutAuctPages /> },
+      { path: "confimAuc", element: <UserConfirmAucPage /> },
     ],
   },
   {

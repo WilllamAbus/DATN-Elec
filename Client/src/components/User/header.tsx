@@ -106,7 +106,7 @@ const Header: React.FC = () => {
                 <span className="cart-count ml-2"> {cartCount}</span>
               </Link>
               <Link
-                to="/cart"
+                to="/viewBids"
                 type="button"
                 className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >

@@ -11,6 +11,7 @@ const notificationService = {
             status: 'active' 
           })
           .sort({ modifieon: -1 }) // Sắp xếp thông báo theo thời gian gần nhất
+          .populate('user', 'avatar') // Lấy trường avatar từ user
           .exec();
     
           return notifications;
