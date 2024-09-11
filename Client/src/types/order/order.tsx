@@ -30,27 +30,25 @@ export interface CartDetail {
 
 export interface Payment {
   amount: number;
-  payment_date: string;
   payment_method: string;
+  order_info?: string;
 }
 
-export interface ShippingAddress {
+export interface shipping {
   recipientName: string;
   phoneNumber: string;
   address: string;
   disabledAt: string | null;
   modifieon: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Order {
   _id?: string;
   cartId: string;
-  user: UserProfile | null; // Điều chỉnh để phù hợp với dữ liệu của bạn
+  user: UserProfile | null;
   cartDetails: CartDetail[];
   payment: Payment;
-  shippingAddressId: ShippingAddress;
+  shipping: shipping;
   voucher: Voucher[];
   formatShipping: string;
   totalAmount: number;

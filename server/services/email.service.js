@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
 });
-
 // Gửi email khôi phục mật khẩu
 module.exports.sendPasswordResetEmail = async (email, token) => {
   try {

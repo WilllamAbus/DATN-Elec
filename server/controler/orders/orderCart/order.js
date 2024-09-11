@@ -5,6 +5,7 @@ const Payment = require("../../../model/orders/payment.model");
 const Shipping = require("../../../model/orders/shipping.model");
 const Voucher = require("../../../model/voucher.model");
 const User = require("../../../model/users.model");
+const Vnpay = require("../../../model/orders/vnpay.model");
 const {
   sendOrderConfirmationEmail,
 } = require("../../../services/email.service");
@@ -23,8 +24,9 @@ const authController = {
         voucherIds = [],
         formatShipping,
         totalAmount,
-        shippingAddressId,
+        shipping,
         cartDetails,
+        payment: paymentInfo,
       } = req.body;
 
       console.log("Yêu cầu Body:", req.body);
@@ -38,25 +40,78 @@ const authController = {
         return res.status(400).json({ message: "Giỏ hàng rỗng" });
       }
 
-      const newPayment = new Payment({
-        amount: req.body.payment?.amount || 0,
-        payment_date: req.body.payment?.payment_date || new Date(),
-        payment_method:
-          req.body.payment?.payment_method || "Chưa chọn phương thức",
-      });
-      await newPayment.save();
+      if (!paymentInfo) {
+        return res
+          .status(400)
+          .json({ message: "Thông tin thanh toán không được cung cấp" });
+      }
 
-      if (!shippingAddressId) {
+      if (paymentInfo.payment_method === "vnPay") {
+        const existingVnpay = await Vnpay.findOne({
+          transaction: paymentInfo.order_info,
+        });
+
+        if (!existingVnpay) {
+          return res
+            .status(400)
+            .json({ message: "Giao dịch VNPay không tồn tại" });
+        }
+
+        // Kiểm tra xem mã giao dịch đã tồn tại trong Payment chưa
+        const existingPayment = await Payment.findOne({
+          order_info: paymentInfo.order_info,
+        });
+
+        if (existingPayment) {
+          return res
+            .status(400)
+            .json({ message: "Giao dịch đã tồn tại trong Payment" });
+        }
+
+        // Tạo bản ghi thanh toán mới
+        const newPayment = new Payment({
+          amount: paymentInfo?.amount || 0,
+          order_info: paymentInfo?.order_info || "null",
+          payment_date: paymentInfo?.payment_date || new Date(),
+          payment_method: "vnPay",
+        });
+
+        await newPayment.save();
+
+        // Cập nhật thông tin thanh toán cho đơn hàng
+        paymentInfo.payment_id = newPayment._id;
+      } else if (paymentInfo.payment_method !== "cash") {
+        const existingPayment = await Payment.findOne({
+          order_info: paymentInfo.order_info,
+        });
+
+        if (existingPayment) {
+          return res.status(400).json({ message: "Giao dịch đã tồn tại" });
+        }
+
+        const newPayment = new Payment({
+          amount: paymentInfo?.amount || 0,
+          order_info: paymentInfo?.order_info || "null",
+          payment_date: paymentInfo?.payment_date || new Date(),
+          payment_method:
+            paymentInfo?.payment_method || "Chưa chọn phương thức",
+        });
+
+        await newPayment.save();
+
+        paymentInfo.payment_id = newPayment._id;
+      }
+
+      if (!shipping) {
         return res
           .status(400)
           .json({ message: "Thông tin giao hàng không được cung cấp" });
       }
 
       const newShipping = new Shipping({
-        recipientName:
-          shippingAddressId.recipientName || "Chưa có tên người nhận",
-        phoneNumber: shippingAddressId.phoneNumber || "Chưa có số điện thoại",
-        address: shippingAddressId.address || "Chưa có địa chỉ",
+        recipientName: shipping.recipientName || "Chưa có tên người nhận",
+        phoneNumber: shipping.phoneNumber || "Chưa có số điện thoại",
+        address: shipping.address || "Chưa có địa chỉ",
         stateShipping: "Xác nhận",
       });
 
@@ -73,12 +128,12 @@ const authController = {
         }
       }
 
-      const shippingFee = shippingAddressId?.shipping || 0;
+      const shippingFee = shipping?.shipping || 0;
       const totalPriceWithShipping = totalAmount + shippingFee;
 
       const newOrder = new Order({
         user: userId,
-        payment: newPayment._id,
+        payment: paymentInfo.payment_id || null,
         shipping: newShipping._id,
         voucherIds,
         cartDetails,
@@ -113,7 +168,7 @@ const authController = {
       await sendOrderConfirmationEmail(user.email, {
         recipientName: newShipping.recipientName,
         address: newShipping.address,
-        paymentMethod: newPayment.payment_method,
+        paymentMethod: paymentInfo.payment_method,
         items: newOrderDetail.items,
         totalPriceWithShipping,
       });
@@ -216,7 +271,7 @@ const authController = {
       const userId = req.user.id;
 
       // Tìm các đơn hàng có trạng thái là "xác nhận" và isDeleted là false
-      const pendingOrders = await Order.find({
+      const ConfirmOrders = await Order.find({
         user: userId,
         isDeleted: false,
         stateOrder: "Đã xác nhận",
@@ -229,13 +284,13 @@ const authController = {
           model: "Voucher",
         });
 
-      if (!pendingOrders || pendingOrders.length === 0) {
+      if (!ConfirmOrders || ConfirmOrders.length === 0) {
         return res
           .status(404)
           .json({ message: "No Confirm orders found for this user" });
       }
 
-      res.status(200).json({ orders: pendingOrders });
+      res.status(200).json({ orders: ConfirmOrders });
     } catch (error) {
       console.error("Error fetching user's Confirm orders:", error);
       res.status(500).json({
@@ -249,7 +304,7 @@ const authController = {
       const userId = req.user.id;
 
       // Tìm các đơn hàng có trạng thái là "xác nhận" và isDeleted là false
-      const pendingOrders = await Order.find({
+      const ShippingOrders = await Order.find({
         user: userId,
         isDeleted: false,
         stateOrder: "Đang vận chuyển",
@@ -262,13 +317,79 @@ const authController = {
           model: "Voucher",
         });
 
-      if (!pendingOrders || pendingOrders.length === 0) {
+      if (!ShippingOrders || ShippingOrders.length === 0) {
         return res
           .status(404)
           .json({ message: "No Shipping orders found for this user" });
       }
 
-      res.status(200).json({ orders: pendingOrders });
+      res.status(200).json({ orders: ShippingOrders });
+    } catch (error) {
+      console.error("Error fetching user's Shipping orders:", error);
+      res.status(500).json({
+        message: "Error fetching Shipping orders",
+        error: error.message || error,
+      });
+    }
+  },
+  getCompletedOrders: async (req, res) => {
+    try {
+      const userId = req.user.id;
+
+      // Tìm các đơn hàng có trạng thái là "xác nhận" và isDeleted là false
+      const CompletedOrders = await Order.find({
+        user: userId,
+        isDeleted: false,
+        stateOrder: "Hoàn tất",
+      })
+        .populate("cartDetails.product")
+        .populate("payment")
+        .populate("shipping")
+        .populate({
+          path: "voucherIds",
+          model: "Voucher",
+        });
+
+      if (!CompletedOrders || CompletedOrders.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No Shipping orders found for this user" });
+      }
+
+      res.status(200).json({ orders: CompletedOrders });
+    } catch (error) {
+      console.error("Error fetching user's Shipping orders:", error);
+      res.status(500).json({
+        message: "Error fetching Shipping orders",
+        error: error.message || error,
+      });
+    }
+  },
+  getCancelOrders: async (req, res) => {
+    try {
+      const userId = req.user.id;
+
+      // Tìm các đơn hàng có trạng thái là "xác nhận" và isDeleted là false
+      const CancelOrders = await Order.find({
+        user: userId,
+        isDeleted: false,
+        stateOrder: "Hủy đơn hàng",
+      })
+        .populate("cartDetails.product")
+        .populate("payment")
+        .populate("shipping")
+        .populate({
+          path: "voucherIds",
+          model: "Voucher",
+        });
+
+      if (!CancelOrders || CancelOrders.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No Shipping orders found for this user" });
+      }
+
+      res.status(200).json({ orders: CancelOrders });
     } catch (error) {
       console.error("Error fetching user's Shipping orders:", error);
       res.status(500).json({
@@ -322,10 +443,12 @@ const authController = {
       const { orderId } = req.params;
       const order = await Order.findOne({ _id: orderId, isDeleted: false })
         .populate("cartDetails.product")
-        .populate("paymentId")
+        .populate("payment")
         .populate("shipping")
-        .populate("voucherIds");
-
+        .populate({
+          path: "voucherIds",
+          model: "Voucher",
+        });
       if (!order) return res.status(404).json({ message: "Order not found" });
 
       res.status(200).json(order);

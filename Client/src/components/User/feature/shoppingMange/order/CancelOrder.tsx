@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import {
-  cancelOrderThunk,
-  ConfirmOrdersThunk,
-} from "../../../../../redux/order/orderThunks";
+import { getCancelOrdersThunk } from "../../../../../redux/order/orderThunks";
 import { Order } from "../../../../../types/order/order";
 import { Link, useNavigate } from "react-router-dom";
 import DetailOrder from "./detailOrders/detail";
-
-const ConfirmOrders: React.FC = () => {
+const CancelOrders: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { orders, status, error } = useSelector(
     (state: RootState) => state.order
@@ -21,7 +17,7 @@ const ConfirmOrders: React.FC = () => {
   };
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   useEffect(() => {
-    dispatch(ConfirmOrdersThunk());
+    dispatch(getCancelOrdersThunk());
   }, [dispatch]);
 
   useEffect(() => {
@@ -30,9 +26,6 @@ const ConfirmOrders: React.FC = () => {
     console.log("Error:", error);
   }, [orders, status, error]);
 
-  const handleCancelOrder = (orderId: string) => {
-    dispatch(cancelOrderThunk({ orderId }));
-  };
   const handleRepurchase = (productId: string) => {
     navigate(`/detailProd/${productId}`);
   };
@@ -46,6 +39,7 @@ const ConfirmOrders: React.FC = () => {
   };
   return (
     <div className="mt-7 border border-gray-300 pt-9">
+      {/* Kiểm tra trạng thái và hiển thị thông báo */}
       {selectedOrder ? (
         <DetailOrder order={selectedOrder} onBack={handleBackToList} />
       ) : (
@@ -74,23 +68,9 @@ const ConfirmOrders: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    {order.stateOrder === "Hủy đơn hàng" ? (
-                      <button
-                        onClick={() =>
-                          handleRepurchase(order.cartDetails[0].product._id)
-                        }
-                        className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700"
-                      >
-                        Mua lại
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleCancelOrder(order._id!)}
-                        className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
-                      >
-                        Hủy đơn hàng
-                      </button>
-                    )}
+                    <button className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700">
+                      Trạng thái: {order.stateOrder}
+                    </button>
                   </div>
                 </div>
 
@@ -181,4 +161,4 @@ const ConfirmOrders: React.FC = () => {
   );
 };
 
-export default ConfirmOrders;
+export default CancelOrders;
