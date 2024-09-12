@@ -1,7 +1,7 @@
 "use strict";
 const User = require("../../../model/users.model");
 const Auction = require("../../../model/orders/auction.model");
-const Inventory = require("../../../model/inventories/inventory.model");
+const Inventory = require("../../../model/inventory/inventory.model");
 const OrderAuction = require("../../../model/orders/auctionsOrders/aucOrders.model");
 const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrderDetail.model");
 const Product_v2 = require("../../../model/product_v2");
