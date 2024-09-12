@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { getListSuppliers, getListProducts, getOneInbound } from "../../../../services/inbound/crudInbound.service";
+import {  getOneInbound } from "../../../../services/inbound/crudInbound.service";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -64,26 +64,10 @@ const EditInbound: React.FC = () => {
             }
         };
 
-        const fetchProducts = async () => {
-            try {
-                const data = await getListProducts();
-                setProducts(data.productReady || []);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            }
-        };
-        const fetchSuppliers = async () => {
-            try {
-                const data = await getListSuppliers();
-                setSuppliers(data.supplierReady || []);
-            } catch (error) {
-                console.error("Error fetching suppliers:", error);
-            }
-        };
+
 
         fetchData();
-        fetchProducts();
-        fetchSuppliers();
+
     }, [id, setValue]);
    
 
@@ -132,7 +116,7 @@ const EditInbound: React.FC = () => {
                                     id="inbound_supplier"
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     placeholder="Tên nhà cung cấp"
-                                    value={suppliers}// Thiết lập giá trị mặc định
+                                    value={suppliers}
                                     
                                 />
                         </div>
