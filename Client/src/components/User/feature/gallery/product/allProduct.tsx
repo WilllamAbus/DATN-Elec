@@ -1,55 +1,120 @@
 import React, { useEffect, useState } from "react";
-import { listProduct } from "../../../../../services/product/crudProduct.service";
+import { getProductShopping } from "../../../../../services/product_v2/client/homeAllProduct";
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
+import Sidebar from "../sidebar";
+import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../../redux/rootReducer";
+const attributesToShow = ["Ram", "Color", "Storage", "Screen","CPU","Pin"];
+import "@fortawesome/fontawesome-free/css/all.min.css";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
+
 const AllProduct: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const id:string = `66c0e5b0a772066cc0854614`;
+  const dispatch = useDispatch<AppDispatch>();
+  useSelector((state: RootState) => state.watchlist.items);
+  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  const handleAddToWatchlist = async (productId: string) => {
+    if (userId) {
+      try {
+        await dispatch(addToWatchlistThunk({ userId, productId })).unwrap();
+      } catch (err) {
+        console.error("Error adding product to watchlist", err);
+      }
+    }
+  };
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productList = await listProduct();
-        setProducts(productList);
+        // Lấy danh sách sản phẩm từ API
+        const response = await getProductShopping(id);
+        if (response.success) {
+          // Cập nhật sản phẩm vào state
+          setProducts(response.products);
+        } else {
+          console.log(`Lỗi khi lấy sản phẩm: ${response.msg}`);
+        }
       } catch (error) {
-        console.log(`lỗi: `, error);
+        console.log(`Lỗi: `, error);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [id]);
   return (
-    <section className="bg-bgf3f4f6 rounded-lg py-8 antialiased dark:bg-gray-900 md:py-12">
-      <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4">
-          {products.map((product, index) => (
+    <>
+      {/* <!-- shop wrapper --> */}
+      <div className="container py-4 flex items-center gap-3">
+        <a href="/" className="text-primary text-base flex items-center">
+          <span className="ml-2">Trang chủ</span>
+        </a>
+        <span className="text-sm text-gray-400 mx-2">
+          <i className="fa-solid fa-chevron-right"></i>
+        </span>
+        <p className="text-gray-600 font-medium">Sản phẩm</p>
+      </div>
+      {/* <h1 className="text-center text-3xl">Mua sắm</h1> */}
+      <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
+        <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hidden md:block hidden">
+          <div className="divide-y divide-gray-200 space-y-5">
+            <div className="pt-4 block">
+              <Sidebar />
+            </div>
+          </div>
+        </div>
+        <div className="text-center md:hidden">
+          <button
+            className="text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block"
+            type="button"
+            data-drawer-target="drawer-example"
+            data-drawer-show="drawer-example"
+            aria-controls="drawer-example"
+          >
+            {/* Mobile sidebar toggle button content */}
+          </button>
+        </div>
+        {/* <!-- products --> */}
+        <div className="col-span-3">
+            <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
+            {products.map((product, index) => (
             <div
               key={index}
-              className="rounded-lg bg-white p-6 shadow hover:shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              className="rounded-md border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
-              <div className="h-56 w-full">
+            <div className="h-56 w-auto">
                 <Link to={`/detailProd/${product._id}`}>
-                  <img
-                    src={product.image}
-                    alt={`product ${index + 1}`}
-                    className="mx-auto h-full dark:hidden"
-                  />
+                  <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
+                    <a href="#">
+                      <img
+                        className="rounded-lg"
+                        src={product.image[0]}
+                        alt={`product ${index + 1}`}
+                      />
+                    </a>
+                  </figure>
                 </Link>
               </div>
               <div className="pt-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                {product.discount > 0 ? <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                    Giảm giá {product.discount}% 
-                  </span>: <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                  </span>}
+                  {product.product_discount.discountPercent > 0 ? (
+                    <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                      Giảm giá {product.product_discount.discountPercent}%
+                    </span>
+                  ) : (
+                    <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
+                  )}
                   <div className="flex items-center justify-end gap-1">
-                  <button
+                    <button
                       type="button"
                       data-tooltip-target="tooltip-quick-look"
                       className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
-                     {product.view > 0 ? <span className="mr-2">({product.view})</span> : '' }
+                      {product.product_view > 0 ? <span className="mr-2">({product.product_view})</span> : ""}
 
                       <svg
                         className="h-5 w-5"
@@ -73,17 +138,19 @@ const AllProduct: React.FC = () => {
                       </svg>
                       <span className="sr-only"> Quick look </span>
                     </button>
+
                     <div
                       id="tooltip-quick-look"
                       role="tooltip"
                       className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
                       data-popper-placement="top"
                     >
-                      Quick look
+                      fcdsf Quick look
                       <div className="tooltip-arrow" data-popper-arrow="" />
                     </div>
                     <button
                       type="button"
+                      onClick={() => handleAddToWatchlist(product._id)}
                       data-tooltip-target="tooltip-add-to-favorites"
                       className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
@@ -117,9 +184,9 @@ const AllProduct: React.FC = () => {
                 </div>
                 <a
                   href="#"
-                  className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
+                  className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
                 >
-                  {product.name}
+                  {product.product_name}
                 </a>
                 <div className="mt-2 flex items-center gap-2">
                   <div className="flex items-center">
@@ -179,8 +246,10 @@ const AllProduct: React.FC = () => {
                         </span>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-500 items-center m-2">
-                    {product.quantity > 0 ? `(Còn ${product.quantity} sản phẩm)` : " "}
+                    <div className="text-xs text-gray-500 items-center m-3">
+                      {product.product_quantity > 0
+                        ? `(Còn ${product.product_quantity} sản phẩm)`
+                        : " "}
                     </div>
                   </p>
                 </div>
@@ -224,19 +293,47 @@ const AllProduct: React.FC = () => {
                   </li>
                 </ul>
                 <div className="mt-4 flex items-center justify-between gap-6">
-                  <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
-                    {product.discount > 1 ? (
+                  <p className="text-xs leading-tight text-gray-900 dark:text-white">
+                    {product.product_discount.discountPercent > 1 ? (
                       <div>
-                        <p className="text-xs">
-                          {formatCurrency(product.price * (1 - product.discount / 100))} đ
+                        <p className="text-xs font-medium text-rose-700">
+                          {formatCurrency(
+                            product.product_price *
+                              (1 - product.product_discount.discountPercent / 100)
+                          )}
+                          đ
                         </p>
-                        <p className="text-xs line-through">{formatCurrency(product.price)}đ</p>
+                        <p className="text-xs font-medium line-through text-gray-400">
+                          {formatCurrency(product.product_price)}
+                        </p>
                       </div>
                     ) : (
-                      <p className="text-xs">{formatCurrency(product.price)}đ</p>
+                      <p className="text-xs font-medium text-rose-700">{formatCurrency(product.product_price)}đ</p>
                     )}
                   </p>
                 </div>
+                <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                  <div className="mt-1 text-sm text-gray-800">
+                    {product.product_attributes
+                      .filter((attribute: ProductAttribute) =>
+                        attributesToShow.includes(attribute.k)
+                      )
+                      .map((attribute: ProductAttribute, index: number) => (
+                        <li key={index} className="mb-1">
+                          <strong>{attribute.k}: </strong>
+                          <span>{attribute.v}</span>
+                        </li>
+                      ))}
+                  </div>
+                </ul>
+                <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                  <div className="mt-1 text-sm text-gray-800">
+                    <li>
+                      <strong>Khối lượng:</strong> <span>{product.weight_g} kg</span>
+                    </li>
+                  </div>
+                </ul>
+
                 <div className="mt-4 flex items-center justify-between gap-6">
                   {" "}
                   <button
@@ -266,18 +363,15 @@ const AllProduct: React.FC = () => {
               </div>
             </div>
           ))}
+            </div>
         </div>
+        {/* 
+        <!-- ./products --> */}
       </div>
-      <div className="w-full text-center">
-        <button
-          type="button"
-          className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-        >
-          Xem tiếp
-        </button>
-      </div>
-    </section>
+      {/* <!-- ./shop wrapper --> */}
+    </>
   );
 };
 
 export default AllProduct;
+

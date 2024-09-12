@@ -47,6 +47,8 @@ const repCommentController = require("../controler/repComment.controller");
 // const inventoryController = require('../controler/inventory.controller');
 /**Inventory */
 
+/**api-service */
+const ServiceController = require('../controler/orders/services/api-service.controller');
 // *TimeTrack*/
 const timeTrackController = require('../controler/timeTrack.controller');
 const router = express.Router();
@@ -373,10 +375,25 @@ router.get("/comment/:id", repCommentController.getRepComment);
 // *timeTrack*/
 router.post('/time-tracks', timeTrackController.create);
 router.post('/time-tracks', timeTrackController.updateEndTime);   // POST /time-tracks
-router.get('/time-tracks/:id', timeTrackController.getTimeTrackById);  // GET /time-tracks/:id
+router.get('/time-tracks/:id', timeTrackController.getTimeTrackById); 
+router.get('/producuByTimeTrack/:productId', timeTrackController.getTimeTractByProductDetails); // GET /time-tracks/:id
 router.get('/time-tracks', timeTrackController.getAllTimeTrack);   // GET /time-tracks
 router.put('/time-tracks/:id', timeTrackController.update); // PUT /time-tracks/:id
 // PATCH /time-tracks/:id
 router.delete('/time-tracks/:id', timeTrackController.delete); // DELETE /time-tracks/:id
 /**Time Track */
+
+
+/**api service */
+
+router.post('/createServcie', ServiceController.createService);
+router.get('/services', ServiceController.getAllServices);
+router.get('/services/:id', ServiceController.getServiceById);
+router.put('/services/:id', ServiceController.updateService);
+router.delete('/services/:id', ServiceController.deleteService);
+router.patch('/services/soft-delete/:id', ServiceController.softDeleteService);
+router.get('/services/deleted', ServiceController.getDeletedServices);
+router.patch('/services/restore/:id', ServiceController.restoreService);
+
+/**api service */
 module.exports = router;

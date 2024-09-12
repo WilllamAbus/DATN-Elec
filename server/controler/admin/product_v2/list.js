@@ -7,7 +7,7 @@ const list = async (req, res) => {
     return res.status(200).json({
       success: true,
       err: 0,
-      msg: 'Lấy danh sách sản phẩm thành công',
+      msg: 'Lấy danh sách sản phẩm thành công ok',
       status: 200,
       products,
     });

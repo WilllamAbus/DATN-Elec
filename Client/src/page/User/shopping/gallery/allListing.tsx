@@ -1,6 +1,6 @@
 import React  from "react";
 
-import UserListting from "../../../../components/User/feature/gallery/allListing"
+import UserListting from "../../../../components/User/feature/gallery/product/allProduct"
 
 const allListing: React.FC = () => {
  

@@ -29,7 +29,6 @@ const add = async (req, res) => {
         status: 400
       });
     }
-    console.log('Parsed productPrice:', productPrice);
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
         success: false,
@@ -39,8 +38,6 @@ const add = async (req, res) => {
       });
     }
     const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
-
-
 
     let imageUrls = [];
     if (req.files && req.files.length) {
@@ -60,6 +57,8 @@ const add = async (req, res) => {
       k: attr.k,
       v: attr.v,
     }));
+    const hasVariants = req.body.hasVariants;
+    console.log("Has Variants (backend):", hasVariants);
     
     const newProduct = new ProductV2({
       product_name: req.body.product_name,
@@ -77,18 +76,15 @@ const add = async (req, res) => {
       product_brand: req.body.product_brand,
       product_format: req.body.product_format,
       product_condition: req.body.product_condition,
-      product_quantity: req.body.product_quantity,
       product_price: productPrice, 
       product_price_unit: productPriceUnit, 
       product_attributes: productAttributes, 
       weight_g: req.body.weight_g,
       product_supplier: req.body.product_supplier,
+      hasVariants: hasVariants
     });
 
     await newProduct.save();
-
-
-    //
 
     return res.status(201).json({
       success:true,

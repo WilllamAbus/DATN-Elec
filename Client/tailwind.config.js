@@ -5,7 +5,6 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./routes/**/*.{js,ts,jsx,tsx}",
-    "./assets/**/*.{js,ts,jsx,tsx}",
     "./public/**/*.html",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./index.html",
@@ -15,6 +14,8 @@ export default {
   ],
   darkMode: 'class',
   safelist: [
+    'bg-blue-700',
+    'hover:bg-blue-800',
     'w-64',
     'w-1/2',
     'rounded-l-lg',
@@ -36,6 +37,7 @@ export default {
       md: "768px",
       lg: "992px",
       xl: "1200px",
+     '2xl': "1536px",
     },
     container: {
       center: true,
@@ -43,7 +45,7 @@ export default {
     },
     extend: {
       colors: {
-        primary: { "50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af", "900": "#F5F5F5","950":"#172554", "901": "#ced4dd" }, bgZincFoter: '#e2e3e7', bgZincFoterCopyRight: '#a1a1a9',bgAmberBtbAdd: '#f49e0b',bgf3f4f6: '#f3f4f6', 
+        primary: { "50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af", "900": "#F5F5F5","950":"#172554", "901": "#ced4dd" }, bgZincFoter: '#e2e3e7', bgZincFoterCopyRight: '#a1a1a9',bgAmberBtbAdd: '#f49e0b',bgf3f4f6: '#f3f4f6', btnDeletesweetalertOk: '##a0de86'
       },
       fontFamily: {
         'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'],

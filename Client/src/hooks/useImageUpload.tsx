@@ -31,6 +31,7 @@ export const useImageUpload = () => {
 
   return {
     imgPreview,
+    setImgPreview,
     error,
     handleImageChange,
   };

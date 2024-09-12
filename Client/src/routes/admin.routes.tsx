@@ -1,81 +1,117 @@
-import "flowbite";
 import React from "react";
 import { RouteObject } from "react-router-dom";
 import Admin from "../page/Admin/Home/home";
 const Dashboard = React.lazy(() => import("../page/Admin/rootAdmin"));
-const AdminAddCategories = React.lazy(() => import("../page/Admin/categories/addCategories"));
-const AdminEditCategories = React.lazy(() => import("../page/Admin/categories/editCategories"));
-const AdminListCategories = React.lazy(() => import("../page/Admin/categories/listCategories"));
+const AdminAddCategories = React.lazy(
+  () => import("../page/Admin/categories/addCategories")
+);
+const AdminEditCategories = React.lazy(
+  () => import("../page/Admin/categories/editCategories")
+);
+const AdminListCategories = React.lazy(
+  () => import("../page/Admin/categories/listCategories")
+);
 /**Products */
-const AdminAddProducts = React.lazy(() => import("../page/Admin/products/addProd"));
-const AdminEditProducts = React.lazy(() => import("../page/Admin/products/editProd"));
-const AdminListProducts = React.lazy(() => import("../page/Admin/products/listProd"));
+const AdminAddProducts = React.lazy(
+  () => import("../page/Admin/products/addProd")
+);
+const AdminEditProducts = React.lazy(
+  () => import("../page/Admin/products/editProd")
+);
+const AdminListProducts = React.lazy(
+  () => import("../page/Admin/products/listProd")
+);
 /**ProductsV2 */
 const AdminAddProductV2 = React.lazy(() => import("../page/Admin/productV2/add"));
+const AdminAddVariant = React.lazy(() => import("../page/Admin/productV2/addVariant"));
 const AdminListProductV2 = React.lazy(() => import("../page/Admin/productV2/list"));
+const AdminEditProductV2 = React.lazy(() => import("../page/Admin/productV2/edit"));
 /**Brands */
-const AdminAddBrands = React.lazy(
-  () => import("../page/Admin/brands/addBrands")
-);
-const AdminEditBrands = React.lazy(
-  () => import("../page/Admin/brands/editBrands")
-);
-const AdminListBrands = React.lazy(
-  () => import("../page/Admin/brands/listBrands")
-);
+const AdminAddBrands = React.lazy(() => import("../page/Admin/brands/addBrands"));
+const AdminEditBrands = React.lazy(() => import("../page/Admin/brands/editBrands"));
+const AdminListBrands = React.lazy(() => import("../page/Admin/brands/listBrands"));
 
 // Suppliers
-const AdminListSuppliers = React.lazy(
-  () => import("../page/Admin/suppliers/listSuppliers")
-);
-const AdminAddSuppliers = React.lazy(
-  () => import("../page/Admin/suppliers/addSuppliers")
-);
-const AdminEditSuppliers = React.lazy(
-  () => import("../page/Admin/suppliers/editSuppliers")
-);
+const AdminListSuppliers = React.lazy(() => import("../page/Admin/suppliers/listSuppliers"));
+const AdminAddSuppliers = React.lazy(() => import("../page/Admin/suppliers/addSuppliers"));
+const AdminEditSuppliers = React.lazy(() => import("../page/Admin/suppliers/editSuppliers"));
 
 /**BuyingFormat */
-const AdminAddBuyingFormat = React.lazy(() => import("../page/Admin/buyingFormat/addBuyFormat"));
-const AdminEditBuyingFormat = React.lazy(() => import("../page/Admin/buyingFormat/editBuyFormat"));
-const AdminListBuyingFormat = React.lazy(() => import("../page/Admin/buyingFormat/listBuyFormat"));
+const AdminAddBuyingFormat = React.lazy(
+  () => import("../page/Admin/buyingFormat/addBuyFormat")
+);
+const AdminEditBuyingFormat = React.lazy(
+  () => import("../page/Admin/buyingFormat/editBuyFormat")
+);
+const AdminListBuyingFormat = React.lazy(
+  () => import("../page/Admin/buyingFormat/listBuyFormat")
+);
 /**Comments */
-const AdminListComments = React.lazy(() => import("../page/Admin/comments/listComments"));
+const AdminListComments = React.lazy(
+  () => import("../page/Admin/comments/listComments")
+);
 
 /**ConditionAuc */
 const AdminConditionAuc = React.lazy(
   () => import("../page/Admin/conditionAuction/addConditionAuction")
 );
-const AdminEditConditionAuc = React.lazy(() => import("../page/Admin/conditionAuction/editCodAuc"));
-const AdminListCondAuc = React.lazy(() => import("../page/Admin/conditionAuction/listCondAuc"));
+const AdminEditConditionAuc = React.lazy(
+  () => import("../page/Admin/conditionAuction/editCodAuc")
+);
+const AdminListCondAuc = React.lazy(
+  () => import("../page/Admin/conditionAuction/listCondAuc")
+);
 
 /**CustomerService */
-const AdminListCService = React.lazy(() => import("../page/Admin/customerService/listCService"));
+const AdminListCService = React.lazy(
+  () => import("../page/Admin/customerService/listCService")
+);
 
 /**discounts */
-const AdminAddVoucher = React.lazy(() => import("../page/Admin/vouchers/addVoucher"));
-const AdminEditVoucher = React.lazy(() => import("../page/Admin/vouchers/editVoucher"));
-const AdminListVoucher = React.lazy(() => import("../page/Admin/vouchers/listVoucher"));
+const AdminAddVoucher = React.lazy(
+  () => import("../page/Admin/vouchers/addVoucher")
+);
+const AdminEditVoucher = React.lazy(
+  () => import("../page/Admin/vouchers/editVoucher")
+);
+const AdminListVoucher = React.lazy(
+  () => import("../page/Admin/vouchers/listVoucher")
+);
 /**Orders */
-const AdminListOrder = React.lazy(() => import("../page/Admin/orders/listOrder"));
-const AdminDetailsOrder = React.lazy(() => import("../page/Admin/orders/detailsOrder"));
+const AdminListOrder = React.lazy(
+  () => import("../page/Admin/orders/listOrder")
+);
+const AdminDetailsOrder = React.lazy(
+  () => import("../page/Admin/orders/detailsOrder")
+);
 
 /**productionAuc */
-const AdminAddProdAuc = React.lazy(() => import("../page/Admin/productAuction/addProdAuc"));
-const AdminEditProdAuc = React.lazy(() => import("../page/Admin/productAuction/editProdAuc"));
-const AdminListProdAuc = React.lazy(() => import("../page/Admin/productAuction/listProdAuc"));
+const AdminAddProdAuc = React.lazy(
+  () => import("../page/Admin/productAuction/addProdAuc")
+);
+const AdminEditProdAuc = React.lazy(
+  () => import("../page/Admin/productAuction/editProdAuc")
+);
+const AdminListProdAuc = React.lazy(
+  () => import("../page/Admin/productAuction/listProdAuc")
+);
 /***RecycleBin */
 const AdminRecycleBinCate = React.lazy(() => import("../page/Admin/recycleBinCate/allItemList"));
 const AdminRecycleBin = React.lazy(() => import("../page/Admin/recycleBin/SoftDeletedProduct"));
 const AdminRecycleBinOrder = React.lazy(() => import("../page/Admin/orders/recycleBinOrder"));
 const AdminRecycleBinVoucher = React.lazy(() => import("../page/Admin/vouchers/softDelVoucher"));
-const AdminRecycleBinSupplier = React.lazy(() => import("../page/Admin/recycleBinSupplier/SoftDeletedSupplier"));
-const AdminRecycleBinBrand = React.lazy(() => import("../page/Admin/recycleBinBrand/SoftDeletedBrand"));
-
+const AdminRecycleBinSupplier = React.lazy(
+  () => import("../page/Admin/recycleBinSupplier/SoftDeletedSupplier")
+);
+const AdminRecycleBinBrand = React.lazy(
+  () => import("../page/Admin/recycleBinBrand/SoftDeletedBrand")
+);
 
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
-const AdminListDeleted = React.lazy(() => import("../page/Admin/users/listDelete"));
+const AdminListDeleted = React.lazy(
+  () => import("../page/Admin/users/listDelete")
+);
 const AdminEditUser = React.lazy(() => import("../page/Admin/users/editUser"));
 
 // Inbound
@@ -107,7 +143,9 @@ const AdminRoutes: RouteObject[] = [
       { path: "editCategories/:id", element: <AdminEditCategories /> },
       { path: "listCategories", element: <AdminListCategories /> },
       { path: "addproduct", element: <AdminAddProductV2 /> },
+      { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
       { path: "listproduct", element: <AdminListProductV2 /> },
+      { path: "editproduct/:id", element: <AdminEditProductV2 /> },
       { path: "addProducts", element: <AdminAddProducts /> },
       { path: "editProducts/:id", element: <AdminEditProducts /> },
       { path: "listProducts", element: <AdminListProducts /> },

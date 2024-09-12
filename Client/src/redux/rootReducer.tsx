@@ -1,4 +1,4 @@
-// src/redux/rootReducer.ts
+
 
 import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
@@ -10,10 +10,23 @@ import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
+import productAdminReducer from "./product/admin";
+import productClientReducer from "./product/client";
+import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
 import countryRenducer from "./country/provinceSlice";
 import VnpayRenducer from "./pay/vnpaySlice";
+import orderRenducer from "./order/orderSlice";
+import productByTimeTrackReducer from "./timeTrackProduct/timeTrackProdSlice"
+import randBidPriceReducer from "./timeTrackProduct/randBidPrice/randBidPriceSlice"
+import biddingReducer from "./bidding/biddingSlice"
+import getRandBidReducer from './timeTrackProduct/getRandBidV2/getRandBidSlice'
+import serviceRefSlice from "./servicesRef/serviceRefSlice";
+import auctionReducer from "./auctions/auctionSlice"
+import deleteBidReducer from "./deleteBid/deleteBidSlice";
+
+
 const authConfig = {
   key: "auth",
   storage,
@@ -27,9 +40,20 @@ const rootReducer = combineReducers({
   watchlist: watchlistReducer,
   voucher: voucherReducer,
   checkout: checkoutSlice,
+  products: productAdminReducer,
+  productClient: productClientReducer,
+  cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,
   Vnpay: VnpayRenducer,
+  order: orderRenducer,
+  productByTimeTrack: productByTimeTrackReducer,
+  randBid: randBidPriceReducer,
+  bidding: biddingReducer,
+  randBidPrice: getRandBidReducer,
+  serviceRef: serviceRefSlice,
+deleteBid: deleteBidReducer,
+auction: auctionReducer
 });
 
 export type AppDispatch = typeof store.dispatch;

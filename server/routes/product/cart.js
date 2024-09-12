@@ -23,7 +23,7 @@ router.put("/:id", middlewareController.verifyToken, CartController.updateCart);
 
 // Xóa giỏ hàng theo ID
 router.delete(
-  "/:id",
+  "/:cartId/:productId?",
   middlewareController.verifyToken,
   CartController.deleteCart
 );

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Breadcrumb } from "flowbite-react";
 import ReusableBreadcrumbItemClient from "./ReusableBreadcrumbItem.Client";
 
@@ -11,18 +12,42 @@ interface ReusableBreadcrumbProps {
 }
 
 const ReusableBreadcrumbClient = ({ items }: ReusableBreadcrumbProps) => {
+  const [isSticky, setIsSticky] = useState(true);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrollTop > lastScrollTop) {
+        setIsSticky(false);
+      } else {
+        setIsSticky(true);
+      }
+      setLastScrollTop(scrollTop <= 0 ? 0 : scrollTop);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollTop]);
+
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-3 -mt-2 antialiased">
-      <Breadcrumb
-        aria-label="Solid background breadcrumb example"
-        className="bg-gray-50 px-5 py-3 dark:bg-gray-800"
+    <section className="w-full bg-gray-50 dark:bg-gray-900 p-0 sm:p-3 -mt-1.5  antialiased">
+      <div
+        className={`sticky top-0 z-60 transition-transform duration-300 ${
+          isSticky ? "" : "-translate-y-full"
+        }`}
       >
-        {items.map((item, index) => (
-          <ReusableBreadcrumbItemClient key={index} href={item.href}>
-            {item.label}
-          </ReusableBreadcrumbItemClient>
-        ))}
-      </Breadcrumb>
+        <Breadcrumb
+          aria-label="Solid background breadcrumb example"
+          className="bg-primary-900 px-6 py-1 dark:bg-gray-800"
+        >
+          {items.map((item, index) => (
+            <ReusableBreadcrumbItemClient key={index} href={item.href}>
+              {item.label}
+            </ReusableBreadcrumbItemClient>
+          ))}
+        </Breadcrumb>
+      </div>
     </section>
   );
 };

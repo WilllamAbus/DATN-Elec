@@ -1,19 +1,21 @@
-import { MultiValue } from "react-select";
+import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
-import { CardOption } from "../types";
+import { CardOption } from "../types/main_product";
+
 export const handleCardChange = (
-  selectedOptions: MultiValue<CardOption>,
-  setSelectedCard: React.Dispatch<React.SetStateAction<MultiValue<CardOption>>>,
+  selectedOption: SingleValue<CardOption>,
+  setSelectedCard: React.Dispatch<React.SetStateAction<SingleValue<CardOption>>>,
   setValue: UseFormSetValue<ProductV2>,
   getValues: () => ProductV2
 ) => {
-  setSelectedCard(selectedOptions);
-  const cardValues = selectedOptions.map((option) => option.label).join(', ');
+  setSelectedCard(selectedOption);
+  const cardValue = selectedOption ? selectedOption.label : '';
   const currentAttributes = getValues().product_attributes || [];
   const updatedAttributes = currentAttributes.filter(attr => attr.k !== "Card").concat({
     k: "Card",
-    v: cardValues
+    v: cardValue
   });
+  
   setValue("product_attributes", updatedAttributes);
 };

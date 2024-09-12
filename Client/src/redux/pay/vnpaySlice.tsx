@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createOrderThunk, VnPaymentThunk } from "./vnpay";
-
+import { VnPaymentThunk } from "./vnpay";
+import { createOrderThunk } from "../order/orderThunks";
 interface CheckoutState {
   loading: boolean;
   error: string | null;

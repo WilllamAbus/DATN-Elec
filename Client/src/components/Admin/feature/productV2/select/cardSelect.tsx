@@ -1,5 +1,6 @@
 import React from "react";
-import Select, { StylesConfig, MultiValue } from "react-select";
+import Select, { StylesConfig, SingleValue } from "react-select";
+
 const cardOptions = [
   { value: "rtx_3050", label: "NVIDIA RTX 3050 6GB" },
   { value: "rtx_3060", label: "NVIDIA RTX 3060 12GB" },
@@ -30,10 +31,19 @@ const cardOptions = [
   { value: "quadro_p4000", label: "NVIDIA Quadro P4000 8GB" },
   { value: "quadro_rtx_4000", label: "NVIDIA Quadro RTX 4000 8GB" },
   { value: "quadro_rtx_5000", label: "NVIDIA Quadro RTX 5000 16GB" },
+  { value: "a15_gpu_4core", label: "Apple A15 GPU, 4-core" },
+  { value: "a16_gpu_5core", label: "Apple A16 GPU, 5-core" },
+  { value: "a17_pro_gpu_6core", label: "Apple A17 Pro GPU, 6-core" },
+  { value: "m1_gpu_7core", label: "Apple M1 GPU, 7-core" },
+  { value: "m1_pro_gpu_14core", label: "Apple M1 Pro GPU, 14-core" },
+  { value: "m1_max_gpu_32core", label: "Apple M1 Max GPU, 32-core" },
+  { value: "m2_gpu_10core", label: "Apple M2 GPU, 10-core" },
+  { value: "m2_pro_gpu_19core", label: "Apple M2 Pro GPU, 19-core" },
+  { value: "m2_max_gpu_38core", label: "Apple M2 Max GPU, 38-core" }
 ];
 
 
-const cardStyles: StylesConfig<(typeof cardOptions)[0], true> = {
+const cardStyles: StylesConfig<{ value: string; label: string }, false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -58,35 +68,23 @@ const cardStyles: StylesConfig<(typeof cardOptions)[0], true> = {
         : undefined,
     },
   }),
-  multiValue: (styles) => ({
-    ...styles,
-    backgroundColor: "#f0f0f0",
-  }),
-  multiValueLabel: (styles) => ({
+  singleValue: (styles) => ({
     ...styles,
     color: "black",
-  }),
-  multiValueRemove: (styles) => ({
-    ...styles,
-    color: "black",
-    ":hover": {
-      backgroundColor: "#d3d3d3",
-      color: "black",
-    },
   }),
 };
 
 interface CardSelectProps {
-  onChange: (selectedOptions: MultiValue<{ value: string; label: string }>) => void;
-  value: MultiValue<{ value: string; label: string }>;
+  onChange: (selectedOption: SingleValue<{ value: string; label: string }>) => void;
+  value: SingleValue<{ value: string; label: string }>;
   className?: string;
 }
 
 const CardSelect: React.FC<CardSelectProps> = ({ onChange, value, className }) => (
   <Select
     classNamePrefix="react-select"
-    closeMenuOnSelect={false}
-    isMulti
+    closeMenuOnSelect={true} // Đóng menu khi chọn một giá trị
+    isMulti={false} // Cho phép chọn một giá trị duy nhất
     options={cardOptions}
     styles={cardStyles}
     value={value}

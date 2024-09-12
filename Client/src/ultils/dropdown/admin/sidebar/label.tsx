@@ -9,4 +9,5 @@ export const labels: Record<string, string> = {
   homeAdmin: "Trang chủ",
   productv2: "Sản phẩmv2",
   inbound: "Nhập hàng"
+  orderCart: "Đơn hàng",
 };

@@ -1,17 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import AdminFetAddProduct from "../../../components/Admin/feature/productV2/list";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
-import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import ProductSummary from "../../../components/Admin/summary/ProductSummary";
-import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
-import AddProductButton from "../../../components/Admin/buttonAdd";
 const listProd: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-  
   return (
     <div>
       <ReusableBreadcrumb items={breadcrumbItems.listproduct} />
@@ -20,22 +12,12 @@ const listProd: React.FC = () => {
           Danh sách sản phẩm
         </h1>
       </div>
-
       <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
         <div className="mb-4 col-span-full xl:mb-2">
-          <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 relative border shadow-md sm:rounded-lg overflow-hidden">
             <ProductSummary />
-            <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
-              <SearchFormProduct />
-              <AddProductButton type="addProduct" />
-            </div>
             <div className="overflow-x-auto">
               <AdminFetAddProduct />
-              <PaginationComponent
-                currentPage={currentPage}
-                totalPages={5}
-                onPageChange={handlePageChange}
-              />
             </div>
           </div>
         </div>

@@ -1,20 +1,20 @@
-import { MultiValue } from "react-select";
+import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
-import { ColorOption } from "../types";
+import { ColorOption } from "../types/main_product";
+
 export const handleColorChange = (
-  selectedOptions: MultiValue<ColorOption>,
-  setSelectedColors: React.Dispatch<React.SetStateAction<MultiValue<ColorOption>>>,
+  selectedOption: SingleValue<ColorOption>,
+  setSelectedColors: React.Dispatch<React.SetStateAction<SingleValue<ColorOption>>>,
   setValue: UseFormSetValue<ProductV2>,
   getValues: () => ProductV2 
 ) => {
-  setSelectedColors(selectedOptions);
-  const colorValues = selectedOptions.map((option) => option.label).join(', ');
+  setSelectedColors(selectedOption);
+  const colorValue = selectedOption ? selectedOption.label : '';
   const currentAttributes = getValues().product_attributes || [];
   const updatedAttributes = currentAttributes.filter(attr => attr.k !== "Color").concat({
     k: "Color", 
-    v: colorValues
+    v: colorValue
   });
   setValue("product_attributes", updatedAttributes);
 };
-

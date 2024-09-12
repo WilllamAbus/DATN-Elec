@@ -2,21 +2,50 @@ const TimeTrackService = require('../services/timeTrack.service');
 
 
 const timeTrackController = {
-    create: async (req, res) => {
+  create : async (req, res) => {
+    try {
+      const { productId, endTime } = req.body;
+  
+      // Validate request body
+      if (!productId || !endTime) {
+        return res.status(400).json({ message: 'Missing required fields: productId and endTime' });
+      }
+  
+      // Create a new TimeTrack record
+      const newTimeTrack = await TimeTrackService.createTimeTrack(productId, { endTime });
+  
+      // Update endTime in real-time
+      // TimeTrackService.updateEndTimeInRealTime(newTimeTrack._id);
+  
+      // Respond with the created TimeTrack record
+      res.status(201).json({
+        success:true, 
+        status: 200,  
+        data:newTimeTrack});
+    } catch (error) {
+      console.error('Error in createTimeTrack controller:', error);
+      res.status(500).json({ message: 'Error creating TimeTrack', error: error.message });
+    }
+  },
+  
+
+      getTimeTractByProductDetails : async (req, res) => {
+             
         try {
-          const data = req.body;
-          // Tạo một bản ghi TimeTrack mới
-          const newTimeTrack = await TimeTrackService.createTimeTrack(data);
+          const { productId } = req.params;
+          console.log('prodctID', productId);
           
-          // Bắt đầu cập nhật endTime trong thời gian thực sau khi tạo thành công
-          TimeTrackService.updateEndTimeInRealTime(newTimeTrack._id);
-      
-          res.status(201).json(newTimeTrack);
+          const productDetails = await TimeTrackService.getTimeTrackByProduct( productId);
+          return res.status(200).json({ success: true, status: 200,  data: productDetails });
         } catch (error) {
-          console.error('Error in createTimeTrack controller:', error);
-          res.status(500).json({ message: 'Error creating TimeTrack', error: error.message });
+          if (error.message === 'Product not found') {
+            return res.status(404).json({ success: false, message: error.message });
+          }
+          console.error('Error fetching product details:', error);
+          return res.status(500).json({ success: false, message: 'Internal server error' });
         }
       },
+      
 
       getTimeTrackById: async(req, res)=> {
         try {

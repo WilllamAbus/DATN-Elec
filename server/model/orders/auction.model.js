@@ -1,19 +1,23 @@
 const { Schema, model } = require("mongoose");
-const biddingSchema = require("./bidding.model");
+
 
 const auctionSchema = Schema(
   {
-    auction_winner: { type: String, require: true },
-    auction_total: { type: Number, require: true },
-    auction_quntity :{type: Number, require: true},
+    productId: { type: Schema.Types.ObjectId, ref: 'product_v2'},
+    auction_winner: { type: String, default: 'A' }, // Tên của người chiến thắng
+    auction_total: { type: Number, default: 0 }, // Tổng giá trị đấu giá
+    auction_quantity: { type: Number, default: 1 }, // Số lượng đấu giá
     // Khoảnh giá của phiên đấu giá
-    auctionStartTime: { type: Date, required: true }, // Thời gian bắt đầu đấu giá
-    auctionEndTime: { type: Date, required: true }, // Thời gian kết thúc đấu giá
-    isAuctionActive: { type: Boolean, default: true }, // Đánh dấu phiên đấu giá có đang hoạt động hay không
-    biddings: [biddingSchema], // Mảng các lượt đấu giá
+    auctionTime: { type: String , default:'5p'}, // Thời gian bắt đầu đấu giá
+   
+    auctionEndTime: {  type: Schema.Types.ObjectId, ref: 'timetrack'  }, // Thời gian kết thúc đấu giá // Thời gian thực hiện đấu giá
+    biddings: [{type: Schema.Types.ObjectId, ref: 'bidding', required: true }], // Mảng các lượt đấu giá
     // Thời gian cập nhật phiên đấu giá
     modifieon: { type: Date, default: Date.now },
- 
+    stateAuction :{
+      type:String,
+      enum:[ 'Xử lý', 'Xác nhận'],
+    },
     isActive: { type: Boolean, default: false },
     status: { type: String, default: "active" },
     disabledAt: { type: Date, default: null },

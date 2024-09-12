@@ -2,9 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchProvinces, fetchDistricts, fetchWards } from "./province";
 
 interface LocationState {
-  provinces: { id: string; full_name: string }[];
-  districts: { id: string; full_name: string }[];
-  wards: { id: string; full_name: string }[];
+  provinces: { province_id: string; province_name: string }[];
+  districts: { district_id: string; district_name: string }[];
+  wards: { ward_id: string; ward_name: string }[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }

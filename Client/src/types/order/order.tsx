@@ -1,0 +1,60 @@
+import { Voucher as Voucher } from "../Voucher.d";
+import { UserProfile } from "../user";
+export interface ProductAttribute {
+  k: string;
+  v: string;
+  // _id?: string;
+}
+
+export interface Product {
+  _id: string;
+  product_name: string;
+  image: string[];
+  product_type: string;
+  product_brand: string;
+  product_format: string;
+  product_condition: string;
+  product_supplier: string;
+  product_price_unit: number;
+  product_attributes: ProductAttribute[];
+  weight_g: number;
+}
+
+export interface CartDetail {
+  product: Product;
+  quantity: number;
+  price: number;
+  totalItemPrice: number;
+  _id: string;
+}
+
+export interface Payment {
+  amount: number;
+  payment_method: string;
+  order_info?: string;
+}
+
+export interface shipping {
+  recipientName: string;
+  phoneNumber: string;
+  address: string;
+  disabledAt: string | null;
+  modifieon: string;
+}
+
+export interface Order {
+  _id?: string;
+  cartId: string;
+  user: UserProfile | null;
+  cartDetails: CartDetail[];
+  payment: Payment;
+  shipping: shipping;
+  voucher: Voucher[];
+  formatShipping: string;
+  totalAmount: number;
+  shippingFee: number;
+  totalPriceWithShipping: number;
+  stateOrder?: string;
+  createdAt: string;
+  updatedAt: string;
+}

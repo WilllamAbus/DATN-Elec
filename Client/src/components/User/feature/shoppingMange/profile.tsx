@@ -12,14 +12,15 @@ import Info from "./info";
 import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
+import OrderList from "./order";
 import useAuth from "../../../../hooks/useAuth";
-import Cookies from "js-cookie";
 
+import Cookies from "js-cookie";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [view, setView] = useState<
-    "info" | "edit" | "address" | "password" | "watchlist"
+    "order" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
   >("info");
 
   const profile = useAppSelector(
@@ -101,7 +102,7 @@ const ProfileUse: React.FC = () => {
                 className="rounded-full w-16 h-16 border-2 border-gray-200 p-1 object-cover"
               />
               <div>
-                <p className="text-gray-600">Hello,</p>
+                <p className="text-gray-600">Xin chào,</p>
                 <h4 className="text-gray-800 font-semibold">{profile?.name}</h4>
               </div>
             </div>
@@ -149,13 +150,16 @@ const ProfileUse: React.FC = () => {
                 <i className="fa fa-edit mr-2"></i>
                 Địa chỉ
               </a>
-              <Link
-                to="/listCart"
-                className="relative text-base block font-medium capitalize text-gray-600 transition hover:text-primary"
+              <a
+                href="#"
+                className={`relative text-base block capitalize transition ${
+                  view === "edit" ? "text-primary" : "text-gray-600"
+                }`}
+                onClick={() => setView("order")}
               >
-                <i className="fa-solid fa-box-archive mr-2"></i>
-                Lịch sử đơn hàng
-              </Link>
+                <i className="fa fa-edit mr-2"></i>
+                Đơn hàng
+              </a>
               <a
                 href="#"
                 className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
@@ -189,6 +193,7 @@ const ProfileUse: React.FC = () => {
           )}
           {view === "password" && <UpdatePassword profile={profile} />}
           {view === "watchlist" && <Watchlist profiles={profile} />}
+          {view === "order" && <OrderList />}
         </section>
       </div>
     </>

@@ -16,6 +16,29 @@ class SocketService {
 
         // on room...
     }
+    emitAuctionComplete(productId, auctionData, timeTrackID) {
+        global._io.emit('auctionComplete', {
+            productId,
+            auction: auctionData,
+            timeTrackID
+        });
+    }
+
+    emitCreateBidding(productId, bidData) {
+        global._io.emit('createBidding', {
+            productId,
+            bid: bidData
+        });
+    }
+    emitUpdateAmountBidding(productId, bidData) {
+        global._io.emit('update-bid', {
+            productId,
+            bid: bidData
+        });
+    }
+    emitNotification(notificationData) {
+        global._io.emit('notification', notificationData);
+    }
 
     
 }

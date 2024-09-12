@@ -1,23 +1,35 @@
-const Product = require('../model/product.model');
+const Product = require('../model/product_v2');
 
 const ProductService = {
-  getProductLimitService: (page) => new Promise(async (resolve, reject) => {
+  getProductLimitService: (page, search) => new Promise(async (resolve, reject) => {
     try {
-      const limit = parseInt(process.env.LIMIT, 10) || 5;
+      const limit = parseInt(process.env.LIMIT, 10) || 3;
       const offset = (!page || +page <= 1) ? 0 : (+page - 1) * limit;
+      const searchQuery = search
+        ? {
+            status: { $ne: 'disable' },
+            product_name: { $regex: search, $options: 'i' }
+          }
+        : { status: { $ne: 'disable' } };
 
-      const products = await Product.find()
+      const products = await Product.find(searchQuery)
         .skip(offset)
         .limit(limit)
-        .populate('categoryid', 'name')
-        .select('name status price image quantity brand color description discount rating view')
+        .populate('product_type', 'name')  
+        .populate('product_brand', 'name')
+        .populate('product_format', 'name')
+        .populate('product_condition', 'name')
+        .populate('product_supplier', 'name')
+        .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
         .lean();
 
-      const total = await Product.countDocuments();
+      const total = await Product.countDocuments(searchQuery); 
 
       resolve({
-        err: products.length ? 0 : 1,
-        msg: products.length ? 'OK' : 'Getting products failed.',
+        success: true,
+        err: 0,
+        msg: products.length ? 'OK' : 'No products found.',
+        status: 200,
         response: {
           total,
           products
@@ -26,11 +38,12 @@ const ProductService = {
 
     } catch (error) {
       reject({
+        success: false,
         err: 1,
-        msg: 'Failed to fetch products: ' + error.message
+        msg: 'chưa có sản phẩm: ' + error.message,
+        status: 500
       });
     }
   }),
 };
-
 module.exports = ProductService;

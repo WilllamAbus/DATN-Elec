@@ -1,0 +1,10 @@
+export { default as listSclice } from "./list";
+export { default as softDeleteSlice } from "./softdelete";
+export { default as addSlice } from "./add";
+export { default as getOneSlice } from "./getone";
+export { default as updateSlice } from "./update";
+export { default as paginatedProductSlice } from "./pagi";
+export { default as deletedProductSlice } from "./deletedList ";
+export { default as hardDeleteSlice } from "./hardDelete";
+export { default as restoreSlice } from "./restore";
+export { default as addVariantSlice } from "./addVariant";

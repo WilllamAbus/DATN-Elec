@@ -18,6 +18,7 @@ const useProductState = () => {
     product_attributes: [],
     weight_g: 0,
     image: undefined,
+    hasVariants: false,
   });
 
   const updateProduct = (newProduct: Partial<ProductV2>) => {

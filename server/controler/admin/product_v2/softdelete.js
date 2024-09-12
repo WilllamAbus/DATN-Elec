@@ -1,16 +1,8 @@
 const modelProduct = require("../../../model/product_v2");
 const Role = require('../../../model/role.model');
+
 const softDelete = async (req, res) => {
   try {
-    if (!req.user || !Array.isArray(req.user.roles)) {
-      return res.status(403).json({
-        success: false,
-        err: 1,
-        msg: "Người dùng không có quyền truy cập.",
-        status: 403
-      });
-    }
-
     const adminRole = await Role.findOne({ name: 'admin' });
     if (!adminRole) {
       return res.status(500).json({
@@ -21,6 +13,14 @@ const softDelete = async (req, res) => {
       });
     }
 
+    if (!req.user || !Array.isArray(req.user.roles)) {
+      return res.status(403).json({
+        success: false,
+        err: 1,
+        msg: "Người dùng không có quyền truy cập.",
+        status: 403
+      });
+    }
     const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
     if (!isAdmin) {
       return res.status(403).json({
@@ -49,6 +49,7 @@ const softDelete = async (req, res) => {
         status: 404
       });
     }
+
     res.status(200).json({
       success: true,
       err: 0,
