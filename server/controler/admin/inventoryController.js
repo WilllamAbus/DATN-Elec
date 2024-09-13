@@ -93,7 +93,7 @@ const inventoryController = {
     getProductsInInventoryController : async (req, res) => {
         try {
             // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
-            const inventoryItems = await modelInventory.find({}, 'product')
+            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' } }, 'product')
             .populate('product', 'product_name')
             .exec();
     
@@ -132,6 +132,79 @@ const inventoryController = {
         } catch (error) {
             console.error('Error retrieving product:', error);
             res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        }
+    },
+    search: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+    
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+    
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+    
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+
+    
+            // Đếm tổng số kết quả khớp với keyword
+            const totalResults = await modelInventory
+                .find()
+                .populate({
+                    path: 'product',
+                    match: { product_name: { $regex: keyword, $options: 'i' } },
+                    select: 'product_name',
+                })
+                .then(results => results.filter(item => item.product !== null).length);
+    
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+    
+            // Lấy kết quả với phân trang và tìm kiếm
+            const result = await modelInventory
+                .find()
+                .populate({
+                    path: 'product',
+                    match: { product_name: { $regex: keyword, $options: 'i' } },
+                    select: 'product_name',
+                })
+                .populate('supplier', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+    
+            // Lọc ra những kết quả không khớp
+            const filteredResults = result.filter(item => item.product !== null);
+    
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: filteredResults,
+                currentPage: page,
+                totalResults,
+                totalPages: Math.ceil(totalResults / limit),
+            });
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
         }
     }
 

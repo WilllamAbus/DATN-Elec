@@ -3,14 +3,10 @@ import instance from "../axios";
 export const listInbound = async (page = 1, limit = 5) => {
   try {
     const response = await instance.get(`/inbound/list?page=${page}&limit=${limit}`);
-    if (response.data.success) {
-      return {
-        data: response.data.data,
-        totalPages: response.data.totalPages,
-      };
-    } else {
-      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách lô hàng");
-    }
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
   } catch (error) {
     console.error("Error fetching inbounds list:", error);
     throw error;
@@ -62,5 +58,32 @@ export const getOneInbound = async (id: string) => {
   } catch (error) {
     console.error("Error fetching inbounds:", error);
     throw error;
+  }
+};
+
+export const searchInbound = async (keyword: string, page = 1, limit = 5) => {
+  try {
+    if (!keyword || keyword.trim() === "") {
+      throw new Error("Từ khóa tìm kiếm không hợp lệ");
+    }
+    const response = await instance.get(`/inbound/search`, {
+      params: {
+        keyword: keyword, 
+        page : page,
+        limit : limit
+      }
+    });
+
+    // console.log("API response data:", response.data); // Xem xét cấu trúc của dữ liệu
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "message" in error) {
+      console.error("Error message:", (error as Error).message);
+    } else {
+      console.error("Unknown error occurred", error);
+    }
   }
 };

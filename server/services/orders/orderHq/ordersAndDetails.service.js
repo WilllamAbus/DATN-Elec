@@ -8,7 +8,7 @@ const Product_v2 = require("../../../model/product_v2");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
-const InventoryOut = require("../../../model/inventories/invenOut.model");
+const InventoryOut = require("../../../model/inventory/invenOut.model");
 
 const orderAndDetailService = {
   createOrderWithDetails: async (userID, auctionDetails) => {

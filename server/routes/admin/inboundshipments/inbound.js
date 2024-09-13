@@ -7,7 +7,8 @@ const {
   addInbound,
   getAllSuppliersController,
   getProductController,
-  getOne
+  getOne,
+  search
 
 } = require("../../../controler/admin/inboundController");
 
@@ -25,5 +26,7 @@ router.get("/listProduct",
 router.get("/listSupplier",
   getAllSuppliersController);
 router.get("/get-one/:id", getOne);
+router.get("/search", search);
+
 
 module.exports = router;

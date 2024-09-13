@@ -126,7 +126,7 @@ const inboundController = {
     getProductController: async (req, res) => {
         try {
 
-            const products = await modelProduct.find({}).exec();
+            const products = await modelProduct.find({ status: { $ne: "disable" } }).exec();
 
             const productReady = products.map(product => ({
                 product: product._id,
@@ -143,7 +143,7 @@ const inboundController = {
     getAllSuppliersController: async (req, res) => {
         try {
 
-            const suppliers = await modelSupplier.find({}).exec();
+            const suppliers = await modelSupplier.find({ status: { $ne: "disable" } }).exec();
 
             const supplierReady = suppliers.map(supplier => ({
                 supplier: supplier._id,
@@ -173,6 +173,81 @@ const inboundController = {
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    search: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+    
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+    
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+    
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+    
+            // Sử dụng `populate` để tìm kiếm theo product_name trong product_v2
+
+    
+            // Tính tổng kết quả
+            const totalResults = await modelInbound
+                .find()
+                .populate({
+                    path: 'product_id', // Tên tham chiếu trong inboundShipmentSchema
+                    match: { product_name: { $regex: keyword, $options: 'i' } }, // Tìm kiếm theo tên sản phẩm
+                    select: 'product_name', // Chỉ lấy trường `product_name`
+                })
+                .countDocuments();
+    
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+    
+            // Lấy kết quả với phân trang và tìm kiếm
+            const result = await modelInbound
+                .find()
+                .populate({
+                    path: 'product_id', 
+                    match: { product_name: { $regex: keyword, $options: 'i' } }, 
+                    select: 'product_name',
+                })
+                .populate('inbound_supplier', 'name') // Tham chiếu đến nhà cung cấp
+                .skip((page - 1) * limit)
+                .limit(limit);
+    
+            // Lọc ra những kết quả không khớp (populate sẽ trả về null cho những kết quả không có product_name khớp với keyword)
+            const filteredResults = result.filter(item => item.product_id !== null);
+    
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: filteredResults,
+                currentPage: page,
+                totalResults,
+                totalPages: Math.ceil(totalResults / limit),
+            });
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
         }
     },
 

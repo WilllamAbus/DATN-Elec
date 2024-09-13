@@ -42,7 +42,7 @@ const routes = (app) => {
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);
-  app.use("/api/auctions", auctionRouter);
+  // app.use("/api/auctions", auctionRouter);
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
 

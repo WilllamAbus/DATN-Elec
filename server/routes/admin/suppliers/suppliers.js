@@ -12,6 +12,7 @@ const {
   deletedList,
   restore,
   search,
+  searchDelete
 } = require("../../../controler/admin/supplierController");
 
 const middlewareController = require("../../../middleware/auth");
@@ -47,6 +48,7 @@ router.patch("/restore/:id",
   middlewareController.verifyToken,
   restore);
 
+router.get("/search", search);
+router.get("/searchDelete", searchDelete);
 
-  router.get("/search/:keyword", search);
 module.exports = router;

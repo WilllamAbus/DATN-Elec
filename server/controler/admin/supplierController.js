@@ -29,7 +29,7 @@ const supplierController = {
     try {
       const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
       const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
-      
+
       const count = await modelSupplier.countDocuments({
         status: { $ne: "disable" },
       });
@@ -43,7 +43,7 @@ const supplierController = {
         success: true,
         msg: "Lấy danh sách nhà cung cấp thành công",
         data: suppliers,
-        totalPages: totalPages, 
+        totalPages: totalPages,
       });
     } catch (error) {
       console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
@@ -358,7 +358,7 @@ const supplierController = {
     try {
       const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
       const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
-      
+
       const count = await modelSupplier.countDocuments({
         status: { $ne: "disable" },
       });
@@ -366,61 +366,76 @@ const supplierController = {
 
       const deleteListSupplier =
         (await modelSupplier.find({ status: "disable" })
-        .skip((page - 1) * limit)
-        .limit(limit)) || [];
+          .skip((page - 1) * limit)
+          .limit(limit)) || [];
 
-        res.status(200).json({
-          success: true,
-          msg: "Lấy danh sách nhà cung cấp thành công",
-          data: deleteListSupplier,
-          totalPages: totalPages, 
-        });
+      res.status(200).json({
+        success: true,
+        msg: "Lấy danh sách nhà cung cấp thành công",
+        data: deleteListSupplier,
+        totalPages: totalPages,
+      });
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error: error.message });
     }
   },
   search: async (req, res) => {
     try {
-      const page = parseInt(req.query.page, 10);
-      const limit = parseInt(req.query.limit, 2);
-
+      const page = parseInt(req.query.page, 10) || 1;  // Default to page 1 if not provided
+      const limit = parseInt(req.query.limit, 10) || 10;  // Default to 10 results per page if not provided
+      const keyword = req.query.keyword;  // Use keyword from query parameters
+  
+      // Validate page and limit
       if (isNaN(page) || page <= 0) {
         return res.status(400).json({
           message: "Số trang không hợp lệ",
         });
       }
-
-      if (isNaN(limit) || limit <= 0) {
+  
+      if (isNaN(limit) || limit <= 0 || limit > 100) {  // Limit to a max of 100
         return res.status(400).json({
           message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
         });
       }
-      const keyword = req.params.keyword;
-
+  
       if (!keyword || keyword.trim() === "") {
         return res.status(400).json({
           message: "Từ khóa tìm kiếm không hợp lệ",
         });
       }
-
-      // Tìm kiếm sản phẩm dựa trên từ khóa (không phân biệt chữ hoa/chữ thường)
-      const result = await modelSupplier
-        .find({
-          name: { $regex: keyword, $options: "i" },
-        })
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      if (result && result.length > 0) {
-        res.status(200).json({
-          data: result,
-        });
-      } else {
-        console.warn("Không tìm thấy kết quả nào cho từ khóa:", keyword);
-        res.status(404).json({
+  
+      // Search for suppliers using keyword (case-insensitive) and active status
+      const searchQuery = {
+        name: { $regex: keyword, $options: "i" }, // Case-insensitive search
+        status: "active",
+      };
+  
+      // Get the total count for pagination purposes
+      const totalResults = await modelSupplier.countDocuments(searchQuery);
+  
+      // If no results, return a suitable message
+      if (totalResults === 0) {
+        return res.status(200).json({
           message: "Không tìm thấy kết quả nào",
+          data: [],
+          totalResults: 0,
         });
       }
+  
+      // Execute the search query with pagination
+      const result = await modelSupplier
+        .find(searchQuery)
+        .skip((page - 1) * limit)
+        .limit(limit);
+  
+      // Return the search results with pagination info
+      res.status(200).json({
+        message: "Tìm kiếm thành công",
+        data: result,
+        currentPage: page,
+        totalResults,
+        totalPages: Math.ceil(totalResults / limit),
+      });
     } catch (error) {
       console.error("Lỗi trong quá trình tìm kiếm:", error);
       res.status(500).json({
@@ -429,6 +444,72 @@ const supplierController = {
       });
     }
   },
+  searchDelete: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page, 10) || 1;  // Default to page 1 if not provided
+      const limit = parseInt(req.query.limit, 10) || 10;  // Default to 10 results per page if not provided
+      const keyword = req.query.keyword;  // Use keyword from query parameters
+  
+      // Validate page and limit
+      if (isNaN(page) || page <= 0) {
+        return res.status(400).json({
+          message: "Số trang không hợp lệ",
+        });
+      }
+  
+      if (isNaN(limit) || limit <= 0 || limit > 100) {  // Limit to a max of 100
+        return res.status(400).json({
+          message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+        });
+      }
+  
+      if (!keyword || keyword.trim() === "") {
+        return res.status(400).json({
+          message: "Từ khóa tìm kiếm không hợp lệ",
+        });
+      }
+  
+      // Search for suppliers using keyword (case-insensitive) and active status
+      const searchQuery = {
+        name: { $regex: keyword, $options: "i" }, // Case-insensitive search
+        status: "disable",
+      };
+  
+      // Get the total count for pagination purposes
+      const totalResults = await modelSupplier.countDocuments(searchQuery);
+  
+      // If no results, return a suitable message
+      if (totalResults === 0) {
+        return res.status(200).json({
+          message: "Không tìm thấy kết quả nào",
+          data: [],
+          totalResults: 0,
+        });
+      }
+  
+      // Execute the search query with pagination
+      const result = await modelSupplier
+        .find(searchQuery)
+        .skip((page - 1) * limit)
+        .limit(limit);
+  
+      // Return the search results with pagination info
+      res.status(200).json({
+        message: "Tìm kiếm thành công",
+        data: result,
+        currentPage: page,
+        totalResults,
+        totalPages: Math.ceil(totalResults / limit),
+      });
+    } catch (error) {
+      console.error("Lỗi trong quá trình tìm kiếm:", error);
+      res.status(500).json({
+        message: "Lỗi máy chủ",
+        error: error.message,
+      });
+    }
+  },
+  
 };
 
 supplierController.upload = upload.single("image");
