@@ -24,10 +24,38 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listCategories", label: "Danh sách danh mục" },
   ],
+  
+  listInbounds: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInbound", label: "Danh sách lô hàng" },
+  ],
+  listInventory: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInventory", label: "Danh sách kho hàng" },
+  ],
   addProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
+  ],
+  
+  addInbounds: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInbound", label: "Thêm lô hàng" },
+  ],
+    
+  addInventory: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInventory", label: "Cập nhật kho hàng lên kệ" },
+  ],
+  editInbounds: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editInbound", label: "Chi tiết lô hàng" },
   ],
   //addproduct v2
   addproduct: [

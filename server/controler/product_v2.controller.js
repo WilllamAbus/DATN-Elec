@@ -1,6 +1,5 @@
 'use strict'
 
-const inventoryService = require('../services/inventory.service');
 const productService = require('../services/product_v2.service');
 
 
@@ -11,23 +10,13 @@ const productController = {
             const images = req.files;
 
             const newProduct = await productService.createProductV2(productData, images);
-
-            const inventoryData = {
-                product: newProduct._id, // ID của sản phẩm mới tạo
-                quantity: productData.quantity || 0, // Lấy số lượng từ dữ liệu sản phẩm, mặc định là 0 nếu không có
-                supplier: productData.supplier, // Nhà cung cấp được truyền từ dữ liệu sản phẩm
-                price: productData.price, // Giá của sản phẩm
-                totalPrice: productData.price * (productData.quantity || 0), 
-            };
-
-            const newInventory = await inventoryService.createInventory(inventoryData);
             res.status(201).json({
                 message: 'Product created successfully',
                 product: newProduct,
                 inventory: newInventory,
             });
         } catch (error) {
-            console.error('Error creating product and inventory:', error);
+            console.error('Error creating product:', error);
             res.status(500).json({
                 message: 'Failed to create product',
                 error: error.message

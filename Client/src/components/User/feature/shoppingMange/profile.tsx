@@ -14,12 +14,13 @@ import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
 import OrderList from "./order";
 import useAuth from "../../../../hooks/useAuth";
+
 import Cookies from "js-cookie";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [view, setView] = useState<
-    "order" | "info" | "edit" | "address" | "password" | "watchlist"
+    "order" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
   >("info");
 
   const profile = useAppSelector(

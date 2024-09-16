@@ -5,7 +5,7 @@ const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
     cartDetails: [orderItem],
-    payment: { type: Schema.Types.ObjectId, ref: "payment", required: true },
+    payment: { type: Schema.Types.ObjectId, ref: "payment", default: null },
     shipping: {
       type: Schema.Types.ObjectId,
       ref: "shipping",

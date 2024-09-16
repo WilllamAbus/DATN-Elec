@@ -1,17 +1,7 @@
 const { Schema, model } = require("mongoose");
-
 const inventorySchema = Schema(
   {
-    product: { 
-      type: Schema.Types.ObjectId, 
-      ref: "product_v2",
-      required: function() { return !this.variant; } // Nếu không có variant, product là bắt buộc
-    },
-    variant: { 
-      type: Schema.Types.ObjectId, 
-      ref: "productVariant",
-      required: function() { return !this.product; } // Nếu không có product, variant là bắt buộc
-    },
+    product: { type: Schema.Types.ObjectId, ref: "product_v2", required: true },
     quantityShelf: {type:Number}, // totalQuantity - quantityStock  số lượng này sẽ là số lượng đưa qua product
     quantityStock: {type:Number},
     totalQuantity : {type: Number, required: true}, // số lượng từ inbound
@@ -29,11 +19,6 @@ const inventorySchema = Schema(
   }
 );
 
-// Trước khi lưu trữ hoặc cập nhật tài liệu
-inventorySchema.pre("save", function (next) {
-  if (this.quantity < 0) {
-    return next(new Error("Quantity cannot be negative."));
-  }
-  next();
-});
-module.exports = model("inventory", inventorySchema);
+
+
+module.exports = model("Inventory", inventorySchema);

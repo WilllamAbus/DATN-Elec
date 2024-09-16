@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../../../controler/admin/vnpay/order");
-const middlewareController = require("../../../middleware/auth");
-// Định nghĩa các tuyến đường và liên kết với các bộ điều khiển
 router.get("/", (req, res) =>
   res.render("orderlist", { title: "Danh sách đơn hàng" })
 );
@@ -18,27 +16,24 @@ router.get("/refund", (req, res) =>
 
 router.post(
   "/create_payment_url",
-  middlewareController.verifyToken,
+
   paymentController.createPaymentUrl
 );
-router.get(
-  "/vnpay_return",
-  middlewareController.verifyToken,
-  paymentController.vnpayReturn
-);
+router.get("/vnpay_return", paymentController.vnpayReturn);
 router.get(
   "/vnpay_ipn",
-  middlewareController.verifyToken,
+
   paymentController.vnpayIpn
 );
+
 router.post(
   "/querydr",
-  middlewareController.verifyToken,
+
   paymentController.queryDr
 );
 router.post(
   "/refund",
-  middlewareController.verifyToken,
+
   paymentController.refund
 );
 

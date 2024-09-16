@@ -44,7 +44,7 @@ const repCommentController = require("../controler/repComment.controller");
 /**@author repCommment */
 
 /**Inventory */
-const inventoryController = require('../controler/inventory.controller');
+// const inventoryController = require('../controler/inventory.controller');
 /**Inventory */
 
 /**api-service */
@@ -356,18 +356,18 @@ router.get("/comment/:id", repCommentController.getRepComment);
 
 /**Inventory */
 
-router.post('/inventory', middlewareController.verifyTokenAdminAuth, inventoryController.createInventory);
-router.put('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.editInventory);
-router.get('/inventory/:id', inventoryController.getInventoryById);
-router.get('/inventories', inventoryController.getAllInventory);
-router.delete('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.deleteInventory);
-router.patch('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.softDeleteInventory);
-router.get('/deleted-inventories', inventoryController.deletedListInventory);
-router.patch('/restore-inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.restoreInventory);
-router.get('/products', inventoryController.getAllProductsV2);
-router.get('/suppliers', inventoryController.getAllSuppliers);
-router.get('/search-inventory', inventoryController.searchInventoryAdmin);
-router.get('/inventory-suggestions', inventoryController.getSuggestions);
+// router.post('/inventory', middlewareController.verifyTokenAdminAuth, inventoryController.createInventory);
+// router.put('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.editInventory);
+// router.get('/inventory/:id', inventoryController.getInventoryById);
+// router.get('/inventories', inventoryController.getAllInventory);
+// router.delete('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.deleteInventory);
+// router.patch('/inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.softDeleteInventory);
+// router.get('/deleted-inventories', inventoryController.deletedListInventory);
+// router.patch('/restore-inventory/:id', middlewareController.verifyTokenAdminAuth, inventoryController.restoreInventory);
+// router.get('/products', inventoryController.getAllProductsV2);
+// router.get('/suppliers', inventoryController.getAllSuppliers);
+// router.get('/search-inventory', inventoryController.searchInventoryAdmin);
+// router.get('/inventory-suggestions', inventoryController.getSuggestions);
 
 /**Inventory */
 

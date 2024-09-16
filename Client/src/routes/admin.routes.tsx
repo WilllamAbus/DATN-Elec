@@ -114,6 +114,25 @@ const AdminListDeleted = React.lazy(
 );
 const AdminEditUser = React.lazy(() => import("../page/Admin/users/editUser"));
 
+// Inbound
+const AdminListInbound = React.lazy(
+  () => import("../page/Admin/inbound/listInbound")
+);
+const AdminAddInbound = React.lazy(
+  () => import("../page/Admin/inbound/addInbound")
+);
+const AdminEditInbound = React.lazy(
+  () => import("../page/Admin/inbound/editInbound")
+);
+
+//Inventory
+const AdminAddInventory = React.lazy(
+  () => import("../page/Admin/inventory/addInventory")
+);
+const AdminListInventory = React.lazy(
+  () => import("../page/Admin/inventory/listInventory")
+);
+
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -136,6 +155,11 @@ const AdminRoutes: RouteObject[] = [
       { path: "listSuppliers", element: <AdminListSuppliers /> },
       { path: "addSuppliers", element: <AdminAddSuppliers /> },
       { path: "editSuppliers/:id", element: <AdminEditSuppliers /> },
+      { path: "listInbound", element: <AdminListInbound /> },
+      { path: "addInbound", element: <AdminAddInbound /> },
+      { path: "listInventory", element: <AdminListInventory /> },
+      { path: "addInventory", element: <AdminAddInventory /> },
+      { path: "editInbound/:id", element: <AdminEditInbound /> },
       { path: "addBuyingFormat", element: <AdminAddBuyingFormat /> },
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
