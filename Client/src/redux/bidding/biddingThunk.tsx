@@ -10,7 +10,7 @@ export const createBidThunk = createAsyncThunk<BidResponse, { productId: string;
       try {
         // Call the service function to create the bid
         const response = await createBid(productId, userId, bidAmount);
-        console.log('response', response);
+    
   
         return response;
       } catch (error) {

@@ -5,7 +5,7 @@ const auctionController  = require("../../../controler/orders/auctions/auction.c
 const middlewareController = require("../../../middleware/auth");
 
 
-router.post('/get-auction-details',middlewareController.verifyToken,auctionController.getAuctionDetails);
+router.get('/get-auction-details',middlewareController.verifyToken,auctionController.getAuctionDetails);
 router.post('/complete',middlewareController.verifyToken,auctionController.completeAuctionController);
 router.get('/auctionByID/:auctionId', auctionController.getAuctionById); // Get auction by ID
 router.delete('delAuction/:auctionId',middlewareController.verifyTokenAdminAuth, auctionController.deleteAuction); // Permanently delete auction

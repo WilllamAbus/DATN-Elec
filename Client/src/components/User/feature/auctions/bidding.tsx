@@ -15,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 const ViewBidPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+
+  
   const bids = useSelector((state: RootState) => state.bidding.bids) || [];
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
   const [canEdit, setCanEdit] = useState<{ [key: string]: boolean }>({});
