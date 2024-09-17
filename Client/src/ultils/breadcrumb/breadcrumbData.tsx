@@ -143,6 +143,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listComments", label: "Danh sách bình luận" },
   ],
+  listDetailComments: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listDetailComments", label: "Danh sách bình luận" },
+  ],
   listVouchers: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },

@@ -1,6 +1,6 @@
 "use strict";
 /**Module */
-
+const mongoose = require('mongoose');
 const moment = require("moment-timezone");
 const Product_v2 = require("../../../model/product_v2");
 const Auction = require("../../../model/orders/auction.model");
@@ -118,7 +118,21 @@ const auctionService = {
         throw new Error("Không thể cập nhật đấu giá.");
       }
 
+    //      // Cập nhật trạng thái sản phẩm thành "disable"
+    // await Product_v2.findByIdAndUpdate(productId, {
+    //   status: "disable",
+    // });
+
+    // // Cập nhật trạng thái của các bản ghi trong priceRandBid và timeTrack thành "disable"
+    // await PriceRandBid.updateMany(
+    //   { productId },
+    //   { $set: { status: "disable" } }
+    // );
+    // await TimeTrack.findByIdAndUpdate(timeTrackID, {
+    //   status: "disable",
+    // });
       return updatedAuction;
+
     } else {
       throw new Error("Đấu giá chưa kết thúc hoặc chưa đến thời điểm xác nhận.");
     }
@@ -179,50 +193,71 @@ const auctionService = {
       throw new Error(`Cannot fetch auction: ${error.message}`);
     }
   },
-  getAuctionDetails: async (auctionId, productId) => {
+  getAuctionDetails: async (productId) => {
     try {
-      // Retrieve the product details
-      const product = await Product_v2.findById(productId)
-        .select("product_name images")
+      // Retrieve the auction based on userId
+      const auction = await Auction.findOne({ "productId": productId })
+        .select("auction_total auction_quantity auction_winner productId auctionTime auctionEndTime biddings stateAuction")
         .lean();
-  
-      if (!product) {
-        throw new Error("Không tìm thấy sản phẩm.");
-      }
-  
-      // Retrieve the auction details
-      const auction = await Auction.findById(auctionId)
-        .select("auction_total auction_quantity auction_winner")
-        .lean();
-  
+      
+      
       if (!auction) {
-        throw new Error("Không thể tìm thấy đấu giá.");
+        throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
       }
   
-      // Retrieve the user details from the auction_winner
-      const userId = auction.auction_winner; // Assuming auction_winner is a userId
-      const user = await User.findById(userId)
-        .select("address name sdt")
-        .lean();
   
-      if (!user) {
-        throw new Error("Không thể tìm thấy người dùng.");
-      }
+      const biddings = auction.productId;
+    const userId = auction.auction_winner
+       
+      const product = await Product_v2.findOne({"_id": biddings})
+      .select("product_name image")
+      .lean();
   
-      // Return the auction details along with the product and user details
+      
+    if (!product) {
+      console.warn(`Product not found for productId: ${biddings}`);
+      throw new Error("Không tìm thấy sản phẩm.");
+    }
+  
+    const user = await User.findById(userId)
+          .select("address name phone")
+          .lean();
+  
+        if (!user) {
+          throw new Error("Không thể tìm thấy người dùng.");
+        }
+      // If each bidding contains a productId, query for product details
+  
+        
       return {
+        auctionId: auction._id,
         auctionTotal: auction.auction_total,
         auctionQuantity: auction.auction_quantity,
         productName: product.product_name,
-        productImages: Array.isArray(product.images) ? product.images : [product.images],
+        productImages: product.image,
         userAddress: user.address,
         userName: user.name,
-        userSdt: user.sdt,
+        userSdt: user.phone,
+        auctionTime: auction.auctionTime,
+        auctionEndTime: auction.auctionEndTime,
+        biddings: biddings,
+        stateAuction: auction.stateAuction
       };
-    } catch (error) {
-      console.error("Error fetching auction details:", error.message);
-      throw new Error(`Cannot fetch auction details: ${error.message}`);
-    }
+        
+        // Retrieve the product details
+      
+  
+      
+  
+        // Return the auction details along with product and user details
+        
+  
+      
+      } catch (error) {
+        console.error("Error fetching auction details:", error.message);
+        throw new Error(`Cannot fetch auction details: ${error.message}`);
+      }
+    
   },
   delete: async (auctionId) => {
     try {

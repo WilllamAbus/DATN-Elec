@@ -53,9 +53,10 @@ const timeTrackService = {
       
           // Validate that finalEndTime is within 30 days from now
           const maxAllowedEndTime = moment(now).add(30, 'days').toDate();
-      
+          console.log('maxAllowedEndTime', maxAllowedEndTime);
+          
           if (finalEndTime > maxAllowedEndTime) {
-            throw new Error('endTime or endTimeBid must be within 30 days from the current time.');
+            throw new Error('Thời gian kết thúc không vượt quá 30 ngày so với thời gian hiện tại.');
           }
       
           // Determine the stateTime

@@ -1,4 +1,5 @@
 const modelProduct = require('../../../model/product_v2');
+const Repcomment = require('../../../model/repComment.model');
 const mongoose = require('mongoose'); 
 const homeAllProduct = async (req, res) => {
   try {
@@ -163,22 +164,25 @@ const upView = async (req, res) => {
 
     // Tăng số lượng lượt xem của sản phẩm
     product.product_view = (product.product_view || 0) + 1;
-    await product.save();
+
+    // Chỉ cập nhật trường 'product_view', bỏ qua các trường khác
+    await product.save({ validateModifiedOnly: true });
 
     res.status(200).json({
         success: true,
         message: 'View count incremented successfully',
         data: product
     });
-} catch (error) {
+  } catch (error) {
     console.error('Error during view count increment:', error);
     res.status(500).json({
         success: false,
         message: 'Internal Server Error',
         error: error.message
     });
-}
+  }
 };
+
 
 const search = async (req, res) => {
   try {
@@ -205,6 +209,31 @@ const search = async (req, res) => {
       });
   }
 };
+const comment = async (req, res) => {
+  try {
+      let { content, id_product, id_user, rating, createdAt } = req.body;
+
+      if (!content || !id_product|| !id_user || !rating) {
+          return res.status(400).json({ message: "Vui lòng nhập đủ thông tin" });
+      }
+
+      createdAt = createdAt ? new Date(createdAt) : new Date();
+
+    
+          await saveComment();
+
+      async function saveComment() {
+          let data = { content, id_product, id_user, rating, createdAt };
+
+          // Save to database
+          const savedProduct = await modelComment.create(data);
+          res.status(201).json({ message: "Sản phẩm được tạo thành công", savedProduct });
+      }
+  } catch (error) {
+      console.error('Lỗi khi thêm sản phẩm:', error);
+      res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+  }
+};
 
 
 module.exports = {
@@ -213,5 +242,6 @@ module.exports = {
   shopping,
   auction,
   upView,
-  search
+  search,
+  comment,
 };

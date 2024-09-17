@@ -15,7 +15,7 @@ const interactionSchema = new Schema(
     score: { type: Number, default: 1 }, // Điểm số cho mô hình học, bạn có thể thay đổi dựa trên loại tương tác
    
     modifieon: { type: Date, default: Date.now },
-  
+    status: { type: String, default: 'active' },
     isActive: { type: Boolean, default: true },
 
     disabledAt: { type: Date, default: null },

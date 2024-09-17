@@ -8,157 +8,148 @@ const Product_v2 = require("../../../model/product_v2");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
-const InventoryOut = require("../../../model/inventory/invenOut.model");
+// const InventoryOut = require("../../../model/inventories/invenOut.model");
+const crypto = require('crypto');
+// const momoService  = require('./momo.service'); 
+const mongoose = require('mongoose')
+const vnpaySService = require('./vnpay.service')
+// const InventoryOut = require("../../../model/inventory/invenOut.model");
 
 const orderAndDetailService = {
-  createOrderWithDetails: async (userID, auctionDetails) => {
+  createOrderWithDetails : async (orderData) => {
     try {
-      // Tìm người dùng
-      const user = await User.findById(userID).lean();
+      const { userId, auctionDetails, payment } = orderData;
+   
+      
+      // Find user
+      const user = await User.findById(userId ).lean();
       if (!user) throw new Error("Người dùng không tồn tại");
-
-      // Tìm phiên đấu giá
+     
+      
+      // Find auction details
       const auction = await Auction.findById(auctionDetails)
         .populate("productId")
         .lean();
+   
+        
+        const auctionID = auction._id;
+      // Extract productID from auction details
+      const productID = mongoose.Types.ObjectId(auction.productId._id);
+ 
+    // Validate productID format
+  
+      
+   
+   
+    // const testProductID = mongoose.Types.ObjectId("66e3eb3506aa43ec4bc5686b");
+    const inven = await Inventory.findOne({ product:  productID }).lean();
+   
 
-      // Lấy productID từ auctionDetails
-      const productID = auction.productId;
-
-      const auctionID = auction._id;
-      const inven = await Inventory.find({ product: productID }).lean();
       if (!inven) throw new Error("Sản phẩm không tồn tại");
-
-      const invenArr = inven[0];
-
-      // Lấy thông tin chi tiết từ auctionDetails
+  
+ 
+  
+  
+      // Extract details from auction
       const quantityDetails = auction.auction_quantity;
       const totalAmount = auction.auction_total;
       const totalPriceWithShipping = totalAmount + 31000;
-
-      // Lấy thông tin người nhận từ user
-      const recipientName = user.name;
-      const phoneNumber = user.phone;
+  
+      // Extract user details
+      const recipientName = user.name|| "Chưa nhập tên";
+      const phoneNumber = user.phone || "Chưa nhập số điện thoại";
       const shippingAddress = user.address;
+  
+      // Prepare hashLinkPayment
+      
+    let hashLinkPayment;
+    let paymentMethodText = ""; // Default payment method text
 
-      // Tạo đơn hàng đấu giá
+    if (payment === 'MoMo') {
+      // Generate MoMo payment link
+      const momoPaymentLink = `${totalPriceWithShipping}MoMoHash`; // Replace with actual MoMo link
+      hashLinkPayment = crypto.createHash('sha256').update(momoPaymentLink).digest('hex');
+      paymentMethodText = "Thanh toán MoMo";
+    } else if (payment === 'Cash') {
+      const paymentData = `${totalPriceWithShipping}`;
+      hashLinkPayment = crypto.createHash('sha256').update(paymentData).digest('hex');
+      paymentMethodText = "Thanh toán trực tiếp";
+    }  else if (payment === 'VnPay') {
+      // Generate VNPay payment URL
+ 
+      const orderInFo =  `Order for auction ${auctionID}`
+      const vnpayResponse = await vnpaySService.createPaymentUrl(totalPriceWithShipping, auctionID, orderInFo);
+      const payMentVnPay = vnpayResponse.url
+      const vnPayHash =  `${totalPriceWithShipping}vnPayHash`;
+      hashLinkPayment = crypto.createHash('sha256').update(vnPayHash).digest('hex');
+      paymentMethodText = "Thanh toán VnPay";
+     
+     return payMentVnPay
+    }  else {
+      throw new Error("Không xác thực phương thức thanh toán");
+    }
+  
+      // Create order auction
       const orderAuction = new OrderAuction({
         shippingAddress: {
           userID: user._id,
           recipientName,
           phoneNumber,
-          address: shippingAddress,
-          email: user.email,
+          address: shippingAddress|| "Chưa có địa chỉ",
+          email: user.email || "Chưa có mail",
           addressID: user.addressID,
         },
-
         amount: totalAmount,
         totalPriceWithShipping,
         stateOrder: "Chờ giao hàng",
       });
-
+  
       await orderAuction.save();
-
-      // Tạo chi tiết đơn hàng đấu giá
+  
+      // Create order detail auction
       const orderDetailAuction = new OrderDetailAuction({
-        auction: [auctionID],
+        auction: auctionID,
         order: orderAuction._id,
         productID,
         nameProduct: productID.product_name, // Include product name
         quantityDetails,
         totalAmount,
         totalPriceWithShipping,
-        payment_method: "Thanh toán trực tiếp",
+        payment_method: paymentMethodText,
         formatShipping: "Tiêu chuẩn",
+        hashLinkPayment,
       });
-
+  
       await orderDetailAuction.save();
-
-      // Update product quantity in ProductV2
-      // Ensure that quantityDetails is defined and a valid number
-      if (typeof quantityDetails !== "number") {
-        throw new Error("quantityDetails must be a valid number");
-      }
-
-      const updatedProductQuantity = inven[0].quantityShelf - quantityDetails;
-
-      const inventoryId = inven[0]._id;
-      // const invenObjID = inven[0]._id;
-
-      const inventoriesShelf = inven[0].quantityShelf;
-      const invetoryPrice = inven[0].price;
-
-      const invetoryQuantityStock = inven[0].quantityStock;
-      const inventoryTotalQuantity = inven[0].totalQuantity; // Corrected typo from totalQuatity to totalQuantity
-
+  
+      // Update product quantity in Inventory
+      const updatedProductQuantity = inven.quantityShelf - quantityDetails;
       if (updatedProductQuantity < 0) {
         throw new Error("Số lượng sản phẩm không đủ");
       }
-
-      const totalQuantityOut = quantityDetails;
-
-      // Kiểm tra và đảm bảo các giá trị không phải là NaN hoặc undefined
-      const remainingQuantitySheft = inventoriesShelf - quantityDetails;
-      const remainingQuantityStock = invetoryQuantityStock - quantityDetails;
-      const remainingTotalQuantity = inventoryTotalQuantity - quantityDetails;
-      const remainingValue = remainingTotalQuantity * invetoryPrice;
-
-      if (isNaN(remainingValue) || isNaN(remainingTotalQuantity)) {
-        throw new Error(
-          "Giá trị tính toán không hợp lệ. Vui lòng kiểm tra lại các biến đầu vào."
-        );
-      }
-
-      const invenOut = new InventoryOut({
-        inventory: [inventoryId],
-        quantitySheftOut: -quantityDetails,
-        quantityStockOut: -quantityDetails,
-        totalQuantityOut: -quantityDetails,
-        salePrice: invetoryPrice,
-        saleValue: invetoryPrice * totalQuantityOut,
-        reason: "trade",
-        remainingQuantitySheft,
-        remainingQuantityStock,
-        remainingTotalQuantity,
-        remainingsalePrice: invetoryPrice,
-        remainingValue, // Sử dụng giá trị đã tính và kiểm tra
-      });
-
-      await invenOut.save();
-
-      const numInventoriesShelf = Number(inventoriesShelf);
-      const numQuantityDetails = Number(quantityDetails);
-
+  
+      const numInventoriesShelf = inven.quantityShelf;
+      const numQuantityDetails = quantityDetails;
       const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
-
-      // const preUpdate = await Inventory.findById(invenObjIDConverted);
-      // console.log("Before update:", preUpdate);
-
-      // Perform update
-      const updateResult = await Inventory.findOneAndUpdate(
+  
+   await Inventory.findOneAndUpdate(
         { product: productID },
         {
           $set: {
             product: productID,
-
             quantityShelf: remainingQuantityShelf,
-            quantityStock: inven[0].quantityStock,
-            totalQuantity: inven[0].totalQuantity,
-            supplier: inven[0].supplier,
-            price: inven[0].price,
-            totalPrice: inven[0].totalPrice,
+            quantityStock: inven.quantityStock,
+            totalQuantity: inven.totalQuantity,
+            supplier: inven.supplier,
+            price: inven.price,
+            totalPrice: inven.totalPrice,
             status: "active",
             createdAt: Date.now(),
             updateAt: Date.now(),
           },
         }
-        // Decrement quantityShelf
-        // Return the updated document
       );
-
-      // Check after update
-      // const postUpdate = await Inventory.findById(invenObjIDConverted);
-      // console.log("After update:", postUpdate);
+    
       // Send confirmation email to user
       const orderDetails = {
         products: [
@@ -174,13 +165,13 @@ const orderAndDetailService = {
           sdt: phoneNumber, // Phone number
         },
       };
-
+  
       await sendMail(user.email, orderDetails);
-
+     
       return {
         orderAuctionID: orderAuction._id,
         orderDetailAuctionID: orderDetailAuction._id,
-        updateInven: updateResult,
+        hashLinkPayment,
       };
     } catch (error) {
       throw error;
@@ -207,19 +198,23 @@ const orderAndDetailService = {
   },
   getOrderDetails: async (orderId) => {
     try {
+      // Find the order and populate the userID in shippingAddress
       const order = await OrderAuction.findById(orderId)
-        .populate("shippingAddress.userID")
+        .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
+  
       if (!order) throw new Error("Đơn hàng không tồn tại");
-
+  
+      // Find order details related to the order
       const orderDetails = await OrderDetailAuction.find({
         order: orderId,
       }).lean();
-
+  
+      // Fetch product details for each order detail
       const productDetails = await Promise.all(
         orderDetails.map(async (detail) => {
           const product = await Product_v2.findById(detail.productID).lean();
-
+  
           return {
             name: product.product_name,
             price: detail.totalAmount,
@@ -227,9 +222,19 @@ const orderAndDetailService = {
           };
         })
       );
-
+  
+      // Extract the user and address information from the shippingAddress
+      const shippingInfo = {
+        userId: order.shippingAddress.userID._id,
+        recipientName: order.shippingAddress.recipientName,
+        phoneNumber: order.shippingAddress.phoneNumber,
+        address: order.shippingAddress.address,
+        email: order.shippingAddress.userID.email, // Assuming the user's email is stored here
+      };
+  
+      // Return the consolidated order information
       return {
-        shippingAddress: order.shippingAddress,
+        shippingInfo, // Contains recipient, phone, address, and user email
         totalPrice: order.totalPriceWithShipping,
         products: productDetails,
       };
@@ -237,11 +242,42 @@ const orderAndDetailService = {
       throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
     }
   },
+// Function to get orders by user ID
+getOrderByUser: async (userId) => {
+  try {
+    // Find all orders where the shippingAddress.userID matches the provided userId
+    const orders = await OrderAuction.find({ 'shippingAddress.userID': userId })
+      .populate('shippingAddress.userID') // Populate the user details inside the shippingAddress
+      .lean(); // Use lean to return plain JavaScript objects
+
+    if (!orders || orders.length === 0) throw new Error("Không tìm thấy đơn hàng cho người dùng này");
+
+    // Map through the orders to extract relevant shipping information and other order details
+    const userOrders = orders.map((order) => ({
+      orderId: order._id,
+      totalPrice: order.totalPriceWithShipping,
+      orderDate: order.createdAt,
+      shippingInfo: {
+        recipientName: order.shippingAddress.recipientName,
+        phoneNumber: order.shippingAddress.phoneNumber,
+        address: order.shippingAddress.address,
+        email: order.shippingAddress.userID.email, // Assuming email is stored in the user model
+      },
+      status: order.status, // Include status if required
+    }));
+
+    return userOrders; // Return array of orders with relevant details
+  } catch (error) {
+    throw new Error(`Lỗi khi lấy đơn hàng của người dùng: ${error.message}`);
+  }
+},
+  
   completeOrder: async (orderId) => {
     try {
+      // Tìm đơn hàng theo ID
       const order = await OrderAuction.findById(orderId).lean();
       if (!order) throw new Error("Đơn hàng không tồn tại");
-
+  
       // Fetch order details
       const orderDetails = await OrderDetailAuction.find({
         order: orderId,
@@ -249,32 +285,23 @@ const orderAndDetailService = {
       if (!orderDetails || orderDetails.length === 0) {
         throw new Error("No order details found for this order ID");
       }
-
-      // Fetch interactions related to the order
-      // const interactions = await Interaction.findById({ orderAuctions: orderId }).lean();
-
-      // Calculate score, default to 0 if no interactions
-
-      // Tính điểm số cho mô hình học (ví dụ: dựa trên tổng giá đơn hàng)
-
-      // Hàm tính điểm số dựa trên giá trị đơn hàng
-
+  
       // Tạo bản ghi tương tác cho từng sản phẩm trong đơn hàng
-      await Promise.all(
+      const interactions = await Promise.all(
         orderDetails.map(async (detail) => {
-          await Interaction.create({
+          return await Interaction.create({
             user: order.shippingAddress.userID,
             orderAuctions: orderId,
             productID: detail.productID,
             item: null, // Lưu thông tin sản phẩm vào productID
             type: "auctions",
             score: 5, // Có thể đặt điểm số chung cho tất cả các sản phẩm, hoặc tùy chỉnh nếu cần
-            item: null, // Để trống cho các tương tác không liên quan đến sản phẩm cụ thể
           });
         })
       );
-
-      await Notification.create({
+  
+      // Tạo thông báo
+      const notification = await Notification.create({
         user: order.shippingAddress.userID,
         order: orderId,
         type: "Thông tin",
@@ -282,8 +309,12 @@ const orderAndDetailService = {
         isRead: true,
         message: `Đơn hàng ${orderId} đã được thanh toán hoàn tất. Cảm ơn bạn đã mua hàng!`,
       });
-
-      return { message: "Thanh toán hoàn tất và thông báo đã được gửi" };
+  
+      return {
+        message: "Thanh toán hoàn tất và thông báo đã được gửi",
+        interactions, // Trả về dữ liệu tương tác đã tạo
+        notification, // Trả về dữ liệu thông báo đã tạo
+      };
     } catch (error) {
       throw new Error(`Lỗi khi xử lý thanh toán: ${error.message}`);
     }

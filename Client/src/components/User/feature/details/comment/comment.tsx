@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+// Comment.tsx
+import  { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../../../../../assets/css/user.style.css";
 import { Link, useParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; 
-import axios from "axios"; 
-// import Listcomment from "./listComment";
+import { jwtDecode } from "jwt-decode";
+import Listcomment from "./listComment";
+import { getProfileThunk } from "../../../../../redux/auth/authThunk";
+import { useAppDispatch } from "../../../../../redux/store";
+import { notify } from "../../../../../ultils/success";
+import { addComment, getCommentProduct, Comment as CommentType } from "../../../../../services/commnet/comment.service";
 
 interface FormValues {
   content: string;
@@ -16,54 +18,65 @@ interface DecodedToken {
   name: string;
 }
 
-const decodeToken = (token: string): DecodedToken => {
-  try {
-    // Decode the JWT token
-    const decoded: any = jwtDecode(token);
-    return {
-      id: decoded.id || "",
-      name: decoded.name || ""
-    };
-  } catch (error) {
-    console.error("Failed to decode token:", error);
-    return { id: "", name: "" };
-  }
-};
-
-const getUserData = (): DecodedToken => {
-  const userData = window.localStorage.getItem("persist:root");
-  if (userData) {
-    try {
-      const parsedData = JSON.parse(userData);
-      const loginData = JSON.parse(parsedData.auth)?.login;
-      if (loginData && loginData.token) {
-        const token = loginData.token;
-        return decodeToken(token);
-      }
-    } catch (error) {
-      console.error("Failed to parse user data:", error);
-    }
-  }
- 
-  return { id: "", name: "" };
-};
-
 const Comment = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset } = useForm<FormValues>();
   const { id } = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
 
-  const userData = getUserData();
+  const decodeToken = (token: string): DecodedToken => {
+    try {
+      const decoded: any = jwtDecode(token);
+      return {  
+        id: decoded.id || "",
+        name: decoded.name || ""
+      };
+    } catch (error) {
+      console.error("Failed to decode token:", error);
+      return { id: "", name: "" };
+    }
+  };
+
+  const getUserData = (): DecodedToken => {
+    const userData = window.localStorage.getItem("persist:root");
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        const loginData = JSON.parse(parsedData.auth)?.login;
+        if (loginData && loginData.token) {
+          const token = loginData.token;
+          return decodeToken(token);
+        }
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+    return { id: "", name: "" };
+  };
+
+  const userDataa = getUserData();
 
   useEffect(() => {
-    setIsLoggedIn(!!userData.id); 
-    console.log(userData);
-    
-  }, [userData]);
+    setIsLoggedIn(!!userDataa.id); 
+    dispatch(getProfileThunk());
+    fetchComments(); // Load comments when component mounts
+  }, [userDataa, id]);
+
+  const fetchComments = async () => {
+    if (id) {
+      try {
+        const productComments = await getCommentProduct(id);
+        setComments(productComments);
+      } catch (error) {
+        console.error("Failed to fetch comments:", error);
+      }
+    }
+  };
 
   const handleRatingClick = (rate: number) => {
     setRating(rate);
@@ -74,25 +87,25 @@ const Comment = () => {
       setErrorMessage("You need to be logged in to submit a comment.");
       return;
     }
-
+    if (!id) {
+      setErrorMessage("Product ID is missing.");
+      return;
+    }
     const commentData = {
       content: data.content,
       rating: rating,
-      id_user: userData.id,
-      id_product: id
+      user: userDataa.id,
     };
 
     try {
-      const response = await axios.post("http://localhost:4000/api/product/comment", commentData);
-      console.log("Comment submitted:", response.data);
-      reset(); 
-      
-      setSuccessMessage("Comment submitted successfully!");
-      setErrorMessage(null); 
-      window.location.reload();  
+      const response = await addComment(id, commentData);
+      console.log("Comment submitted:", response);
+      setComments((prevComments) => [...prevComments, response.data]); 
+      notify(); 
+      reset();
     } catch (error) {
       console.error("Error submitting comment:", error);
-      setSuccessMessage(null); 
+      setSuccessMessage(null);
       setErrorMessage("Failed to submit comment.");
     }
   };
@@ -117,9 +130,10 @@ const Comment = () => {
             {errorMessage}
           </div>
         )}
-        {/* Load comments */}
         
-        {/* <Listcomment /> */}
+        {/*Listcomment */}
+        <Listcomment comments={comments} />
+
         {isLoggedIn ? (
           <form
             className="mt-6"
@@ -165,12 +179,10 @@ const Comment = () => {
         ) : (
           <div>
             <Link to="/login">
-            <button className="bg-blue-600 border border-blue-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-blue-600 transition">
+              <button className="bg-blue-600 border border-blue-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-blue-600 transition">
                 Đăng nhập để bình luận
               </button>
-          
             </Link>
-    
           </div>
         )}
       </div>
