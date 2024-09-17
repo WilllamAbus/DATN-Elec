@@ -49,7 +49,7 @@ const ProductDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist.items[0]
+    (state: RootState) => state.watchlist?.items[0]
   );
 
   const increaseQuantity = () => setQuantity(quantity + 1);

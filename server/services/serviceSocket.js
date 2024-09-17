@@ -30,7 +30,12 @@ class SocketService {
             bid: bidData
         });
     }
-
+    emitUpdateAmountBidding(productId, bidData) {
+        global._io.emit('update-bid', {
+            productId,
+            bid: bidData
+        });
+    }
     emitNotification(notificationData) {
         global._io.emit('notification', notificationData);
     }

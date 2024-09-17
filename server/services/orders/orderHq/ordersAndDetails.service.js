@@ -9,9 +9,7 @@ const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
 const InventoryOut = require("../../../model/inventories/invenOut.model");
-const { ObjectId } = require("mongodb"); // CommonJS
 
-const mongoose = require("mongoose");
 const orderAndDetailService = {
   createOrderWithDetails: async (userID, auctionDetails) => {
     try {
@@ -85,7 +83,7 @@ const orderAndDetailService = {
       const updatedProductQuantity = inven[0].quantityShelf - quantityDetails;
 
       const inventoryId = inven[0]._id;
-      const invenObjID = inven[0]._id;
+      // const invenObjID = inven[0]._id;
 
       const inventoriesShelf = inven[0].quantityShelf;
       const invetoryPrice = inven[0].price;
@@ -267,7 +265,8 @@ const orderAndDetailService = {
           await Interaction.create({
             user: order.shippingAddress.userID,
             orderAuctions: orderId,
-            productID: detail.productID, // Lưu thông tin sản phẩm vào productID
+            productID: detail.productID,
+            item: null, // Lưu thông tin sản phẩm vào productID
             type: "auctions",
             score: 5, // Có thể đặt điểm số chung cho tất cả các sản phẩm, hoặc tùy chỉnh nếu cần
             item: null, // Để trống cho các tương tác không liên quan đến sản phẩm cụ thể

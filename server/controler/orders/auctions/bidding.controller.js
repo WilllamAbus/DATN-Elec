@@ -5,14 +5,14 @@ const BiddingController = {
   createBid: async (req, res) => {
     try {
       // const {productId} = req.params;
-      const {productId, bidInput} = req.body; // Lấy bidInput từ req.body
+      const {productId,  bidAmount} = req.body; // Lấy bidInput từ req.body
       const userId = req.user.id; // Giả định rằng thông tin người dùng có trong req.user sau khi xác thực
-
+   
       // Gọi service để tạo đấu giá
       const newBid = await biddingService.createBid(
         productId,
         userId,
-        bidInput
+        bidAmount
       );
       SocketService.emitCreateBidding(productId, newBid);
 
@@ -29,14 +29,41 @@ const BiddingController = {
         .json({ message: `Không thể tạo lượt đấu giá: ${error.message}` });
     }
   },
+
+  updateBidAmountController : async (req, res) => {
+    try {
+     // Extract userId, productId, and bidAmount from request body
+        const {productId,  bidAmount} = req.body; // Lấy bidInput từ req.body
+        const userId = req.user.id;
+        // Call the service to update the bid amount
+        const updatedBid = await biddingService.updateBidAmountService(userId, 
+          productId, 
+          bidAmount);
+
+        if (!updatedBid) {
+            return res.status(400).json({ message: 'Unable to update bid amount. Product might not be an auction or bid is invalid.' });
+        }
+        SocketService.emitUpdateAmountBidding(productId, updatedBid);
+        return res.status(200).json({
+          success:true,
+          status:200,
+            message: 'Cập nhật giá của lượt đấu giá thành công.',
+            data: updatedBid
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+},
   getBidsByUser : async (req, res) => {
     try {
-        const userId = req.query.userId;
+        const userId = req.user.id;
+    
+        
         const result = await biddingService.getBidsByUser(userId);
 
         res.status(200).json( {
-success: true,
-          message: "Lượt đấu giá đã được xóa thành công.",
+          success: true,
+          message: "Lấy lượt đấu giá thành công.",
           data: result
         } );
     } catch (error) {

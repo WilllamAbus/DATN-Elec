@@ -5,7 +5,7 @@ const { Schema, model } = require("mongoose");
 
 const timeTrackSchema = new Schema(
   {
- 
+    productId :{type: Schema.Types.ObjectId , ref :'product_v2'},
     startTime: {
       type: Date,
       default: Date.now, // Optional: sets default to the current time if not provided
@@ -13,6 +13,8 @@ const timeTrackSchema = new Schema(
     endTime: {
       type: Date,
     },
+    endTimeBid :{ type: Date,},
+    stateTime: {type: String , enum:['Thời gian đang chạy',"Thời gian kết thúc" ]},
     status: { type: String, default: 'active' },
     disabledAt: { type: Date, default: null },
   },
