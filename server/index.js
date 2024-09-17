@@ -59,6 +59,7 @@ const io = socketIo(server, {
 
 global.__basedir = __dirname;
 global._io = io;
+SocketServices.setSocketIO(io);
 
 // Handle socket connections
 io.on("connection", (socket) => {
