@@ -101,7 +101,7 @@ const InventoryList: React.FC = () => {
 
   return (
     <>
-     <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="flex-1 flex items-center space-x-2">
           <h5>
             <span className="text-gray-500">Tổng có: </span>
@@ -204,10 +204,14 @@ const InventoryList: React.FC = () => {
                 "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800";
               let buttonDisabled = false;
               let quantityWarning = "";
+              let quantityStockWarning = "";
 
               if (quantityShelf <= 5) {
-                quantityWarning = "Cần nhập thêm hàng!";
-              } else if (quantityShelf >= 30) {
+                quantityWarning = "Cần nhập hàng lên kệ!";
+              } 
+              else if(quantityStock < 10){
+                quantityStockWarning = "Cần nhập thêm hàng!"
+              }else if (quantityShelf >= 30) {
                 buttonText = "Kệ đầy";
                 buttonClass =
                   "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-gray-400 rounded-lg cursor-not-allowed";
@@ -232,7 +236,11 @@ const InventoryList: React.FC = () => {
                     {product.product_name}
                   </td>
                   <td className="px-4 py-3">{supplier.name}</td>
-                  <td className="px-4 py-3">{quantityStock}</td>
+                  <td className="px-4 py-3">{quantityStock}
+                    {quantityStockWarning && (
+                      <p className="text-red-500 text-xs italic">{quantityStockWarning}</p>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {quantityShelf}
                     {quantityWarning && (
