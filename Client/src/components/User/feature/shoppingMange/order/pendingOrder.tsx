@@ -132,7 +132,14 @@ const PendingOrder: React.FC = () => {
                                         Số lượng: {item.quantity}
                                       </div>
                                       <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                        Giá: {item.price.toLocaleString()} đ
+                                        Giá:{" "}
+                                        {item.product.product_price_unit.toLocaleString(
+                                          "vi-VN",
+                                          {
+                                            style: "currency",
+                                            currency: "VND",
+                                          }
+                                        )}{" "}
                                       </div>
                                     </div>
                                   </div>

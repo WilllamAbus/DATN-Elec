@@ -114,8 +114,14 @@ const CancelOrders: React.FC = () => {
                                     Số lượng: {item.items[0].quantity}
                                   </div>
                                   <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Giá: {item.items[0].price.toLocaleString()}{" "}
-                                    đ
+                                    Giá:{" "}
+                                    {item.items[0].product.product_price_unit.toLocaleString(
+                                      "vi-VN",
+                                      {
+                                        style: "currency",
+                                        currency: "VND",
+                                      }
+                                    )}{" "}
                                   </div>
                                 </div>
                               </div>
