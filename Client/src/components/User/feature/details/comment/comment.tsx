@@ -62,10 +62,12 @@ const Comment = () => {
   const userDataa = getUserData();
 
   useEffect(() => {
-    setIsLoggedIn(!!userDataa.id); 
-    dispatch(getProfileThunk());
-    fetchComments(); // Load comments when component mounts
-  }, [userDataa, id]);
+    if (id) {  // Chỉ chạy khi id tồn tại
+      setIsLoggedIn(!!userDataa.id); 
+      dispatch(getProfileThunk());
+      fetchComments(); // Chỉ gọi hàm fetchComments khi id đã có giá trị
+    }
+  }, [id]); // Thay vì phụ thuộc vào userDataa, chỉ phụ thuộc vào idn
 
   const fetchComments = async () => {
     if (id) {
