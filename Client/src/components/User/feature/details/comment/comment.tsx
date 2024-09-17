@@ -1,5 +1,5 @@
 // Comment.tsx
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -32,7 +32,7 @@ const Comment = () => {
   const decodeToken = (token: string): DecodedToken => {
     try {
       const decoded: any = jwtDecode(token);
-      return {  
+      return {
         id: decoded.id || "",
         name: decoded.name || ""
       };
@@ -62,10 +62,12 @@ const Comment = () => {
   const userDataa = getUserData();
 
   useEffect(() => {
-    setIsLoggedIn(!!userDataa.id); 
-    dispatch(getProfileThunk());
-    fetchComments(); // Load comments when component mounts
-  }, [userDataa, id]);
+    if (id) {  // Chỉ chạy khi id tồn tại
+      setIsLoggedIn(!!userDataa.id);
+      dispatch(getProfileThunk());
+      fetchComments(); // Chỉ gọi hàm fetchComments khi id đã có giá trị
+    }
+  }, [id]); // Thay vì phụ thuộc vào userDataa, chỉ phụ thuộc vào idn
 
   const fetchComments = async () => {
     if (id) {
@@ -100,9 +102,12 @@ const Comment = () => {
     try {
       const response = await addComment(id, commentData);
       console.log("Comment submitted:", response);
-      setComments((prevComments) => [...prevComments, response.data]); 
-      notify(); 
+      setComments((prevComments) => [...prevComments, response.data]);
+      notify();
       reset();
+      setRating(0); // Reset lại rating về 0
+      setHover(0);  // Reset lại hover về 0
+      fetchComments();
     } catch (error) {
       console.error("Error submitting comment:", error);
       setSuccessMessage(null);
@@ -130,7 +135,7 @@ const Comment = () => {
             {errorMessage}
           </div>
         )}
-        
+
         {/*Listcomment */}
         <Listcomment comments={comments} />
 
@@ -163,11 +168,10 @@ const Comment = () => {
                 return (
                   <p
                     key={index}
-                    className={`fa fa-star ${
-                      index <= (hover || rating)
+                    className={`fa fa-star ${index <= (hover || rating)
                         ? "text-yellow-400"
                         : "text-gray-400"
-                    }`}
+                      }`}
                     onClick={() => handleRatingClick(index)}
                     onMouseEnter={() => setHover(index)}
                     onMouseLeave={() => setHover(rating)}
