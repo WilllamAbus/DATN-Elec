@@ -170,7 +170,6 @@ const AddProduct: React.FC = () => {
                         setSelectedStorage,
                         handleAttributesChange
                       );
-                      // Cập nhật giá trị của toggle switch
                       field.onChange(checked);
                     }}
                     label="Có thuộc tính biến thể"

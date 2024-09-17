@@ -1,10 +1,11 @@
 
 const express = require('express');
 const router = express.Router();
-const { homeAllProduct,listPageAuction, getID, getLimitProductClient,shopping,auction,upView,search } = require('../../../controler/client');
+const { homeAllProduct,listPageAuction,resetFilter, getID, getLimitProductClient,shopping,auction,upView,search } = require('../../../controler/client');
 const { getProductsByCategory } = require('../../../controler/client');
 router.get('/homeAllProduct', homeAllProduct);
 router.get('/auction-product', listPageAuction);
+router.get('/reset-filter', resetFilter);
 router.get('/getLimitProductClient', getLimitProductClient);
 router.get('/:id', getID);
 router.get('/category/:categoryId', getProductsByCategory);

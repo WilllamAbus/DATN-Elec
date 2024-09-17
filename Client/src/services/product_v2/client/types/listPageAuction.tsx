@@ -6,6 +6,15 @@ interface ProductDiscountClient {
   status: string;
   disabledAt: string | null;
 }
+export interface ProductBrand {
+  _id: string;
+  name: string;
+}
+export interface ProductCondition {
+  _id: string;
+  nameCondition: string;
+}
+
 
 export interface products {
   _id: string;
@@ -17,9 +26,9 @@ export interface products {
   view: number;
   product_ratingAvg: number;
   product_supplier: string;
-  product_brand: string;
+  product_brand: ProductBrand; 
   product_format: string;
-  product_condition: string;
+  product_condition: ProductCondition;
   product_quantity: number;
   product_price: number;
   product_attributes: { k: string; v: string }[];
@@ -43,6 +52,20 @@ export interface LimitPageAuctionProductResponse {
   data: {
     total: number;
     products: products[];
+    brand: ProductBrand[];  
+    conditionShopping: ProductCondition[];  
   };
   pagination: Pagination;
 }
+
+export interface FilterState {
+  _sort: string;
+  brand?: ProductBrand[];
+  conditionShopping?: ProductCondition[];
+  minPrice?: number;
+  maxPrice?: number;
+  minDiscountPercent?: number;
+  maxDiscountPercent?: number;
+  [key: string]: string | number | ProductBrand[] | ProductCondition[] | undefined; 
+}
+

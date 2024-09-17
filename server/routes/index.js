@@ -9,7 +9,7 @@ const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
 const clientSidebarAuction = require("./client/sidebar/auction");
-const clientCategỏy = require("./client/category");
+const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
 
@@ -44,7 +44,7 @@ const routes = (app) => {
   app.use("/api/admin/randBid", randBidRouter);
   app.use("/api/client/bidding", biddingRouter);
   app.use("/api/client/auctions", auctionsRouter);
-  app.use("/api/client/category", clientCategỏy);
+  app.use("/api/client/category", clientCategory);
   app.use("/api/client/orderAuc", orderAucRouter);
   app.use("/api/client/orderDetailAuc", orderDetailAuction);
   app.use("/api/client/customer-service", customerServiceRouter);

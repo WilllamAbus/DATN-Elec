@@ -17,7 +17,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
       className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
     >
       <div className="backdrop-blur-sm bg-white/30">
-        <Link to={`/detailProd/${product._id}`}>
+        <Link to={`/detailAuc/${product._id}`}>
           <figure className="relative w-full h-0 pb-[75%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
             <img
               className="absolute inset-0 w-full h-full object-cover rounded-lg"

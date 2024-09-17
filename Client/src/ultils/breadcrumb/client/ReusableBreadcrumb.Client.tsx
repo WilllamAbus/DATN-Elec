@@ -39,7 +39,7 @@ const ReusableBreadcrumbClient = ({ items }: ReusableBreadcrumbProps) => {
       >
         <Breadcrumb
           aria-label="Solid background breadcrumb example"
-          className="bg-primary-900 px-6 py-1 dark:bg-gray-800"
+          className="bg-white px-6 py-1 dark:bg-gray-800"
         >
           {items.map((item, index) => (
             <ReusableBreadcrumbItemClient key={index} href={item.href}>
