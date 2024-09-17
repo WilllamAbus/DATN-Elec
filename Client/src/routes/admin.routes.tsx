@@ -68,6 +68,9 @@ const AdminListBuyingFormat = React.lazy(
 const AdminListComments = React.lazy(
   () => import("../page/Admin/comments/listComments")
 );
+const AdminListDetailComments = React.lazy(
+  () => import("../page/Admin/comments/listDetailComments")
+);
 
 /**ConditionAuc */
 const AdminConditionAuc = React.lazy(
@@ -165,6 +168,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
       { path: "listComments", element: <AdminListComments /> },
+      { path: "listDetailComments/:id", element: <AdminListDetailComments/> },
       { path: "addConditon", element: <AdminConditionAuc /> },
       { path: "editCondition", element: <AdminEditConditionAuc /> },
       { path: "listCondition", element: <AdminListCondAuc /> },

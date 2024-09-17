@@ -33,7 +33,7 @@ const search: React.FC = () => {
         <h1 className="text-center text-3xl m-3">Sản phẩm có từ khóa: {keyword}</h1>
         {/* <!-- products --> */}
           {(keyword ?? "").length > 0 && (
-            <div className="grid md:grid-cols-6 gap-2 ">
+            <div className="grid md:grid-cols-5 gap-2 m-3 ">
               {products.length > 0 ? (
                 products.map((product, index) => (
                   <div

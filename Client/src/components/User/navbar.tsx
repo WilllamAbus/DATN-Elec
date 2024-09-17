@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "flowbite";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "../../ultils/dropdown/client/nav/dropdown.LogoUser.nav";
 import UserMenuDropdown from "../../ultils/dropdown/client/nav/toggleDropdown";
 import { listCateNavItemThunk } from "../../redux/clientcate/client/Thunk/";
@@ -11,8 +11,8 @@ import { searchProduct } from "../../services/product_v2/client/homeAllProduct";
 
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const [keyword, setKeyword] = useState<string>(""); 
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]); 
+  const [keyword, setKeyword] = useState<string>("");
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
         setFilteredProducts([]);
         return;
       }
-  
+
       const result = await searchProduct(keyword);
       const filteredProducts = result.data.filter((product: any) => {
         return (
@@ -36,19 +36,17 @@ const Navbar: React.FC = () => {
           product.product_name.toLowerCase().includes(keyword.toLowerCase())
         );
       });
-  
+
       setFilteredProducts(filteredProducts);
     } catch (error) {
       console.error("Error fetching search results:", error);
     }
   };
-  
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setKeyword(value); 
+    setKeyword(value);
     dataSearch(value);
-   
   };
   const handleSubmit = () => {
     const trimmedKeyword = keyword.trim();
@@ -101,10 +99,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <form
-            className="hidden lg:block lg:pl-3.5"
-            onSubmit={handleSubmit}
-          >
+          <form className="hidden lg:block lg:pl-3.5" onSubmit={handleSubmit}>
             <label htmlFor="topbar-search" className="sr-only">
               Search
             </label>
@@ -136,19 +131,24 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Render filtered products */}
-            {filteredProducts.length > 0 && (
+            {filteredProducts.length > 0 ? (
   <div className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
     {filteredProducts.map((result) => (
       <div
         key={result.id}
-        onClick={() => window.location.href=(`/search/${encodeURIComponent(result.product_name)}`)} // Điều hướng tới trang sản phẩm
+        onClick={() =>
+          (window.location.href = `/search/${encodeURIComponent(
+            result.product_name
+          )}`)
+        } // Điều hướng tới trang sản phẩm
         className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
       >
         {result.product_name}
       </div>
     ))}
   </div>
-)}
+) : null}
+
           </form>
 
           <div className="flex justify-between items-center lg:order-2">

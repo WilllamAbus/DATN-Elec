@@ -592,7 +592,7 @@ const ProductDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist.items[0]
+    (state: RootState) => state.watchlist
   );
 
   const increaseQuantity = () => setQuantity(quantity + 1);
@@ -611,7 +611,9 @@ const ProductDetail: React.FC = () => {
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
-
+        await upViewProduct(id);
+        const updatedProduct = await getProductByID(id);
+        setProduct(updatedProduct);
         // Lấy danh sách yêu thích của người dùng
         const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
         const isFavoriteProduct = watchlistResponse.some(
@@ -704,20 +706,20 @@ const ProductDetail: React.FC = () => {
         console.log("Không có ID sản phẩm nào được cung cấp");
         return;
       }
-      await upViewProduct(id);
-      const updatedProduct = await getProductByID(id);
-      setProduct(updatedProduct);
       try {
         console.log("Fetching product with ID:", id);
         const productID = await getProductByID(id); 
         setProduct(productID.product);
         console.log(productID.product);
-
+   
+        // await upViewProduct(id);
+        // const updatedProduct = await getProductByID(id);
+        // setProduct(updatedProduct);
         // if (productID.image[0]) {
         //   const url = await getFileFirebase(productID.image);
         //   setImgPreview(url);
         // }
-       
+      
 
         // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
         if (Array.isArray(watchlistItems)) {
