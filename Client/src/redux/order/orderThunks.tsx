@@ -27,19 +27,25 @@ export const createOrderThunk = createAsyncThunk<
   }
 });
 
-// Lấy danh sách đơn hàng
 export const listOrderThunk = createAsyncThunk<
-  { orders: Order[] },
-  void,
-  { rejectValue: string }
->("order/listOrder", async (_, { rejectWithValue }) => {
+  { orders: Order[] }, // Kết quả trả về
+  void, // Không có tham số đầu vào
+  { rejectValue: string } // Giá trị trả về khi lỗi
+>("admin/order/listOrder", async (_, { rejectWithValue }) => {
   try {
-    const { data } = await listOrder();
-    return { orders: data };
+    const response = await listOrder();
+
+    // Kiểm tra cấu trúc dữ liệu trả về
+    if (!response || !response.orders || !Array.isArray(response.orders)) {
+      throw new Error("Invalid data format");
+    }
+
+    return { orders: response.orders }; // Trả về đúng kiểu dữ liệu
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }
 });
+
 export const fetchUserOrdersThunk = createAsyncThunk<
   { orders: Order[] }, // Kết quả trả về
   void, // Không có tham số đầu vào

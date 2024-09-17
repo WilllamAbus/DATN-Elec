@@ -8,44 +8,54 @@ import {
 import { Order } from "../../../../../types/order/order";
 import { Link, useNavigate } from "react-router-dom";
 import DetailOrder from "./detailOrders/detail";
+
 const PendingOrder: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { orders, status, error } = useSelector(
     (state: RootState) => state.order
   );
   const [showAll, setShowAll] = useState(false);
+  const [localOrders, setLocalOrders] = useState<Order[]>([]);
   const navigate = useNavigate();
-  const toggleShowAll = () => {
-    setShowAll(!showAll);
-  };
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
   useEffect(() => {
     dispatch(pendingOrdersThunk());
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("Orders:", orders);
-    console.log("Status:", status);
-    console.log("Error:", error);
-  }, [orders, status, error]);
+    setLocalOrders(orders);
+  }, [orders]);
 
-  const handleCancelOrder = (orderId: string) => {
-    dispatch(cancelOrderThunk({ orderId }));
+  const toggleShowAll = () => {
+    setShowAll(!showAll);
   };
+
+  // Xử lý hủy đơn hàng
+  const handleCancelOrder = async (orderId: string) => {
+    const resultAction = await dispatch(cancelOrderThunk({ orderId }));
+    if (cancelOrderThunk.fulfilled.match(resultAction)) {
+      setLocalOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
+    }
+  };
+
   const handleRepurchase = (productId: string) => {
     navigate(`/detailProd/${productId}`);
   };
+
   const handleViewOrderDetail = (orderId: string) => {
-    const order = orders.find((order) => order._id === orderId);
+    const order = localOrders.find((order) => order._id === orderId);
     setSelectedOrder(order || null);
   };
 
   const handleBackToList = () => {
-    setSelectedOrder(null); // Reset trạng thái khi quay lại danh sách đơn hàng
+    setSelectedOrder(null);
   };
+
   return (
     <div className="mt-7 border border-gray-300 pt-9">
-      {/* Kiểm tra trạng thái và hiển thị thông báo */}
       {selectedOrder ? (
         <DetailOrder order={selectedOrder} onBack={handleBackToList} />
       ) : (
@@ -60,8 +70,8 @@ const PendingOrder: React.FC = () => {
               {error || "Có lỗi xảy ra khi tải đơn hàng."}
             </p>
           )}
-          {status === "succeeded" && orders && orders.length > 0 ? (
-            orders.map((order: Order) => (
+          {status === "succeeded" && localOrders && localOrders.length > 0 ? (
+            localOrders.map((order: Order) => (
               <div key={order._id} className="order-item">
                 {/* Thông tin đơn hàng */}
                 <div className="flex flex-col md:flex-row items-center justify-between px-3 md:px-11 mb-6">
@@ -74,23 +84,12 @@ const PendingOrder: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    {order.stateOrder === "Hủy đơn hàng" ? (
-                      <button
-                        onClick={() =>
-                          handleRepurchase(order.cartDetails[0].product._id)
-                        }
-                        className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700"
-                      >
-                        Mua lại
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleCancelOrder(order._id!)}
-                        className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
-                      >
-                        Hủy đơn hàng
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleCancelOrder(order._id!)}
+                      className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
+                    >
+                      Hủy đơn hàng
+                    </button>
                   </div>
                 </div>
 
@@ -102,39 +101,48 @@ const PendingOrder: React.FC = () => {
                         <div className="relative h-auto">
                           {order.cartDetails
                             .slice(0, showAll ? order.cartDetails.length : 2)
-                            .map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex flex-col items-center gap-4 sm:flex-row mb-4"
-                              >
-                                {item.product.image &&
-                                  item.product.image.length > 0 && (
-                                    <Link to="">
-                                      <img
-                                        onClick={() =>
-                                          handleRepurchase(
-                                            order.cartDetails[0].product._id
-                                          )
-                                        }
-                                        src={item.product.image[0]}
-                                        alt={`Product Image ${index + 1}`}
-                                        className="w-24 h-24 object-cover sm:w-32 sm:h-32"
-                                      />
-                                    </Link>
-                                  )}
-                                <div className="flex flex-col justify-center sm:ml-4">
-                                  <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
-                                    {item.product.product_name}
-                                  </h6>
-                                  <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Số lượng: {item.quantity}
+                            .map((cartDetail, index) =>
+                              cartDetail.items &&
+                              cartDetail.items.length > 0 ? (
+                                cartDetail.items.map((item) => (
+                                  <div
+                                    key={index}
+                                    className="flex flex-col items-center gap-4 sm:flex-row mb-4"
+                                  >
+                                    {item.product.image &&
+                                      item.product.image.length > 0 && (
+                                        <Link
+                                          to={`/detailProd/${item.product._id}`}
+                                        >
+                                          <img
+                                            src={item.product.image[0]}
+                                            onClick={() =>
+                                              handleRepurchase(item.product._id)
+                                            }
+                                            alt={`Hình ảnh sản phẩm ${item.product.product_name}`}
+                                            className="w-24 h-24 object-cover sm:w-32 sm:h-32 cursor-pointer"
+                                          />
+                                        </Link>
+                                      )}
+                                    <div className="flex flex-col justify-center sm:ml-4">
+                                      <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
+                                        {item.product.product_name}
+                                      </h6>
+                                      <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
+                                        Số lượng: {item.quantity}
+                                      </div>
+                                      <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
+                                        Giá: {item.price.toLocaleString()} đ
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Giá: {item.price.toLocaleString()} đ
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                                ))
+                              ) : (
+                                <p className="text-red-500">
+                                  Không có sản phẩm trong đơn hàng.
+                                </p>
+                              )
+                            )}
                           {order.cartDetails.length > 2 && (
                             <button
                               onClick={toggleShowAll}
@@ -168,12 +176,9 @@ const PendingOrder: React.FC = () => {
               </div>
             ))
           ) : (
-            <a
-              href="/"
-              className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
-            >
+            <button className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700">
               Tiếp tục mua sắm
-            </a>
+            </button>
           )}
         </>
       )}

@@ -21,7 +21,9 @@ export const createOrder = async (orderData: Order) => {
 };
 export const listOrder = async () => {
   try {
-    const response = await instance.get(`${API_URL}/order/listOrder`);
+    const response = await instance.get(`${API_URL}/admin/order/listOrder`);
+    console.log(response);
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

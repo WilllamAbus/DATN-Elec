@@ -1,6 +1,7 @@
 import axios from "axios";
 import instance from "../axios";
 import Cookies from "js-cookie";
+import { UserProfile } from "../../types/user";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const registerUser = async (user: {
@@ -22,33 +23,62 @@ export const registerUser = async (user: {
   }
 };
 
-export const loginUser = async (user: { email: string; password: string }) => {
-  try {
-    const response = await instance.post(`${API_URL}/auth/login`, user);
-    // console.log("API Response:", response.data);
+// export const loginUser = async (user: { email: string; password: string }) => {
+//   try {
+//     const response = await instance.post(`${API_URL}/auth/login`, user);
+//     // console.log("API Response:", response.data);
 
-    const { accessToken } = response.data;
+//     const { accessToken } = response.data;
+
+//     // Lưu token vào cookie
+//     Cookies.set("token", accessToken, {
+//       path: "/",
+//       expires: 7,
+//       secure: true,
+//       sameSite: "strict",
+//     });
+
+//     return {
+//       status: response.status,
+//       message: response.data.message,
+//       token: accessToken,
+//     };
+//   } catch (error: any) {
+//     console.error("Login error:", error);
+//     return {
+//       status: error.response?.status || 500,
+//       message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.",
+//     };
+//   }
+// };
+export const loginUser = async (user: {
+  email: string;
+  password: string;
+}): Promise<UserProfile | { status: number; message: string }> => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/login`, user);
+
+    // Giả sử rằng phản hồi API trả về một đối tượng UserProfile
+    const userProfile: UserProfile = response.data;
 
     // Lưu token vào cookie
-    Cookies.set("token", accessToken, {
+    Cookies.set("token", userProfile.accessToken, {
       path: "/",
       expires: 7,
       secure: true,
       sameSite: "strict",
     });
 
-    // Lưu trữ thông tin vào localStorage
-    // localStorage.setItem("roles", roles?.[0]?.name || "");
-    // localStorage.setItem("name", name || "");
-    // localStorage.setItem("userProfile", JSON.stringify({ name, roles, email }));
-
+    // Trả về toàn bộ đối tượng UserProfile
     return {
+      ...userProfile,
       status: response.status,
-      message: response.data.message,
-      token: accessToken,
+      message: userProfile.message || "Đăng nhập thành công!",
     };
   } catch (error: any) {
     console.error("Login error:", error);
+
+    // Trả về thông tin lỗi nếu có
     return {
       status: error.response?.status || 500,
       message: error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.",
@@ -58,15 +88,15 @@ export const loginUser = async (user: { email: string; password: string }) => {
 export const getProfile = async () => {
   try {
     const response = await instance.get(`/auth/profile`);
-    // console.log("Profile data:", response.data);
     return response.data;
-  } catch (error: unknown) {
-    const err = error as Error; // Type assertion
-    console.error("Error fetching profile:", err.message);
-    throw new Error("Failed to fetch profile: " + err.message);
+  } catch (error: any) {
+    // Trả về thông tin lỗi nếu có
+    return {
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || "Đã xảy ra lỗi .",
+    };
   }
 };
-
 export const getList = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found");

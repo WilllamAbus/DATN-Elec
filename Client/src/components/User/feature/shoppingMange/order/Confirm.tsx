@@ -77,7 +77,9 @@ const ConfirmOrders: React.FC = () => {
                     {order.stateOrder === "Hủy đơn hàng" ? (
                       <button
                         onClick={() =>
-                          handleRepurchase(order.cartDetails[0].product._id)
+                          handleRepurchase(
+                            order.cartDetails[0].items[0].product._id
+                          )
                         }
                         className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700"
                       >
@@ -102,39 +104,48 @@ const ConfirmOrders: React.FC = () => {
                         <div className="relative h-auto">
                           {order.cartDetails
                             .slice(0, showAll ? order.cartDetails.length : 2)
-                            .map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex flex-col items-center gap-4 sm:flex-row mb-4"
-                              >
-                                {item.product.image &&
-                                  item.product.image.length > 0 && (
-                                    <Link to="">
-                                      <img
-                                        onClick={() =>
-                                          handleRepurchase(
-                                            order.cartDetails[0].product._id
-                                          )
-                                        }
-                                        src={item.product.image[0]}
-                                        alt={`Product Image ${index + 1}`}
-                                        className="w-24 h-24 object-cover sm:w-32 sm:h-32"
-                                      />
-                                    </Link>
-                                  )}
-                                <div className="flex flex-col justify-center sm:ml-4">
-                                  <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
-                                    {item.product.product_name}
-                                  </h6>
-                                  <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Số lượng: {item.quantity}
+                            .map((cartDetail, index) =>
+                              cartDetail.items &&
+                              cartDetail.items.length > 0 ? (
+                                cartDetail.items.map((item) => (
+                                  <div
+                                    key={index}
+                                    className="flex flex-col items-center gap-4 sm:flex-row mb-4"
+                                  >
+                                    {item.product.image &&
+                                      item.product.image.length > 0 && (
+                                        <Link
+                                          to={`/detailProd/${item.product._id}`}
+                                        >
+                                          <img
+                                            src={item.product.image[0]} // Hiển thị hình ảnh đầu tiên từ danh sách hình ảnh
+                                            onClick={() =>
+                                              handleRepurchase(item.product._id)
+                                            }
+                                            alt={`Hình ảnh sản phẩm ${item.product.product_name}`}
+                                            className="w-24 h-24 object-cover sm:w-32 sm:h-32 cursor-pointer"
+                                          />
+                                        </Link>
+                                      )}
+                                    <div className="flex flex-col justify-center sm:ml-4">
+                                      <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
+                                        {item.product.product_name}
+                                      </h6>
+                                      <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
+                                        Số lượng: {item.quantity}
+                                      </div>
+                                      <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
+                                        Giá: {item.price.toLocaleString()} đ
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Giá: {item.price.toLocaleString()} đ
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                                ))
+                              ) : (
+                                <p className="text-red-500">
+                                  Không có sản phẩm trong đơn hàng.
+                                </p>
+                              )
+                            )}
                           {order.cartDetails.length > 2 && (
                             <button
                               onClick={toggleShowAll}

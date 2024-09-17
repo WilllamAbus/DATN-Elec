@@ -12,11 +12,24 @@ import {
   getCancelOrdersThunk,
   getOrderByIdThunk,
 } from "./orderThunks";
+import {
+  getOrderDetailByIdThunk,
+  getAllOrderDetailsThunk,
+  updateOrderDetailByIdThunk,
+  deleteOrderDetailByIdThunk,
+  getAllOUserOrderdetailsThunk,
+} from "./orderDetail";
+import {
+  cancelOrderAdminThunk,
+  updateStatusByIdThunk,
+} from "./Admin/orderAdmin";
 import { Order } from "../../types/order/order";
 
 interface OrderState {
   selectedOrder: Order | null;
   orders: Order[];
+  items: any[];
+
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -24,6 +37,8 @@ interface OrderState {
 const initialState: OrderState = {
   selectedOrder: null,
   orders: [],
+  items: [],
+
   status: "idle",
   error: null,
 };
@@ -179,7 +194,7 @@ const orderSlice = createSlice({
         cancelOrderThunk.fulfilled,
         (state, action: PayloadAction<Order>) => {
           state.status = "succeeded";
-          // Cập nhật trạng thái đơn hàng trong danh sách đơn hàng
+
           const index = state.orders.findIndex(
             (order) => order._id === action.payload._id
           );
@@ -193,6 +208,51 @@ const orderSlice = createSlice({
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
       })
+
+      .addCase(cancelOrderAdminThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        cancelOrderAdminThunk.fulfilled,
+        (state, action: PayloadAction<Order>) => {
+          state.status = "succeeded";
+
+          const index = state.orders.findIndex(
+            (order) => order._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.orders[index] = action.payload;
+          }
+          state.error = null;
+        }
+      )
+      .addCase(cancelOrderAdminThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
+      .addCase(updateStatusByIdThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateStatusByIdThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Cập nhật trạng thái của đơn hàng trong danh sách
+        if (Array.isArray(state.orders)) {
+          const existingOrder = state.orders.find(
+            (order) => order._id === action.payload._id
+          );
+          if (existingOrder) {
+            existingOrder.stateOrder = action.payload.stateOrder;
+          }
+        }
+      })
+
+      .addCase(updateStatusByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+
       .addCase(getOrderByIdThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -208,6 +268,101 @@ const orderSlice = createSlice({
       .addCase(getOrderByIdThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Something went wrong";
+      })
+      // Xử lý chi tiết đơn hàng theo ID
+      .addCase(getOrderDetailByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getOrderDetailByIdThunk.fulfilled,
+        (state, action: PayloadAction<{ order: Order[]; items: any[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.order; // Cập nhật với order
+          state.items = action.payload.items;
+        }
+      )
+      .addCase(getOrderDetailByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string; // Error message from thunk
+      })
+      // Handle getAllOrderDetailsThunk
+      .addCase(getAllOrderDetailsThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getAllOrderDetailsThunk.fulfilled,
+        (state, action: PayloadAction<{ orderDetails: Order[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.orderDetails;
+          state.error = null;
+        }
+      )
+      .addCase(getAllOrderDetailsThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
+      // Handle getAllOUserOrderdetailsThunk
+      .addCase(getAllOUserOrderdetailsThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getAllOUserOrderdetailsThunk.fulfilled,
+        (state, action: PayloadAction<{ orderDetails: Order[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.orderDetails;
+          state.error = null;
+        }
+      )
+      .addCase(getAllOUserOrderdetailsThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
+      // Handle updateOrderDetailByIdThunk
+      .addCase(updateOrderDetailByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        updateOrderDetailByIdThunk.fulfilled,
+        (state, action: PayloadAction<{ orderDetail: Order }>) => {
+          state.status = "succeeded";
+          const index = state.orders.findIndex(
+            (order) => order._id === action.payload.orderDetail._id
+          );
+          if (index !== -1) {
+            state.orders[index] = action.payload.orderDetail;
+          }
+          state.error = null;
+        }
+      )
+      .addCase(updateOrderDetailByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
+      // Handle deleteOrderDetailByIdThunk
+      .addCase(deleteOrderDetailByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        deleteOrderDetailByIdThunk.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.status = "succeeded";
+          state.orders = state.orders.filter(
+            (order) => order._id !== action.payload
+          );
+          state.error = null;
+        }
+      )
+      .addCase(deleteOrderDetailByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
       });
   },
 });

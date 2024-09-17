@@ -49,7 +49,7 @@ exports.sendMail = async (userEmail, orderDetails) => {
       from: "haotri335@gmail.com",
       to: `${userEmail}`,
       subject: "XÁC NHẬN THANH TOÁN",
-    html: `
+      html: `
   <body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
 
 
@@ -151,12 +151,12 @@ For what reason would it be advisable for me to think about business content? Th
                                     </td>
                                     <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                           ${orderDetails.totalPrice.toLocaleString(
-                                       "vi-VN",
-                                       {
-                                         style: "currency",
-                                         currency: "VND",
-                                       }
-                                     )}
+                                            "vi-VN",
+                                            {
+                                              style: "currency",
+                                              currency: "VND",
+                                            }
+                                          )}
                                     </td>
                                 </tr>
 
@@ -222,19 +222,16 @@ For what reason would it be advisable for me to think about business content? Th
       if (error) {
         return console.log(error);
       }
-    //   console.log("Email sent: " + info.response);
+      //   console.log("Email sent: " + info.response);
     });
   } catch (error) {
     console.error("Error sending email:", error);
   }
 };
 
-
-
 // <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-                                           
-// </td>
 
+// </td>
 
 // <tr>
 // <td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
@@ -247,14 +244,12 @@ For what reason would it be advisable for me to think about business content? Th
 //                     <tr>
 //                         <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
 //                             <p style="font-weight: 800;">Địa chỉ giao đến</p>
-                         
-
 
 //                         </td>
 //                     </tr>
 //                 </table>
 //             </div>
-      
+
 //         </td>
 //     </tr>
 // </table>

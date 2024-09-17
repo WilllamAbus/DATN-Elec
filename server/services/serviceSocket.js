@@ -1,5 +1,9 @@
 class SocketService {
 
+     // Để lưu trữ đối tượng io toàn cục
+     setSocketIO(io) {
+        global._io = io;
+    }
     // connection socket
     connection(socket) {
         console.log(`New user connected: ${socket.id}`);
@@ -38,6 +42,16 @@ class SocketService {
     }
     emitNotification(notificationData) {
         global._io.emit('notification', notificationData);
+    }
+
+      // Phát sự kiện cảnh báo tồn kho thấp
+      emitInventory(productId, productName, quantityStock) {
+        global._io.emit('inventoryWarning', {
+            productId,
+            productName,
+            quantityStock,
+            message: `Sản phẩm ${productName} có số lượng tồn kho thấp: ${quantityStock}.`
+        });
     }
 
     

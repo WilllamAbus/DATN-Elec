@@ -43,19 +43,6 @@ const ProfileUse: React.FC = () => {
     dispatch(getProfileThunk());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (profileStatus === "succeeded" && profile) {
-  //     const profileData = {
-  //       name: profile.name || "",
-  //       address: profile.address || "",
-  //       phone: profile.phone || "",
-  //       roles: profile.roles || [],
-  //       birthday: profile.birthday || "",
-  //     };
-  //     localStorage.setItem("userProfile", JSON.stringify(profileData));
-  //   }
-  // }, [profile, profileStatus]);
-
   if (profileStatus === "loading") {
     return <p>Loading...</p>;
   }
@@ -69,9 +56,8 @@ const ProfileUse: React.FC = () => {
 
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-      localStorage.removeItem("userProfile");
 
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error logging out:", error);
     }

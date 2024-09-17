@@ -84,33 +84,38 @@ const CompletedOrders: React.FC = () => {
                             .slice(0, showAll ? order.cartDetails.length : 2)
                             .map((item, index) => (
                               <div
-                                key={index}
+                                key={item.items[0].product._id}
                                 className="flex flex-col items-center gap-4 sm:flex-row mb-4"
                               >
-                                {item.product.image &&
-                                  item.product.image.length > 0 && (
-                                    <Link to="">
+                                {item.items[0].product.image &&
+                                  item.items[0].product.image.length > 0 && (
+                                    <Link
+                                      to={`/detailProd/${item.items[0].product._id}`}
+                                    >
                                       <img
+                                        src={item.items[0].product.image[0]} // Hiển thị hình ảnh đầu tiên từ danh sách hình ảnh
                                         onClick={() =>
                                           handleRepurchase(
-                                            order.cartDetails[0].product._id
+                                            item.items[0].product._id
                                           )
                                         }
-                                        src={item.product.image[0]}
-                                        alt={`Product Image ${index + 1}`}
-                                        className="w-24 h-24 object-cover sm:w-32 sm:h-32"
+                                        alt={`Hình ảnh sản phẩm ${
+                                          item.items[0].product.product_name
+                                        } ${index + 1}`}
+                                        className="w-24 h-24 object-cover sm:w-32 sm:h-32 cursor-pointer"
                                       />
                                     </Link>
                                   )}
                                 <div className="flex flex-col justify-center sm:ml-4">
                                   <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
-                                    {item.product.product_name}
+                                    {item.items[0].product.product_name}
                                   </h6>
                                   <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Số lượng: {item.quantity}
+                                    Số lượng: {item.items[0].quantity}
                                   </div>
                                   <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                    Giá: {item.price.toLocaleString()} đ
+                                    Giá: {item.items[0].price.toLocaleString()}{" "}
+                                    đ
                                   </div>
                                 </div>
                               </div>

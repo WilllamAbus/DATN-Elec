@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "../../../../redux/store";
-import { logoutThunk, getProfileThunk } from "../../../../redux/auth/authThunk";
+import { logoutThunk } from "../../../../redux/auth/authThunk";
+import { getProfileThunk } from "../../../../redux/auth/authThunk"; // Nhập thunk lấy thông tin người dùng
 import Cookies from "js-cookie";
 
 const UserMenuDropdown: React.FC = () => {
@@ -10,37 +11,36 @@ const UserMenuDropdown: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(getProfileThunk());
-  }, [dispatch]);
-
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
   };
 
+  // Lấy thông tin người dùng và trạng thái xác thực từ Redux store
+  const profile = useSelector((state: RootState) => state.auth.profile.profile);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.login.isAuthenticated
+  );
+
+  const isAdmin = profile?.roles?.includes("admin");
+
+  // Kiểm tra xem người dùng có đăng nhập hay không
+  const isLoggedIn =
+    isAuthenticated && profile !== null && profile !== undefined;
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getProfileThunk());
+    }
+  }, [dispatch, isAuthenticated]);
   const handleLogout = async () => {
     try {
       await dispatch(logoutThunk()).unwrap();
-
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-
-  const user = useSelector((state: RootState) => state.auth.profile);
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.login.isAuthenticated
-  );
-
-  const isAdmin = user?.roles?.includes("admin");
-  const avatar = user?.profile?.avatar;
-
-  const isLoggedIn = isAuthenticated && user !== null && user !== undefined;
-
   return (
     <div className="relative">
       {isLoggedIn ? (
@@ -56,7 +56,7 @@ const UserMenuDropdown: React.FC = () => {
             <img
               className="w-8 h-8 rounded-full"
               src={
-                avatar ||
+                profile.avatar ||
                 "https://cdn-icons-png.flaticon.com/128/149/149071.png"
               }
               alt="User photo"

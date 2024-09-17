@@ -1,10 +1,24 @@
-const { Schema, model } = require("mongoose");
-const orderItem = require("./orderItem");
-
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Product = require("../../product-v2.model");
 const orderDetailSchema = new Schema(
   {
     order: { type: Schema.Types.ObjectId, ref: "OrderCart", required: true },
-    items: [orderItem],
+    items: [
+      {
+        product: {
+          type: Schema.Types.ObjectId,
+          ref: "product_v2",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        // totalItemPrice: { type: Number, required: true },
+      },
+    ],
+    // quantity: { type: Number, required: true },
+    // price: { type: Number, required: true },
+    totalItemPrice: { type: Number, required: true },
   },
   {
     collection: "OrderDetail",
@@ -12,4 +26,4 @@ const orderDetailSchema = new Schema(
   }
 );
 
-module.exports = model("OrderDetail", orderDetailSchema);
+module.exports = mongoose.model("OrderDetail", orderDetailSchema);

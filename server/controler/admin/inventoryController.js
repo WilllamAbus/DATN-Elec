@@ -3,6 +3,7 @@ const modelInbound = require("../../model/inboundShipments.model");
 const modelProduct = require("../../model/product_v2");
 const modelSupplier = require("../../model/suppliers.model");
 const modelInventory = require("../../model/inventory/inventory.model");
+const { checkInventoryAndNotify } = require('../../services/inventoryChecker');
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccount.json");
@@ -206,7 +207,16 @@ const inventoryController = {
                 error: error.message,
             });
         }
-    }
+    },
+    checkInventory: async (req, res) => {
+        try {
+          await checkInventoryAndNotify();  // Gọi hàm từ service
+          res.status(200).json({ message: 'Đã kiểm tra tồn kho và gửi cảnh báo nếu cần.' });
+        } catch (error) {
+          console.error('Lỗi từ controller:', error);
+          res.status(500).json({ message: 'Lỗi khi kiểm tra tồn kho.' });
+        }
+      },
 
 };
 

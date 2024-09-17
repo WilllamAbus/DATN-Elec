@@ -277,7 +277,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -364,6 +363,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
       <h4 className="text-lg font-semibold text-gray-800 capitalize mb-6">
         Cập Nhật Thông Tin
       </h4>
+
       <form onSubmit={handleSubmit}>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-6">
