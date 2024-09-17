@@ -89,7 +89,7 @@ export interface Role {
 export interface LoginResponse {
   status: number;
   message: string;
-  roles: string[];
+  roles: Role[];
   currentUser: string;
   token?: string;
   userProfile: UserProfile;

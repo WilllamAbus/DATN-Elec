@@ -47,6 +47,15 @@ const screenStyles: StylesConfig<(typeof screenOptions)[0], false> = {
         : undefined,
     },
   }),
+  singleValue: (styles) => ({
+    ...styles,
+    color: "black",
+  }),
+  clearIndicator: (styles) => ({
+    ...styles,
+    color: "black",
+    cursor: "pointer",
+  }),
 };
 
 interface ScreenSelectProps {
@@ -68,6 +77,7 @@ const ScreenSelect: React.FC<ScreenSelectProps> = ({ onChange, value, className 
     value={value}
     onChange={onChange}
     className={className}
+    isClearable={true}
   />
 );
 

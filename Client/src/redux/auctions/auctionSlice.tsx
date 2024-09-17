@@ -2,10 +2,10 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { completeAuction } from './auctionThunk';
-import { AuctionData } from '../../types/auctions/auctions';
+import { AuctionDataComplete } from '../../types/auctions/auctions';
 
 interface AuctionState {
-  auction: AuctionData | null;
+  auction: AuctionDataComplete | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -26,7 +26,7 @@ const auctionSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(completeAuction.fulfilled, (state, action: PayloadAction<AuctionData>) => {
+      .addCase(completeAuction.fulfilled, (state, action: PayloadAction<AuctionDataComplete>) => {
         state.isLoading = false;
         state.auction = action.payload;
       })

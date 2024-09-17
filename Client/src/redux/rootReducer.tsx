@@ -23,6 +23,9 @@ import getRandBidReducer from "./timeTrackProduct/getRandBidV2/getRandBidSlice";
 import serviceRefSlice from "./servicesRef/serviceRefSlice";
 import auctionReducer from "./auctions/auctionSlice";
 import deleteBidReducer from "./deleteBid/deleteBidSlice";
+import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
+import confirmReducer from "./confirmOrder/confirmOrderSlice";
+import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
 
 const authConfig = {
   key: "auth",
@@ -51,6 +54,9 @@ const rootReducer = combineReducers({
   serviceRef: serviceRefSlice,
   deleteBid: deleteBidReducer,
   auction: auctionReducer,
+  auctCheckout: auctCheckoutReducer,
+  orderAuction: orderAuctionReducer,
+  confirmOrder: confirmReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

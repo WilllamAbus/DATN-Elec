@@ -1,7 +1,6 @@
 const modelComment = require('../model/comment.model');
 const modelUser = require('../model/users.model');
 
-
 const commmentService = {
     findUserById : async (id) => {
         return await modelUser.findById(id);

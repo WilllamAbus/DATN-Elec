@@ -8,8 +8,11 @@ const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
+// const productRouter_v2 = require("./admin/product_v2");
+const inboundRouter = require("./admin/inboundshipments/inbound");
+const inventoryRouter = require("./admin/inventory");
 const clientSidebarAuction = require("./client/sidebar/auction");
-const clientCategỏy = require("./client/category");
+const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
 
@@ -27,6 +30,10 @@ const notificationRouter = require("./client/notification/notification.routes");
 const interactionRouter = require("./client/interaction/interation.routes");
 const orderdetails = require("./client/orders/OrderDetail");
 const OrderAd = require("./admin/order/orderAd");
+const momoRouter = require("./client/momo/momo");
+const commentAdminRouter = require("./admin/comment");
+const commentClientRouter = require("./client/comment");
+
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -40,12 +47,16 @@ const routes = (app) => {
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);
+  // app.use("/api/auctions", auctionRouter);
+  app.use("/api/inbound", inboundRouter);
+  app.use("/api/inventory", inventoryRouter);
+
   app.use("/api/vnpay", vnPayRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
   app.use("/api/client/bidding", biddingRouter);
   app.use("/api/client/auctions", auctionsRouter);
-  app.use("/api/client/category", clientCategỏy);
+  app.use("/api/client/category", clientCategory);
   app.use("/api/client/orderAuc", orderAucRouter);
   app.use("/api/client/orderDetailAuc", orderDetailAuction);
   app.use("/api/client/customer-service", customerServiceRouter);
@@ -53,6 +64,9 @@ const routes = (app) => {
   app.use("/api/interaction", interactionRouter);
   app.use("/api/orderdetails", orderdetails);
   app.use("/api/admin/order", OrderAd);
+  app.use("/api/momo", momoRouter);
+  app.use("/api/admin/comment", commentAdminRouter);
+  app.use("/api/client/comment", commentClientRouter);
 };
 
 module.exports = routes;

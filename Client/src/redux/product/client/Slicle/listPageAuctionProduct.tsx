@@ -1,9 +1,10 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { listPageAuctionProductThunk } from "../Thunk";
 import {
-  LimitPageAuctionProductResponse,
   Pagination,
   products,
+  ProductBrand,
+  ProductCondition
 } from "../types/listPageAuctionProduct";
 
 interface AuctionProductState {
@@ -12,6 +13,13 @@ interface AuctionProductState {
   error: string | null;
   pagination: Pagination | null;
   isLoading: boolean;
+  brand: ProductBrand[]; 
+  conditionShopping: ProductCondition[];  
+  minPrice: number | null; 
+  maxPrice: number | null; 
+  minDiscountPercent: number | null;
+  maxDiscountPercent: number | null;
+  total: number | null;
 }
 
 const initialState: AuctionProductState = {
@@ -20,8 +28,14 @@ const initialState: AuctionProductState = {
   error: null,
   pagination: null,
   isLoading: false,
+  brand: [], 
+  conditionShopping: [], 
+  minPrice: null,
+  maxPrice: null,
+  minDiscountPercent: null,
+  maxDiscountPercent: null,
+  total:null,
 };
-
 const listPageAuctionProductSlice = createSlice({
   name: "productsClient/listPageAuction",
   initialState,
@@ -34,17 +48,24 @@ const listPageAuctionProductSlice = createSlice({
       })
       .addCase(
         listPageAuctionProductThunk.fulfilled,
-        (state, action: PayloadAction<LimitPageAuctionProductResponse>) => {
+        (state, action) => {
           state.status = "success";
           state.isLoading = false;
           state.products = action.payload.data.products;
           state.pagination = action.payload.pagination;
+          state.brand = action.payload.data.brand || [];
+          state.conditionShopping = action.payload.data.conditionShopping || [];
+          state.minPrice = action.meta?.arg.minPrice || null;
+          state.maxPrice = action.meta?.arg.maxPrice || null;
+          state.minDiscountPercent = action.meta?.arg.minDiscountPercent || null;
+          state.maxDiscountPercent = action.meta?.arg.maxDiscountPercent || null;  
+          state.total = action.payload.data.total || 0;          
         }
       )
       .addCase(listPageAuctionProductThunk.rejected, (state, action) => {
         state.status = "fail";
         state.isLoading = false;
-        state.error = (action.payload as string) || "Lỗi không xác định";
+        state.error = action.error.message || "Unknown error";
       });
   },
 });

@@ -14,7 +14,7 @@ const ListComments: React.FC = () => {
       <ReusableBreadcrumb items={breadcrumbItems.listComments} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Danh sách bình luận
+          Danh sách sản phẩm có bình luận
         </h1>
       </div>
 

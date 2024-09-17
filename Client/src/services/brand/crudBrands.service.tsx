@@ -4,14 +4,10 @@ export const listBrands = async (page = 1, limit = 5) => {
   try {
     
     const response = await instance.get(`/brands/list?page=${page}&limit=${limit}`);
-    if (response.data.success) {
-      return {
-        data: response.data.data,
-        totalPages: response.data.totalPages,
-      };
-    }else {
-      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách thương hiệu");
-    }
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
   } catch (error) {
     console.error("Error fetching brand list:", error);
     throw error;
@@ -104,14 +100,10 @@ export const softDeleteBrand = async (id: string) => {
 export const getSoftDeletedBrands = async (page = 1, limit = 5) => {
   try {
     const response = await instance.get(`/brands/deleted-list?page=${page}&limit=${limit}`);
-    if (response.data.success) {
-      return {
-        data: response.data.data,
-        totalPages: response.data.totalPages,
-      };
-    }else {
-      throw new Error(response.data.msg || "Lỗi không xác định khi lấy danh sách thương hiệu");
-    }
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
   } catch (error) {
     console.error("Error fetching soft-deleted brands:", error);
     throw error;
@@ -124,5 +116,58 @@ export const restoreBrand = async (id: string) => {
   } catch (error) {
     console.error("Error restoring brands:", error);
     throw error;
+  }
+};
+
+export const searchBrands = async (keyword: string, page = 1, limit = 5) => {
+  try {
+    if (!keyword || keyword.trim() === "") {
+      throw new Error("Từ khóa tìm kiếm không hợp lệ");
+    }
+    const response = await instance.get(`/brands/search`, {
+      params: {
+        keyword: keyword, 
+        page : page,
+        limit : limit
+      }
+    });
+
+    // console.log("API response data:", response.data); // Xem xét cấu trúc của dữ liệu
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "message" in error) {
+      console.error("Error message:", (error as Error).message);
+    } else {
+      console.error("Unknown error occurred", error);
+    }
+  }
+};
+export const searchDeleteBrands = async (keyword: string, page = 1, limit = 5) => {
+  try {
+    if (!keyword || keyword.trim() === "") {
+      throw new Error("Từ khóa tìm kiếm không hợp lệ");
+    }
+    const response = await instance.get(`/brands/searchDelete`, {
+      params: {
+        keyword: keyword, 
+        page : page,
+        limit : limit
+      }
+    });
+
+    // console.log("API response data:", response.data); // Xem xét cấu trúc của dữ liệu
+    return {
+      data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
+      totalPages: response.data.totalPages,  // Tổng số trang
+    };
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "message" in error) {
+      console.error("Error message:", (error as Error).message);
+    } else {
+      console.error("Unknown error occurred", error);
+    }
   }
 };

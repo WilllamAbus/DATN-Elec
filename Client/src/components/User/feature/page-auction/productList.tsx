@@ -1,6 +1,7 @@
-import ProductItem from "./productItem";
+
 import styles from "./css/section.module.css";
 import { products } from "../../../../services/product_v2/client/types/listPageAuction";
+import ProductItem from "./productItem";
 export interface ProductListProps {
   products: products[];
 }

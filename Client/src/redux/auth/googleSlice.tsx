@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { apiLoginSuccessThunk } from "./apiLoginSuccessThunk";
-import { LoginResponse } from "../../types/user";
-
+import { LoginResponse,Role  } from "../../types/user";
 interface AuthState {
   login: {
     isFetching: boolean;
@@ -9,11 +8,10 @@ interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
-    roles: string[];
+    roles: Role[];
     currentUser: string | null;
   };
 }
-
 const initialState: AuthState = {
   login: {
     isFetching: false,
@@ -25,7 +23,6 @@ const initialState: AuthState = {
     error: null,
   },
 };
-
 const authSlice = createSlice({
   name: "authGoogle",
   initialState,
@@ -38,16 +35,16 @@ const authSlice = createSlice({
       action: PayloadAction<{
         currentUser: string;
         token: string;
-        roles: string[];
+        roles: Role[];
       }>
     ) => {
       state.login.isFetching = false;
       state.login.currentUser = action.payload.currentUser;
-      state.login.token = action.payload.token;
+      state.login.token = action.payload.token ?? null; 
       state.login.isAuthenticated = true;
       state.login.isLoggedIn = true;
       state.login.error = null;
-      state.login.roles = action.payload.roles;
+      state.login.roles = action.payload.roles; 
     },
     loginFailed: (state, action) => {
       state.login.isFetching = false;
@@ -60,7 +57,7 @@ const authSlice = createSlice({
       state.login.token = null;
       state.login.isAuthenticated = false;
       state.login.isLoggedIn = false;
-      state.login.roles = []; // Xóa roles khi logout
+      state.login.roles = []; 
     },
   },
   extraReducers: (builder) => {
@@ -74,11 +71,11 @@ const authSlice = createSlice({
         (state, action: PayloadAction<LoginResponse>) => {
           state.login.isFetching = false;
           state.login.currentUser = action.payload.currentUser;
-          state.login.token = action.payload.token ?? null;
+          state.login.token = action.payload.token ?? null; 
           state.login.isAuthenticated = true;
           state.login.isLoggedIn = true;
           state.login.error = null;
-          state.login.roles = action.payload.roles;
+          state.login.roles = action.payload.roles; 
         }
       )
       .addCase(apiLoginSuccessThunk.rejected, (state, action) => {

@@ -1,21 +1,44 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { listPageAuction } from "../../../../services/product_v2/client";
-import { LimitPageAuctionProductResponse } from "../types/listPageAuctionProduct";
+import { LimitPageAuctionProductResponse, ProductCondition,ProductBrand} from "../types/listPageAuctionProduct";
 
-// Cập nhật thunk để nhận _sort
 export const listPageAuctionProductThunk = createAsyncThunk<
   LimitPageAuctionProductResponse,
-  { page: number; _sort: string },
+  { 
+    page: number; 
+    _sort: string; 
+    brand?: ProductBrand[];  
+    conditionShopping?: ProductCondition[];
+    minPrice?: number; 
+    maxPrice?: number; 
+    minDiscountPercent?: number;
+    maxDiscountPercent?: number;
+  },
   { rejectValue: string }
->("productsClient/listPageAuction", async ({ page, _sort }, { rejectWithValue }) => {
-  try {
-    const response = await listPageAuction(page, _sort);
-    if (response.success) {
-      return response;
-    } else {
-      return rejectWithValue(response.msg);
+>(
+  "productsClient/listPageAuction",
+  async (
+    { page, _sort, brand = [], conditionShopping = [], minPrice, maxPrice, minDiscountPercent, maxDiscountPercent }, 
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await listPageAuction(
+        page, 
+        _sort, 
+        brand, 
+        conditionShopping, 
+        minPrice, 
+        maxPrice, 
+        minDiscountPercent, 
+        maxDiscountPercent
+      );
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.msg);
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Lỗi không xác định");
     }
-  } catch (error: any) {
-    return rejectWithValue(error.message || "Lỗi không xác định");
   }
-});
+);

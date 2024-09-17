@@ -1,6 +1,6 @@
 'use strict'
 const OrderDetailAuction = require('../../../model/orders/auctionsOrders/aucOrderDetail.model');
-const Inventory = require('../../../model/inventories/inventory.model');
+const Inventory = require('../../../model/inventory/inventory.model');
 
 
 

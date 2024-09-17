@@ -1,6 +1,6 @@
 // src/types/auctionTypes.ts
 
-export interface AuctionData {
+export interface AuctionDataComplete {
   _id:string
     productId: string;
     auctionEndTime: string; // Time when auction ends

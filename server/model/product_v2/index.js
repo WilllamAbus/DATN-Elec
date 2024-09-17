@@ -1,5 +1,12 @@
 const { Schema, model } = require("mongoose");
 const slugify = require('slugify');
+const commentSchema = new Schema({
+  content: { type: String, required: true },
+  rating: { type: Number, min: 1, max: 5 },
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+}, {
+  timestamps: true,
+});
 
 const productV2Schema = new Schema({
   product_name: { type: String, required: true },
@@ -39,13 +46,20 @@ const productV2Schema = new Schema({
   isActive: { type: Boolean, default: true },
   status: { type: String, default: 'active' },
   disabledAt: { type: Date, default: null },
-  comments: [{
-    user: { type: Schema.Types.ObjectId, ref: 'users' },
-    content: { type: String, required: true },
-    rating: { type: Number, min: 1, max: 5, required: true },
-    createdAt: { type: Date, default: Date.now }
-  }],
-  variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }] 
+  comments:  [commentSchema],
+  variants: [{
+    variant_name: { type: String, required: true }, 
+    variant_description: { type: String }, 
+    variant_price: { type: Number, required: true },
+    variant_attributes: [{
+      k: { type: String, required: true }, 
+      v: { type: String, required: true }, 
+    }],
+    variant_image: { type: [String] },
+    sku: { type: String, unique: true }, 
+    variant_color: { type: String },
+    isActive: { type: Boolean, default: true }, 
+  }]
 }, {
   collection: "product_v2",
   timestamps: true

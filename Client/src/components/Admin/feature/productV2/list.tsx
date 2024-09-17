@@ -4,7 +4,7 @@ import { fetchPaginatedProducts } from "../../../../redux/product/admin/Thunk";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { truncateText } from "./truncate/truncateText";
-import SyncLoader from "./loading/SyncLoader";
+// import SyncLoader from "./loading/SyncLoader";
 import { handleSoftDeleteProduct } from "./handlers/softDelete";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../../components/Admin/searchform/searchFomProduct";
@@ -20,9 +20,9 @@ const ProductList: React.FC = () => {
     (state: RootState) => state.products.pagilistActive.pagination?.totalPages || 1
   );
   const products = useSelector((state: RootState) => state.products.pagilistActive.products || []);
-  const loading = useSelector(
-    (state: RootState) => state.products.pagilistActive.status === "loading"
-  );
+  // const loading = useSelector(
+  //   (state: RootState) => state.products.pagilistActive.status === "loading"
+  // );
 
   useEffect(() => {
     dispatch(fetchPaginatedProducts({ page: currentPage, search: searchTerm }));
@@ -31,14 +31,6 @@ const ProductList: React.FC = () => {
   const handlePageChange = (page: number) => {
     dispatch(fetchPaginatedProducts({ page, search: searchTerm }));
   };
-
-  if (loading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 bg-white dark:bg-gray-800">
-        <SyncLoader />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -56,6 +48,9 @@ const ProductList: React.FC = () => {
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
+            <th scope="col" className="p-4">
+                Hình ảnh
+              </th>
               <th scope="col" className="p-4">
                 Tên sản phẩm
               </th>
@@ -86,12 +81,14 @@ const ProductList: React.FC = () => {
                   <div className="flex items-center mr-3">
                     <img
                       src={product.image[0]}
-                      className="h-12 w-auto mr-3"
+                      className="h-12 w-12 object-cover mr-3"
                       alt={product.product_name}
                     />
-                    <span>{truncateText(product.product_name, 30)}</span>
                   </div>
                 </th>
+                <td className="px-4 py-3">
+                <span>{truncateText(product.product_name, 15)}</span>
+                </td>
                 <td className="px-4 py-3">
                   <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                     {product.product_type?.name || "Chưa có loại"}
