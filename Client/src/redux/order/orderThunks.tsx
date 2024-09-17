@@ -7,6 +7,9 @@ import {
   pendingOrders,
   ConfirmOrders,
   shippingOrders,
+  CompletedOrders,
+  CancelOrders,
+  getOrderById,
 } from "../../services/order/order";
 import { Order } from "../../types/order/order";
 
@@ -111,6 +114,60 @@ export const shippingOrdersThunk = createAsyncThunk<
   try {
     const response = await shippingOrders();
     console.log("shippingOrders", response);
+
+    if (!response || !response.orders || !Array.isArray(response.orders)) {
+      throw new Error("Invalid data format");
+    }
+
+    return { orders: response.orders };
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
+  }
+});
+export const CompletedOrdersThunk = createAsyncThunk<
+  { orders: Order[] },
+  void,
+  { rejectValue: string }
+>("order/CompletedOrders", async (_, { rejectWithValue }) => {
+  try {
+    const response = await CompletedOrders();
+    console.log("CompletedOrders", response);
+
+    if (!response || !response.orders || !Array.isArray(response.orders)) {
+      throw new Error("Invalid data format");
+    }
+
+    return { orders: response.orders };
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
+  }
+});
+export const getCancelOrdersThunk = createAsyncThunk<
+  { orders: Order[] },
+  void,
+  { rejectValue: string }
+>("order/CancelOrders ", async (_, { rejectWithValue }) => {
+  try {
+    const response = await CancelOrders();
+    console.log("CancelOrders ", response);
+
+    if (!response || !response.orders || !Array.isArray(response.orders)) {
+      throw new Error("Invalid data format");
+    }
+
+    return { orders: response.orders };
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
+  }
+});
+export const getOrderByIdThunk = createAsyncThunk<
+  { orders: Order[] },
+  string,
+  { rejectValue: string }
+>("order/getOrderById ", async (orderId, { rejectWithValue }) => {
+  try {
+    const response = await getOrderById(orderId);
+    console.log("CancelOrders ", response);
 
     if (!response || !response.orders || !Array.isArray(response.orders)) {
       throw new Error("Invalid data format");

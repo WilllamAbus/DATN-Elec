@@ -64,15 +64,19 @@ getAuctionDetails: async (req, res) => {
  
 
   try {
-    const { auctionId, productId } = req.body;
+    const {productId} = req.query;
+
+    
     // Validate input
-    if (!auctionId || !productId) {
-      return res.status(400).json({ error: "Auction ID and Product ID are required." });
-    }
+  
 
     // Get auction details from the service
-    const details = await autionService.getAuctionDetails(auctionId, productId);
-    res.status(200).json(details);
+    const details = await autionService.getAuctionDetails(productId);
+    res.status(200).json({
+      success:true,
+        status: 201,
+        data:details
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -8,6 +8,9 @@ const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const clientProduct = require("./client/product");
+// const productRouter_v2 = require("./admin/product_v2");
+const inboundRouter = require("./admin/inboundshipments/inbound");
+const inventoryRouter = require("./admin/inventory");
 const clientSidebarAuction = require("./client/sidebar/auction");
 const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
@@ -25,6 +28,9 @@ const orderDetailAuction = require("./client/details/orderDetail.routes");
 const customerServiceRouter = require("./client/customer-service/deleteBidding.routes");
 const notificationRouter = require("./client/notification/notification.routes");
 const interactionRouter = require("./client/interaction/interation.routes");
+const momoRouter = require('./client/momo/momo')
+const commentAdminRouter = require("./admin/comment");
+const commentClientRouter = require("./client/comment");
 
 const routes = (app) => {
   app.use("/api/auth", authRouter);
@@ -39,6 +45,10 @@ const routes = (app) => {
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);
+  // app.use("/api/auctions", auctionRouter);
+  app.use("/api/inbound", inboundRouter);
+  app.use("/api/inventory", inventoryRouter);
+
   app.use("/api/vnpay", vnPayRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
@@ -50,6 +60,9 @@ const routes = (app) => {
   app.use("/api/client/customer-service", customerServiceRouter);
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
+  app.use("/api/momo", momoRouter);
+  app.use("/api/admin/comment", commentAdminRouter);
+  app.use("/api/client/comment", commentClientRouter);
 };
 
 module.exports = routes;

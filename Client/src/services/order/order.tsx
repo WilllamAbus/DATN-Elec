@@ -109,3 +109,51 @@ export const shippingOrders = async () => {
     }
   }
 };
+export const CompletedOrders = async () => {
+  try {
+    const response = await instance.get(`${API_URL}/order/CompletedOrders`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(
+        "Error fetching pendingOrders: An unknown error occurred"
+      );
+    }
+  }
+};
+export const CancelOrders = async () => {
+  try {
+    const response = await instance.get(`${API_URL}/order/CancelOrders`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(
+        "Error fetching pendingOrders: An unknown error occurred"
+      );
+    }
+  }
+};
+export const getOrderById = async (orderId: string) => {
+  try {
+    const response = await instance.get(`${API_URL}/order/${orderId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(
+        "Error fetching pendingOrders: An unknown error occurred"
+      );
+    }
+  }
+};

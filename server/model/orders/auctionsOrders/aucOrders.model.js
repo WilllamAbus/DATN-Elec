@@ -13,7 +13,7 @@ const orderAuctionSchema = new Schema(
     },
     stateOrder: {
       type: String,
-      enum: ["Chờ giao hàng", "Hủy bỏ", "Xác nhận", "Nhận hàng"], // Order status
+      enum: ["Chờ giao hàng", "Hủy bỏ", "Xác nhận", "Nhận hàng", "Vận chuyển"], // Order status
     },
     order_date: { type: Date, default: Date.now }, // Order date
     createdAt: { type: Date, default: Date.now },

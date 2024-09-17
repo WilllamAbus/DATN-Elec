@@ -19,6 +19,12 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.product,
     label: labels.product,
   },
+
+  productv2: {
+    icon: icons.productv2,
+    links: links.productv2,
+    label: labels.productv2,
+  },
   supplier: {
     icon: icons.supplier,
     links: links.supplier,
@@ -43,6 +49,11 @@ export const dropdownData: Record<string, DropdownData> = {
     icon: icons.comment,
     links: links.comment,
     label: labels.comment,
+  },
+  inbound: {
+    icon: icons.inbound,
+    links: links.inbound,
+    label: labels.inbound,
   },
   homeAdmin: {
     icon: icons.homeAdmin,

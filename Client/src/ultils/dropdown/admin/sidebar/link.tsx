@@ -15,6 +15,7 @@ export const links: Record<string, Link[]> = {
   productv2: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
+    { label: "Kho hàng", to: "/admin/listInventory" },
   ],
   orderCart: [{ label: "Đơn hàng", to: "/admin/orderCart" }],
   supplier: [{ label: "Nhà cung cấp", to: "/admin/listSuppliers" }],
@@ -30,4 +31,6 @@ export const links: Record<string, Link[]> = {
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
+  inbound: [{ label: "Nhập hàng", to: "/admin/listInbound" }],
+
 };

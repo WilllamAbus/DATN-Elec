@@ -1,66 +1,121 @@
-// export default CheckoutPage;
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
-import { Button, Card, Label, Select } from "flowbite-react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-import { RootState } from "../../../../../redux/store";
-
-import {  ShippingAddress } from "../../../../../types/order/order";
-import { Controller, useForm} from "react-hook-form";
-
-// Define the type for form data
-type FormData = {
-  payment: string;
-};
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../../../redux/store';
+import { fetchAuction } from '../../../../../redux/aucCheckout/auctCheckoutThunk';
+import { createOrderThunk } from '../../../../../redux/orderAuction/orderAuctionThunk';
+import { Button, Card, Label, Select } from 'flowbite-react';
+import { ToastContainer, toast } from 'react-toastify';
+import { Controller, useForm } from 'react-hook-form';
+import { AuctionData, FormData, OrderDataType , OrderResponse} from '../../../../../types/auctions/auctCheckout';
+// import { AuctionDataComplete} from '../../../../../types/auctions/auctions';
+import { SanboxPayment } from '../../../../../services/pay/sanboxPayment';
+import { calculateSignature } from '../../../../../services/pay/signature';
+import { useNavigate } from 'react-router-dom';
+// import { Bid } from "../../../../types/bidding/bidding";
+// Create an instance of SanboxPayment
+const signatureService = { calculateSignature };
+const paymentService = new SanboxPayment(signatureService);
 
 const CheckoutPage: React.FC = () => {
-//   const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
+  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId) ;
 
-//   const userId = useSelector(
-//     (state: RootState) => state.auth.profile.profile?._id
-//   );
-  const carts = useSelector((state: RootState) => state.cart.carts);
-  const profile = useSelector((state: RootState) => state.auth.profile.profile);
 
-  const { control,  } = useForm<FormData>();
+  const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
+   // Access order data from `orderAuction`
+  const loading = useSelector((state: RootState) => state.orderAuction.loading); // Use loading from `orderAuction`
+  const navigate = useNavigate(); // Create navigate instance
 
-  const [, setShippingAddress] =
-    useState<ShippingAddress | null>(null);
-  const [voucherCode, setVoucherCode] = useState<string>("");
+  const { control, handleSubmit } = useForm<FormData>();
+  const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
-    if (profile) {
-      setShippingAddress({
-        recipientName: profile.name,
-        phoneNumber: profile.phone,
-        address: profile.address,
-        disabledAt: null,
-        modifieon: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+    if (userId && bids) {
+      dispatch(fetchAuction(bids));
     }
-  }, [profile]);
+  }, [dispatch, bids]);
 
-  const grandTotal = carts.reduce((total, cart) => {
-    return (
-      total +
-      cart.items.reduce((itemTotal, item) => {
-        return (
-          itemTotal + (item.product.product_price_unit || 0) * item.quantity
-        );
-      }, 0)
-    );
-  }, 0);
+  useEffect(() => {
+    if (auctionData) {
+      // Calculate the amount including auctionTotal and shipping (assuming shipping is fixed)
+      const shipping = 31000; // Fixed shipping cost
+      const totalAmount = (auctionData.auctionTotal || 0) + shipping;
+      setAmount(totalAmount);
+    }
+  }, [auctionData]);
+const auctionDetails= auctionData?.auctionId
 
-  // Update handleCheckout to use FormData type
+
+const onSubmit = async (data: FormData) => {
+  // Check for missing form fields
+  if (!auctionDetails || !userId || !data.payment) {
+    toast.error('Vui lòng điền đầy đủ thông tin và chọn phương thức thanh toán');
+    return;
+  }
+
+  // Ensure address is provided
+  if (!auctionData?.userAddress || !auctionData?.userName || !auctionData?.userSdt) {
+    navigate('/profile'); // Redirect to profile page
+    toast.error('Bạn cần cập nhật thông tin cá nhân và địa chỉ');
+    return;
+  }
+
+  const orderData: OrderDataType = {
+    userId,
+    auctionDetails,
+    payment: data.payment,
+  };
+
+  try {
+    // Create order with details
+    const response: OrderResponse = await dispatch(createOrderThunk(orderData)).unwrap();
+ 
+
+    if (data.payment === 'MoMo') {
+      // Process MoMo payment
+      await paymentService.processMoMoPaymentWithRetry(amount, auctionData.auctionId);
+      toast.success('Thanh toán thành công');
+  
+
+    } else if (data.payment === 'Cash') {
+      if(response.data){
+        toast.success('Thanh toán khi nhận hàng');
+      navigate('/confimAuc');
+      }
+      // Handle Cash payment
+       // Redirect after successful payment
+
+    } else if (data.payment === 'VnPay') {
+      // Handle VNPay payment
+      if (response.data && response.data.hashLinkPayment) {
+        // Redirect user to VNPay payment page
+        toast.success('Thanh toán thành công');
+        window.location.href = response.data.hashLinkPayment;
+      } else {
+        throw new Error('VNPay payment URL is missing in the response');
+      }
+
+    } else {
+      throw new Error('Phương thức thanh toán không hợp lệ');
+    }
+
+  } catch (error) {
+    console.error('Error processing order:', error);
+    toast.error('Đã xảy ra lỗi trong quá trình xử lý đơn hàng');
+  }
+};
+
+
+  const shippingFee = 31000;
+
+  // Calculate the total price including shipping
+  const totalPriceWithShipping = auctionData && auctionData.auctionTotal !== undefined
+    ? auctionData.auctionTotal + shippingFee
+    : shippingFee;
 
   return (
     <>
-      {/* Breadcrumb */}
       <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base">
           <i className="fa-solid fa-house"></i>
@@ -71,18 +126,18 @@ const CheckoutPage: React.FC = () => {
         <p className="text-gray-600 font-medium">Checkout</p>
       </div>
 
-      {/* Wrapper */}
       <div className="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
         <div className="col-span-8 border border-gray-200 p-4 rounded-lg">
           <h3 className="text-lg font-medium capitalize mb-4">Checkout</h3>
           <div className="space-y-4">
-            <form >
+            <form onSubmit={handleSubmit(onSubmit)}>
+          
               <div>
                 <Label htmlFor="name" value="Tên người nhận" />
                 <input
                   type="text"
                   id="name"
-                  value={profile?.name || ""}
+                  value={auctionData?.userName || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -93,7 +148,7 @@ const CheckoutPage: React.FC = () => {
                 <input
                   type="text"
                   id="address"
-                  value={profile?.address || ""}
+                  value={auctionData?.userAddress || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -104,7 +159,7 @@ const CheckoutPage: React.FC = () => {
                 <input
                   type="text"
                   id="phone"
-                  value={profile?.phone || ""}
+                  value={auctionData?.userSdt || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -115,28 +170,17 @@ const CheckoutPage: React.FC = () => {
                 <Controller
                   name="payment"
                   control={control}
-                  defaultValue="" // Ensure there's a default value
+                  defaultValue=""
                   render={({ field }) => (
                     <Select id="payment" {...field}>
-                      <option value="" disabled selected>
+                      <option value="" disabled>
                         Chọn phương thức thanh toán
                       </option>
-                      <option value="cash">Thanh toán khi nhận hàng</option>
-                      {/* Thêm các phương thức thanh toán khác nếu có */}
+                      <option value="Cash">Thanh toán khi nhận hàng</option>
+                      <option value="MoMo">MoMo</option>
+                      <option value="VnPay">VnPay</option>
                     </Select>
                   )}
-                />
-              </div>
-              <br />
-              <div>
-                <Label htmlFor="voucher" value="Mã voucher" />
-                <input
-                  type="text"
-                  id="voucher"
-                  value={voucherCode}
-                  onChange={(e) => setVoucherCode(e.target.value)}
-                  placeholder="Nhập mã voucher nếu có"
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
               <br />
@@ -149,35 +193,44 @@ const CheckoutPage: React.FC = () => {
 
         <div className="col-span-4">
           <Card>
-            <h3 className="text-lg font-medium mb-4">Giỏ hàng</h3>
-            <div className="flex flex-col">
-              {carts.flatMap((cart) =>
-                cart.items.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between py-2 border-b border-gray-200"
-                  >
-                    <span>{item.product.product_name}</span>
-                    <span>
-                      {item.quantity} x{" "}
-                      {item.price.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
-                    </span>
-                  </div>
-                ))
-              )}
-              <div className="flex items-center justify-between py-2 font-bold">
-                <span>Tổng cộng:</span>
-                <span>
-                  {grandTotal.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
-                </span>
+            <h3 className="text-lg font-medium mb-4">Mua sắm đấu giá</h3>
+            {loading ? (
+              <p>Đang tải dữ liệu đơn hàng...</p>
+            ) : (
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                {auctionData?.productImages && auctionData.productImages.length > 0 ? (
+                  <img
+                    src={auctionData.productImages[0]} // Show only the first image
+                    alt={auctionData.productName || 'No product name'}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                ) : (
+                  <p>No image available</p>
+                )}
+                <span>{auctionData?.productName || 'No product name'}</span>
+                <span>{auctionData?.auctionQuantity || '0'}</span>
               </div>
+            )}
+            <div className="flex items-center justify-between py-2 font-bold">
+            <span>Vận chuyển:</span>
+             
+             <span>
+                31.000 đ
+             </span>
+              <span>Tổng cộng:</span>
+             
+              <span>
+              {totalPriceWithShipping.toLocaleString()} đ
+               
+              </span>
             </div>
+            {/* {orderData && (
+              <div className="mt-4">
+                <h4 className="text-md font-medium">Thông tin đơn hàng:</h4>
+                <p>ID Đơn Hàng: {orderData.orderAuctionID}</p>
+                <p>ID Chi Tiết Đơn Hàng: {orderData.orderDetailAuctionID}</p>
+              </div>
+            )} */}
           </Card>
         </div>
       </div>

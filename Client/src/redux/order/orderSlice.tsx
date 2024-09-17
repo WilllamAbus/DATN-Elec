@@ -8,18 +8,21 @@ import {
   pendingOrdersThunk,
   ConfirmOrdersThunk,
   shippingOrdersThunk,
+  CompletedOrdersThunk,
+  getCancelOrdersThunk,
+  getOrderByIdThunk,
 } from "./orderThunks";
 import { Order } from "../../types/order/order";
 
 interface OrderState {
-  order: Order | null;
+  selectedOrder: Order | null;
   orders: Order[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: OrderState = {
-  order: null,
+  selectedOrder: null,
   orders: [],
   status: "idle",
   error: null,
@@ -28,7 +31,11 @@ const initialState: OrderState = {
 const orderSlice = createSlice({
   name: "order",
   initialState,
-  reducers: {},
+  reducers: {
+    setPaymentStatus: (state, action) => {
+      state.status = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createOrderThunk.pending, (state) => {
@@ -39,7 +46,7 @@ const orderSlice = createSlice({
         createOrderThunk.fulfilled,
         (state, action: PayloadAction<{ order: Order }>) => {
           state.status = "succeeded";
-          state.order = action.payload.order;
+          state.selectedOrder = action.payload.order;
           state.error = null;
         }
       )
@@ -128,6 +135,41 @@ const orderSlice = createSlice({
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
       })
+
+      .addCase(CompletedOrdersThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        CompletedOrdersThunk.fulfilled,
+        (state, action: PayloadAction<{ orders: Order[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.orders;
+          state.error = null;
+        }
+      )
+      .addCase(CompletedOrdersThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
+      .addCase(getCancelOrdersThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getCancelOrdersThunk.fulfilled,
+        (state, action: PayloadAction<{ orders: Order[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.orders;
+          state.error = null;
+        }
+      )
+      .addCase(getCancelOrdersThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
       // Xử lý cho cancelOrderThunk
       .addCase(cancelOrderThunk.pending, (state) => {
         state.status = "loading";
@@ -150,8 +192,24 @@ const orderSlice = createSlice({
       .addCase(cancelOrderThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
+      })
+      .addCase(getOrderByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        getOrderByIdThunk.fulfilled,
+        (state, action: PayloadAction<{ orders: Order[] }>) => {
+          state.status = "succeeded";
+          state.orders = action.payload.orders;
+          state.error = null;
+        }
+      )
+      .addCase(getOrderByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Something went wrong";
       });
   },
 });
-
+export const { setPaymentStatus } = orderSlice.actions;
 export default orderSlice.reducer;

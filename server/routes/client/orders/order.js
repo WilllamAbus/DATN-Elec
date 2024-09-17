@@ -38,6 +38,21 @@ router.get(
   middlewareController.verifyToken,
   orderController.getShippingOrders
 );
+router.get(
+  "/CompletedOrders",
+  middlewareController.verifyToken,
+  orderController.getCompletedOrders
+);
+router.get(
+  "/CancelOrders",
+  middlewareController.verifyToken,
+  orderController.getCancelOrders
+);
+router.get(
+  "/:orderId",
+  middlewareController.verifyToken,
+  orderController.getOrderById
+);
 router.put(
   "/cancel/:orderId",
   middlewareController.verifyToken,
