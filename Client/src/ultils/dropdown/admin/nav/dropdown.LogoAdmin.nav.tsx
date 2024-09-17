@@ -5,7 +5,10 @@ interface DropdownProps {
   buttonText: string;
 }
 
-const DropdownLogoAdminNav: React.FC<DropdownProps> = ({ items, buttonText }) => {
+const DropdownLogoAdminNav: React.FC<DropdownProps> = ({
+  items,
+  buttonText,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {

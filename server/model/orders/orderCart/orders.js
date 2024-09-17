@@ -1,10 +1,9 @@
 const { Schema, model } = require("mongoose");
-const orderItem = require("./orderItem");
 
 const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
-    cartDetails: [orderItem],
+    cartDetails: [{ type: Schema.Types.ObjectId, ref: "OrderDetail" }],
     payment: { type: Schema.Types.ObjectId, ref: "payment", default: null },
     shipping: {
       type: Schema.Types.ObjectId,

@@ -363,8 +363,9 @@ const CheckoutPage: React.FC = () => {
     (state: RootState) => state.auth.profile.profile?._id
   );
   const address = useSelector(
-    (state: RootState) => state.order.orders[0]?.shipping
+    (state: RootState) => state.auth.profile.profile?.address
   );
+  console.log(address);
 
   const carts = useSelector((state: RootState) => state.cart.carts);
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
@@ -385,11 +386,14 @@ const CheckoutPage: React.FC = () => {
     paymentMethod: string,
     orderIdParam?: string
   ): Order => {
+    // Assuming `carts` is an array of cart details
     return {
-      cartId: carts[0]._id,
+      cartId: carts[0]._id, // Assuming this is the cart ID you want to use
       user: profile?._id ? profile : null,
-      cartDetails: carts.flatMap((cart) =>
-        cart.items.map((item) => ({
+      cartDetails: carts.map((cart) => ({
+        _id: cart._id, // Assuming this is the ID for CartDetail
+        order: orderIdParam || "", // Order ID or some identifier for the order
+        items: cart.items.map((item) => ({
           product: {
             ...item.product,
             product_attributes: item.product.product_attributes.map((attr) => ({
@@ -401,22 +405,19 @@ const CheckoutPage: React.FC = () => {
           price: item.product.product_price_unit,
           totalItemPrice: item.product.product_price_unit * item.quantity,
           _id: item._id,
-        }))
-      ),
+        })),
+      })),
       payment: {
         amount: grandTotal,
-        // payment_date: new Date().toISOString(),
         payment_method: paymentMethod,
         order_info: orderIdParam || "",
       },
       shipping: {
-        recipientName: address.recipientName,
-        phoneNumber: address.phoneNumber,
-        address: address.address,
-        disabledAt: address.disabledAt,
-        modifieon: address.modifieon,
+        recipientName: profile?.name || "",
+        phoneNumber: profile?.phone || "",
+        address: address || "",
       },
-      voucher: [],
+      voucher: [], // Assuming no vouchers are being applied
       formatShipping: "Nhanh",
       totalAmount: grandTotal,
       shippingFee: 0,
@@ -564,7 +565,9 @@ const CheckoutPage: React.FC = () => {
                       <option value="" disabled selected>
                         Chọn phương thức thanh toán
                       </option>
-                      <option value="cash">Thanh toán khi nhận hàng</option>
+                      <option value="Thanh toán khi nhận hàng">
+                        Thanh toán khi nhận hàng
+                      </option>
                       <option value="vnPay">VNPay</option>
                     </Select>
                   )}

@@ -1,5 +1,3 @@
-
-
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -52,8 +50,8 @@ instance.interceptors.response.use(
         );
 
         const newAccessToken = refreshResponse.data.accessToken;
-        console.log('NewAcessToken:', newAccessToken);
-        
+        console.log("NewAcessToken:", newAccessToken);
+
         Cookies.set("token", newAccessToken, {
           path: "/",
           expires: 7,

@@ -6,7 +6,7 @@ const paymentSchema = new Schema(
     order_info: { type: String },
     payment_method: {
       type: String,
-      enum: ["MoMo", "cash", "vnPay"], // Chỉ định các giá trị hợp lệ cho payment_method
+      enum: ["MoMo", "Thanh toán khi nhận hàng", "vnPay"], // Chỉ định các giá trị hợp lệ cho payment_method
       required: true,
     },
 

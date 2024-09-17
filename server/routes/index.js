@@ -25,7 +25,8 @@ const orderDetailAuction = require("./client/details/orderDetail.routes");
 const customerServiceRouter = require("./client/customer-service/deleteBidding.routes");
 const notificationRouter = require("./client/notification/notification.routes");
 const interactionRouter = require("./client/interaction/interation.routes");
-
+const orderdetails = require("./client/orders/OrderDetail");
+const OrderAd = require("./admin/order/orderAd");
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -50,6 +51,8 @@ const routes = (app) => {
   app.use("/api/client/customer-service", customerServiceRouter);
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
+  app.use("/api/orderdetails", orderdetails);
+  app.use("/api/admin/order", OrderAd);
 };
 
 module.exports = routes;

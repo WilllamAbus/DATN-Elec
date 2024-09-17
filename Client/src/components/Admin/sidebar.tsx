@@ -17,11 +17,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
   const handleLogout = async () => {
     try {
       await dispatch(logoutThunk()).unwrap();
-
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-      localStorage.removeItem("userProfile");
-
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);

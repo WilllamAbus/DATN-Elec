@@ -56,41 +56,43 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
       {/* Phương thức thanh toán */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold mb-4">Phương thức thanh toán</h3>
-        <p className="text-lg">{order.payment.payment_method}</p>
+        <p className="text-lg">{order.payment?.payment_method}</p>
       </div>
 
       {/* Danh sách sản phẩm trong đơn hàng */}
       <div className="mb-6">
         <h3 className="text-xl font-semibold mb-4">Sản phẩm</h3>
         <ListGroup className="space-y-4">
-          {order.cartDetails.map((item) => (
-            <ListGroup.Item
-              key={item.product._id}
-              className="flex justify-between items-center p-4 bg-gray-100 rounded-md shadow-sm"
-            >
-              <div className="flex items-center space-x-4">
-                <img
-                  onClick={
-                    () => handleRepurchase(item.product._id) // Thay đổi từ order.cartDetails[0].product._id thành item.product._id
-                  }
-                  src={item.product.image[0]}
-                  alt={item.product.product_name}
-                  className="w-16 h-16 object-cover rounded-md"
-                />
-                <div>
-                  <h4 className="font-medium text-lg mb-1">
-                    {item.product.product_name}
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Số lượng: {item.quantity}
-                  </p>
+          {order.cartDetails.map((cartDetail) =>
+            cartDetail.items.map((item) => (
+              <ListGroup.Item
+                key={item.product._id}
+                className="flex justify-between items-center p-4 bg-gray-100 rounded-md shadow-sm"
+              >
+                <div className="flex items-center space-x-4">
+                  {item.product.image && item.product.image.length > 0 && (
+                    <img
+                      onClick={() => handleRepurchase(item.product._id)}
+                      src={item.product.image[0]} // Hiển thị hình ảnh đầu tiên
+                      alt={item.product.product_name}
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+                  )}
+                  <div>
+                    <h4 className="font-medium text-lg mb-1">
+                      {item.product.product_name}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Số lượng: {item.quantity}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <p className="text-lg">
-                {item.product.product_price_unit.toLocaleString()} VND
-              </p>
-            </ListGroup.Item>
-          ))}
+                <p className="text-lg">
+                  {item.product.product_price_unit.toLocaleString()} VND
+                </p>
+              </ListGroup.Item>
+            ))
+          )}
         </ListGroup>
       </div>
 

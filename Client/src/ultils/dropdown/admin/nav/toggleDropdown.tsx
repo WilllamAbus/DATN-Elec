@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import LogoAdmin from "../../../../assets/images/icons/userAmin.png";
+import { RootState, useAppSelector } from "../../../../redux/store";
 
 const adminDropdownToggle = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,12 +9,17 @@ const adminDropdownToggle = () => {
   const toggleDropdownAdmin = () => {
     setIsOpen(!isOpen);
   };
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
+  );
 
-  return { isOpen, toggleDropdownAdmin };
+  const avatar = profile?.avatar;
+
+  return { isOpen, toggleDropdownAdmin, avatar };
 };
 
 const AdminMenuDropdown: React.FC = () => {
-  const { isOpen, toggleDropdownAdmin } = adminDropdownToggle();
+  const { isOpen, toggleDropdownAdmin, avatar } = adminDropdownToggle();
 
   return (
     <div className="relative">
@@ -27,7 +33,8 @@ const AdminMenuDropdown: React.FC = () => {
         <span className="sr-only">Open user menu</span>
         <img
           className="w-8 h-8 rounded-full"
-          src={LogoAdmin}
+          // Hiển thị avatar từ profile, nếu không có thì sử dụng logo mặc định
+          src={avatar ? avatar : LogoAdmin}
           alt="user photo"
         />
       </button>
@@ -37,17 +44,6 @@ const AdminMenuDropdown: React.FC = () => {
           className="absolute right-0 mt-2 z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
           id="userMenuDropdown"
         >
-          {/* <div className="px-4 py-3" role="none">
-            <p className="text-sm text-gray-900 dark:text-white" role="none">
-              Hậu
-            </p>
-            <p
-              className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
-              role="none"
-            >
-              haudppc07506@fpt.edu.vn
-            </p>
-          </div> */}
           <ul
             className="py-1 font-light text-gray-500 dark:text-gray-400"
             aria-labelledby="userMenuDropdownButton"

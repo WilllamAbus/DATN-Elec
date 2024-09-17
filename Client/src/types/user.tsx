@@ -45,7 +45,15 @@ export interface UserProfile {
   addressID: string;
   createdAt: string;
   updatedAt?: string;
+  message: string;
+  currentUser: string;
+  redirectTo: string;
 }
+export interface ErrorResponse {
+  status: number;
+  message: string;
+}
+
 export interface ForgotState {
   status: "idle" | "loading" | "succeeded" | "failed";
   message: string;
@@ -87,4 +95,5 @@ export interface LoginResponse {
   userProfile: UserProfile;
   accessToken: string;
   refreshToken: string;
+  redirectTo: string;
 }

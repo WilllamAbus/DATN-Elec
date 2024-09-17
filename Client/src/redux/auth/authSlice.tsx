@@ -4,7 +4,7 @@ import {
   Role,
   ResetPassState,
   ForgotState,
-  LoginResponse,
+
   // LoginResponse,
 } from "../../types/user";
 import {
@@ -26,12 +26,7 @@ import {
   fetchUserById,
   getlistRoleThunk,
 } from "./authThunk";
-// interface User {
-//   // Định nghĩa kiểu dữ liệu cho người dùng nếu cần
-//   id: string;
-//   name: string;
-//   status: string;
-// }
+
 interface AuthState {
   role: {
     roles: Role[];
@@ -45,6 +40,7 @@ interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
+    redirectTo: string | null;
   };
   profile: {
     profile: UserProfile | null;
@@ -115,6 +111,7 @@ const initialState: AuthState = {
     error: null,
     isAuthenticated: false,
     token: null,
+    redirectTo: null,
     isLoggedIn: false,
   },
   profile: {
@@ -514,16 +511,17 @@ const authSlice = createSlice({
           state.role.status = "failed";
           state.role.error = action.payload as string;
         }
-      });
-    builder.addCase(logoutThunk.fulfilled, (state) => {
-      state.login.isFetching = false;
-      state.login.currentUser = null;
-      state.login.token = null;
-      state.login.isAuthenticated = false;
-      state.login.isLoggedIn = false;
-      state.profile.profile = null;
-    });
-    builder
+      })
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.login.isFetching = false;
+        state.login.currentUser = null;
+        state.login.token = null;
+        state.login.isAuthenticated = false;
+        state.login.isLoggedIn = false;
+        state.profile.profile = null;
+        state.profile.roles = null;
+      })
+
       .addCase(logoutThunk.rejected, (state, action) => {
         state.login.isFetching = false;
         state.login.error = action.payload as string;
@@ -534,11 +532,12 @@ const authSlice = createSlice({
       })
       .addCase(
         loginUserThunk.fulfilled,
-        (state, action: PayloadAction<LoginResponse>) => {
+        (state, action: PayloadAction<UserProfile>) => {
           state.login.isFetching = false;
           state.login.currentUser = action.payload.currentUser;
           state.login.token = action.payload.token ?? null;
           state.login.isAuthenticated = true;
+          state.login.redirectTo = action.payload.redirectTo || null;
           state.login.isLoggedIn = true;
           state.login.error = null;
         }
