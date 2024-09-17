@@ -29,6 +29,9 @@ const customerServiceRouter = require("./client/customer-service/deleteBidding.r
 const notificationRouter = require("./client/notification/notification.routes");
 const interactionRouter = require("./client/interaction/interation.routes");
 const momoRouter = require('./client/momo/momo')
+const commentAdminRouter = require("./admin/comment");
+const commentClientRouter = require("./client/comment");
+
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
@@ -58,6 +61,8 @@ const routes = (app) => {
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
   app.use("/api/momo", momoRouter);
+  app.use("/api/admin/comment", commentAdminRouter);
+  app.use("/api/client/comment", commentClientRouter);
 };
 
 module.exports = routes;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ListComment from "../../../components/Admin/feature/comment/list";
+import ListDetailComment from "../../../components/Admin/feature/comment/listDetailComment";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
 import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
@@ -14,7 +14,7 @@ const ListComments: React.FC = () => {
       <ReusableBreadcrumb items={breadcrumbItems.listComments} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Danh sách sản phẩm có bình luận
+          Danh sách bình luận
         </h1>
       </div>
 
@@ -25,7 +25,7 @@ const ListComments: React.FC = () => {
               <SearchFormProduct />
             </div>
             <div className="overflow-x-auto">
-              <ListComment />
+              <ListDetailComment />
               <PaginationComponent
                 currentPage={currentPage}
                 totalPages={5}
