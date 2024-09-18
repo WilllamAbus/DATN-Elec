@@ -9,6 +9,7 @@ import {
   deleteCart as deleteCartService,
 } from "../../services/cart/cart";
 import { CartType } from "../../types/cart/carts";
+import axios from "axios";
 // Lấy danh sách giỏ hàng
 // export const fetchCartList = createAsyncThunk(
 //   "cart/fetchCartList",
@@ -71,34 +72,48 @@ export const addProductToCart = createAsyncThunk(
 // );
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItemQuantity",
-  async ({
-    cartId,
-    itemId,
-    quantity,
-    isSelected = false, // Thêm giá trị mặc định cho selected
-  }: {
-    cartId: string;
-    itemId: string;
-    quantity: number;
-    isSelected?: boolean;
-  }) => {
-    const response = await updateCart(cartId, [
-      {
-        product: itemId,
-        quantity,
-        isSelected,
-      },
-    ]);
-    console.log("Update Cart Response:", response); // Kiểm tra phản hồi từ API
-    return {
+  async (
+    {
       cartId,
       itemId,
       quantity,
-      isSelected,
-    };
+      isSelected = false,
+    }: {
+      cartId: string;
+      itemId: string;
+      quantity: number;
+      isSelected?: boolean;
+    },
+    { rejectWithValue } // Tham số `rejectWithValue` để trả về giá trị lỗi
+  ) => {
+    try {
+      const response = await updateCart(cartId, [
+        {
+          product: itemId,
+          quantity,
+          isSelected,
+        },
+      ]);
+      console.log("Update Cart Response:", response);
+      return {
+        cartId,
+        itemId,
+        quantity,
+        isSelected,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(
+          error.response.data.message || "Cập nhật số lượng thất bại."
+        );
+      } else {
+        return rejectWithValue(
+          (error as Error).message || "Cập nhật số lượng thất bại."
+        );
+      }
+    }
   }
 );
-
 // Lấy giỏ hàng theo ID
 export const fetchCartById = createAsyncThunk(
   "cart/fetchCartById",

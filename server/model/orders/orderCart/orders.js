@@ -26,7 +26,7 @@ const orderSchema = new Schema(
         "Đã xác nhận",
         "Đang vận chuyển",
         "Hoàn tất",
-        "Trả hàng",
+        // "Trả hàng",
         "Hủy đơn hàng",
       ],
       required: true,

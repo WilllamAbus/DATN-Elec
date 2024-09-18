@@ -8,20 +8,20 @@ const OrderController = {
         order: orderId,
       })
         .populate({
-          path: "order", // Populate the entire order object
+          path: "order",
           populate: [
             {
-              path: "payment", // Populate payment within the order
+              path: "payment",
               model: "payment",
             },
             {
-              path: "shipping", // Populate shipping within the order
+              path: "shipping",
               model: "shipping",
             },
           ],
         })
         .populate({
-          path: "items.product", // Populate product details in order items
+          path: "items.product",
           model: "product_v2",
         });
 
@@ -39,15 +39,14 @@ const OrderController = {
 
   getUserOrders: async (req, res) => {
     try {
-      const userId = req.user?.id; // Lấy ID người dùng từ request
+      const userId = req.user?.id;
 
-      // Tìm tất cả chi tiết đơn hàng liên quan đến người dùng
       const orderDetails = await OrderDetail.find({ user: userId })
         .populate({
-          path: "items.product", // Populate chi tiết sản phẩm
+          path: "items.product",
           model: "product_v2",
         })
-        .populate("order"); // Populate thông tin đơn hàng
+        .populate("order");
 
       if (!orderDetails || orderDetails.length === 0) {
         return res
@@ -64,15 +63,15 @@ const OrderController = {
       });
     }
   },
-  // Lấy tất cả chi tiết đơn hàng
+
   getAllOrderDetails: async (req, res) => {
     try {
       const orderDetails = await OrderDetail.find()
         .populate({
-          path: "items.product", // Populate chi tiết sản phẩm
+          path: "items.product",
           model: "product_v2",
         })
-        .populate("order"); // Populate thông tin đơn hàng
+        .populate("order");
 
       if (!orderDetails || orderDetails.length === 0) {
         return res.status(404).json({ message: "Không có chi tiết đơn hàng" });
@@ -97,15 +96,15 @@ const OrderController = {
         orderDetailId,
         {
           order: req.body.order,
-          items: req.body.items, // Cập nhật items bao gồm product, quantity, price, totalItemPrice
+          items: req.body.items,
         },
-        { new: true } // Trả về đối tượng mới sau khi cập nhật
+        { new: true }
       )
         .populate({
-          path: "items.product", // Populate chi tiết sản phẩm
+          path: "items.product",
           model: "product_v2",
         })
-        .populate("order"); // Populate thông tin đơn hàng
+        .populate("order");
 
       if (!updatedOrderDetail) {
         return res

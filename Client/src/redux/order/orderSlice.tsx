@@ -5,11 +5,11 @@ import {
   listOrderThunk,
   fetchUserOrdersThunk,
   cancelOrderThunk,
-  pendingOrdersThunk,
-  ConfirmOrdersThunk,
-  shippingOrdersThunk,
-  CompletedOrdersThunk,
-  getCancelOrdersThunk,
+  // pendingOrdersThunk,
+  // ConfirmOrdersThunk,
+  // shippingOrdersThunk,
+  // CompletedOrdersThunk,
+  // getCancelOrdersThunk,
   getOrderByIdThunk,
 } from "./orderThunks";
 import {
@@ -98,89 +98,6 @@ const orderSlice = createSlice({
         }
       )
       .addCase(fetchUserOrdersThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
-      })
-      .addCase(pendingOrdersThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        pendingOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
-        }
-      )
-      .addCase(pendingOrdersThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
-      })
-
-      .addCase(ConfirmOrdersThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        ConfirmOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
-        }
-      )
-      .addCase(ConfirmOrdersThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
-      })
-      .addCase(shippingOrdersThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        shippingOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
-        }
-      )
-      .addCase(shippingOrdersThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
-      })
-
-      .addCase(CompletedOrdersThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        CompletedOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
-        }
-      )
-      .addCase(CompletedOrdersThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
-      })
-
-      .addCase(getCancelOrdersThunk.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(
-        getCancelOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
-        }
-      )
-      .addCase(getCancelOrdersThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
       })
