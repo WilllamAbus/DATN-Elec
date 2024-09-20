@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import Cmt from "./tetx";
-import { getProfileThunk } from "../../../../../redux/auth/authThunk";
-import { useAppDispatch } from "../../../../../redux/store";
+import ListCmt from "./listComment";
 import { notify } from "../../../../../ultils/success";
 import { addComment, getCommentProduct, Comment as CommentType } from "../../../../../services/commnet/comment.service";
 
@@ -26,7 +24,6 @@ const Comment = () => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset } = useForm<FormValues>();
   const { id } = useParams<{ id: string }>();
-  const dispatch = useAppDispatch();
 
   const decodeToken = (token: string): DecodedToken => {
     try {
@@ -63,7 +60,6 @@ const Comment = () => {
   useEffect(() => {
     if (id) {
       setIsLoggedIn(!!userData.id);
-      dispatch(getProfileThunk());
       fetchComments();
     }
   }, [id]);
@@ -142,7 +138,7 @@ useEffect(() => {
           </div>
         )}
 
-        <Cmt comments={comments} />
+        <ListCmt comments={comments} />
 
         {isLoggedIn ? (
           <div className="mt-8 md:mt-0 w-full">
