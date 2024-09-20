@@ -26,6 +26,8 @@ const UserListCart = React.lazy(() => import("../page/User/shoppingMange/manageC
 const UserWatchList = React.lazy(() => import("../page/User/watchList/watchList"));
 const UserSearch = React.lazy(() => import("../page/User/shopping/search/index"));
 const UserFilter = React.lazy(() => import("../page/User/shopping/filter/index"));
+const UserContact = React.lazy(() => import("../page/User/contact/contact"));
+
 
 const UserRoutes: RouteObject[] = [
   {
@@ -57,6 +59,7 @@ const UserRoutes: RouteObject[] = [
       { path: "profile", element: <UserProdfile /> },
       { path: "listCart", element: <UserListCart /> },
       { path: "watchList", element: <UserWatchList /> },
+      { path: "contact", element: <UserContact /> },
     ],
   },
   {

@@ -11,7 +11,7 @@ const clientProduct = require("./client/product");
 const clientCategỏy = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
-
+const Contact = require("./client/contact/contact");
 // const supplierRoutes = require("./admin/suppliers/suppliers");
 // const WathListRouter = require("./product/product");
 
@@ -48,6 +48,7 @@ const routes = (app) => {
   app.use("/api/client/customer-service", customerServiceRouter);
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
+  app.use("/api/client/contact", Contact);
 };
 
 module.exports = routes;
