@@ -27,17 +27,17 @@ const brandController = {
 
     listBrands: async (req, res) => {
         try {
-            const page = parseInt(req.query.page, 10) || 1; 
-            const limit = parseInt(req.query.limit, 5) || 5; 
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 5) || 5;
             const count = await modelBrand.countDocuments({
-              status: { $ne: "disable" },
+                status: { $ne: "disable" },
             });
             const totalPages = Math.ceil(count / limit);
             const brands = await modelBrand.find({ status: { $ne: 'disable' } })
-            .populate('category_id', 'name')
-            .populate('supplier_id','name')
-            .skip((page - 1) * limit)
-            .limit(limit);
+                .populate('category_id', 'name')
+                .populate('supplier_id', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
 
             res.status(200).json({
                 success: true,
@@ -110,7 +110,7 @@ const brandController = {
     getAllCategoriesController: async (req, res) => {
         try {
 
-            const categories = await modelCategory.find({}).exec();
+            const categories = await modelCategory.find({ status: { $ne: 'disable' } }).exec();
 
             const cateReady = categories.map(category => ({
                 category: category._id,
@@ -128,7 +128,7 @@ const brandController = {
     getAllSuppliersController: async (req, res) => {
         try {
 
-            const suppliers = await modelSupplier.find({}).exec();
+            const suppliers = await modelSupplier.find({ status: { $ne: 'disable' } }).exec();
 
             const supplierReady = suppliers.map(supplier => ({
                 supplier: supplier._id,
@@ -158,33 +158,33 @@ const brandController = {
             res.status(500).json({ message: "Lỗi server" });
         }
     },
-    update : async (req, res) => {
+    update: async (req, res) => {
         try {
             const { id } = req.params;
             const { name, category_id, supplier_id, description } = req.body;
             const image = req.file ? req.file : undefined;
-    
-            if (!name || !description || !category_id || !supplier_id ) {
+
+            if (!name || !description || !category_id || !supplier_id) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
             }
-    
+
             let imageURL;
             if (image) {
                 if (!Buffer.isBuffer(image.buffer)) {
                     return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
                 }
-    
+
                 const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
                 const file = bucket.file(`brands/${filename}`);
                 const fileStream = file.createWriteStream({
                     metadata: { contentType: image.mimetype },
                 });
-    
+
                 fileStream.on('error', err => {
                     console.error('Lỗi khi tải lên Firebase Storage:', err);
                     return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
                 });
-    
+
                 fileStream.on('finish', async () => {
                     try {
                         await file.makePublic();
@@ -195,22 +195,22 @@ const brandController = {
                         return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
                     }
                 });
-    
+
                 fileStream.end(image.buffer);
             } else {
                 await updateBrandInDB();
             }
-    
+
             async function updateBrandInDB() {
                 const updatedData = { name, category_id, supplier_id, description };
                 if (imageURL) updatedData.image = imageURL;
-    
+
                 const updatedBrand = await modelBrand.findByIdAndUpdate(id, updatedData, { new: true });
-    
+
                 if (!updatedBrand) {
                     return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 }
-    
+
                 return res.status(200).json({ message: "Sản phẩm được cập nhật thành công", updatedBrand });
             }
         } catch (error) {
@@ -264,7 +264,7 @@ const brandController = {
 
             const id = req.params.id;
             // Cập nhật trạng thái của danh mục thành "Đã xóa"
-            const softDeletedBrand= await modelBrand.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
+            const softDeletedBrand = await modelBrand.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
 
             if (!softDeletedBrand) {
                 return res.status(404).json({ message: "Không tìm thấy thương hiệu" });
@@ -290,7 +290,7 @@ const brandController = {
             const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
 
             if (!isAdmin) {
-                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục thương hiệu "});
+                return res.status(403).json({ message: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục thương hiệu " });
             }
 
 
@@ -317,19 +317,17 @@ const brandController = {
         try {
             const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
             const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
-            
+
             const count = await modelBrand.countDocuments({
-              status: { $ne: "disable" },
+                status: "disable" ,
             });
             const totalPages = Math.ceil(count / limit);
 
-
-
             const deleteListBrand = await modelBrand.find({ status: 'disable' })
-            .populate('category_id', 'name')
-            .populate('supplier_id','name')
-            .skip((page - 1) * limit)
-            .limit(limit);
+                .populate('category_id', 'name')
+                .populate('supplier_id', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
             res.status(200).json({
                 success: true,
                 data: deleteListBrand,
@@ -339,6 +337,136 @@ const brandController = {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
+    search: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+            const searchQuery = {
+                name: { $regex: keyword, $options: "i" },
+                status: "active",
+            };
+
+            // Get the total count for pagination purposes
+            const totalResults = await modelBrand.countDocuments(searchQuery);
+
+            // If no results, return a suitable message
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+
+            // Execute the search query with pagination
+            const result = await modelBrand
+                .find(searchQuery)
+                .populate('category_id', 'name')
+                .populate('supplier_id', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            // Return the search results with pagination info
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: result,
+                currentPage: page,
+                totalResults,
+                totalPages: Math.ceil(totalResults / limit),
+            });
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
+        }
+    },
+
+    searchDelete: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+            const searchQuery = {
+                name: { $regex: keyword, $options: "i" },
+                status: "disable",
+            };
+
+            // Get the total count for pagination purposes
+            const totalResults = await modelBrand.countDocuments(searchQuery);
+
+            // If no results, return a suitable message
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+
+            // Execute the search query with pagination
+            const result = await modelBrand
+                .find(searchQuery)
+                .populate('category_id', 'name')
+                .populate('supplier_id', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            // Return the search results with pagination info
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: result,
+                currentPage: page,
+                totalResults,
+                totalPages: Math.ceil(totalResults / limit),
+            });
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
+        }
+    },
+
 
 
 

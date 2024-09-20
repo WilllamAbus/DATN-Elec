@@ -1,36 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../../redux/store";
-import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
+import React, { useState } from "react";
 import OrderList from "./order/listOrder";
 import PendingOrder from "./order/pendingOrder";
 import ConfirmOrders from "./order/Confirm";
 import ShippingOrders from "./order/ShippingOrder";
+import CompletedOrders from "./order/CompletedOrders";
+import CancelOrders from "./order/CancelOrder";
 
 const Order: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch();
-  const { orders, status, error } = useSelector(
-    (state: RootState) => state.order
-  );
   const [view, setView] = useState<
-    "list" | "confirm" | "pending" | "shipping" | "completed" | "CancelOrder"
+    | "list"
+    | "confirm"
+    | "pending"
+    | "detail"
+    | "shipping"
+    | "completed"
+    | "CancelOrder"
   >("list");
 
-  useEffect(() => {
-    dispatch(fetchUserOrdersThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    console.log("Orders:", orders);
-    console.log("Status:", status);
-    console.log("Error:", error);
-  }, [orders, status, error]);
   return (
     <div className="py-5 relative">
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
-        <h2 className=" text-3xl leading-10 text-black mb-9">
-          Lịch sử đơn hàng
-        </h2>
+        <h2 className=" text-3xl leading-10 text-black mb-9">Đơn hàng</h2>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between">
           <ul className="flex flex-wrap sm:flex-nowrap gap-x-5 gap-y-3 sm:gap-y-0">
             <li
@@ -87,6 +77,13 @@ const Order: React.FC = () => {
         {view === "pending" && <PendingOrder />}
         {view === "confirm" && <ConfirmOrders />}
         {view === "shipping" && <ShippingOrders />}
+        {view === "completed" && <CompletedOrders />}
+        {view === "CancelOrder" && <CancelOrders />}
+        {/* {view === "detail" && selectedOrder && (
+          <DetailOrder order={selectedOrder} onBack={handleBackToList} />
+        )} */}
+
+        {/* {view === "watchlist" && <Watchlist profiles={profile} />} */}
       </div>
     </div>
   );

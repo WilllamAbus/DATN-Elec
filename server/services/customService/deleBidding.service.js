@@ -41,7 +41,7 @@ const deleBidingService = {
             status: "active",
             disabledAt: null
           });
-      
+          
           await log.save();
         } catch (error) {
           throw new Error(`Error logging service request: ${error.message}`);
@@ -51,14 +51,15 @@ const deleBidingService = {
         try {
           // Xóa đấu giá
           const auction = await deleBidingService.softDeleteBidding(biddingId);
-    
+         
+            
           // Ghi nhận yêu cầu dịch vụ
           await deleBidingService.logServiceRequest(userId, biddingId, serviceRequestId, reason, notes);
-    
+          
           // Lấy thông tin người dùng và dịch vụ
           const userEmail = await getUserAndService.getUserEmailById(userId);
           const serviceDetails = await getUserAndService.getServiceDetailsById(serviceRequestId); // Dịch vụ có thể là đấu giá hoặc dịch vụ liên quan
-          
+        
           // Gửi email xác nhận hủy dịch vụ
           await sendDeletionConfirmationEmail(userEmail, serviceDetails);
           const notificationMessage = `Yêu cầu hủy dịch vụ của bạn đối với dịch vụ ${serviceDetails.name} đã được xử lý.`;
@@ -74,6 +75,9 @@ const deleBidingService = {
             isActive: true,
             status: 'active'
           });
+
+       
+          
       
           await newNotification.save();
       
@@ -89,6 +93,7 @@ const deleBidingService = {
           return auction;
      
         } catch (error) {
+          console.error(error)
           throw new Error(`Error handling auction deletion: ${error.message}`);
         }
       }

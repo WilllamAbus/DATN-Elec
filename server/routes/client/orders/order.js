@@ -20,23 +20,10 @@ router.get(
   middlewareController.verifyToken,
   orderController.getUserOrders
 );
-//pending
 router.get(
-  "/pendingOrders",
+  "/:orderId",
   middlewareController.verifyToken,
-  orderController.getPendingOrders
-);
-//Confirm
-router.get(
-  "/ConfirmOrders",
-  middlewareController.verifyToken,
-  orderController.getConfirmOrders
-);
-//shipping
-router.get(
-  "/shippingOrders",
-  middlewareController.verifyToken,
-  orderController.getShippingOrders
+  orderController.getOrderById
 );
 router.put(
   "/cancel/:orderId",

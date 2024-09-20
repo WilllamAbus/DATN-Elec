@@ -12,6 +12,8 @@ const {
     softDelete,
     deletedList,
     restore,
+    search,
+    searchDelete
 } = require("../../../controler/admin/brandController");
 
 const middlewareController = require("../../../middleware/auth");
@@ -51,5 +53,9 @@ router.get("/deleted-list",
 router.patch("/restore/:id",
     middlewareController.verifyToken,
     restore);
+
+router.get("/search", search);
+router.get("/searchDelete", searchDelete);
+
 
 module.exports = router;

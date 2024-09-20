@@ -1,5 +1,3 @@
-
-
 import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
@@ -18,6 +16,17 @@ import cartRenducer from "./cart/cartSlice";
 import countryRenducer from "./country/provinceSlice";
 import VnpayRenducer from "./pay/vnpaySlice";
 import orderRenducer from "./order/orderSlice";
+import productByTimeTrackReducer from "./timeTrackProduct/timeTrackProdSlice";
+import randBidPriceReducer from "./timeTrackProduct/randBidPrice/randBidPriceSlice";
+import biddingReducer from "./bidding/biddingSlice";
+import getRandBidReducer from "./timeTrackProduct/getRandBidV2/getRandBidSlice";
+import serviceRefSlice from "./servicesRef/serviceRefSlice";
+import auctionReducer from "./auctions/auctionSlice";
+import deleteBidReducer from "./deleteBid/deleteBidSlice";
+import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
+import confirmReducer from "./confirmOrder/confirmOrderSlice";
+import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
+
 const authConfig = {
   key: "auth",
   storage,
@@ -38,6 +47,16 @@ const rootReducer = combineReducers({
   country: countryRenducer,
   Vnpay: VnpayRenducer,
   order: orderRenducer,
+  productByTimeTrack: productByTimeTrackReducer,
+  randBid: randBidPriceReducer,
+  bidding: biddingReducer,
+  randBidPrice: getRandBidReducer,
+  serviceRef: serviceRefSlice,
+  deleteBid: deleteBidReducer,
+  auction: auctionReducer,
+  auctCheckout: auctCheckoutReducer,
+  orderAuction: orderAuctionReducer,
+  confirmOrder: confirmReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

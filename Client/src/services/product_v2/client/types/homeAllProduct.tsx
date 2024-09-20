@@ -19,7 +19,7 @@ export interface ProductAttribute {
   v: string;
   _id: string; 
 }
-export interface HomeAllProductResponse {
+export interface HomeAllProductResponse {   
   success: boolean;
   err: number;
   msg: string;

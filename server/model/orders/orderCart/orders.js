@@ -1,11 +1,10 @@
 const { Schema, model } = require("mongoose");
-const orderItem = require("./orderItem");
 
 const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
-    cartDetails: [orderItem],
-    payment: { type: Schema.Types.ObjectId, ref: "payment", required: true },
+    cartDetails: [{ type: Schema.Types.ObjectId, ref: "OrderDetail" }],
+    payment: { type: Schema.Types.ObjectId, ref: "payment", default: null },
     shipping: {
       type: Schema.Types.ObjectId,
       ref: "shipping",
@@ -27,7 +26,7 @@ const orderSchema = new Schema(
         "Đã xác nhận",
         "Đang vận chuyển",
         "Hoàn tất",
-        "Trả hàng",
+        // "Trả hàng",
         "Hủy đơn hàng",
       ],
       required: true,

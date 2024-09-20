@@ -1,7 +1,7 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
-import { BatteryOption } from "../types";
+import { BatteryOption } from "../types/main_product";
 
 export const handleBatteryChange = (
   selectedOption: SingleValue<BatteryOption>,

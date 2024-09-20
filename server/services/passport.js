@@ -53,7 +53,7 @@ passport.use(new GoogleStrategy({
                 return cb(new Error("Không tìm thấy ID hồ sơ"), null);
             }
         } catch (err) {
-            return cb(err, null); // Trả về lỗi nếu có lỗi xảy ra
+            return cb(err, null); 
         }
     }
 ));

@@ -193,9 +193,7 @@ const authController = {
 
       if (user.status !== "active") {
         console.log("Tài khoản đã bị khóa");
-        return res.status(400).json({
-          message: "Tài khoản đã bị khóa ",
-        });
+        return res.status(400).json({ message: "Tài khoản đã bị khóa" });
       }
 
       const token = authController.generateToken(user);
@@ -210,11 +208,17 @@ const authController = {
         sameSite: "strict",
       });
 
-      const { password, ...others } = user._doc;
+      const { password, ...userData } = user._doc;
 
-      return res
-        .status(200)
-        .json({ ...others, accessToken: token, roles: user.roles });
+      // Gửi thông tin vai trò và token về client
+      return res.status(200).json({
+        ...userData,
+        accessToken: token,
+        roles: user.roles,
+        redirectTo: user.roles.some((role) => role.name === "admin")
+          ? "/admin"
+          : "/profile",
+      });
     } catch (err) {
       return res
         .status(500)

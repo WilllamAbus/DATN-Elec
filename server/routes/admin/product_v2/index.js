@@ -21,7 +21,7 @@ const {
    hardDelete} = require('../../../controler/admin/product_v2');
 router.get('/list',list);
 router.post('/add', upload.array('image'), add);
-router.post('/:product_id/variants', upload.array('image'), addVariant);
+router.post('/:product_id/addvariant', upload.array('image'), addVariant);
 router.patch('/softDelete/:id',middlewareController.verifyToken,softDelete);
 router.get('/selectbrand',selectbrand);
 router.get('/selectsupplier',selectSupplier);

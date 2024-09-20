@@ -11,7 +11,8 @@ export interface ProductV2 {
   product_condition: string;
   product_quantity: number;
   product_price: number;
-  product_attributes: { k: string; v: string }[]; 
+  product_attributes: { k: string; v: string }[];
   weight_g: number;
   image?: FileList;
+  hasVariants: boolean;
 }

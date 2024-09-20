@@ -1,123 +1,154 @@
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import "../../../../../assets/css/user.style.css";
-// import "@fortawesome/fontawesome-free/css/all.min.css";
-// import axios from "axios";
-// import { commentProduct } from "../../../../../services/commnet/comment.service";
-// import RepComment from "../comment/repComment";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "../../../../../assets/css/user.style.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
+import "react-toastify/dist/ReactToastify.css";
+import RepComment from "./repComment";
+import RatingStats from "./ratingStats";
 
-// interface Comment {
-//   _id: string;
-//   avatar?: string;
-//   content: string;
-//   rating: number;
-//   id_user: string;
-// }
+import {
+  getCommentProduct,
+  Comment as CommentType,
+} from "../../../../../services/commnet/comment.service";
+interface ListcommentProps {
+  comments: CommentType[];
+}
 
-// interface User {
-//   name: string;
-//   avatar: string;
-// }
+interface User {
+  _id?: string; 
+  name?: string;
+  avatar?: string;
+}
+const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
+  const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
+  const { id } = useParams<{ id: string }>();
+  const [visibleCount, setVisibleCount] = useState(2);
+  const handleShowMore = () => {
+    setVisibleCount(comments.length); 
+  };
+  const fetchComments = async () => {
+    if (!id) {
+      console.log("ID sản phẩm không tồn tại");
+      return;
+    }
 
-// const Listcomment: React.FC = () => {
-//   const [comments, setComments] = useState<Comment[]>([]);
-//   const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
-//   const { id } = useParams<{ id: string }>();
+    try {
+      const productComments: CommentType[] = await getCommentProduct(id);
+      const userIds = Array.from(
+        new Set(productComments.map((comment) => comment.user.toString()))
+      );
 
-//   const fetchComments = async () => {
-//     if (!id) {
-//       console.log("id sản phẩm ko tồn tại");
-//       return;
-//     }
+      const userNameResponses = await Promise.all(
+        userIds.map((userId) =>
+          axios.get(`http://localhost:4000/api/product/userID/${userId}`)
+        )
+      );
 
-//     try {
-//       console.log("id sản phẩm:", id);
+      const userNameMap = userNameResponses.reduce((map, response) => {
+        const user = response.data;
+        if (user._id) {
+          map[user._id] = {
+            name: user.name || "Anonymous",
+            avatar: user.avatar || "default-avatar.png",
+          };
+        }
+        return map;
+      }, {} as { [key: string]: User });
 
-//       const productComments = await commentProduct(id);
-//       console.log("ds cmt:", productComments);
+      setUserNames(userNameMap);
+    } catch (error) {
+      console.error("Lỗi:", error);
+    }
+  };
+  useEffect(() => {
+    fetchComments();
+  }, [id]);
+  return (
+    <>
+  {comments?.length > 0 ? (
+    <section className="bg-white py-4 dark:bg-gray-900">
+      <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <div className="flex flex-col md:flex-row items-start justify-between">
+          {/* Phần đánh giá */}
+          <div className="md:w-2/3">
+            <RatingStats comments={comments}/>
+            {/* Nội dung bình luận */}
+            {comments?.slice(0, visibleCount)?.map((comment) => (
+              <div
+                key={comment?._id}
+                className="mt-6 divide-y divide-gray-200 dark:divide-gray-700"
+              >
+                <div className="gap-3 pb-6 sm:flex sm:items-start">
+                  <div className="shrink-0 space-y-2 sm:w-48 md:w-72">
+                    <div className="space-y-0.5">
+                      <div className="flex items-start space-x-4">
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          src={userNames[comment?.user]?.avatar || "default-avatar.png"}
+                          alt="No avatar"
+                        />
+                        <div>
+                          <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
+                            {userNames[comment?.user]?.name || "Anonymous"}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            {[...Array(5)].map((_, index) => (
+                              <svg
+                                key={index}
+                                className={`h-4 w-4 ${
+                                  index < comment?.rating
+                                    ? "text-yellow-300"
+                                    : "text-gray-400"
+                                }`}
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                            {comment?.createdAt?.slice(0, 10)}
+                          </p>
+                          <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
+                            <p className="text-base font-normal text-gray-500 dark:text-gray-400">
+                              {comment?.content}
+                            </p>
+                            <div className="flex items-center gap-4">
+                              {/* RepComment */}
+                              <RepComment id_comment={comment?._id} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {visibleCount < comments?.length && (
+        <div className="w-full text-center">
+          <button
+            type="button"
+            className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+            onClick={handleShowMore}
+          >
+            Xem thêm
+          </button>
+        </div>
+      )}
+    </section>
+  ) : (
+    <p>Chưa có bình luận</p>
+  )}
+</>
 
-//       if (Array.isArray(productComments)) {
-//         setComments(productComments);
-
-//         const userIds = Array.from(new Set(productComments.map(comment => comment.id_user.toString())));
-
-//         const userNameResponses = await Promise.all(
-//           userIds.map(userId => axios.get(`http://localhost:4000/api/product/userID/${userId}`))
-//         );
-
-//         const userNameMap = userNameResponses.reduce((map, response) => {
-//           const user = response.data;
-//           console.log(user);
-          
-//           if (user && user._id || user.avatar || typeof user.name === 'string') {
-//             map[user._id] = {
-//               name: user.name,
-//               avatar: user.avatar,
-//             };
-//           } else {
-//             console.warn("Invalid user data:", user);
-//           }
-//           return map;
-//         }, {} as { [key: string]: User });
-
-//         setUserNames(userNameMap);
-//       } else {
-//         setComments([]);
-//       }
-//     } catch (error) {
-//       console.error("lỗi:", error);
-//       setComments([]);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchComments();
-//   }, [id]);
-
-//   return (
-//     <div>
-//      {comments.length > 0 ? (
-//       <>
-//         {comments.map((comment) => (
-//           <div key={comment._id} className="flex items-start space-x-4 mb-6">
-//             <div className="flex-shrink-0">
-//               <img
-//                 className="h-10 w-10 rounded-full"
-//                 src={userNames[comment.id_user]?.avatar || "default-avatar.png"}
-//                 alt="No avatar"
-//               />
-//             </div>
-//             <div className="flex-1">
-//               <div className="text-sm">
-//                 <p className="font-medium text-gray-800">
-//                   {userNames[comment.id_user]?.name || "Anonymous"}
-//                 </p>
-//                 <p className="text-gray-600">{comment.content}</p>
-//               </div>
-//               <div className="text-yellow-400">
-//                 {[...Array(5)].map((_, index) => (
-//                   <i
-//                     key={index}
-//                     className={`fa fa-star ${
-//                       index < comment.rating ? "text-yellow-400" : "text-gray-400"
-//                     }`}
-//                   ></i>
-//                 ))}
-//               </div>
-//               <br></br>
-//                 {/* Truyền id_comment vào RepComment */}
-//                 <RepComment id_comment={comment._id} />
-//             </div>
-//           </div>
-//         ))}
-//       </>
-//     ) : (
-//       <div>
-//         <p>Chưa có bình luận</p>
-//       </div>
-//     )}
-//     </div>
-//   );
-// };
-
-// export default Listcomment;
+  );
+};
+export default ListCmt;

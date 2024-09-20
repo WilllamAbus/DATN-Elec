@@ -30,15 +30,10 @@ const search: React.FC = () => {
   }, [keyword]);
   return (
     <>
-        <h1 className="text-center text-3xl">Từ khóa tìm kiếm: {keyword}</h1>
-        
+        <h1 className="text-center text-3xl m-3">Sản phẩm có từ khóa: {keyword}</h1>
         {/* <!-- products --> */}
-        <div className="col-span-4">
-                    
-         
-
           {(keyword ?? "").length > 0 && (
-            <div className="grid md:grid-cols-4 grid-cols-2 gap-2">
+            <div className="grid md:grid-cols-5 gap-2 m-3 ">
               {products.length > 0 ? (
                 products.map((product, index) => (
                   <div
@@ -47,7 +42,7 @@ const search: React.FC = () => {
                   >
                   <div className="h-56 w-auto">
                       <Link to={`/detailProd/${product._id}`}>
-                        <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
+                      <figure className="relative max-w-full transition-all duration-300 cursor-pointer filter grayscale-0">
                           <a href="#">
                             <img
                               className="rounded-lg"
@@ -205,7 +200,7 @@ const search: React.FC = () => {
                               </span>
                             ))}
                           </div>
-                          <div className="text-xs text-gray-500 items-center m-3">
+                          <div className="text-xs text-gray-500 items-center m-2">
                             {product.product_quantity > 0
                               ? `(Còn ${product.product_quantity} sản phẩm)`
                               : " "}
@@ -251,7 +246,7 @@ const search: React.FC = () => {
                           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Giá tốt</p>
                         </li>
                       </ul>
-                      <div className="mt-4 flex items-center justify-between gap-6">
+                      <div className="mt-4 flex items-center justify-between gap-8">
                         <p className="text-xs leading-tight text-gray-900 dark:text-white">
                           {product.product_discount.discountPercent > 1 ? (
                             <div>
@@ -329,7 +324,7 @@ const search: React.FC = () => {
               )}
             </div>
           )}
-        </div>
+        
     </>
   );
 };

@@ -13,6 +13,13 @@ const screenOptions = [
   { value: "14in_ips", label: '14.0" Full HD (1080p), IPS, 60Hz' },
   { value: "15in_va", label: '15.6" Full HD (1080p), VA, 60Hz' },
   { value: "15in_curved", label: '15.6" Full HD (1080p), Curved, 60Hz' },
+  { value: "iphone_12", label: 'iPhone 12, 6.1" Super Retina XDR' },
+  { value: "iphone_13", label: 'iPhone 13, 6.1" Super Retina XDR' },
+  { value: "iphone_14", label: 'iPhone 14, 6.1" Super Retina XDR' },
+  { value: "samsung_galaxy_s21", label: 'Samsung Galaxy S21, 6.2" Dynamic AMOLED 2X' },
+  { value: "samsung_galaxy_s22", label: 'Samsung Galaxy S22, 6.1" Dynamic AMOLED 2X' },
+  { value: "samsung_galaxy_s23", label: 'Samsung Galaxy S23, 6.1" Dynamic AMOLED 2X' },
+
 ];
 
 const screenStyles: StylesConfig<(typeof screenOptions)[0], false> = {
@@ -40,6 +47,15 @@ const screenStyles: StylesConfig<(typeof screenOptions)[0], false> = {
         : undefined,
     },
   }),
+  singleValue: (styles) => ({
+    ...styles,
+    color: "black",
+  }),
+  clearIndicator: (styles) => ({
+    ...styles,
+    color: "black",
+    cursor: "pointer",
+  }),
 };
 
 interface ScreenSelectProps {
@@ -61,6 +77,7 @@ const ScreenSelect: React.FC<ScreenSelectProps> = ({ onChange, value, className 
     value={value}
     onChange={onChange}
     className={className}
+    isClearable={true}
   />
 );
 

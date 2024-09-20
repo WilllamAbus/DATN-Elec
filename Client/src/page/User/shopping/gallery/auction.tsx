@@ -1,12 +1,11 @@
-import React  from "react";
+import React from "react";
 
-import UserListting from "../../../../components/User/feature/gallery/product/auctionProduct"
+import UserListting from "../../../../components/User/feature/page-auction/pageAuction";
 
-const auctionProduct : React.FC = () => {
- 
+const auctionProduct: React.FC = () => {
   return (
     <>
-      <UserListting/>
+      <UserListting />
     </>
   );
 };

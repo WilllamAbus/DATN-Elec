@@ -1,3 +1,4 @@
+import axios from "axios";
 import instance from "../axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,21 +24,23 @@ export const addToCart = async (
   return response.data;
 };
 
-// export const updateCart = async (
-//   cartId: string,
-//   items: { product: string; quantity: number }[]
-// ) => {
-//   const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
-//   return response.data;
-// };
 export const updateCart = async (
   cartId: string,
   items: { product: string; quantity: number; isSelected?: boolean }[]
 ) => {
-  const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
-  return response.data;
+  try {
+    const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred while updating the cart.");
+    }
+  }
 };
-
 export const getCartById = async (cartId: string) => {
   const response = await instance.get(`${API_URL}/cart/${cartId}`);
   return response.data;

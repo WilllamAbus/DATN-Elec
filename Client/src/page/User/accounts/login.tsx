@@ -1,12 +1,15 @@
-
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import {
+  RootState,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../redux/store";
 import { loginUserThunk } from "../../../redux/auth/authThunk";
-import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
 interface IFormInput {
   email: string;
   password: string;
@@ -21,22 +24,20 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
-  const [cookies] = useCookies(["token"]);
-  const token = cookies.token;
+  const redirect = useAppSelector((state) => state.auth.login.redirectTo);
+  const Profile = useSelector((state: RootState) => state.auth.profile.profile);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (Profile && redirect) {
+      navigate(redirect);
+    }
+  }, [Profile, redirect, navigate]);
   useEffect(() => {
     if (status === "failed" && error) {
       setMessage(error);
     }
   }, [status, error]);
-
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (token) {
-      navigate("/profile");
-    }
-  }, [token, navigate]);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
@@ -47,8 +48,9 @@ const Login: React.FC = () => {
 
       if (resultAction) {
         setMessage(resultAction.message || "Đăng nhập thành công!");
-        if (resultAction.status === 200) {
-          window.location.href = "/";
+
+        if (resultAction.redirectTo) {
+          navigate(resultAction.redirectTo);
         }
       }
     } catch (err: unknown) {

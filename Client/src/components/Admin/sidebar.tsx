@@ -17,11 +17,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
   const handleLogout = async () => {
     try {
       await dispatch(logoutThunk()).unwrap();
-
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-      localStorage.removeItem("userProfile");
-
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -78,13 +75,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
                 </li>
                 <NavItem type="homeAdmin" />
                 <DropdownItem type="product" />
-                <NavItem type="productv2" />
+                <DropdownItem type="productv2" />
                 <DropdownItem type="orderCart" />
                 <DropdownItem type="account" />
                 <NavItem type="categories" />
                 <NavItem type="comment" />
                 <NavItem type="supplier" />
                 <NavItem type="brand" />
+                <NavItem type="inbound" />
               </ul>
               <div className="pt-2 space-y-2">
                 <ul className="pb-2 space-y-2">

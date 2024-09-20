@@ -21,4 +21,5 @@ router.post('/deleteBidd',middlewareController.verifyTokenAdminAuth, biddingCont
 router.patch('/restoreBidd/:bidId',middlewareController.verifyTokenAdminAuth, biddingController.restoreBid);
 router.get('/soft-deleted-bids', biddingController.getSoftDeletedBids);
 router.get('/bids',middlewareController.verifyToken, biddingController.getBidsByUser);
+router.put('/update-bid',middlewareController.verifyToken, biddingController.updateBidAmountController);
 module.exports = router;

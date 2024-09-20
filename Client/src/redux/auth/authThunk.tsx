@@ -12,7 +12,7 @@ import {
   resetPassword,
   resendEmail,
 } from "../../services/authentication/auth.services";
-
+import { logout } from "./authSlice";
 import {
   listDeleted,
   restore,
@@ -22,29 +22,16 @@ import {
   getUserById,
   listRole,
 } from "../../services/authentication/authAdmin";
-import { Role, UserProfile, LoginResponse } from "../../types/user";
+import { Role, UserProfile } from "../../types/user";
 
-// Thunk cho việc đăng nhập
-// export const loginUserThunk = createAsyncThunk(
-//   "auth/login",
-//   async (user: { email: string; password: string }, { rejectWithValue }) => {
-//     try {
-//       const response = await loginUserService(user);
-//       return response;
-//     } catch (error) {
-//       if (error instanceof Error) {
-//         return rejectWithValue((error as { message: string }).message);
-//       }
-//     }
-//   }
-// );
 export const loginUserThunk = createAsyncThunk<
-  LoginResponse,
+  UserProfile,
   { email: string; password: string }
 >("auth/login", async (user, { rejectWithValue }) => {
   try {
     const response = await loginUserService(user);
-    return response as LoginResponse;
+    console.log("API Response:", response);
+    return response as UserProfile;
   } catch (error) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
@@ -59,7 +46,6 @@ export const getProfileThunk = createAsyncThunk<
 >("auth/getProfile", async (_, { rejectWithValue }) => {
   try {
     const result = await getProfileService();
-    // console.log("API result:", result);
     return result;
   } catch (error) {
     return rejectWithValue((error as Error).message);
@@ -82,9 +68,10 @@ export const getListThunk = createAsyncThunk<
 //  đăng xuất
 export const logoutThunk = createAsyncThunk(
   "auth/logout",
-  async (_, { rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       await logoutService();
+      dispatch(logout());
       return true;
     } catch (error) {
       return rejectWithValue((error as Error).message);

@@ -1,31 +1,38 @@
-// src/hooks/useVnPay.ts
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../redux/store";
-import { VnPaymentThunk } from "../redux/pay/vnpay";
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const useVnPay = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
+export const useVNPay = () => {
+  const [loading, setLoading] = useState(false);
 
-  const handleVnPayPayment = async () => {
-    setLoading(true);
-    setError(null);
+  const createPaymentUrl = async (
+    amount: number,
+    bankCode?: string,
+    language: string = "vn"
+  ) => {
     try {
-      await dispatch(VnPaymentThunk()).unwrap();
-      setSuccess(true);
-      // Handle successful VNPay payment (e.g., redirect to payment page)
-      window.location.href = "/vnpay";
-    } catch (err) {
-      setError("Đã xảy ra lỗi trong quá trình thanh toán VNPay.");
+      setLoading(true);
+      const response = await axios.post(
+        "http://localhost:4000/api/vnpay/create_payment_url",
+        {
+          amount,
+          bankCode,
+          language,
+        }
+      );
+      const { paymentUrl } = response.data;
+
+      return paymentUrl; // Trả về URL cho client
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Lỗi không xác định";
+      toast.error("Không thể tạo URL thanh toán VNPay: " + errorMessage);
+      return null; // Trả về null nếu có lỗi
     } finally {
       setLoading(false);
     }
   };
 
-  return { handleVnPayPayment, loading, error, success };
+  // Không cần verifyPayment trong hook này vì bạn xử lý trực tiếp trong component
+  return { createPaymentUrl, loading };
 };
-
-export default useVnPay;

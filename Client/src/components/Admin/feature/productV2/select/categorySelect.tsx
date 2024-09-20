@@ -1,11 +1,11 @@
 import React from "react";
-import { FieldError, UseFormRegister } from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
 import { Category } from "../../../../../services/product_v2/admin/types";
 
 interface CategorySelectProps {
   categories: Category[];
   register: UseFormRegister<any>;
-  error: FieldError | undefined;
+  error: string | undefined;
 }
 
 const CategorySelect: React.FC<CategorySelectProps> = ({ categories, register, error }) => {
@@ -31,7 +31,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ categories, register, e
       </select>
       {error && (
         <div className="flex items-center mt-2 text-red-600">
-          <span className="text-sm font-medium">{error.message}</span>
+          <span className="text-sm font-medium">{error}</span>
         </div>
       )}
     </div>

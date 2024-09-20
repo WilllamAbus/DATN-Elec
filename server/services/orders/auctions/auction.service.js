@@ -1,6 +1,6 @@
 "use strict";
 /**Module */
-
+const mongoose = require('mongoose');
 const moment = require("moment-timezone");
 const Product_v2 = require("../../../model/product_v2");
 const Auction = require("../../../model/orders/auction.model");
@@ -18,10 +18,10 @@ const auctionService = {
       .populate("product_format", "formats")
       .lean();
 
+    
+      
     if (!product) {
-      throw new Error(
-        "Không tìm thấy sản phẩm hoặc sản phẩm đã bị vô hiệu hóa."
-      );
+      throw new Error("Không tìm thấy sản phẩm hoặc sản phẩm đã bị vô hiệu hóa.");
     }
 
     const format = product.product_format?.formats?.trim();
@@ -34,24 +34,20 @@ const auctionService = {
     if (!timeTrack) {
       throw new Error("Không tìm thấy thông tin thời gian đấu giá.");
     }
+  // Kiểm tra nếu productId trong timeTrack khớp với productId từ request
 
-    console.log("timeTrack:", timeTrack);
 
     const currentTime = moment().tz("Asia/Ho_Chi_Minh").toDate();
-    const bidEndTime = moment(timeTrack.endTime)
-      .tz("Asia/Ho_Chi_Minh")
-      .toDate();
-    console.log("BidEndTime:", bidEndTime);
+    const bidEndTime = timeTrack._id
 
     // Cập nhật trạng thái đấu giá
     const updatedBiddings = await Bidding.find({
       "product_bidding.productId": productId,
-      bidTime: { $gt: bidEndTime },
+      bidEndTime: { $eq: bidEndTime }, // Sử dụng endTimeBid để xác định đúng phiên đấu giá
     }).lean();
 
-    console.log('productID', typeof(productId));
-    
-    console.log("Updated Biddings:", updatedBiddings);
+   
+  
 
     if (updatedBiddings.length === 0) {
       throw new Error("Không có lượt đấu giá nào để cập nhật.");
@@ -63,26 +59,17 @@ const auctionService = {
     );
 
     // Tìm kiếm hoặc tạo mới Auction
-    // Create or find the relevant Time_Track document
-    const timeTracks = await TimeTrack.findOne({ _id: timeTrackID }); // Assume timeTrackId is known
-    if (!timeTrack) {
-      throw new Error("Time track not found");
-    }
-
-    // Set auctionEndTime to the ObjectId of the Time_Track document
-    const auctionEndTimeObjectId = timeTracks._id;
-
-    let auctionTemp = await Auction.findOne({ productId });
-    console.log("aucttionTemp:", auctionTemp);
+    let auctionTemp = await Auction.findOne({ productId, auctionEndTime: timeTrackID }); // Tìm kiếm theo productId và timeTrackID
+  
 
     if (!auctionTemp) {
       auctionTemp = new Auction({
         productId: productId,
-        auction_winner: null, // Thay đổi thành null thay vì 'A' để chưa xác định người thắng
-        auction_quantity: 0, // Số lượng nên bắt đầu từ 0
+        auction_winner: null,
+        auction_quantity: 0,
         auction_total: 0,
         auctionTime: currentTime,
-        auctionEndTime: auctionEndTimeObjectId, // Use the ObjectId reference
+        auctionEndTime: timeTrackID, // Set auctionEndTime to timeTrackID
         biddings: [],
       });
     }
@@ -92,36 +79,34 @@ const auctionService = {
     await auctionTemp.save();
 
     // Kiểm tra thời gian và tìm người chiến thắng
-    const auctionEndTime = moment(auctionTemp.auctionTime).add(
-      timeTrack.duration,
-      "minutes"
-    );
-    console.log("AuctionEndTime:", auctionEndTime);
+    const auctionEndTime = moment(auctionTemp.auctionTime).add(timeTrack.duration, "minutes");
+   
 
     if (moment(currentTime).isSameOrAfter(auctionEndTime)) {
       const biddings = await Bidding.find({
         "product_bidding.productId": productId,
+        bidEndTime: { $eq: bidEndTime }, // Chỉ xét các biddings trong khoảng thời gian này
       })
         .sort({ bidAmount: -1 })
         .lean();
-      console.log("Biddings:", biddings);
+
 
       if (biddings.length === 0) {
         throw new Error("Không có giá đấu nào cho phiên đấu giá này.");
       }
 
       const highestBid = biddings[0];
-      console.log("HighestBid:", highestBid);
+ 
 
       const updatedAuction = await Auction.findOneAndUpdate(
-        { productId, status: "active" },
+        { productId, auctionEndTime: timeTrackID },
         {
           $set: {
             auction_winner: highestBid.bidder,
             auction_total: highestBid.bidAmount,
-            auction_quantity: 1, // Điều chỉnh số lượng nếu cần
+            auction_quantity: 1,
             stateAuction: "Xác nhận",
-            isActive: true, // Đấu giá đã kết thúc
+            isActive: true,
             auctionTime: currentTime,
             biddings: auctionTemp.biddings,
           },
@@ -133,13 +118,26 @@ const auctionService = {
         throw new Error("Không thể cập nhật đấu giá.");
       }
 
+    //      // Cập nhật trạng thái sản phẩm thành "disable"
+    // await Product_v2.findByIdAndUpdate(productId, {
+    //   status: "disable",
+    // });
+
+    // // Cập nhật trạng thái của các bản ghi trong priceRandBid và timeTrack thành "disable"
+    // await PriceRandBid.updateMany(
+    //   { productId },
+    //   { $set: { status: "disable" } }
+    // );
+    // await TimeTrack.findByIdAndUpdate(timeTrackID, {
+    //   status: "disable",
+    // });
       return updatedAuction;
+
     } else {
-      throw new Error(
-        "Đấu giá chưa kết thúc hoặc chưa đến thời điểm xác nhận."
-      );
+      throw new Error("Đấu giá chưa kết thúc hoặc chưa đến thời điểm xác nhận.");
     }
   },
+
   getAll: async (page = 1, limit = 5) => {
     try {
       const skip = (page - 1) * limit;
@@ -195,39 +193,71 @@ const auctionService = {
       throw new Error(`Cannot fetch auction: ${error.message}`);
     }
   },
-  getAuctionDetails: async (auctionId, productId) => {
+  getAuctionDetails: async (productId) => {
     try {
-      // Retrieve the product details
-      const product = await Product_v2.findById(productId)
-        .select("product_name images")
+      // Retrieve the auction based on userId
+      const auction = await Auction.findOne({ "productId": productId })
+        .select("auction_total auction_quantity auction_winner productId auctionTime auctionEndTime biddings stateAuction")
         .lean();
-
-      if (!product) {
-        throw new Error("Không tìm thấy sản phẩm.");
-      }
-
-      // Retrieve the auction details
-      const auction = await Auction.findById(auctionId)
-        .select("auction_total auction_quantity")
-        .lean();
-
+      
+      
       if (!auction) {
-        throw new Error("Không thể tìm thấy đấu giá.");
+        throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
       }
-
-      // Return the auction details along with the product details
+  
+  
+      const biddings = auction.productId;
+    const userId = auction.auction_winner
+       
+      const product = await Product_v2.findOne({"_id": biddings})
+      .select("product_name image")
+      .lean();
+  
+      
+    if (!product) {
+      console.warn(`Product not found for productId: ${biddings}`);
+      throw new Error("Không tìm thấy sản phẩm.");
+    }
+  
+    const user = await User.findById(userId)
+          .select("address name phone")
+          .lean();
+  
+        if (!user) {
+          throw new Error("Không thể tìm thấy người dùng.");
+        }
+      // If each bidding contains a productId, query for product details
+  
+        
       return {
+        auctionId: auction._id,
         auctionTotal: auction.auction_total,
         auctionQuantity: auction.auction_quantity,
         productName: product.product_name,
-        productImages: Array.isArray(product.images)
-          ? product.images
-          : [product.images],
+        productImages: product.image,
+        userAddress: user.address,
+        userName: user.name,
+        userSdt: user.phone,
+        auctionTime: auction.auctionTime,
+        auctionEndTime: auction.auctionEndTime,
+        biddings: biddings,
+        stateAuction: auction.stateAuction
       };
-    } catch (error) {
-      console.error("Error fetching auction details:", error.message);
-      throw new Error(`Cannot fetch auction details: ${error.message}`);
-    }
+        
+        // Retrieve the product details
+      
+  
+      
+  
+        // Return the auction details along with product and user details
+        
+  
+      
+      } catch (error) {
+        console.error("Error fetching auction details:", error.message);
+        throw new Error(`Cannot fetch auction details: ${error.message}`);
+      }
+    
   },
   delete: async (auctionId) => {
     try {

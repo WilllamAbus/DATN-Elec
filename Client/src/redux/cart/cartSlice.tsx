@@ -30,9 +30,10 @@
 //         cartId: string;
 //         itemId: string;
 //         quantity: number;
+//         selected?: boolean;
 //       }>
 //     ) {
-//       const { cartId, itemId, quantity } = action.payload;
+//       const { cartId, itemId, quantity, selected } = action.payload;
 
 //       const cartIndex = state.carts.findIndex((cart) => cart._id === cartId);
 //       if (cartIndex !== -1) {
@@ -41,6 +42,9 @@
 //         );
 //         if (itemIndex !== -1) {
 //           state.carts[cartIndex].items[itemIndex].quantity = quantity;
+//           if (selected !== undefined) {
+//             state.carts[cartIndex].items[itemIndex].isSelected = selected;
+//           }
 //           state.carts[cartIndex].items[itemIndex].totalItemPrice =
 //             quantity * state.carts[cartIndex].items[itemIndex].price;
 
@@ -57,14 +61,6 @@
 //       .addCase(fetchCartList.pending, (state) => {
 //         state.status = "loading";
 //       })
-//       // .addCase(
-//       //   fetchCartList.fulfilled,
-//       //   (state, action: PayloadAction<CartType[]>) => {
-//       //     state.status = "succeeded";
-//       //     state.carts = action.payload;
-//       //     state.error = null; // Clear any existing message
-//       //   }
-//       // )
 //       .addCase(fetchCartList.fulfilled, (state, action) => {
 //         state.status = "succeeded";
 //         if (Array.isArray(action.payload)) {
@@ -83,7 +79,7 @@
 //         state.carts.push(action.payload);
 //       })
 //       .addCase(updateCartItem.fulfilled, (state, action) => {
-//         const { cartId, itemId, quantity } = action.payload;
+//         const { cartId, itemId, quantity, isSelected } = action.payload;
 
 //         const cartIndex = state.carts.findIndex((cart) => cart._id === cartId);
 
@@ -93,6 +89,9 @@
 //           );
 //           if (itemIndex !== -1) {
 //             state.carts[cartIndex].items[itemIndex].quantity = quantity;
+//             if (isSelected !== undefined) {
+//               state.carts[cartIndex].items[itemIndex].isSelected = isSelected;
+//             }
 //             state.carts[cartIndex].items[itemIndex].totalItemPrice =
 //               quantity * state.carts[cartIndex].items[itemIndex].price;
 
@@ -113,7 +112,6 @@
 //           state.carts.push(action.payload);
 //         }
 //       })
-
 //       .addCase(deleteCart.pending, (state) => {
 //         state.status = "loading";
 //       })

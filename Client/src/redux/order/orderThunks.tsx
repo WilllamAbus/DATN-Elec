@@ -4,9 +4,7 @@ import {
   listOrder,
   fetchUserOrders,
   cancelOrder,
-  pendingOrders,
-  ConfirmOrders,
-  shippingOrders,
+  getOrderById,
 } from "../../services/order/order";
 import { Order } from "../../types/order/order";
 
@@ -24,93 +22,62 @@ export const createOrderThunk = createAsyncThunk<
   }
 });
 
-// Lấy danh sách đơn hàng
 export const listOrderThunk = createAsyncThunk<
   { orders: Order[] },
   void,
   { rejectValue: string }
->("order/listOrder", async (_, { rejectWithValue }) => {
+>("admin/order/listOrder", async (_, { rejectWithValue }) => {
   try {
-    const { data } = await listOrder();
-    return { orders: data };
+    const response = await listOrder();
+
+    if (!response || !response.orders || !Array.isArray(response.orders)) {
+      throw new Error("Invalid data format");
+    }
+
+    return { orders: response.orders };
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }
 });
+
 export const fetchUserOrdersThunk = createAsyncThunk<
-  { orders: Order[] }, // Kết quả trả về
-  void, // Không có tham số đầu vào
-  { rejectValue: string } // Giá trị trả về khi lỗi
+  { orders: Order[] },
+  void,
+  { rejectValue: string }
 >("order/UserOrders", async (_, { rejectWithValue }) => {
   try {
     const response = await fetchUserOrders();
 
-    // Kiểm tra cấu trúc dữ liệu trả về
     if (!response || !response.orders || !Array.isArray(response.orders)) {
       throw new Error("Invalid data format");
     }
 
-    return { orders: response.orders }; // Trả về đúng kiểu dữ liệu
+    return { orders: response.orders };
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }
 });
+
 export const cancelOrderThunk = createAsyncThunk<
-  Order, // Kết quả trả về là đối tượng Order đã được cập nhật
-  { orderId: string }, // Tham số đầu vào là ID của đơn hàng
-  { rejectValue: string } // Giá trị trả về khi lỗi
+  Order,
+  { orderId: string },
+  { rejectValue: string }
 >("order/cancelOrder", async ({ orderId }, { rejectWithValue }) => {
   try {
     const response = await cancelOrder(orderId);
-    return response.order; // Đảm bảo trả về đúng kiểu dữ liệu
+    return response.order;
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }
 });
-export const pendingOrdersThunk = createAsyncThunk<
+
+export const getOrderByIdThunk = createAsyncThunk<
   { orders: Order[] },
-  void,
+  string,
   { rejectValue: string }
->("order/pendingOrders", async (_, { rejectWithValue }) => {
+>("order/getOrderById", async (orderId, { rejectWithValue }) => {
   try {
-    const response = await pendingOrders();
-    console.log("pendingOrders", response);
-
-    if (!response || !response.orders || !Array.isArray(response.orders)) {
-      throw new Error("Invalid data format");
-    }
-
-    return { orders: response.orders };
-  } catch (error) {
-    return rejectWithValue((error as Error).message);
-  }
-});
-export const ConfirmOrdersThunk = createAsyncThunk<
-  { orders: Order[] },
-  void,
-  { rejectValue: string }
->("order/ConfirmOrders", async (_, { rejectWithValue }) => {
-  try {
-    const response = await ConfirmOrders();
-    console.log("pendingOrders", response);
-
-    if (!response || !response.orders || !Array.isArray(response.orders)) {
-      throw new Error("Invalid data format");
-    }
-
-    return { orders: response.orders };
-  } catch (error) {
-    return rejectWithValue((error as Error).message);
-  }
-});
-export const shippingOrdersThunk = createAsyncThunk<
-  { orders: Order[] },
-  void,
-  { rejectValue: string }
->("order/shippingOrders", async (_, { rejectWithValue }) => {
-  try {
-    const response = await shippingOrders();
-    console.log("shippingOrders", response);
+    const response = await getOrderById(orderId);
 
     if (!response || !response.orders || !Array.isArray(response.orders)) {
       throw new Error("Invalid data format");

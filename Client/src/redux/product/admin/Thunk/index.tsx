@@ -7,7 +7,7 @@ export * from './pagi';
 export * from './deletedList ';
 export * from './hardDelete';
 export * from './restore';
-
+export * from './addVariant';
 
 
 

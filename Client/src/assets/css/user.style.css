@@ -1,29 +1,52 @@
-#box-sp {
+/* Mặc định ẩn mũi tên */
+.comment-container::after,
+.comment-container::before,
+.horizontal-line {
+  display: none;
+}
+
+/* Khi có repComment thì hiển thị mũi tên và thanh ngang */
+.show-arrow::after,
+.show-arrow::before,
+.show-arrow .horizontal-line {
+  display: block;
+}
+
+.comment-container {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+  /* Đường thẳng dọc (mũi tên) */
+  .comment-container::after {
+    content: '';
     position: absolute;
-    top: 210px;
-    left: 390px;
-}
-
-@media (max-width: 767px) { 
-    #box-sp {
-        position: static; 
-        top: auto;
-        left: auto;
-    }
-}
-/* Đảm bảo rằng phần tử không bị cắt xén khi phóng to */
-html {
-    font-size: 100%; /* Có thể điều chỉnh nếu cần */
-}
-
-/* Đặt các quy tắc responsive cho các phần tử cụ thể */
-.container {
-    max-width: 1200px; /* Giới hạn chiều rộng tối đa của phần tử */
-    margin: 0 auto; /* Căn giữa phần tử */
-}
-
-@media (max-width: 1200px) {
-    .container {
-        padding: 0 20px; /* Thêm khoảng cách bên trong để tránh cắt xén */
-    }
-}
+    left: -35px; /* Vị trí của đường thẳng */
+    top: -65px; /* Đặt mũi tên ngay dưới comment */
+    width: 2px;
+    height: 75px; /* Độ dài của đường thẳng (mũi tên) */
+    background-color: #ccc; /* Màu của đường thẳng */
+  }
+  
+  /* Thanh ngang nối vào mũi tên */
+  .comment-container .horizontal-line {
+    position: absolute;
+    left: -35px; /* Điều chỉnh vị trí của thanh ngang */
+    top: calc(10px); /* Ngang với đỉnh của đường thẳng */
+    width: 35px; /* Độ dài của thanh ngang */
+    height: 2px;
+    background-color: #ccc; /* Màu của thanh ngang */
+  }
+  
+  /* Đầu mũi tên */
+  .comment-container::before {
+    content: '';
+    position: absolute;
+    left: -3px; /* Cùng vị trí với mũi tên */
+    top: calc(4.5px); /* Điều chỉnh để thêm đầu mũi tên */
+    width: 0;
+    height: 0;
+    border-left: 6px solid #ccc;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+  

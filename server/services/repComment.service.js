@@ -17,7 +17,10 @@ const repCommentService = {
         } catch (error) {
             throw new Error('Error fetching reply comments');
         }
-    }
+    },
+    deleteRepCommentById : async (id) => {
+        return await modelRepComment.findByIdAndDelete(id);
+    },
 };
 
 module.exports = repCommentService;

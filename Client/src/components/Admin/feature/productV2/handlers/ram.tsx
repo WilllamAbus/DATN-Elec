@@ -1,7 +1,7 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
 import { ProductV2 } from "../../../../../types/ProductV2";
-import { RamOption } from "../types";
+import { RamOption } from "../types/main_product";
 
 export const handleRamChange = (
   selectedOption: SingleValue<RamOption>,

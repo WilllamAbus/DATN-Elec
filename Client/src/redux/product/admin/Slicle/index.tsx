@@ -7,3 +7,4 @@ export { default as paginatedProductSlice } from "./pagi";
 export { default as deletedProductSlice } from "./deletedList ";
 export { default as hardDeleteSlice } from "./hardDelete";
 export { default as restoreSlice } from "./restore";
+export { default as addVariantSlice } from "./addVariant";
