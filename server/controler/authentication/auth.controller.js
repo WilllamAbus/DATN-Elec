@@ -152,7 +152,7 @@ const authController = {
       name: user.name,
       roles: user.roles,
     };
-    return jwt.sign(payload, jwtSecret, { expiresIn: "1d" });
+    return jwt.sign(payload, jwtSecret, { expiresIn: "10s" });
   },
 
   generateRefreshToken: (user) => {
@@ -214,6 +214,7 @@ const authController = {
       return res.status(200).json({
         ...userData,
         accessToken: token,
+        refreshToken,
         roles: user.roles,
         redirectTo: user.roles.some((role) => role.name === "admin")
           ? "/admin"

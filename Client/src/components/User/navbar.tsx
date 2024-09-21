@@ -132,23 +132,22 @@ const Navbar: React.FC = () => {
 
             {/* Render filtered products */}
             {filteredProducts.length > 0 ? (
-  <div className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
-    {filteredProducts.map((result) => (
-      <div
-        key={result.id}
-        onClick={() =>
-          (window.location.href = `/search/${encodeURIComponent(
-            result.product_name
-          )}`)
-        } // Điều hướng tới trang sản phẩm
-        className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
-      >
-        {result.product_name}
-      </div>
-    ))}
-  </div>
-) : null}
-
+              <div className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
+                {filteredProducts.map((result) => (
+                  <div
+                    key={result.id}
+                    onClick={() =>
+                      (window.location.href = `/search/${encodeURIComponent(
+                        result.product_name
+                      )}`)
+                    } // Điều hướng tới trang sản phẩm
+                    className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
+                  >
+                    {result.product_name}
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </form>
 
           <div className="flex justify-between items-center lg:order-2">

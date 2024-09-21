@@ -3,13 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import authGoogleService from "../../../services/authentication/authGoogle.service";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import {
-  RootState,
-  useAppDispatch,
-  useAppSelector,
-} from "../../../redux/store";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import { loginUserThunk } from "../../../redux/auth/authThunk";
-import { useSelector } from "react-redux";
+
+import Cookies from "js-cookie";
 interface IFormInput {
   email: string;
   password: string;
@@ -24,15 +21,16 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
-  const redirect = useAppSelector((state) => state.auth.login.redirectTo);
-  const Profile = useSelector((state: RootState) => state.auth.profile.profile);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const token = Cookies.get("token");
   useEffect(() => {
-    if (Profile && redirect) {
-      navigate(redirect);
+    if (token) {
+      navigate("/");
     }
-  }, [Profile, redirect, navigate]);
+  }, []);
+
   useEffect(() => {
     if (status === "failed" && error) {
       setMessage(error);

@@ -240,27 +240,42 @@ const Header: React.FC = () => {
           >
             <ul className="text-gray-900 dark:text-white text-sm font-medium space-y-3">
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Home
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Best Sellers
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Gift Ideas
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Games
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-primary-700 dark:hover:text-primary-500">
+                <a
+                  href="#"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
+                >
                   Electronics
                 </a>
               </li>

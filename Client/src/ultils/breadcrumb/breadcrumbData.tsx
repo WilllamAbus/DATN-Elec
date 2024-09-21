@@ -24,7 +24,7 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listCategories", label: "Danh sách danh mục" },
   ],
-  
+
   listInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -40,13 +40,13 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
   ],
-  
+
   addInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInbound", label: "Thêm lô hàng" },
   ],
-    
+
   addInventory: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -116,7 +116,10 @@ export const breadcrumbItems = {
   recycleBinSupplier: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
-    { href: "/admin/recycleBinSupplier", label: "Danh sách xóa mềm nhà cung cấp" },
+    {
+      href: "/admin/recycleBinSupplier",
+      label: "Danh sách xóa mềm nhà cung cấp",
+    },
   ],
   recycleBinBrand: [
     { href: "/", label: "Home" },
@@ -162,5 +165,16 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/editVouchers", label: "cập nhật giảm giá" },
+  ],
+
+  orderCart: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listOrders", label: "Danh sách đơn hàng" },
+  ],
+  listDetailOrder: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listDetailOrder", label: "Chi tiết đơn hàng" },
   ],
 };

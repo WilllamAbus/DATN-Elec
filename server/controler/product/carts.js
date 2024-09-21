@@ -1,6 +1,7 @@
 const Product = require("../../model/product_v2");
 const Cart = require("../../model/orders/cart.model");
 const Inventory = require("../../model/inventory/inventory.model");
+const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
 
 const CartController = {
@@ -240,6 +241,18 @@ const CartController = {
 
       cart.totalPrice = totalPrice;
       await cart.save();
+
+      for (const item of items) {
+        const newInteraction = new Interaction({
+          user: userId,
+          Cart: cart._id,
+          productID: item.product,
+          type: "cart",
+          score: 1,
+        });
+
+        await newInteraction.save();
+      }
 
       res.status(201).json(cart);
     } catch (error) {

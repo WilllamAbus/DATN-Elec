@@ -56,7 +56,7 @@ export const loginUser = async (user: {
   password: string;
 }): Promise<UserProfile | { status: number; message: string }> => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, user);
+    const response = await instance.post(`${API_URL}/auth/login`, user);
 
     // Giả sử rằng phản hồi API trả về một đối tượng UserProfile
     const userProfile: UserProfile = response.data;

@@ -40,7 +40,6 @@ interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
-    redirectTo: string | null;
   };
   profile: {
     profile: UserProfile | null;
@@ -111,7 +110,7 @@ const initialState: AuthState = {
     error: null,
     isAuthenticated: false,
     token: null,
-    redirectTo: null,
+
     isLoggedIn: false,
   },
   profile: {
@@ -537,7 +536,7 @@ const authSlice = createSlice({
           state.login.currentUser = action.payload.currentUser;
           state.login.token = action.payload.token ?? null;
           state.login.isAuthenticated = true;
-          state.login.redirectTo = action.payload.redirectTo || null;
+
           state.login.isLoggedIn = true;
           state.login.error = null;
         }

@@ -19,10 +19,26 @@ export const createOrder = async (orderData: Order) => {
   }
 };
 
-export const listOrder = async () => {
+// export const listOrder = async () => {
+//   try {
+//     const response = await instance.get(`${API_URL}/admin/order/listOrder`);
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error("Error fetching listOrder: An unknown error occurred");
+//     }
+//   }
+// };
+export const listOrder = async (page = 1, limit = 10) => {
   try {
-    const response = await instance.get(`${API_URL}/admin/order/listOrder`);
-    return response.data;
+    const response = await instance.get(`${API_URL}/admin/order/listOrder`, {
+      params: { page, limit },
+    });
+    return response.data; // Đảm bảo rằng API trả về đối tượng có trường orders và totalOrders
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || error.message);
