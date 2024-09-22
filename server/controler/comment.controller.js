@@ -126,23 +126,29 @@ const commentController = {
             res.status(500).json({ message: "Failed to search comments" });
         }
     },
-    getCommentProduct : async (req, res) => {
-        try {
-            const { id } = req.params;
-            
-            // Tìm sản phẩm theo ID và chỉ lấy trường comments
-            const product = await modelProduct.findById(id, 'comments');
-            
-            if (!product || product.comments.length === 0) {
-                return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
-            }
-    
-            res.status(200).json(product.comments);
-        } catch (error) {
-            console.error("Error fetching comments:", error);
-            res.status(500).json({ message: "Lỗi server" });
-        }
-    },
+    getCommentProduct: async (req, res) => {
+      try {
+          const { id } = req.params;
+  
+          // Tìm sản phẩm theo ID và chỉ lấy trường comments
+          const product = await modelProduct.findById(id, 'comments');
+  
+          if (!product || product.comments.length === 0) {
+              return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+          }
+  
+          // Sắp xếp các bình luận theo thời gian tạo (giả sử bạn có trường createdAt)
+          const sortedComments = product.comments.sort((a, b) => {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+  
+          res.status(200).json(sortedComments);
+      } catch (error) {
+          console.error("Error fetching comments:", error);
+          res.status(500).json({ message: "Lỗi server" });
+      }
+  },
+  
     getCommentAdmin : async (req, res) => {
         try {
             console.log('Request data:', req.body); // Hoặc req.params tùy thuộc vào cách bạn nhận dữ liệu
