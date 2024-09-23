@@ -1,37 +1,24 @@
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-const ejs = require("ejs");
-const path = require("path");
-dotenv.config();
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  host: "smtp.gmail.com", // ví dụ: smtp.gmail.com
+  port: 587, // cổng SMTP
+  secure: false, // true cho cổng 465, false cho cổng 587
   auth: {
-    user: 'daodinhhay@gmail.com',
+    user: process.env.EMAIL_USERNAME,
     pass: process.env.EMAIL_PASSWORD,
   },
 });
 
-
-const sendContactEmail = (fromEmail, toEmail, subject, message) => {
-  const mailOptions = {
-    from: fromEmail,
-    to: toEmail,
-    subject: subject,
-    text: message,
-  };
-
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(info);
-      }
-    });
-  });
+const sendEmail = async (mailOptions) => {
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email đã được gửi thành công');
+  } catch (error) {
+    console.error('Lỗi khi gửi email:', error);
+    throw error; // Ném lỗi để xử lý trong controller
+  }
 };
 
-module.exports = { sendContactEmail };
+
+module.exports = { sendEmail };

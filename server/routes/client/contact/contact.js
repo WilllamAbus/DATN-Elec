@@ -5,6 +5,6 @@ const {
 } = require("../../../controler/contact.controller");
 const middlewareController = require("../../../middleware/auth");
 
-router.post('/add', addContact, middlewareController.verifyToken,);
+router.post('/add', middlewareController.verifyToken, addContact);
 
-module.exports = router; 
+module.exports = router;

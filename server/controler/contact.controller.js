@@ -5,6 +5,7 @@ const multer = require('multer');
 const dotenv = require("dotenv");
 const { v4: uuidv4 } = require('uuid');
 const Role = require('../model/role.model');
+const { sendEmail } = require('../../server/services/contact.service');
 dotenv.config();
 
 
@@ -42,7 +43,8 @@ const contactController = {
         });
       }
       // Lấy dữ liệu từ request body
-      const { id_user, name, phone, email, message } = req.body;
+      const { id_user, name, phone, message } = req.body;
+      const email = req.user.email;
       // Kiểm tra thông tin bắt buộc
       if (!id_user || !name || !phone || !email || !message) {
         return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin liên hệ" });
@@ -51,6 +53,15 @@ const contactController = {
       // Tạo contact mới
       const contactData = { id_user, name, phone, email, message };
       const savedContact = await Contact.create(contactData);
+
+      const mailOptions = {
+        from: email, // sử dụng biến môi trường
+        to: "daodinhhay@gmail.com",
+        subject: 'Thông tin liên hệ mới',
+        text: `Có thông tin liên hệ mới từ ${name}.\nSố điện thoại: ${phone}\nEmail: ${email}\nTin nhắn: ${message}`,
+      };
+
+      await sendEmail(mailOptions);
 
       res.status(201).json({ message: "Liên hệ được tạo thành công", savedContact });
 
