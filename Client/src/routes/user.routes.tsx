@@ -96,7 +96,7 @@ const UserRoutes: RouteObject[] = [
       { path: "reciveCode", element: <UserReciveCode /> },
       { path: "allList", element: <UserAllList /> },
       { path: "listTing", element: <UserMyList /> },
-      { path: "productlist/:categoryId", element: <UserListPage /> },
+      { path: "category/:slug", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
       { path: "detailProd/:id", element: <UserdetailsProd /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },

@@ -3,7 +3,21 @@ const {homeAllProduct,getID,auction,upView,shopping,search} = require('./home');
 const {getLimitProductClient} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
-const {getAllBrandPageAuction,getALLConditionShopping} = require('./sidebar');
+const {
+  getAllBrandPageAuction,
+  getALLConditionShopping,
+  getAllProductVariants,
+  getAllColorVariant,
+  getAllRam,
+  getAllColor,
+  getAllCpu,
+  getAllScreen,
+  getAllGraphicsCard,
+  getAllBattery,
+  getAllOperatingSystem,
+  getAllStorage
+  
+} = require('./sidebar');
 module.exports = {
   homeAllProduct,
   getID,
@@ -17,5 +31,15 @@ module.exports = {
   resetFilter,
   getAllBrandPageAuction,
   getALLConditionShopping,
-  search
+  getAllProductVariants,
+  getAllColorVariant,
+  search,
+  getAllRam,
+  getAllColor,
+  getAllCpu,
+  getAllScreen,
+  getAllGraphicsCard,
+  getAllBattery,
+  getAllOperatingSystem,
+  getAllStorage
 };

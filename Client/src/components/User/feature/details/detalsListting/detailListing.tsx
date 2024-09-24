@@ -8,6 +8,7 @@ import {
   deleteWatchlistThunk,
   getWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
+
 import { getProductByID,upViewProduct} from "../../../../../services/product_v2/client/homeAllProduct";
 import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
@@ -283,7 +284,7 @@ const ProductDetail: React.FC = () => {
                             <input
                               type="radio"
                               id={`${attribute.k}-${i}`}
-                              name={attribute.k} // Same name for all radios in the same group
+                              name={attribute.k}
                               value={value.trim()}
                               checked={
                                 selectedValues[attribute.k] === value.trim()
@@ -314,7 +315,6 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Quantity Selector */}
           <div className="mt-4">
             <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">
               Số lượng
@@ -337,8 +337,6 @@ const ProductDetail: React.FC = () => {
               </button>
             </div>
           </div>
-
-          {/* Action Buttons */}
           <div className="mt-6 flex gap-3 border-t border-gray-200 pt-5">
             <a
               href="/checkout"
@@ -366,8 +364,6 @@ const ProductDetail: React.FC = () => {
               <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>
           </div>
-
-          {/* Social Media Share */}
           <div className="flex gap-3 mt-4">
             {["facebook-f", "twitter", "linkedin-in", "pinterest"].map(
               (platform) => (
@@ -404,87 +400,15 @@ const ProductDetail: React.FC = () => {
               <strong>Khối lượng:</strong> <span>{products?.weight_g} kg</span>
             </li>
 
-            {/* <tbody>
-              {[
-                ["Category", "A"],
-                ["Product Code", "B"],
-                ["Size", "C"],
-                ["Weight", "D"],
-                ["Color", "E"],
-                ["Material", "F"],
-              ].map(([label, value]) => (
-                <tr key={label}>
-                  <td className="py-2 border-b">{label}</td>
-                  <td className="py-2 border-b">{value}</td>
-                </tr>
-              ))}
-            </tbody> */}
+       
           </table>
         </div>
       </div>
 
-      {/* comments */}
-      {/* <div className="container py-8">
-                <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded" role="alert">
-                        Comment submitted successfully!
-                    </div>
-                <div>
-                <div className="flex items-start space-x-4 mb-4">
-                            <div className="flex-shrink-0">
-                                <img className="h-10 w-10 rounded-full" src={Avatar} alt="avatar" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="text-sm">
-                                    <p className="font-medium text-gray-800"></p>
-                                    <p className="text-gray-600">Sản Phẩm Tốt!!!</p>
-                                </div>
-                          <p className="text-yellow-400">
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                           </p>
-                            </div>
-                 </div>
-                 <div className="flex items-start space-x-4 mb-4">
-                            <div className="flex-shrink-0">
-                                <img className="h-10 w-10 rounded-full" src={Avatar} alt="avatar" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="text-sm">
-                                    <p className="font-medium text-gray-800"></p>
-                                    <p className="text-gray-600">Good!!!</p>
-                                </div>
-                          <p className="text-yellow-400">
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                           </p>
-                            </div>
-                 </div>
-                </div>
-                <form  className="mt-6">
-                    <div className="flex items-center space-x-3">
-                        <input type="text" name="contents" placeholder="Enter your comment..." className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md" />
-                        <button type="submit" className="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none">Submit</button>
-                    </div>
-                    <div className="text-gray-400">
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                            <p  className="fa fa-star"></p>
-                    </div>
-                </form>
-            </div> */}
-      <Comment />
-      {/* ./comments */}
 
-      {/* related-products */}
+      <Comment />
+
+
       <div className="container pb-16">
         <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
           Related Products
@@ -495,11 +419,6 @@ const ProductDetail: React.FC = () => {
               key={index}
               className="border border-gray-200 rounded-lg overflow-hidden"
             >
-              {/* <img
-                src={listTwo}
-                alt="related-product"
-                className="w-full h-48 object-cover"
-              /> */}
               <div className="p-4">
                 <h3 className="text-gray-800 font-medium">
                   Related Product Name

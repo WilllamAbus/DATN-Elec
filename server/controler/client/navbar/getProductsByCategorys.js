@@ -1,11 +1,36 @@
 const ProductCategoryService = require('./ProductCategorySV');
-const getProductsByCategory = async (req, res) => {
-  const { categoryId } = req.params;
-  const { page } = req.query;
-  const limit = 12;
+const Category = require('../../../model/catgories.model'); 
 
+const getProductsByCategory = async (req, res) => {
+  const { slug } = req.params;  
+  const { page, _sort, brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
+  const limit = 12;
+  const brands = brand ? brand.split(',').map(b => b.trim()).filter(b => b) : [];
+  const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
   try {
-    const response = await ProductCategoryService.getProductsByCategory(categoryId, page, limit);
+    const category = await Category.findOne({ slug });
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        err: 'Lỗi',
+        msg: 'Không tìm thấy danh mục',
+        status: 404
+      });
+    }
+
+    const response = await ProductCategoryService.getProductsByCategory(
+      category._id, 
+      page, 
+      limit, 
+      _sort, 
+      brands,  
+      conditions, 
+      minPrice, 
+      maxPrice, 
+      minDiscountPercent, 
+      maxDiscountPercent
+    );
+
     if (response.err) {
       return res.status(400).json({
         success: false,
@@ -33,7 +58,6 @@ const getProductsByCategory = async (req, res) => {
     });
 
   } catch (error) {
-
     return res.status(500).json({
       success: false,
       err: -1,

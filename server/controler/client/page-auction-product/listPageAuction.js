@@ -2,8 +2,9 @@ const ProductAuctionService = require('./getAuctionProductSV');
 const listPageAuction = async (req, res) => {
   const { page, _sort, brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
   const limit = 12;
-  const brands = brand ? brand.split(',').map(b => b.trim()) : [];
-  const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()) : [];
+  const brands = brand ? brand.split(',').map(b => b.trim()).filter(b => b) : [];
+  const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
+  
   try {
     const response = await ProductAuctionService.getAuctionProducts(
       page, 
@@ -38,6 +39,7 @@ const listPageAuction = async (req, res) => {
       pagination: {
         currentPage,
         totalPages,
+        limit,
         hasNextPage: currentPage < totalPages,
         hasPrevPage: currentPage > 1,
       }

@@ -40,6 +40,7 @@ export interface products {
 export interface Pagination {
   currentPage: number;
   totalPages: number;
+  limit: number; 
   hasNextPage: boolean;
   hasPrevPage: boolean;
 }
@@ -52,20 +53,35 @@ export interface LimitPageAuctionProductResponse {
   data: {
     total: number;
     products: products[];
-    brand: ProductBrand[];
-    conditionShopping:ProductCondition[];
+    brand: ProductBrand[];  
+    conditionShopping: ProductCondition[];  
   };
   pagination: Pagination;
+  limit?: number;
 }
 
 export interface FilterState {
   _sort: string;
+  page: number;
+  limit?: number;
   brand?: ProductBrand[];
   conditionShopping?: ProductCondition[];
   minPrice?: number;
   maxPrice?: number;
   minDiscountPercent?: number;
   maxDiscountPercent?: number;
-  [key: string]: string | number | ProductBrand[] | ProductCondition[] | undefined; 
+  [key: string]: string | number | ProductBrand[] | ProductCondition[] | undefined | string[];
 }
 
+export interface QueryParamAuction {
+  [key: string]: string | number | undefined; 
+  _sort?: string; 
+  page?: number; 
+  limit?: number | string; 
+  brand?: string; 
+  conditionShopping?: string; 
+  minPrice?: string; 
+  maxPrice?: string; 
+  minDiscountPercent?: string; 
+  maxDiscountPercent?: string; 
+}

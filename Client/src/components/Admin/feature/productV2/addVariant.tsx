@@ -178,13 +178,13 @@ const AddVariant: React.FC = () => {
 
               <div className="col-span-6 sm:col-span-3">
                 <label
-                  htmlFor="product_price"
+                  htmlFor="variant_price"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Giá gốc
                 </label>
                 <NumericFormat
-                  id="product_price"
+                  id="variant_price"
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-500 focus:border-primary-500 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   thousandSeparator="."
                   decimalSeparator=","

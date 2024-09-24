@@ -27,9 +27,9 @@ const listNavItemsSlice = createSlice({
         state.status = 'success';
         state.navItems = action.payload.navItems;
       })
-      .addCase(listCateNavItemThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
+      .addCase(listCateNavItemThunk.rejected, (state, action) => {
         state.status = 'fail';
-        state.error = action.payload || 'Lỗi không xác định';
+        state.error = action.error.message || 'Lỗi không xác định';
       });
   },
 });

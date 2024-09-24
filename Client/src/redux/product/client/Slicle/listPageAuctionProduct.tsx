@@ -8,6 +8,7 @@ import {
 } from "../types/listPageAuctionProduct";
 
 interface AuctionProductState {
+  _sort?: string;
   products: products[];
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
@@ -20,6 +21,7 @@ interface AuctionProductState {
   minDiscountPercent: number | null;
   maxDiscountPercent: number | null;
   total: number | null;
+  limit: number | null;
 }
 
 const initialState: AuctionProductState = {
@@ -35,6 +37,7 @@ const initialState: AuctionProductState = {
   minDiscountPercent: null,
   maxDiscountPercent: null,
   total:null,
+  limit: 12,
 };
 const listPageAuctionProductSlice = createSlice({
   name: "productsClient/listPageAuction",
@@ -52,14 +55,18 @@ const listPageAuctionProductSlice = createSlice({
           state.status = "success";
           state.isLoading = false;
           state.products = action.payload.data.products;
-          state.pagination = action.payload.pagination;
+              state.pagination = {
+            ...state.pagination,
+            ...action.payload.pagination, 
+          };
           state.brand = action.payload.data.brand || [];
           state.conditionShopping = action.payload.data.conditionShopping || [];
           state.minPrice = action.meta?.arg.minPrice || null;
           state.maxPrice = action.meta?.arg.maxPrice || null;
           state.minDiscountPercent = action.meta?.arg.minDiscountPercent || null;
           state.maxDiscountPercent = action.meta?.arg.maxDiscountPercent || null;  
-          state.total = action.payload.data.total || 0;          
+          state.total = action.payload.data.total || 0;    
+          state.limit = action.meta?.arg.limit || state.pagination.limit || null;    
         }
       )
       .addCase(listPageAuctionProductThunk.rejected, (state, action) => {

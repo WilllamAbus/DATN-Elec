@@ -1,7 +1,7 @@
 const _ConditionShopping = require('../../../model/condition-shop.model');
 const getALLConditionShopping = async (req, res) => {
   try {
-    const conditionShopping = await _ConditionShopping.find({ status: { $ne: 'disable' } });
+    const conditionShopping = await _ConditionShopping.find({ status: { $ne: 'disable' } }).select('_id nameCondition');
 
     return res.status(200).json({
       success: true,

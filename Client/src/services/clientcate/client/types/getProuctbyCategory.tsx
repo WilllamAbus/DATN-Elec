@@ -7,7 +7,14 @@ interface ProductDiscountClient {
   status: string;
   disabledAt: string | null; 
 }
-
+export interface ProductBrand {
+  _id: string;
+  name: string;
+}
+export interface ProductCondition {
+  _id: string;
+  nameCondition: string;
+}
 export interface products {
   _id: string; 
   product_name: string;
@@ -18,9 +25,9 @@ export interface products {
   view: number; 
   product_ratingAvg: number; 
   product_supplier: string; 
-  product_brand: string;
+  product_brand: ProductBrand; 
   product_format: string;
-  product_condition: string; 
+  product_condition: ProductCondition;
   product_quantity: number; 
   product_price: number;
   product_attributes: { k: string; v: string }[]; 
@@ -34,17 +41,48 @@ export interface Pagination {
   totalPages: number; 
   hasNextPage: boolean; 
   hasPrevPage: boolean; 
+  limit?: number; 
 }
 
 
 export interface GetProductsByCategoryResponse {
-  success: boolean; 
-  err: number; 
-  msg: string; 
-  status: number; 
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
   data: {
-    total: number; 
-    products: products[]; 
+    total: number;
+    products: products[];
+    brand: ProductBrand[];  
+    conditionShopping: ProductCondition[];  
   };
-  pagination: Pagination; 
+  pagination: Pagination;
+  limit?: number;
+  }
+
+
+export interface FilterState {
+_sort: string;
+page: number;
+limit?: number;
+brand?: ProductBrand[];
+conditionShopping?: ProductCondition[];
+minPrice?: number;
+maxPrice?: number;
+minDiscountPercent?: number;
+maxDiscountPercent?: number;
+[key: string]: string | number | ProductBrand[] | ProductCondition[] | undefined | string[];
+}
+
+export interface QueryParamAuction {
+[key: string]: string | number | undefined; 
+_sort?: string; 
+page?: number; 
+limit?: number | string; 
+brand?: string; 
+conditionShopping?: string; 
+minPrice?: string; 
+maxPrice?: string; 
+minDiscountPercent?: string; 
+maxDiscountPercent?: string; 
 }

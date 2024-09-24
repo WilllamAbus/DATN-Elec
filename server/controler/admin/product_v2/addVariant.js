@@ -88,10 +88,9 @@ const addVariant = async (req, res) => {
       product: product_id 
     });
 
+ 
     await newVariant.save();
-
     product.variants.push(newVariant._id);
-
     await product.save();
 
     return res.status(201).json({
@@ -99,8 +98,9 @@ const addVariant = async (req, res) => {
       err: 0,
       msg: 'Biến thể mới đã được thêm thành công',
       status: 201,
-      product
+      variant: newVariant 
     });
+    
   } catch (error) {
     console.error('Lỗi khi thêm biến thể sản phẩm:', error);
     return res.status(500).json({

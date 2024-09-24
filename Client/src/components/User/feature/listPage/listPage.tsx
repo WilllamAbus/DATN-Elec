@@ -1,21 +1,36 @@
-import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+} from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { FunnelIcon } from "@heroicons/react/20/solid";
+import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import ProductFilters from "./prouctAuctionFilter";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getProductsByCategoryThunk } from "../../../../redux/product/client/Thunk";
+import { getAllBrandPageAuctionThunk, getAllConditionShoppingThunk ,getProductsByCategoryThunk} from "../../../../redux/product/client/Thunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
-import currencyFormatter from "currency-formatter";
-import { truncateText } from "./truncate/truncateText";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
+import ProductList from "./productList";
 import styles from "./css/section.module.css";
-import { HeartIcon, StarIcon } from "./svg";
+import ProductAuctionSort from "./productAuctionSort";
+import FilterViewer from "./filterAuction/filterViewer";
+import { FilterState, QueryParamAuction } from "../../../../services/product_v2/client/types/listPageAuction";
+import NoProductsMessage from "./noProduct";
+import { useLocation, useParams } from "react-router-dom";
+import queryString from "query-string";
+import useAuctionFilters from "./useAuctionFiltersHook";
 
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
-}
+
+
 export default function ListPage() {
-  const { categoryId } = useParams<{ categoryId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const dispatch: AppDispatch = useDispatch();
+  const location = useLocation();
+  const queryParams = queryString.parse(location.search) as QueryParamAuction;
   const currentPage = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.pagination?.currentPage || 1
   );
@@ -25,119 +40,179 @@ export default function ListPage() {
   const products = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.products || []
   );
+  const total = useSelector(
+    (state: RootState) => state.productClient.getProductsByCategory.total || 0
+  );
 
   const isLoading = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.isLoading
   );
+  const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
+  const conditions = useSelector((state: RootState) => state.productClient.getAllConditionShoppingPageAuction.conditionShopping || []);
   useEffect(() => {
-    if (categoryId) {
-      dispatch(getProductsByCategoryThunk({ categoryId, page: currentPage }));
+    dispatch(getAllBrandPageAuctionThunk());
+    dispatch(getAllConditionShoppingThunk());
+  }, [dispatch]);
+  const [filters, setFilters] = useAuctionFilters(queryParams, brands, conditions);
+  const noProducts = !isLoading && products.length === 0;
+  useEffect(() => {
+    if (slug) {
+      dispatch(getProductsByCategoryThunk({ 
+        slug,    
+         page: filters.page,
+        limit: filters.limit,
+        _sort: filters._sort,
+        brand: filters.brand || [],
+        conditionShopping: filters.conditionShopping || [],
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
+        minDiscountPercent: filters.minDiscountPercent,
+        maxDiscountPercent: filters.maxDiscountPercent,}));
     }
-  }, [dispatch, currentPage, categoryId]);
-
-  const handlePageChange = (page: number) => {
-    if (categoryId) {
-      dispatch(getProductsByCategoryThunk({ categoryId, page }));
-    }
+  }, [dispatch, filters, slug]); 
+  const handleSortChange = (newSortValue: string) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      _sort: newSortValue,
+    }));
   };
 
+const handlePageChange = (page: number) => {
+  setFilters((prevFilters) => ({
+    ...prevFilters,
+    page,
+  }));
+};
+  const handleFilterChange = useCallback(
+    (newFilters: FilterState) => {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        ...newFilters,
+      }));
+    },
+    []
+  );
+  const setNewFilter = useCallback(
+    (newFilters: FilterState) => {
+      setFilters(newFilters);
+    },
+    []
+  );
+
+  const hasFilters = Object.keys(filters).some((key) => {
+    const value = filters[key];
+    if (key === '_sort' && (value === 'product_price:ASC' || value === 'product_price:DESC')) return false;
+    if (key === 'page' && value === 1) return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    if (value === undefined || value === null || value === '') return false;
+    return true;
+  });
+  
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   return (
-    <div className="bg-white">
-      {isLoading ? (
-        <ProductSkeletonList length={12} />
-      ) : (
-        <section className={styles.sectionContainer}>
-          <div className={styles.container}>
-            <div className={styles.gridContainer}>
-              {products.map((product, index) => (
-                <div
-                  key={index}
-                  className="relative w-full flex-col overflow-hidden rounded-s-sm border border-gray-100 bg-white shadow-md"
-                >
-                  <div className="relative w-full h-56">
-                    <Link to={`/detailProd/${product._id}`}>
-                      <figure className="relative transition-all duration-300 cursor-pointer filter grayscale-0">
-                        <img
-                          className="object-cover w-full h-full rounded-lg"
-                          src={product.image[0]}
-                          alt={`product ${index + 1}`}
-                        />
-                      </figure>
-                    </Link>
+    <div>
+      <ReusableBreadcrumbClient items={breadcrumbItemClient.productlist} />
+      <div className="w-full max-w-screen-2xl px-0 bg-white">
+        <div>
+          <Dialog
+            open={mobileFiltersOpen}
+            onClose={setMobileFiltersOpen}
+            className="relative z-40 lg:hidden"
+          >
+            <DialogBackdrop
+              transition
+              className="fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+            />
+
+            <div className="fixed inset-0 z-40 flex">
+              <DialogPanel
+                transition
+                className="relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-[closed]:translate-x-full"
+              >
+                <div className="flex items-center justify-between px-4">
+                  <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+                  <button
+                    type="button"
+                    onClick={() => setMobileFiltersOpen(false)}
+                    className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                  >
+                    <span className="sr-only">Close menu</span>
+                    <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                  </button>
+                </div>
+                <form className="mt-4 border-t border-gray-200">
+                  <h3 className="sr-only">Categories</h3>
+                  <ProductFilters filters={filters} onChange={handleFilterChange} />
+
+                </form>
+              </DialogPanel>
+            </div>
+          </Dialog>
+          <main className="w-full max-w-screen-2xl px-0 sm:px-6 lg:px-5">
+            <section aria-labelledby="products-heading" className="pb-24 pt-4">
+              <h2 id="products-heading" className="sr-only">
+                sản phẩm
+              </h2>
+              <div className="grid grid-cols-1 gap-x-0.5 gap-y-10 lg:grid-cols-4">
+                <div className="lg:col-span-1">
+                  {" "}
+                  <form className="hidden lg:block rounded-lg border border-gray-100 bg-white shadow-sm ">
+                    <h3 className="sr-only">Categories</h3>
+                    <ProductFilters filters={filters} onChange={handleFilterChange} />
+                  </form>{" "}
+                </div>
+                <div className="lg:col-span-3">
+                  <div className="bg-white shadow-md sm:rounded-t-lg  overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4">
+                    <div className="flex items-center justify-between px-4 py-2">
+                      <h1 className="text-xl font-barlow font-bold text-gray-900">
+                        Sản phẩm - Đấu giá
+                        <span className="text-lg font-medium text-gray-500"> (có {total} sản phẩm)</span>
+                      </h1>
+                      <button
+                        type="button"
+                        onClick={() => setMobileFiltersOpen(true)}
+                        className="ml-4 p-2 text-gray-400 hover:text-gray-500 lg:hidden"
+                      >
+                        <span className="sr-only">Filters</span>
+                        <FunnelIcon aria-hidden="true" className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="pt-1 mb-10">
-                    <div className="mb-4 px-2 flex items-center justify-between gap-4">
-                      {product.product_discount.discountPercent > 0 ? (
-                        <span className=" rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                          Giảm giá {product.product_discount.discountPercent}%
-                        </span>
-                      ) : (
-                        <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
-                      )}
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          data-tooltip-target="tooltip-add-to-favorites"
-                          className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                        >
-                          <HeartIcon fill="red" size="1em" />
-                        </button>
+                  {hasFilters && (
+                    <div className="bg-white shadow-md overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4">
+                      <div className="flex items-center px-4 py-2">
+                        <h1 className="text-lg font-barlow font-medium text-gray-900">
+                          Bộ lọc hiện tại
+                        </h1>
+                        <FilterViewer filters={filters} onChange={setNewFilter} />
                       </div>
                     </div>
-                    <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
-                      <div className="mt-1 px-2 pb-1">
-                        <a href="#">
-                          <h5 className="text-sm tracking-tight text-slate-900 font-medium">
-                            {truncateText(product.product_name, 30)}
-                          </h5>
-                        </a>
+                  )}
+                  <div className="bg-white">
+                    <section className={styles.sectionContainer}>
+                      <ProductAuctionSort currentSort={filters._sort} onChange={handleSortChange} />
+                      <div className={styles.container}>
+                        {isLoading ? (
+                          <ProductSkeletonList length={12} />
+                        ) : noProducts ? (
+                          <NoProductsMessage />
+                        ) : (
+                          <ProductList products={products} />
+                        )}
                       </div>
-                    </div>
-
-                    <div className="px-2 flex items-center gap-2">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {product.product_ratingAvg ? product.product_ratingAvg.toFixed(1) : "N/A"}
-                      </p>
-                      <StarIcon />
-                      <div className="text-xs text-gray-500 items-center">
-                        {product.product_quantity > 0
-                          ? `(Còn ${product.product_quantity} sản phẩm)`
-                          : "Hết hàng"}
-                      </div>
-                    </div>
-                    <div className="mt-2 px-2 flex items-center gap-2">
-                      {product.product_discount.discountPercent > 1 ? (
-                        <div className="flex w-full">
-                          <p className="text-xs font-medium text-rose-700 flex-grow">
-                            {formatCurrency(
-                              product.product_price *
-                                (1 - product.product_discount.discountPercent / 100)
-                            )}{" "}
-                            đ
-                          </p>
-                          <p className="text-xs font-medium text-gray-400 line-through flex-shrink-0">
-                            {formatCurrency(product.product_price)} đ
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-xs font-medium text-rose-700">
-                          {formatCurrency(product.product_price)} đ
-                        </p>
-                      )}
-                    </div>
+                      <PaginationComponent
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </section>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-      <PaginationComponent
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
     </div>
   );
 }

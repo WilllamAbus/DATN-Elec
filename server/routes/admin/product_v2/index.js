@@ -19,7 +19,7 @@ const {
    getProductLimit,
    deletedList,
    hardDelete} = require('../../../controler/admin/product_v2');
-router.get('/list',list);
+router.get('/list',middlewareController.verifyTokenAdminAuth,list);
 router.post('/add', upload.array('image'), add);
 router.post('/:product_id/addvariant', upload.array('image'), addVariant);
 router.patch('/softDelete/:id',middlewareController.verifyToken,softDelete);

@@ -12,10 +12,10 @@ const productV2Schema = new Schema({
   product_name: { type: String, required: true },
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
-  product_slug: { type: String, unique: true }, 
+  product_slug: { type: String, unique: true },
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_discount: {
-    discountId: { type: Schema.Types.ObjectId, ref: 'discounts' }, 
+    discountId: { type: Schema.Types.ObjectId, ref: 'discounts' },
     code: { type: String },
     discountPercent: { type: Number },
     isActive: { type: Boolean },
@@ -38,34 +38,22 @@ const productV2Schema = new Schema({
   product_price_unit: { type: Number, required: true },
   product_attributes: [{
     k: { type: String, required: true },
-    v: { type: Schema.Types.Mixed, required: true }, 
+    v: { type: Schema.Types.Mixed, required: true },
     u: { type: String }
   }],
-  product_color: { type: String,},
+  product_color: { type: String, },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
   status: { type: String, default: 'active' },
   disabledAt: { type: Date, default: null },
-  comments:  [commentSchema],
-  variants: [{
-    variant_name: { type: String, required: true }, 
-    variant_description: { type: String }, 
-    variant_price: { type: Number, required: true },
-    variant_attributes: [{
-      k: { type: String, required: true }, 
-      v: { type: String, required: true }, 
-    }],
-    variant_image: { type: [String] },
-    sku: { type: String, unique: true }, 
-    variant_color: { type: String },
-    isActive: { type: Boolean, default: true }, 
-  }]
+  comments: [commentSchema],
+  variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }]
 }, {
   collection: "product_v2",
   timestamps: true
 });
 
-productV2Schema.pre('save', function(next){
+productV2Schema.pre('save', function (next) {
   this.product_slug = slugify(this.product_name, { lower: true });
   next();
 });
