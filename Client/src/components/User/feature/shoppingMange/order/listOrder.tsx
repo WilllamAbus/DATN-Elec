@@ -210,7 +210,7 @@
 // };
 
 // export default OrderList;
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import {
@@ -230,10 +230,6 @@ const OrderList: React.FC = () => {
   const [showAll, setShowAll] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    dispatch(fetchUserOrdersThunk());
-  }, [dispatch]);
 
   const handleCancelOrder = async (orderId: string) => {
     try {
@@ -257,10 +253,9 @@ const OrderList: React.FC = () => {
     setSelectedOrder(null);
   };
 
-  // Lọc danh sách đơn hàng để loại bỏ các đơn hàng có trạng thái "Hủy đơn hàng"
-  const filteredOrders = orders.filter(
-    (order) => order.stateOrder !== "Hủy đơn hàng"
-  );
+  const filteredOrders = Array.isArray(orders)
+    ? orders.filter((order) => order.stateOrder !== "Hủy đơn hàng")
+    : [];
 
   return (
     <div className="mt-7 border border-gray-300 pt-9">

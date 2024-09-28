@@ -256,7 +256,7 @@
 // };
 
 // export default EditProfile;
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { UserProfile } from "../../../../types/user";
 import { useAppDispatch } from "../../../../redux/store";
 import { setProfile } from "../../../../redux/auth/authSlice";
@@ -266,13 +266,19 @@ import {
 } from "../../../../redux/auth/authThunk";
 import axios from "axios";
 import moment from "moment";
+import { useForm } from "react-hook-form";
 
 interface EditProfileProps {
   profile: UserProfile | null;
 }
 
 const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
-  const [localProfile, setLocalProfile] = useState<UserProfile | null>(profile);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<UserProfile>();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -281,58 +287,44 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
 
   useEffect(() => {
     if (profile) {
-      setLocalProfile(profile);
+      setValue("name", profile.name || "");
+      setValue("phone", profile.phone || "");
+      setValue(
+        "birthday",
+        profile.birthday ? moment(profile.birthday).format("YYYY-MM-DD") : ""
+      );
+      setValue("gender", profile.gender || "");
       if (profile.avatar) {
         setImagePreview(profile.avatar);
       }
     }
-  }, [profile]);
+  }, [profile, setValue]);
 
-  const birthday = localProfile?.birthday
-    ? moment(localProfile.birthday).format("YYYY-MM-DD")
-    : "";
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-
-    if (name === "avatar" && files) {
-      const file = files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            setImagePreview(reader.result);
-          }
-        };
-        reader.readAsDataURL(file);
-        setSelectedImage(file);
-      }
-    } else {
-      if (localProfile) {
-        setLocalProfile({
-          ...localProfile,
-          [name]: value,
-        });
-      }
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setImagePreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+      setSelectedImage(file);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!localProfile) return;
-
+  const onSubmit = async (data: UserProfile) => {
     setLoading(true);
     setMessage(null);
 
     try {
       const formData = new FormData();
-      formData.append("name", localProfile.name || "");
-      formData.append("address", localProfile.address || "");
-      formData.append("gender", localProfile.gender || "");
-      formData.append("phone", localProfile.phone || "");
-      formData.append("birthday", localProfile.birthday || "");
+      formData.append("name", data.name);
+      formData.append("address", data.address || "");
+      formData.append("gender", data.gender || "");
+      formData.append("phone", data.phone || "");
+      formData.append("birthday", data.birthday || "");
       if (selectedImage) {
         formData.append("avatar", selectedImage);
       }
@@ -345,7 +337,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
       setMessage("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
-
       const errorMessage =
         axios.isAxiosError(err) && err.response?.data?.msg
           ? `Lỗi: ${err.response.status} - ${err.response.data.msg}`
@@ -356,7 +347,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <div className="col-span-9 shadow-lg rounded-lg px-8 py-6 bg-white">
@@ -364,7 +355,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
         Cập Nhật Thông Tin
       </h4>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-6">
             <div>
@@ -372,16 +363,18 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Tên
+                Họ tên
               </label>
               <input
                 type="text"
-                name="name"
-                id="name"
-                value={localProfile?.name || ""}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full"
+                {...register("name", { required: "Họ tên là bắt buộc" })}
+                className={`form-input mt-1 block w-full ${
+                  errors.name ? "border-red-500" : ""
+                }`}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <label
@@ -392,12 +385,20 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               </label>
               <input
                 type="text"
-                name="phone"
-                id="phone"
-                value={localProfile?.phone || ""}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full"
+                {...register("phone", {
+                  required: "Số điện thoại là bắt buộc",
+                  pattern: {
+                    value: /^(0[0-9]{8,9})$/,
+                    message: "Số điện thoại phải gồm 9-10 số",
+                  },
+                })}
+                className={`form-input mt-1 block w-full ${
+                  errors.phone ? "border-red-500" : ""
+                }`}
               />
+              {errors.phone && (
+                <p className="text-red-500 text-sm">{errors.phone.message}</p>
+              )}
             </div>
             <div>
               <label
@@ -408,12 +409,18 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               </label>
               <input
                 type="date"
-                name="birthday"
-                id="birthday"
-                value={birthday}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full"
+                {...register("birthday", {
+                  required: "Ngày sinh không được để trống",
+                })}
+                className={`form-input mt-1 block w-full ${
+                  errors.birthday ? "border-red-500" : ""
+                }`}
               />
+              {errors.birthday && (
+                <p className="text-red-500 text-sm">
+                  {errors.birthday.message}
+                </p>
+              )}
             </div>
             <div>
               <label
@@ -423,32 +430,40 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                 Giới tính
               </label>
               <select
-                name="gender"
-                id="gender"
-                value={localProfile?.gender || ""}
-                onChange={handleChange}
-                className="form-select mt-1 block w-full"
+                {...register("gender", {
+                  required: "Giới tính không được để trống",
+                })}
+                className={`form-select mt-1 block w-full ${
+                  errors.gender ? "border-red-500" : ""
+                }`}
               >
                 <option value="">Chọn giới tính</option>
                 <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>
               </select>
+              {errors.gender && (
+                <p className="text-red-500 text-sm">{errors.gender.message}</p>
+              )}
             </div>
             <div>
               <label
                 htmlFor="avatar"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Avatar
+                Ảnh đại diện
               </label>
               <input
                 type="file"
                 id="avatar"
-                name="avatar"
                 accept="image/*"
-                onChange={handleChange}
-                className="form-input mt-1 block w-full"
+                onChange={handleImageChange}
+                className={`form-input mt-1 block w-full ${
+                  !selectedImage && errors.avatar ? "border-red-500" : ""
+                }`}
               />
+              {errors.avatar && (
+                <p className="text-red-500 text-sm">{errors.avatar.message}</p>
+              )}
               {imagePreview && (
                 <img
                   src={imagePreview}

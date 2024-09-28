@@ -7,10 +7,11 @@ const interactionSchema = new Schema(
     item: { type: Schema.Types.ObjectId, ref: "product_v2" },
     OrderCart: { type: Schema.Types.ObjectId, ref: "OrderCart" },
     Watchlist: { type: Schema.Types.ObjectId, ref: "Watchlist" },
+    Cart: { type: Schema.Types.ObjectId, ref: "Cart" },
     productID: { type: String },
     type: {
       type: String,
-      enum: ["view", "comment", "add wishlist", "purchase", "auctions"], // Các loại tương tác
+      enum: ["view", "comment", "add wishlist", "purchase", "auctions", "cart"], // Các loại tương tác
       required: true,
     },
     score: { type: Number, default: 1 }, // Điểm số cho mô hình học, bạn có thể thay đổi dựa trên loại tương tác

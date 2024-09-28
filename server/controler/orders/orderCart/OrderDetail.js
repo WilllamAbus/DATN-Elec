@@ -1,39 +1,46 @@
 const OrderDetail = require("../../../model/orders/orderCart/OrderDetails");
-
+const Order = require("../../../model/orders/orderCart/orders");
 const OrderController = {
   getOrderById: async (req, res) => {
     try {
       const { orderId } = req.params;
-      const order = await OrderDetail.findOne({
-        order: orderId,
-      })
+      const order = await OrderDetail.findOne({ order: orderId })
         .populate({
           path: "order",
           populate: [
-            {
-              path: "payment",
-              model: "payment",
-            },
-            {
-              path: "shipping",
-              model: "shipping",
-            },
+            { path: "payment", model: "payment" },
+            { path: "shipping", model: "shipping" },
           ],
         })
-        .populate({
-          path: "items.product",
-          model: "product_v2",
-        });
+        .populate({ path: "items.product", model: "product_v2" });
 
       if (!order) return res.status(404).json({ message: "Order not found" });
+
+      // Kiểm tra sản phẩm bị xóa
+      const itemsWithDeletedProducts = order.items.filter(
+        (item) => !item.product
+      );
+
+      if (itemsWithDeletedProducts.length > 0) {
+        console.log("Deleted Products:", itemsWithDeletedProducts);
+
+        // Loại bỏ sản phẩm bị xóa khỏi danh sách trả về
+        order.items = order.items.filter((item) => item.product);
+
+        return res.status(200).json({
+          ...order.toObject(),
+          message: "Some products have been deleted",
+          deletedProducts: itemsWithDeletedProducts.map((item) => ({
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        });
+      }
 
       res.status(200).json(order);
     } catch (error) {
       console.error("Error fetching order details:", error);
-      res.status(500).json({
-        message: "Error fetching order",
-        error: error.message || error,
-      });
+      res.status(500).json({ message: "Error fetching order", error });
     }
   },
 
@@ -125,13 +132,11 @@ const OrderController = {
   // Xóa chi tiết đơn hàng theo ID
   deleteOrderDetailById: async (req, res) => {
     try {
-      const orderDetailId = req.params.id;
+      const OrderId = req.params.id;
 
-      const deletedOrderDetail = await OrderDetail.findByIdAndDelete(
-        orderDetailId
-      );
+      const deletedOrder = await Order.findByIdAndDelete(OrderId);
 
-      if (!deletedOrderDetail) {
+      if (!deletedOrder) {
         return res
           .status(404)
           .json({ message: "Chi tiết đơn hàng không tìm thấy" });
@@ -144,6 +149,41 @@ const OrderController = {
       console.error("Lỗi khi xóa chi tiết đơn hàng:", error);
       res.status(500).json({
         message: "Lỗi khi xóa chi tiết đơn hàng",
+        error: error.message || error,
+      });
+    }
+  },
+  getSoftdeleteOrder: async (req, res) => {
+    const userId = req.user.id;
+    try {
+      if (!userId) {
+        return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
+      }
+
+      const orders = await Order.find({ isDeleted: true })
+        .populate({
+          path: "cartDetails",
+          populate: {
+            path: "items.product",
+            model: "product_v2",
+          },
+        })
+        .populate("payment")
+        .populate("shipping")
+        .populate({
+          path: "voucherIds",
+          model: "Voucher",
+        });
+
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: "Không có đơn hàng nào" });
+      }
+
+      res.status(200).json({ orders });
+    } catch (error) {
+      console.error("Error fetching all orders:", error);
+      res.status(500).json({
+        message: "Lỗi khi lấy đơn hàng",
         error: error.message || error,
       });
     }

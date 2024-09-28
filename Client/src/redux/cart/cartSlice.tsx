@@ -153,8 +153,9 @@ import {
   fetchCartById,
   updateCartItem,
   deleteCart,
+  SelectCart,
 } from "./cartThunk";
-import { CartType } from "../../types/cart/carts";
+import { CartItem, CartType } from "../../types/cart/carts";
 
 interface CartState {
   carts: CartType[];
@@ -203,6 +204,23 @@ const cartSlice = createSlice({
         }
       }
     },
+    toggleSelectCartItem(
+      state,
+      action: PayloadAction<{ cartId: string; itemId: string }>
+    ) {
+      const { cartId, itemId } = action.payload;
+
+      const cartIndex = state.carts.findIndex((cart) => cart._id === cartId);
+      if (cartIndex !== -1) {
+        const itemIndex = state.carts[cartIndex].items.findIndex(
+          (item) => item._id === itemId
+        );
+        if (itemIndex !== -1) {
+          state.carts[cartIndex].items[itemIndex].isSelected =
+            !state.carts[cartIndex].items[itemIndex].isSelected;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -219,12 +237,19 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCartList.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload
-          ? String(action.payload)
-          : "Failed to fetch carts";
+        state.error = action.error.message || "Cập nhật giỏ hàng thất bại";
       })
       .addCase(addProductToCart.fulfilled, (state, action) => {
-        state.carts.push(action.payload);
+        const newCart = action.payload; // Gán toàn bộ cart mới
+        const existingCartIndex = state.carts.findIndex(
+          (cart) => cart._id === newCart._id
+        );
+
+        if (existingCartIndex >= 0) {
+          state.carts[existingCartIndex] = newCart; // Cập nhật cart đã tồn tại
+        } else {
+          state.carts.push(newCart); // Thêm cart mới
+        }
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         const { cartId, itemId, quantity, isSelected } = action.payload;
@@ -250,47 +275,131 @@ const cartSlice = createSlice({
           }
         }
       })
+      .addCase(fetchCartById.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+        console.log("Fetching cart by ID: loading", state); // Log trạng thái loading
+      })
       .addCase(fetchCartById.fulfilled, (state, action) => {
-        const index = state.carts.findIndex(
-          (cart) => cart._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.carts[index] = action.payload;
+        state.status = "succeeded"; // Change status to succeeded
+        console.log("Fetching cart by ID: succeeded", action.payload); // Log the action payload
+
+        if (action.payload) {
+          // Replace the carts array with the new cart data
+          state.carts = [action.payload]; // Use this if you only expect one cart
         } else {
-          state.carts.push(action.payload);
+          console.error("Payload is undefined"); // Log if payload is not valid
         }
       })
+
+      .addCase(fetchCartById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string; // Tin nhắn lỗi từ thunk
+        console.log("Fetching cart by ID: failed", action.payload); // Log khi thất bại
+      })
+
       .addCase(deleteCart.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(
-        deleteCart.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ cartId: string; productId: string }>
-        ) => {
-          state.status = "succeeded";
+      // .addCase(
+      //   deleteCart.fulfilled,
+      //   (
+      //     state,
+      //     action: PayloadAction<{ cartId: string; productId: string }>
+      //   ) => {
+      //     state.status = "succeeded";
 
-          const { cartId, productId } = action.payload;
-          const cart = state.carts.find((cart) => cart._id === cartId);
-          if (cart) {
-            cart.items = cart.items.filter(
-              (item) => item.product._id !== productId
-            );
-            cart.totalPrice = cart.items.reduce(
-              (total, item) => total + item.totalItemPrice,
-              0
-            );
-          }
+      //     const { cartId, productId } = action.payload;
+      //     const cart = state.carts.find((cart) => cart._id === cartId);
+      //     if (cart) {
+      //       cart.items = cart.items.filter(
+      //         (item) => item.product._id !== productId
+      //       );
+      //       cart.totalPrice = cart.items.reduce(
+      //         (total, item) => total + item.totalItemPrice,
+      //         0
+      //       );
+      //     }
+      //   }
+      // )
+      .addCase(deleteCart.fulfilled, (state, action) => {
+        const { cartId, productId } = action.payload;
+        const cart = state.carts.find((cart) => cart._id === cartId);
+        if (cart) {
+          cart.items = cart.items.filter(
+            (item) => item.product._id !== productId
+          );
         }
-      )
+      })
       .addCase(deleteCart.rejected, (state, action) => {
         state.status = "failed";
         state.error =
           action.error.message || "Failed to delete product from cart";
+      })
+      // Thêm trường hợp cho SelectCart
+      .addCase(SelectCart.pending, (state) => {
+        state.status = "loading"; // Khi bắt đầu xử lý
+      })
+      // .addCase(SelectCart.fulfilled, (state, action) => {
+      //   console.log("action payload:", action.payload);
+      //   const { productId, items } = action.payload;
+
+      //   // Tìm giỏ hàng có chứa sản phẩm được chọn
+      //   const cart = state.carts.find((cart) =>
+      //     cart.items.some((item) => item.product._id === productId)
+      //   );
+
+      //   if (cart) {
+      //     // Cập nhật trạng thái `isSelected` của sản phẩm
+      //     cart.items = cart.items.map((item) =>
+      //       item.product._id === productId ? { ...item, ...items[0] } : item
+      //     );
+
+      //     // Tính toán lại tổng giá nếu cần
+      //     cart.totalPrice = cart.items.reduce((total, item) => {
+      //       const itemPrice = item.totalItemPrice || 0;
+      //       return total + itemPrice;
+      //     }, 0);
+      //   }
+      //   console.log("Redux state after update:", cart);
+      // })
+      .addCase(SelectCart.fulfilled, (state, action) => {
+        console.log("action payload:", action.payload);
+        const { allItems } = action.payload;
+
+        // Lặp qua tất cả các sản phẩm trong allItems để cập nhật trạng thái của chúng trong giỏ hàng
+        allItems.forEach((updatedItem: CartItem) => {
+          const cart = state.carts.find((cart) =>
+            cart.items.some(
+              (item) => item.product._id === updatedItem.product._id
+            )
+          );
+
+          if (cart) {
+            // Cập nhật sản phẩm trong giỏ hàng
+            cart.items = cart.items.map((item) =>
+              item.product._id === updatedItem.product._id
+                ? { ...item, ...updatedItem }
+                : item
+            );
+
+            // Cập nhật tổng giá tiền
+            cart.totalPrice = cart.items.reduce((total, item) => {
+              const itemPrice = item.totalItemPrice || 0;
+              return total + itemPrice;
+            }, 0);
+          }
+        });
+
+        console.log("Redux state after update:", state.carts);
+      })
+
+      .addCase(SelectCart.rejected, (state, action) => {
+        state.status = "failed"; // Khi xử lý thất bại
+        state.error = action.error.message || "Cập nhật giỏ hàng thất bại"; // Ghi nhận thông báo lỗi
       });
   },
 });
 
-export const { updateItemQuantity } = cartSlice.actions;
+export const { updateItemQuantity, toggleSelectCartItem } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -8,6 +8,12 @@ router.get(
   middlewareController.verifyTokenAdminAuth,
   orderController.getOrders
 );
+router.get("/limit", orderController.getOrderLimit);
+router.get(
+  "/getSoftOrder",
+  middlewareController.verifyTokenAdminAuth,
+  orderDetail.getSoftdeleteOrder
+);
 // Lấy chi tiết đơn hàng
 router.get(
   "/detail/:orderId",
@@ -34,7 +40,7 @@ router.put(
 
 // Xóa đơn hàng
 router.delete(
-  "/:orderId",
+  "/delete/:orderId",
   orderController.deleteOrder,
   middlewareController.verifyTokenAdminAuth
 );

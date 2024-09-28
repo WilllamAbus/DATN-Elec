@@ -16,3 +16,4 @@ export interface ProductV2 {
   image?: FileList;
   hasVariants: boolean;
 }
+

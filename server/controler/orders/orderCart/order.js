@@ -3,11 +3,12 @@ const Cart = require("../../../model/orders/cart.model");
 const OrderDetail = require("../../../model/orders/orderCart/OrderDetails");
 const Payment = require("../../../model/orders/payment.model");
 const Inventory = require("../../../model/inventory/inventory.model");
-
+const Interaction = require("../../../model/recommendation/interaction.model");
 const Shipping = require("../../../model/orders/shipping.model");
 const Voucher = require("../../../model/voucher.model");
 const User = require("../../../model/users.model");
 const Vnpay = require("../../../model/orders/vnpay.model");
+const OrderService = require("../../../services/orders/orderSp");
 const {
   sendOrderConfirmationEmail,
 } = require("../../../services/email.service");
@@ -367,6 +368,16 @@ const authController = {
       newOrder.cartDetails = [orderDetail._id];
       await newOrder.save();
 
+      const newInteraction = new Interaction({
+        user: userId,
+        OrderCart: newOrder._id,
+        type: "purchase",
+        productID: null,
+        score: 5,
+      });
+
+      await newInteraction.save();
+
       // Xóa giỏ hàng
       cart.items = [];
       await cart.save();
@@ -557,9 +568,9 @@ const authController = {
             model: "product_v2",
           },
         })
-        // .populate("cartDetails")
-        .populate("payment") // Populate thông tin thanh toán
-        .populate("shipping") // Populate thông tin giao hàng
+
+        .populate("payment")
+        .populate("shipping")
         .populate({
           path: "voucherIds",
           model: "Voucher",
@@ -750,21 +761,34 @@ const authController = {
       const { orderId } = req.params;
       const order = await Order.findById(orderId);
 
-      if (!order) return res.status(404).json({ message: "Order not found" });
+      if (!order) {
+        return res.status(404).json({ message: "Không thấy đơn hàng!" });
+      }
+
+      // Kiểm tra trạng thái đơn hàng
+      if (
+        order.stateOrder !== "Hủy đơn hàng" &&
+        order.stateOrder !== "Hoàn tất"
+      ) {
+        return res.status(403).json({
+          message:
+            "Đơn hàng không thể bị xóa vì trạng thái chưa hủy hoặc hoàn tất",
+        });
+      }
+
       order.isDeleted = true;
       await order.save();
 
-      res
-        .status(200)
-        .json({ message: "Order deleted successfully (soft delete)" });
+      res.status(200).json({ message: "Xóa đơn hàng thành công" });
     } catch (error) {
-      console.error("Error deleting order:", error);
+      console.error("Lỗi xóa đơn hàng:", error);
       res.status(500).json({
-        message: "Error deleting order",
+        message: "Lỗi xóa đơn hàng",
         error: error.message || error,
       });
     }
   },
+
   restoreOrder: async (req, res) => {
     try {
       const { orderId } = req.params;
@@ -789,6 +813,50 @@ const authController = {
       res.status(500).json({
         message: "Error restoring order",
         error: error.message || error,
+      });
+    }
+  },
+
+  getOrderLimit: async (req, res) => {
+    const { page, search } = req.query;
+
+    try {
+      const response = await OrderService.getOrderLimitService(page, search);
+      if (response.err) {
+        return res.status(400).json({
+          success: false,
+          err: response.err,
+          msg: response.msg || "Lỗi khi lấy đơn hàng",
+          status: 400,
+        });
+      }
+
+      const currentPage = page ? +page : 1;
+      const totalPages = Math.ceil(
+        response.response.total / (+process.env.LIMIT || 1)
+      );
+
+      return res.status(200).json({
+        success: true,
+        err: 0,
+        msg: "OK",
+        status: 200,
+        data: response.response,
+        pagination: {
+          currentPage,
+          totalPages,
+          hasNextPage: currentPage < totalPages,
+          hasPrevPage: currentPage > 1,
+        },
+      });
+    } catch (error) {
+      console.error("Error:", error);
+
+      return res.status(500).json({
+        success: false,
+        err: -1,
+        msg: "Lỗi: " + error.message,
+        status: 500,
       });
     }
   },

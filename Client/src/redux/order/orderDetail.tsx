@@ -6,16 +6,16 @@ import {
   getAllOrderDetails,
   getAllOUserOrderdetails,
 } from "../../services/order/orderDetail";
-import { Order } from "../../types/order/order"; // Update the import to use Order instead of CartDetail
+import { Order } from "../../types/order/order";
 
 export const getOrderDetailByIdThunk = createAsyncThunk<
-  { order: Order[]; items: any[] }, // Thay đổi loại dữ liệu trả về để phù hợp với cấu trúc thực tế
+  { order: Order[]; items: any[] },
   string,
   { rejectValue: string }
 >("order/getOrderDetailById", async (orderId, { rejectWithValue }) => {
   try {
     const response = await getOrderDetailById(orderId);
-    console.log("API response:", response); // Kiểm tra dữ liệu trả về từ API
+    console.log("API response:", response);
 
     // Kiểm tra cấu trúc dữ liệu trả về
     if (!response || !response.order || !Array.isArray(response.items)) {
@@ -32,7 +32,6 @@ export const getOrderDetailByIdThunk = createAsyncThunk<
   }
 });
 
-// Get all order details
 export const getAllOrderDetailsThunk = createAsyncThunk<
   { orderDetails: Order[] },
   void,
@@ -60,7 +59,6 @@ export const getAllOUserOrderdetailsThunk = createAsyncThunk<
   }
 });
 
-// Update order detail by ID
 export const updateOrderDetailByIdThunk = createAsyncThunk<
   { orderDetail: Order },
   { orderDetailId: string; orderDetailData: Order },

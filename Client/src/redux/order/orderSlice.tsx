@@ -1,35 +1,34 @@
 // orderSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import {
   createOrderThunk,
   listOrderThunk,
   fetchUserOrdersThunk,
   cancelOrderThunk,
-  // pendingOrdersThunk,
-  // ConfirmOrdersThunk,
-  // shippingOrdersThunk,
-  // CompletedOrdersThunk,
-  // getCancelOrdersThunk,
   getOrderByIdThunk,
 } from "./orderThunks";
 import {
   getOrderDetailByIdThunk,
   getAllOrderDetailsThunk,
   updateOrderDetailByIdThunk,
-  deleteOrderDetailByIdThunk,
   getAllOUserOrderdetailsThunk,
 } from "./orderDetail";
 import {
   cancelOrderAdminThunk,
+  deleteOrderAdminThunk,
+  restoreOrderAdminThunk,
   updateStatusByIdThunk,
+  listSoftOrderThunk,
 } from "./Admin/orderAdmin";
 import { Order } from "../../types/order/order";
 
 interface OrderState {
   selectedOrder: Order | null;
   orders: Order[];
-  items: any[];
 
+  softDeletedOrders: Order[];
+  items: any[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -37,8 +36,9 @@ interface OrderState {
 const initialState: OrderState = {
   selectedOrder: null,
   orders: [],
-  items: [],
 
+  softDeletedOrders: [],
+  items: [],
   status: "idle",
   error: null,
 };
@@ -85,6 +85,22 @@ const orderSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message ?? "An error occurred";
       })
+
+      .addCase(listSoftOrderThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        listSoftOrderThunk.fulfilled,
+        (state, action: PayloadAction<Order[]>) => {
+          state.status = "succeeded";
+          state.softDeletedOrders = action.payload;
+        }
+      )
+      .addCase(listSoftOrderThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "An error occurred";
+      })
+
       .addCase(fetchUserOrdersThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -263,21 +279,63 @@ const orderSlice = createSlice({
       })
 
       // Handle deleteOrderDetailByIdThunk
-      .addCase(deleteOrderDetailByIdThunk.pending, (state) => {
+      // .addCase(deleteOrderDetailByIdThunk.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(
+      //   deleteOrderDetailByIdThunk.fulfilled,
+      //   (state, action: PayloadAction<string>) => {
+      //     state.status = "succeeded";
+      //     state.orders = state.orders.filter(
+      //       (order) => order._id !== action.payload
+      //     );
+      //     state.error = null;
+      //   }
+      // )
+      // .addCase(deleteOrderDetailByIdThunk.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = (action.payload as string) || "An error occurred";
+      // })
+
+      // Xử lý thunk cho xóa đơn hàng
+      .addCase(deleteOrderAdminThunk.pending, (state) => {
         state.status = "loading";
-        state.error = null;
       })
       .addCase(
-        deleteOrderDetailByIdThunk.fulfilled,
-        (state, action: PayloadAction<string>) => {
+        deleteOrderAdminThunk.fulfilled,
+        (state, action: PayloadAction<Order | undefined>) => {
           state.status = "succeeded";
-          state.orders = state.orders.filter(
-            (order) => order._id !== action.payload
-          );
-          state.error = null;
+          if (action.payload && action.payload._id) {
+            state.orders = state.orders.filter(
+              (order) => order._id !== action.payload?._id
+            );
+          }
         }
       )
-      .addCase(deleteOrderDetailByIdThunk.rejected, (state, action) => {
+
+      .addCase(deleteOrderAdminThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "An error occurred";
+      })
+
+      // Xử lý thunk cho khôi phục đơn hàng
+      .addCase(restoreOrderAdminThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        restoreOrderAdminThunk.fulfilled,
+        (state, action: PayloadAction<Order>) => {
+          state.status = "succeeded";
+
+          state.softDeletedOrders = state.softDeletedOrders.filter(
+            (order) => order._id !== action.payload._id
+          );
+
+          state.orders.push(action.payload);
+        }
+      )
+      .addCase(restoreOrderAdminThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
       });

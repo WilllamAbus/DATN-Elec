@@ -8,7 +8,6 @@ import {
 } from "../../services/order/order";
 import { Order } from "../../types/order/order";
 
-// Tạo đơn hàng mới
 export const createOrderThunk = createAsyncThunk<
   { order: Order },
   Order,

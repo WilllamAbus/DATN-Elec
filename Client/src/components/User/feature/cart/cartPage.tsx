@@ -4,9 +4,10 @@
 //   deleteCart,
 //   fetchCartList,
 //   updateCartItem,
+//   SelectCart,
 // } from "../../../../redux/cart/cartThunk";
 // import { AppDispatch, RootState } from "../../../../redux/store";
-// import { CartType } from "../../../../types/cart/carts";
+// import { CartItem, CartType } from "../../../../types/cart/carts";
 // import { useNavigate } from "react-router-dom";
 // import { Button } from "flowbite-react";
 // import { ToastContainer, toast } from "react-toastify";
@@ -21,7 +22,6 @@
 //   const carts = useSelector((state: RootState) => state.cart.carts);
 //   const cartStatus = useSelector((state: RootState) => state.cart.status);
 //   const cartError = useSelector((state: RootState) => state.cart.error);
-
 //   const [itemQuantities, setItemQuantities] = useState<{
 //     [key: string]: number;
 //   }>({});
@@ -45,18 +45,57 @@
 //     setItemQuantities(newItemQuantities);
 //   }, [carts]);
 
+//   // Tính tổng giá trị giỏ hàng dựa trên trạng thái isSelected
 //   useEffect(() => {
 //     const total = carts.reduce((total, cart) => {
 //       return (
 //         total +
 //         cart.items.reduce((itemTotal, item) => {
-//           const quantity = itemQuantities[item.product._id] || item.quantity;
-//           return itemTotal + (item.product.product_price_unit || 0) * quantity;
+//           // Kiểm tra trạng thái isSelected từ state
+//           if (item.isSelected) {
+//             // Thay đổi ở đây
+//             const quantity = itemQuantities[item.product._id] || item.quantity;
+//             return (
+//               itemTotal + (item.product.product_price_unit || 0) * quantity
+//             );
+//           }
+//           return itemTotal; // Không tính nếu không được chọn
 //         }, 0)
 //       );
 //     }, 0);
 //     setTotalCartPrice(total);
 //   }, [carts, itemQuantities]);
+
+//   // Hàm chọn sản phẩm
+//   const handleSelectCart = (productId: string, item: CartItem) => {
+//     const updatedItem = {
+//       productId: item.product._id,
+//       isSelected: item.isSelected, // Giữ trạng thái được truyền vào
+//     };
+
+//     dispatch(SelectCart({ productId, items: [updatedItem] }))
+//       .unwrap()
+//       .then((response) => {
+//         console.log("Giỏ hàng đã được chọn:", response);
+//         toast.success("Giỏ hàng đã được cập nhật thành công!");
+//       })
+//       .catch((error) => {
+//         console.error("Lỗi khi chọn giỏ hàng:", error);
+//         toast.error("Lỗi khi cập nhật giỏ hàng.");
+//       });
+//   };
+
+//   // Hàm xử lý chọn tất cả sản phẩm
+//   const handleSelectAll = (isSelected: boolean) => {
+//     carts.forEach((cart) => {
+//       cart.items.forEach((item) => {
+//         // Chỉ cập nhật những sản phẩm có trạng thái isSelected khác với yêu cầu
+//         if (item.isSelected !== isSelected) {
+//           handleSelectCart(cart._id, { ...item, isSelected });
+//         }
+//       });
+//     });
+//   };
 
 //   const handleQuantityChange = async (
 //     cartId: string,
@@ -68,7 +107,7 @@
 //       .find((i) => i.product._id === itemId);
 
 //     if (item) {
-//       const stock = item.product.product_quantity; // Số lượng tồn kho
+//       const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
 //       if (newQuantity > stock) {
 //         toast.error(
 //           `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
@@ -109,7 +148,7 @@
 //       .find((i) => i.product._id === itemId);
 
 //     if (item) {
-//       const stock = item.product.product_quantity; // Số lượng tồn kho
+//       const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
 
 //       if (newQuantity > stock) {
 //         toast.error(
@@ -222,6 +261,22 @@
 //         <div className="md:col-span-2 p-4 rounded-md">
 //           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
 //           <hr className="border-gray-300 mt-4 mb-8" />
+//           <th scope="col" className="p-4">
+//             <div className="flex items-center">
+//               <input
+//                 id="checkbox-all-orders"
+//                 type="checkbox"
+//                 className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+//                 onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
+//                 checked={carts.every((cart) =>
+//                   cart.items.every((item) => item.isSelected)
+//                 )} // Kiểm tra nếu tất cả sản phẩm được chọn
+//               />
+//               <label htmlFor="checkbox-all-orders" className="ml-2">
+//                 Chọn tất cả
+//               </label>
+//             </div>
+//           </th>
 
 //           <div className="space-y-4">
 //             {groupedCarts.map((cart) => (
@@ -230,6 +285,29 @@
 //                 className="grid bg-white grid-cols-3 items-center gap-4"
 //               >
 //                 <div className="col-span-2 flex items-center gap-4">
+//                   <th scope="col" className="p-4">
+//                     <div className="flex items-center">
+//                       <input
+//                         id={`checkbox-${cart._id}`} // Đảm bảo ID duy nhất cho từng giỏ hàng
+//                         type="checkbox"
+//                         checked={cart.items.every((item) => item.isSelected)} // Kiểm tra nếu tất cả sản phẩm trong giỏ hàng đã được chọn
+//                         onChange={() => {
+//                           // Lặp qua từng sản phẩm trong giỏ hàng để cập nhật trạng thái
+//                           cart.items.forEach((item) => {
+//                             handleSelectCart(cart._id, item); // Gọi hàm handleSelectCart với cart ID và item
+//                           });
+//                         }}
+//                         className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+//                       />
+//                       <label
+//                         htmlFor={`checkbox-${cart._id}`}
+//                         className="sr-only"
+//                       >
+//                         checkbox
+//                       </label>
+//                     </div>
+//                   </th>
+
 //                   <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
 //                     <img
 //                       src={
@@ -252,13 +330,7 @@
 //                     >
 //                       Xóa
 //                     </h6>
-//                     {/* <Button
-//                       onClick={() =>
-//                         handleDeleteProduct(cart._id, cart.items[0].product._id)
-//                       }
-//                     >
-//                       Xóa sản phẩm
-//                     </Button> */}
+
 //                     <div className="flex gap-4 mt-4">
 //                       <button
 //                         type="button"
@@ -421,9 +493,10 @@ import {
   deleteCart,
   fetchCartList,
   updateCartItem,
+  SelectCart,
 } from "../../../../redux/cart/cartThunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { CartType } from "../../../../types/cart/carts";
+import { CartItem, CartType } from "../../../../types/cart/carts";
 import { useNavigate } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { ToastContainer, toast } from "react-toastify";
@@ -438,6 +511,7 @@ const CartPage: React.FC = () => {
   const carts = useSelector((state: RootState) => state.cart.carts);
   const cartStatus = useSelector((state: RootState) => state.cart.status);
   const cartError = useSelector((state: RootState) => state.cart.error);
+  const [loading, setLoading] = useState(false);
 
   const [itemQuantities, setItemQuantities] = useState<{
     [key: string]: number;
@@ -451,15 +525,13 @@ const CartPage: React.FC = () => {
   }, [dispatch, userId]);
 
   useEffect(() => {
-    console.log("Carts updated:", carts);
-
-    const newItemQuantities: { [key: string]: number } = {};
+    const updatedItemQuantities: { [key: string]: number } = {};
     carts.forEach((cart) => {
       cart.items.forEach((item) => {
-        newItemQuantities[item.product._id] = item.quantity;
+        updatedItemQuantities[item.product._id] = item.quantity;
       });
     });
-    setItemQuantities(newItemQuantities);
+    setItemQuantities(updatedItemQuantities);
   }, [carts]);
 
   useEffect(() => {
@@ -467,13 +539,52 @@ const CartPage: React.FC = () => {
       return (
         total +
         cart.items.reduce((itemTotal, item) => {
-          const quantity = itemQuantities[item.product._id] || item.quantity;
-          return itemTotal + (item.product.product_price_unit || 0) * quantity;
+          if (item.isSelected) {
+            const quantity = itemQuantities[item.product._id] || item.quantity;
+            return (
+              itemTotal + (item.product.product_price_unit || 0) * quantity
+            );
+          }
+          return itemTotal;
         }, 0)
       );
     }, 0);
     setTotalCartPrice(total);
   }, [carts, itemQuantities]);
+
+  const handleSelectCart = async (productId: string, item: CartItem) => {
+    const updatedItem = {
+      productId: item.product._id,
+      isSelected: !item.isSelected,
+    };
+    toast.dismiss();
+    setLoading(true);
+    try {
+      await dispatch(SelectCart({ productId, items: [updatedItem] })).unwrap();
+    } catch (error) {
+      console.error("Lỗi khi chọn giỏ hàng:", error);
+      toast.error("Lỗi khi cập nhật giỏ hàng.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectAll = async (isSelected: boolean) => {
+    setLoading(true);
+    try {
+      for (const cart of carts) {
+        for (const item of cart.items) {
+          if (item.isSelected !== isSelected) {
+            await handleSelectCart(cart._id, { ...item, isSelected });
+          }
+        }
+      }
+    } catch (error) {
+      toast.error("Lỗi khi chọn tất cả sản phẩm.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQuantityChange = async (
     cartId: string,
@@ -520,26 +631,6 @@ const CartPage: React.FC = () => {
   ) => {
     const newQuantity =
       currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
-
-    const item = carts
-      .flatMap((cart) => cart.items)
-      .find((i) => i.product._id === itemId);
-
-    if (item) {
-      const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
-
-      if (newQuantity > stock) {
-        toast.error(
-          `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
-        );
-        setItemQuantities((prevQuantities) => ({
-          ...prevQuantities,
-          [itemId]: item.quantity,
-        }));
-        return;
-      }
-    }
-
     await handleQuantityChange(cartId, itemId, newQuantity);
   };
 
@@ -561,21 +652,31 @@ const CartPage: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    navigate("/checkout", { state: { groupedCarts, totalCartPrice } });
+    navigate(`/checkout/${carts[0]._id}`, {
+      state: { groupedCarts, totalCartPrice },
+    });
   };
-
+  //   <Button
+  //   to={`/admin/listDetailOrder/${carts[0]._id}`}
+  //   className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
+  // >
+  //   Thanh toán
+  // </Button>
   const handleDeleteProduct = async (cartId: string, productId: string) => {
+    setLoading(true); // Bắt đầu loading
     try {
       await dispatch(deleteCart({ cartId, productId })).unwrap();
       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
     } catch (error) {
       toast.error("Xóa sản phẩm thất bại.");
+    } finally {
+      setLoading(false); // Dừng loading sau khi thực hiện xong
     }
   };
 
-  if (cartStatus === "loading") {
-    return <p>Loading...</p>;
-  }
+  // if (cartStatus === "loading") {
+  //   return <p>Loading...</p>;
+  // }
 
   if (cartStatus === "failed") {
     toast.error(`Error: ${cartError}`);
@@ -589,8 +690,7 @@ const CartPage: React.FC = () => {
   const groupedMap = new Map<string, CartType>();
   const groupedCarts: CartType[] = [];
   const filteredCarts = carts.filter(
-    (cart): cart is CartType =>
-      cart !== null && cart !== undefined && Array.isArray(cart.items)
+    (cart) => cart !== null && cart !== undefined && Array.isArray(cart.items)
   );
 
   filteredCarts.forEach((cart) => {
@@ -602,11 +702,9 @@ const CartPage: React.FC = () => {
         } else {
           const existingCart = groupedMap.get(key)!;
           const updatedItems = [...existingCart.items];
-
           const itemIndex = updatedItems.findIndex(
             (i) => i.product._id === item.product._id
           );
-
           if (itemIndex !== -1) {
             updatedItems[itemIndex] = {
               ...updatedItems[itemIndex],
@@ -616,13 +714,11 @@ const CartPage: React.FC = () => {
                 item.product.product_price_unit * item.quantity,
             };
           } else {
-            // Trường hợp thêm mới sản phẩm vào giỏ hàng
             updatedItems.push({
               ...item,
               totalItemPrice: item.product.product_price_unit * item.quantity,
             });
           }
-
           existingCart.items = updatedItems;
         }
       }
@@ -632,12 +728,29 @@ const CartPage: React.FC = () => {
   groupedMap.forEach((cart) => {
     groupedCarts.push(cart);
   });
+
   return (
     <div className="container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 p-4 rounded-md">
           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />
+          <th scope="col" className="p-4">
+            <div className="flex items-center">
+              <input
+                id="checkbox-all-orders"
+                type="checkbox"
+                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
+                checked={carts.every((cart) =>
+                  cart.items.every((item) => item.isSelected)
+                )}
+              />
+              <label htmlFor="checkbox-all-orders" className="ml-2">
+                Chọn tất cả
+              </label>
+            </div>
+          </th>
 
           <div className="space-y-4">
             {groupedCarts.map((cart) => (
@@ -646,6 +759,28 @@ const CartPage: React.FC = () => {
                 className="grid bg-white grid-cols-3 items-center gap-4"
               >
                 <div className="col-span-2 flex items-center gap-4">
+                  <th scope="col" className="p-4">
+                    <div className="flex items-center">
+                      <input
+                        id={`checkbox-${cart._id}`} // Đảm bảo ID duy nhất cho từng giỏ hàng
+                        type="checkbox"
+                        checked={cart.items.every((item) => item.isSelected)}
+                        onChange={() => {
+                          cart.items.forEach((item) => {
+                            handleSelectCart(cart._id, item);
+                          });
+                        }}
+                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label
+                        htmlFor={`checkbox-${cart._id}`}
+                        className="sr-only"
+                      >
+                        checkbox
+                      </label>
+                    </div>
+                  </th>
+
                   <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
                     <img
                       src={
@@ -664,17 +799,13 @@ const CartPage: React.FC = () => {
                       onClick={() =>
                         handleDeleteProduct(cart._id, cart.items[0].product._id)
                       }
-                      className="text-xs text-red-500 cursor-pointer mt-0.5"
+                      className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
+                        loading ? "opacity-50" : ""
+                      }`}
                     >
                       Xóa
                     </h6>
-                    {/* <Button
-                      onClick={() =>
-                        handleDeleteProduct(cart._id, cart.items[0].product._id)
-                      }
-                    >
-                      Xóa sản phẩm
-                    </Button> */}
+
                     <div className="flex gap-4 mt-4">
                       <button
                         type="button"
@@ -717,8 +848,8 @@ const CartPage: React.FC = () => {
                           onChange={(e) => {
                             const newQuantity = Number(e.target.value);
                             if (!isNaN(newQuantity) && newQuantity >= 1) {
-                              setItemQuantities((prevQuantities) => ({
-                                ...prevQuantities,
+                              setItemQuantities((prev) => ({
+                                ...prev,
                                 [cart.items[0].product._id]: newQuantity,
                               }));
                             }
@@ -756,12 +887,13 @@ const CartPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
                 <div className="ml-auto">
                   <h4 className="text-base font-bold text-gray-800">
                     {cart.items[0].product.product_price_unit.toLocaleString(
                       "vi-VN",
                       { style: "currency", currency: "VND" }
-                    )}{" "}
+                    )}
                   </h4>
                 </div>
               </div>
@@ -773,6 +905,7 @@ const CartPage: React.FC = () => {
           <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />
           <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
+
           {groupedCarts.map((cart) => (
             <div key={cart._id} className="flex justify-between mt-2">
               <span className="text-gray-800">
@@ -782,6 +915,7 @@ const CartPage: React.FC = () => {
               </span>
             </div>
           ))}
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-gray-800">Tạm tính:</p>
@@ -810,6 +944,7 @@ const CartPage: React.FC = () => {
               })}
             </p>
           </div>
+
           <div className="mt-8 space-y-2">
             <Button
               onClick={handleCheckout}
