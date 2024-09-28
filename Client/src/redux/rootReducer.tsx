@@ -26,7 +26,7 @@ import deleteBidReducer from "./deleteBid/deleteBidSlice";
 import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
 import confirmReducer from "./confirmOrder/confirmOrderSlice";
 import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
-
+import orderPagiReducer from "./order/pagiOrder/pagislice";
 const authConfig = {
   key: "auth",
   storage,
@@ -57,6 +57,7 @@ const rootReducer = combineReducers({
   auctCheckout: auctCheckoutReducer,
   orderAuction: orderAuctionReducer,
   confirmOrder: confirmReducer,
+  orderPagi: orderPagiReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

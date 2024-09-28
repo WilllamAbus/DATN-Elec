@@ -17,7 +17,7 @@ const jwtSecret = process.env.JWT_ACCESS_KEY;
 const jwtRefreshSecret = process.env.JWT_REFRESH_KEY;
 const admin = require("firebase-admin");
 const STORE_BUCKET = process.env.STORE_BUCKET;
-
+const axios = require("axios");
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -32,6 +32,28 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 let refreshTokens = [];
 const authController = {
+  CheckEmailHunter: async (email) => {
+    const apiKey = process.env.HUNTER_API_KEY;
+    const apiUrl = process.env.HUNTER_API_URL;
+
+    const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
+
+    try {
+      const response = await axios.get(url);
+      const data = response.data;
+      if (
+        data.data.result === "undeliverable" ||
+        data.data.result === "risky"
+      ) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Lỗi xác thực email với Hunter.io:", error);
+      throw new Error("Không thể xác thực email");
+    }
+  },
+
   registerUser: async (req, res) => {
     try {
       const userRole = await Role.findOne({ name: "user" });
@@ -42,7 +64,10 @@ const authController = {
       }
 
       const { email, password, name } = req.body;
-
+      const isEmailValid = await authController.CheckEmailHunter(email);
+      if (!isEmailValid) {
+        return res.status(400).json({ message: "Email không chính xác" });
+      }
       const checkEmail = await User.findOne({ email });
       if (checkEmail) {
         return res.status(200).json({ message: "Email đã tồn tại" });
@@ -214,12 +239,14 @@ const authController = {
       return res.status(200).json({
         ...userData,
         accessToken: token,
+        refreshToken,
         roles: user.roles,
         redirectTo: user.roles.some((role) => role.name === "admin")
           ? "/admin"
           : "/profile",
       });
     } catch (err) {
+      console.error(err);
       return res
         .status(500)
         .json({ message: "Server error", error: err.message });
@@ -493,12 +520,12 @@ const authController = {
 
       if (!user) {
         return res
-          .status(400)
+          .status(404)
           .json({ message: "Email không tồn tại trên hệ thống" });
       }
 
       if (user.resetPasswordExpires && user.resetPasswordExpires > Date.now()) {
-        return res.status(400).json({
+        return res.status(429).json({
           message: "Không được yêu cầu liên tục",
         });
       }
@@ -510,7 +537,7 @@ const authController = {
         .digest("hex");
 
       user.resetPasswordToken = hashedToken;
-      user.resetPasswordExpires = Date.now() + 3600000; // 1 giờ
+      user.resetPasswordExpires = Date.now() + 3600000;
       await user.save();
 
       await sendPasswordResetEmail(user.email, token);

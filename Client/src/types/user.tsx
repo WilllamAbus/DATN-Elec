@@ -30,11 +30,13 @@ export interface UserProfile {
   msg?: string;
   token?: string;
   _id: string;
+  id?: string;
   name: string;
   accessToken: string;
   email: string;
   VerifiedEmail: string;
-  status: string;
+  status: number | null;
+  message: string | null;
   refreshToken: string;
   roles: string[];
   birthday: string;
@@ -45,7 +47,7 @@ export interface UserProfile {
   addressID: string;
   createdAt: string;
   updatedAt?: string;
-  message: string;
+
   currentUser: string;
   redirectTo: string;
 }
@@ -55,8 +57,9 @@ export interface ErrorResponse {
 }
 
 export interface ForgotState {
-  status: "idle" | "loading" | "succeeded" | "failed";
-  message: string;
+  status: number | null;
+  message: string | null;
+  loading: boolean;
   error: string | null;
 }
 export interface ResetPassState {

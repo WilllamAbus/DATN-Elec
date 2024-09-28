@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import AdminSoftListVoucher from "../../../components/Admin/feature/vouchers/softDeleVoucher";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import {
+  breadcrumbItems,
+  ReusableBreadcrumb,
+} from "../../../ultils/breadcrumb";
 import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import ProductSummary from "../../../components/Admin/summary/ProductSummary";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";

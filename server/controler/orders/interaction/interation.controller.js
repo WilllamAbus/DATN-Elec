@@ -1,4 +1,4 @@
-const interactionService = require('../../../services/interaction/interation.service'); // Import interaction service
+const interactionService = require("../../../services/interaction/interation.service"); // Import interaction service
 
 const interactionController = {
   getPurchasedProducts: async (req, res) => {
@@ -7,7 +7,7 @@ const interactionController = {
       const products = await interactionService.getPurchasedProducts(userId);
       res.status(200).json({
         title: "Lịch sử mua sắm",
-        products
+        products,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -16,7 +16,10 @@ const interactionController = {
   getAll: async (req, res) => {
     try {
       const { page = 1, limit = 10 } = req.query;
-      const result = await interactionService.getAllInteractions(parseInt(page), parseInt(limit));
+      const result = await interactionService.getAllInteractions(
+        parseInt(page),
+        parseInt(limit)
+      );
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -56,7 +59,10 @@ const interactionController = {
   getDeletedList: async (req, res) => {
     try {
       const { page = 1, limit = 10 } = req.query;
-      const result = await interactionService.getDeletedInteractions(parseInt(page), parseInt(limit));
+      const result = await interactionService.getDeletedInteractions(
+        parseInt(page),
+        parseInt(limit)
+      );
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -4,7 +4,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../redux/store";
-import { getProfileThunk } from "../../../../redux/auth/authThunk";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutThunk } from "../../../../redux/auth/authThunk";
 import EditProfile from "./edit-profile";
@@ -16,6 +15,7 @@ import OrderList from "./order";
 import useAuth from "../../../../hooks/useAuth";
 
 import Cookies from "js-cookie";
+import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -33,19 +33,13 @@ const ProfileUse: React.FC = () => {
     (state: RootState) => state.auth.profile.error
   );
   const [, setAddress] = useState<string>("");
-
+  useEffect(() => {
+    dispatch(fetchUserOrdersThunk());
+  }, [dispatch]);
   (newAddress: string) => {
     setAddress(newAddress);
   };
   useAuth();
-
-  useEffect(() => {
-    dispatch(getProfileThunk());
-  }, [dispatch]);
-
-  if (profileStatus === "loading") {
-    return <p>Loading...</p>;
-  }
 
   if (profileStatus === "failed") {
     return <p>Error: {profileError || "Unknown error occurred"}</p>;
@@ -103,7 +97,14 @@ const ProfileUse: React.FC = () => {
                 }`}
                 onClick={() => setView("info")}
               >
-                <i className="fa-regular fa-address-card mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
                 Quản lý tài khoản
               </a>
               <a
@@ -113,7 +114,14 @@ const ProfileUse: React.FC = () => {
                 }`}
                 onClick={() => setView("password")}
               >
-                <i className="fa-solid fa-key mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C9.243 2 7 4.243 7 7v2H6c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-5 7h10v2H7V9zm5-5c1.654 0 3 1.346 3 3v2H9V7c0-1.654 1.346-3 3-3z" />
+                </svg>
                 Đổi mật khẩu
               </a>
               <a
@@ -123,27 +131,48 @@ const ProfileUse: React.FC = () => {
                 }`}
                 onClick={() => setView("edit")}
               >
-                <i className="fa fa-edit mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1 17.93V15h-2v5h5v-2H11zM14 11v-1.414l-6.707 6.707L7 18h2l5-5V11z" />
+                </svg>
                 Cập nhật thông tin
               </a>
               <a
                 href="#"
                 className={`relative text-base block capitalize transition ${
-                  view === "edit" ? "text-primary" : "text-gray-600"
+                  view === "address" ? "text-primary" : "text-gray-600"
                 }`}
                 onClick={() => setView("address")}
               >
-                <i className="fa fa-edit mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C8.136 2 5 5.136 5 9c0 3.174 3.614 7.702 6.238 10.794a1 1 0 0 0 1.524 0C15.386 16.703 19 12.174 19 9c0-3.864-3.136-7-7-7zm0 9c-1.104 0-2-.896-2-2s.896-2 2-2 2 .896 2 2-.896 2-2 2z" />
+                </svg>
                 Địa chỉ
               </a>
               <a
                 href="#"
                 className={`relative text-base block capitalize transition ${
-                  view === "edit" ? "text-primary" : "text-gray-600"
+                  view === "order" ? "text-primary" : "text-gray-600"
                 }`}
                 onClick={() => setView("order")}
               >
-                <i className="fa fa-edit mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M22 7H2V5h20v2zM7 11H5v10h2V11zm4 0H9v10h2V11zm4 0h-2v10h2V11zm4 0h-2v10h2V11z" />
+                </svg>
                 Đơn hàng
               </a>
               <a
@@ -151,7 +180,14 @@ const ProfileUse: React.FC = () => {
                 className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
                 onClick={() => setView("watchlist")}
               >
-                <i className="fa-regular fa-heart mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
                 Yêu thích
               </a>
               <a
@@ -159,7 +195,14 @@ const ProfileUse: React.FC = () => {
                 className="relative text-base block font-medium capitalize text-gray-600 transition hover:text-primary"
                 onClick={handleLogout}
               >
-                <i className="fa-solid fa-right-from-bracket mr-2"></i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M13 3h-2v10h2V3zm-7.293.707l-1.414 1.414L10.586 10H16v2h-5.414l-6.293 6.293 1.414 1.414L13.414 12H18V8h-4.586L5.707 3.707z" />
+                </svg>
                 Đăng Xuất
               </a>
             </nav>

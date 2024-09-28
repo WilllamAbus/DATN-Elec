@@ -66,72 +66,33 @@ export interface Order {
   updatedAt: string;
 }
 
-export interface OrderDetailResponse {
-  _id: string;
-  order: {
-    _id: string;
-    user: string;
-    cartDetails: string[];
-    payment: string | null;
-    shipping: string;
-    voucherIds: string[];
-    formatShipping: string;
-    totalAmount: number;
-    shippingFee: number;
-    totalPriceWithShipping: number;
-    stateOrder: string;
-    isDeleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface LimitCrudOrderResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: {
+    total: number;
+    orders: Order[];
   };
-  items: Array<{
-    product: {
-      product_discount: {
-        discountId: string;
-        code: string;
-        discountPercent: number;
-        isActive: boolean;
-        status: string;
-        disabledAt: string | null;
-      };
-      _id: string;
-      product_name: string;
-      image: string[];
-      product_description: string;
-      product_type: string;
-      product_brand: string;
-      product_format: string;
-      product_condition: string;
-      product_supplier: string;
-      product_quantity: number;
-      product_ratingAvg: number;
-      product_view: number;
-      product_price: number;
-      product_price_unit: number;
-      product_attributes: Array<{
-        k: string;
-        v: string;
-        _id: string;
-      }>;
-      weight_g: number;
-      isActive: boolean;
-      status: string;
-      disabledAt: string | null;
-      comments: Array<any>;
-      createdAt: string;
-      updatedAt: string;
-      product_slug: string;
-      __v: number;
-      variants: string[];
-      hasVariants: string;
-    };
-    quantity: number;
-    price: number;
-    totalItemPrice: number;
-    _id: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
+  pagination: Pagination;
+}
+
+export interface LimitDeletedListResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: {
+    total: number;
+    orders: Order[];
+  };
+  pagination: Pagination;
 }
