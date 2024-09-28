@@ -42,5 +42,6 @@ module.exports = {
   getAllGraphicsCard,
   getAllBattery,
   getAllOperatingSystem,
-  getAllStorage
+  getAllStorage,
+  relatedProduct
 };
