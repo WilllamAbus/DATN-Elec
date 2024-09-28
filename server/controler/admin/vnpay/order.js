@@ -63,6 +63,7 @@ exports.createPaymentUrl = (req, res) => {
     res.status(500).json({ message: "Error creating VNPay payment URL" });
   }
 };
+
 exports.vnpayReturn = async (req, res) => {
   const vnp_Params = req.query;
 
@@ -107,20 +108,29 @@ exports.vnpayReturn = async (req, res) => {
       try {
         const newVnpay = new Vnpay(paymentData);
         await newVnpay.save();
+
+        // Thay đổi URL chuyển hướng với id đơn hàng
         res.redirect(
-          `http://localhost:3150/checkout?paymentResult=success&orderId=${transactionNo}`
+          `http://localhost:3150/complete/${orderId}?paymentResult=success&orderId=${transactionNo}`
         );
       } catch (error) {
         console.error("Lưu thanh toán thất bại:", error);
-        res.redirect(`http://localhost:3150/checkout?paymentResult=failure`);
+        res.redirect(
+          `http://localhost:3150/complete/${orderId}?paymentResult=failure`
+        );
       }
     } else {
-      res.redirect(`http://localhost:3150/checkout?paymentResult=failure`);
+      res.redirect(
+        `http://localhost:3150/complete/${orderId}?paymentResult=failure`
+      );
     }
   } else {
-    res.redirect(`http://localhost:3150/checkout?paymentResult=invalid`);
+    res.redirect(
+      `http://localhost:3150/complete/${orderId}?paymentResult=invalid`
+    );
   }
 };
+
 exports.vnpayIpn = (req, res) => {
   let vnp_Params = req.query;
   let secureHash = vnp_Params["vnp_SecureHash"];

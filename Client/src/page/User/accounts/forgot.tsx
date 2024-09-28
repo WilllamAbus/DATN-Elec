@@ -1,26 +1,53 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
 import { forgotPasswordThunk } from "../../../redux/auth/authThunk";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
 const Forgot: React.FC = () => {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const dispatch = useDispatch<AppDispatch>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(forgotPasswordThunk(email))
-      .unwrap()
-      .then((result) => setMessage(result))
-      .catch((error) => setError(error.message || "An unknown error occurred"));
+    setIsLoading(true); // Bắt đầu quá trình loading
+    toast.dismiss(); // Xóa thông báo trước đó
+
+    try {
+      const resultAction = await dispatch(forgotPasswordThunk(email));
+
+      if (forgotPasswordThunk.fulfilled.match(resultAction)) {
+        const { status, message } = resultAction.payload as {
+          status: number;
+          message: string;
+        };
+
+        if (status === 200) {
+          toast.success(message || "Đã gửi email đặt lại mật khẩu.");
+        } else {
+          toast.error(message || "Đã xảy ra lỗi khi gửi email.");
+        }
+      } else if (forgotPasswordThunk.rejected.match(resultAction)) {
+        const { message } = resultAction.payload as {
+          status: number;
+          message: string;
+        };
+        toast.error(message || "Đã xảy ra lỗi khi gửi email.");
+      }
+    } catch (error) {
+      toast.error("Đã xảy ra lỗi khi gửi email.");
+    } finally {
+      setIsLoading(false); // Kết thúc quá trình loading
+    }
   };
 
   return (
     <>
       <div className="container mx-auto py-16">
+        <ToastContainer />
         <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -49,12 +76,35 @@ const Forgot: React.FC = () => {
               <div className="mt-6">
                 <button
                   type="submit"
-                  className="block w-full py-3 text-white bg-primary border border-primary rounded-lg hover:bg-transparent hover:text-primary transition duration-200 ease-in-out font-semibold uppercase"
+                  className={`flex items-center justify-center block w-full py-3 text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-transparent hover:text-orange-500 transition duration-200 ease-in-out font-semibold uppercase ${
+                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isLoading} // Vô hiệu hóa nút khi loading
                 >
-                  Gửi email
+                  {isLoading && (
+                    <svg
+                      className="w-5 h-5 mr-2 animate-spin"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8H4z"
+                      ></path>
+                    </svg>
+                  )}
+                  {isLoading ? "Đang yêu cầu..." : "Khôi phục"}
                 </button>
-                {message && <p className="text-green-600 mt-4">{message}</p>}
-                {error && <p className="text-red-600 mt-4">{error}</p>}
               </div>
             </form>
             <p className="mt-8 text-center text-gray-600 text-sm">

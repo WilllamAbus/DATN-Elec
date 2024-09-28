@@ -20,7 +20,11 @@ router.get(
 );
 
 router.put("/:id", middlewareController.verifyToken, CartController.updateCart);
-
+router.put(
+  "/isSelect/:id",
+  middlewareController.verifyToken,
+  CartController.selectCart
+);
 // Xóa giỏ hàng theo ID
 router.delete(
   "/:cartId/:productId?",

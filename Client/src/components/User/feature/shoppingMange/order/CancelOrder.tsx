@@ -173,7 +173,7 @@
 // };
 
 // export default CancelOrders;
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import {
@@ -194,9 +194,9 @@ const CancelOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(fetchUserOrdersThunk());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchUserOrdersThunk());
+  // }, [dispatch]);
 
   const handleCancelOrder = async (orderId: string) => {
     try {

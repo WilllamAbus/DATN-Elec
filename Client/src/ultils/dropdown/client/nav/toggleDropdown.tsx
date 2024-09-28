@@ -20,6 +20,7 @@ const UserMenuDropdown: React.FC = () => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.login.isAuthenticated
   );
+  console.log(isAuthenticated);
 
   const isAdmin = profile?.roles?.includes("admin");
 

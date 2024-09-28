@@ -568,9 +568,9 @@ const authController = {
             model: "product_v2",
           },
         })
-        // .populate("cartDetails")
-        .populate("payment") // Populate thông tin thanh toán
-        .populate("shipping") // Populate thông tin giao hàng
+
+        .populate("payment")
+        .populate("shipping")
         .populate({
           path: "voucherIds",
           model: "Voucher",
@@ -764,9 +764,15 @@ const authController = {
       if (!order) {
         return res.status(404).json({ message: "Không thấy đơn hàng!" });
       }
-      if (order.stateOrder !== "Hủy đơn hàng") {
+
+      // Kiểm tra trạng thái đơn hàng
+      if (
+        order.stateOrder !== "Hủy đơn hàng" &&
+        order.stateOrder !== "Hoàn tất"
+      ) {
         return res.status(403).json({
-          message: "Đơn hàng không thể bị xóa vì trạng thái chưa hủy",
+          message:
+            "Đơn hàng không thể bị xóa vì trạng thái chưa hủy hoặc hoàn tất",
         });
       }
 
@@ -782,6 +788,7 @@ const authController = {
       });
     }
   },
+
   restoreOrder: async (req, res) => {
     try {
       const { orderId } = req.params;

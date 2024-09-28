@@ -4,36 +4,43 @@ const OrderController = {
   getOrderById: async (req, res) => {
     try {
       const { orderId } = req.params;
-      const order = await OrderDetail.findOne({
-        order: orderId,
-      })
+      const order = await OrderDetail.findOne({ order: orderId })
         .populate({
           path: "order",
           populate: [
-            {
-              path: "payment",
-              model: "payment",
-            },
-            {
-              path: "shipping",
-              model: "shipping",
-            },
+            { path: "payment", model: "payment" },
+            { path: "shipping", model: "shipping" },
           ],
         })
-        .populate({
-          path: "items.product",
-          model: "product_v2",
-        });
+        .populate({ path: "items.product", model: "product_v2" });
 
       if (!order) return res.status(404).json({ message: "Order not found" });
+
+      // Kiểm tra sản phẩm bị xóa
+      const itemsWithDeletedProducts = order.items.filter(
+        (item) => !item.product
+      );
+
+      if (itemsWithDeletedProducts.length > 0) {
+        console.log("Deleted Products:", itemsWithDeletedProducts);
+
+        // Loại bỏ sản phẩm bị xóa khỏi danh sách trả về
+        order.items = order.items.filter((item) => item.product);
+
+        return res.status(200).json({
+          ...order.toObject(),
+          message: "Some products have been deleted",
+          deletedProducts: itemsWithDeletedProducts.map((item) => ({
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        });
+      }
 
       res.status(200).json(order);
     } catch (error) {
       console.error("Error fetching order details:", error);
-      res.status(500).json({
-        message: "Error fetching order",
-        error: error.message || error,
-      });
+      res.status(500).json({ message: "Error fetching order", error });
     }
   },
 
