@@ -50,7 +50,6 @@ const routes = (app) => {
   // app.use("/api/auctions", auctionRouter);
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
-
   app.use("/api/vnpay", vnPayRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);

@@ -136,6 +136,7 @@ const AdminListInventory = React.lazy(
   () => import("../page/Admin/inventory/listInventory")
 );
 
+
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",

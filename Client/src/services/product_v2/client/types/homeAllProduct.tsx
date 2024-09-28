@@ -35,3 +35,17 @@ export interface ProductResponse {
   product: Product | null;
   error?: string;
 }
+export interface ProductRelated {
+  _id: string;
+  image: string[];
+  product_discount: {
+    discountPercent: number;
+  };
+  product_name: string;
+  product_ratingAvg: number | null;
+  product_quantity: number;
+  product_price: number;
+}
+export interface RelatedProductsResponse {
+  relatedProducts: ProductRelated[];
+}
