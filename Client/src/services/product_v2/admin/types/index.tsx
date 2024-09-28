@@ -6,7 +6,7 @@ export type { ConditionShopping, SelectConditionShoppingResponse } from "./condi
 export type { ApiResponse } from "./apiResponse";
 export type { Category, SelectCategoryResponse } from "./category";
 export type { LimitCrudProductResponse, LimitDeletedListResponse } from "./pagination";
-export type { VariantAttributes, ProductVariant,ProductVariantResponse } from "./addVariant";
+export type { ProductVariant,ProductVariantResponse } from "./addVariant";
 export type {
   Product,
   ListProductResponse,
@@ -16,7 +16,5 @@ export type {
 } from "./product";
 export type {
   GetOneResponse,
-  ProductUpdate,
   ProductGetOne,
-  UpdateProductResponse,
 } from "./editproduct";

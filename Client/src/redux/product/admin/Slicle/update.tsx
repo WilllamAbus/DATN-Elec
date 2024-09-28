@@ -1,25 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { update } from "../Thunk/update";
-import { ProductStateUpdate, ApiResponse, ProductUpdate } from "../types";
-
-const initialState: ProductStateUpdate = {
-  products: [],
-  status: "idle",
-  error: null,
-};
+import { reponseProduct, initialProductState } from "../../../../services/product_v2/admin/types/add-product";
 
 const updateSlice = createSlice({
   name: "product/update",
-  initialState,
+  initialState: initialProductState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(update.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(update.fulfilled, (state, action: PayloadAction<ApiResponse<ProductUpdate>>) => {
+      .addCase(update.fulfilled, (state, action: PayloadAction<reponseProduct>) => { 
         state.status = "success";
-        const updatedProduct = action.payload.data;
+        const updatedProduct = action.payload.pproduct; 
         if (updatedProduct) {
           state.products = state.products.map(product =>
             product._id === updatedProduct._id ? updatedProduct : product
@@ -30,7 +24,7 @@ const updateSlice = createSlice({
       })
       .addCase(update.rejected, (state, action) => {
         state.status = "fail";
-        const errorPayload = action.payload as ApiResponse<null>;
+        const errorPayload = action.payload as reponseProduct; 
         state.error = errorPayload.msg || "Lỗi khi cập nhật sản phẩm";
         console.log(errorPayload.msg);
       });

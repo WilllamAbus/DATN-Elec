@@ -1,8 +1,8 @@
 const Product = require('../../../model/product_v2');
 const mongoose = require('mongoose');
-
+const ProductVariant = require('../../../model/product_v2/productVariant');
 const ProductCategoryService = {
-  getProductsByCategory: (categoryId, page = 1, limit = 12, _sort, brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent) => new Promise(async (resolve, reject) => {
+  getProductsByCategory: (categoryId, page = 1, limit = 12, _sort, brand, ram , conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent) => new Promise(async (resolve, reject) => {
     try {
       page = parseInt(page, 10) || 1;
       limit = parseInt(limit, 10) || 12;
@@ -29,8 +29,25 @@ const ProductCategoryService = {
       const brandFilter =  brand && brand.length > 0
       ? { product_brand: { $in: brand.map(brand => mongoose.Types.ObjectId(brand)) } }
       : {};
-  
 
+  
+      const ramVariantIds = ram && ram.length > 0
+      ? await ProductVariant.find({
+          ram: {
+            $in: ram
+              .filter(ramId => mongoose.Types.ObjectId.isValid(ramId))
+              .map(ramId => mongoose.Types.ObjectId(ramId))
+          }
+        }).distinct('_id')
+      : [];
+    
+      
+      console.log('ramVariantIds:', ramVariantIds); 
+      
+      const ramFilter = ramVariantIds.length > 0 ? { 'variants': { $in: ramVariantIds } } : {};
+      
+    
+      
       const conditionShoppingFilter =  conditionShopping && conditionShopping.length > 0
       ? { product_condition: { $in: conditionShopping.map(condition => mongoose.Types.ObjectId(condition)) } }
       : {};
@@ -63,7 +80,8 @@ const ProductCategoryService = {
         ...brandFilter,
         ...conditionShoppingFilter,
         ...priceFilter,
-        ...discountFilter
+        ...discountFilter,
+        ...ramFilter,
       })
       .sort(sortOptions)
       .skip(offset)
@@ -73,7 +91,8 @@ const ProductCategoryService = {
       .populate('product_format')
       .populate('product_condition')
       .populate('product_supplier')
-      .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
+      .populate('variants')
+      .select('product_name image product_description product_slug product_discount product_brand variants product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
       .lean();
 
       const total = await Product.countDocuments({
@@ -82,7 +101,8 @@ const ProductCategoryService = {
         ...brandFilter,
         ...conditionShoppingFilter,
         ...priceFilter,
-        ...discountFilter
+        ...discountFilter,
+        ...ramFilter,
       });
 
       resolve({

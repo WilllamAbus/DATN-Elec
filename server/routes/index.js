@@ -14,7 +14,7 @@ const inboundRouter = require("./admin/inboundshipments/inbound");
 const inventoryRouter = require("./admin/inventory");
 const clientSidebarAuction = require("./client/sidebar/auction");
 const clientSidebarProduct = require("./client/sidebar/product");
-const clientSidebarAttributes = require("./client/sidebar/attributes");
+const attributesRouter = require("./attributes");
 const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
@@ -49,7 +49,7 @@ const routes = (app) => {
   app.use("/api/admin/attributes", adminAttributes);
   app.use("/api/client/product", clientProduct);
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
-  app.use("/api/client/sidebar/attributes", clientSidebarAttributes);
+  app.use("/api/attributes", attributesRouter);
   app.use("/api/client/sidebar/product", clientSidebarProduct);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);

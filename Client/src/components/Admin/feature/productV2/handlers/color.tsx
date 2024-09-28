@@ -1,20 +1,34 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
-import { ColorOption } from "../types/main_product";
-
+import { ProductVariant, COLOR } from "../../../../../services/product_v2/admin/types/addVariant";
 export const handleColorChange = (
-  selectedOption: SingleValue<ColorOption>,
-  setSelectedColors: React.Dispatch<React.SetStateAction<SingleValue<ColorOption>>>,
-  setValue: UseFormSetValue<ProductV2>,
-  getValues: () => ProductV2 
+  selectedOption: SingleValue<COLOR>,
+  setSelectedColors: React.Dispatch<React.SetStateAction<SingleValue<COLOR>>>, 
+  setValue: UseFormSetValue<ProductVariant>
 ) => {
   setSelectedColors(selectedOption);
-  const colorValue = selectedOption ? selectedOption.label : '';
-  const currentAttributes = getValues().product_attributes || [];
-  const updatedAttributes = currentAttributes.filter(attr => attr.k !== "Color").concat({
-    k: "Color", 
-    v: colorValue
-  });
-  setValue("product_attributes", updatedAttributes);
+  const colorData: COLOR = selectedOption ? {
+    _id: selectedOption._id,
+    name: selectedOption.name,
+    code: selectedOption.code,
+    hex: selectedOption.hex,
+    status: selectedOption.status,
+    sku: selectedOption.sku,
+    pid: selectedOption.pid,
+    createdAt: selectedOption.createdAt,
+    updatedAt: selectedOption.updatedAt,
+    slug: selectedOption.slug,
+  } : {
+    _id: '',
+    name: '',
+    code: '',
+    hex: '', 
+    status: '',
+    sku: '',
+    pid: '',
+    createdAt: '',
+    updatedAt: '',
+    slug: '',
+  };
+  setValue("color", [colorData]);
 };

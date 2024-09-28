@@ -1,12 +1,15 @@
 const ProductCategoryService = require('./ProductCategorySV');
-const Category = require('../../../model/catgories.model'); 
+const Category = require('../../../model/catgories.model');
 
 const getProductsByCategory = async (req, res) => {
-  const { slug } = req.params;  
-  const { page, _sort, brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
+  const { slug } = req.params;
+  const { page, _sort, brand, ram, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
   const limit = 12;
   const brands = brand ? brand.split(',').map(b => b.trim()).filter(b => b) : [];
   const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
+  const rams = ram ? ram.split(',').map(r => r.trim()).filter(r => r) : [];
+  console.log("Received RAM query:", ram);
+
   try {
     const category = await Category.findOne({ slug });
     if (!category) {
@@ -19,15 +22,16 @@ const getProductsByCategory = async (req, res) => {
     }
 
     const response = await ProductCategoryService.getProductsByCategory(
-      category._id, 
-      page, 
-      limit, 
-      _sort, 
-      brands,  
-      conditions, 
-      minPrice, 
-      maxPrice, 
-      minDiscountPercent, 
+      category._id,
+      page,
+      limit,
+      _sort,
+      brands,
+      rams,
+      conditions,
+      minPrice,
+      maxPrice,
+      minDiscountPercent,
       maxDiscountPercent
     );
 
@@ -58,6 +62,7 @@ const getProductsByCategory = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Error in getProductsByCategory:', error);
     return res.status(500).json({
       success: false,
       err: -1,

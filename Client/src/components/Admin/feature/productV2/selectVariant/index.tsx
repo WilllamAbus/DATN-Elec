@@ -6,3 +6,5 @@ export { default as ScreenSelect } from './screenVariant';
 export { default as CpuSelect } from './cpuVariant';
 export { default as CardSelect } from './cardVariant';
 export { default as BatterySelect } from './batteryVariant';
+export { default as StorageSelect } from './storageVariant';
+export { default as OsSelect } from './operatingSystem';

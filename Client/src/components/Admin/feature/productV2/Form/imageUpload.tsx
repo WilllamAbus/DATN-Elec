@@ -1,10 +1,10 @@
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
+import { Product} from "../../../../../services/product_v2/admin/types/add-product";
 
 interface ImageUploadProps {
   imgPreview: string | null;
-  register: UseFormRegister<ProductV2>;
+  register: UseFormRegister<Product>;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
 }

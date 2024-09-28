@@ -1,23 +1,31 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
-import { BatteryOption } from "../types/main_product";
-
+import { ProductVariant, BATTERY } from "../../../../../services/product_v2/admin/types/addVariant"; 
 export const handleBatteryChange = (
-  selectedOption: SingleValue<BatteryOption>,
-  setSelectedBattery: React.Dispatch<React.SetStateAction<SingleValue<BatteryOption>>>,
-  setValue: UseFormSetValue<ProductV2>,
-  getValues: () => ProductV2
+  selectedOption: SingleValue<BATTERY>, 
+  setSelectedBattery: React.Dispatch<React.SetStateAction<SingleValue<BATTERY>>>, 
+  setValue: UseFormSetValue<ProductVariant>
 ) => {
   setSelectedBattery(selectedOption);
-  const batteryValue = selectedOption ? selectedOption.label : "";
-  const currentAttributes = getValues().product_attributes || [];
-  const updatedAttributes = currentAttributes
-    .filter((attr) => attr.k !== "Battery")
-    .concat({
-      k: "Pin",
-      v: batteryValue,
-    });
 
-  setValue("product_attributes", updatedAttributes);
+  const batteryData: BATTERY = selectedOption ? {
+    _id: selectedOption._id,
+    name: selectedOption.name,
+    status: selectedOption.status,
+    sku: selectedOption.sku,
+    pid: selectedOption.pid,
+    createdAt: selectedOption.createdAt,
+    updatedAt: selectedOption.updatedAt,
+    slug: selectedOption.slug,
+  } : {
+    _id: '',
+    name: '',
+    status: '',
+    sku: '',
+    pid: '',
+    createdAt: '',
+    updatedAt: '',
+    slug: '',
+  };
+  setValue("battery", [batteryData]);
 };

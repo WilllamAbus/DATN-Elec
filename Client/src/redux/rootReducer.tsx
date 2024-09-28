@@ -10,6 +10,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
 import productClientReducer from "./product/client";
+import attributesReducer from "./product/attributes";
 import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
   checkout: checkoutSlice,
   products: productAdminReducer,
   productClient: productClientReducer,
+  attributes:attributesReducer,
   cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,

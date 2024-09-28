@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getProductsByCategoryThunk } from "../Thunk";
-import { GetProductsByCategoryResponse, products, ProductBrand, ProductCondition,  Pagination, } from "../types/getProuctbyCategory";
+import { GetProductsByCategoryResponse, products, ProductBrand, ProductCondition,  Pagination,RAM } from "../../../../services/clientcate/client/types/getProuctbyCategory";
 
 interface ProductState {
   products: products[];
@@ -9,6 +9,7 @@ interface ProductState {
   pagination: Pagination | null;
   isLoading: boolean;
   brand: ProductBrand[];
+  ram: RAM[];
   conditionShopping: ProductCondition[];
   minPrice: number | null; 
   maxPrice: number | null; 
@@ -26,6 +27,7 @@ interface FulfilledAction extends PayloadAction<GetProductsByCategoryResponse> {
       page: number;
       _sort: string;
       brand?: ProductBrand[];
+      ram?: RAM[];
       conditionShopping?: ProductCondition[];
       minPrice?: number; 
       maxPrice?: number;
@@ -44,6 +46,7 @@ const initialState: ProductState = {
   pagination: null,
   isLoading: false,
   brand: [],
+  ram: [],
   conditionShopping: [],
   minPrice: null,
   maxPrice: null,
@@ -71,6 +74,7 @@ const getProductsByCategorySlice = createSlice({
           state.products = action.payload.data.products;
           state.pagination = action.payload.pagination;
           state.brand = action.payload.data.brand || [];
+          state.ram = action.payload.data.ram || [];
           state.conditionShopping = action.payload.data.conditionShopping || [];         
           const { minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, limit } = action.meta.arg || {
             minPrice: null,

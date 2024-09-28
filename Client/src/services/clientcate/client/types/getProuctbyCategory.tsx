@@ -1,4 +1,120 @@
 
+export interface SCREEN {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface CPU {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+export interface RAM {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+  size?: number; 
+}
+
+
+export interface COLOR {
+  _id: string;
+  name: string;
+  code: string; 
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+  hex: string; 
+}
+
+
+export interface GRAPHICSCARD {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface BATTERY {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface OPERATINGSYSTEM {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface STORAGE {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+export interface ProductVariant {
+  variant_name: string;                
+  variant_description: string;         
+  variant_price: number;               
+  battery: BATTERY[];                    
+  color: COLOR[];                   
+  cpu: CPU[];                     
+  graphicsCard: GRAPHICSCARD[];             
+  operatingSystem: OPERATINGSYSTEM[];          
+  ram: RAM[];                    
+  screen: SCREEN[];                   
+  storage: STORAGE[];                    
+  image?: FileList;                   
+  sku: string;                         
+  pid: string;                        
+  status: 'active' | 'inactive';      
+  product: string;                     
+  inventory?: string[];                
+  _id: string;                         
+  createdAt: string;                   
+  updatedAt: string;                   
+  slug: string;                        
+  __v: number;                         
+}
+
 interface ProductDiscountClient {
   discountId: string;
   code: string;
@@ -30,6 +146,7 @@ export interface products {
   product_condition: ProductCondition;
   product_quantity: number; 
   product_price: number;
+  variants: ProductVariant[];
   product_attributes: { k: string; v: string }[]; 
   weight_g: number; 
   image: string[];
@@ -55,6 +172,7 @@ export interface GetProductsByCategoryResponse {
     products: products[];
     brand: ProductBrand[];  
     conditionShopping: ProductCondition[];  
+    ram: RAM[];  
   };
   pagination: Pagination;
   limit?: number;
@@ -67,6 +185,7 @@ page: number;
 limit?: number;
 brand?: ProductBrand[];
 conditionShopping?: ProductCondition[];
+ram?: RAM[];
 minPrice?: number;
 maxPrice?: number;
 minDiscountPercent?: number;
@@ -80,9 +199,11 @@ _sort?: string;
 page?: number; 
 limit?: number | string; 
 brand?: string; 
+ram?: string; 
 conditionShopping?: string; 
 minPrice?: string; 
 maxPrice?: string; 
 minDiscountPercent?: string; 
 maxDiscountPercent?: string; 
 }
+

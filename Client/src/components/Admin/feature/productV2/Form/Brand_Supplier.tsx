@@ -1,13 +1,13 @@
 // components/BrandSupplierSelect.tsx
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
+import { Product} from "../../../../../services/product_v2/admin/types/add-product";
 import { BrandSelect, SupplierSelect } from "../select";
 
 interface BrandSupplierProps {
   brands: any[];
   suppliers: any[];
-  register: UseFormRegister<ProductV2>;
+  register: UseFormRegister<Product>;
   errors: {
     product_brand?: string;
     product_supplier?: string;

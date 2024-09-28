@@ -15,6 +15,7 @@ const colorMap = {
   'Màu Tím': '#800080',
   'Màu Teal': '#008080',
   'Màu Navy': '#000080',
+  'Màu Titan tự nhiên': '#bbb4a7',
 };
 
 const getColorCode = (name) => {

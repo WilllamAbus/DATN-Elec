@@ -7,22 +7,27 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FunnelIcon } from "@heroicons/react/20/solid";
 import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
-import ProductFilters from "./prouctAuctionFilter";
+import ProductFilters from "./prouctFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getAllBrandPageAuctionThunk, getAllConditionShoppingThunk ,getProductsByCategoryThunk} from "../../../../redux/product/client/Thunk";
+import { 
+  getAllBrandPageAuctionThunk,
+  getAllConditionShoppingThunk,
+  getProductsByCategoryThunk
+} from "../../../../redux/product/client/Thunk";
+import { getAllRamThunk} from "../../../../redux/product/attributes/Thunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
 import ProductList from "./productList";
 import styles from "./css/section.module.css";
-import ProductAuctionSort from "./productAuctionSort";
-import FilterViewer from "./filterAuction/filterViewer";
-import { FilterState, QueryParamAuction } from "../../../../services/product_v2/client/types/listPageAuction";
+import ProductAuctionSort from "./productSort";
+import FilterViewer from "./filter/filterViewer";
+import { FilterState, QueryParamAuction } from "../../../../services/clientcate/client/types/getProuctbyCategory";
 import NoProductsMessage from "./noProduct";
 import { useLocation, useParams } from "react-router-dom";
 import queryString from "query-string";
-import useAuctionFilters from "./useAuctionFiltersHook";
+import useProductFilters from "./produtFiltersHook";
 
 
 
@@ -49,11 +54,13 @@ export default function ListPage() {
   );
   const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
   const conditions = useSelector((state: RootState) => state.productClient.getAllConditionShoppingPageAuction.conditionShopping || []);
+  const rams = useSelector((state: RootState) => state.attributes.getAllRam.rams); 
   useEffect(() => {
     dispatch(getAllBrandPageAuctionThunk());
     dispatch(getAllConditionShoppingThunk());
+    dispatch(getAllRamThunk());
   }, [dispatch]);
-  const [filters, setFilters] = useAuctionFilters(queryParams, brands, conditions);
+  const [filters, setFilters] = useProductFilters(queryParams, brands, conditions,rams);
   const noProducts = !isLoading && products.length === 0;
   useEffect(() => {
     if (slug) {
@@ -63,6 +70,7 @@ export default function ListPage() {
         limit: filters.limit,
         _sort: filters._sort,
         brand: filters.brand || [],
+        ram: filters.ram || [],
         conditionShopping: filters.conditionShopping || [],
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,

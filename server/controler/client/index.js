@@ -8,6 +8,8 @@ const {
   getALLConditionShopping,
   getAllProductVariants,
   getAllColorVariant,
+} = require('./sidebar');
+const {
   getAllRam,
   getAllColor,
   getAllCpu,
@@ -16,8 +18,7 @@ const {
   getAllBattery,
   getAllOperatingSystem,
   getAllStorage
-  
-} = require('./sidebar');
+} = require('./attributes');
 module.exports = {
   homeAllProduct,
   getID,

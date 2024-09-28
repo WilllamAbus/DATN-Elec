@@ -1,11 +1,12 @@
 import instance from "../../../axios";
-import { GetProductsByCategoryResponse, ProductCondition, ProductBrand } from "../types/getProuctbyCategory";
+import { GetProductsByCategoryResponse, ProductCondition, ProductBrand,RAM } from "../types/getProuctbyCategory";
 export const getProductsByCategory = async (
   slug: string, 
   page: number,
   _sort?: string,
   brand: ProductBrand[] = [], 
   conditionShopping?: ProductCondition[], 
+  ram: RAM[]=[],
   minPrice?: number,
   maxPrice?: number,
   minDiscountPercent?: number,
@@ -15,11 +16,13 @@ export const getProductsByCategory = async (
   try {
     const brandParam = brand.length > 0 ? brand.map(b => b._id).join(',') : ''; 
     const conditionParam = conditionShopping ? conditionShopping.map(condition => condition._id).join(',') : ''; 
+    const ramParam = ram.length > 0 ? ram.map(r => r._id).join(',') : '';
     const queryParams = new URLSearchParams({
       page: page.toString(),
       _sort: _sort || '',
       ...(brandParam ? { brand: brandParam } : {}),
       ...(conditionParam ? { conditionShopping: conditionParam } : {}),
+      ...(ramParam ? { ram: ramParam } : {}),
       ...(minPrice != null ? { minPrice: minPrice.toString() } : {}),
       ...(maxPrice != null ? { maxPrice: maxPrice.toString() } : {}),
       ...(minDiscountPercent != null ? { minDiscountPercent: minDiscountPercent.toString() } : {}),

@@ -15,7 +15,6 @@ export const pagiCrudProduct = async (
     const response = await instance.get<LimitCrudProductResponse>(
       `/admin/product/limit/?${queryParams.toString()}`
     );
-    console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
