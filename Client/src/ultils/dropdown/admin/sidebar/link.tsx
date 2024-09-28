@@ -35,5 +35,4 @@ export const links: Record<string, Link[]> = {
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
   inbound: [{ label: "Nhập hàng", to: "/admin/listInbound" }],
-
 };

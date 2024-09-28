@@ -1,11 +1,8 @@
-// Comment.tsx
 import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import Listcomment from "./listComment";
-import { getProfileThunk } from "../../../../../redux/auth/authThunk";
-import { useAppDispatch } from "../../../../../redux/store";
+import ListCmt from "./listComment";
 import { notify } from "../../../../../ultils/success";
 import { addComment, getCommentProduct, Comment as CommentType } from "../../../../../services/commnet/comment.service";
 
@@ -27,7 +24,6 @@ const Comment = () => {
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset } = useForm<FormValues>();
   const { id } = useParams<{ id: string }>();
-  const dispatch = useAppDispatch();
 
   const decodeToken = (token: string): DecodedToken => {
     try {
@@ -59,15 +55,14 @@ const Comment = () => {
     return { id: "", name: "" };
   };
 
-  const userDataa = getUserData();
+  const userData = getUserData();
 
   useEffect(() => {
-    if (id) {  // Chỉ chạy khi id tồn tại
-      setIsLoggedIn(!!userDataa.id);
-      dispatch(getProfileThunk());
-      fetchComments(); // Chỉ gọi hàm fetchComments khi id đã có giá trị
+    if (id) {
+      setIsLoggedIn(!!userData.id);
+      fetchComments();
     }
-  }, [id]); // Thay vì phụ thuộc vào userDataa, chỉ phụ thuộc vào idn
+  }, [id]);
 
   const fetchComments = async () => {
     if (id) {
@@ -86,100 +81,98 @@ const Comment = () => {
 
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
-      setErrorMessage("You need to be logged in to submit a comment.");
-      return;
+        setErrorMessage("You need to be logged in to submit a comment.");
+        return;
     }
     if (!id) {
-      setErrorMessage("Product ID is missing.");
-      return;
+        setErrorMessage("Product ID is missing.");
+        return;
     }
+
     const commentData = {
-      content: data.content,
-      rating: rating,
-      user: userDataa.id,
+        content: data.content,
+        rating: rating,
+        user: userData.id,
     };
 
     try {
-      const response = await addComment(id, commentData);
-      console.log("Comment submitted:", response);
-      setComments((prevComments) => [...prevComments, response.data]);
-      notify();
-      reset();
-      setRating(0); // Reset lại rating về 0
-      setHover(0);  // Reset lại hover về 0
-      fetchComments();
-    } catch (error) {
-      console.error("Error submitting comment:", error);
-      setSuccessMessage(null);
-      setErrorMessage("Failed to submit comment.");
-    }
-  };
+        const response = await addComment(id, commentData);
+        console.log("Comment submitted:", response);
 
+        const newComment = {
+            ...response.data,
+            user: userData.name || "Anonymous",
+        };
+
+        setComments((prevComments) => [...prevComments, newComment]);
+        
+        notify();
+        reset();
+        setRating(0);
+        setHover(0);
+        fetchComments(); 
+    } catch (error) {
+        console.error("Error submitting comment:", error);
+        setSuccessMessage(null);
+        setErrorMessage("Failed to submit comment.");
+    }
+};
+
+
+useEffect(() => {
+  if (comments.length > 0) {
+      console.log("Comments updated:", comments);
+  }
+}, [comments]);
   return (
     <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
-      <div className="container py-8">
-        <h2 className="text-2xl font-semibold mb-4">Bình luận</h2>
+      <div className="container">
         {successMessage && (
-          <div
-            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded"
-            role="alert"
-          >
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded" role="alert">
             {successMessage}
           </div>
         )}
         {errorMessage && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded"
-            role="alert"
-          >
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded" role="alert">
             {errorMessage}
           </div>
         )}
 
-        {/*Listcomment */}
-        <Listcomment comments={comments} />
+        <ListCmt comments={comments} />
 
         {isLoggedIn ? (
-          <form
-            className="mt-6"
-            onSubmit={handleSubmit(submitComment)}
-          >
-            <div className="flex items-center space-x-3">
-              <input
-                type="text"
-                placeholder="Nhập bình luận của bạn..."
-                className="border border-gray-300 px-4 py-2 w-full focus:outline-none focus:border-primary rounded-md"
-                {...register("content", { required: true })}
-              />
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-opacity-80 transition focus:outline-none"
-              >
-                Gửi
-              </button>
-            </div>
-            <br />
-            <div className="flex items-start space-x-4 mb-4">
-              <h3>Đánh giá</h3>
-            </div>
-            <div className="star flex">
-              {[...Array(5)].map((_, index) => {
-                index += 1;
-                return (
-                  <p
-                    key={index}
-                    className={`fa fa-star ${index <= (hover || rating)
-                        ? "text-yellow-400"
-                        : "text-gray-400"
-                      }`}
-                    onClick={() => handleRatingClick(index)}
-                    onMouseEnter={() => setHover(index)}
-                    onMouseLeave={() => setHover(rating)}
-                  ></p>
-                );
-              })}
-            </div>
-          </form>
+          <div className="mt-8 md:mt-0 w-full">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Gửi đánh giá của bạn</h2>
+            <form onSubmit={handleSubmit(submitComment)}>
+              <div className="space-y-4 max-w-full">
+                <textarea
+                  className="block w-full h-32 p-3 text-sm border border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  placeholder="Viết bình luận của bạn..."
+                  {...register("content", { required: true })}
+                ></textarea>
+                <div className="flex items-center gap-1 mt-1">
+                  {[...Array(5)].map((_, index) => {
+                    index += 1;
+                    return (
+                      <p
+                        key={index}
+                        className={`fa fa-star ${index <= (hover || rating) ? "text-yellow-400" : "text-gray-400"}`}
+                        onClick={() => handleRatingClick(index)}
+                        onMouseEnter={() => setHover(index)}
+                        onMouseLeave={() => setHover(rating)}
+                      ></p>
+                    );
+                  })}
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500"
+                >
+                  Gửi đánh giá
+                </button>
+              </div>
+            </form>
+          </div>
         ) : (
           <div>
             <Link to="/login">

@@ -18,7 +18,7 @@ const attributesRouter = require("./attributes");
 const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
-
+const Contact = require("./client/contact/contact");
 // const supplierRoutes = require("./admin/suppliers/suppliers");
 // const WathListRouter = require("./product/product");
 
@@ -56,7 +56,6 @@ const routes = (app) => {
   // app.use("/api/auctions", auctionRouter);
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
-
   app.use("/api/vnpay", vnPayRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
@@ -68,6 +67,7 @@ const routes = (app) => {
   app.use("/api/client/customer-service", customerServiceRouter);
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
+  app.use("/api/client/contact", Contact);
   app.use("/api/orderdetails", orderdetails);
   app.use("/api/admin/order", OrderAd);
   app.use("/api/momo", momoRouter);

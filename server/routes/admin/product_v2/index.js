@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const upload = require('../../../middleware/multer.middle');
-const middlewareController = require('../../../middleware/auth');
+const upload = require("../../../middleware/multer.middle");
+const middlewareController = require("../../../middleware/auth");
 const {
    list,
    add,
@@ -30,15 +30,15 @@ router.get('/selectProductFormat',selectProductFormat);
 router.get('/selectConditionSP',selectConditionShopping);
 router.get('/selectCategories',selectCategories);
 router.get("/getone/:id", getOne);
-router.patch("/restore/:id", middlewareController.verifyToken,restore);
-router.delete("/hardDelete/:id",middlewareController.verifyToken,hardDelete);
+router.patch("/restore/:id", middlewareController.verifyToken, restore);
+router.delete("/hardDelete/:id", middlewareController.verifyToken, hardDelete);
 router.get("/deletedlist", middlewareController.verifyToken, deletedList);
-router.get('/limit', getProductLimit)
+router.get("/limit", getProductLimit);
 router.put(
-   "/update/:id",
-   middlewareController.verifyToken,
-   upload.array("image"),
-   update
- );
+  "/update/:id",
+  middlewareController.verifyToken,
+  upload.array("image"),
+  update
+);
 
 module.exports = router;

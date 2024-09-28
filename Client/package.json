@@ -102,6 +102,7 @@
     "socket.io-client": "^4.7.5",
     "sweetalert2": "^11.12.3",
     "sweetalert2-react-content": "^5.0.7",
+    "swiper": "^11.1.14",
     "use-history": "^1.4.1",
     "yup": "^1.4.0",
     "zustand": "^4.5.4"

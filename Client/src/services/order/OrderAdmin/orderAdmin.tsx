@@ -8,7 +8,7 @@ export const cancelOrderAdmin = async (orderId: string) => {
     const response = await instance.put(
       `${API_URL}/admin/order/cancel/${orderId}`
     );
-    return response.data; // Đảm bảo trả về dữ liệu đúng
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || error.message);
@@ -36,7 +36,22 @@ export const listOrder = async () => {
     }
   }
 };
+export const getSoftOrder = async () => {
+  try {
+    const response = await instance.get(`${API_URL}/admin/order/getSoftOrder`);
+    console.log(response);
 
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error fetching listOrder: An unknown error occurred");
+    }
+  }
+};
 export const updateStatusById = async (orderId: string, stateOrder: string) => {
   try {
     const response = await instance.put(
@@ -54,84 +69,38 @@ export const updateStatusById = async (orderId: string, stateOrder: string) => {
     }
   }
 };
+// Hàm xóa đơn hàng (soft delete)
+export const deleteOrderAdmin = async (orderId: string) => {
+  try {
+    const response = await instance.delete(
+      `${API_URL}/admin/order/delete/${orderId}`
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error deleting order: An unknown error occurred");
+    }
+  }
+};
 
-// export const pendingOrders = async () => {
-//   try {
-//     const response = await instance.get(`${API_URL}/order/pendingOrders`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error fetching pendingOrders: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
-// export const ConfirmOrders = async () => {
-//   try {
-//     const response = await instance.get(`${API_URL}/order/ConfirmOrders`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error fetching pendingOrders: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
-// export const shippingOrders = async () => {
-//   try {
-//     const response = await instance.get(`${API_URL}/order/shippingOrders`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error fetching pendingOrders: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
-// export const CompletedOrders = async () => {
-//   try {
-//     const response = await instance.get(`${API_URL}/order/CompletedOrders`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error fetching pendingOrders: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
-// export const CancelOrders = async () => {
-//   try {
-//     const response = await instance.get(`${API_URL}/order/CancelOrders`);
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error fetching pendingOrders: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
+// Hàm khôi phục đơn hàng
+export const restoreOrderAdmin = async (orderId: string) => {
+  try {
+    const response = await instance.put(
+      `${API_URL}/admin/order/restore/${orderId}`
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error restoring order: An unknown error occurred");
+    }
+  }
+};
