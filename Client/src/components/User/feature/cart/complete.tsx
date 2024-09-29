@@ -1,145 +1,142 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { CartItem, CartState } from "../../../../types/Voucher.d";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import "react-toastify/dist/ReactToastify.css";
+import { createOrderThunk } from "../../../../redux/order/orderThunks";
+import { AppDispatch, RootState } from "../../../../redux/store";
+import { Order } from "../../../../types/order/order";
+import { CartItem } from "../../../../types/cart/carts";
 
-import listOne from "../../../../assets/images/products/product14.jpg";
-import "../../../../assets/css/user.style.css";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-const completePage: React.FC = () => {
-    const [cartState, setCartState] = useState<CartState>({
-        items: [],
-        totalPrice: 0,
-        shipping: 0,
-        applyVoucher: false,
-        selectedVoucher: undefined,
-      });
-      const [grandTotal, setGrandTotal] = useState<number>(0);
-      // const [, setVoucher] = useState<{
-      //   code: string;
-      //   discount: number;
-      // } | null>(null);
-    
-      const navigate = useNavigate();
-      useEffect(() => {
-        // Retrieve cart items from localStorage
-        const storedCartItems = localStorage.getItem("cart");
-        const storedGrandTotal = localStorage.getItem("grandTotal");
-        // const storedVoucher = JSON.parse(
-        //   localStorage.getItem("selectedVoucher") || "null"
-        // );
-        if (storedCartItems) {
-          const items: CartItem[] = JSON.parse(storedCartItems);
-          setCartState(prevState => ({
-            ...prevState,
-            items,
-            totalPrice: calculateTotalPrice(items), // Calculate total price if needed
-          }));
-        }
+const CompletePage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-        if (storedGrandTotal) {
-          setGrandTotal(JSON.parse(storedGrandTotal));
-        }
-        // if (storedVoucher) {
-        //   setVoucher(JSON.parse(storedVoucher));
-        // }
-      }, []);
-    
-      const calculateTotalPrice = (items: CartItem[]): number => {
-        return items.reduce((total, item) => total + item.price * item.quantity, 0);
-      };
-      const handleHome = () => {
-        localStorage.removeItem("cart");
-        localStorage.removeItem("grandTotal");
-        localStorage.removeItem("selectedVoucher");
-        navigate("/"); // Redirect to the complete page
-      };
+  const address = useSelector(
+    (state: RootState) => state.auth.profile.profile?.address
+  );
+  const profile = useSelector((state: RootState) => state.auth.profile.profile);
+  const carts = useSelector((state: RootState) => state.cart.carts);
+
+  const [cart] = useState<any>(null);
+  const [, setOrderId] = useState<string | null>(null);
+
+  const grandTotal =
+    cart?.items?.reduce((total: number, item: CartItem) => {
+      return total + (item.product.product_price_unit || 0) * item.quantity;
+    }, 0) || 0;
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const paymentResult = query.get("paymentResult");
+    const orderIdFromQuery = query.get("orderId");
+
+    if (paymentResult === "success" && orderIdFromQuery) {
+      setOrderId(orderIdFromQuery);
+      handleOrderCreation(orderIdFromQuery);
+    }
+  }, [location.search]);
+
+  const generateOrderData = (
+    paymentMethod: string,
+    orderIdParam?: string
+  ): Order => {
+    return {
+      cartId: carts[0]._id,
+      user: profile?._id ? profile : null,
+      cartDetails: [
+        {
+          _id: cart?._id,
+          order: orderIdParam || "",
+          items: cart?.items.map((item: CartItem) => ({
+            product: {
+              ...item.product,
+              product_attributes: item.product.product_attributes.map(
+                (attr) => ({
+                  k: attr.k,
+                  v: attr.v,
+                })
+              ),
+            },
+            quantity: item.quantity,
+            price: item.product.product_price_unit,
+            totalItemPrice: item.product.product_price_unit * item.quantity,
+            _id: item._id,
+          })),
+        },
+      ],
+      payment: {
+        amount: grandTotal,
+        payment_method: paymentMethod,
+        order_info: orderIdParam || "",
+      },
+      shipping: {
+        recipientName: profile?.name || "",
+        phoneNumber: profile?.phone || "",
+        address: address || "",
+      },
+      voucher: [],
+      formatShipping: "Nhanh",
+      totalAmount: grandTotal,
+      shippingFee: 0,
+      totalPriceWithShipping: grandTotal,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  };
+
+  const handleOrderCreation = async (orderId: string) => {
+    const orderData = generateOrderData("vnPay", orderId);
+
+    try {
+      await dispatch(createOrderThunk(orderData)).unwrap();
+
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to create order:", error);
+    }
+  };
+
   return (
-    <>
-   
-      {/* <!-- breadcrumb --> */}
-      <div className="container py-4 flex items-center gap-3">
-        <a href="/" className="text-primary text-base">
-          <i className="fa-solid fa-house"></i>
-        </a>
-        <span className="text-sm text-gray-400">
-          <i className="fa-solid fa-chevron-right"></i>
-        </span>
-        <p className="text-gray-600 font-medium">Complete</p>
-      </div>
-      {/* <!-- ./breadcrumb --> */}
-
-      {/* <!-- wrapper --> */}
-      <div className="container grid grid-cols-12 items-start pb-16 pt-4 gap-6">
-        <div className="col-span-8 border border-gray-200 p-4 rounded">
-          <h3 className="text-lg font-medium capitalize mb-4">Hoàn thành thanh toán</h3>
-          <div className="space-y-4">
-             {/* Product Items */}
-             {cartState.items.length > 0 ? (
-              cartState.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <img
-                      src={item.imgPreview || listOne}
-                      alt={`product ${item.name}`}
-                      className="w-28 h-10"
-                    />
-                  
-                  </div>
-                  <h5 className="text-gray-800 font-medium">{item.name}</h5>
-                  <div className="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-                  
-                    <div className="h-8 w-8 text-base flex items-center justify-center">
-                      {item.quantity}
-                    </div>
-                
-                  </div>
-                  <p className="text-gray-800 font-medium">
-                    {(item.price * item.quantity).toLocaleString()} vnđ
-                  </p>
-                
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-600">Giỏ hàng trống</p>
-            )}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+        <h1 className="text-3xl font-bold text-center text-green-600 mb-4">
+          Thanh toán thành công!
+        </h1>
+        <p className="text-gray-600 text-center mb-6">
+          Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận và sẽ được
+          xử lý sớm nhất.
+        </p>
+        <div className="flex flex-col items-center">
+          <div className="mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-20 w-20 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
           </div>
-        </div>
-
-        <div className="col-span-4 border border-gray-200 p-4 rounded">
-          <h4 className="text-gray-800 text-lg mb-4 font-medium uppercase">
-           Tổng thanh toán
-          </h4>
-
-          <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>Thanh toán</p>
-            <p>{grandTotal.toLocaleString()} vnđ</p>
-          </div>
-
-          {/* <div className="flex justify-between border-b border-gray-200 mt-1 text-gray-800 font-medium py-3 uppercas">
-            <p>Vận chuyển</p>
-            <p>{cartState.shipping.toLocaleString()} vnđ</p>
-          </div> */}
-
-    
-
-          <div className="flex justify-between text-gray-800 font-medium py-3 uppercas">
-            <p className="font-semibold">Tổng thanh toán</p>
-            <p>{grandTotal.toLocaleString()} vnđ</p>
-          </div>
-
-          <button
-            onClick={handleHome}
-            className="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md 
-                hover:bg-transparent hover:text-primary transition font-medium"
+          <Link
+            to="/"
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
           >
-            Hoàn thành thanh toán
-          </button>
+            Quay về trang chủ
+          </Link>
         </div>
       </div>
-  
-    </>
+    </div>
   );
 };
 
-export default completePage;
+export default CompletePage;

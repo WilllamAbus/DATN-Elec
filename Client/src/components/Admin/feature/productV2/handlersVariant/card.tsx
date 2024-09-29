@@ -1,21 +1,30 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
-import { ProductVariant } from "../../../../../services/product_v2/admin/types";
-import { CardOption } from "../types/variant_product";
-
+import { ProductVariant, GRAPHICSCARD } from "../../../../../services/product_v2/admin/types/addVariant"; 
 export const handleCardChange = (
-  selectedOption: SingleValue<CardOption>,
-  setSelectedCard: React.Dispatch<React.SetStateAction<SingleValue<CardOption>>>,
-  setValue: UseFormSetValue<ProductVariant>,
-  getValues: () => ProductVariant
+  selectedOption: SingleValue<GRAPHICSCARD>, 
+  setSelectedCard: React.Dispatch<React.SetStateAction<SingleValue<GRAPHICSCARD>>>, 
+  setValue: UseFormSetValue<ProductVariant>
 ) => {
   setSelectedCard(selectedOption);
-  const cardValue = selectedOption ? selectedOption.label : '';
-  const currentVariantAttributes = getValues().variant_attributes || [];
-  const updateVariantAttributes = currentVariantAttributes.filter(attr => attr.k !== "Card").concat({
-    k: "Card",
-    v: cardValue
-  });
-  
-  setValue("variant_attributes", updateVariantAttributes);
+  const graphicCardData: GRAPHICSCARD = selectedOption ? {
+    _id: selectedOption._id,
+    name: selectedOption.name,
+    status: selectedOption.status,
+    sku: selectedOption.sku,
+    pid: selectedOption.pid,
+    createdAt: selectedOption.createdAt,
+    updatedAt: selectedOption.updatedAt,
+    slug: selectedOption.slug,
+  } : {
+    _id: '',
+    name: '',
+    status: '',
+    sku: '',
+    pid: '',
+    createdAt: '',
+    updatedAt: '',
+    slug: '',
+  };
+  setValue("graphicsCard", [graphicCardData]);
 };

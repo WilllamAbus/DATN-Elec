@@ -11,26 +11,26 @@ import ProductFilters from "./prouctAuctionFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { listPageAuctionProductThunk } from "../../../../redux/product/client/Thunk";
+import { 
+  listPageAuctionProductThunk,
+  getAllBrandPageAuctionThunk,
+  getAllConditionShoppingThunk
+ } from "../../../../redux/product/client/Thunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
 import ProductList from "./productList";
 import styles from "./css/section.module.css";
 import ProductAuctionSort from "./productAuctionSort";
 import FilterViewer from "./filterAuction/filterViewer";
-import { FilterState } from "../../../../services/product_v2/client/types/listPageAuction";
+import { FilterState, QueryParamAuction } from "../../../../services/product_v2/client/types/listPageAuction";
 import NoProductsMessage from "./noProduct";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
+import useAuctionFilters from "./useAuctionFiltersHook";
 export default function AuctionSidebar() {
   const dispatch: AppDispatch = useDispatch();
-  const [filters, setFilters] = useState<FilterState>({
-    _sort: "product_price:ASC",
-    brand: undefined,
-    conditionShopping: undefined,
-    minPrice: undefined,
-    maxPrice: undefined,
-    minDiscountPercent: undefined,
-    maxDiscountPercent: undefined,
-  });
+  const location = useLocation();
+  const queryParams = queryString.parse(location.search) as QueryParamAuction;
   const currentPage = useSelector(
     (state: RootState) => state.productClient.listPageAuctionProduct.pagination?.currentPage || 1
   );
@@ -40,39 +40,37 @@ export default function AuctionSidebar() {
   const total = useSelector(
     (state: RootState) => state.productClient.listPageAuctionProduct.total || 0
   );
-
   const products = useSelector(
     (state: RootState) => state.productClient.listPageAuctionProduct.products || []
   );
   const isLoading = useSelector(
     (state: RootState) => state.productClient.listPageAuctionProduct.isLoading
   );
+  const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
+  const conditions = useSelector((state: RootState) => state.productClient.getAllConditionShoppingPageAuction.conditionShopping || []);
+  useEffect(() => {
+    dispatch(getAllBrandPageAuctionThunk());
+    dispatch(getAllConditionShoppingThunk());
+  }, [dispatch]);
+  const [filters, setFilters] = useAuctionFilters(queryParams, brands, conditions);
   const noProducts = !isLoading && products.length === 0;
   useEffect(() => {
     dispatch(listPageAuctionProductThunk({
-      page: currentPage,
+      page: filters.page,
+      limit: filters.limit,
       _sort: filters._sort,
-      brand: filters.brand,
-      conditionShopping: filters.conditionShopping,
+      brand: filters.brand || [],
+      conditionShopping: filters.conditionShopping || [],
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
       minDiscountPercent: filters.minDiscountPercent,
       maxDiscountPercent: filters.maxDiscountPercent,
     }));
-  }, [dispatch, currentPage, filters._sort, filters.brand,
-    filters.conditionShopping, filters.minPrice, filters.maxPrice,
-    filters.minDiscountPercent, filters.maxDiscountPercent]);
-
+  }, [dispatch, filters]);
   const handlePageChange = (page: number) => {
-    dispatch(listPageAuctionProductThunk({
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       page,
-      _sort: filters._sort,
-      brand: filters.brand,
-      conditionShopping: filters.conditionShopping,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
-      minDiscountPercent: filters.minDiscountPercent,
-      maxDiscountPercent: filters.maxDiscountPercent,
     }));
   };
   const handleSortChange = (newSortValue: string) => {
@@ -96,7 +94,14 @@ export default function AuctionSidebar() {
     },
     []
   );
-  const hasFilters = Object.keys(filters).some(key => key !== '_sort' && filters[key] !== undefined && filters[key] !== null);
+  const hasFilters = Object.keys(filters).some((key) => {
+    const value = filters[key];
+    if (key === '_sort' && (value === 'product_price:ASC' || value === 'product_price:DESC')) return false;
+    if (key === 'page' && value === 1) return false;
+    if (Array.isArray(value) && value.length === 0) return false;
+    if (value === undefined || value === null || value === '') return false;
+    return true;
+  });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   return (
     <div>
@@ -132,7 +137,6 @@ export default function AuctionSidebar() {
                 <form className="mt-4 border-t border-gray-200">
                   <h3 className="sr-only">Categories</h3>
                   <ProductFilters filters={filters} onChange={handleFilterChange} />
-
                 </form>
               </DialogPanel>
             </div>
@@ -153,7 +157,7 @@ export default function AuctionSidebar() {
                 <div className="lg:col-span-3">
                   <div className="bg-white shadow-md sm:rounded-t-lg  overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4">
                     <div className="flex items-center justify-between px-4 py-2">
-                    <h1 className="text-xl font-barlow font-bold text-gray-900">
+                      <h1 className="text-xl font-barlow font-bold text-gray-900">
                         Sản phẩm - Đấu giá
                         <span className="text-lg font-medium text-gray-500"> (có {total} sản phẩm)</span>
                       </h1>

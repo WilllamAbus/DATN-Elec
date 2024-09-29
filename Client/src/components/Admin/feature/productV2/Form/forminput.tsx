@@ -1,4 +1,4 @@
-import { NumericFormat } from "react-number-format";
+import  NumericFormat  from "../../../../../ultils/numerFormat/numericFormatWrapper";
 import { FieldError } from "react-hook-form";
 
 interface FormInputProps {

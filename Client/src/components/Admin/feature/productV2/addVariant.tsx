@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NumericFormat } from "react-number-format";
+import  NumericFormat  from "../../../../ultils/numerFormat/numericFormatWrapper";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -8,19 +8,11 @@ import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
-import { ProductVariant } from "../../../../services/product_v2/admin/types";
-import { ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
+import { ProductVariant, RAM, CPU, COLOR, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
 import { addVariantThunk } from "../../../../redux/product/admin/Thunk";
-import {
-  ColorOption,
-  RamOption,
-  ScreenOption,
-  CPUOption,
-  CardOption,
-  BatteryOption,
-} from "./types/variant_product";
+
 import {
   RamSelect,
   ColorSelect,
@@ -28,6 +20,9 @@ import {
   CpuSelect,
   CardSelect,
   BatterySelect,
+  StorageSelect,
+  OsSelect
+
 } from "./selectVariant";
 import {
   handleRamChange,
@@ -36,8 +31,9 @@ import {
   handleCPUChange,
   handleCardChange,
   handleBatteryChange,
+  handleOsChange,
+  handleStorageChange
 } from "./handlersVariant";
-
 import { SingleValue } from "react-select";
 import Productdescription from "./description/product_description";
 const AddVariant: React.FC = () => {
@@ -46,49 +42,54 @@ const AddVariant: React.FC = () => {
   const {
     register,
     setValue,
-    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<ProductVariant>({
     defaultValues: {
-      variant_attributes: [],
     },
   });
-
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const { imgPreview, handleImageChange } = useImageUpload();
-  const [selectedRam, setSelectedRam] = useState<SingleValue<RamOption>>(null);
-  const [selectedColors, setSelectedColors] = useState<SingleValue<ColorOption>>(null);
-  const [selectedScreen, setSelectedScreen] = useState<SingleValue<ScreenOption>>(null);
-  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPUOption>>(null);
-  const [selectedCard, setSelectedCard] = useState<SingleValue<CardOption>>(null);
-  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BatteryOption>>(null);
-  const onColorChange = (selectedOptions: SingleValue<ColorOption>) => {
-    handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
-  };
-  const onRamChange = (selectedOptions: SingleValue<RamOption>) => {
-    handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
-  };
-  const onScreenChange = (selectedOptions: SingleValue<ScreenOption>) => {
-    handleScreenChange(selectedOptions, setSelectedScreen, setValue, getValues);
-  };
-  const onCPUChange = (selectedOptions: SingleValue<CPUOption>) => {
-    handleCPUChange(selectedOptions, setSelectedCPU, setValue, getValues);
-  };
-  const onCardChange = (selectedOptions: SingleValue<CardOption>) => {
-    handleCardChange(selectedOptions, setSelectedCard, setValue, getValues);
-  };
-  const onBatteryChange = (selectedOptions: SingleValue<BatteryOption>) => {
-    handleBatteryChange(selectedOptions, setSelectedBattery, setValue, getValues);
+  const [selectedRam, setSelectedRam] = useState<SingleValue<RAM>>(null);
+  const [selectedColors, setSelectedColors] = useState<SingleValue<COLOR>>(null);
+  const [selectedScreen, setSelectedScreen] = useState<SingleValue<SCREEN>>(null);
+  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPU>>(null);
+  const [selectedCard, setSelectedCard] = useState<SingleValue<GRAPHICSCARD>>(null);
+  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BATTERY>>(null);
+  const [selectedOS, setSelectedOs] = useState<SingleValue<OPERATINGSYSTEM>>(null); 
+  const [selectedStorage, setSelectedStorage] = useState<SingleValue<STORAGE>>(null); 
+  const onRamChange = (selectedOptions: SingleValue<RAM>) => {
+    handleRamChange(selectedOptions, setSelectedRam, setValue);
   };
 
+  const onColorChange = (selectedOptions: SingleValue<COLOR>) => {
+    handleColorChange(selectedOptions, setSelectedColors, setValue);
+  };
+  const onScreenChange = (selectedOptions: SingleValue<SCREEN>) => {
+    handleScreenChange(selectedOptions, setSelectedScreen, setValue);
+  };
+
+  const onCPUChange = (selectedOptions: SingleValue<CPU>) => {
+    handleCPUChange(selectedOptions, setSelectedCPU, setValue);
+  };
+  const onCardChange = (selectedOptions: SingleValue<GRAPHICSCARD>) => {
+    handleCardChange(selectedOptions, setSelectedCard, setValue);
+  };
+  const onBatteryChange = (selectedOptions: SingleValue<BATTERY>) => {
+    handleBatteryChange(selectedOptions, setSelectedBattery, setValue);
+  };
+  const onOsChange = (selectedOptions: SingleValue<OPERATINGSYSTEM>) => { 
+    handleOsChange(selectedOptions, setSelectedOs, setValue);
+  };
+
+  const onStorageChange = (selectedOptions: SingleValue<STORAGE>) => { 
+    handleStorageChange(selectedOptions, setSelectedStorage, setValue);
+  };
   const navigate = useNavigate();
 
   const submitFormAdd: SubmitHandler<ProductVariant> = async (data) => {
     setIsLoading(true);
-    console.log("Submitting variant:", data);
-    console.log("Product ID:", productIdString);
 
     try {
       const actionResult = await dispatch(
@@ -100,9 +101,7 @@ const AddVariant: React.FC = () => {
       }, 2000);
     } catch (error) {
       console.error("Error submitting variant:", error);
-      notifyError((error as ProductVariantResponse<null>).msg);
-    } finally {
-      setIsLoading(false);
+      notifyError((error as ProductVariantResponse).msg); 
     }
   };
 
@@ -178,13 +177,13 @@ const AddVariant: React.FC = () => {
 
               <div className="col-span-6 sm:col-span-3">
                 <label
-                  htmlFor="product_price"
+                  htmlFor="variant_price"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Giá gốc
                 </label>
                 <NumericFormat
-                  id="product_price"
+                  id="variant_price"
                   className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-500 focus:border-primary-500 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   thousandSeparator="."
                   decimalSeparator=","
@@ -218,9 +217,31 @@ const AddVariant: React.FC = () => {
                   Dung lượng RAM
                 </label>
                 <RamSelect value={selectedRam} onChange={onRamChange} />
-                {errors.variant_attributes && (
+                {errors.ram && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.ram.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Ổ cứng
+                </label>
+                <StorageSelect value={selectedStorage} onChange={onStorageChange} />
+                {errors.storage && (
+                  <span className="text-red-600">
+                    {errors.storage.message?.toString()}
+                  </span>
+                )}
+              </div>
+              <div className="col-span-3 1sm:col-span-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                 Hệ điều hành
+                </label>
+                <OsSelect value={selectedOS} onChange={onOsChange} />
+                {errors.operatingSystem && (
+                  <span className="text-red-600">
+                    {errors.operatingSystem.message?.toString()}
                   </span>
                 )}
               </div>
@@ -229,9 +250,9 @@ const AddVariant: React.FC = () => {
                   Màn hình
                 </label>
                 <ScreenSelect value={selectedScreen} onChange={onScreenChange} />
-                {errors.variant_attributes && (
+                {errors.screen && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.screen.message?.toString()}
                   </span>
                 )}
               </div>
@@ -240,9 +261,9 @@ const AddVariant: React.FC = () => {
                   CPU
                 </label>
                 <CpuSelect value={selectedCPU} onChange={onCPUChange} />
-                {errors.variant_attributes && (
+                {errors.cpu && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.cpu.message?.toString()}
                   </span>
                 )}
               </div>
@@ -251,9 +272,9 @@ const AddVariant: React.FC = () => {
                   Màu sắc
                 </label>
                 <ColorSelect value={selectedColors} onChange={onColorChange} />
-                {errors.variant_attributes && (
+                {errors.color && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.color.message?.toString()}
                   </span>
                 )}
               </div>
@@ -262,9 +283,9 @@ const AddVariant: React.FC = () => {
                   Card Đồ Họa
                 </label>
                 <CardSelect value={selectedCard} onChange={onCardChange} />
-                {errors.variant_attributes && (
+                {errors.graphicsCard && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.graphicsCard.message?.toString()}
                   </span>
                 )}
               </div>
@@ -273,9 +294,9 @@ const AddVariant: React.FC = () => {
                   Pin
                 </label>
                 <BatterySelect value={selectedBattery} onChange={onBatteryChange} />
-                {errors.variant_attributes && (
+                {errors.battery && (
                   <span className="text-red-600">
-                    {errors.variant_attributes.message?.toString()}
+                    {errors.battery.message?.toString()}
                   </span>
                 )}
               </div>
@@ -285,9 +306,8 @@ const AddVariant: React.FC = () => {
             <div className="col-span-6 sm:col-full">
               <button
                 type="submit"
-                className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 disabled={isLoading}
               >
                 {isLoading ? (

@@ -5,7 +5,9 @@ import {
   listPageAuctionProductSlice,
   getAllBrandPageAuctionSlice,
   resetFilterAuctionProductSlice,
-  getAllConditionShoppingSlice
+  getAllConditionShoppingSlice,
+
+
 } from "./Slicle";
 const productsReducer = combineReducers({
   list: listPageSlice,
@@ -13,7 +15,9 @@ const productsReducer = combineReducers({
   listPageAuctionProduct: listPageAuctionProductSlice,
   resetFilterAuctionProduct: resetFilterAuctionProductSlice,
   getAllBrandPageAuction: getAllBrandPageAuctionSlice,
-  getAllConditionShoppingPageAuction: getAllConditionShoppingSlice
+  getAllConditionShoppingPageAuction: getAllConditionShoppingSlice,
+
+
 });
 
 export default productsReducer;

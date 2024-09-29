@@ -8,8 +8,9 @@ const cateDropdownItems = () => {
   );
   const dropdownItems = (cateClients || []).map((item: NavItem) => ({
     label: item.name,
-    href: `/productlist/${item._id}`, 
+    href: `/category/${item.slug}`,
   }));
+  
 
   return dropdownItems;
 };

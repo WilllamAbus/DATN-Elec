@@ -6,12 +6,14 @@ const cartItemSchema = new Schema({
   price: { type: Number, required: true },
   totalItemPrice: { type: Number, required: true },
   isSelected: { type: Boolean, default: false },
+  inventory: { type: Schema.Types.ObjectId, ref: "Inventory" },
 });
 
 const cartSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
     items: [cartItemSchema],
+
     totalPrice: { type: Number, required: true },
     stateNotifi: { type: String, default: "has" },
     isActive: { type: Boolean, default: true },

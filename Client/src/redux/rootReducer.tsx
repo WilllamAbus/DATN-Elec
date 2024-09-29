@@ -10,6 +10,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
 import productClientReducer from "./product/client";
+import attributesReducer from "./product/attributes";
 import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
@@ -33,6 +34,7 @@ import allLIstOrderStatusReducer from "./statusOrderUser/allListOrderStatus/allL
 import statusComplteOrderStatusReducer from "./statusOrderUser/completOrderStatus/completeStatusSlice"
 import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/receiveStatuSlice"
 import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice"
+import orderPagiReducer from "./order/pagiOrder/pagislice";
 const authConfig = {
   key: "auth",
   storage,
@@ -48,6 +50,7 @@ const rootReducer = combineReducers({
   checkout: checkoutSlice,
   products: productAdminReducer,
   productClient: productClientReducer,
+  attributes:attributesReducer,
   cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,
@@ -69,7 +72,8 @@ const rootReducer = combineReducers({
   allListOrderStatus: allLIstOrderStatusReducer,
   completStatusOrder : statusComplteOrderStatusReducer,
   receiveStatusOrder: statusReceiveOrderReducer,
-  softDelOrderUser: softDelOrderStatus
+  softDelOrderUser: softDelOrderStatus,
+  orderPagi: orderPagiReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;

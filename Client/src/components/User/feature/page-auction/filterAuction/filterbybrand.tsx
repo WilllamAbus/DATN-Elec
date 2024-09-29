@@ -6,23 +6,28 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react
 import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
 import XIcon from '../svg/deleteicon';
 import { ProductBrand, FilterState } from '../../../../../services/product_v2/client/types/listPageAuction';
+
 interface FilterByBrandProps {
   onchange?: (selectedBrands: ProductBrand[]) => void;
   filters: FilterState;
 }
+
 interface Option {
   value: string;
   label: string;
   checked: boolean;
   brand?: ProductBrand;
 }
+
 const FilterByBrand: React.FC<FilterByBrandProps> = ({ onchange, filters }) => {
   const dispatch: AppDispatch = useDispatch();
   const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
   const [selectedBrands, setSelectedBrands] = useState<ProductBrand[]>([]);
+
   useEffect(() => {
     dispatch(getAllBrandPageAuctionThunk());
   }, [dispatch]);
+
   useEffect(() => {
     if (filters.brand) {
       setSelectedBrands(filters.brand);
@@ -30,29 +35,26 @@ const FilterByBrand: React.FC<FilterByBrandProps> = ({ onchange, filters }) => {
       setSelectedBrands([]);
     }
   }, [filters.brand]);
-  useEffect(() => {
-    if (filters.brand) {
-      setSelectedBrands(filters.brand);
-    }else{
-      setSelectedBrands([])
-    }
-  }, [filters.brand]);
+
   const handleBrandClick = (brand: ProductBrand) => {
-    const isSelected = selectedBrands.some((selected: ProductBrand) => selected._id === brand._id);
+    const isSelected = selectedBrands.some((selected) => selected._id === brand._id);
     const newSelectedBrands = isSelected
-      ? selectedBrands.filter((selected: ProductBrand) => selected._id !== brand._id)
+      ? selectedBrands.filter((selected) => selected._id !== brand._id)
       : [...selectedBrands, brand];
+  
     setSelectedBrands(newSelectedBrands);
     if (onchange) {
       onchange(newSelectedBrands);
     }
   };
+
   const handleClearAll = () => {
     setSelectedBrands([]);
     if (onchange) {
       onchange([]);
     }
   };
+
   const options: Option[] = [
     { value: 'select-all', label: 'Bỏ chọn tất cả', checked: false },
     ...brands.map((brand) => ({
@@ -62,7 +64,9 @@ const FilterByBrand: React.FC<FilterByBrandProps> = ({ onchange, filters }) => {
       brand: brand,
     })),
   ];
+
   const showClearAllOption = selectedBrands.length > 0;
+
   return (
     <Disclosure as="div" className="border-t border-gray-200 py-6">
       <h3 className="-my-3 flow-root">

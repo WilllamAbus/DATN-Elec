@@ -43,7 +43,6 @@ const update = async (req, res) => {
       });
     }
 
-
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
         success: false,
@@ -52,7 +51,6 @@ const update = async (req, res) => {
         status: 400
       });
     }
-
 
     const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
 
@@ -64,19 +62,6 @@ const update = async (req, res) => {
         imageUrls.push(imageUrl);
       }
     }
-
-    let productAttributes = [];
-    if (typeof req.body.product_attributes === 'string') {
-      productAttributes = JSON.parse(req.body.product_attributes);
-    } else {
-      productAttributes = req.body.product_attributes;
-    }
-
-    productAttributes = productAttributes.map(attr => ({
-      k: attr.k,
-      v: attr.v,
-    }));
-
 
     existingProduct.product_name = req.body.product_name || existingProduct.product_name;
     existingProduct.image = imageUrls;
@@ -95,7 +80,6 @@ const update = async (req, res) => {
     existingProduct.product_condition = req.body.product_condition || existingProduct.product_condition;
     existingProduct.product_price = productPrice; 
     existingProduct.product_price_unit = productPriceUnit;
-    existingProduct.product_attributes = productAttributes;
     existingProduct.weight_g = req.body.weight_g || existingProduct.weight_g;
     existingProduct.product_supplier = req.body.product_supplier || existingProduct.product_supplier;
 

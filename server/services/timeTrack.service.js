@@ -61,8 +61,7 @@ const timeTrackService = {
       
           // Determine the stateTime
           const stateTime = now <= finalEndTime ? "Thời gian đang chạy" : "Thời gian kết thúc";
-      
-          // Create the Time_Track instance
+// Create the Time_Track instance
           const timeTrack = new Time_Track({
             productId,
             startTime: now,
@@ -136,7 +135,7 @@ const timeTrackService = {
       
           // Extract and format product attributes
           const productAttributes = product.product_attributes.map((attribute) => ({
-            key: attribute.k,  // 'k' for key
+key: attribute.k,  // 'k' for key
             value: attribute.v,  // 'v' for value
           }));
       
@@ -203,7 +202,7 @@ const timeTrackService = {
          
         
           return updatedTimeTracks;
-        } catch (error) {
+} catch (error) {
             console.error(error)
           throw new Error(`Error retrieving TimeTracks: ${error.message}`);
         }
@@ -280,7 +279,7 @@ const timeTrackService = {
 
         // Kiểm tra endTime và xóa bản ghi nếu cần
         if (moment(timeTrack.endTime, 'DD/MM/YYYY HH:mm:ss').isBefore(moment())) {
-          await Time_Track.findByIdAndDelete(id);
+await Time_Track.findByIdAndDelete(id);
           clearInterval(interval);
           // console.log('TimeTrack deleted as endTime has passed.');
         }

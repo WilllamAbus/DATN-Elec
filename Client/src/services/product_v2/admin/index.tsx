@@ -1,5 +1,5 @@
 import { listProduct } from "./list";
-import { addProductV2 } from "./add";
+import { addProduct } from "./add";
 import { softDeleteProduct } from "./softdelete";
 import { getOneProduct } from "./getone";
 import { updateProductV2 } from "./update";
@@ -10,7 +10,7 @@ import { restoreProduct } from "./restore";
 import { addVariant } from "./addVariant";
 export {
   listProduct,
-  addProductV2,
+  addProduct,
   softDeleteProduct,
   getOneProduct,
   updateProductV2,

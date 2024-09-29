@@ -15,4 +15,23 @@ export interface ProductV2 {
   weight_g: number;
   image?: FileList;
   hasVariants: boolean;
+  variants?: ProductVariant[]; 
+}
+export interface ProductVariant {
+  _id: string;
+  variant_name: string;
+  variant_price: number;
+  ram: string | null;
+  color?: string | null;
+  cpu?: string| null;
+  graphicsCard?: string| null;
+  battery?:string | null;
+  operatingSystem?: string| null;
+  screen?: string| null;
+  storage?: string| null;
+  image: string[];
+  sku: string;
+  status: 'active' | 'inactive';
+  product: string; 
+  inventory: string[]; 
 }

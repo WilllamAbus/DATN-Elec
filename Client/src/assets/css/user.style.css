@@ -21,9 +21,9 @@
     content: '';
     position: absolute;
     left: -35px; /* Vị trí của đường thẳng */
-    top: -45px; /* Đặt mũi tên ngay dưới comment */
-    width: 1px;
-    height: 55px; /* Độ dài của đường thẳng (mũi tên) */
+    top: -65px; /* Đặt mũi tên ngay dưới comment */
+    width: 2px;
+    height: 75px; /* Độ dài của đường thẳng (mũi tên) */
     background-color: #ccc; /* Màu của đường thẳng */
   }
   
@@ -33,7 +33,7 @@
     left: -35px; /* Điều chỉnh vị trí của thanh ngang */
     top: calc(10px); /* Ngang với đỉnh của đường thẳng */
     width: 35px; /* Độ dài của thanh ngang */
-    height: 1px;
+    height: 2px;
     background-color: #ccc; /* Màu của thanh ngang */
   }
   

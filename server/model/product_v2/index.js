@@ -1,21 +1,17 @@
 const { Schema, model } = require("mongoose");
 const slugify = require('slugify');
-const commentSchema = new Schema({
-  content: { type: String, required: true },
-  rating: { type: Number, min: 1, max: 5 },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-}, {
-  timestamps: true,
-});
+const { v4: uuidv4 } = require("uuid");
+
 
 const productV2Schema = new Schema({
   product_name: { type: String, required: true },
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
-  product_slug: { type: String, unique: true }, 
+  sku: { type: String, unique: true, required: true },
+  pid: { type: String, required: true, default: uuidv4 },
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_discount: {
-    discountId: { type: Schema.Types.ObjectId, ref: 'discounts' }, 
+    discountId: { type: Schema.Types.ObjectId, ref: 'discounts' },
     code: { type: String },
     discountPercent: { type: Number },
     isActive: { type: Boolean },
@@ -33,40 +29,54 @@ const productV2Schema = new Schema({
     min: [1, 'Rating must be above 1'],
     max: [5, 'Rating must be below 5']
   },
+
   product_view: { type: Number, default: 0 },
   product_price: { type: Number, required: true },
   product_price_unit: { type: Number, required: true },
-  product_attributes: [{
-    k: { type: String, required: true },
-    v: { type: Schema.Types.Mixed, required: true }, 
-    u: { type: String }
-  }],
-  product_color: { type: String,},
+  product_color: { type: String, },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
   status: { type: String, default: 'active' },
   disabledAt: { type: Date, default: null },
-  comments:  [commentSchema],
-  variants: [{
-    variant_name: { type: String, required: true }, 
-    variant_description: { type: String }, 
-    variant_price: { type: Number, required: true },
-    variant_attributes: [{
-      k: { type: String, required: true }, 
-      v: { type: String, required: true }, 
-    }],
-    variant_image: { type: [String] },
-    sku: { type: String, unique: true }, 
-    variant_color: { type: String },
-    isActive: { type: Boolean, default: true }, 
-  }]
+  variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
+  product_attributes: [{
+    k: { type: String, required: true },
+    v: { type: Schema.Types.Mixed, required: true },
+    u: { type: String }
+  }],
+  slug: { type: String, unique: true, sparse: true },
 }, {
   collection: "product_v2",
   timestamps: true
 });
 
-productV2Schema.pre('save', function(next){
-  this.product_slug = slugify(this.product_name, { lower: true });
+
+productV2Schema.pre('save', function (next) {
+  const options = {
+    lower: true,
+    replacement: '-',
+    strict: true,
+    locale: 'vi',
+    customReplacements: { 'Đ': 'd', 'đ': 'd' }
+  };
+
+  this.slug = slugify(this.product_name, options);
+  next();
+});
+
+productV2Schema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate();
+  if (update.name) {
+    const options = {
+      lower: true,
+      replacement: '-',
+      strict: true,
+      locale: 'vi',
+      customReplacements: { 'Đ': 'd', 'đ': 'd' }
+    };
+    update.slug = slugify(update.product_name, options);
+    this.setUpdate(update);
+  }
   next();
 });
 

@@ -22,19 +22,39 @@ const AdminListProducts = React.lazy(
   () => import("../page/Admin/products/listProd")
 );
 /**ProductsV2 */
-const AdminAddProductV2 = React.lazy(() => import("../page/Admin/productV2/add"));
-const AdminAddVariant = React.lazy(() => import("../page/Admin/productV2/addVariant"));
-const AdminListProductV2 = React.lazy(() => import("../page/Admin/productV2/list"));
-const AdminEditProductV2 = React.lazy(() => import("../page/Admin/productV2/edit"));
+const AdminAddProductV2 = React.lazy(
+  () => import("../page/Admin/productV2/add")
+);
+const AdminAddVariant = React.lazy(
+  () => import("../page/Admin/productV2/addVariant")
+);
+const AdminListProductV2 = React.lazy(
+  () => import("../page/Admin/productV2/list")
+);
+const AdminEditProductV2 = React.lazy(
+  () => import("../page/Admin/productV2/edit")
+);
 /**Brands */
-const AdminAddBrands = React.lazy(() => import("../page/Admin/brands/addBrands"));
-const AdminEditBrands = React.lazy(() => import("../page/Admin/brands/editBrands"));
-const AdminListBrands = React.lazy(() => import("../page/Admin/brands/listBrands"));
+const AdminAddBrands = React.lazy(
+  () => import("../page/Admin/brands/addBrands")
+);
+const AdminEditBrands = React.lazy(
+  () => import("../page/Admin/brands/editBrands")
+);
+const AdminListBrands = React.lazy(
+  () => import("../page/Admin/brands/listBrands")
+);
 
 // Suppliers
-const AdminListSuppliers = React.lazy(() => import("../page/Admin/suppliers/listSuppliers"));
-const AdminAddSuppliers = React.lazy(() => import("../page/Admin/suppliers/addSuppliers"));
-const AdminEditSuppliers = React.lazy(() => import("../page/Admin/suppliers/editSuppliers"));
+const AdminListSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/listSuppliers")
+);
+const AdminAddSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/addSuppliers")
+);
+const AdminEditSuppliers = React.lazy(
+  () => import("../page/Admin/suppliers/editSuppliers")
+);
 
 /**BuyingFormat */
 const AdminAddBuyingFormat = React.lazy(
@@ -99,10 +119,18 @@ const AdminListProdAuc = React.lazy(
   () => import("../page/Admin/productAuction/listProdAuc")
 );
 /***RecycleBin */
-const AdminRecycleBinCate = React.lazy(() => import("../page/Admin/recycleBinCate/allItemList"));
-const AdminRecycleBin = React.lazy(() => import("../page/Admin/recycleBin/SoftDeletedProduct"));
-const AdminRecycleBinOrder = React.lazy(() => import("../page/Admin/orders/recycleBinOrder"));
-const AdminRecycleBinVoucher = React.lazy(() => import("../page/Admin/vouchers/softDelVoucher"));
+const AdminRecycleBinCate = React.lazy(
+  () => import("../page/Admin/recycleBinCate/allItemList")
+);
+const AdminRecycleBin = React.lazy(
+  () => import("../page/Admin/recycleBin/SoftDeletedProduct")
+);
+const AdminRecycleBinOrder = React.lazy(
+  () => import("../page/Admin/orders/recycleBinOrder")
+);
+const AdminRecycleBinVoucher = React.lazy(
+  () => import("../page/Admin/vouchers/softDelVoucher")
+);
 const AdminRecycleBinSupplier = React.lazy(
   () => import("../page/Admin/recycleBinSupplier/SoftDeletedSupplier")
 );
@@ -178,7 +206,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
       { path: "listComments", element: <AdminListComments /> },
-      { path: "listDetailComments/:id", element: <AdminListDetailComments/> },
+      { path: "listDetailComments/:id", element: <AdminListDetailComments /> },
       { path: "addConditon", element: <AdminConditionAuc /> },
       { path: "editCondition", element: <AdminEditConditionAuc /> },
       { path: "listCondition", element: <AdminListCondAuc /> },

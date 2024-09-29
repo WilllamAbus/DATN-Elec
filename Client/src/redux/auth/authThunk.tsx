@@ -24,21 +24,39 @@ import {
 } from "../../services/authentication/authAdmin";
 import { Role, UserProfile } from "../../types/user";
 
+// export const loginUserThunk = createAsyncThunk<
+//   UserProfile,
+//   { email: string; password: string }
+// >("auth/login", async (user, { rejectWithValue }) => {
+//   try {
+//     const response = await loginUserService(user);
+//     console.log("API :", response);
+//     return response as UserProfile;
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       return rejectWithValue(error.message);
+//     }
+//     return rejectWithValue("An unknown error occurred");
+//   }
+// });
 export const loginUserThunk = createAsyncThunk<
   UserProfile,
-  { email: string; password: string }
+  { email: string; password: string },
+  { rejectValue: string } // Cấu hình rejectValue để trả về dạng string
 >("auth/login", async (user, { rejectWithValue }) => {
   try {
     const response = await loginUserService(user);
     console.log("API Response:", response);
-    return response as UserProfile;
-  } catch (error) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
+    return response as UserProfile; // Trả về UserProfile nếu đăng nhập thành công
+  } catch (error: any) {
+    // Xử lý lỗi từ API
+    if (error.response?.data?.message) {
+      return rejectWithValue(error.response.data.message); // Trả về message từ server nếu có
     }
-    return rejectWithValue("An unknown error occurred");
+    return rejectWithValue(error.message || "Đã xảy ra lỗi khi đăng nhập."); // Trả về lỗi chung nếu không có thông tin chi tiết
   }
 });
+
 export const getProfileThunk = createAsyncThunk<
   UserProfile,
   void,
@@ -149,10 +167,21 @@ export const forgotPasswordThunk = createAsyncThunk(
   async (email: string, { rejectWithValue }) => {
     try {
       const response = await forgotPassword(email);
-      console.log(response);
-      return response.message;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
+      return {
+        status: response.status,
+        message: response.message,
+      };
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        return rejectWithValue({
+          status: error.response.status,
+          message: error.response.data.message,
+        });
+      }
+      return rejectWithValue({
+        status: 500,
+        message: "Đã xảy ra lỗi.",
+      });
     }
   }
 );

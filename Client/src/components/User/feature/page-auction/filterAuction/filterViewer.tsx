@@ -23,8 +23,8 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
         const conditions = filters.conditionShopping ?? [];
         return conditions.map(condition => condition.nameCondition).join(', ') || 'Điều kiện mua sắm';
       },
-      isVisible: (filters: FilterState) => Array.isArray(filters.conditionShopping) && filters.conditionShopping.length > 0,
-      isActive: (filters: FilterState) => Array.isArray(filters.conditionShopping) && filters.conditionShopping.length > 0,
+      isVisible: (filters: FilterState) => filters.conditionShopping && filters.conditionShopping.length > 0,
+      isActive: (filters: FilterState) => filters.conditionShopping && filters.conditionShopping.length > 0,
       isRemovable: true,
       onRemove: (filters: FilterState) => {
         const newFilters = { ...filters };
@@ -55,8 +55,8 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
         const brands = filters.brand ?? [];
         return brands.map(brand => brand.name).join(', ') || 'Thương hiệu';
       },
-      isVisible: (filters: FilterState) => Array.isArray(filters.brand) && filters.brand.length > 0,
-      isActive: (filters: FilterState) => Array.isArray(filters.brand) && filters.brand.length > 0,
+      isVisible: (filters: FilterState) => filters.brand && filters.brand.length > 0,
+      isActive: (filters: FilterState) => filters.brand && filters.brand.length > 0,
       isRemovable: true,
       onRemove: (filters: FilterState) => {
         const newFilters = { ...filters };
@@ -65,7 +65,24 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
       },
       onToggle: (filters: FilterState): FilterState => filters,
     },
-    
+    {
+      id: 4,
+      type: 'discount',
+      getLabel: (filters: FilterState) => {
+        const min = filters.minDiscountPercent ?? null;
+        return min !== null ? `Giảm giá từ ${min}%` : 'Giảm giá';
+      },
+      isVisible: (filters: FilterState) => filters.minDiscountPercent !== undefined,
+      isActive: (filters: FilterState) => filters.minDiscountPercent !== undefined,
+      isRemovable: true,
+      onRemove: (filters: FilterState) => {
+        const newFilters = { ...filters };
+        delete newFilters.minDiscountPercent;
+        delete newFilters.maxDiscountPercent;
+        return newFilters;
+      },
+      onToggle: (filters: FilterState): FilterState => filters,
+    },
   ], [filters]);
 
   const visibleFilters = useMemo(() => {
@@ -79,6 +96,7 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
       onChange(newFilters);
     }
   };
+
   const handleRemoveBrand = (brandId: string) => {
     const newBrands = (filters.brand ?? []).filter(brand => brand._id !== brandId);
     const newFilters = { ...filters, brand: newBrands };
@@ -91,6 +109,15 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
     const newFilters = { ...filters };
     delete newFilters.minPrice;
     delete newFilters.maxPrice;
+    if (onChange) {
+      onChange(newFilters);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    const newFilters = { ...filters };
+    delete newFilters.minDiscountPercent;
+    delete newFilters.maxDiscountPercent;
     if (onChange) {
       onChange(newFilters);
     }
@@ -138,6 +165,15 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
               sx={{ margin: theme.spacing(0.5) }}
             />
           ))}
+          {filter.type === 'discount' && (
+            <Chip
+              label={filter.getLabel(filters)}
+              color='primary'
+              size='small'
+              onDelete={handleRemoveDiscount}
+              sx={{ margin: theme.spacing(0.5) }}
+            />
+          )}
         </li>
       ))}
     </Box>

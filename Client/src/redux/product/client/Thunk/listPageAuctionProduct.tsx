@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { listPageAuction } from "../../../../services/product_v2/client";
-import { LimitPageAuctionProductResponse, ProductCondition,ProductBrand} from "../types/listPageAuctionProduct";
+import { LimitPageAuctionProductResponse, ProductCondition, ProductBrand } from "../types/listPageAuctionProduct";
 
 export const listPageAuctionProductThunk = createAsyncThunk<
   LimitPageAuctionProductResponse,
@@ -13,12 +13,13 @@ export const listPageAuctionProductThunk = createAsyncThunk<
     maxPrice?: number; 
     minDiscountPercent?: number;
     maxDiscountPercent?: number;
+    limit?: number;
   },
   { rejectValue: string }
 >(
   "productsClient/listPageAuction",
   async (
-    { page, _sort, brand = [], conditionShopping = [], minPrice, maxPrice, minDiscountPercent, maxDiscountPercent }, 
+    { page, _sort, brand = [], conditionShopping = [], minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, limit }, 
     { rejectWithValue }
   ) => {
     try {
@@ -30,7 +31,8 @@ export const listPageAuctionProductThunk = createAsyncThunk<
         minPrice, 
         maxPrice, 
         minDiscountPercent, 
-        maxDiscountPercent
+        maxDiscountPercent,
+        limit 
       );
       if (response.success) {
         return response;

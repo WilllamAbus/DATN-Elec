@@ -1,14 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { updateProductV2 } from "../../../../services/product_v2/admin";
-import { ApiResponse, ProductUpdate } from "../types";
+import { reponseProduct, Product } from "../../../../services/product_v2/admin/types/add-product";
 
-export const update = createAsyncThunk<ApiResponse<ProductUpdate>, { id: string, product: ProductUpdate }, { rejectValue: ApiResponse<null> }>(
+export const update = createAsyncThunk<
+  reponseProduct, 
+  { id: string; product: Product },
+  { rejectValue: reponseProduct } 
+>(
   "product/update",
   async ({ id, product }, { rejectWithValue }) => {
     try {
       const response = await updateProductV2(id, product);
       if (response.success) {
-        return response;
+        return response; 
       } else {
         return rejectWithValue({
           success: false,

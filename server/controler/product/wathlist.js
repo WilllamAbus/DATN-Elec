@@ -1,6 +1,7 @@
 const WathList = require("../../model/wathlist");
 const Product = require("../../model/product_v2/index");
 const User = require("../../model/users.model");
+const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
 
 const WathListController = {
@@ -47,9 +48,20 @@ const WathListController = {
       await newWatchlist.save();
       newWatchlist = await newWatchlist.populate("product");
 
+      const newInteraction = new Interaction({
+        user: userId,
+        Watchlist: newWatchlist._id,
+        productID: productId,
+        type: "add wishlist",
+        score: 1,
+      });
+
+      await newInteraction.save();
+
       return res.status(200).json({
         success: true,
-        message: "Sản phẩm đã được thêm vào danh sách yêu thích",
+        message:
+          "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
         data: newWatchlist,
       });
     } catch (error) {

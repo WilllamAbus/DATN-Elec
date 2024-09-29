@@ -1,75 +1,85 @@
 const modelProduct = require("../../../model/product_v2");
+const ProductVariant = require('../../../model/product_v2/productVariant'); 
 const Role = require('../../../model/role.model');
-
+const { RESPONSE_MESSAGES_CRUD, STATUS_CODES } = require('./constants'); 
 const hardDelete = async (req, res) => {
     try {
-
         const adminRole = await Role.findOne({ name: 'admin' });
         if (!adminRole) {
-            return res.status(500).json({
+            return res.status(STATUS_CODES.SERVER_ERROR).json({
                 success: false,
                 err: 1,
-                msg: "Không tìm thấy vai trò quản trị viên",
-                status: 500
+                msg: RESPONSE_MESSAGES_CRUD.ADMIN_ROLE_NOT_FOUND,
+                status: STATUS_CODES.SERVER_ERROR
             });
         }
-
         if (!req.user || !Array.isArray(req.user.roles)) {
-            return res.status(403).json({
+            return res.status(STATUS_CODES.FORBIDDEN).json({
                 success: false,
                 err: 1,
-                msg: "Người dùng không có quyền truy cập.",
+                msg: RESPONSE_MESSAGES_CRUD.USER_ACCESS_DENIED,
                 status: 403
             });
         }
         const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
         if (!isAdmin) {
-            return res.status(403).json({
+            return res.status(STATUS_CODES.FORBIDDEN).json({
                 success: false,
                 err: 1,
-                msg: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm",
-                status: 403
+                msg: RESPONSE_MESSAGES_CRUD.ACCESS_DENIED,
+                status: STATUS_CODES.FORBIDDEN
             });
         }
-
         const id = req.params.id;
         if (!id) {
-            return res.status(400).json({
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
                 err: 1,
-                msg: "ID sản phẩm không hợp lệ",
-                status: 400
+                msg: RESPONSE_MESSAGES_CRUD.INVALID_PRODUCT_ID,
+                status: STATUS_CODES.BAD_REQUEST
             });
         }
-
+        const productToDelete = await modelProduct.findById(id);
+        if (!productToDelete) {
+            return res.status(STATUS_CODES.NOT_FOUND).json({
+                success: false,
+                err: 1,
+                msg: RESPONSE_MESSAGES_CRUD.PRODUCT_NOT_FOUND,
+                status: STATUS_CODES.NOT_FOUND
+            });
+        }
+        if (productToDelete.variants && productToDelete.variants.length > 0) {
+            const variantIds = productToDelete.variants.map(variantId => variantId.toString());
+            await ProductVariant.deleteMany({ _id: { $in: variantIds } });
+        }
         const hardDeletedProduct = await modelProduct.findByIdAndDelete(id);
         if (!hardDeletedProduct) {
-            return res.status(404).json({
+            return res.status(STATUS_CODES.NOT_FOUND).json({
                 success: false,
                 err: 1,
-                msg: "Không tìm thấy sản phẩm",
-                status: 404
+                msg: RESPONSE_MESSAGES_CRUD.PRODUCT_NOT_FOUND,
+                status: STATUS_CODES.NOT_FOUND
             });
         }
-
-        res.status(200).json({
+        res.status(STATUS_CODES.SUCCESS_DELETE).json({
             success: true,
             err: 0,
-            msg: 'Sản phẩm đã được xóa thành công',
-            status: 200,
+            msg: RESPONSE_MESSAGES_CRUD.SUCCESS_DELETE,
+            status: STATUS_CODES.SUCCESS_DELETE,
             data: hardDeletedProduct
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        res.status(STATUS_CODES.SERVER_ERROR).json({
             success: false,
             err: 1,
-            msg: "Lỗi server",
-            status: 500,
+            msg: RESPONSE_MESSAGES_CRUD.SERVER_ERROR,
+            status: STATUS_CODES.SERVER_ERROR,
             error: error.message
         });
     }
-}
+};
+
 module.exports = {
     hardDelete,
 };

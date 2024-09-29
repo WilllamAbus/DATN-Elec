@@ -1,17 +1,8 @@
 import { useState } from "react";
 import { SingleValue } from "react-select";
-import { UseFormSetValue, UseFormGetValues } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
-import {
-  ColorOption,
-  RamOption,
-  ScreenOption,
-  CPUOption,
-  CardOption,
-  BatteryOption,
-  OsOption,
-  StorageOption,
-} from "../types/main_product";
+import { UseFormSetValue } from "react-hook-form";
+import { ProductVariant, RAM, CPU, COLOR, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE } from "../../../../../services/product_v2/admin/types/addVariant";
+
 import {
   handleColorChange,
   handleRamChange,
@@ -24,42 +15,49 @@ import {
 } from "../handlers";
 
 export const useProductForm = (
-  setValue: UseFormSetValue<ProductV2>,
-  getValues: UseFormGetValues<ProductV2>
+  setValue: UseFormSetValue<ProductVariant>,
 ) => {
-  const [selectedRam, setSelectedRam] = useState<SingleValue<RamOption>>(null);
-  const [selectedColors, setSelectedColors] = useState<SingleValue<ColorOption>>(null);
-  const [selectedScreen, setSelectedScreen] = useState<SingleValue<ScreenOption>>(null);
-  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPUOption>>(null);
-  const [selectedCard, setSelectedCard] = useState<SingleValue<CardOption>>(null);
-  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BatteryOption>>(null);
-  const [selectedOS, setSelectedOS] = useState<SingleValue<OsOption>>(null);
-  const [selectedStorage, setSelectedStorage] = useState<SingleValue<StorageOption>>(null);
+  const [selectedRam, setSelectedRam] = useState<SingleValue<RAM>>(null);
+  const [selectedColors, setSelectedColors] = useState<SingleValue<COLOR>>(null);
+  const [selectedScreen, setSelectedScreen] = useState<SingleValue<SCREEN>>(null);
+  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPU>>(null);
+  const [selectedCard, setSelectedCard] = useState<SingleValue<GRAPHICSCARD>>(null);
+  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BATTERY>>(null);
+  const [selectedOS, setSelectedOs] = useState<SingleValue<OPERATINGSYSTEM>>(null); 
+  const [selectedStorage, setSelectedStorage] = useState<SingleValue<STORAGE>>(null); 
 
-  const onColorChange = (selectedOptions: SingleValue<ColorOption>) => {
-    handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
+
+  const onRamChange = (selectedOptions: SingleValue<RAM>) => {
+    handleRamChange(selectedOptions, setSelectedRam, setValue);
   };
-  const onRamChange = (selectedOptions: SingleValue<RamOption>) => {
-    handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
+
+  const onColorChange = (selectedOptions: SingleValue<COLOR>) => {
+    handleColorChange(selectedOptions, setSelectedColors, setValue);
   };
-  const onScreenChange = (selectedOptions: SingleValue<ScreenOption>) => {
-    handleScreenChange(selectedOptions, setSelectedScreen, setValue, getValues);
+
+
+  const onScreenChange = (selectedOptions: SingleValue<SCREEN>) => {
+    handleScreenChange(selectedOptions, setSelectedScreen, setValue);
   };
-  const onCPUChange = (selectedOptions: SingleValue<CPUOption>) => {
-    handleCPUChange(selectedOptions, setSelectedCPU, setValue, getValues);
+
+  const onCPUChange = (selectedOptions: SingleValue<CPU>) => {
+    handleCPUChange(selectedOptions, setSelectedCPU, setValue);
   };
-  const onCardChange = (selectedOptions: SingleValue<CardOption>) => {
-    handleCardChange(selectedOptions, setSelectedCard, setValue, getValues);
+
+  const onCardChange = (selectedOptions: SingleValue<GRAPHICSCARD>) => {
+    handleCardChange(selectedOptions, setSelectedCard, setValue);
   };
-  const onBatteryChange = (selectedOptions: SingleValue<BatteryOption>) => {
-    handleBatteryChange(selectedOptions, setSelectedBattery, setValue, getValues);
+  const onBatteryChange = (selectedOptions: SingleValue<BATTERY>) => {
+    handleBatteryChange(selectedOptions, setSelectedBattery, setValue);
   };
-  const onOsChange = (selectedOptions: SingleValue<OsOption>) => {
-    handleOsChange(selectedOptions, setSelectedOS, setValue, getValues);
+  const onOsChange = (selectedOptions: SingleValue<OPERATINGSYSTEM>) => { 
+    handleOsChange(selectedOptions, setSelectedOs, setValue);
   };
-  const onStorageChange = (selectedOptions: SingleValue<StorageOption>) => {
-    handleStorageChange(selectedOptions, setSelectedStorage, setValue, getValues);
+
+  const onStorageChange = (selectedOptions: SingleValue<STORAGE>) => { 
+    handleStorageChange(selectedOptions, setSelectedStorage, setValue);
   };
+
 
   return {
     selectedRam,
@@ -84,7 +82,6 @@ export const useProductForm = (
     setSelectedCPU,
     setSelectedCard,
     setSelectedBattery,
-    setSelectedOS,
     setSelectedStorage,
   };
 };

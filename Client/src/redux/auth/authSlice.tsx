@@ -40,7 +40,6 @@ interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
-    redirectTo: string | null;
   };
   profile: {
     profile: UserProfile | null;
@@ -111,7 +110,7 @@ const initialState: AuthState = {
     error: null,
     isAuthenticated: false,
     token: null,
-    redirectTo: null,
+
     isLoggedIn: false,
   },
   profile: {
@@ -141,8 +140,9 @@ const initialState: AuthState = {
     status: "idle",
   },
   ForgotPassword: {
-    status: "idle",
-    message: "",
+    status: null,
+    message: null,
+    loading: false,
     error: null,
   },
   ResetPassword: {
@@ -410,39 +410,44 @@ const authSlice = createSlice({
           (action.payload as string) || "An unknown error occurred";
       })
       .addCase(forgotPasswordThunk.pending, (state) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "loading";
-        }
+        state.ForgotPassword.loading = true;
+        state.ForgotPassword.status = null;
+        state.ForgotPassword.message = null;
+        state.ForgotPassword.error = null;
       })
       .addCase(forgotPasswordThunk.fulfilled, (state, action) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "succeeded";
-          state.ForgotPassword.message = action.payload;
-        }
+        const { status, message } = action.payload as {
+          status: number;
+          message: string;
+        };
+        state.ForgotPassword.loading = false;
+        state.ForgotPassword.status = status;
+        state.ForgotPassword.message = message;
       })
       .addCase(forgotPasswordThunk.rejected, (state, action) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "failed";
-          state.ForgotPassword.error = action.payload as string;
-        }
+        state.ForgotPassword.loading = false;
+        state.ForgotPassword.error = action.payload as string;
       })
       .addCase(resetPasswordThunk.pending, (state) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "loading";
-        }
+        state.ForgotPassword.loading = true;
+        state.ForgotPassword.status = null;
+        state.ForgotPassword.message = null;
+        state.ForgotPassword.error = null; // Xóa kiểm tra null và trực tiếp cập nhật trạng thái
       })
       .addCase(resetPasswordThunk.fulfilled, (state, action) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "succeeded";
-          state.ForgotPassword.message = action.payload;
-        }
+        const { status, message } = action.payload as {
+          status: number;
+          message: string;
+        };
+        state.ForgotPassword.loading = false;
+        state.ForgotPassword.status = status;
+        state.ForgotPassword.message = message;
       })
       .addCase(resetPasswordThunk.rejected, (state, action) => {
-        if (state.ForgotPassword) {
-          state.ForgotPassword.status = "failed";
-          state.ForgotPassword.error = action.payload as string;
-        }
+        state.ForgotPassword.loading = false;
+        state.ForgotPassword.error = action.payload as string;
       })
+
       .addCase(resendEmailThunk.pending, (state) => {
         state.resendEmail.status = "pending";
         state.resendEmail.message = "";
@@ -537,7 +542,7 @@ const authSlice = createSlice({
           state.login.currentUser = action.payload.currentUser;
           state.login.token = action.payload.token ?? null;
           state.login.isAuthenticated = true;
-          state.login.redirectTo = action.payload.redirectTo || null;
+
           state.login.isLoggedIn = true;
           state.login.error = null;
         }
@@ -548,6 +553,44 @@ const authSlice = createSlice({
         state.login.isAuthenticated = false;
         state.login.isLoggedIn = false;
       });
+    // builder
+    //   .addCase(loginUserThunk.pending, (state) => {
+    //     state.login.isFetching = true;
+    //     state.login.error = null;
+    //     state.login.isAuthenticated = false;
+    //   })
+    //   .addCase(
+    //     loginUserThunk.fulfilled,
+    //     (state, action: PayloadAction<any>) => {
+    //       // Sửa kiểu payload thành kiểu phù hợp
+    //       state.login.isFetching = false;
+
+    //       // Kiểm tra và cập nhật các thông tin trả về từ API
+    //       if (action.payload._id && action.payload.name) {
+    //         state.login.currentUser = {
+    //           id: action.payload._id,
+    //           name: action.payload.name,
+    //           email: action.payload.email,
+    //         };
+    //         state.login.token = action.payload.token ?? null; // Giả sử token có thể trả về, nếu không thì null
+    //         state.login.isAuthenticated = true; // Đăng nhập thành công
+    //         state.login.isLoggedIn = true;
+    //       } else {
+    //         state.login.isAuthenticated = false;
+    //         state.login.isLoggedIn = false;
+    //       }
+
+    //       state.login.error = null;
+    //     }
+    //   )
+    //   .addCase(loginUserThunk.rejected, (state, action) => {
+    //     state.login.isFetching = false;
+    //     state.login.error = action.payload as string;
+    //     state.login.isAuthenticated = false;
+    //     state.login.isLoggedIn = false;
+    //     state.login.currentUser = null;
+    //     state.login.token = null;
+    //   });
 
     // .addCase(getlistRoleThunk.pending, (state) => {
     //   state.status = "loading";
