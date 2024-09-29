@@ -33,7 +33,7 @@ const timeTrackController = {
              
         try {
           const { productId } = req.params;
-          console.log('prodctID', productId);
+     
           
           const productDetails = await TimeTrackService.getTimeTrackByProduct( productId);
           return res.status(200).json({ success: true, status: 200,  data: productDetails });

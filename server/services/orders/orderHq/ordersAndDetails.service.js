@@ -45,7 +45,7 @@ const orderAndDetailService = {
     const inven = await Inventory.findOne({ product:  productID }).lean();
    
 
-      if (!inven) throw new Error("Sản phẩm không tồn tại");
+      if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
   
  
   
@@ -77,14 +77,13 @@ const orderAndDetailService = {
     }  else if (payment === 'VnPay') {
       // Generate VNPay payment URL
  
-      const orderInFo =  `Order for auction ${auctionID}`
-      const vnpayResponse = await vnpaySService.createPaymentUrl(totalPriceWithShipping, auctionID, orderInFo);
-      const payMentVnPay = vnpayResponse.url
+    
+  
       const vnPayHash =  `${totalPriceWithShipping}vnPayHash`;
       hashLinkPayment = crypto.createHash('sha256').update(vnPayHash).digest('hex');
       paymentMethodText = "Thanh toán VnPay";
      
-     return payMentVnPay
+     
     }  else {
       throw new Error("Không xác thực phương thức thanh toán");
     }
@@ -167,11 +166,13 @@ const orderAndDetailService = {
       };
   
       await sendMail(user.email, orderDetails);
-     
+      
+      const orderInFo =  `Order for auction ${auctionID}`
+      const vnpayResponse = await vnpaySService.createPaymentUrl(totalPriceWithShipping, auctionID, orderInFo);
       return {
         orderAuctionID: orderAuction._id,
         orderDetailAuctionID: orderDetailAuction._id,
-        hashLinkPayment,
+        hashLinkPayment:   vnpayResponse.url,
       };
     } catch (error) {
       throw error;
@@ -231,12 +232,69 @@ const orderAndDetailService = {
         address: order.shippingAddress.address,
         email: order.shippingAddress.userID.email, // Assuming the user's email is stored here
       };
-  
+      const orderIds = order._id
       // Return the consolidated order information
       return {
+        orderIds,
         shippingInfo, // Contains recipient, phone, address, and user email
         totalPrice: order.totalPriceWithShipping,
         products: productDetails,
+      };
+    } catch (error) {
+      throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
+    }
+  },
+
+  getOrderDetailAdmin: async (orderId) => {
+    try {
+      // Find the order and populate the userID in shippingAddress
+      const order = await OrderAuction.findById(orderId)
+        .populate("shippingAddress.userID") // Populating userID inside shippingAddress
+        .exec();
+  
+      if (!order) throw new Error("Đơn hàng không tồn tại");
+  
+      // Find order details related to the order
+      const orderDetails = await OrderDetailAuction.find({
+        order: orderId,
+      }).lean();
+ 
+      const payment = orderDetails[0].payment_method 
+      const totalPriceWithShipping = orderDetails[0].totalPriceWithShipping
+      const date = orderDetails[0].payment_date
+      // Fetch product details for each order detail
+      const productDetails = await Promise.all(
+        orderDetails.map(async (detail) => {
+          const product = await Product_v2.findById(detail.productID).lean();
+  
+          return {
+            name: product.product_name,
+            price: detail.totalAmount,
+            image: product.image,
+          };
+        })
+      );
+ 
+      // Extract the user and address information from the shippingAddress
+      const shippingInfo = {
+        userId: order.shippingAddress.userID._id,
+        recipientName: order.shippingAddress.recipientName,
+        phoneNumber: order.shippingAddress.phoneNumber,
+        address: order.shippingAddress.address,
+        email: order.shippingAddress.userID.email, // Assuming the user's email is stored here
+      };
+   
+    
+      
+      // Return the consolidated order information
+      return {
+        shippingInfo, // Contains recipient, phone, address, and user email
+        totalPrice: totalPriceWithShipping,
+        products: productDetails,
+        state: order.stateOrder,
+        paymetMethod:payment,
+        orderid: order._id,
+        dateOrder: date
       };
     } catch (error) {
       throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
@@ -293,6 +351,8 @@ getOrderByUser: async (userId) => {
             user: order.shippingAddress.userID,
             orderAuctions: orderId,
             productID: detail.productID,
+            OrderCart:null,
+            Watchlist:null,
             item: null, // Lưu thông tin sản phẩm vào productID
             type: "auctions",
             score: 5, // Có thể đặt điểm số chung cho tất cả các sản phẩm, hoặc tùy chỉnh nếu cần
@@ -341,26 +401,77 @@ getOrderByUser: async (userId) => {
       throw new Error(`Lỗi khi cập nhật đơn hàng: ${error.message}`);
     }
   },
-  getAllOrders: async (page = 1, limit = 5) => {
+
+  searchOrdersByPhoneNumber: async (search, page, limit = 17) => {
     try {
-      const orders = await OrderAuction.find({ status: { $ne: "disable" } })
-        .skip((page - 1) * limit)
-        .limit(parseInt(limit))
-
-        .exec();
-
-      const totalOrders = await OrderAuction.countDocuments({
-        status: { $ne: "disable" },
-      });
-
+      // Use defaults if page and limit are not provided
+      const offset = (!page || +page <= 1) ? 0 : (+page - 1) * limit;
+      const searchQuery = search
+      ? {
+          status: { $ne: 'disable' },
+          "shippingAddress.phoneNumber": { $regex: search, $options: 'i' }
+        }
+      : { status: { $ne: 'disable' } };
+      // Fetch orders matching the phone number and excluding status "disable"
+      const orders = await OrderAuction.find(searchQuery)
+      .populate("shippingAddress.userID")
+    
+      .skip(offset)
+      .limit(limit)
+      .exec();
+  
+      // Count the total number of matching orders for pagination
+      const totalOrders = await OrderAuction.countDocuments(searchQuery);
+  
       return {
         orders,
         totalOrders,
+        totalPages: Math.ceil(totalOrders / limit), // Total number of pages
+        currentPage: page,
       };
     } catch (error) {
-      throw new Error(`Error retrieving orders: ${error.message}`);
+      throw new Error(
+        `Error searching orders by phone number: ${error.message}`
+      );
     }
   },
+  getAllOrders: async (search, page , limit ) => {
+    try {
+        const offset = (page - 1) * limit;
+
+        const searchQuery = search
+            ? {
+                status: { $ne: 'disable' },
+                "shippingAddress.phoneNumber": { $regex: search, $options: 'i' }
+              }
+            : { status: { $ne: 'disable' } };
+
+   
+
+        const orders = await OrderAuction.find(searchQuery)
+            .skip(offset)
+            .limit(limit)
+            .populate('shippingAddress.userID') // nếu cần thiết
+            .sort({ createdAt: -1 });
+        const totalOrders = await OrderAuction.countDocuments(searchQuery);
+        const totalPages = Math.ceil(totalOrders / limit);
+        return {
+            success: true,
+            data: {
+              orders,
+              pagination: {
+                totalOrders,
+                totalPages,
+                currentPage: page,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+              },
+            },
+        };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+},
 
   getOrderById: async (id) => {
     try {
@@ -439,7 +550,7 @@ getOrderByUser: async (userId) => {
           $set: { 
             status: "disable", 
             disabledAt: now, 
-            stateOrder: "Hủy bỏ" 
+            stateOrder: "Hủy đơn hàng" 
           } 
         },
         { new: true } // Optionally, return the updated document
@@ -455,81 +566,80 @@ getOrderByUser: async (userId) => {
       throw new Error(`Lỗi khi xóa mềm đơn hàng: ${error.message}`);
     }
   },
-  getDeletedOrders: async (page = 1, limit = 5) => {
+  getDeletedOrders: async (page , limit ) => {
     try {
       // Tính toán skip và limit dựa trên số trang và giới hạn (limit)
-      const skip = (page - 1) * limit;
-
+      // const skip = (page - 1) * limit;
+      const pageNum = page && !isNaN(parseInt(page, 10)) ? parseInt(page, 10) : 1;
+      const limitNum = limit && !isNaN(parseInt(limit, 10)) ? parseInt(limit, 10) : 5;
       // Sử dụng Bucket Pattern để phân trang
       const orders = await OrderAuction.find({
         status: "disable",
-        stateOrder: "Hủy bỏ",
+        stateOrder: "Hủy đơn hàng",
       })
         .populate("shippingAddress.userID")
-        .populate("auctionDetails")
-        .skip(skip)
-        .limit(limit)
+      
+        .skip((pageNum - 1) * limitNum) // Skip documents based on page
+        .limit(limitNum) // Limit the number of documents per page
         .exec();
 
+      //  const shippingInfo = {
+      //   userId: orders[0].shippingAddress.userID._id,
+      //   recipientName: orders[0].shippingAddress.recipientName,
+      //   phoneNumber: orders[0].shippingAddress.phoneNumber,
+      //   address: orders[0].shippingAddress.address,
+      //   email: orders[0].shippingAddress.userID.email, // Assuming the user's email is stored here
+      // };
+      // const stateOrder = orders[0].stateOrder
+      
       // Đếm tổng số lượng đơn hàng thỏa mãn điều kiện
       const totalOrders = await OrderAuction.countDocuments({
         status: "disable",
-        stateOrder: "Hủy bỏ",
+        stateOrder: "Hủy đơn hàng",
       });
 
       return {
+        orders,
         totalOrders,
         totalPages: Math.ceil(totalOrders / limit),
-        currentPage: page,
-        orders,
+        currentPage: pageNum,
+      
       };
     } catch (error) {
       throw new Error(`Error retrieving deleted orders: ${error.message}`);
     }
   },
 
-  searchOrdersByPhoneNumber: async (phoneNumber) => {
-    try {
-      return await OrderAuction.find({
-        "shippingAddress.phoneNumber": phoneNumber,
-      })
-        .populate("shippingAddress.userID")
-        .populate("auctionDetails")
-        .exec();
-    } catch (error) {
-      throw new Error(
-        `Error searching orders by phone number: ${error.message}`
-      );
-    }
-  },
+
+  
 };
-const calculateScore = (interactions) => {
-  let score = 0;
-  interactions.forEach((interaction) => {
-    switch (interaction.type) {
-      case "view":
-        score += 1; // Mỗi lần xem, tăng 1 điểm
-        break;
-      case "purchase":
-        score += 5; // Mỗi lần mua, tăng 5 điểm
-        break;
-      case "rating":
-        score += interaction.rating; // Dùng điểm đánh giá làm score
-        break;
-      case "auctions":
-        score += 5;
-        break;
-      case "comment":
-        score += 3;
-        break;
-      case "addWhishList":
-        score += 4;
-        break;
-      default:
-        score += 0;
-    }
-  });
-  return score;
-};
+// const calculateScore = (interactions) => {
+//   let score = 0;
+//   interactions.forEach((interaction) => {
+//     switch (interaction.type) {
+//       case "view":
+//         score += 1; // Mỗi lần xem, tăng 1 điểm
+//         break;
+//       case "purchase":
+//         score += 5; // Mỗi lần mua, tăng 5 điểm
+//         break;
+//       case "rating":
+//         score += interaction.rating; // Dùng điểm đánh giá làm score
+//         break;
+//       case "auctions":
+//         score += 5;
+//         break;
+//       case "comment":
+//         score += 3;
+//         break;
+//       case "addWhishList":
+//         score += 4;
+//         break;
+//       default:
+//         score += 0;
+//     }
+//   });
+//   return score;
+// };
 
 module.exports = orderAndDetailService;

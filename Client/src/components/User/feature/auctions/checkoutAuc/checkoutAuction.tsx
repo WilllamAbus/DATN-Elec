@@ -23,7 +23,7 @@ const CheckoutPage: React.FC = () => {
 
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
-   // Access order data from `orderAuction`
+     // Access order data from `orderAuction`
   const loading = useSelector((state: RootState) => state.orderAuction.loading); // Use loading from `orderAuction`
   const navigate = useNavigate(); // Create navigate instance
 

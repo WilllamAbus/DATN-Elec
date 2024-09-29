@@ -36,7 +36,7 @@ const timeTrackService = {
           const endTime = data.endTime ? moment.tz(data.endTime, timeZone).toDate() : null;
           const endTimeBid = data.endTimeBid ? moment.tz(data.endTimeBid, timeZone).toDate() : null;
       
-          console.log(`Incoming endTime: ${data.endTime}, Incoming endTimeBid: ${data.endTimeBid}`);
+          // console.log(`Incoming endTime: ${data.endTime}, Incoming endTimeBid: ${data.endTimeBid}`);
       
           // Ensure at least one of endTime or endTimeBid is provided
           if (!endTime && !endTimeBid) {
@@ -53,7 +53,7 @@ const timeTrackService = {
       
           // Validate that finalEndTime is within 30 days from now
           const maxAllowedEndTime = moment(now).add(30, 'days').toDate();
-          console.log('maxAllowedEndTime', maxAllowedEndTime);
+          // console.log('maxAllowedEndTime', maxAllowedEndTime);
           
           if (finalEndTime > maxAllowedEndTime) {
             throw new Error('Thời gian kết thúc không vượt quá 30 ngày so với thời gian hiện tại.');

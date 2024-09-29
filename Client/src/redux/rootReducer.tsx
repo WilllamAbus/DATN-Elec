@@ -25,8 +25,14 @@ import auctionReducer from "./auctions/auctionSlice";
 import deleteBidReducer from "./deleteBid/deleteBidSlice";
 import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
 import confirmReducer from "./confirmOrder/confirmOrderSlice";
+import OrderListAuctionAdminReducer from './orderAucAdmin/orderAucAdminSlice'
+import getDeletedOrderAucAdminReducer from './orderAucAdmin/getDeletedAucAdmin/getDeletedSlice'
+import statusShippingReducer from './statusOrderUser/shippingStatusOrder/shiipingStatusSlice'
 import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
-
+import allLIstOrderStatusReducer from "./statusOrderUser/allListOrderStatus/allListStatuSlice"
+import statusComplteOrderStatusReducer from "./statusOrderUser/completOrderStatus/completeStatusSlice"
+import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/receiveStatuSlice"
+import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice"
 const authConfig = {
   key: "auth",
   storage,
@@ -57,6 +63,13 @@ const rootReducer = combineReducers({
   auctCheckout: auctCheckoutReducer,
   orderAuction: orderAuctionReducer,
   confirmOrder: confirmReducer,
+  orderAucAdmin: OrderListAuctionAdminReducer,
+  getDeletedOrderAucAdmin : getDeletedOrderAucAdminReducer,
+  statusShippingOrder : statusShippingReducer,
+  allListOrderStatus: allLIstOrderStatusReducer,
+  completStatusOrder : statusComplteOrderStatusReducer,
+  receiveStatusOrder: statusReceiveOrderReducer,
+  softDelOrderUser: softDelOrderStatus
 });
 
 export type AppDispatch = typeof store.dispatch;

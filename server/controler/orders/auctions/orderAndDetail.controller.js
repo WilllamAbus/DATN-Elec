@@ -122,6 +122,21 @@ const orderAndDetailControler = {
             res.status(500).json({ error: error.message });
         }
     },
+    getOrderDetailsAdmin : async (req, res) => {
+      try {
+          const { orderId } =  req.params; // Sử dụng req.body để lấy tham số từ request body
+          if (!orderId) {
+              return res.status(400).json({ error: 'orderId là bắt buộc' });
+          }
+          const orderDetails = await orderService.getOrderDetailAdmin(orderId);
+          res.status(200).json({ success: true,
+              status: 200,
+              error: -2,
+              data: orderDetails});
+      } catch (error) {
+          res.status(500).json({ error: error.message });
+      }
+  },
 
     completeOrder: async (req, res) => {
         try {
@@ -139,24 +154,25 @@ const orderAndDetailControler = {
             res.status(500).json({ error: error.message });
         }
     },
-      getAllOrders : async (req, res) => {
-        try {
-          const { page = 1, limit = 5 } = req.query;
-          const { orders, totalOrders } = await orderService.getAllOrders(parseInt(page), parseInt(limit));
-      
-          res.status(200).json({
-            success: true,
-            status: 200,
-            page,
-            limit,
-            totalOrders,
-            data: orders,
+    getAllOrders: async (req, res) => {
+      const { search } = req.query; // Lấy từ query string
+      const page = parseInt(req.query.page) || 1; // Trang mặc định là 1
+      const limit = parseInt(req.query.limit) || 5; // Giới hạn mặc định là 5
+
+      const result = await orderService.getAllOrders(search, page, limit);
+
+      if (result.success) {
+          return res.status(200).json({
+            status: 200 ,
+            data: {
+              success: true,
+              data: result.data, // Ensure you're sending back the orders and pagination details
+            },
           });
-        } catch (error) {
-          console.error('Error getting all orders:', error.message);
-          res.status(500).json({ message: `Error retrieving orders: ${error.message}` });
-        }
-      },
+      } else {
+          return res.status(500).json({ success: false, message: result.message });
+      }
+  },
       getOrderById : async (req, res) => {
         try {
           const { id } = req.params;
@@ -196,23 +212,42 @@ const orderAndDetailControler = {
       getDeletedOrders : async (req, res) => {
         try {
             const { page, limit } = req.query; // Lấy số trang và giới hạn từ query params
-            const paginationResult = await orderAuctionService.getDeletedOrders(parseInt(page, 5) || 1, parseInt(limit, 5) || 5);
+            const paginationResult = await orderService.getDeletedOrders(page, limit );
     
-            res.status(200).json(paginationResult); // Trả về kết quả phân trang
+            res.status(200).json({
+              success: true,
+              data: paginationResult.orders,
+              pagination: {
+                totalOrders: paginationResult.totalOrders,
+                totalPages: paginationResult.totalPages,
+                currentPage: paginationResult.currentPage,
+              },
+
+            }); // Trả về kết quả phân trang
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     },
 
       searchOrdersByPhoneNumber : async (req, res) => {
-        try {
-          const { phoneNumber } = req.query;
-          const orders = await orderService.searchOrdersByPhoneNumber(phoneNumber);
+         // Get page and limit from query params
       
-          res.status(200).json({ success: true,status: 200, data: orders });
+        try {
+          const { page, search } = req.query;
+          const limit = 12; 
+          // Call the service function to search orders by phone number
+          const result = await orderService.searchOrdersByPhoneNumber(page, search, limit);
+      
+          // Respond with the paginated result
+          return res.status(200).json({
+            success: true,
+            data: result,
+          });
         } catch (error) {
-          console.error('Error searching orders by phone number:', error.message);
-          res.status(500).json({ message: `Error searching orders: ${error.message}` });
+          return res.status(500).json({
+            success: false,
+            message: error.message,
+          });
         }
       }
 

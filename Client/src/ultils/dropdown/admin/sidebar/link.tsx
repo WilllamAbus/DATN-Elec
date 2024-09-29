@@ -19,8 +19,9 @@ export const links: Record<string, Link[]> = {
   ],
   orderCart: [
     { label: "Đơn hàng", to: "/admin/listOrders" },
-    { label: "xyz", to: "/admin/listOrders" },
+    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
   ],
+
   supplier: [{ label: "Nhà cung cấp", to: "/admin/listSuppliers" }],
   brand: [{ label: "Thương hiệu", to: "/admin/listBrands" }],
   recycleBin: [
@@ -30,6 +31,7 @@ export const links: Record<string, Link[]> = {
     { label: "Nhà cung cấp", to: "/admin/recycleBinSupplier" },
     { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
     { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
+    { label: "Đơn hàng đấu giá", to: "/admin/recBinOrderAuction" },
   ],
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],

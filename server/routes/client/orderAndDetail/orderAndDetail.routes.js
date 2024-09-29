@@ -4,16 +4,17 @@ const orderController = require("../../../controler/orders/auctions/orderAndDeta
 const middlewareController = require("../../../middleware/auth");
 
 router.post("/create-order",middlewareController.verifyToken, orderController.createOrder);
-router.get('/getAll', orderController.getAllOrders);
+router.get('/getAll',middlewareController.verifyTokenAdminAuth, orderController.getAllOrders);
 router.get('/getByID/:id', orderController.getOrderById);
 router.get('/getOrderByUser',middlewareController.verifyToken, orderController.getOrderByUser)
-router.post('/restore/:id',middlewareController.verifyTokenAdminAuth, orderController.restoreOrder);
-router.delete('/soft-delete/:id',middlewareController.verifyTokenAdminAuth, orderController.softDeleteOrder);
-router.get('/deleted', orderController.getDeletedOrders);
-router.get('/search', orderController.searchOrdersByPhoneNumber);
+router.patch('/restore/:id',middlewareController.verifyTokenAdminAuth, orderController.restoreOrder);
+router.patch('/soft-delete/:id',middlewareController.verifyTokenAdminAuth, orderController.softDeleteOrder);
+router.get('/deleted',middlewareController.verifyToken, orderController.getDeletedOrders);
+router.get('/search',middlewareController.verifyTokenAdminAuth, orderController.searchOrdersByPhoneNumber);
 router.put('/product-details',middlewareController.verifyToken, orderController.getProductDetailsAuction)
 router.get('/orderDetailAuc',middlewareController.verifyToken, orderController.getOrderDetails)
 router.post('/complete',middlewareController.verifyToken, orderController.completeOrder)
 router.put('/received',middlewareController.verifyToken, orderController.updateAndGetReceivedOrdersByUser);
 router.patch('/received/soft-delete',middlewareController.verifyToken, orderController.softDeleteReceivedOrders);
+router.get('/orderDetailAdmin/:orderId',middlewareController.verifyTokenAdminAuth, orderController.getOrderDetailsAdmin)
 module.exports = router;

@@ -13,6 +13,7 @@ import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
 import OrderList from "./order";
+import OrderAuct from "./orderAuctStatus"
 import useAuth from "../../../../hooks/useAuth";
 
 import Cookies from "js-cookie";
@@ -20,7 +21,7 @@ const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [view, setView] = useState<
-    "order" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
+    "order"|"orderAuct" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
   >("info");
 
   const profile = useAppSelector(
@@ -148,6 +149,16 @@ const ProfileUse: React.FC = () => {
               </a>
               <a
                 href="#"
+                className={`relative text-base block capitalize transition ${
+                  view === "edit" ? "text-primary" : "text-gray-600"
+                }`}
+                onClick={() => setView("orderAuct")}
+              >
+                <i className="fa fa-edit mr-2"></i>
+                Đơn hàng đấu giá
+              </a>
+              <a
+                href="#"
                 className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
                 onClick={() => setView("watchlist")}
               >
@@ -180,6 +191,7 @@ const ProfileUse: React.FC = () => {
           {view === "password" && <UpdatePassword profile={profile} />}
           {view === "watchlist" && <Watchlist profiles={profile} />}
           {view === "order" && <OrderList />}
+          {view === "orderAuct" && <OrderAuct />}
         </section>
       </div>
     </>

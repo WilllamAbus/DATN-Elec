@@ -35,6 +35,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listInventory", label: "Danh sách kho hàng" },
   ],
+  listOrderGeneral: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listOrderAuction", label: "Danh sách đon hàng" },
+  ],
   addProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },

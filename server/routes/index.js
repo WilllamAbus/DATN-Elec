@@ -31,6 +31,8 @@ const interactionRouter = require("./client/interaction/interation.routes");
 const orderdetails = require("./client/orders/OrderDetail");
 const OrderAd = require("./admin/order/orderAd");
 const momoRouter = require("./client/momo/momo");
+const orderAucIteraction = require('./client/iterationOrderAuct/iterationOrderAuc.routes')
+
 const commentAdminRouter = require("./admin/comment");
 const commentClientRouter = require("./client/comment");
 
@@ -67,6 +69,7 @@ const routes = (app) => {
   app.use("/api/momo", momoRouter);
   app.use("/api/admin/comment", commentAdminRouter);
   app.use("/api/client/comment", commentClientRouter);
+  app.use("/api/client/iteracOder", orderAucIteraction);
 };
 
 module.exports = routes;

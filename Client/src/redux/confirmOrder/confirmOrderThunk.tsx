@@ -8,7 +8,7 @@ export const getOrderAuctionDetails = createAsyncThunk(
   async (orderId: string, { rejectWithValue }) => {
     try {
       const response: OrderAuctionResponse = await fetchAuctionData(orderId);
-      console.log('responese', response);
+  
       
       return response.data;
     } catch (error: any) {
