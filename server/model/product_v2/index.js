@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 const slugify = require("slugify");
-
 const productV2Schema = new Schema(
   {
     product_name: { type: String, required: true },
@@ -63,14 +62,7 @@ const productV2Schema = new Schema(
     isActive: { type: Boolean, default: true },
     status: { type: String, default: "active" },
     disabledAt: { type: Date, default: null },
-    comments: [
-      {
-        user: { type: Schema.Types.ObjectId, ref: "users" },
-        content: { type: String, required: true },
-        rating: { type: Number, min: 1, max: 5, required: true },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     variants: [{ type: Schema.Types.ObjectId, ref: "productVariant" }],
   },
   {

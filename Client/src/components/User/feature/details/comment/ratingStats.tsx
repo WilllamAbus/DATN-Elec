@@ -4,24 +4,24 @@ interface RatingStatsProps {
   comments: CommentType[];
 }
 const RatingStats = ({ comments }: RatingStatsProps) => {
-  if (!comments || comments?.length === 0) {
+  if (!comments || comments.length === 0) {
     return <p>Chưa có thống kê.</p>;
   }
 
   const totalRatings = comments.reduce(
-    (sum, comment) => sum + comment?.rating,    
+    (sum, comment) => sum + comment.rating,    
     0
   );
   const averageRating =
-    comments?.length > 0
-      ? (totalRatings / comments?.length).toFixed(1)
+    comments.length > 0
+      ? (totalRatings / comments.length).toFixed(1)
       : " ";
   const ratingCount = [5, 4, 3, 2, 1].map((rating) => ({
     rating,
-    count: comments?.filter((comment) => comment?.rating === rating)?.length,
+    count: comments?.filter((comment) => comment.rating === rating).length,
   }));
 
-  const totalComments = comments?.length;
+  const totalComments = comments.length;
   return (
     <>
       <div className="flex flex-col md:flex-row items-center gap-4">

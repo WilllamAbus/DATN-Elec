@@ -30,6 +30,7 @@ export const links: Record<string, Link[]> = {
     { label: "Nhà cung cấp", to: "/admin/recycleBinSupplier" },
     { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
     { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
+    { label: "Tương tác", to: "/admin/recycleBinComment" },
   ],
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],

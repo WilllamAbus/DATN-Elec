@@ -10,7 +10,7 @@ const interactionSchema = new Schema(
     productID: { type: String },
     type: {
       type: String,
-      enum: ["view", "comment", "add wishlist", "purchase", "auctions"], // Các loại tương tác
+      enum: ["view", "comment", "add wishlist", "purchase", "auctions","search"], // Các loại tương tác
       required: true,
     },
     score: { type: Number, default: 1 }, // Điểm số cho mô hình học, bạn có thể thay đổi dựa trên loại tương tác

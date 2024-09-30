@@ -1,14 +1,20 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../../../redux/store";
+import {
+  AppDispatch,
+  RootState,
+  useAppSelector,
+} from "../../../../../redux/store";
 import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
   getWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
-import { getProductByID,upViewProduct} from "../../../../../services/product_v2/client/homeAllProduct";
+import {
+  getProductByID,
+  upViewProduct,
+} from "../../../../../services/product_v2/client/homeAllProduct";
 import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
@@ -22,6 +28,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { WatchlistItem } from "../../../../../types/cart/profile/wathlist";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
+import { getProfileThunk } from "../../../../../redux/auth/authThunk";
+import {
+  addInteractionView,
+} from "../../../../../services/interaction/interaction.service";
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -34,6 +44,9 @@ const ProductDetail: React.FC = () => {
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | null>
   >({});
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
+  );
 
   const handleChange = (attributeKey: string, value: string) => {
     setSelectedValues((prev) => ({
@@ -48,43 +61,72 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
-  const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist 
-  );
+  const watchlistItems = useSelector((state: RootState) => state.watchlist);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
+
   useEffect(() => {
+    // Khởi tạo ref để theo dõi trạng thái tương tác
     const fetchData = async () => {
       if (!id) {
-        console.log("Không có ID sản phẩm nào được cung cấp");
-        return;
+        console.log("Product ID is not available.");
+        return; // Nếu không có ID, không thực hiện
       }
+      
+      if (!profile?._id) {
+        console.log("User profile is not available.");
+        return; // Nếu không có profile, không thực hiện
+      }
+    
+      const interactionData = {
+        user: profile._id, // Lấy user ID từ profile
+        orderAuctions: null,
+        item: id,
+        OrderCart: null,
+        productID: id,
+        Watchlist: null,
+        type: "view",
+        score: 2,
+      };
+    
       try {
         // Lấy thông tin sản phẩm
         console.log("Fetching product with ID:", id);
-        const productID = await getProductByID(id);
-        setProduct(productID.product);
-        console.log(productID.product);
-        await upViewProduct(id);
-        const updatedProduct = await getProductByID(id);
-        setProduct(updatedProduct);
+        await upViewProduct(id); // Gọi hàm để tăng view
+    
+        const productResponse = await getProductByID(id);
+        if (productResponse.product) {
+          setProduct(productResponse.product);
+          console.log("Sản phẩm đã được lấy thành công:", productResponse.product);
+        } else {
+          console.log("Không tìm thấy sản phẩm với ID:", id);
+          return;
+        }
+        //them interaction
+        await addInteractionView(interactionData); 
+       
+    
         // Lấy danh sách yêu thích của người dùng
         const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
         const isFavoriteProduct = watchlistResponse.some(
           (item: WatchlistItem) => item.product._id === id
         );
         setIsFavorite(isFavoriteProduct);
+        console.log("Sản phẩm có trong danh sách yêu thích:", isFavoriteProduct);
+        
       } catch (error) {
-        console.log(
-          "Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:",
-          error
-        );
+        console.error("Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:", error);
       }
     };
-    fetchData();
+    
+    
+    
+
+    fetchData(); // Gọi hàm fetchData
+    dispatch(getProfileThunk()); // Lấy thông tin profile
   }, [id, dispatch]);
 
   const handleAddToCart = async () => {
@@ -163,10 +205,6 @@ const ProductDetail: React.FC = () => {
         return;
       }
       try {
-        console.log("Fetching product with ID:", id);
-        const productID = await getProductByID(id); 
-        setProduct(productID.product);
-        console.log(productID.product);
         if (Array.isArray(watchlistItems)) {
           const isFavoriteProduct = watchlistItems.some(
             (item) => item.product && item.product._id === id
@@ -202,7 +240,8 @@ const ProductDetail: React.FC = () => {
             <img src={products?.image?.[currentIndex]} alt="Ảnh chính" />
           </div>
           <div className="flex justify-center gap-4">
-            {products?.image?.slice(0, 4)
+            {products?.image
+              ?.slice(0, 4)
               .map((imgSrc: string | undefined, index: number) => (
                 <img
                   key={index}
@@ -271,7 +310,8 @@ const ProductDetail: React.FC = () => {
             </h3>
             <div className="flex flex-wrap gap-2">
               {products?.product_attributes?.length ? (
-                products.product_attributes?.filter((attribute: ProductAttribute) =>
+                products.product_attributes
+                  ?.filter((attribute: ProductAttribute) =>
                     ["Ram", "Color"].includes(attribute.k)
                   )
                   .map((attribute: ProductAttribute, index: number) => (
@@ -391,7 +431,8 @@ const ProductDetail: React.FC = () => {
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            {products?.product_attributes?.filter((attribute: ProductAttribute) =>
+            {products?.product_attributes
+              ?.filter((attribute: ProductAttribute) =>
                 attributesToShow.includes(attribute.k)
               )
               .map((attribute: ProductAttribute, index: number) => (

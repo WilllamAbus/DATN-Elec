@@ -1,6 +1,7 @@
 'use strict'
 const Interaction = require('../../model/recommendation/interaction.model');
 const Product_v2 = require('../../model/product_v2'); // Import product model
+const mongoose = require('mongoose'); 
 
 const interactionService = {
   getPurchasedProducts: async (userId) => {
@@ -124,6 +125,65 @@ const interactionService = {
       throw new Error(`Error retrieving deleted interactions: ${error.message}`);
     }
   },
+  postInteractionsView : async (additionalData) => {
+    try {
+      const { user, orderAuction, item, orderCart, productID, watchlist, type, score } = additionalData;
+  
+      const interactionExists = await Interaction.findOne({ user, productID});
+  
+      if (interactionExists) {
+        throw new Error('Interaction already exists');
+      }
+  
+      const interactions = await Interaction.create({
+        user,
+        orderAuction,
+        item,
+        orderCart,
+        productID,
+        watchlist,
+        type,
+        score
+      });
+  
+      return interactions;
+    } catch (error) {
+      console.error(`Error creating interactions: ${error.message}`);
+      throw new Error(`Error creating interactions: ${error.message}`);
+    }
+  },
+  postInteractions: async (additionalData) => {
+    try {
+      const { user, orderAuction, item, orderCart, productID, watchlist, type, score } = additionalData;
+  
+      // Kiểm tra nếu tương tác cùng user, productID và type là "comment" đã tồn tại
+      const interactionExists = await Interaction.findOne({ user, productID, type: "comment" });
+  
+      // Nếu tương tác đã tồn tại, trả về một thông báo mà không cần ném lỗi
+      if (interactionExists) {
+        return { message: 'Interaction already exists', interaction: interactionExists };
+      }
+  
+      // Nếu tương tác không tồn tại, tiến hành tạo mới
+      const interactions = await Interaction.create({
+        user,
+        orderAuction,
+        item,
+        orderCart,
+        productID,
+        watchlist,
+        type,
+        score
+      });
+  
+      return interactions;
+    } catch (error) {
+      console.error(`Error creating interactions: ${error.message}`);
+      throw new Error(`Error creating interactions: ${error.message}`);
+    }
+  },
+  
+  
 };
 
 module.exports = interactionService;
