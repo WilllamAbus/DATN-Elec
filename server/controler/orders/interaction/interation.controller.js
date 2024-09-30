@@ -1,4 +1,5 @@
-const interactionService = require("../../../services/interaction/interation.service"); // Import interaction service
+const interactionService = require('../../../services/interaction/interation.service'); // Import interaction service
+const mongoose = require('mongoose'); 
 
 const interactionController = {
   getPurchasedProducts: async (req, res) => {
@@ -68,6 +69,29 @@ const interactionController = {
       res.status(500).json({ error: error.message });
     }
   },
+  postInteractionView: async (req, res) => {
+    try {
+      // Gọi service postInteractions để lưu dữ liệu vào database
+      const result = await interactionService.postInteractionsView(req.body);
+  
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: `Error creating interactions: ${error.message}` });
+    }
+  },
+  postInteraction: async (req, res) => {
+    try {
+      const result = await interactionService.postInteractions(req.body);
+  
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: `Error creating interactions: ${error.message}` });
+    }
+  },
+
+
+
+  
 };
 
 module.exports = interactionController;

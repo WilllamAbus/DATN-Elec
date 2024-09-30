@@ -27,23 +27,28 @@ const productV2Schema = new Schema({
     type: Number,
     default: 4.5,
     min: [1, 'Rating must be above 1'],
-    max: [5, 'Rating must be below 5']
+    max: [5, 'Rating must be below 5'],
+    product_slug: { type: String, unique: true },
+    product_view: { type: Number, default: 0 },
+    product_price: { type: Number, required: true },
+    product_price_unit: { type: Number, required: true },
+    product_attributes: [
+      {
+        k: { type: String, required: true },
+        v: { type: Schema.Types.Mixed, required: true },
+        u: { type: String },
+      },
+    ],
+    product_quantity: { type: Number, require: true },
+    product_color: { type: String },
+    weight_g: { type: Number, required: true },
+    isActive: { type: Boolean, default: true },
+    status: { type: String, default: "active" },
+    disabledAt: { type: Date, default: null },
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    variants: [{ type: Schema.Types.ObjectId, ref: "productVariant" }],
   },
-
-  product_view: { type: Number, default: 0 },
-  product_price: { type: Number, required: true },
-  product_price_unit: { type: Number, required: true },
-  product_color: { type: String, },
-  weight_g: { type: Number, required: true },
-  isActive: { type: Boolean, default: true },
-  status: { type: String, default: 'active' },
-  disabledAt: { type: Date, default: null },
-  variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
-  product_attributes: [{
-    k: { type: String, required: true },
-    v: { type: Schema.Types.Mixed, required: true },
-    u: { type: String }
-  }],
+ 
   slug: { type: String, unique: true, sparse: true },
 }, {
   collection: "product_v2",

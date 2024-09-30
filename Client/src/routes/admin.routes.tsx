@@ -137,6 +137,9 @@ const AdminRecycleBinSupplier = React.lazy(
 const AdminRecycleBinBrand = React.lazy(
   () => import("../page/Admin/recycleBinBrand/SoftDeletedBrand")
 );
+const AdminRecycleComment = React.lazy(
+  () => import("../page/Admin/recycleBinComment/index")
+);
 
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
@@ -225,6 +228,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinVoucher", element: <AdminRecycleBinVoucher /> },
       { path: "recycleBinSupplier", element: <AdminRecycleBinSupplier /> },
       { path: "recycleBinBrand", element: <AdminRecycleBinBrand /> },
+      { path: "recycleBinComment", element: <AdminRecycleComment /> },
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },

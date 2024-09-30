@@ -9,4 +9,6 @@ router.get('/interactions/:id', interactionController.getById);
 router.patch('/interactions/:id/soft-delete',middlewareController.verifyTokenAdminAuth, interactionController.softDel);
 router.patch('/interactions/:id/restore',middlewareController.verifyTokenAdminAuth, interactionController.restore);
 router.get('/interactions/deleted', interactionController.getDeletedList);
+router.post('/interactions-view',interactionController.postInteractionView);
+router.post('/interactions',interactionController.postInteraction);
 module.exports = router;
