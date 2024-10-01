@@ -82,20 +82,20 @@ const ProductDetail: React.FC = () => {
   };
 
   useEffect(() => {
-    // Khởi tạo ref để theo dõi trạng thái tương tác
     const fetchData = async () => {
+      // Kiểm tra sự tồn tại của ID sản phẩm và profile
       if (!id) {
         console.log("Product ID is not available.");
         return; // Nếu không có ID, không thực hiện
       }
-      
+  
       if (!profile?._id) {
         console.log("User profile is not available.");
         return; // Nếu không có profile, không thực hiện
       }
-    
+  
       const interactionData = {
-        user: profile._id, // Lấy user ID từ profile
+        user: profile._id,
         orderAuctions: null,
         item: id,
         OrderCart: null,
@@ -104,28 +104,28 @@ const ProductDetail: React.FC = () => {
         type: "view",
         score: 2,
       };
-    
+  
       try {
-        // Lấy thông tin sản phẩm
         console.log("Fetching product with ID:", id);
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
-        await upViewProduct(id);
+  
+        await upViewProduct(id); // Cập nhật lượt xem sản phẩm
+        await addInteractionView(interactionData);
         const updatedProduct = await getProductByID(id);
         setProduct(updatedProduct);
+  
         const relatedData = await fetchRelatedProducts(id);
         // Kiểm tra và thiết lập giá trị cho relatedProducts
         if (relatedData && Array.isArray(relatedData.relatedProducts)) {
-          setRelatedProducts(relatedData.relatedProducts); // Đây là mảng
+          setRelatedProducts(relatedData.relatedProducts);
         } else {
           console.error('Error: relatedData is not an array', relatedData);
         }
-
-        //them interaction
-        await addInteractionView(interactionData); 
-       
-    
+  
+        // Ghi lại tương tác
+  
         // Lấy danh sách yêu thích của người dùng
         const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
         const isFavoriteProduct = watchlistResponse.some(
@@ -133,18 +133,20 @@ const ProductDetail: React.FC = () => {
         );
         setIsFavorite(isFavoriteProduct);
         console.log("Sản phẩm có trong danh sách yêu thích:", isFavoriteProduct);
-        
+  
       } catch (error) {
         console.error("Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:", error);
       }
     };
-    
-    
-    
-
-    fetchData(); // Gọi hàm fetchData
-    dispatch(getProfileThunk()); // Lấy thông tin profile
-  }, [id, dispatch]);
+  
+    // Gọi hàm fetchData
+    fetchData();
+  
+    // Lấy thông tin profile
+    dispatch(getProfileThunk());
+  
+  }, [id, dispatch]); // Thêm profile vào dependency array
+  
 
   const handleAddToCart = async () => {
     if (userId && id) {
@@ -222,6 +224,9 @@ const ProductDetail: React.FC = () => {
         return;
       }
       try {
+        const productID = await getProductByID(id);
+        setProduct(productID.product);
+        console.log(productID.product);
         if (Array.isArray(watchlistItems)) {
           const isFavoriteProduct = watchlistItems.some(
             (item) => item.product && item.product._id === id
