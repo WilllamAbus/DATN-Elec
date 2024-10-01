@@ -8,4 +8,5 @@ router.get('/:id', comment.getCommentProduct);
 router.get('/repComment/:id', repComment.getRepComment);
 router.get(`/userComment/:id`,comment.userID);
 
+
 module.exports = router;
