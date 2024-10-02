@@ -107,6 +107,7 @@ const ProductDetail: React.FC = () => {
   
       try {
         console.log("Fetching product with ID:", id);
+        
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
