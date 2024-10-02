@@ -11,4 +11,5 @@ router.patch('/interactions/:id/restore',middlewareController.verifyTokenAdminAu
 router.get('/interactions/deleted', interactionController.getDeletedList);
 router.post('/interactions-view',interactionController.postInteractionView);
 router.post('/interactions',interactionController.postInteraction);
+router.post('/auctions',interactionController.postInteractionAuction);
 module.exports = router;

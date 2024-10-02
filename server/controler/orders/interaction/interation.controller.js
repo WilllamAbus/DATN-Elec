@@ -88,6 +88,15 @@ const interactionController = {
       res.status(500).json({ error: `Error creating interactions: ${error.message}` });
     }
   },
+  postInteractionAuction: async (req, res) => {
+    try {
+      const result = await interactionService.postInteractionsAuction(req.body);
+  
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: `Error creating interactions: ${error.message}` });
+    }
+  },
 
 
 
