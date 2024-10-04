@@ -4,7 +4,7 @@ import { ApiResponseShipping } from '../../types/iterationOrder/shippingStatusOr
 import {  ApiResponseAll } from '../../types/iterationOrder/allOrderStatus';
 import { ApiResponseReceve } from '../../types/iterationOrder/reciveStatusOrder';
 import { ApiResponseComplete } from '../../types/iterationOrder/completeStatusOrder';
-import {SoftDeleteOrderResponse  } from '../../types/iterationOrder/softDeleteForUser';
+
 export const shippingStatusOrder = async (userId: string): Promise<ApiResponseShipping> => {
   try {
     const response = await axios.get('client/iteracOder/shippStateOrderAuc', {
@@ -57,13 +57,13 @@ export const statusComplte = async (userId: string): Promise<ApiResponseComplete
 };
 
 
-export const softDelOrderUser = async (orderId: string): Promise<SoftDeleteOrderResponse> => {
+export const softDelOrderUser = async (orderId: string) => {
   try {
-    const response = await axios.patch<SoftDeleteOrderResponse>('client/iteracOder/received/soft-delete', {
-      params: {orderId: orderId }
-    });
+    const response = await axios.patch(`client/iteracOder/received/soft-delete/${orderId}`);
     return response.data;
   } catch (error: any) {
     throw new Error('Error fetching order data');
   }
 };
+
+

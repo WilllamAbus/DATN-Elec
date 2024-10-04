@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { getOrderAuctionDetailsAdmin } from "../../../../redux/orderAucAdmin/orderAucAdminThunk";
-import { Card, ListGroup, Select } from "flowbite-react";
-
+import { updateOrderStatusThunk } from "../../../../redux/orderAucAdmin/updateStatusAdmin/updateStatusAdminThunk";
+import { Card, ListGroup, Select , Button} from "flowbite-react";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const OrderDetails: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
@@ -18,15 +20,44 @@ const OrderDetails: React.FC = () => {
   }, [dispatch, id]);
 
   const selectedOrder = orders.confirmOrder;
-
+  const selectedOrderStatus = Array.isArray(orders.orders)
+    ? orders.orders.find((order) => order._id === id)
+    : orders.orders;
   useEffect(() => {
-    if (selectedOrder) {
-      setSelectedStatus(selectedOrder.state || "");
+    if (selectedOrderStatus) {
+      setSelectedStatus(selectedOrderStatus?.stateOrder || "");
     }
-  }, [selectedOrder]);
+  }, [selectedOrderStatus]);
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedStatus(e.target.value);
+  const handleStatusChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value;
+
+    setSelectedStatus(newStatus);
+  
+  };
+
+  const handleUpdateStatus = async() => {
+
+    if (selectedOrderStatus ) {
+ 
+     
+
+     
+    await dispatch(updateOrderStatusThunk({  
+        orderId: selectedOrderStatus._id as string,
+        stateOrder: selectedStatus  })).unwrap()
+        .then((response) => {
+          const successMessage =
+            response.stateOrder || "Cập nhật trạng thái đơn hàng thành công!";
+          toast.success(successMessage);
+        })
+        .catch((error) => {
+          const errorMessage = error;
+          toast.error(errorMessage);
+        });
+        
+     
+    }
   };
 
   return (
@@ -56,13 +87,15 @@ const OrderDetails: React.FC = () => {
               <div className="mb-4">
                 <p className="text-lg font-medium mb-2">Tổng quan trạng thái</p>
                 <Select value={selectedStatus} onChange={handleStatusChange}>
-                  <option value="Chờ xử lý">Chờ giao hàng</option>
-                  <option value="Đã xác nhận">Đang vận chuyển</option>
-                  <option value="Đang vận chuyển">Xác nhận</option>
-                  <option value="Đang vận chuyển">Nhận hàng</option>
+                <option >Trạng thái đơn hàng</option>
+                  <option value="Vận chuyển">Vận chuyển</option>
+                  <option value="Nhận hàng">Nhận hàng</option>
                   <option value="Hoàn tất">Hoàn tất</option>
-                  <option value="Trả hàng">Hủy đơn</option>
+                  <option value="Hủy đơn hàng">Hủy đơn hàng</option>
                 </Select>
+                <Button onClick={handleUpdateStatus}
+                   className="mt-4 bg-blue-500 text-white p-2 rounded-md">
+                    Cập nhật trạng thái</Button>
               </div>
             </div>
 
@@ -102,6 +135,7 @@ const OrderDetails: React.FC = () => {
           <p>Loading...</p>
         )}
       </Card>
+      <ToastContainer />
     </main>
   );
 };

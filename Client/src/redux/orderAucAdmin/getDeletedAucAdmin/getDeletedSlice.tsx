@@ -61,7 +61,7 @@ const deletedOrderAucAdminSlice = createSlice({
         (order) => order._id !== action.payload._id
       );
       state.orders = [...state.orders, action.payload];
-        console.log('action Payload', action.payload);
+      
         
     })
     .addCase(restoreOrderThunk.rejected, (state, action) => {

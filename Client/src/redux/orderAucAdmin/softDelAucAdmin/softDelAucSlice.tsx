@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { SoftDeleteOrderData } from '../../../types/iterationOrder/softDeleteForUser'; // Thay đổi nếu cần
-import { softDelThunk } from './softDellOrderThunk';
-import { OrderDataAllShipping } from '../../../types/iterationOrder/shippingStatusOrder'; 
+import {Order  } from '../../../types/adminOrder/orderAll';
+import { softDelAdminThunk } from './softDelAdminThunk';
+import {  } from '../../../types/iterationOrder/shippingStatusOrder'; 
 interface OrderState {
-  softDelorder: SoftDeleteOrderData[];
-  shippingStatus:  OrderDataAllShipping[] // Đảm bảo kiểu đúng,
-  delOrderSoft: SoftDeleteOrderData | null;
+  softDelorder: Order[];
+
+  delOrderSoft: Order | null;
   loading: boolean;
   error: string | null;
   successMessage: string | null;
@@ -13,7 +13,7 @@ interface OrderState {
 
 const initialState: OrderState = {
   softDelorder: [],
-  shippingStatus: [], // Thay đ��i kiểu đúng,
+
   delOrderSoft: null, // Thay đ��i kiểu đúng,
   loading: false,
   error: null,
@@ -35,12 +35,12 @@ const softDetlaeOrderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(softDelThunk.pending, (state) => {
+      .addCase(softDelAdminThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.successMessage = null;
       })
-      .addCase(softDelThunk.fulfilled, (state, action) => {
+      .addCase(softDelAdminThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.delOrderSoft = action.payload; // Thay đ��i kiểu đúng,
         // Kiểm tra softDelorder trước khi gọi filter
@@ -50,7 +50,7 @@ const softDetlaeOrderSlice = createSlice({
         state.softDelorder = [...state.softDelorder, action.payload];
         state.successMessage = "Xóa đơn hàng thành công";
       })
-      .addCase(softDelThunk.rejected, (state, action) => {
+      .addCase(softDelAdminThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

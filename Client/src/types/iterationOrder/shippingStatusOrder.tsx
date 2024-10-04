@@ -15,6 +15,7 @@ export interface OrderProductShipping {
 
   export interface OrderDataAllShipping {
     _id:string,
+    orderId:string,
     userId:string
     recipientName: string;
     phoneNumber: string;

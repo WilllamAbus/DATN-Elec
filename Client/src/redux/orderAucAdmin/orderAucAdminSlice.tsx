@@ -66,7 +66,7 @@ const orderAdminsSlice = createSlice({
     })
     .addCase(getOrders.fulfilled, (state, action: PayloadAction<OrderResponse>) => {
       state.loading = false;
-      console.log("Fetched Orders:", action.payload);
+   
       state.orders = action.payload.orders;
       state.pagination = {
         totalOrders: action.payload.pagination.totalOrders,
@@ -75,7 +75,7 @@ const orderAdminsSlice = createSlice({
         hasNextPage: action.payload.pagination.hasNextPage,
         hasPrevPage: action.payload.pagination.hasPrevPage,
       };
-      console.log('orders', state.orders);
+  
     })
     .addCase(getOrders.rejected, (state, action) => {
       state.loading = false;

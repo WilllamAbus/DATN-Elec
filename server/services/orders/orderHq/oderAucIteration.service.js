@@ -88,17 +88,18 @@ const iteractionOrderAucService = {
   getShippingOrdersByUser: async (userId) => {
     try {
       // Tìm đơn hàng với userID tương ứng và không phải là "Nhận hàng"
-      const fineOrderAucForUser = await OrderAuction.findOne({
+ 
+      const orders = await OrderAuction.find({
         'shippingAddress.userID': userId,
-        stateOrder: { $ne: "Vận chuyển" },
-        status: { $ne: "disable" },
-      })// Sắp xếp theo thứ tự giảm dần (mới nhất lên trên)
-    
-      .lean(); // Trả về dữ liệu JavaScript object thuần;
-  
-      if (!fineOrderAucForUser) {
-        throw new Error("Không tìm thấy đơn hàng phù hợp.");
-      }
+        stateOrder: 'Vận chuyển', // Lọc theo trạng thái đơn hàng
+          status: { $ne: "disable" }, // Loại bỏ đơn hàng bị vô hiệu hóa
+        }) // Trả về dữ liệu JavaScript object thuần
+        .lean(); // Trả về dữ liệu JavaScript object thuần
+   
+        if (!orders) {
+          throw new Error('Không tìm thấy đơn hàng nào.');
+        }
+   
   
       // Cập nhật stateOrder thành "Vận chuyển"
       // await OrderAuction.findOneAndUpdate(
@@ -111,20 +112,19 @@ const iteractionOrderAucService = {
       // );
   
       // Lấy các đơn hàng với stateOrder là "Vận chuyển" và không bị vô hiệu hóa
-      const orders = await OrderAuction.find({
-        _id: fineOrderAucForUser._id,
-        stateOrder: 'Vận chuyển',
-        status: { $ne: "disable" },
-      }).lean(); // Sắp xếp theo thứ tự từ dưới lên (mới nhất lên trên)
-  
+    // Sắp xếp theo thứ tự từ dưới lên (mới nhất lên trên)
+   
+      
       const orderIds = orders.map(order => order._id);
-  
+      console.log('orderIds', orderIds);
+      
       // Lấy chi tiết các đơn hàng theo orderIds
       const orderDetails = await OrderDetailAuction.find({
         order: { $in: orderIds },
         status: { $ne: "disable" }
       }).lean();
   
+      
       if (!orderDetails.length) {
         throw new Error('Không tìm thấy chi tiết đơn hàng nào.');
       }
@@ -154,6 +154,11 @@ const iteractionOrderAucService = {
       // Cấu trúc lại dữ liệu trả về theo từng đơn hàng
       const finalOrderDetails = orders.map(order => {
         return {
+          orderId: order._id,
+          userId: order.shippingAddress.userID,
+          recipientName: order.shippingAddress.recipientName,
+          phoneNumber: order.shippingAddress.phoneNumber,
+          address: order.shippingAddress.address,
           userId: order.shippingAddress.userID,
           recipientName: order.shippingAddress.recipientName,
           phoneNumber: order.shippingAddress.phoneNumber,
@@ -176,12 +181,7 @@ const iteractionOrderAucService = {
 
       getReciveOrdersByUser: async (userId) => {
         try {
-          const fineOrderAucForUser = await OrderAuction.findOne({
-            'shippingAddress.userID': userId,
-            stateOrder: 'Vận chuyển',
-            status: { $ne: "disable" },
-          })
-          .lean()
+      
 
         
           
@@ -198,7 +198,7 @@ const iteractionOrderAucService = {
           //    {$set:{ stateOrder: "Nhận hàng" } }).exec();
 
              const orders = await OrderAuction.find({
-              _id: fineOrderAucForUser._id,
+              'shippingAddress.userID': userId,
               stateOrder: 'Nhận hàng',
               status: { $ne: "disable" },
              })
@@ -267,12 +267,7 @@ const iteractionOrderAucService = {
 
       getCompleteOrdersByUser: async (userId) => {
         try {
-          const fineOrderAucForUser = await OrderAuction.findOne({
-            'shippingAddress.userID': userId,
-            stateOrder: 'Nhận hàng',
-            status: { $ne: "disable" },
-          })
-          .lean()
+      
           // Tìm các đơn hàng với userID tương ứng và không phải là "Nhận hàng"
           //  await OrderAuction.findOneAndUpdate(
           //   {
@@ -353,7 +348,7 @@ const iteractionOrderAucService = {
         }
       },
 
-      softDeleteReceivedOrdersByUser: async (orderId) => {
+      softDeleteReceivedOrdersByUser: async (orderId, userId) => {
         try {
           const nowUtc = new Date();
           const offset = 7 * 60 * 60 * 1000; // Chuyển đổi thời gian UTC sang múi giờ Việt Nam (UTC + 7)
@@ -362,13 +357,15 @@ const iteractionOrderAucService = {
           // Tìm và xóa mềm các đơn hàng có stateOrder là "Nhận hàng"
           const orderToUpdate = await OrderAuction.findOne({
            _id: orderId,
+       
             stateOrder: "Vận chuyển",
             status: { $ne: "disable" },
           }).exec();
-    
+       
+          
           
           const orderIds = orderToUpdate._id
-    console.log('orderIds', orderIds);
+  
     
           
         
@@ -423,40 +420,90 @@ const iteractionOrderAucService = {
         }
       },
 
-      updateOrderStatus : async (orderId) => {
+      updateOrderStatus : async (orderId, stateOrder) => {
         try {
-          const statusOrderFlow = [ "Vận chuyển", "Nhận hàng", "Hoàn tất", "Hủy đơn hàng"];
+          console.log('orderStatus', stateOrder);
+          console.log('orderId', orderId);
+          
+          const statusOrderFlow = ["Vận chuyển", "Nhận hàng", "Hoàn tất", "Hủy đơn hàng"];
+          
           // Tìm đơn hàng
           const order = await OrderAuction.findById(orderId);
           if (!order) {
+            console.error("Đơn hàng không tồn tại", orderId);
             throw new Error("Đơn hàng không tồn tại");
           }
-      
+          console.log('Order found:', order);
+          console.log('State', order.stateOrder);
+          
+          
           // Nếu trạng thái hiện tại là "Hủy đơn hàng", không thể cập nhật nữa
           if (order.stateOrder === "Hủy đơn hàng") {
+            console.warn("Đơn hàng đã bị hủy, không thể thay đổi trạng thái:", orderId);
             throw new Error("Đơn hàng đã bị hủy, không thể thay đổi trạng thái.");
           }
-      
+       
+          if (
+            stateOrder === "Hoàn tất" &&
+            (order.stateOrder === "Chờ giao hàng" || order.stateOrder === "Nhận hàng")
+          ) {
+            return res.status(400).json({
+              message:
+                "Đơn hàng không thể chuyển từ trạng thái 'Chờ giao hàng' hoặc 'Đã xác nhận' sang trạng thái 'Nhận hàng'.",
+            });
+          }
+          if (order.stateOrder === "Hủy đơn hàng") {
+            return res.status(400).json({
+              message: "Đơn hàng đã bị hủy và không thể cập nhật trạng thái khác.",
+            });
+          }
+    
+          if (
+            order.stateOrder === "Đang vận chuyển" &&
+            (stateOrder === "Chờ giao hàng" || stateOrder === "Hoàn tất")
+          ) {
+            return res.status(400).json({
+              message:
+                "Đơn hàng đang vận chuyển không thể chuyển về trạng thái 'Chờ giao hàng' hoặc 'Hoàn tất'.",
+            });
+          }
+          if (
+            order.stateOrder === "Nhận hàng" &&
+            stateOrder === "Đang vận chuyển"
+          ) {
+            return res.status(400).json({
+              message:
+                "Đơn hàng ở trạng thái 'Nhận hàng' không thể chuyển sang trạng thái 'Đang vận chuyển'.",
+            });
+          }
+          console.log('Incoming orderId:', orderId);
+          console.log('Incoming newStatus:', stateOrder);
           // Kiểm tra trạng thái mới có hợp lệ không
           const currentIndex = statusOrderFlow.indexOf(order.stateOrder);
-          const newIndex = statusOrderFlow.indexOf(newStatus);
-      
+          const newIndex = statusOrderFlow.indexOf(stateOrder);
+          
+          console.log(`Current status index: ${currentIndex}, New status index: ${newIndex}`);
+          console.log(`Current status: ${order.stateOrder}, New status: ${stateOrder}`);
+          
           // Nếu trạng thái mới là "Hủy đơn hàng" hoặc là trạng thái tiếp theo hợp lệ
           if (newIndex === statusOrderFlow.length - 1 || newIndex === currentIndex + 1) {
-            order.stateOrder = newStatus;
-            await order.save();
-      
-            // Nếu trạng thái mới là "Chờ giao hàng", cập nhật tồn kho
-         
-      
-            // Với các trạng thái khác, chỉ cần cập nhật trạng thái đơn hàng
-            return { order, message: `Cập nhật trạng thái đơn hàng thành công: ${newStatus}` };
+            const updatedOrder = await OrderAuction.findOneAndUpdate(
+              { _id: orderId },
+              { $set: { stateOrder: stateOrder } }, // Use $set to specify the field to update
+              { new: true, runValidators: true } // Options: return updated doc, run validation
+            );
+        
+            console.log('Updated order:', updatedOrder);
+            return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
           } else {
+            console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);
             throw new Error("Trạng thái không hợp lệ.");
           }
         } catch (error) {
+          console.error("Error updating order status:", error.message || "Lỗi cập nhật trạng thái đơn hàng.");
           throw new Error(error.message || "Lỗi cập nhật trạng thái đơn hàng.");
         }
+        
 
 
       

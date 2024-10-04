@@ -1,9 +1,8 @@
-// thunks/orderThunks.ts
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { softDelOrderUser } from '../../../services/statusOrders/statusOrder';
-import {SoftDeleteOrderData  } from '../../../types/iterationOrder/softDeleteForUser';
+import {Order  } from '../../../types/adminOrder/orderAll';
 
-export const softDelThunk = createAsyncThunk<SoftDeleteOrderData , { orderId: string }, { rejectValue: string }>(
+export const softDelAdminThunk = createAsyncThunk<Order , { orderId: string }, { rejectValue: string }>(
     'order/fetchOrderData',
     async ({orderId}, { rejectWithValue }) => {
       try {
@@ -15,5 +14,3 @@ export const softDelThunk = createAsyncThunk<SoftDeleteOrderData , { orderId: st
       }
     }
   );
-
-
