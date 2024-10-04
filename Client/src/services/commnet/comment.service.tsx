@@ -3,15 +3,16 @@ import instance from "../axios";
 const API_URL_CLIENT = 'http://localhost:4000/api/client/comment';
 const API_URL_ADMIN = 'http://localhost:4000/api/admin/comment';
 export interface Comment {
+  avatar: string ;
   createdAt: string;
   _id: string;
   content: string;
   rating: number;
-  user:string;
+  id_user:string;
 }
-import { HomeAllProductResponse} from "../product_v2/client/types/homeAllProduct";
+// import { HomeAllProductResponse} from "../product_v2/client/types/homeAllProduct";
 
-export const addComment = async (id: string, commentData: { content: string; user: string; rating: number }) => {
+export const addComment = async (id: string, commentData: { content: string; id_user: string; rating: number }) => {
   try {
     const response = await instance.post(`${API_URL_CLIENT}/addComment/${id}`, commentData, {
       headers: {
@@ -67,7 +68,7 @@ export const getRepComment = async (id:string) =>{
     throw error;
   }
 };
-export const postRepComment = async (id:string, commentData: { content: string; id_comment: string }) =>{
+export const postRepComment = async (id:string, commentData: { content: string }) =>{
   try{
     const response = await instance.post(`${API_URL_ADMIN}/repComment/${id}`,commentData);
     return response.data;
@@ -86,7 +87,7 @@ export const getCommentProduct = async (id: string) => {
 };
 export const getCommentAdmin = async () => {
   try {
-    const response = await instance.get<HomeAllProductResponse>(`${API_URL_ADMIN}/getCommentAdmin`);
+    const response = await instance.get(`${API_URL_ADMIN}/getCommentAdmin`);
     return response.data;
   } catch (error) {
     throw error; 
@@ -100,3 +101,40 @@ export const deleteCommentAdmin = async (idProduct:string,idComment:string) => {
     throw error; 
   }
 };
+export const getUserComment = async (idUser: string) => {
+  try {
+    const response = await instance.get(`${API_URL_CLIENT}/userComment/${idUser}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+export const softDeleteComment = async (commentId: string) => {
+  try {
+    const response = await instance.patch(`${API_URL_ADMIN}/softDelete/${commentId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+export const restoreComment = async (id: string) => {
+  try {
+    const response = await instance.patch(`${API_URL_ADMIN}/restore/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+export const getCommentDelete = async () => {
+  try {
+    const response = await instance.get(`${API_URL_ADMIN}/getCommentDelete`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+

@@ -1,14 +1,18 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../../../redux/store";
 //css carosel sản phẩm liên quan
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination ,} from 'swiper/modules';
+
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import {
+  AppDispatch,
+  RootState,
+  useAppSelector,
+} from "../../../../../redux/store";
 import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
@@ -30,6 +34,10 @@ import { WatchlistItem } from "../../../../../types/cart/profile/wathlist";
 import { HeartIcon, StarIcon } from "../../page-auction/svg";
 import { fetchRelatedProducts } from "../../../../../services/detailProduct/detailProduct.service";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
+import { getProfileThunk } from "../../../../../redux/auth/authThunk";
+import {
+  addInteractionView,
+} from "../../../../../services/interaction/interaction.service";
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -47,6 +55,9 @@ const ProductDetail: React.FC = () => {
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | null>
   >({});
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
+  );
 
   const handleChange = (attributeKey: string, value: string) => {
     setSelectedValues((prev) => ({
@@ -69,44 +80,74 @@ const ProductDetail: React.FC = () => {
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
+
   useEffect(() => {
     const fetchData = async () => {
+      // Kiểm tra sự tồn tại của ID sản phẩm và profile
       if (!id) {
-        console.log("Không có ID sản phẩm nào được cung cấp");
-        return;
+        console.log("Product ID is not available.");
+        return; // Nếu không có ID, không thực hiện
       }
+  
+      if (!profile?._id) {
+        console.log("User profile is not available.");
+        return; // Nếu không có profile, không thực hiện
+      }
+  
+      const interactionData = {
+        user: profile._id,
+        orderAuctions: null,
+        item: id,
+        OrderCart: null,
+        productID: id,
+        Watchlist: null,
+        type: "view",
+        score: 2,
+      };
+  
       try {
-        // Lấy thông tin sản phẩm
         console.log("Fetching product with ID:", id);
+        
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
-        await upViewProduct(id);
+  
+        await upViewProduct(id); // Cập nhật lượt xem sản phẩm
+        await addInteractionView(interactionData);
         const updatedProduct = await getProductByID(id);
         setProduct(updatedProduct);
+  
         const relatedData = await fetchRelatedProducts(id);
         // Kiểm tra và thiết lập giá trị cho relatedProducts
         if (relatedData && Array.isArray(relatedData.relatedProducts)) {
-          setRelatedProducts(relatedData.relatedProducts); // Đây là mảng
+          setRelatedProducts(relatedData.relatedProducts);
         } else {
           console.error('Error: relatedData is not an array', relatedData);
         }
-
+  
+        // Ghi lại tương tác
+  
         // Lấy danh sách yêu thích của người dùng
         const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
         const isFavoriteProduct = watchlistResponse.some(
           (item: WatchlistItem) => item.product._id === id
         );
         setIsFavorite(isFavoriteProduct);
+        console.log("Sản phẩm có trong danh sách yêu thích:", isFavoriteProduct);
+  
       } catch (error) {
-        console.log(
-          "Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:",
-          error
-        );
+        console.error("Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:", error);
       }
     };
+  
+    // Gọi hàm fetchData
     fetchData();
-  }, [id, dispatch]);
+  
+    // Lấy thông tin profile
+    dispatch(getProfileThunk());
+  
+  }, [id, dispatch]); // Thêm profile vào dependency array
+  
 
   const handleAddToCart = async () => {
     if (userId && id) {
@@ -184,7 +225,6 @@ const ProductDetail: React.FC = () => {
         return;
       }
       try {
-        console.log("Fetching product with ID:", id);
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
@@ -223,7 +263,8 @@ const ProductDetail: React.FC = () => {
             <img src={products?.image?.[currentIndex]} alt="Ảnh chính" />
           </div>
           <div className="flex justify-center gap-4">
-            {products?.image?.slice(0, 4)
+            {products?.image
+              ?.slice(0, 4)
               .map((imgSrc: string | undefined, index: number) => (
                 <img
                   key={index}

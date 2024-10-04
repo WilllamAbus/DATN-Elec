@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import ListCmt from "./listComment";
+import { RootState, useAppDispatch, useAppSelector } from "../../../../../redux/store";
 import { notify } from "../../../../../ultils/success";
 import { addComment, getCommentProduct, Comment as CommentType } from "../../../../../services/commnet/comment.service";
+import { addInteraction} from "../../../../../services/interaction/interaction.service";
+import { getProfileThunk } from "../../../../../redux/auth/authThunk";
 
 interface FormValues {
   content: string;
-}
-
-interface DecodedToken {
-  id: string;
-  name: string;
 }
 
 const Comment = () => {
@@ -20,49 +17,15 @@ const Comment = () => {
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset } = useForm<FormValues>();
   const { id } = useParams<{ id: string }>();
 
-  const decodeToken = (token: string): DecodedToken => {
-    try {
-      const decoded: any = jwtDecode(token);
-      return {
-        id: decoded.id || "",
-        name: decoded.name || ""
-      };
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return { id: "", name: "" };
-    }
-  };
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector((state: RootState) => state.auth.profile.profile);
+  const isLoggedIn = !!profile?._id;
 
-  const getUserData = (): DecodedToken => {
-    const userData = window.localStorage.getItem("persist:root");
-    if (userData) {
-      try {
-        const parsedData = JSON.parse(userData);
-        const loginData = JSON.parse(parsedData.auth)?.login;
-        if (loginData && loginData.token) {
-          const token = loginData.token;
-          return decodeToken(token);
-        }
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
-      }
-    }
-    return { id: "", name: "" };
-  };
 
-  const userData = getUserData();
-
-  useEffect(() => {
-    if (id) {
-      setIsLoggedIn(!!userData.id);
-      fetchComments();
-    }
-  }, [id]);
 
   const fetchComments = async () => {
     if (id) {
@@ -78,52 +41,85 @@ const Comment = () => {
   const handleRatingClick = (rate: number) => {
     setRating(rate);
   };
-
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
-        setErrorMessage("You need to be logged in to submit a comment.");
-        return;
+      setErrorMessage("You need to be logged in to submit a comment.");
+      return;
     }
     if (!id) {
-        setErrorMessage("Product ID is missing.");
-        return;
+      setErrorMessage("Product ID is missing.");
+      return;
     }
-
-    const commentData = {
-        content: data.content,
-        rating: rating,
-        user: userData.id,
+    if (!profile?._id) {
+      setErrorMessage("User profile is not available.");
+      return;
+    }
+  
+    const interactionData = {
+      user: profile._id,
+      orderAuctions:  null,
+      item: id,
+      OrderCart:  null,
+      productID: id,
+      Watchlist:  null,
+      type: "comment",
+      score: 3
     };
-
+    
+  
+    const commentData = {
+      content: data.content,
+      rating: rating,
+      id_user: profile?._id,
+    };
+  
     try {
-        const response = await addComment(id, commentData);
-        console.log("Comment submitted:", response);
-
-        const newComment = {
-            ...response.data,
-            user: userData.name || "Anonymous",
-        };
-
-        setComments((prevComments) => [...prevComments, newComment]);
-        
-        notify();
-        reset();
-        setRating(0);
-        setHover(0);
-        fetchComments(); 
+      // Sử dụng Promise.all để gọi cả hai API cùng một lúc
+      const [commentResponse,interactionResponse] = await Promise.all([
+        addComment(id,commentData ),
+        addInteraction(interactionData)
+      ]);
+  
+      console.log("Comment submitted:", commentResponse);
+      console.log("Interaction submitted:", interactionResponse);
+  
+      const newComment = {
+        ...commentResponse.data, // Đảm bảo sử dụng commentResponse 
+        id_user: profile.name,
+      };
+  
+      // Cập nhật danh sách comments
+      setComments((prevComments) => [...prevComments, newComment]);
+      notify();
+      reset();
+      setRating(0);
+      setHover(0);
+      fetchComments();
     } catch (error) {
-        console.error("Error submitting comment:", error);
-        setSuccessMessage(null);
-        setErrorMessage("Failed to submit comment.");
+      console.error("Error submitting comment:", error);
+      setErrorMessage("Failed to submit comment.");
+      setSuccessMessage(null);
     }
-};
+  };
+  
+  
+ 
+  useEffect(() => {
+    dispatch(getProfileThunk());
+  }, [dispatch]);
+  useEffect(() => {
+    console.log(profile);
+    
+    if (id) {
+      fetchComments();
+    }
+  }, [id]);
+  // useEffect(() => {
+  //   if (comments.length > 0) {
+  //     console.log("Comments updated:", comments);
+  //   }
+  // }, [comments]);
 
-
-useEffect(() => {
-  if (comments.length > 0) {
-      console.log("Comments updated:", comments);
-  }
-}, [comments]);
   return (
     <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
       <div className="container">
@@ -136,7 +132,7 @@ useEffect(() => {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded" role="alert">
             {errorMessage}
           </div>
-        )}
+        )}  
 
         <ListCmt comments={comments} />
 

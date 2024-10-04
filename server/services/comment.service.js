@@ -77,7 +77,7 @@ const commmentService = {
             const offset = 7 * 60 * 60 * 1000; // 7 giờ tính bằng mili giây
             const now = new Date(nowUtc.getTime() + offset);
         
-            const softDeleteComment = await modelComment.findByIdAndUpdate(
+            const softDeleteComment = await modelComment.Comment.findByIdAndUpdate(
                 id,
                 { status: "disable",   disabledAt: now },
                 
@@ -99,10 +99,10 @@ const commmentService = {
       
           // Fetch the paginated list of deleted discounts
           const [deletedComment, totalCount] = await Promise.all([
-          modelComment.find({ status: "disable" })  // Assuming "disable" status indicates deletion
+          modelComment.Comment.find({ status: "disable" })  // Assuming "disable" status indicates deletion
                       .skip(skip)
                       .limit(size),
-            modelComment.countDocuments({ status: "disable" })
+            modelComment.Comment.countDocuments({ status: "disable" })
           ]);
           
           // Return the list of deleted discounts along with pagination info
@@ -123,7 +123,7 @@ const commmentService = {
       restore: async (id) => {
         try {
           
-            const restore =  await modelComment.findByIdAndUpdate(
+            const restore =  await modelComment.Comment.findByIdAndUpdate(
                 id,
                 { status: "active" },
                 { new: true }
