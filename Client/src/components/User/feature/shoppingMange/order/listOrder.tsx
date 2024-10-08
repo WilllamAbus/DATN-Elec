@@ -285,41 +285,8 @@ const OrderList: React.FC = () => {
                       Ngày đặt: {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  {/* <div className="flex items-center gap-3">
-                    {order.stateOrder === "Hủy đơn hàng" ? (
-                      <button
-                        onClick={() =>
-                          handleRepurchase(
-                            order.cartDetails[0]?.items[0]?.product._id
-                          )
-                        }
-                        className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700"
-                      >
-                        Mua lại
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleCancelOrder(order._id!)}
-                        className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
-                      >
-                        Hủy đơn hàng
-                      </button>
-                    )}
-                  </div> */}
-                  <div className="flex items-center gap-3">
-                    {/* {order.stateOrder === "Hủy đơn hàng" && (
-                      <button
-                        onClick={() =>
-                          handleRepurchase(
-                            order.cartDetails[0]?.items[0]?.product._id
-                          )
-                        }
-                        className="rounded-full px-7 py-3 bg-green-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-green-700"
-                      >
-                        Mua lại
-                      </button>
-                    )} */}
 
+                  <div className="flex items-center gap-3">
                     {(order.stateOrder === "Chờ xử lý" ||
                       order.stateOrder === "Đã xác nhận") && (
                       <button

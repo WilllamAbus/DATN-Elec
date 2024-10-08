@@ -2,7 +2,7 @@ import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/authSlice";
-import authGoogleReducer from "./auth/googleSlice";
+// import authGoogleReducer from "./auth/googleSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
@@ -35,7 +35,7 @@ const authConfig = {
 
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
-  authGoogle: persistReducer(authConfig, authGoogleReducer),
+  // authGoogle: persistReducer(authConfig, authGoogleReducer),
   categories: categoriesSlice,
   watchlist: watchlistReducer,
   voucher: voucherReducer,

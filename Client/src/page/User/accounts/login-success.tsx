@@ -12,15 +12,19 @@ const LoginSuccess = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const isLoggedIn = useSelector((state: RootState) => state.authGoogle.login.isLoggedIn);
-  const error = useSelector((state: RootState) => state.authGoogle.login.error);
-  const roles = useSelector((state: RootState) => state.authGoogle.login.roles);
+  const isLoggedIn = useSelector(
+    (state: RootState) => state.auth.login.isLoggedIn
+  );
+  const error = useSelector((state: RootState) => state.auth.login.error);
+  const roles = useSelector((state: RootState) => state.auth.login.roles);
 
   useEffect(() => {
     if (userId && tokenLogin) {
       const loginSuccess = async () => {
         try {
-          await dispatch(apiLoginSuccessThunk({ id: userId, token: tokenLogin })).unwrap();
+          await dispatch(
+            apiLoginSuccessThunk({ id: userId, token: tokenLogin })
+          ).unwrap();
         } catch (error: any) {
           console.error("Lỗi khi đăng nhập:", error.message);
         }
@@ -38,7 +42,7 @@ const LoginSuccess = () => {
 
       const timer = setTimeout(() => {
         if (roles && roles.length > 0) {
-          const isAdmin = roles.some(role => role.name === "admin");
+          const isAdmin = roles.some((role) => role.name === "admin");
 
           console.log("Is admin:", isAdmin);
 
@@ -47,7 +51,6 @@ const LoginSuccess = () => {
           } else {
             navigate("/");
           }
-          
         } else {
           navigate("/login-error");
         }
@@ -69,13 +72,21 @@ const LoginSuccess = () => {
               error ? "bg-red-100" : "bg-green-100"
             }`}
           >
-            <i className={`text-6xl ${error ? "text-red-500" : "text-green-500"}`}>
+            <i
+              className={`text-6xl ${
+                error ? "text-red-500" : "text-green-500"
+              }`}
+            >
               {error ? "✘" : "✓"}
             </i>
           </div>
         </div>
         <div className="text-center px-6 py-4">
-          <h1 className={`text-3xl font-bold ${error ? "text-red-900" : "text-green-900"}`}>
+          <h1
+            className={`text-3xl font-bold ${
+              error ? "text-red-900" : "text-green-900"
+            }`}
+          >
             {error ? "Lỗi" : "Thành Công"}
           </h1>
           <p className="text-gray-700 mt-2">

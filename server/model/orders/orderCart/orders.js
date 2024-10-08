@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-
+const moment = require("moment-timezone");
 const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
@@ -34,11 +34,28 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    deletedAt: { type: Date, default: null },
+    createdAt: {
+      type: Date,
+      default: moment.tz("Asia/Ho_Chi_Minh").toDate(),
+    },
+    updatedAt: {
+      type: Date,
+      default: moment.tz("Asia/Ho_Chi_Minh").toDate(),
+    },
   },
+
   {
     collection: "OrderCart",
     timestamps: true,
   }
 );
-
+orderSchema.pre("save", function (next) {
+  const now = moment.tz("Asia/Ho_Chi_Minh").toDate();
+  this.updatedAt = now; // Cập nhật updatedAt
+  if (!this.createdAt) {
+    this.createdAt = now; // Nếu chưa có createdAt, gán giá trị
+  }
+  next();
+});
 module.exports = model("OrderCart", orderSchema);
