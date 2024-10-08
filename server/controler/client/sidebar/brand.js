@@ -2,7 +2,7 @@ const modelBrand = require('../../../model/brands.model');
 
 const getAllBrandPageAuction = async (req, res) => {
   try {
-    const brands = await modelBrand.find({ status: { $ne: 'disable' } });
+    const brands = await modelBrand.find({ status: { $ne: 'disable' } }).select('_id name');
     return res.status(200).json({
       success: true,
       err: 0,
@@ -20,5 +20,6 @@ const getAllBrandPageAuction = async (req, res) => {
     });
   }
 };
+
 
 module.exports = { getAllBrandPageAuction };

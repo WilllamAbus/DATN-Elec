@@ -1,16 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select, { StylesConfig, SingleValue } from "react-select";
+import { AppDispatch, RootState } from "../../../../../redux/store"; 
+import { getAllStorageThunk } from "../../../../../redux/product/attributes/Thunk"; 
+import { Storage } from "../../../../../services/product_v2/types/attributes/getAllStorage";
 
-const storageOptions = [
-  { value: "256gb", label: "256GB" },
-  { value: "512gb", label: "512GB" },
-  { value: "1tb", label: "1TB" },
-  { value: "2tb", label: "2TB" },
-  { value: "4tb", label: "4TB" },
-  { value: "8tb", label: "8TB" },
-];
-
-const storageStyles: StylesConfig<(typeof storageOptions)[0], false> = {
+const storageStyles: StylesConfig<{ value: string; label: string }, false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -28,7 +23,11 @@ const storageStyles: StylesConfig<(typeof storageOptions)[0], false> = {
     cursor: isDisabled ? "not-allowed" : "default",
     ":active": {
       ...styles[":active"],
-      backgroundColor: !isDisabled ? (isSelected ? "#d3d3d3" : "#e0e0e0") : undefined,
+      backgroundColor: !isDisabled
+        ? isSelected
+          ? "#d3d3d3"
+          : "#e0e0e0"
+        : undefined,
     },
   }),
   singleValue: (styles) => ({
@@ -44,22 +43,42 @@ const storageStyles: StylesConfig<(typeof storageOptions)[0], false> = {
 
 interface StorageSelectProps {
   onChange: (selectedOption: SingleValue<{ value: string; label: string }>) => void;
-  value: SingleValue<{ value: string; label: string }>;
+  value: SingleValue<{ value: string; label: string }> | null;
   className?: string;
 }
 
-const StorageSelect: React.FC<StorageSelectProps> = ({ onChange, value, className }) => (
-  <Select
-    classNamePrefix="react-select"
-    closeMenuOnSelect
-    isMulti={false}
-    options={storageOptions}
-    styles={storageStyles}
-    value={value}
-    onChange={onChange}
-    className={className}
-    isClearable={true}
-  />
-);
+const StorageSelect: React.FC<StorageSelectProps> = ({ onChange, value, className }) => {
+  const dispatch = useDispatch<AppDispatch>(); 
+  const { storages, isLoading } = useSelector(
+    (state: RootState) => state.attributes.getAllStorage
+  );
+
+  useEffect(() => {
+    dispatch(getAllStorageThunk());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const storageOptions = storages.map((storage: Storage) => ({
+    value: storage._id,
+    label: storage.name,
+  }));
+
+  return (
+    <Select
+      classNamePrefix="react-select"
+      closeMenuOnSelect
+      isMulti={false}
+      options={storageOptions} 
+      styles={storageStyles}
+      value={value}
+      onChange={onChange}
+      className={className}
+      isClearable={true}
+    />
+  );
+};
 
 export default StorageSelect;

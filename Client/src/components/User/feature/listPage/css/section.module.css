@@ -1,5 +1,5 @@
 .sectionContainer {
-  @apply bg-white py-1 antialiased dark:bg-gray-900 md:py-4;
+  @apply bg-white shadow-md sm:rounded-b-lg overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4;
 }
 .container {
   @apply mx-auto max-w-screen-xl px-2;

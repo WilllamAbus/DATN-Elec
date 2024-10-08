@@ -1,9 +1,11 @@
+
 import instance from "../../axios";
-import { ProductV2 } from "../../../types/ProductV2";
-import { ApiResponse } from "./types";
+import { Product,reponseProduct } from "./types/add-product";
+
 import { AxiosError } from "axios";
-export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<ProductV2>> => {
+export const addProduct = async (product: Product): Promise<reponseProduct> => {
   try {
+
     const formData = new FormData();
     formData.append("product_name", product.product_name);
     formData.append("product_description", product.product_description);
@@ -14,9 +16,12 @@ export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<Prod
     formData.append("product_format", product.product_format);
     formData.append("product_condition", product.product_condition);
     formData.append("product_price", product.product_price.toString());
-    formData.append("product_attributes", JSON.stringify(product.product_attributes));
     formData.append("weight_g", product.weight_g.toString());
     formData.append("hasVariants", product.hasVariants.toString());
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ', ' + pair[1]);
+    }
+
     if (product.image && product.image.length > 0) {
       for (let i = 0; i < product.image.length; i++) {
         formData.append("image", product.image[i]);
@@ -24,6 +29,7 @@ export const addProductV2 = async (product: ProductV2): Promise<ApiResponse<Prod
     } else {
       console.warn("ko có ảnh");
     }
+
     const response = await instance.post("/admin/product/add", formData, {
       headers: {
         "Content-Type": "multipart/form-data",

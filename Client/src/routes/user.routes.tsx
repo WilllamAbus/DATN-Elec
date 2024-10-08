@@ -75,6 +75,7 @@ const UserCheckoutAuctPages = React.lazy(
 const UserConfirmAucPage = React.lazy(
   () => import("../page/User/shopping/auction/biddings/completAuctions")
 );
+const UserContact = React.lazy(() => import("../page/User/contact/contact"));
 const UserRoutes: RouteObject[] = [
   {
     path: "/",
@@ -96,7 +97,7 @@ const UserRoutes: RouteObject[] = [
       { path: "reciveCode", element: <UserReciveCode /> },
       { path: "allList", element: <UserAllList /> },
       { path: "listTing", element: <UserMyList /> },
-      { path: "productlist/:categoryId", element: <UserListPage /> },
+      { path: "category/:slug", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
       { path: "detailProd/:id", element: <UserdetailsProd /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
@@ -111,6 +112,7 @@ const UserRoutes: RouteObject[] = [
       { path: "viewBids", element: <UserViewBids /> },
       { path: "checkoutAuc", element: <UserCheckoutAuctPages /> },
       { path: "confimAuc", element: <UserConfirmAucPage /> },
+      { path: "contact", element: <UserContact /> },
     ],
   },
   {

@@ -196,7 +196,7 @@ const auctionService = {
   getAuctionDetails: async (productId) => {
     try {
       // Retrieve the auction based on userId
-      const auction = await Auction.findOne({ "productId": productId })
+      const auction = await Auction.findOne({ productId: productId })
         .select("auction_total auction_quantity auction_winner productId auctionTime auctionEndTime biddings stateAuction")
         .lean();
       

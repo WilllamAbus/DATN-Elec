@@ -67,7 +67,8 @@ const ViewBidPage: React.FC = () => {
       const productStats: { [key: string]: { totalBids: number, totalAmount: number } } = {};
 
       bids.forEach(bid => {
-        const productId = bid.product_bidding?.productId.product_name;
+      
+        const productId = bid.product_bidding?.productId?.product_name;
         if (productId) {
           if (!productStats[productId]) {
             productStats[productId] = { totalBids: 0, totalAmount: 0 };
@@ -112,7 +113,10 @@ const ViewBidPage: React.FC = () => {
     const groupedBids: { [key: string]: Bid[] } = {};
 
     bids.forEach((bid: Bid) => {
-      const productId = bid.product_bidding?.productId._id;
+      console.log('Checking bid:', bid);
+      const productId = bid.product_bidding?.productId?._id;
+      console.log('productId', productId);
+      
       if (productId) {
         if (!groupedBids[productId]) {
           groupedBids[productId] = [];

@@ -1,20 +1,33 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
-import { ScreenOption } from "../types/main_product";
+import { ProductVariant, SCREEN } from "../../../../../services/product_v2/admin/types/addVariant"; 
 
 export const handleScreenChange = (
-  selectedOption: SingleValue<ScreenOption>,
-  setSelectedScreen: React.Dispatch<React.SetStateAction<SingleValue<ScreenOption>>>,
-  setValue: UseFormSetValue<ProductV2>,
-  getValues: () => ProductV2
+  selectedOption: SingleValue<SCREEN>, 
+  setSelectedScreen: React.Dispatch<React.SetStateAction<SingleValue<SCREEN>>>, 
+  setValue: UseFormSetValue<ProductVariant>
 ) => {
   setSelectedScreen(selectedOption);
-  const screenValue = selectedOption ? selectedOption.label : '';
-  const currentAttributes = getValues().product_attributes || [];
-  const updatedAttributes = currentAttributes.filter(attr => attr.k !== "Screen").concat({
-    k: "Screen",
-    v: screenValue
-  });
-  setValue("product_attributes", updatedAttributes);
+
+  const screenData: SCREEN = selectedOption ? {
+    _id: selectedOption._id,
+    name: selectedOption.name,
+    status: selectedOption.status,
+    sku: selectedOption.sku,
+    pid: selectedOption.pid,
+    createdAt: selectedOption.createdAt,
+    updatedAt: selectedOption.updatedAt,
+    slug: selectedOption.slug
+  } : {
+    _id: '',
+    name: '',
+    status: '',
+    sku: '',
+    pid: '',
+    createdAt: '',
+    updatedAt: '',
+    slug: ''
+  };
+
+  setValue("screen", [screenData]); 
 };

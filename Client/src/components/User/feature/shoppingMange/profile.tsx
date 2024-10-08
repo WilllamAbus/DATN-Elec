@@ -12,6 +12,7 @@ import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
 import OrderList from "./order";
+import OrderAuct from "./orderAuctStatus"
 import useAuth from "../../../../hooks/useAuth";
 
 import Cookies from "js-cookie";
@@ -20,7 +21,7 @@ const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [view, setView] = useState<
-    "order" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
+    "order"|"orderAuct" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
   >("info");
 
   const profile = useAppSelector(
@@ -177,6 +178,23 @@ const ProfileUse: React.FC = () => {
               </a>
               <a
                 href="#"
+                className={`relative text-base block capitalize transition ${
+                  view === "edit" ? "text-primary" : "text-gray-600"
+                }`}
+                onClick={() => setView("orderAuct")}
+              >
+             <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M22 7H2V5h20v2zM7 11H5v10h2V11zm4 0H9v10h2V11zm4 0h-2v10h2V11zm4 0h-2v10h2V11z" />
+                </svg>
+                Đơn hàng đấu giá
+              </a>
+              <a
+                href="#"
                 className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
                 onClick={() => setView("watchlist")}
               >
@@ -223,6 +241,7 @@ const ProfileUse: React.FC = () => {
           {view === "password" && <UpdatePassword profile={profile} />}
           {view === "watchlist" && <Watchlist profiles={profile} />}
           {view === "order" && <OrderList />}
+          {view === "orderAuct" && <OrderAuct />}
         </section>
       </div>
     </>

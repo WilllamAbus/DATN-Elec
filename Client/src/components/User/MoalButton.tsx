@@ -112,9 +112,9 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
             <div className="relative p-5 text-center bg-white rounded-lg shadow dark:bg-gray-800 max-w-3xl mx-auto">
             <div className="flex justify-center items-center space-x-8">
   {[
-    { label: "Giá thấp nhất (VNĐ)", value: bid?.minBid },
-    { label: "Giá trung bình (VNĐ)", value: bid?.midBid },
-    { label: "Giá cao nhất (VNĐ)", value: (bid?.minBid ?? 0) * 1.07 },
+    { label: "Giá thấp đ ", value: bid?.minBid,  },
+    { label: "Giá trung bình đ", value: bid?.midBid },
+    { label: "Giá cao đ ", value: (bid?.minBid ?? 0) * 1.07 },
   ].map((item, index) => (
     <div key={index} className="flex flex-col items-center w-1/3">
       <label className="text-sm text-gray-500 dark:text-gray-300 mb-1">{item.label}</label>
@@ -123,7 +123,7 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
         className="w-full py-3 px-6 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-900"
         onClick={() => handleBidClick(item.value)}
       >
-        {currencyFormatter.format(item.value ?? 0, { code: "VND", symbol: "" })}
+        {currencyFormatter.format(item.value ?? 0, { code: "VND", symbol: "" })} 
       </button>
     </div>
   ))}

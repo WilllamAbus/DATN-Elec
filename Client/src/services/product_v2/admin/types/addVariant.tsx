@@ -1,31 +1,155 @@
 
-export interface VariantAttributes {
-  k: string;
-  v: string;
-}
+export const RESPONSE_MESSAGES = {
+  VARIANT_NAME_DUPLICATE_PRODUCT: 'Tên biến thể không được trùng với tên sản phẩm gốc',
+  VARIANT_NAME_EXISTS: (variant_name: string) => `Tên biến thể '${variant_name}' đã tồn tại cho sản phẩm này`,
+  VARIANT_ADDED_SUCCESS: 'Biến thể mới đã được thêm thành công',
+  VARIANT_ADD_ERROR: 'Có lỗi xảy ra khi thêm biến thể sản phẩm',
+  PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại',
+};
 
-export interface ProductVariant {
-  variant_name: string;
-  variant_description: string;
-  variant_price: number;
-  variant_color: string;
-  createdAt:string;
-  variant_attributes: VariantAttributes[];
-  image?: FileList;
+
+export const STATUS_CODES = {
+  SUCCESS: 201,
+  BAD_REQUEST: 400,
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500,
+};
+export interface RAM {
+  _id: string;
+  name: string;
+  status: string;
   sku: string;
-  isActive: boolean;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
 }
 
-export interface ProductVariantResponse<T> {
-  success: boolean;
-  err: number;
-  msg: string;
-  status: number;
-  data?: T; 
-  error?: string;
+export interface SCREEN {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
 }
-export interface ProductStateAddVariant {
-  variants: ProductVariant[]; 
-  status: "idle" | "loading" | "success" | "fail";
-  error: string | null;
+
+export interface CPU {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
 }
+
+
+export interface COLOR {
+  _id: string;
+  name: string;
+  code: string; 
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+  hex: string; 
+}
+
+
+export interface GRAPHICSCARD {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface BATTERY {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface OPERATINGSYSTEM {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+export interface STORAGE {
+  _id: string;
+  name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+export interface ProductVariant {
+  variant_name: string;                
+  variant_description: string;         
+  variant_price: number;               
+  battery: BATTERY[];                    
+  color: COLOR[];                   
+  cpu: CPU[];                     
+  graphicsCard: GRAPHICSCARD[];             
+  operatingSystem: OPERATINGSYSTEM[];          
+  ram: RAM[];                    
+  screen: SCREEN[];                   
+  storage: STORAGE[];                    
+  image?: FileList;                   
+  sku: string;                         
+  pid: string;                        
+  status: 'active' | 'inactive';      
+  product: string;                     
+  inventory?: string[];                
+  _id: string;                         
+  createdAt: string;                   
+  updatedAt: string;                   
+  slug: string;                        
+  __v: number;                         
+}
+
+
+export interface ProductVariantResponse {
+  success: boolean;                 
+  err: number;                 
+  msg: string;                      
+  status: number;                    
+  variant: ProductVariant | null;      
+}
+
+export interface ProductStateVariant {
+  variants: ProductVariant[];   
+  status: "idle" | "loading" | "success" | "fail"; 
+  error: string | null;    
+  isLoading: boolean;          
+}
+export const initialVariantState: ProductStateVariant = {
+  variants: [],
+  status: "idle",
+  error: null,
+  isLoading: false,
+};
+
+

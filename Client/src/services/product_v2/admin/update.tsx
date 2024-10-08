@@ -1,9 +1,8 @@
 import instance from "../../axios";
-import { ProductUpdate } from "./types";
-import { ApiResponse } from "./types";
+import { Product, reponseProduct } from "../../../services/product_v2/admin/types/add-product";
 import { AxiosError } from "axios";
 
-export const updateProductV2 = async (id: string,product: ProductUpdate): Promise<ApiResponse<ProductUpdate>> => {
+export const updateProductV2 = async (id: string, product: Product): Promise<reponseProduct> => { 
   try {
     const formData = new FormData();
     formData.append("product_name", product.product_name);
@@ -15,7 +14,6 @@ export const updateProductV2 = async (id: string,product: ProductUpdate): Promis
     formData.append("product_format", product.product_format);
     formData.append("product_condition", product.product_condition);
     formData.append("product_price", product.product_price.toString());
-    formData.append("product_attributes", JSON.stringify(product.product_attributes));
     formData.append("weight_g", product.weight_g.toString());
 
     if (product.image && product.image.length > 0) {
@@ -25,14 +23,25 @@ export const updateProductV2 = async (id: string,product: ProductUpdate): Promis
     } else {
       console.warn("No images provided");
     }
-
+    
+    if (product.variants && product.variants.length > 0) {
+      formData.append("variants", JSON.stringify(product.variants));
+    }
+    
     const response = await instance.put(`/admin/product/update/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
-    return response.data;
+    return {
+      success: true,
+      err: 0,
+      msg: response.data.msg,
+      status: response.status,
+      pproduct: response.data.pproduct 
+    };
+    
   } catch (error) {
     if (error instanceof AxiosError) {
       return {
@@ -53,3 +62,4 @@ export const updateProductV2 = async (id: string,product: ProductUpdate): Promis
     }
   }
 };
+

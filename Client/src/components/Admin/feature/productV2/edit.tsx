@@ -6,38 +6,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductUpdate } from "./types/main_product";
+import { Product} from "../../../../services/product_v2/admin/types/add-product";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { update, getOne } from "../../../../redux/product/admin/Thunk";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
-import {
-  ColorOption,
-  RamOption,
-  ScreenOption,
-  CPUOption,
-  CardOption,
-  BatteryOption,
-} from "./types/main_product";
-import {
-  RamSelect,
-  ColorSelect,
-  ScreenSelect,
-  CpuSelect,
-  CardSelect,
-  BatterySelect,
-} from "./select";
-import {
-  handleRamChange,
-  handleColorChange,
-  handleScreenChange,
-  handleCPUChange,
-  handleCardChange,
-  handleBatteryChange,
-} from "./handlers";
+
+
+
 import { selectFetchData } from "./FetchData";
-import { SingleValue } from "react-select";
 import BrandSupplierSelect from "./Form/Brand_Supplier";
 import CategoryDiscountSelect from "./Form/cate_Discount";
 const EditProduct: React.FC = () => {
@@ -49,7 +27,7 @@ const EditProduct: React.FC = () => {
     setValue,
     getValues,
     formState: { errors },
-  } = useForm<ProductUpdate>();
+  } = useForm<Product>();
 
   const dispatch: AppDispatch = useDispatch();
   const { imgPreview, setImgPreview, handleImageChange } = useImageUpload();
@@ -57,30 +35,7 @@ const EditProduct: React.FC = () => {
   const product = useSelector((state: RootState) => state.products.getone.product);
   const fetchStatus = useSelector((state: RootState) => state.products.getone.status);
   const fetchError = useSelector((state: RootState) => state.products.getone.error);
-  const [selectedRam, setSelectedRam] = useState<SingleValue<RamOption>>(null);
-  const [selectedColors, setSelectedColors] = useState<SingleValue<ColorOption>>(null);
-  const [selectedScreen, setSelectedScreen] = useState<SingleValue<ScreenOption>>(null);
-  const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPUOption>>(null);
-  const [selectedCard, setSelectedCard] = useState<SingleValue<CardOption>>(null);
-  const [selectedBattery, setSelectedBattery] = useState<SingleValue<BatteryOption>>(null);
-  const onColorChange = (selectedOptions: SingleValue<ColorOption>) => {
-    handleColorChange(selectedOptions, setSelectedColors, setValue, getValues);
-  };
-  const onRamChange = (selectedOptions: SingleValue<RamOption>) => {
-    handleRamChange(selectedOptions, setSelectedRam, setValue, getValues);
-  };
-  const onScreenChange = (selectedOptions: SingleValue<ScreenOption>) => {
-    handleScreenChange(selectedOptions, setSelectedScreen, setValue, getValues);
-  };
-  const onCPUChange = (selectedOptions: SingleValue<CPUOption>) => {
-    handleCPUChange(selectedOptions, setSelectedCPU, setValue, getValues);
-  };
-  const onCardChange = (selectedOptions: SingleValue<CardOption>) => {
-    handleCardChange(selectedOptions, setSelectedCard, setValue, getValues);
-  };
-  const onBatteryChange = (selectedOptions: SingleValue<BatteryOption>) => {
-    handleBatteryChange(selectedOptions, setSelectedBattery, setValue, getValues);
-  };
+
 
   const { brands, suppliers, discounts, productFormats, conditionShoppingList, categories } =
     selectFetchData();
@@ -123,7 +78,7 @@ const EditProduct: React.FC = () => {
     }
   }, [fetchStatus, product, setValue]);
 
-  const submitFormEdit: SubmitHandler<ProductUpdate> = async (data) => {
+  const submitFormEdit: SubmitHandler<Product> = async (data) => {
     if (!id) {
       notifyError("ID sản phẩm không hợp lệ");
       return;
@@ -378,72 +333,6 @@ const EditProduct: React.FC = () => {
                   <div className="flex items-center mt-2 text-red-600">
                     <span className="text-sm font-medium">{errors.product_condition.message}</span>
                   </div>
-                )}
-              </div>
-              <div className="col-span-3 1sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Dung lượng RAM
-                </label>
-                <RamSelect value={selectedRam} onChange={onRamChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
-                )}
-              </div>
-              <div className="col-span-3 1sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Màn hình
-                </label>
-                <ScreenSelect value={selectedScreen} onChange={onScreenChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
-                )}
-              </div>
-              <div className="col-span-3 1sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  CPU
-                </label>
-                <CpuSelect value={selectedCPU} onChange={onCPUChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
-                )}
-              </div>
-              <div className="col-span-3 sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Màu sắc
-                </label>
-                <ColorSelect value={selectedColors} onChange={onColorChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
-                )}
-              </div>
-              <div className="col-span-3 1sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Card Đồ Họa
-                </label>
-                <CardSelect value={selectedCard} onChange={onCardChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
-                )}
-              </div>
-              <div className="col-span-3 1sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Pin
-                </label>
-                <BatterySelect value={selectedBattery} onChange={onBatteryChange} />
-                {errors.product_attributes && (
-                  <span className="text-red-600">
-                    {errors.product_attributes.message?.toString()}
-                  </span>
                 )}
               </div>
             </div>

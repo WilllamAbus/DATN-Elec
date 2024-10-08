@@ -1,13 +1,13 @@
 // components/CategoryDiscountSelect.tsx
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
+import { Product} from "../../../../../services/product_v2/admin/types/add-product";
 import { CategorySelect, DiscountSelect } from "../select";
 
 interface CategoryDiscountProps {
   categories: any[];
   discounts: any[];
-  register: UseFormRegister<ProductV2>;
+  register: UseFormRegister<Product>;
   errors: {
     product_type?: string;
     product_discount?: string;

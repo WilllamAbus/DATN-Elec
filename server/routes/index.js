@@ -7,15 +7,18 @@ const brandRouter = require("./admin/brands/brands");
 const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
+const adminAttributes = require("./admin/attributes");
 const clientProduct = require("./client/product");
 // const productRouter_v2 = require("./admin/product_v2");
 const inboundRouter = require("./admin/inboundshipments/inbound");
 const inventoryRouter = require("./admin/inventory");
 const clientSidebarAuction = require("./client/sidebar/auction");
+const clientSidebarProduct = require("./client/sidebar/product");
+const attributesRouter = require("./attributes");
 const clientCategory = require("./client/category");
 const WathListRouter = require("./product/product");
 const orderCart = require("./client/orders/order");
-
+const Contact = require("./client/contact/contact");
 // const supplierRoutes = require("./admin/suppliers/suppliers");
 // const WathListRouter = require("./product/product");
 
@@ -31,6 +34,8 @@ const interactionRouter = require("./client/interaction/interation.routes");
 const orderdetails = require("./client/orders/OrderDetail");
 const OrderAd = require("./admin/order/orderAd");
 const momoRouter = require("./client/momo/momo");
+const orderAucIteraction = require('./client/iterationOrderAuct/iterationOrderAuc.routes')
+
 const commentAdminRouter = require("./admin/comment");
 const commentClientRouter = require("./client/comment");
 
@@ -43,14 +48,16 @@ const routes = (app) => {
   app.use("/api/suppliers", supplierRoutes);
   app.use("/api/cart", CartRouter);
   app.use("/api/admin/product", adminProduct);
+  app.use("/api/admin/attributes", adminAttributes);
   app.use("/api/client/product", clientProduct);
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
+  app.use("/api/attributes", attributesRouter);
+  app.use("/api/client/sidebar/product", clientSidebarProduct);
   app.use("/api/brands", brandRouter);
   app.use("/api/wathlist", WathListRouter);
   // app.use("/api/auctions", auctionRouter);
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
-
   app.use("/api/vnpay", vnPayRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
@@ -62,11 +69,13 @@ const routes = (app) => {
   app.use("/api/client/customer-service", customerServiceRouter);
   app.use("/api/notification", notificationRouter);
   app.use("/api/interaction", interactionRouter);
+  app.use("/api/client/contact", Contact);
   app.use("/api/orderdetails", orderdetails);
   app.use("/api/admin/order", OrderAd);
   app.use("/api/momo", momoRouter);
   app.use("/api/admin/comment", commentAdminRouter);
   app.use("/api/client/comment", commentClientRouter);
+  app.use("/api/client/iteracOder", orderAucIteraction);
 };
 
 module.exports = routes;

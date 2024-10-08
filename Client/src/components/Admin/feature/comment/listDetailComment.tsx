@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
   getCommentProduct,
-  deleteCommentAdmin,
+  softDeleteComment,
   postRepComment,
   getRepComment,
   deleteRepComment,
+  getUserComment
 } from "../../../../services/commnet/comment.service";
-import { getOneUser } from "../../../../services/user/user.service";
+// import { getOneUser } from "../../../../services/user/user.service";
 import { useParams, useNavigate } from "react-router-dom";
 import { getOneProduct } from "../../../../services/product_v2/admin/getone";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -30,7 +31,9 @@ interface Comment {
   _id: string;
   content: string;
   rating: number;
-  user: string;
+  id_user: string;
+  replies?:any[];
+  
 }
 
 interface User {
@@ -52,57 +55,67 @@ const ListDetailComment: React.FC = () => {
   const [repComments, setRepComments] = useState<{ [key: string]: Comment[] }>(
     {}
   );
+  const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
+
   const navigatee = useNavigate();
   const { reset } = useForm<FormValues>();
 
-  const fetchUserDetails = async (userId: string): Promise<string> => {
-    try {
-      const userData: User = await getOneUser(userId);
-      return userData.name;
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return "Unknown User";
-    }
-  };
 
-  const fetchComments = async () => {
+  const fetchData = async () => {
     if (!id) {
       console.log("No product ID provided");
       return;
     }
+  
     try {
-      const commentData = (await getCommentProduct(id)) || [];
-
-      if (Array.isArray(commentData)) {
-        const commentsWithUser = await Promise.all(
-          commentData.map(async (comment: Comment) => {
-            const userName = await fetchUserDetails(comment?.user);
-            return { ...comment, user: userName };
-          })
-        );
-        setComments(commentsWithUser);
-      }
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
-
-  const fetchProducts = async () => {
-    if (!id) {
-      console.log("No product ID provided");
-      return;
-    }
-    try {
-      const productData = await getOneProduct(id);
+      const [productComments, productData] = await Promise.all([
+        getCommentProduct(id),
+        getOneProduct(id),
+      ]);
+  
+      // Xử lý comments và set state
+      setComments(productComments);
+  
+      // Xử lý product và set state
       if (productData && productData.product) {
         setProduct(productData.product);
       } else {
         console.error("No product found for the given ID");
       }
+  
+      // Lấy danh sách các user từ comment
+      const userIds = Array.from(
+        new Set(productComments.map((comment: Comment) => comment.id_user.toString()))
+      );
+  
+      // Gọi API lấy thông tin người dùng song song
+      const userNameResponses = await Promise.all(
+        userIds.map((userId) => {
+          if (typeof userId === 'string') {
+            return getUserComment(userId);
+          }
+          return Promise.reject("userId is not a string");
+        })
+      );
+      
+  
+      const userNameMap = userNameResponses.reduce((map, response) => {
+        const user = response;
+        if (user?._id) {
+          map[user?._id] = {
+            name: user?.name,
+          };
+        }
+        return map;
+      }, {} as { [key: string]: User });
+  
+      // Set tên người dùng sau khi lấy xong
+      setUserNames(userNameMap);
     } catch (error) {
-      console.error("Error fetching product:", error);
+      console.error("Error fetching data:", error);
     }
   };
+  
 
   const fetchRepComment = async (commentId: string) => {
     if (!commentId) {
@@ -139,16 +152,16 @@ const ListDetailComment: React.FC = () => {
       });
       if (result.isConfirmed) {
         try {
-          const productData = await deleteCommentAdmin(id, commentId);
+          await softDeleteComment(commentId);
+          setComments((prevComments) => 
+            prevComments.filter((comment) => comment._id !== commentId) // Giữ lại các bình luận không bị xóa
+          )
           MySwal.fire({
             title: "Đã Xóa!",
             text: "Bình luận đã được xóa.",
             icon: "success",
           });
-          fetchComments();
-          if (productData && productData.product) {
-            setProduct(productData.product);
-          }
+       
           if (!id && !commentId) {
             navigatee("/admin/listComments");
           }
@@ -200,7 +213,7 @@ const ListDetailComment: React.FC = () => {
               return updatedComments;
             });
   
-            fetchComments();
+            fetchData();
           } else {
             throw new Error("Xóa bình luận phản hồi không thành công");
           }
@@ -228,48 +241,46 @@ const ListDetailComment: React.FC = () => {
     setOpenCommentId(null);
   };
 
-  const handleReplySubmit = async (
-    event: React.FormEvent,
-    idComment: string
-  ) => {
+  const handleReplySubmit = async (event: React.FormEvent<HTMLFormElement>, idComment: string) => {
     event.preventDefault();
 
-    const replyContent = content[idComment] || "";// Lấy nội dung từ đối tượng content
-
-    if (!idComment || !replyContent) {
+    const replyContent = content[idComment];
+    if (!replyContent || !idComment) {
       console.log("Lỗi: Thiếu thông tin id_comment hoặc nội dung bình luận");
       return;
     }
 
-    const commentData = {
-      content: replyContent,
-      id_comment: idComment,
-    };
-
     try {
-      const response = await postRepComment(idComment, commentData);
-      console.log("Comment submitted:", response);
-      setComments((prevComments) => [...prevComments, response.data]);
-      notify();
+      const response = await postRepComment(idComment, { content: replyContent });
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === idComment
+            ? { ...comment, replies: [...(comment.replies || []), response] }
+            : comment
+        )
+      );
+
       reset();
-      fetchComments();
+      notify();
+      setContent((prevContent) => ({ ...prevContent, [idComment]: "" })); // Clear reply content
     } catch (error) {
-      console.error("Error submitting comment:", error);
+      console.error("Error submitting reply comment:", error);
+    } finally {
+      closeForm(); // Close form after submission
     }
-
-    closeForm();
   };
+  
+  
 
-  const handleContentChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    commentId: string
-  ) => {
-    setContent((prev) => ({ ...prev, [commentId]: event.target.value }));
+  const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>, idComment: string) => {
+    const { value } = event.target;
+    setContent((prevContent) => ({
+      ...prevContent,
+      [idComment]: value,
+    }));
   };
-
   useEffect(() => {
-    fetchComments();
-    fetchProducts();
+    fetchData();
   }, [id]);
   useEffect(() => {
     comments.forEach((comment) => {
@@ -291,15 +302,15 @@ const ListDetailComment: React.FC = () => {
         <tbody>
           {product ? (
             <tr className="border-b text-left dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-              <td className="px-4 py-3">{product.product_name}</td>
-              <td className="px-4 py-3">{product.product_price}</td>
+              <td className="px-4 py-3">{product?.product_name}</td>
+              <td className="px-4 py-3">{product?.product_price}</td>
               <td className="px-4 py-3">
-                {product.image && product.image[0] && (
+                {product?.image && product?.image[0] && (
                   <img
-                    src={product.image[0]}
+                    src={product?.image[0]}
                     width={100}
                     height={50}
-                    alt={product.product_name}
+                    alt={product?.product_name}
                   />
                 )}
               </td>
@@ -331,7 +342,8 @@ const ListDetailComment: React.FC = () => {
               <React.Fragment key={comment?._id}>
                 <tr className="border-b text-center dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <td className="px-4 py-3">{index + 1}</td>
-                  <td className="px-4 py-3">{comment?.user}</td>
+                  <td className="px-4 py-3">{userNames[comment?.id_user]?.name || "Loading..."}
+                  </td>
                   <td className="px-4 py-3 text-sm text-yellow-400">
                     {Array.from({ length: comment?.rating }, (_, i) => (
                       <span key={i}>
@@ -343,7 +355,7 @@ const ListDetailComment: React.FC = () => {
                   <td className="px-4 py-3">
                     {repComments[comment?._id]?.map((repComment) => (
                       <div key={repComment?._id} className="ml-4">
-                        <div className="font-bold">{repComment?.user}</div>
+                        <div className="font-bold">{repComment?.id_user}</div>
                         <div>{repComment?.content}</div>
                       </div>
                     ))}
@@ -358,10 +370,10 @@ const ListDetailComment: React.FC = () => {
                       </button>
                     )}
                     <button
-                      className="py-2 px-3 m-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                      className="py-2 px-3 m-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                       onClick={() => deleteComment(comment?._id)}
                     >
-                      Xóa
+                      Xóa bình luận
                     </button>
                     {repComments[comment?._id]?.map((repComment) => (
                       <button
@@ -369,7 +381,7 @@ const ListDetailComment: React.FC = () => {
                         className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         onClick={() => deleteRep(repComment?._id, comment?._id)}
                       >
-                        Xóa phản hồi bình luận
+                        Xóa phản hồi 
                       </button>
                     ))}
                   </td>
@@ -379,20 +391,18 @@ const ListDetailComment: React.FC = () => {
                 {openCommentId === comment?._id && (
                   <tr>
                     <td colSpan={5}>
-                      <form
-                        onSubmit={(event) =>
-                          handleReplySubmit(event, comment?._id)
-                        }
+                    <form
+                        onSubmit={(event) => handleReplySubmit(event, comment._id)}
                       >
-                        <input
+                       <input
                           type="text"
                           placeholder="Trả lời bình luận"
                           className="w-full p-2 mb-3 border border-gray-300 rounded-md"
                           name="content"
                           value={content[comment?._id] || ""} // Dùng nội dung tương ứng hoặc chuỗi rỗng
                           onChange={(event) =>
-                            handleContentChange(event, comment?._id)
-                          } // Truyền comment ID
+                            handleContentChange(event, comment._id) // Truyền comment ID
+                          }
                         />
 
                         <div className="flex gap-3">
@@ -418,7 +428,7 @@ const ListDetailComment: React.FC = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={5}>Loading comments...</td>
+              <td colSpan={5}>Không có comment....</td>
               
             </tr>
           )}

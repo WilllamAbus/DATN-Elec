@@ -1,6 +1,6 @@
 import { UseFormSetValue } from "react-hook-form";
-import { ProductV2 } from "../../../../../types/ProductV2";
+import { Product} from "../../../../../services/product_v2/admin/types/add-product";
 
-export const resetProductAttributes = (setValue: UseFormSetValue<ProductV2>) => {
-  setValue("product_attributes", [], { shouldValidate: true, shouldDirty: true });
+export const resetProductAttributes = (setValue: UseFormSetValue<Product>) => {
+  setValue("variants", [], { shouldValidate: true, shouldDirty: true });
 };

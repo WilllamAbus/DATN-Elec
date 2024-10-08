@@ -1,80 +1,81 @@
-import React from "react";
-import chroma from "chroma-js";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select, { StylesConfig, SingleValue } from "react-select";
+import { AppDispatch, RootState } from "../../../../../redux/store"; 
+import { getAllOperatingSystemThunk } from "../../../../../redux/product/attributes/Thunk"; 
+import { OperatingSystem } from "../../../../../services/product_v2/types/attributes/getAllOperatingSystem"; 
 
-const colorOptions = [
-  { value: "black", label: "Màu đen", color: "#000000" },
-  { value: "gray", label: "Màu xám", color: "#808080" },
-  { value: "white", label: "Màu trắng", color: "#fff3f3" },
-  { value: "red", label: "Màu đỏ", color: "#FF0000" },
-  { value: "purple", label: "Màu tím", color: "#3b0764" },
-  { value: "pink", label: "Màu hồng", color: "#FFC0CB" },
-  { value: "titan", label: "Titan tự nhiên", color: "#BEBEBE" },
-];
-
-const getColorStyles = (
-  color: string,
-  isDisabled: boolean,
-  isSelected: boolean,
-  isFocused: boolean
-) => {
-  const chromaColor = chroma(color);
-  return {
+const osStyles: StylesConfig<OperatingSystem, false> = {
+  control: (styles) => ({
+    ...styles,
+    backgroundColor: "white",
+  }),
+  option: (styles, { isDisabled, isFocused, isSelected }) => ({
+    ...styles,
     backgroundColor: isDisabled
       ? undefined
       : isSelected
-      ? color
+      ? "#d3d3d3"
       : isFocused
-      ? chromaColor.alpha(0.1).css()
+      ? "#f0f0f0"
       : undefined,
-    color: isDisabled
-      ? "#ccc"
-      : isSelected
-      ? chroma.contrast(chromaColor, "white") > 2
-        ? "white"
-        : "black"
-      : color,
+    color: isDisabled ? "#ccc" : isSelected ? "black" : "black",
     cursor: isDisabled ? "not-allowed" : "default",
-  };
-};
-
-const colourStyles: StylesConfig<{ value: string; label: string; color: string }, false> = {
-  control: (styles) => ({ ...styles, backgroundColor: "white" }),
-  option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
-    ...styles,
-    ...getColorStyles(data.color, isDisabled, isSelected, isFocused),
     ":active": {
       ...styles[":active"],
-      backgroundColor: !isDisabled
-        ? isSelected
-          ? data.color
-          : chroma(data.color).alpha(0.3).css()
-        : undefined,
+      backgroundColor: !isDisabled ? (isSelected ? "#d3d3d3" : "#e0e0e0") : undefined,
     },
   }),
-  singleValue: (styles, { data }) => ({
+  singleValue: (styles) => ({
     ...styles,
-    color: data.color,
+    color: "black",
+  }),
+  clearIndicator: (styles) => ({
+    ...styles,
+    color: "black",
+    cursor: "pointer",
   }),
 };
 
-interface ColorSelectProps {
-  onChange: (selectedOption: SingleValue<{ value: string; label: string; color: string }>) => void;
-  value: SingleValue<{ value: string; label: string; color: string }>;
+interface OsSelectProps {
+  onChange: (selectedOption: SingleValue<OperatingSystem>) => void;
+  value: SingleValue<OperatingSystem> | null;
   className?: string;
 }
 
-const ColorSelect: React.FC<ColorSelectProps> = ({ onChange, value, className }) => (
-  <Select
-    classNamePrefix="react-select"
-    closeMenuOnSelect={true}
-    isMulti={false}
-    options={colorOptions}
-    styles={colourStyles}
-    value={value}
-    onChange={onChange}
-    className={className}
-  />
-);
+const OsSelect: React.FC<OsSelectProps> = ({ onChange, value, className }) => {
+  const dispatch = useDispatch<AppDispatch>(); 
+  const { operatingSystems, isLoading } = useSelector((state: RootState) => state.attributes.getAllOperatingSystem); 
 
-export default ColorSelect;
+  useEffect(() => {
+    dispatch(getAllOperatingSystemThunk());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const osOptions = operatingSystems.map((os: OperatingSystem) => ({
+    ...os,
+    _id: os._id,
+    name: os.name,
+  }));
+
+  return (
+    <Select
+      classNamePrefix="react-select"
+      closeMenuOnSelect
+      isMulti={false}
+      options={osOptions}
+      styles={osStyles}
+      value={value}
+      onChange={onChange}
+      className={className}
+      isClearable={true}
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => option._id}
+    />
+  );
+};
+
+export default OsSelect;

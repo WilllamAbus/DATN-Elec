@@ -11,7 +11,8 @@ export interface ShippingInfo {
   
   export interface OrderAuctionDetail {
     shippingInfo?: ShippingInfo;  // Thay đổi từ shippingInfo bắt buộc sang tùy chọn
-    products: Product[]; // Ví dụ về một thuộc tính khác
+    products: Product[];
+    orderIds: string // Ví dụ về một thuộc tính khác
   }
   
   // Ví dụ về Product

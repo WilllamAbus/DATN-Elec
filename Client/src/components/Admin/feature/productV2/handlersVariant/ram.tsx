@@ -1,20 +1,32 @@
 import { SingleValue } from "react-select";
 import { UseFormSetValue } from "react-hook-form";
-import { ProductVariant } from "../../../../../services/product_v2/admin/types";
-import { RamOption } from "../types/variant_product";
-
+import { ProductVariant, RAM } from "../../../../../services/product_v2/admin/types/addVariant"; 
 export const handleRamChange = (
-  selectedOption: SingleValue<RamOption>,
-  setSelectedRam: React.Dispatch<React.SetStateAction<SingleValue<RamOption>>>,
-  setValue: UseFormSetValue<ProductVariant>,
-  getValues: () => ProductVariant 
+  selectedOption: SingleValue<RAM>, 
+  setSelectedRam: React.Dispatch<React.SetStateAction<SingleValue<RAM>>>,
+  setValue: UseFormSetValue<ProductVariant>
 ) => {
   setSelectedRam(selectedOption);
-  const ramValue = selectedOption ? selectedOption.label : "";
-  const currentVariantAttributes = getValues().variant_attributes || [];
-  const updateVariantAttributes = currentVariantAttributes.filter(attr => attr.k !== "Ram").concat({
-    k: "Ram", 
-    v: ramValue
-  });
-  setValue("variant_attributes", updateVariantAttributes);
+  
+  const ramData: RAM = selectedOption ? {
+    _id: selectedOption._id,
+    name: selectedOption.name,
+    status: selectedOption.status,
+    sku: selectedOption.sku,
+    pid: selectedOption.pid,
+    createdAt: selectedOption.createdAt,
+    updatedAt: selectedOption.updatedAt,
+    slug: selectedOption.slug,
+  } : {
+    _id: '',
+    name: '',
+    status: '',
+    sku: '',
+    pid: '',
+    createdAt: '',
+    updatedAt: '',
+    slug: '',
+  };
+  setValue("ram", [ramData]); 
 };
+

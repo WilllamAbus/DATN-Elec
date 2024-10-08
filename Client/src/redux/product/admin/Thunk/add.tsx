@@ -1,13 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { addProductV2 } from "../../../../services/product_v2/admin";
-import { ApiResponse,ProductAdd } from "../types";
-export const add = createAsyncThunk<ApiResponse<ProductAdd>, ProductAdd, { rejectValue: ApiResponse<null> }>(
+import { addProduct } from "../../../../services/product_v2/admin";
+import { reponseProduct, Product } from "../../../../services/product_v2/admin/types/add-product";
+
+export const add = createAsyncThunk<
+  reponseProduct, 
+  Product,  
+  { rejectValue: reponseProduct }  
+>(
   "product/add",
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await addProductV2(productData);
+      const response = await addProduct(productData);
       if (response.success) {
-        return response;
+        return response; 
       } else {
         return rejectWithValue({
           success: false,

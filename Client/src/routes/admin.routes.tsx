@@ -137,6 +137,9 @@ const AdminRecycleBinSupplier = React.lazy(
 const AdminRecycleBinBrand = React.lazy(
   () => import("../page/Admin/recycleBinBrand/SoftDeletedBrand")
 );
+const AdminRecycleComment = React.lazy(
+  () => import("../page/Admin/recycleBinComment/index")
+);
 
 /**User */
 const AdminListUser = React.lazy(() => import("../page/Admin/users/listUser"));
@@ -164,6 +167,17 @@ const AdminListInventory = React.lazy(
   () => import("../page/Admin/inventory/listInventory")
 );
 
+// OrderAuction 
+const AdminListOrderAuction = React.lazy(
+  () => import("../page/Admin/orderAuction/listOrder")
+);
+const AdminListRecybinOrderAuction = React.lazy(
+  () => import("../page/Admin/orderAuction/recycleBinOrderAuction")
+);
+
+const AdminDetailOrderAuction = React.lazy(
+  () => import("../page/Admin/orderAuction/detailsOrderAuction")
+);
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -214,9 +228,13 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinVoucher", element: <AdminRecycleBinVoucher /> },
       { path: "recycleBinSupplier", element: <AdminRecycleBinSupplier /> },
       { path: "recycleBinBrand", element: <AdminRecycleBinBrand /> },
+      { path: "recycleBinComment", element: <AdminRecycleComment /> },
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },
+      { path: "listOrderAuction", element: <AdminListOrderAuction /> },
+      { path: "detailOrderAuction/:id", element: <AdminDetailOrderAuction /> },
+      { path: "recBinOrderAuction", element: <AdminListRecybinOrderAuction /> },
       { path: "*", element: <Dashboard /> },
     ],
   },

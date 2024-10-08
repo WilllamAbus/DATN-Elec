@@ -1,42 +1,41 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { addVariantThunk } from "../Thunk";
 import {
-  ProductStateAddVariant,
+  initialVariantState,
   ProductVariantResponse,
-  ProductVariant,
-} from "../types/addVariant";
-
-const initialState: ProductStateAddVariant = {
-  variants: [],
-  status: "idle",
-  error: null,
-};
+  RESPONSE_MESSAGES,
+} from "../../../../services/product_v2/admin/types/addVariant";
 
 const addVariantSlice = createSlice({
   name: "product/addVariant",
-  initialState,
+  initialState: initialVariantState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(addVariantThunk.pending, (state) => {
         state.status = "loading";
+        state.isLoading = true; 
       })
       .addCase(
         addVariantThunk.fulfilled,
-        (state, action: PayloadAction<ProductVariantResponse<ProductVariant>>) => {
+        (state, action: PayloadAction<ProductVariantResponse>) => {
           state.status = "success";
-          if (action.payload.data) {
-            state.variants.push(action.payload.data);
+          state.isLoading = false; 
+          
+          if (action.payload.variant) {
+            state.variants.push(action.payload.variant);
           }
           state.error = null;
-          console.log(action.payload.msg);
+          console.log(RESPONSE_MESSAGES.VARIANT_ADDED_SUCCESS); 
         }
       )
       .addCase(addVariantThunk.rejected, (state, action) => {
         state.status = "fail";
-        const errorPayload = action.payload as ProductVariantResponse<null>;
-        state.error = errorPayload.msg || "Lỗi thêm biến thể không thành công";
-        console.log(errorPayload.msg);
+        state.isLoading = false; 
+        
+        const errorPayload = action.payload as { msg: string } || { msg: RESPONSE_MESSAGES.VARIANT_ADD_ERROR };
+        state.error = errorPayload.msg || RESPONSE_MESSAGES.VARIANT_ADD_ERROR;
+        console.log(state.error);
       });
   },
 });

@@ -23,7 +23,7 @@ const CheckoutPage: React.FC = () => {
 
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
-   // Access order data from `orderAuction`
+     // Access order data from `orderAuction`
   const loading = useSelector((state: RootState) => state.orderAuction.loading); // Use loading from `orderAuction`
   const navigate = useNavigate(); // Create navigate instance
 
@@ -48,6 +48,11 @@ const auctionDetails= auctionData?.auctionId
 
 
 const onSubmit = async (data: FormData) => {
+  if (!auctionData?.userAddress || !auctionData?.userName || !auctionData?.userSdt) {
+    navigate('/profile'); // Redirect to profile page
+    toast.error('Bạn cần cập nhật thông tin cá nhân và địa chỉ');
+    return;
+  }
   // Check for missing form fields
   if (!auctionDetails || !userId || !data.payment) {
     toast.error('Vui lòng điền đầy đủ thông tin và chọn phương thức thanh toán');
@@ -55,11 +60,7 @@ const onSubmit = async (data: FormData) => {
   }
 
   // Ensure address is provided
-  if (!auctionData?.userAddress || !auctionData?.userName || !auctionData?.userSdt) {
-    navigate('/profile'); // Redirect to profile page
-    toast.error('Bạn cần cập nhật thông tin cá nhân và địa chỉ');
-    return;
-  }
+ 
 
   const orderData: OrderDataType = {
     userId,

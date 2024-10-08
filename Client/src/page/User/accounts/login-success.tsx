@@ -37,28 +37,17 @@ const LoginSuccess = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      console.log("User is logged in:", isLoggedIn);
-      console.log("User roles:", roles);
-
-      const timer = setTimeout(() => {
-        if (roles && roles.length > 0) {
-          const isAdmin = roles.some((role) => role.name === "admin");
-
-          console.log("Is admin:", isAdmin);
-
-          if (isAdmin) {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
+      if (roles && roles.length > 0) {
+        const isAdmin = roles.some((role) => role.name === "admin");
+        if (isAdmin) {
+          navigate("/admin");
         } else {
-          navigate("/login-error");
+          navigate("/");
         }
-      }, 3000);
-
-      return () => clearTimeout(timer);
+      } else {
+        navigate("/login-error");
+      }
     } else if (error) {
-      console.error("Login error:", error);
       navigate("/login-error");
     }
   }, [isLoggedIn, roles, error, navigate]);

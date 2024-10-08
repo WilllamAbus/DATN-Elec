@@ -1,20 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select, { StylesConfig, SingleValue } from "react-select";
+import { AppDispatch, RootState } from "../../../../../redux/store"; 
+import { getAllRamThunk } from "../../../../../redux/product/attributes/Thunk"; 
+import { Ram } from "../../../../../services/product_v2/types/attributes/getAllRam"; 
 
-const ramOptions = [
-  { value: "2gb", label: "2GB" },
-  { value: "4gb", label: "4GB" },
-  { value: "6gb", label: "6GB" },
-  { value: "8gb", label: "8GB" },
-  { value: "12gb", label: "12GB" },
-  { value: "16gb", label: "16GB" },
-  { value: "24gb", label: "24GB" },
-  { value: "32gb", label: "32GB" },
-  { value: "64gb", label: "64GB" },
-  { value: "128gb", label: "128GB" },
-];
-
-const ramStyles: StylesConfig<typeof ramOptions[0], false> = {
+const ramStyles: StylesConfig<Ram, false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -24,9 +15,9 @@ const ramStyles: StylesConfig<typeof ramOptions[0], false> = {
     backgroundColor: isDisabled
       ? undefined
       : isSelected
-      ? "#d3d3d3" 
+      ? "#d3d3d3"
       : isFocused
-      ? "#f0f0f0" 
+      ? "#f0f0f0"
       : undefined,
     color: isDisabled ? "#ccc" : isSelected ? "black" : "black",
     cursor: isDisabled ? "not-allowed" : "default",
@@ -34,8 +25,8 @@ const ramStyles: StylesConfig<typeof ramOptions[0], false> = {
       ...styles[":active"],
       backgroundColor: !isDisabled
         ? isSelected
-          ? "#d3d3d3" 
-          : "#e0e0e0" 
+          ? "#d3d3d3"
+          : "#e0e0e0"
         : undefined,
     },
   }),
@@ -51,23 +42,44 @@ const ramStyles: StylesConfig<typeof ramOptions[0], false> = {
 };
 
 interface RamSelectProps {
-  onChange: (selectedOption: SingleValue<{ value: string; label: string }>) => void;
-  value: SingleValue<{ value: string; label: string }>;
+  onChange: (selectedOption: SingleValue<Ram>) => void;
+  value: SingleValue<Ram> | null;
   className?: string;
 }
 
-const RamSelect: React.FC<RamSelectProps> = ({ onChange, value, className }) => (
-  <Select
-    classNamePrefix="react-select"
-    closeMenuOnSelect
-    isMulti={false} 
-    options={ramOptions}
-    styles={ramStyles}
-    value={value}
-    onChange={onChange}
-    className={className}
-    isClearable={true}
-  />
-);
+const RamSelect: React.FC<RamSelectProps> = ({ onChange, value, className }) => {
+  const dispatch = useDispatch<AppDispatch>(); 
+  const { rams, isLoading } = useSelector((state: RootState) => state.attributes.getAllRam);
+
+  useEffect(() => {
+    dispatch(getAllRamThunk());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const ramOptions = rams.map((ram: Ram) => ({
+    ...ram,
+    _id: ram._id,
+    name: ram.name,
+  }));
+
+  return (
+    <Select
+      classNamePrefix="react-select"
+      closeMenuOnSelect
+      isMulti={false}
+      options={ramOptions}
+      styles={ramStyles}
+      value={value}
+      onChange={onChange}
+      className={className}
+      isClearable={true}
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => option._id}
+    />
+  );
+};
 
 export default RamSelect;

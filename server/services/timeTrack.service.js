@@ -36,7 +36,7 @@ const timeTrackService = {
           const endTime = data.endTime ? moment.tz(data.endTime, timeZone).toDate() : null;
           const endTimeBid = data.endTimeBid ? moment.tz(data.endTimeBid, timeZone).toDate() : null;
       
-          console.log(`Incoming endTime: ${data.endTime}, Incoming endTimeBid: ${data.endTimeBid}`);
+          // console.log(`Incoming endTime: ${data.endTime}, Incoming endTimeBid: ${data.endTimeBid}`);
       
           // Ensure at least one of endTime or endTimeBid is provided
           if (!endTime && !endTimeBid) {
@@ -53,7 +53,7 @@ const timeTrackService = {
       
           // Validate that finalEndTime is within 30 days from now
           const maxAllowedEndTime = moment(now).add(30, 'days').toDate();
-          console.log('maxAllowedEndTime', maxAllowedEndTime);
+          // console.log('maxAllowedEndTime', maxAllowedEndTime);
           
           if (finalEndTime > maxAllowedEndTime) {
             throw new Error('Thời gian kết thúc không vượt quá 30 ngày so với thời gian hiện tại.');
@@ -61,8 +61,7 @@ const timeTrackService = {
       
           // Determine the stateTime
           const stateTime = now <= finalEndTime ? "Thời gian đang chạy" : "Thời gian kết thúc";
-      
-          // Create the Time_Track instance
+// Create the Time_Track instance
           const timeTrack = new Time_Track({
             productId,
             startTime: now,
@@ -136,7 +135,7 @@ const timeTrackService = {
       
           // Extract and format product attributes
           const productAttributes = product.product_attributes.map((attribute) => ({
-            key: attribute.k,  // 'k' for key
+key: attribute.k,  // 'k' for key
             value: attribute.v,  // 'v' for value
           }));
       
@@ -203,7 +202,7 @@ const timeTrackService = {
          
         
           return updatedTimeTracks;
-        } catch (error) {
+} catch (error) {
             console.error(error)
           throw new Error(`Error retrieving TimeTracks: ${error.message}`);
         }
@@ -280,7 +279,7 @@ const timeTrackService = {
 
         // Kiểm tra endTime và xóa bản ghi nếu cần
         if (moment(timeTrack.endTime, 'DD/MM/YYYY HH:mm:ss').isBefore(moment())) {
-          await Time_Track.findByIdAndDelete(id);
+await Time_Track.findByIdAndDelete(id);
           clearInterval(interval);
           // console.log('TimeTrack deleted as endTime has passed.');
         }

@@ -14,11 +14,11 @@ const ProductSkeletonList: React.FC<ProductSkeletonListProps> = ({ length = 12 }
           key={index}
           className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
         >
-          <div className="relative w-full h-0 pb-[75%] overflow-hidden">
+          <div className="relative w-full h-0 pb-[100%] overflow-hidden">
             <Skeleton
               variant="rectangular"
               className="absolute inset-0 w-full h-full object-cover rounded-lg"
-              height={130}
+              height={150}
             />
           </div>
           <div className="p-2">
@@ -52,7 +52,7 @@ const ProductSkeletonList: React.FC<ProductSkeletonListProps> = ({ length = 12 }
               </div>
             </div>
             {/* Skeleton cho giá */}
-            <div className="mt-1 px-2 flex items-center gap-2 mb-7">
+            <div className="mt-1 px-2 flex items-center gap-2 mb-11">
               <Skeleton
                 variant="text"
                 width="60%" // Điều chỉnh chiều rộng phù hợp

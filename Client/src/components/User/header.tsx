@@ -26,13 +26,12 @@ const Header: React.FC = () => {
             <div className="flex items-center space-x-8">
               <ul className="hidden lg:flex items-center justify-start gap-6 md:gap-8 sm:justify-center">
                 <li>
-                  <a
-                    href="#"
-                    title=""
+                <Link
+                    to="contact"
                     className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
                   >
-                    Liên hệ
-                  </a>
+                    Liên hệ
+                  </Link>
                 </li>
                 <li className="shrink-0">
                   <a

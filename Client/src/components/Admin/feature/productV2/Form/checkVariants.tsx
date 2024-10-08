@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { UseFormSetValue, UseFormGetValues } from "react-hook-form";
 import { SingleValue } from "react-select";
-import { ProductV2 } from "../../../../../types/ProductV2";
+import { Product} from "../../../../../services/product_v2/admin/types/add-product";
 import {
   OsOption,
   StorageOption,
@@ -15,9 +15,9 @@ import {
 
 export const handleVariantChange = async (
   checked: boolean,
-  setValue: UseFormSetValue<ProductV2>,
-  getValues: UseFormGetValues<ProductV2>,
-  resetProductAttributes: (setValue: UseFormSetValue<ProductV2>) => void,
+  setValue: UseFormSetValue<Product>,
+  getValues: UseFormGetValues<Product>,
+  resetProductAttributes: (setValue: UseFormSetValue<Product>) => void,
   setSelectedRam: React.Dispatch<React.SetStateAction<RamOption | null>>,
   setSelectedColors: React.Dispatch<React.SetStateAction<ColorOption | null>>,
   setSelectedScreen: React.Dispatch<React.SetStateAction<ScreenOption | null>>,
@@ -31,8 +31,8 @@ export const handleVariantChange = async (
   if (checked) {
     const filledFields = getValues();
     if (
-      filledFields.product_attributes &&
-      Object.keys(filledFields.product_attributes).length > 0
+      filledFields.variants &&
+      Object.keys(filledFields.variants).length > 0
     ) {
       const result = await Swal.fire({
         title: "Xác nhận",

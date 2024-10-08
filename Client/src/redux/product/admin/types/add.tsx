@@ -20,6 +20,7 @@ export interface ProductStateAdd {
   products: ProductAdd[];
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
+  isLoading: boolean;
 }
 
 export interface ApiResponse<T> {
@@ -30,3 +31,12 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+
+
+export const  initialState: ProductStateAdd = {
+  products: [],
+  status: "idle",
+  error: null,
+  isLoading: false,
+};

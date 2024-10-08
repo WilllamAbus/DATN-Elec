@@ -1,17 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select, { StylesConfig, SingleValue } from "react-select";
+import { AppDispatch, RootState } from "../../../../../redux/store";
+import { getAllOperatingSystemThunk } from "../../../../../redux/product/attributes/Thunk"; 
+import { OperatingSystem } from "../../../../../services/product_v2/types/attributes/getAllOperatingSystem"; 
 
-const osOptions = [
-  { value: "windows", label: "Windows" },
-  { value: "macos", label: "macOS" },
-  { value: "linux", label: "Linux" },
-  { value: "ubuntu", label: "Ubuntu" },
-  { value: "debian", label: "Debian" },
-  { value: "fedora", label: "Fedora" },
-  { value: "arch", label: "Arch Linux" },
-];
-
-const osStyles: StylesConfig<(typeof osOptions)[0], false> = {
+const osStyles: StylesConfig<{ value: string; label: string }, false> = {
   control: (styles) => ({
     ...styles,
     backgroundColor: "white",
@@ -45,22 +39,44 @@ const osStyles: StylesConfig<(typeof osOptions)[0], false> = {
 
 interface OsSelectProps {
   onChange: (selectedOption: SingleValue<{ value: string; label: string }>) => void;
-  value: SingleValue<{ value: string; label: string }>;
+  value: SingleValue<{ value: string; label: string }> | null;
   className?: string;
 }
 
-const OsSelect: React.FC<OsSelectProps> = ({ onChange, value, className }) => (
-  <Select
-    classNamePrefix="react-select"
-    closeMenuOnSelect
-    isMulti={false}
-    options={osOptions}
-    styles={osStyles}
-    value={value}
-    onChange={onChange}
-    className={className}
-    isClearable={true}
-  />
-);
+const OsSelect: React.FC<OsSelectProps> = ({ onChange, value, className }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { operatingSystems, isLoading } = useSelector(
+    (state: RootState) => state.attributes.getAllOperatingSystem 
+  );
+  
+
+  useEffect(() => {
+    dispatch(getAllOperatingSystemThunk()); 
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const osSelectOptions = operatingSystems.map((operatingSystem: OperatingSystem) => ({
+    value: operatingSystem._id,
+    label: operatingSystem.name,
+  }));
+  
+
+  return (
+    <Select
+      classNamePrefix="react-select"
+      closeMenuOnSelect
+      isMulti={false}
+      options={osSelectOptions} 
+      styles={osStyles}
+      value={value}
+      onChange={onChange}
+      className={className}
+      isClearable={true}
+    />
+  );
+};
 
 export default OsSelect;
