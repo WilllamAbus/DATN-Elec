@@ -1,6 +1,6 @@
 "use strict";
 const modelInbound = require("../../model/inboundShipments.model");
-const modelProduct = require("../../model/product_v2");
+const modelProductVariant = require("../../model/product_v2/productVariant");
 const modelSupplier = require("../../model/suppliers.model");
 const modelInventory = require("../../model/inventory/inventory.model");
 
@@ -36,7 +36,7 @@ const inboundController = {
             const count = await modelInbound.countDocuments({ });
             const totalPages = Math.ceil(count / limit);
             const inbounds = await modelInbound.find({})
-                .populate('product_id', 'product_name')
+                .populate('product_variant_id', 'variant_name')
                 .populate('inbound_supplier', 'name')
                 .skip((page - 1) * limit)
                 .limit(limit);
@@ -76,20 +76,20 @@ const inboundController = {
                     .json({ message: "Bạn không có quyền thêm mới lô hàng" });
             }
 
-            let { product_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price } = req.body;
+            let {product_variant_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price } = req.body;
 
-            if (!product_id || !inbound_supplier || !inbound_quantity || !inbound_description || !inbound_price) {
+            if (!product_variant_id || !inbound_supplier || !inbound_quantity || !inbound_description || !inbound_price) {
                 return res
                     .status(400)
                     .json({ message: "Vui lòng nhập đầy đủ thông tin lô hàng" });
             }
 
-            const data = { product_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price };
+            const data = { product_variant_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price };
             const savedInbound = await modelInbound.create(data);
 
             // Tìm kiếm sản phẩm trong inventory
             const existingInventory = await modelInventory.findOne({
-                product: product_id,
+                product_variant: product_variant_id,
                 supplier: inbound_supplier
             });
 
@@ -103,7 +103,7 @@ const inboundController = {
             } else {
                 // Tạo mới bản ghi inventory
                 const inventoryData = {
-                    product: product_id,
+                    product_variant: product_variant_id,
                     supplier: inbound_supplier,
                     totalQuantity: inbound_quantity,
                     quantityStock: inbound_quantity,
@@ -126,11 +126,12 @@ const inboundController = {
     getProductController: async (req, res) => {
         try {
 
-            const products = await modelProduct.find({ status: { $ne: "disable" } }).exec();
 
-            const productReady = products.map(product => ({
-                product: product._id,
-                product_name: product.product_name,
+            const productVariants = await modelProductVariant.find({ status: { $ne: "disable" } }).exec();
+
+            const productReady = productVariants.map(product => ({
+                productVariant: product._id,
+                product_name: product.variant_name,
                 _id: product._id
             }));
 

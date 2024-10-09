@@ -5,8 +5,9 @@ import {
   fetchUserOrders,
   cancelOrder,
   getOrderById,
+  applyVoucher,
 } from "../../services/order/order";
-import { Order } from "../../types/order/order";
+import { ApplyVoucherResponse, Order } from "../../types/order/order";
 
 export const createOrderThunk = createAsyncThunk<
   { order: Order },
@@ -83,6 +84,18 @@ export const getOrderByIdThunk = createAsyncThunk<
     }
 
     return { orders: response.orders };
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
+  }
+});
+export const applyVoucherThunk = createAsyncThunk<
+  ApplyVoucherResponse, // Kiểu dữ liệu trả về của API
+  { cartId: string; voucherCode: string } // Tham số truyền vào
+>("cart/applyVoucher", async ({ cartId, voucherCode }, { rejectWithValue }) => {
+  try {
+    const response = await applyVoucher(cartId, voucherCode);
+
+    return response.data as ApplyVoucherResponse; // Đảm bảo rằng response trả về đúng kiểu
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }

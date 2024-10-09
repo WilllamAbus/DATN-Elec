@@ -7,6 +7,7 @@ import {
   fetchUserOrdersThunk,
   cancelOrderThunk,
   getOrderByIdThunk,
+  applyVoucherThunk,
 } from "./orderThunks";
 import {
   getOrderDetailByIdThunk,
@@ -338,6 +339,26 @@ const orderSlice = createSlice({
       .addCase(restoreOrderAdminThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";
+      })
+      .addCase(applyVoucherThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(applyVoucherThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const { newTotalPrice } = action.payload;
+
+        // Kiểm tra nếu selectedOrder tồn tại trước khi cập nhật
+        if (state.selectedOrder) {
+          state.selectedOrder.totalAmount = newTotalPrice;
+        }
+      })
+      .addCase(applyVoucherThunk.rejected, (state, action) => {
+        state.status = "failed";
+        // Kiểm tra xem action.payload có tồn tại hay không, nếu không gán giá trị lỗi mặc định
+        state.error = action.payload
+          ? (action.payload as string)
+          : "Lỗi không xác định";
       });
   },
 });

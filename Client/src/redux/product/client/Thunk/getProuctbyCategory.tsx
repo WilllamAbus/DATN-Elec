@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { GetProductsByCategoryResponse, ProductBrand, ProductCondition,RAM } from "../../../../services/clientcate/client/types/getProuctbyCategory";
+import { GetProductsByCategoryResponse, ProductBrand, ProductCondition,RAM, STORAGE } from "../../../../services/clientcate/client/types/getProuctbyCategory";
 import { getProductsByCategory } from "../../../../services/clientcate/client/navbar/getProductsByCategory";
 
 export const getProductsByCategoryThunk = createAsyncThunk<
@@ -10,6 +10,7 @@ export const getProductsByCategoryThunk = createAsyncThunk<
     _sort: string; 
     brand?: ProductBrand[];  
     ram?: RAM[];  
+    storage?:STORAGE[];
     conditionShopping?: ProductCondition[];
     minPrice?: number; 
     maxPrice?: number; 
@@ -21,7 +22,7 @@ export const getProductsByCategoryThunk = createAsyncThunk<
 >(
   "productsClient/getProductsByCategory",
   async (
-    { slug, page, _sort, brand = [], ram = [], conditionShopping = [], minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, limit },
+    { slug, page, _sort, brand = [], ram = [], conditionShopping = [],storage=[], minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, limit },
     { rejectWithValue }
   ) => {
     try {
@@ -32,6 +33,7 @@ export const getProductsByCategoryThunk = createAsyncThunk<
         brand, 
         conditionShopping, 
         ram,
+        storage,
         minPrice, 
         maxPrice, 
         minDiscountPercent, 

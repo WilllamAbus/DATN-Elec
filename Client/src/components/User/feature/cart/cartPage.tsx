@@ -652,16 +652,9 @@ const CartPage: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    navigate(`/checkout/${carts[0]._id}`, {
-      state: { groupedCarts, totalCartPrice },
-    });
+    navigate(`/checkout/${carts[0]._id}`, {});
   };
-  //   <Button
-  //   to={`/admin/listDetailOrder/${carts[0]._id}`}
-  //   className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-  // >
-  //   Thanh toán
-  // </Button>
+
   const handleDeleteProduct = async (cartId: string, productId: string) => {
     setLoading(true); // Bắt đầu loading
     try {
@@ -670,13 +663,9 @@ const CartPage: React.FC = () => {
     } catch (error) {
       toast.error("Xóa sản phẩm thất bại.");
     } finally {
-      setLoading(false); // Dừng loading sau khi thực hiện xong
+      setLoading(false);
     }
   };
-
-  // if (cartStatus === "loading") {
-  //   return <p>Loading...</p>;
-  // }
 
   if (cartStatus === "failed") {
     toast.error(`Error: ${cartError}`);
@@ -949,10 +938,15 @@ const CartPage: React.FC = () => {
             <Button
               onClick={handleCheckout}
               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-              disabled={!groupedCarts.length}
+              disabled={
+                !groupedCarts.some((cart) =>
+                  cart.items.some((item) => item.isSelected)
+                )
+              }
             >
               Thanh toán
             </Button>
+
             <Button className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light">
               Tiếp tục mua sắm
             </Button>

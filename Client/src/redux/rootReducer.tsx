@@ -2,7 +2,7 @@ import { combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/authSlice";
-import authGoogleReducer from "./auth/googleSlice";
+// import authGoogleReducer from "./auth/googleSlice";
 import categoriesSlice from "./categories/categoriesSlice";
 import voucherReducer from "./discount/voucherSlice";
 import { store } from "./store";
@@ -26,31 +26,38 @@ import auctionReducer from "./auctions/auctionSlice";
 import deleteBidReducer from "./deleteBid/deleteBidSlice";
 import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
 import confirmReducer from "./confirmOrder/confirmOrderSlice";
-import OrderListAuctionAdminReducer from './orderAucAdmin/orderAucAdminSlice'
-import getDeletedOrderAucAdminReducer from './orderAucAdmin/getDeletedAucAdmin/getDeletedSlice'
-import statusShippingReducer from './statusOrderUser/shippingStatusOrder/shiipingStatusSlice'
+import OrderListAuctionAdminReducer from "./orderAucAdmin/orderAucAdminSlice";
+import getDeletedOrderAucAdminReducer from "./orderAucAdmin/getDeletedAucAdmin/getDeletedSlice";
+import statusShippingReducer from "./statusOrderUser/shippingStatusOrder/shiipingStatusSlice";
 import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
-import allLIstOrderStatusReducer from "./statusOrderUser/allListOrderStatus/allListStatuSlice"
-import statusComplteOrderStatusReducer from "./statusOrderUser/completOrderStatus/completeStatusSlice"
-import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/receiveStatuSlice"
-import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice"
+import allLIstOrderStatusReducer from "./statusOrderUser/allListOrderStatus/allListStatuSlice";
+import statusComplteOrderStatusReducer from "./statusOrderUser/completOrderStatus/completeStatusSlice";
+import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/receiveStatuSlice";
+import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice";
 import orderPagiReducer from "./order/pagiOrder/pagislice";
+import linkAccountReducer from "./linkAccount/Slice/linkAccount";
 const authConfig = {
   key: "auth",
   storage,
   whitelist: ["login"],
 };
-
+const linkAccountConfig = {
+  key: "linkAccount",
+  storage,
+  whitelist: ["linkAccount"],
+};
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
-  authGoogle: persistReducer(authConfig, authGoogleReducer),
+  // authGoogle: persistReducer(authConfig, authGoogleReducer),
+  // authGoogle: persistReducer(authConfig, authGoogleReducer),
+  linkAccountUser: persistReducer(linkAccountConfig, linkAccountReducer),
   categories: categoriesSlice,
   watchlist: watchlistReducer,
   voucher: voucherReducer,
   checkout: checkoutSlice,
   products: productAdminReducer,
   productClient: productClientReducer,
-  attributes:attributesReducer,
+  attributes: attributesReducer,
   cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,
@@ -67,10 +74,10 @@ const rootReducer = combineReducers({
   orderAuction: orderAuctionReducer,
   confirmOrder: confirmReducer,
   orderAucAdmin: OrderListAuctionAdminReducer,
-  getDeletedOrderAucAdmin : getDeletedOrderAucAdminReducer,
-  statusShippingOrder : statusShippingReducer,
+  getDeletedOrderAucAdmin: getDeletedOrderAucAdminReducer,
+  statusShippingOrder: statusShippingReducer,
   allListOrderStatus: allLIstOrderStatusReducer,
-  completStatusOrder : statusComplteOrderStatusReducer,
+  completStatusOrder: statusComplteOrderStatusReducer,
   receiveStatusOrder: statusReceiveOrderReducer,
   softDelOrderUser: softDelOrderStatus,
   orderPagi: orderPagiReducer,

@@ -66,3 +66,21 @@ export const searchInventory = async (keyword: string, page = 1, limit = 5) => {
     }
   }
 };
+
+
+export const getOneInventoryItem = async (productId: string) => {
+  try {
+    // Gọi API get-one với productId
+    const response = await instance.get(`/inventory/get-one/${productId}`);
+    
+    // Kiểm tra phản hồi từ API
+    if (response.data.success && response.data.data) {
+      return response.data.data; // Trả về dữ liệu inventory
+    } else {
+      throw new Error(response.data.message || "Sản phẩm không tồn tại.");
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+    throw new Error("Không thể lấy thông tin sản phẩm từ API.");
+  }
+};

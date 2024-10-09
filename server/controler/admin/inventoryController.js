@@ -2,6 +2,7 @@
 const modelInbound = require("../../model/inboundShipments.model");
 const modelProduct = require("../../model/product_v2");
 const modelSupplier = require("../../model/suppliers.model");
+const ProductVariant = require('../../model/product_v2/productVariant'); 
 const modelInventory = require("../../model/inventory/inventory.model");
 const { checkInventoryAndNotify } = require('../../services/inventoryChecker');
 
@@ -39,7 +40,7 @@ const inventoryController = {
             });
             const totalPages = Math.ceil(count / limit);
             const inventories = await modelInventory.find({})
-                .populate('product', 'product_name')
+                .populate('product_variant', 'variant_name')
                 .populate('supplier', 'name')
                 .skip((page - 1) * limit)
                 .limit(limit);
@@ -61,13 +62,13 @@ const inventoryController = {
 
     updateQuantityShelf : async (req, res) => {
         try {
-            const { product_id, quantity} = req.body;
-            if (!product_id || quantity == null) {
+            const { product_variant, quantity} = req.body;
+            if (!product_variant || quantity == null) {
                 return res.status(400).json({ message: "Vui lòng cung cấp thông tin sản phẩm và số lượng." });
             }
     
             // Tìm sản phẩm trong kho (inventory)
-            const inventory = await modelInventory.findOne({ product: product_id });
+            const inventory = await modelInventory.findOne({ product_variant: product_variant });
     
             if (!inventory) {
                 return res.status(404).json({ message: "Không tìm thấy sản phẩm trong kho." });
@@ -81,9 +82,15 @@ const inventoryController = {
             // Cập nhật số lượng trên kệ và trong kho
             inventory.quantityShelf += quantity;
             inventory.quantityStock -= quantity;
-    
-            // Lưu lại cập nhật
+
             await inventory.save();
+            const productVariant = await ProductVariant.findById(product_variant);
+            if (productVariant) {
+                if (!productVariant.inventory.includes(inventory._id)) {
+                    productVariant.inventory.push(inventory._id);
+                    await productVariant.save(); 
+                }
+            }
     
             res.status(200).json({ message: "Cập nhật thành công.", inventory });
         } catch (error) {
@@ -95,14 +102,14 @@ const inventoryController = {
         try {
             // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
             const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' } }, 'product')
-            .populate('product', 'product_name')
+            .populate('product_variant', 'variant_name')
             .exec();
     
             // Duyệt qua các bản ghi inventory và tạo danh sách các
             const productsInInventory = inventoryItems.map(item => ({
-                product: item.product._id,
-                product_name: item.product.product_name, // Assuming product_name is populated
-                _id: item.product._id
+                product_variant: item.product_variant._id,
+                variant_name: item.product_variant.variant_name, // Assuming product_name is populated
+                _id: item.product_variant._id
             }));
     
             res.status(200).json({ productsInInventory });
@@ -115,10 +122,11 @@ const inventoryController = {
         try {
             // Lấy productId từ params
             const productId = req.params.productId;
-    
+
+
             // Tìm sản phẩm trong inventory dựa trên productId
-            const inventoryItem = await modelInventory.findOne({ product: productId })
-                .populate('product', 'product_name')
+            const inventoryItem = await modelInventory.findOne({ product_variant: productId })
+                .populate('product_variant', 'variant_name')
                 .exec();
     
             if (inventoryItem) {

@@ -26,7 +26,8 @@ import {
   fetchUserById,
   getlistRoleThunk,
 } from "./authThunk";
-
+import { apiLoginSuccessThunk } from "./apiLoginSuccessThunk";
+import { LoginResponse } from "../../types/user";
 interface AuthState {
   role: {
     roles: Role[];
@@ -40,6 +41,7 @@ interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
     isLoggedIn: boolean;
+    roles: Role[];
   };
   profile: {
     profile: UserProfile | null;
@@ -110,7 +112,7 @@ const initialState: AuthState = {
     error: null,
     isAuthenticated: false,
     token: null,
-
+    roles: [],
     isLoggedIn: false,
   },
   profile: {
@@ -548,6 +550,28 @@ const authSlice = createSlice({
         }
       )
       .addCase(loginUserThunk.rejected, (state, action) => {
+        state.login.isFetching = false;
+        state.login.error = action.payload as string;
+        state.login.isAuthenticated = false;
+        state.login.isLoggedIn = false;
+      })
+      .addCase(apiLoginSuccessThunk.pending, (state) => {
+        state.login.isFetching = true;
+        state.login.error = null;
+      })
+      .addCase(
+        apiLoginSuccessThunk.fulfilled,
+        (state, action: PayloadAction<LoginResponse>) => {
+          state.login.isFetching = false;
+          state.login.currentUser = action.payload.currentUser;
+          state.login.token = action.payload.token ?? null;
+          state.login.isAuthenticated = true;
+          state.login.isLoggedIn = true;
+          state.login.error = null;
+          state.login.roles = action.payload.roles;
+        }
+      )
+      .addCase(apiLoginSuccessThunk.rejected, (state, action) => {
         state.login.isFetching = false;
         state.login.error = action.payload as string;
         state.login.isAuthenticated = false;

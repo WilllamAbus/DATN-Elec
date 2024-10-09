@@ -558,7 +558,7 @@ import {
   cancelOrderAdminThunk,
   deleteOrderAdminThunk,
 } from "../../../../redux/order/Admin/orderAdmin";
-import { listOrderThunk } from "../../../../redux/order/orderThunks";
+// import { listOrderThunk } from "../../../../redux/order/orderThunks";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import Swal, { SweetAlertResult } from "sweetalert2";
@@ -584,6 +584,11 @@ const ListOrders: React.FC = () => {
   );
   const [orderList, setOrderList] = useState<Order[]>(Order || []);
   const [filter, setFilter] = useState<string>("Tất cả");
+  //   useEffect(() => {
+  //     if (orders) {
+  //       setOrderList(orders);
+  //     }
+  //   }, [orders]);
 
   useEffect(() => {
     dispatch(fetchPaginatedOrder({ page: currentPage, search: searchTerm }));
@@ -605,7 +610,9 @@ const ListOrders: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await dispatch(cancelOrderAdminThunk({ orderId })).unwrap();
-          dispatch(listOrderThunk());
+          dispatch(
+            fetchPaginatedOrder({ page: currentPage, search: searchTerm })
+          );
           setOrderList((prevOrder) =>
             prevOrder.filter((order) => order._id !== orderId)
           );
@@ -638,7 +645,9 @@ const ListOrders: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await dispatch(deleteOrderAdminThunk({ orderId })).unwrap();
-          dispatch(listOrderThunk());
+          dispatch(
+            fetchPaginatedOrder({ page: currentPage, search: searchTerm })
+          );
           toast.success("Đơn hàng đã được xóa.");
         } catch (error) {
           // Kiểm tra nội dung lỗi và hiển thị thông báo tương ứng

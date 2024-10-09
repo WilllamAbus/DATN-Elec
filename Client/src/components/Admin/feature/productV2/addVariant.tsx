@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import  NumericFormat  from "../../../../ultils/numerFormat/numericFormatWrapper";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -36,6 +35,7 @@ import {
 } from "./handlersVariant";
 import { SingleValue } from "react-select";
 import Productdescription from "./description/product_description";
+import FormInput from "./Form/forminput";
 const AddVariant: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const productIdString = productId ?? "";
@@ -108,10 +108,10 @@ const AddVariant: React.FC = () => {
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
       <ToastContainer />
-      <ReusableBreadcrumb items={breadcrumbItems.addProducts} />
+      <ReusableBreadcrumb items={breadcrumbItems.addVariant} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Thêm sản phẩm
+          Thêm biến thể sản phẩm
         </h1>
       </div>
       <div className="grid grid-cols-[1fr_2fr] px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
@@ -175,43 +175,30 @@ const AddVariant: React.FC = () => {
                 )}
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="variant_price"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Giá gốc
-                </label>
-                <NumericFormat
-                  id="variant_price"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-md focus:ring-primary-500 focus:border-primary-500 block w-full p-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  suffix=" đ"
-                  {...register("variant_price", {
-                    required: "Giá sản phẩm không được bỏ trống",
-                    min: {
-                      value: 1000,
-                      message: "Giá sản phẩm không thể thấp hơn 1000",
-                    },
-                    max: {
-                      value: 2000000000,
-                      message: "Giá sản phẩm không thể vượt quá 2000000000",
-                    },
-                    valueAsNumber: true,
-                  })}
-                  onValueChange={(values) => {
-                    const { floatValue } = values;
-                    setValue("variant_price", floatValue ?? 0);
-                  }}
-                />
-                {errors.variant_price && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.variant_price.message}</span>
-                  </div>
-                )}
-              </div>
-
+              <FormInput
+                id="product_price"
+                label="Giá gốc"
+                format
+                suffix=" đ"
+                register={register}
+                error={errors.variant_price}
+                validation={{
+                  required: "Giá sản phẩm không được bỏ trống",
+                  min: {
+                    value: 1000,
+                    message: "Giá sản phẩm không thể thấp hơn 1000",
+                  },
+                  max: {
+                    value: 2000000000,
+                    message: "Giá sản phẩm không thể vượt quá 2000000000",
+                  },
+                  valueAsNumber: true,
+                }}
+                onValueChange={(values) => {
+                  const { floatValue } = values;
+                  setValue("variant_price", floatValue ?? 0);
+                }}
+              />
               <div className="col-span-3 1sm:col-span-3">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Dung lượng RAM

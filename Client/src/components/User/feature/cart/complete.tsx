@@ -22,11 +22,6 @@ const CompletePage: React.FC = () => {
   const [cart] = useState<any>(null);
   const [, setOrderId] = useState<string | null>(null);
 
-  const grandTotal =
-    cart?.items?.reduce((total: number, item: CartItem) => {
-      return total + (item.product.product_price_unit || 0) * item.quantity;
-    }, 0) || 0;
-
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const paymentResult = query.get("paymentResult");
@@ -67,7 +62,7 @@ const CompletePage: React.FC = () => {
         },
       ],
       payment: {
-        amount: grandTotal,
+        amount: carts[0].totalPrice,
         payment_method: paymentMethod,
         order_info: orderIdParam || "",
       },
@@ -78,9 +73,9 @@ const CompletePage: React.FC = () => {
       },
       voucher: [],
       formatShipping: "Nhanh",
-      totalAmount: grandTotal,
+      totalAmount: carts[0].totalPrice,
       shippingFee: 0,
-      totalPriceWithShipping: grandTotal,
+      totalPriceWithShipping: carts[0].totalPrice,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

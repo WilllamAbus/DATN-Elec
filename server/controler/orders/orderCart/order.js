@@ -13,190 +13,6 @@ const {
   sendOrderConfirmationEmail,
 } = require("../../../services/email.service");
 const authController = {
-  // Lấy danh sách đơn hàng của người dùng
-  // createOrder: async (req, res) => {
-  //   try {
-  //     const userId = req.user?.id;
-  //     if (!userId) {
-  //       return res
-  //         .status(401)
-  //         .json({ message: "Người dùng chưa được xác thực" });
-  //     }
-
-  //     const {
-  //       cartId,
-  //       voucherIds = [],
-  //       formatShipping,
-  //       totalAmount,
-  //       shipping,
-  //       payment: paymentInfo,
-  //     } = req.body;
-
-  //     console.log("Yêu cầu Body:", req.body);
-
-  //     const cart = await Cart.findById(cartId);
-  //     if (!cart) {
-  //       return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
-  //     }
-
-  //     if (cart.items.length === 0) {
-  //       return res.status(400).json({ message: "Giỏ hàng rỗng" });
-  //     }
-
-  //     if (!paymentInfo) {
-  //       return res
-  //         .status(400)
-  //         .json({ message: "Thông tin thanh toán không được cung cấp" });
-  //     }
-
-  //     // Xử lý thanh toán
-  //     let paymentId = null;
-  //     if (paymentInfo.payment_method === "vnPay") {
-  //       const existingVnpay = await Vnpay.findOne({
-  //         transaction: paymentInfo.order_info,
-  //       });
-
-  //       if (!existingVnpay) {
-  //         return res
-  //           .status(400)
-  //           .json({ message: "Giao dịch VNPay không tồn tại" });
-  //       }
-
-  //       const existingPayment = await Payment.findOne({
-  //         order_info: paymentInfo.order_info,
-  //       });
-
-  //       if (existingPayment) {
-  //         return res
-  //           .status(400)
-  //           .json({ message: "Giao dịch đã tồn tại trong Payment" });
-  //       }
-
-  //       const newPayment = new Payment({
-  //         amount: paymentInfo?.amount || 0,
-  //         order_info: paymentInfo?.order_info || "null",
-  //         payment_date: paymentInfo?.payment_date || new Date(),
-  //         payment_method: "vnPay",
-  //       });
-
-  //       await newPayment.save();
-  //       paymentId = newPayment._id;
-  //     } else if (paymentInfo.payment_method !== "cash") {
-  //       const existingPayment = await Payment.findOne({
-  //         order_info: paymentInfo.order_info,
-  //       });
-
-  //       if (existingPayment) {
-  //         return res.status(400).json({ message: "Giao dịch đã tồn tại" });
-  //       }
-
-  //       const newPayment = new Payment({
-  //         amount: paymentInfo?.amount || 0,
-  //         order_info: paymentInfo?.order_info || "null",
-  //         payment_date: paymentInfo?.payment_date || new Date(),
-  //         payment_method:
-  //           paymentInfo?.payment_method || "Chưa chọn phương thức",
-  //       });
-
-  //       await newPayment.save();
-  //       paymentId = newPayment._id;
-  //     }
-
-  //     if (!shipping) {
-  //       return res
-  //         .status(400)
-  //         .json({ message: "Thông tin giao hàng không được cung cấp" });
-  //     }
-
-  //     const newShipping = new Shipping({
-  //       recipientName: shipping.recipientName || "Chưa có tên người nhận",
-  //       phoneNumber: shipping.phoneNumber || "Chưa có số điện thoại",
-  //       address: shipping.address || "Chưa có địa chỉ",
-  //       stateShipping: "Xác nhận",
-  //     });
-
-  //     await newShipping.save();
-
-  //     if (voucherIds.length > 0) {
-  //       const vouchers = await Voucher.find({ _id: { $in: voucherIds } });
-  //       if (voucherIds.length !== vouchers.length) {
-  //         return res
-  //           .status(404)
-  //           .json({ message: "Một số voucher không tìm thấy" });
-  //       }
-  //     }
-
-  //     const shippingFee = shipping?.shipping || 0;
-  //     const totalPriceWithShipping = totalAmount + shippingFee;
-
-  //     // Tạo đơn hàng
-  //     const newOrder = new Order({
-  //       user: userId,
-  //       payment: paymentId || null,
-  //       shipping: newShipping._id,
-  //       voucherIds,
-  //       cartDetails: [], // Sẽ được cập nhật sau
-  //       formatShipping,
-  //       totalAmount,
-  //       shippingFee,
-  //       totalPriceWithShipping,
-  //       stateOrder: "Chờ xử lý",
-  //     });
-
-  //     await newOrder.save();
-
-  //     // Tạo chi tiết đơn hàng cho từng sản phẩm trong giỏ hàng
-  //     const orderDetailItems = cart.items.map((item) => ({
-  //       product: item.product,
-  //       quantity: item.quantity,
-  //       price: item.price,
-  //       totalItemPrice: item.quantity * item.price,
-  //     }));
-
-  //     const orderDetail = new OrderDetail({
-  //       order: newOrder._id,
-  //       items: orderDetailItems,
-  //       quantity: cart.items.reduce((sum, item) => sum + item.quantity, 0),
-  //       price: orderDetailItems.reduce((sum, item) => sum + item.price, 0),
-  //       totalItemPrice: orderDetailItems.reduce(
-  //         (sum, item) => sum + item.totalItemPrice,
-  //         0
-  //       ),
-  //     });
-
-  //     await orderDetail.save();
-
-  //     // Cập nhật đơn hàng với chi tiết đơn hàng
-  //     newOrder.cartDetails = [orderDetail._id];
-  //     await newOrder.save();
-
-  //     // Xóa giỏ hàng
-  //     cart.items = [];
-  //     await cart.save();
-
-  //     // Gửi email xác nhận đơn hàng
-  //     const user = await User.findById(userId);
-
-  //     await sendOrderConfirmationEmail(user.email, {
-  //       recipientName: newShipping.recipientName,
-  //       address: newShipping.address,
-  //       paymentMethod: paymentInfo.payment_method,
-  //       items: orderDetailItems,
-  //       totalPriceWithShipping,
-  //     });
-
-  //     res.status(201).json({
-  //       message: "Đơn hàng đã được tạo thành công",
-  //       order: newOrder,
-  //     });
-  //   } catch (error) {
-  //     console.error("Lỗi khi tạo đơn hàng:", error);
-  //     res.status(500).json({
-  //       message: "Lỗi khi tạo đơn hàng",
-  //       error: error.message || error,
-  //     });
-  //   }
-  // },
   createOrder: async (req, res) => {
     try {
       const userId = req.user?.id;
@@ -222,8 +38,13 @@ const authController = {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
 
-      if (cart.items.length === 0) {
-        return res.status(400).json({ message: "Giỏ hàng rỗng" });
+      const selectedItems = cart.items.filter(
+        (item) => item.isSelected === true
+      );
+      if (selectedItems.length === 0) {
+        return res
+          .status(400)
+          .json({ message: "Chưa có sản phẩm nào được chọn" });
       }
 
       if (!paymentInfo) {
@@ -318,7 +139,7 @@ const authController = {
         payment: paymentId || null,
         shipping: newShipping._id,
         voucherIds,
-        cartDetails: [], // Sẽ được cập nhật sau
+        cartDetails: [],
         formatShipping,
         totalAmount,
         shippingFee,
@@ -327,10 +148,8 @@ const authController = {
       });
 
       await newOrder.save();
-
-      // Tạo chi tiết đơn hàng cho từng sản phẩm trong giỏ hàng
       const orderDetailItems = [];
-      for (const item of cart.items) {
+      for (const item of selectedItems) {
         const productVariant = item.product;
         const inventory = await Inventory.findOne({
           product: productVariant._id,
@@ -347,14 +166,14 @@ const authController = {
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.quantity * item.price,
-          inventory: inventory._id, // Thêm thông tin tồn kho vào chi tiết đơn hàng
+          inventory: inventory._id,
         });
       }
 
       const orderDetail = new OrderDetail({
         order: newOrder._id,
         items: orderDetailItems,
-        quantity: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+        quantity: selectedItems.reduce((sum, item) => sum + item.quantity, 0),
         price: orderDetailItems.reduce((sum, item) => sum + item.price, 0),
         totalItemPrice: orderDetailItems.reduce(
           (sum, item) => sum + item.totalItemPrice,
@@ -364,7 +183,6 @@ const authController = {
 
       await orderDetail.save();
 
-      // Cập nhật đơn hàng với chi tiết đơn hàng
       newOrder.cartDetails = [orderDetail._id];
       await newOrder.save();
 
@@ -378,11 +196,9 @@ const authController = {
 
       await newInteraction.save();
 
-      // Xóa giỏ hàng
-      cart.items = [];
+      cart.items = cart.items.filter((item) => item.isSelected === false);
       await cart.save();
 
-      // Gửi email xác nhận đơn hàng
       const user = await User.findById(userId);
 
       await sendOrderConfirmationEmail(user.email, {
@@ -775,8 +591,9 @@ const authController = {
             "Đơn hàng không thể bị xóa vì trạng thái chưa hủy hoặc hoàn tất",
         });
       }
-
+      const now = new Date();
       order.isDeleted = true;
+      order.deletedAt = now;
       await order.save();
 
       res.status(200).json({ message: "Xóa đơn hàng thành công" });

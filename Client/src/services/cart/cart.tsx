@@ -63,21 +63,21 @@ export const SelectCart = async ({
   items,
 }: {
   productId: string;
-  items: { productId: string }[]; // Xóa isSelected
+  items: { productId: string }[];
 }) => {
   try {
     const response = await instance.put(
-      `http://localhost:4000/api/cart/isSelect/${productId}`,
-      { items } // Gửi chỉ productId mà không có isSelected
+      `${API_URL}/cart/isSelect/${productId}`,
+      { items }
     );
-    return response.data; // Trả về dữ liệu từ response
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      throw new Error(error.response.data.message || error.message); // Trả về thông điệp lỗi từ server nếu có
+      throw new Error(error.response.data.message || error.message);
     } else if (error instanceof Error) {
-      throw new Error(error.message); // Trả về thông điệp lỗi mặc định
+      throw new Error(error.message);
     } else {
-      throw new Error("Đã xảy ra lỗi không xác định khi chọn giỏ hàng."); // Lỗi không xác định
+      throw new Error("Đã xảy ra lỗi không xác định khi chọn giỏ hàng.");
     }
   }
 };

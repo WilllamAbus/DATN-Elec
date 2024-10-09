@@ -9,6 +9,7 @@ const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
 const adminAttributes = require("./admin/attributes");
 const clientProduct = require("./client/product");
+const clientProductDetail = require("./client/product-detail");
 // const productRouter_v2 = require("./admin/product_v2");
 const inboundRouter = require("./admin/inboundshipments/inbound");
 const inventoryRouter = require("./admin/inventory");
@@ -50,6 +51,7 @@ const routes = (app) => {
   app.use("/api/admin/product", adminProduct);
   app.use("/api/admin/attributes", adminAttributes);
   app.use("/api/client/product", clientProduct);
+  app.use("/api/client/product-detail", clientProductDetail);
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/attributes", attributesRouter);
   app.use("/api/client/sidebar/product", clientSidebarProduct);
