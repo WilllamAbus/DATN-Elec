@@ -5,7 +5,7 @@ import { getAllBrandPageAuctionThunk } from '../../../../../redux/product/client
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
 import XIcon from '../svg/deleteicon';
-import { ProductBrand, FilterState } from '../../../../../services/product_v2/client/types/listPageAuction';
+import { ProductBrand, FilterState } from '../../../../../services/clientcate/client/types/getProuctbyCategory';
 
 interface FilterByBrandProps {
   onchange?: (selectedBrands: ProductBrand[]) => void;

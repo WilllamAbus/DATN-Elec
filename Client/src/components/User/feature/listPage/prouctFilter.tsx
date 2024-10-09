@@ -4,7 +4,8 @@ import FilterByPrice from "./filter/filterbyPrice";
 import FilterByRam from "./filter/filterbyRam";
 import FilterByConditionShopping from "./filter/filterbyConditionShopping";
 import FilterByService from "./filter/filterbyService";
-import { FilterState,ProductCondition,ProductBrand,RAM } from "../../../../services/clientcate/client/types/getProuctbyCategory"; 
+import { FilterState,ProductCondition,ProductBrand,RAM, STORAGE } from "../../../../services/clientcate/client/types/getProuctbyCategory"; 
+import FilterByStorage from "./filter/filterbyStorage";
 interface ProductFiltersProps {
   filters: FilterState;
   onChange?: (newFilters: FilterState) => void;
@@ -22,6 +23,13 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
     const newFilters: FilterState = {
       ...filters,
       conditionShopping: selectedConditions.length > 0 ? selectedConditions : undefined,
+    };
+    onChange(newFilters);
+  };
+  const handleStorageChange = (selectedStorages: STORAGE[]) => {
+    const newFilters: FilterState = {
+      ...filters,
+      storage: selectedStorages.length > 0 ? selectedStorages : undefined,
     };
     onChange(newFilters);
   };
@@ -55,6 +63,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
       <FilterByPrice onchange={handlePriceChange} />
       <FilterByBrand filters={filters} onchange={handleBrandChange} />
       <FilterByRam filters={filters} onchange={handleRamChange} />
+      <FilterByStorage filters={filters} onchange={handleStorageChange} />
       <FilterByConditionShopping filters={filters} onchange={handleConditionShoppingChange} />
      <FilterByService filters={filters} onchange={handleServiceChange} />
     </div>

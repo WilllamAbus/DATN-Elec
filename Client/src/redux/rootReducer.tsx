@@ -35,15 +35,21 @@ import statusComplteOrderStatusReducer from "./statusOrderUser/completOrderStatu
 import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/receiveStatuSlice"
 import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice"
 import orderPagiReducer from "./order/pagiOrder/pagislice";
+import linkAccountReducer from "./linkAccount/Slice/linkAccount";
 const authConfig = {
   key: "auth",
   storage,
   whitelist: ["login"],
 };
-
+const linkAccountConfig = {
+  key: "linkAccount",
+  storage,
+  whitelist: ["linkAccount"], 
+};
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
   authGoogle: persistReducer(authConfig, authGoogleReducer),
+  linkAccountUser: persistReducer(linkAccountConfig, linkAccountReducer),
   categories: categoriesSlice,
   watchlist: watchlistReducer,
   voucher: voucherReducer,
@@ -74,6 +80,7 @@ const rootReducer = combineReducers({
   receiveStatusOrder: statusReceiveOrderReducer,
   softDelOrderUser: softDelOrderStatus,
   orderPagi: orderPagiReducer,
+
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -11,12 +11,14 @@ import ProductFilters from "./prouctFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { 
+import {
   getAllBrandPageAuctionThunk,
   getAllConditionShoppingThunk,
-  getProductsByCategoryThunk
+  getProductsByCategoryThunk,
+  getAllRamThunk,
+  getAllStorageThunk
 } from "../../../../redux/product/client/Thunk";
-import { getAllRamThunk} from "../../../../redux/product/attributes/Thunk";
+
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
 import ProductList from "./productList";
@@ -28,6 +30,7 @@ import NoProductsMessage from "./noProduct";
 import { useLocation, useParams } from "react-router-dom";
 import queryString from "query-string";
 import useProductFilters from "./produtFiltersHook";
+
 
 
 
@@ -48,36 +51,41 @@ export default function ListPage() {
   const total = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.total || 0
   );
+  const category = useSelector((state: RootState) => state.productClient.getProductsByCategory.category);
 
   const isLoading = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.isLoading
   );
   const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
   const conditions = useSelector((state: RootState) => state.productClient.getAllConditionShoppingPageAuction.conditionShopping || []);
-  const rams = useSelector((state: RootState) => state.attributes.getAllRam.rams); 
+  const rams = useSelector((state: RootState) => state.productClient.getAllRam.rams || []);
+  const storages = useSelector((state: RootState) => state.productClient.getAllStorage.storages || []);
   useEffect(() => {
     dispatch(getAllBrandPageAuctionThunk());
     dispatch(getAllConditionShoppingThunk());
     dispatch(getAllRamThunk());
+    dispatch(getAllStorageThunk());
   }, [dispatch]);
-  const [filters, setFilters] = useProductFilters(queryParams, brands, conditions,rams);
+  const [filters, setFilters] = useProductFilters(queryParams, brands, conditions, rams, storages);
   const noProducts = !isLoading && products.length === 0;
   useEffect(() => {
     if (slug) {
-      dispatch(getProductsByCategoryThunk({ 
-        slug,    
-         page: filters.page,
+      dispatch(getProductsByCategoryThunk({
+        slug,
+        page: filters.page,
         limit: filters.limit,
         _sort: filters._sort,
         brand: filters.brand || [],
         ram: filters.ram || [],
+        storage: filters.storage || [],
         conditionShopping: filters.conditionShopping || [],
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,
         minDiscountPercent: filters.minDiscountPercent,
-        maxDiscountPercent: filters.maxDiscountPercent,}));
+        maxDiscountPercent: filters.maxDiscountPercent,
+      }));
     }
-  }, [dispatch, filters, slug]); 
+  }, [dispatch, filters, slug]);
   const handleSortChange = (newSortValue: string) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -85,12 +93,12 @@ export default function ListPage() {
     }));
   };
 
-const handlePageChange = (page: number) => {
-  setFilters((prevFilters) => ({
-    ...prevFilters,
-    page,
-  }));
-};
+  const handlePageChange = (page: number) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      page,
+    }));
+  };
   const handleFilterChange = useCallback(
     (newFilters: FilterState) => {
       setFilters((prevFilters) => ({
@@ -115,7 +123,7 @@ const handlePageChange = (page: number) => {
     if (value === undefined || value === null || value === '') return false;
     return true;
   });
-  
+
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   return (
     <div>
@@ -173,9 +181,10 @@ const handlePageChange = (page: number) => {
                   <div className="bg-white shadow-md sm:rounded-t-lg  overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4">
                     <div className="flex items-center justify-between px-4 py-2">
                       <h1 className="text-xl font-barlow font-bold text-gray-900">
-                        Sản phẩm - Đấu giá
-                        <span className="text-lg font-medium text-gray-500"> (có {total} sản phẩm)</span>
+                        {category && category.trim() !== "" ? `${category} ` : "Sản phẩm"}
+                        <span className="text-lg font-medium text-gray-500"> (có {total} sản phẩm)</span>
                       </h1>
+                    
                       <button
                         type="button"
                         onClick={() => setMobileFiltersOpen(true)}

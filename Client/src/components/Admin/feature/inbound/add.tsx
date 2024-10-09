@@ -10,7 +10,7 @@ import { ProductV2 } from "../../../../types/ProductV2";
 import { Supplier } from "../../../../types/Suppliers.d";
 
 interface IFormInput {
-    product_id: string;
+    product_variant_id: string;
     inbound_supplier: string;
     inbound_description: string;
     inbound_quantity: number;
@@ -65,7 +65,7 @@ const AddInbound: React.FC = () => {
     const submitFormAdd = async (data: IFormInput) => {
         try {
             const payload = {
-                product_id: data.product_id,
+                product_variant_id: data.product_variant_id,
                 inbound_supplier: data.inbound_supplier,
                 inbound_description: data.inbound_description || '',
                 inbound_quantity: data.inbound_quantity,
@@ -106,9 +106,9 @@ const AddInbound: React.FC = () => {
                                     Tên sản phẩm
                                 </label>
                                 <select
-                                    id="product_id"
+                                    id="product_variant_id"
                                     className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    {...register("product_id", { required: "Sản phẩm không được bỏ trống" })}
+                                    {...register("product_variant_id", { required: "Sản phẩm không được bỏ trống" })}
                                 >
                                     <option value="">Chọn sản phẩm</option>
                                     {products.length > 0 ? (
@@ -121,9 +121,9 @@ const AddInbound: React.FC = () => {
                                         <option disabled>Không có sản phẩm nào</option>
                                     )}
                                 </select>
-                                {errors.product_id && (
+                                {errors.product_variant_id && (
                                     <span className="text-red-500 text-xs italic">
-                                        {errors.product_id.message?.toString()}
+                                        {errors.product_variant_id.message?.toString()}
                                     </span>
                                 )}
                             </div>
@@ -421,7 +421,7 @@ const AddInbound: React.FC = () => {
                                 type="submit"
                                 className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                             >
-                                Thêm nhà cung cấp
+                                Thêm lô hàng
                             </button>
                         </div>
                     </div>

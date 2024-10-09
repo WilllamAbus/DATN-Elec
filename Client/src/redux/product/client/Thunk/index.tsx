@@ -4,3 +4,6 @@ export * from "./listPageAuctionProduct";
 export * from "./getAllBrandPageAuction";
 export * from "./resetFilter";
 export * from "./getAllConditionShopping";
+export * from "./getAllRam";
+export * from "./getAllStorage";
+export * from "./getProductDetail";

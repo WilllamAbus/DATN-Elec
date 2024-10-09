@@ -6,6 +6,9 @@ import {
   getAllBrandPageAuctionSlice,
   resetFilterAuctionProductSlice,
   getAllConditionShoppingSlice,
+  getAllStorageSlice,
+  getAllRamSlice,
+  getProductDetailSlice
 
 
 } from "./Slicle";
@@ -16,6 +19,9 @@ const productsReducer = combineReducers({
   resetFilterAuctionProduct: resetFilterAuctionProductSlice,
   getAllBrandPageAuction: getAllBrandPageAuctionSlice,
   getAllConditionShoppingPageAuction: getAllConditionShoppingSlice,
+  getAllRam: getAllRamSlice,
+  getAllStorage:getAllStorageSlice,
+  getProductDetail:getProductDetailSlice
 
 
 });

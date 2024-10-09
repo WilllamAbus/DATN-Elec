@@ -9,7 +9,6 @@ const createErrorResponse = (message, status) => {
     msg: message,
     status: status,
     total: 0, 
-    rams: [],
   };
 };
 
