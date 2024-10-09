@@ -73,14 +73,6 @@ const Navbar: React.FC = () => {
                 </span>
                 <li>
                   <Link
-                    to="allList"
-                    className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    Sản phẩm
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     to="auction"
                     className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
                   >

@@ -209,43 +209,56 @@ const InboundList: React.FC = () => {
         </thead>
         <tbody>
           {inbounds && inbounds.length > 0 ? (
-            inbounds.map((inbound) => (
-              <tr key={inbound._id} className="hover:bg-grey-lighter">
-                <td className="p-4 w-4">
-                  <div className="flex items-center">
-                    <input
-                      id="checkbox-table-search-1"
-                      type="checkbox"
-                      className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <label htmlFor="checkbox-table-search-1" className="sr-only">
-                      checkbox
-                    </label>
-                  </div>
-                </td>
-                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{inbound.product_id.product_name}</td>
-                <td className="px-4 py-3">{inbound.inbound_supplier.name}</td>
-                <td className="px-4 py-3">{inbound.inbound_quantity}</td>
-                <td className="px-4 py-3">{inbound.inbound_price}</td>
-                <td className="px-4 py-3">
-                  {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
-                </td>
-                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  <div className="flex items-center space-x-4">
-                    <Link
-                      to={`/admin/editInbound/${inbound._id}`}
-                      className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                    >
-                      Xem
-                    </Link>
-                  </div>
+            inbounds.some((inbound) => inbound.product_variant_id && inbound.product_variant_id.variant_name) ? (
+              inbounds.map((inbound) =>
+                inbound.product_variant_id && inbound.product_variant_id.variant_name ? (
+                  <tr key={inbound._id} className="hover:bg-grey-lighter">
+                    <td className="p-4 w-4">
+                      <div className="flex items-center">
+                        <input
+                          id="checkbox-table-search-1"
+                          type="checkbox"
+                          className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <label htmlFor="checkbox-table-search-1" className="sr-only">
+                          checkbox
+                        </label>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      {inbound.product_variant_id.variant_name}
+                    </td>
+                    <td className="px-4 py-3">{inbound.inbound_supplier.name}</td>
+                    <td className="px-4 py-3">{inbound.inbound_quantity}</td>
+                    <td className="px-4 py-3">{inbound.inbound_price}</td>
+                    <td className="px-4 py-3">
+                      {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      <div className="flex items-center space-x-4">
+                        <Link
+                          to={`/admin/editInbound/${inbound._id}`}
+                          className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                        >
+                          Xem
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ) : null
+              )
+            ) : (
+              <tr>
+                <td colSpan={6} className="text-center p-4">
+                  Không có lô hàng nào để hiển thị
                 </td>
               </tr>
-            ))) : (
+            )
+          ) : (
             <tr>
               <td colSpan={6} className="text-center p-4">
                 Không có lô hàng nào để hiển thị

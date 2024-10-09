@@ -1,8 +1,9 @@
 const router = require("express").Router();
 require("dotenv").config();
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 const googleController = require("../controler/authentication/auth.controller");
-
+const linkAccount = require("../controler/authentication/linkAccount");
 router.get(
   "/google",
   passport.authenticate("google", {
@@ -20,13 +21,16 @@ router.get("/google/callback", (req, res, next) => {
     if (!profile) {
       return res.redirect(`${process.env.URL_FE}/login-error`);
     }
-
     if (profile.existingUser) {
-      const email = encodeURIComponent(profile.email);
-      const googleId = encodeURIComponent(profile.googleId);
-      return res.redirect(
-        `${process.env.URL_FE}/link-account?email=${email}&googleId=${googleId}`
+      const token = jwt.sign(
+        {
+          email: profile.email,
+          googleId: profile.googleId,
+        },
+        process.env.JWT_ACCESS_KEY, 
+        { expiresIn: '1h' } 
       );
+      return res.redirect(`${process.env.URL_FE}/link-account?token=${token}`);
     }
 
     res.redirect(
@@ -36,5 +40,8 @@ router.get("/google/callback", (req, res, next) => {
 });
 
 router.post("/login-success", googleController.loginSuccess);
+router.post("/link-account", linkAccount.linkAccount);
+
+
 
 module.exports = router;

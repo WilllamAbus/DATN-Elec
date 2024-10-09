@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { HeartIcon, StarIcon } from "../listPage/svg";
 import { truncateText } from "../listPage/truncate/truncateText";
 import currencyFormatter from "currency-formatter";
-import { products } from "../../../../services/product_v2/client/types/listPageAuction";
+import { products } from "../../../../services/clientcate/client/types/getProuctbyCategory";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
@@ -17,10 +17,10 @@ export default function ProductItem({ product, index }: ProductItemProps) {
       className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
     >
       <div className="backdrop-blur-sm bg-white/30">
-        <Link to={`/detailAuc/${product._id}`}>
+        <Link to={`/product/${product.slug}`}>
           <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
             <img
-              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+              className="absolute inset-0 w-full h-full object-cover rounded-lg p-4"
               src={product.image[0]}
               alt={`product ${index + 1}`}
             />

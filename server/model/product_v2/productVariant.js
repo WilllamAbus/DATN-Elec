@@ -19,7 +19,7 @@ const productVariantSchema = new Schema({
   pid: { type: String, required: true, default: uuidv4 },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   product: { type: Schema.Types.ObjectId, ref: 'product_v2', required: true },
-  inventory: [{ type: Schema.Types.ObjectId, ref: 'inventory' }] 
+  inventory: [{ type: Schema.Types.ObjectId, ref: 'Inventory' }],
 }, {
   collection: "productvariants",
   timestamps: true

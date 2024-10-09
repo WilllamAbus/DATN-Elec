@@ -32,7 +32,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { WatchlistItem } from "../../../../../types/cart/profile/wathlist";
 import { HeartIcon, StarIcon } from "../../page-auction/svg";
-import { fetchRelatedProducts } from "../../../../../services/detailProduct/detailProduct.service";
+import { fetchRelatedProducts } from "../../../../../services/detailProduct/relatedProducts";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
 import {

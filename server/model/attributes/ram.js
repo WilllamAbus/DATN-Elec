@@ -8,7 +8,7 @@ const ramSchema = new Schema({
   pid: { type: String, required: true, default: uuidv4 },
   slug: { type: String, unique: true },
 }, {
-  collection: "ram",
+  collection: "rams",
   timestamps: true,
 });
 

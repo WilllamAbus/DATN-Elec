@@ -11,11 +11,15 @@ const colorMap = {
   'Màu Xám': '#808080',
   'Màu Maroon': '#800000',
   'Màu Olive': '#808000',
-  'Màu Xanh Lá': '#008000',
+  'Màu Xanh Lá': '#a5ce8b',
   'Màu Tím': '#800080',
   'Màu Teal': '#008080',
   'Màu Navy': '#000080',
   'Màu Titan tự nhiên': '#bbb4a7',
+  'Màu Titan đen': '#3f4142',
+  'Màu Titan Sa Mạc': '#c4ab96',
+  'Màu Hồng': '#fde3e3',
+  'Màu Xanh Mòng Két': '#aed6d3',
 };
 
 const getColorCode = (name) => {
