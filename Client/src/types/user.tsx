@@ -92,6 +92,8 @@ export interface Role {
 export interface LoginResponse {
   status: number;
   message: string;
+  email: string;
+  googleId: string;
   roles: Role[];
   currentUser: string;
   token?: string;
@@ -99,4 +101,10 @@ export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   redirectTo: string;
+}
+
+export interface LinkAccountData {
+  email: string;
+  password: string;
+  token: string; 
 }

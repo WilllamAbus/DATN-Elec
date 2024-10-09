@@ -5,7 +5,7 @@ import { getAllConditionShoppingThunk } from '../../../../../redux/product/clien
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
 import XIcon from '../svg/deleteicon';
-import { ProductCondition, FilterState } from '../../../../../services/product_v2/client/types/listPageAuction';
+import { ProductCondition, FilterState } from '../../../../../services/clientcate/client/types/getProuctbyCategory';
 interface FilterByConditionShoppingProps {
   onchange?: (conditionShoppings: ProductCondition[]) => void;
   filters: FilterState;

@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
-import { updateQuantityShelf, getListProducts } from "../../../../services/inventory/crudInventory.service";
+import { updateQuantityShelf, getListProducts,getOneInventoryItem } from "../../../../services/inventory/crudInventory.service";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductV2 } from "../../../../types/ProductV2";
+import { ProductVariant } from "../../../../types/ProductV2";
 import { Inventory } from "../../../../types/Inventories";
+
 interface IFormInput {
-    product_id: string;
+    product_variant: string;
     quantity: number;
 
 }
@@ -24,7 +25,7 @@ const AddInventory: React.FC = () => {
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [products, setProducts] = useState<ProductV2[]>([]);
+    const [product_variant, setProducts] = useState<ProductVariant[]>([]);
     const [selectedProductInventory, setSelectedProductInventory] = useState<Inventory | null>(null);
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -42,22 +43,14 @@ const AddInventory: React.FC = () => {
     
         if (productId) {
             try {
-                const response = await fetch(`http://localhost:4000/api/inventory/get-one/${productId}`);
-                if (!response.ok) throw new Error('Failed to fetch inventory data');
-                
-                const responseData = await response.json();
-                // console.log("Fetched Inventory Data:", responseData); // Kiểm tra dữ liệu
-                if (responseData.success && responseData.data) {
-                    setSelectedProductInventory(responseData.data);
-                } else {
-                    setError("Dữ liệu không hợp lệ.");
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy thông tin inventory:", error);
-                setError("Không thể lấy dữ liệu kho hàng.");
+                const inventoryItem = await getOneInventoryItem(productId); 
+                setSelectedProductInventory(inventoryItem); 
+            } catch (error: unknown) {
+                const typedError = error as Error; 
+                setError(typedError.message); 
             }
         } else {
-            setSelectedProductInventory(null);
+            setSelectedProductInventory(null); 
         }
     };
 
@@ -85,7 +78,7 @@ const AddInventory: React.FC = () => {
                 return;
             }
             const payload = {
-                product_id: data.product_id,
+                product_variant: data.product_variant,
                 quantity: data.quantity,
             };
             await updateQuantityShelf(payload);
@@ -123,25 +116,25 @@ const AddInventory: React.FC = () => {
                                     Tên sản phẩm
                                 </label>
                                 <select
-                                    id="product_id"
+                                    id="product_variant"
                                     className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    {...register("product_id", { required: "Sản phẩm không được bỏ trống" })}
+                                    {...register("product_variant", { required: "Sản phẩm không được bỏ trống" })}
                                     onChange={handleProductChange}
                                 >
                                     <option value="">Chọn sản phẩm</option>
-                                    {products.length > 0 ? (
-                                        products.map((product, index) => (
+                                    {product_variant.length > 0 ? (
+                                        product_variant.map((product, index) => (
                                             <option key={product._id || index} value={product._id}>
-                                                {product.product_name}
+                                                {product.variant_name}
                                             </option>
                                         ))
                                     ) : (
                                         <option disabled>Không có sản phẩm nào</option>
                                     )}
                                 </select>
-                                {errors.product_id && (
+                                {errors.product_variant && (
                                     <span className="text-red-500 text-xs italic">
-                                        {errors.product_id.message?.toString()}
+                                        {errors.product_variant.message?.toString()}
                                     </span>
                                 )}
                             </div>

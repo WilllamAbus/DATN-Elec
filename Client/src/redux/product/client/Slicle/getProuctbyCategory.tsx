@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getProductsByCategoryThunk } from "../Thunk";
-import { GetProductsByCategoryResponse, products, ProductBrand, ProductCondition,  Pagination,RAM } from "../../../../services/clientcate/client/types/getProuctbyCategory";
+import { GetProductsByCategoryResponse, products, ProductBrand, ProductCondition, Pagination, RAM, STORAGE } from "../../../../services/clientcate/client/types/getProuctbyCategory";
 
 interface ProductState {
   products: products[];
@@ -10,30 +10,34 @@ interface ProductState {
   isLoading: boolean;
   brand: ProductBrand[];
   ram: RAM[];
+  storage: STORAGE[];
   conditionShopping: ProductCondition[];
-  minPrice: number | null; 
-  maxPrice: number | null; 
+  minPrice: number | null;
+  maxPrice: number | null;
   minDiscountPercent: number | null;
   maxDiscountPercent: number | null;
   total: number | null;
   limit: number | null;
+  category: string;
 }
 
 
 interface FulfilledAction extends PayloadAction<GetProductsByCategoryResponse> {
   meta: {
     arg: {
-      slug: string; 
+      slug: string;
       page: number;
       _sort: string;
       brand?: ProductBrand[];
       ram?: RAM[];
+      storage?: STORAGE[];
       conditionShopping?: ProductCondition[];
-      minPrice?: number; 
+      minPrice?: number;
       maxPrice?: number;
       minDiscountPercent?: number;
       maxDiscountPercent?: number;
       limit?: number;
+      category?: string;
     };
   };
 }
@@ -47,6 +51,7 @@ const initialState: ProductState = {
   isLoading: false,
   brand: [],
   ram: [],
+  storage: [],
   conditionShopping: [],
   minPrice: null,
   maxPrice: null,
@@ -54,6 +59,7 @@ const initialState: ProductState = {
   maxDiscountPercent: null,
   total: null,
   limit: 12,
+  category: "", 
 };
 
 const getProductsByCategorySlice = createSlice({
@@ -75,20 +81,22 @@ const getProductsByCategorySlice = createSlice({
           state.pagination = action.payload.pagination;
           state.brand = action.payload.data.brand || [];
           state.ram = action.payload.data.ram || [];
-          state.conditionShopping = action.payload.data.conditionShopping || [];         
+          state.storage = action.payload.data.storage || [];
+          state.conditionShopping = action.payload.data.conditionShopping || [];
           const { minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, limit } = action.meta.arg || {
             minPrice: null,
             maxPrice: null,
             minDiscountPercent: null,
             maxDiscountPercent: null,
             limit: null,
-          };  
+          };
           state.minPrice = minPrice || null;
           state.maxPrice = maxPrice || null;
           state.minDiscountPercent = minDiscountPercent || null;
-          state.maxDiscountPercent = maxDiscountPercent || null;  
-          state.total = action.payload.data.total || 0;    
-          state.limit = limit || state.pagination?.limit || null;    
+          state.maxDiscountPercent = maxDiscountPercent || null;
+          state.total = action.payload.data.total || 0;
+          state.category = action.payload.data.category || '';
+          state.limit = limit || state.pagination?.limit || null;
         }
       )
       .addCase(getProductsByCategoryThunk.rejected, (state, action) => {

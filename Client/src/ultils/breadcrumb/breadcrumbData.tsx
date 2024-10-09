@@ -1,3 +1,5 @@
+
+
 export const breadcrumbItems = {
   listProducts: [
     { href: "/admin", label: "Home" },
@@ -63,6 +65,10 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addproduct", label: "Thêm sản phẩm" },
+  ],
+  addVariant: [
+    { href: "/", label: "Home" },
+    { href: "/admin/product:id/addVariant", label: "Thêm biến thể sản phẩm" },
   ],
   addSuppliers: [
     { href: "/", label: "Home" },

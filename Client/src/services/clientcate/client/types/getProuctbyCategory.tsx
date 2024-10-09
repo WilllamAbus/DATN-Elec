@@ -151,6 +151,7 @@ export interface products {
   weight_g: number; 
   image: string[];
   status: string; 
+  slug: string;        
 }
 
 export interface Pagination {
@@ -163,16 +164,19 @@ export interface Pagination {
 
 
 export interface GetProductsByCategoryResponse {
+  slug: string; 
   success: boolean;
   err: number;
   msg: string;
   status: number;
   data: {
     total: number;
+    category: string; 
     products: products[];
     brand: ProductBrand[];  
     conditionShopping: ProductCondition[];  
     ram: RAM[];  
+    storage: STORAGE[];    
   };
   pagination: Pagination;
   limit?: number;
@@ -186,11 +190,12 @@ limit?: number;
 brand?: ProductBrand[];
 conditionShopping?: ProductCondition[];
 ram?: RAM[];
+storage?: STORAGE[];
 minPrice?: number;
 maxPrice?: number;
 minDiscountPercent?: number;
 maxDiscountPercent?: number;
-[key: string]: string | number | ProductBrand[] | ProductCondition[] | undefined | string[];
+[key: string]: string | number | ProductBrand[] | ProductCondition[] | RAM[] | STORAGE[] | undefined | string[];
 }
 
 export interface QueryParamAuction {
@@ -200,6 +205,7 @@ page?: number;
 limit?: number | string; 
 brand?: string; 
 ram?: string; 
+storage?: string; 
 conditionShopping?: string; 
 minPrice?: string; 
 maxPrice?: string; 

@@ -9,10 +9,6 @@ export const links: Record<string, Link[]> = {
     { label: "Tài khoản đã khóa", to: "/admin/listDelete" },
   ],
   product: [
-    { label: "Sản phẩm", to: "/admin/listProducts" },
-    { label: "Mã giảm giá", to: "/admin/listVouchers" },
-  ],
-  productv2: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },

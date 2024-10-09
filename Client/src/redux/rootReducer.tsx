@@ -28,15 +28,21 @@ import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
 import confirmReducer from "./confirmOrder/confirmOrderSlice";
 import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
 import orderPagiReducer from "./order/pagiOrder/pagislice";
+import linkAccountReducer from "./linkAccount/Slice/linkAccount";
 const authConfig = {
   key: "auth",
   storage,
   whitelist: ["login"],
 };
-
+const linkAccountConfig = {
+  key: "linkAccount",
+  storage,
+  whitelist: ["linkAccount"], 
+};
 const rootReducer = combineReducers({
   auth: persistReducer(authConfig, authReducer),
   authGoogle: persistReducer(authConfig, authGoogleReducer),
+  linkAccountUser: persistReducer(linkAccountConfig, linkAccountReducer),
   categories: categoriesSlice,
   watchlist: watchlistReducer,
   voucher: voucherReducer,
@@ -60,6 +66,7 @@ const rootReducer = combineReducers({
   orderAuction: orderAuctionReducer,
   confirmOrder: confirmReducer,
   orderPagi: orderPagiReducer,
+
 });
 
 export type AppDispatch = typeof store.dispatch;
