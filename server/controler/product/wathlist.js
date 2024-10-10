@@ -56,6 +56,7 @@ const WathListController = {
         score: 1,
       });
 
+      
       await newInteraction.save();
 
       return res.status(200).json({
