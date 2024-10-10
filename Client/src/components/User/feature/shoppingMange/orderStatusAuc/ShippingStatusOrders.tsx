@@ -19,17 +19,26 @@ const OrderListShippingStatus: React.FC = () => {
     (state: RootState) => state.statusShippingOrder.orderShipping
   );
 
+
+
+// const orderIds = ordersFromStore[0].orderId
+ 
   const navigate = useNavigate();
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
-  const orderId = useSelector(
-    (state: RootState) => state.confirmOrder.confirmOrder?.orderIds
-  );
+  // const orderId = useSelector(
+  //   (state: RootState) => state.orderAuction.orderData?.orderAuctionID
+  // );
+
+  // console.log('orderId', orderId);
+  
   const [showAll, setShowAll] = useState(false);
   const [orders, setOrders] = useState<OrderDataAllShipping[]>([]);
-  console.log('oders', orders);
-  const [, setLocalOrder] = useState(orders);
+
+  // const [, setLocalOrder] = useState(orders);
+
+  
   const toggleShowAll = () => {
     setShowAll(!showAll);
   };
@@ -48,15 +57,15 @@ const OrderListShippingStatus: React.FC = () => {
   const goBack = () => {
     navigate("/auction");
   };
-  const handleSoftDelOrder = () => {
-    if (orderId ) {
-      console.log('orderId', orderId);
+  const handleSoftDelOrder = (orderId: string) => {
+    if (orderId && userId ) {
+
       
       // Assuming orderId is an array and you want to delete multiple orders
-      dispatch(softDelThunk(orderId)).unwrap();
-      console.log("Deleting order with ID:", orderId);
-      setLocalOrder((prevCategories) =>
-        prevCategories.filter((order) => order._id !== orderId)
+      dispatch(softDelThunk({orderId})).unwrap();
+      // dispatch(fetchOrderDataShippingThunk(userId));
+      setOrders((prevCategories) =>
+        prevCategories.filter((order) => order.orderId !== orderId)
       );
       toast.success("Xóa đơn hàng thành công");
     } else {
@@ -79,7 +88,7 @@ const OrderListShippingStatus: React.FC = () => {
                 </p>
                 <p className="font-semibold text-xl text-gray-800 mt-3">
                   Trạng thái:{" "}
-                  <span className="font-normal">{order.stateOrder}</span>
+                  <span className="font-normal ">{order.stateOrder}</span>
                 </p>
                 <p className="font-semibold text-xl text-gray-800 mt-3">
                   Email: <span className="font-normal">{order.email}</span>
@@ -125,7 +134,7 @@ const OrderListShippingStatus: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-4 w-full md:w-auto md:flex-row mt-4 md:mt-0 md:ml-auto justify-center md:justify-end">
                       <button
-                     onClick={() => handleSoftDelOrder()} // Truy cập _id từ đối tượng order
+                     onClick={() => handleSoftDelOrder(order.orderId)} // Truy cập _id từ đối tượng order
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
                       >
                         Hủy đơn hàng

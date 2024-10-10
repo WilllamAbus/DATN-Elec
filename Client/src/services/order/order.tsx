@@ -38,7 +38,7 @@ export const listOrder = async (page = 1, limit = 10) => {
     const response = await instance.get(`${API_URL}/admin/order/listOrder`, {
       params: { page, limit },
     });
-    return response.data; // Đảm bảo rằng API trả về đối tượng có trường orders và totalOrders
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || error.message);
@@ -83,6 +83,23 @@ export const cancelOrder = async (orderId: string) => {
 export const getOrderById = async (orderId: string) => {
   try {
     const response = await instance.get(`${API_URL}/order/${orderId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error fetching order by ID: An unknown error occurred");
+    }
+  }
+};
+export const applyVoucher = async (cartId: string, voucherCode: string) => {
+  try {
+    const response = await instance.post(`${API_URL}/order/apply-voucher`, {
+      cartId,
+      voucherCode,
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

@@ -96,3 +96,6 @@ export interface LimitDeletedListResponse {
   };
   pagination: Pagination;
 }
+export interface ApplyVoucherResponse {
+  newTotalPrice: number;
+}

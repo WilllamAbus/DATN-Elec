@@ -3,6 +3,7 @@ const {homeAllProduct,getID,auction,upView,shopping,search} = require('./home');
 const {getLimitProductClient, relatedProduct} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
+const {getProductDetail} = require('./detail');
 const {
   getAllBrandPageAuction,
   getALLConditionShopping,
@@ -43,5 +44,7 @@ module.exports = {
   getAllBattery,
   getAllOperatingSystem,
   getAllStorage,
-  relatedProduct
+  relatedProduct,
+  getProductDetail
 };
+

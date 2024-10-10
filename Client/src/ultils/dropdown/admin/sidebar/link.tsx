@@ -9,10 +9,6 @@ export const links: Record<string, Link[]> = {
     { label: "Tài khoản đã khóa", to: "/admin/listDelete" },
   ],
   product: [
-    { label: "Sản phẩm", to: "/admin/listProducts" },
-    { label: "Mã giảm giá", to: "/admin/listVouchers" },
-  ],
-  productv2: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },
@@ -32,6 +28,7 @@ export const links: Record<string, Link[]> = {
     { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
     { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
     { label: "Đơn hàng đấu giá", to: "/admin/recBinOrderAuction" },
+    { label: "Tương tác", to: "/admin/recycleBinComment" },
   ],
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],

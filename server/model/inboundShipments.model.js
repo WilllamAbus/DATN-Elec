@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const inboundShipmentSchema = new Schema(
     {
-      product_id: { type: Schema.Types.ObjectId, ref: 'product_v2', required: true }, // Tham chiếu đến sản phẩm
+      product_variant_id: { type: Schema.Types.ObjectId, ref: 'productVariant', required: true },// Tham chiếu đến sản phẩm
       inbound_description: {type: String},
       inbound_quantity: { type: Number, required: true }, // Số lượng hàng nhập khẩu
       inbound_price: {type: Number, require: true},

@@ -1,13 +1,13 @@
 // thunks/orderThunks.ts
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { softDelOrderUser } from '../../../services/statusOrders/statusOrder';
-import {SoftDeleteOrderResponse  } from '../../../types/iterationOrder/softDeleteForUser';
+import {SoftDeleteOrderData  } from '../../../types/iterationOrder/softDeleteForUser';
 
-export const softDelThunk = createAsyncThunk(
+export const softDelThunk = createAsyncThunk<SoftDeleteOrderData , { orderId: string }, { rejectValue: string }>(
     'order/fetchOrderData',
-    async (orderId: string, { rejectWithValue }) => {
+    async ({orderId}, { rejectWithValue }) => {
       try {
-        const response:SoftDeleteOrderResponse  = await softDelOrderUser(orderId);
+        const response  = await softDelOrderUser(orderId);
         return response.data;
       } catch (error: any) {
         // Trả về thông báo lỗi cụ thể với rejectWithValue
@@ -15,3 +15,5 @@ export const softDelThunk = createAsyncThunk(
       }
     }
   );
+
+

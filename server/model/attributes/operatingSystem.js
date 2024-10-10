@@ -21,13 +21,14 @@ osSchema.pre('save', function (next) {
     locale: 'vi',
     customReplacements: { 'Đ': 'd', 'đ': 'd' }
   };
-  this.slug = slugify(`${this.name} ${this.version}`, options);
+  this.slug = slugify(this.name, options); 
   next();
 });
 
+
 osSchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate();
-  if (update.name || update.version) {
+  if (update.name) {
     const options = {
       lower: true,
       replacement: '-',
@@ -35,10 +36,11 @@ osSchema.pre('findOneAndUpdate', function (next) {
       locale: 'vi',
       customReplacements: { 'Đ': 'd', 'đ': 'd' }
     };
-    update.slug = slugify(`${update.name || this._update.name} ${update.version || this._update.version}`, options);
+    update.slug = slugify(update.name, options); 
     this.setUpdate(update);
   }
   next();
 });
+
 
 module.exports = model("OperatingSystem", osSchema);

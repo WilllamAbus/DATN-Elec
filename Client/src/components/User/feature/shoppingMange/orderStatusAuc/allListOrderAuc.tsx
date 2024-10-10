@@ -20,7 +20,7 @@ const OrderListAuc: React.FC = () => {
   // const orderId = useSelector(
   //   (state: RootState) => state.confirmOrder.confirmOrder?.orderIds
   // );
-  console.log('oders', orders);
+
   
 
   
@@ -38,7 +38,7 @@ const OrderListAuc: React.FC = () => {
   // Update local orders state when orders from store change
   useEffect(() => {
     if (ordersFromStore && ordersFromStore.length > 0) {
-      console.log("Orders from Redux Store:", ordersFromStore);
+   
       setOrders(ordersFromStore);
     } else {
       setOrders([]); // Đảm bảo orders được cập nhật lại khi không có dữ liệu

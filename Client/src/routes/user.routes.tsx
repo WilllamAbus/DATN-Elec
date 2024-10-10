@@ -2,6 +2,7 @@ import React from "react";
 import { RouteObject } from "react-router-dom";
 import User from "../page/User/Home/home";
 const UserHome = React.lazy(() => import("../page/User/rootUser"));
+const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
 const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
 const UserRegister = React.lazy(() => import("../page/User/accounts/register"));
 const UserRegisOTP = React.lazy(() => import("../page/User/accounts/regisOTP"));
@@ -39,6 +40,9 @@ const UserAuction = React.lazy(
 const UserdetailsProd = React.lazy(
   () => import("../page/User/shopping/details/detail")
 );
+const UserPageDetail = React.lazy(
+  () => import("../page/User/shopping/detailV2/detail")
+);
 const UserdetailsAuc = React.lazy(
   () => import("../page/User/shopping/auction/auctionDetails")
 );
@@ -75,6 +79,8 @@ const UserCheckoutAuctPages = React.lazy(
 const UserConfirmAucPage = React.lazy(
   () => import("../page/User/shopping/auction/biddings/completAuctions")
 );
+const LinkAccount = React.lazy(() => import("../page/User/accounts/link-account"));
+const LinkAccountSuccess = React.lazy(() => import("../page/User/accounts/link-account-success")); 
 const UserContact = React.lazy(() => import("../page/User/contact/contact"));
 const UserRoutes: RouteObject[] = [
   {
@@ -99,6 +105,7 @@ const UserRoutes: RouteObject[] = [
       { path: "listTing", element: <UserMyList /> },
       { path: "category/:slug", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
+      { path: "product/:slug", element: <UserPageDetail /> },
       { path: "detailProd/:id", element: <UserdetailsProd /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },
@@ -113,6 +120,15 @@ const UserRoutes: RouteObject[] = [
       { path: "checkoutAuc", element: <UserCheckoutAuctPages /> },
       { path: "confimAuc", element: <UserConfirmAucPage /> },
       { path: "contact", element: <UserContact /> },
+    ],
+  },
+  {
+    path: "/",
+    element: <ExternalPage />,
+    children: [
+      { path: "link-account", element: <LinkAccount /> },
+      { path: "link-account-success", element: <LinkAccountSuccess /> }
+
     ],
   },
   {

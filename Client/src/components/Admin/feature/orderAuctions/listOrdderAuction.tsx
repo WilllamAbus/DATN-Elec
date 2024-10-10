@@ -5,18 +5,21 @@ import { getOrders } from "../../../../redux/orderAucAdmin/orderAucAdminThunk";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer , toast} from "react-toastify";
+import Swal, { SweetAlertResult } from "sweetalert2";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import { Order } from "../../../../types/adminOrder/orderAll";
 import SearchFormOrders from "./searchForm/searFormOrder";
-
+import { softDelAdminThunk } from "../../../../redux/orderAucAdmin/softDelAucAdmin/softDelAdminThunk";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 const ListOrderAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
 
 
   const {orders} = useSelector((state: RootState) => state.orderAucAdmin);
-  console.log('orders', orders);
+  const [, setOrders] = useState<Order[]>([]);
   
   const pagination = useSelector((state: RootState) => state.orderAucAdmin.pagination);
   // const loading = useSelector((state: RootState) => state.orderAucAdmin.loading);
@@ -34,6 +37,34 @@ const ListOrderAuction: React.FC = () => {
   const handlePageChange = (page: number) => {
     dispatch(getOrders({ page, search: searchTerm }));
   };
+const handleSoftDelOrder = async (orderId: string) => {
+    MySwal.fire({
+      title: "Hủy đơn hàng?",
+      text: "Bạn có chắc muốn hủy đơn hàng này không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(softDelAdminThunk({orderId})).unwrap();
+          dispatch(getOrders({ page: currentPage, search: searchTerm }));
+          // dispatch(fetchOrderDataShippingThunk(userId));
+          setOrders((prevCategories) =>
+            prevCategories.filter((order) => order._id !== orderId)
+          );
+
+          toast.success("Đơn hàng của bạn đã bị hủy.");
+        } catch (error) {
+          toast.error("Đã xảy ra sự cố khi hủy đơn hàng.");
+        }
+      }
+    });
+  };
+
 
   return (
     <>
@@ -71,9 +102,10 @@ const ListOrderAuction: React.FC = () => {
                       ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
                       : order.stateOrder === "Vận chuyển"
                       ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      : order.stateOrder === " Hoàn tất"
-                      ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
-                     
+                      : order.stateOrder === "Nhận hàng"
+                      ? "bg-orange-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
+                       : order.stateOrder === "Hoàn tất"
+                      ? "bg-green-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
                      
                       : order.stateOrder === "Hủy đơn hàng"
                       ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
@@ -118,7 +150,39 @@ const ListOrderAuction: React.FC = () => {
                       />
                     </svg>
                   )}
-             
+              {order.stateOrder === "Nhận hàng" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      version="1.1"
+                      className="me-1 h-4 w-4"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 29 37.5"
+                    >
+                      <g transform="translate(-270 -380)">
+                        <g xmlns="http://www.w3.org/2000/svg">
+                          <path d="M281.5,382l-11.5,6.64v12l11,6.351l0.5,0.289l0.5-0.289l2.618-1.512c1.152,2.66,3.799,4.521,6.882,4.521    c4.143,0,7.5-3.357,7.5-7.5c0-3.629-2.576-6.654-6-7.35v-6.511L281.5,382z M281.5,383.154l10,5.774l-4.5,2.599l-10-5.774    L281.5,383.154z M281,405.836l-10-5.773v-10.269l10,5.774V405.836z M281.5,394.702l-10-5.773l4.5-2.599l10.001,5.773    L281.5,394.702z M282,405.836v-10.268l10-5.774v5.231c-0.166-0.011-0.331-0.025-0.5-0.025c-4.143,0-7.5,3.357-7.5,7.5    c0,0.7,0.104,1.375,0.283,2.018L282,405.836z M298,402.5c0,3.59-2.91,6.5-6.5,6.5s-6.5-2.91-6.5-6.5s2.91-6.5,6.5-6.5    S298,398.91,298,402.5z" />
+                          <polygon points="287.965,402.146 287.258,402.854 290.086,405.682 295.742,400.025 295.035,399.318 290.086,404.268   " />
+                        </g>
+                      </g>
+                      <text
+                        x="0"
+                        y="45"
+                        fill="#000000"
+                        font-size="5px"
+                        font-weight="bold"
+                        font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif"
+                      ></text>
+                      <text
+                        x="0"
+                        y="50"
+                        fill="#000000"
+                        font-size="5px"
+                        font-weight="bold"
+                        font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif"
+                      ></text>
+                    </svg>
+                  )}
                   {order.stateOrder === "Hoàn tất" && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -153,25 +217,7 @@ const ListOrderAuction: React.FC = () => {
                     </svg>
                   )}
               
-                  {order.stateOrder === "Hủy đơn hàng" && (
-                    <svg
-                      className="me-1 h-3 w-3"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18 17.94 6M18 18 6.06 6"
-                      />
-                    </svg>
-                  )}
+                
                   {order.stateOrder}
                 </span>
                 </td>
@@ -179,23 +225,26 @@ const ListOrderAuction: React.FC = () => {
                   <div className="flex items-center space-x-4">
                   <button
                     className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center ${
-                      order.stateOrder === "Chờ xử lý" ||
-                      order.stateOrder === "Đã xác nhận"
+                      order.stateOrder === "Vận chuyển" 
                         ? "text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                         : "text-gray-500 bg-gray-200 border-gray-500 cursor-not-allowed dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
                     }`}
                     onClick={() => {
-                      if (
-                        order.stateOrder === "Chờ xử lý" ||
-                        order.stateOrder === "Đã xác nhận"
-                      ) {
-                        // handleCancelOrder(order._id!);
+                      if( order.stateOrder === "Vận chuyển"){
+                        handleSoftDelOrder(order._id)
                       }
+                   
+                    
                     }}
                     disabled={
-                      !(
-                        order.stateOrder === "Chờ xử lý" ||
-                        order.stateOrder === "Đã xác nhận"
+                      (
+                        (
+                           
+                          order.stateOrder === "Chờ giao hàng" ||
+                          order.stateOrder === "Nhận hàng" ||
+                          order.stateOrder === "Hoàn tất" 
+                        )
+                       
                       )
                     }
                   >

@@ -183,7 +183,14 @@ const ProfileUse: React.FC = () => {
                 }`}
                 onClick={() => setView("orderAuct")}
               >
-                <i className="fa fa-edit mr-2"></i>
+             <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="inline-block w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M22 7H2V5h20v2zM7 11H5v10h2V11zm4 0H9v10h2V11zm4 0h-2v10h2V11zm4 0h-2v10h2V11z" />
+                </svg>
                 Đơn hàng đấu giá
               </a>
               <a

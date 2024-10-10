@@ -39,6 +39,7 @@ const productV2Schema = new Schema({
   status: { type: String, default: 'active' },
   disabledAt: { type: Date, default: null },
   variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   product_attributes: [{
     k: { type: String, required: true },
     v: { type: Schema.Types.Mixed, required: true },

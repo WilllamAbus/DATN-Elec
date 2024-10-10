@@ -18,7 +18,7 @@ export const fetchDeletedOrderAuc = async ({ page = 1, limit = 5 }: FetchOrdersP
         limit,
       },
     });
-    console.log('response', response);
+    // console.log('response', response);
     
     return response.data;
   } catch (error: any) {

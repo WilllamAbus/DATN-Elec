@@ -2,8 +2,8 @@ import axios from '../axios';
 // import { Order } from '../../types/adminOrder/orderAll';
 import { OrderDetailAdminResponse} from '../../types/adminOrder/orderDetailAdmin';
 
-
-
+// import  { AxiosResponse } from 'axios';
+// import {Order} from '../../types/adminOrder/orderUpdateStatus';
 
 export const getAllOrders = async (page: number, search: string,  ) => {
   try {
@@ -39,3 +39,14 @@ export const fetchOrderDetailAdminData = async (orderId: string): Promise<OrderD
   
   return response.data;
 };
+
+
+
+export const updateOrderStatus = async (orderId: string, stateOrder: string) => {
+  const response = await axios.put(`/client/iteracOder/updateStatus/${orderId}`, { stateOrder });
+  console.log('response', response);
+  
+  return response.data; // Return the order data
+};
+
+

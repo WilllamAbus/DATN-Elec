@@ -87,7 +87,9 @@ const iteractionOrderAuController = {
     },
     softDeleteReceivedOrders : async (req, res) => {
         try {
-            const { orderId } = req.query; // Lấy userId từ URL
+         
+      
+            const { orderId } = req.params; // Lấy userId từ URL
             const result = await iteractionOrderAucService.softDeleteReceivedOrdersByUser(orderId);
     
             res.status(200).json({
@@ -102,10 +104,16 @@ const iteractionOrderAuController = {
 
     updateorderStatus: async(req, res)=>{
       try {
-        const {orderId} = req.query;
+        const { orderId } = req.params; // Get orderId from URL parameters
+        const { stateOrder } = req.body; // Get newStatus from the request body
     
-        const updateOrderStatus = iteractionOrderAucService.updateOrderStatus(orderId)
-        res.status(200).json({success:true , status: 200, data: updateOrderStatus})
+        const updateOrderStatus = iteractionOrderAucService.updateOrderStatus(orderId, stateOrder)
+        console.log('update', updateOrderStatus);
+        
+        res.status(200).json({success:true ,
+           status: 200,
+            data: (await updateOrderStatus).order,
+             msg: (await updateOrderStatus).message})
       } catch (error) {
         res.status(500).json({ error: error.message });
       }

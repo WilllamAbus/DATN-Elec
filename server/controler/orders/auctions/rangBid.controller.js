@@ -63,7 +63,7 @@ const randBinController = {
     try {
       const { productId } = req.params;
 
-      console.log('productId:', productId);
+   
       
       // Truy vấn sản phẩm để lấy các giá trị minBid, midBid, maxBid
       const product = await randBidService.getProductPriceRange(productId);
@@ -85,6 +85,165 @@ const randBinController = {
       res.status(400).json({
         success: false,
         status: 400,
+        message: error.message,
+      });
+    }
+  },
+
+  getProductAuctionAdmin: async (req, res) => {
+    try {
+      const products = await randBidService.getProductAuctionAdmin();
+
+      return res.status(200).json({
+        status: 200,
+        message: 'Lấy danh sách sản phẩm thành công',
+        data: products,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: 'Lỗi server: ' + error.message,
+      });
+    }
+  },
+
+  getAllPriceRange: async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search, parentBucket } = req.query;
+
+      const { priceRanges, totalCount } = await randBidService.getAllPriceRange(
+        parseInt(page),
+        parseInt(limit),
+        search,
+        parentBucket
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách đấu giá thành công",
+        data: {
+          priceRanges,
+          totalCount,
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalCount / parseInt(limit)),
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  editPriceRange: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+      const { bidInput } = req.body;
+
+      const updatedBid = await randBidService.editPriceRange(
+        priceRangeBidId,
+        bidInput
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Chỉnh sửa đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  restorePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await pricRangeBidService.restorePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  restorePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await pricRangeBidService.restorePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  softDeletePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await randBidService.softDeletePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Xóa mềm đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  getDeletedPriceRangeBid: async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search, parentBucket } = req.query;
+
+      const { priceRanges, totalCount } =
+        await pricRangeBidService.getDeletedPriceRangeBid(
+          parseInt(page),
+          parseInt(limit),
+          search,
+          parentBucket
+        );
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách đấu giá đã xóa thành công",
+        data: {
+          priceRanges,
+          totalCount,
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalCount / parseInt(limit)),
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
         message: error.message,
       });
     }

@@ -373,7 +373,7 @@ router.get("/comment/:id", repCommentController.getRepComment);
 
 
 // *timeTrack*/
-router.post('/time-tracks', timeTrackController.create);
+
 router.post('/time-tracks', timeTrackController.updateEndTime);   // POST /time-tracks
 router.get('/time-tracks/:id', timeTrackController.getTimeTrackById); 
 router.get('/producuByTimeTrack/:productId', timeTrackController.getTimeTractByProductDetails); // GET /time-tracks/:id
@@ -381,6 +381,13 @@ router.get('/time-tracks', timeTrackController.getAllTimeTrack);   // GET /time-
 router.put('/time-tracks/:id', timeTrackController.update); // PUT /time-tracks/:id
 // PATCH /time-tracks/:id
 router.delete('/time-tracks/:id', timeTrackController.delete); // DELETE /time-tracks/:id
+router.post('/time-tracks',middlewareController.verifyTokenAdminAuth, timeTrackController.create);
+router.get('/timeTrackAdmin', timeTrackController.getAllTimeTracksAdmin);
+router.put('/edittimeTrackAdmin/:id',middlewareController.verifyTokenAdminAuth, timeTrackController.editTimeTrackAdmin);
+router.patch('/softDel/:id',middlewareController.verifyTokenAdminAuth, timeTrackController.softDelTimeTrack); // GET /edittimeTrackAdmin // GET /edittimeTrackAdmin
+router.patch('/restoreTimAdmin/:id', middlewareController.verifyTokenAdminAuth, timeTrackController.restoreTimeTrackAdmin); // GET /edittimeTrackAdmin // GET /edittimeTrackAdmin
+router.get('/deletedTime', middlewareController.verifyTokenAdminAuth, timeTrackController.deletedTimeTrackAdmin);
+router.get('/getProductBy', timeTrackController.getProductAuctionAdmin);
 /**Time Track */
 
 

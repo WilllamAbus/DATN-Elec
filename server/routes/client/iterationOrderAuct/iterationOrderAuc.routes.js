@@ -10,6 +10,6 @@ router.get('/allOrder', iteractionOrderAuController.getOrderByUser);
 router.get('/shippStateOrderAuc', iteractionOrderAuController.getShippingOrderByUser);
 router.get('/reciveStateOrderAuc', iteractionOrderAuController.getReciveOrderByUser);
 router.get('/completStateOrderAuc', iteractionOrderAuController.getCompleteOrderByUser);
-router.patch('/received/soft-delete',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);
+router.patch('/received/soft-delete/:orderId',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);
 router.put('/updateStatus/:orderId', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatus)
 module.exports = router;

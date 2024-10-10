@@ -3,6 +3,7 @@ import { Box, Chip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FilterState } from '../../../../../services/clientcate/client/types/getProuctbyCategory';
 
+
 interface FilterViewerProps {
   filters: FilterState;
   onChange?: (newFilters: FilterState) => void;
@@ -100,6 +101,23 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
       },
       onToggle: (filters: FilterState): FilterState => filters,
     },
+    {
+      id: 6,
+      type: 'storage',
+      getLabel: (filters: FilterState) => {
+        const storages = filters.storage ?? [];
+        return storages.map(storage => storage.name).join(', ') || 'Storage';
+      },
+      isVisible: (filters: FilterState) => filters.storage && filters.storage.length > 0,
+      isActive: (filters: FilterState) => filters.storage && filters.storage.length > 0,
+      isRemovable: true,
+      onRemove: (filters: FilterState) => {
+        const newFilters = { ...filters };
+        delete newFilters.storage;
+        return newFilters;
+      },
+      onToggle: (filters: FilterState): FilterState => filters,
+    },
   ], [filters]);
 
   const visibleFilters = useMemo(() => {
@@ -124,6 +142,13 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
   const handleRemoveRam = (ramId: string) => {
     const newRams = (filters.ram ?? []).filter(ram => ram._id !== ramId);
     const newFilters = { ...filters, ram: newRams };
+    if (onChange) {
+      onChange(newFilters);
+    }
+  };
+  const handleRemoveStorage = (StorageId: string) => {
+    const newStorages = (filters.storage ?? []).filter(storage => storage._id !== StorageId);
+    const newFilters = { ...filters, storage: newStorages };
     if (onChange) {
       onChange(newFilters);
     }
@@ -196,6 +221,16 @@ const FilterViewer: React.FC<FilterViewerProps> = ({ filters, onChange }) => {
               color='primary'
               size='small'
               onDelete={() => handleRemoveRam(ram._id)}
+              sx={{ margin: theme.spacing(0.5) }}
+            />
+          ))}
+           {filter.type === 'storage' && (filters.storage ?? []).map(storage => (
+            <Chip
+              key={storage._id}
+              label={storage.name}
+              color='primary'
+              size='small'
+              onDelete={() => handleRemoveStorage(storage._id)}
               sx={{ margin: theme.spacing(0.5) }}
             />
           ))}

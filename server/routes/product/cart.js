@@ -18,7 +18,11 @@ router.get(
   middlewareController.verifyToken,
   CartController.getCartById
 );
-
+router.post(
+  "/apply-voucher",
+  middlewareController.verifyToken,
+  CartController.applyVoucherToCart
+);
 router.put("/:id", middlewareController.verifyToken, CartController.updateCart);
 router.put(
   "/isSelect/:id",
