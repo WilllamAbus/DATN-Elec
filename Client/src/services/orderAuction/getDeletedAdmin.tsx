@@ -33,7 +33,7 @@ export const fetchDeletedOrderAuc = async ({ page = 1, limit = 5 }: FetchOrdersP
 
 export const restoreOrder = async (orderId: string): Promise<RestoreOrderResponse> => {
   const response = await axios.patch<RestoreOrderResponse>(`client/orderAuc/restore/${orderId}`);
-  console.log('responseRestore', response);
+
   
   return response.data;
 };

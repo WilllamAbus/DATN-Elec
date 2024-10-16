@@ -110,9 +110,8 @@ const orderAndDetailControler = {
     getOrderDetails : async (req, res) => {
         try {
             const { orderId } =  req.query; // Sử dụng req.body để lấy tham số từ request body
-            if (!orderId) {
-                return res.status(400).json({ error: 'orderId là bắt buộc' });
-            }
+           console.log('getOrderDetails', orderId);
+           
             const orderDetails = await orderService.getOrderDetails(orderId);
             res.status(200).json({ success: true,
                 status: 200,

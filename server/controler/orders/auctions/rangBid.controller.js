@@ -5,52 +5,54 @@ const randBinController = {
     // Lấy productId từ URL params
   
     // Lấy bidInput từ request body
-    const {productId, bidInput } = req.body;
-
+ 
+    
     try {
+      const {productId, bidInput } = req.body;
+   
+      
+      
       // Lấy thông tin sản phẩm và các giá trị đấu giá từ dịch vụ
-      const product = await randBidService.getProductPriceRange(productId);
+      // const product = await randBidService.getProductPriceRange(productId);
+      // console.log('Product: ' + product);
+      
+      // if (!product) {
+      //   return res.status(404).json({
+      //     success: false,
+      //     message: "Sản phẩm không tìm thấy hoặc không phải là đấu giá.",
+      //   });
+      // }
 
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Sản phẩm không tìm thấy hoặc không phải là đấu giá.",
-        });
-      }
+      // // Tính toán minBid, midBid và maxBid
+      // const minBid = product.product_price_unit;
+      // const midBid = minBid + minBid * 0.03; // midBid = minBid + 3%
+      // const maxBid = midBid + midBid * 0.04; // maxBid = midBid + 4%
 
-      // Tính toán minBid, midBid và maxBid
-      const minBid = product.product_price_unit;
-      const midBid = minBid + minBid * 0.03; // midBid = minBid + 3%
-      const maxBid = midBid + midBid * 0.04; // maxBid = midBid + 4%
-
-      // Kiểm tra điều kiện cho bidInput
-      const maxAllowedBidInput = minBid + midBid * 0.1; // bidInput không được vượt quá 10% từ giá minBid
-      if (bidInput > maxAllowedBidInput) {
-        return res.status(400).json({
-          success: false,
-          status: 400,
-          message: `Bid input không được vượt quá 10% từ giá minBid (${maxAllowedBidInput.toFixed(
-            2
-          )})`,
-          erorr: -4,
-        });
-      }
+      // // Kiểm tra điều kiện cho bidInput
+      // const maxAllowedBidInput = minBid + midBid * 0.1; // bidInput không được vượt quá 10% từ giá minBid
+      // if (bidInput > maxAllowedBidInput) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     status: 400,
+      //     message: `Bid input không được vượt quá 10% từ giá minBid (${maxAllowedBidInput.toFixed(
+      //       2
+      //     )})`,
+      //     erorr: -4,
+      //   });
+      // }
 
       // Nếu điều kiện thỏa mãn, gọi hàm tạo đấu giá từ dịch vụ
       const newBid = await randBidService.createPriceRange(productId, bidInput);
-
+   
+      
       // Trả về thông tin đấu giá và các giá trị minBid, midBid, maxBid
       res.status(201).json({
         success: true,
         message: "Đấu giá đã được tạo thành công.",
-        data: {
-          newBid,
-          minBid,
-          midBid,
-          maxBid,
-        },
+        data:  newBid,
       });
     } catch (error) {
+      console.error(error);
       res.status(400).json({
         success: false,
         message: error.message,
@@ -63,7 +65,7 @@ const randBinController = {
     try {
       const { productId } = req.params;
 
-      console.log('productId:', productId);
+   
       
       // Truy vấn sản phẩm để lấy các giá trị minBid, midBid, maxBid
       const product = await randBidService.getProductPriceRange(productId);
@@ -85,6 +87,166 @@ const randBinController = {
       res.status(400).json({
         success: false,
         status: 400,
+        message: error.message,
+      });
+    }
+  },
+
+  getProductAuctionAdmin: async (req, res) => {
+    try {
+      const products = await randBidService.getProductAuctionAdmin();
+
+      return res.status(200).json({
+        status: 200,
+        message: 'Lấy danh sách sản phẩm thành công',
+        data: products,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: 'Lỗi server: ' + error.message,
+      });
+    }
+  },
+
+  getAllPriceRange: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 5;
+      const search = req.query.search || '';
+
+      const { priceRanges, totalPages, currentPage }  = await randBidService.getAllPriceRange(
+        page,
+        pageSize,
+        search,
+      
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách đấu giá thành công",
+        data: {
+          priceRanges,
+          totalPages,
+          currentPage
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  editPriceRange: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+      const { bidInput } = req.body;
+
+      const updatedBid = await randBidService.editPriceRange(
+        priceRangeBidId,
+        bidInput
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Chỉnh sửa đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  restorePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await pricRangeBidService.restorePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  restorePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await pricRangeBidService.restorePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Khôi phục đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  softDeletePriceRangeBid: async (req, res) => {
+    try {
+      const { priceRangeBidId } = req.params;
+
+      const updatedBid = await randBidService.softDeletePriceRangeBid(
+        priceRangeBidId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Xóa mềm đấu giá thành công",
+        data: updatedBid,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  getDeletedPriceRangeBid: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 5;
+      const search = req.query.search || '';
+
+      const { priceRanges, totalPages, currentPage }  = await randBidService.getDeletedPriceRangeBid(
+        page,
+        pageSize,
+        search,
+      
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách đấu giá thành công",
+        data: {
+          priceRanges,
+          totalPages,
+          currentPage
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
         message: error.message,
       });
     }

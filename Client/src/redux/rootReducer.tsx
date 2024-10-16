@@ -36,6 +36,10 @@ import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/recei
 import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice";
 import orderPagiReducer from "./order/pagiOrder/pagislice";
 import linkAccountReducer from "./linkAccount/Slice/linkAccount";
+import adminTimeTrackReducer from "./adminTimeTrack/list/listTimeTrackSlice"
+import adminTimeTrackDeletedReducer from "./adminTimeTrack/deleted/deletedTimeProdSlice"
+import adminListPriceRandReducer from "./adminPriceRand/list/listPriceRandSlice"
+import adminDeletedPriceRandReducer from "./adminPriceRand/deleted/deletedPriceRandSlice"
 const authConfig = {
   key: "auth",
   storage,
@@ -81,6 +85,11 @@ const rootReducer = combineReducers({
   receiveStatusOrder: statusReceiveOrderReducer,
   softDelOrderUser: softDelOrderStatus,
   orderPagi: orderPagiReducer,
+  adminTimeTrack: adminTimeTrackReducer,
+  adminDeletedTimeProd: adminTimeTrackDeletedReducer,
+  adminListPriceRand: adminListPriceRandReducer,
+  adminDeltedPriceRand: adminDeletedPriceRandReducer,
+  // Add other reducers here to combine them with the persisted state.
 });
 
 export type AppDispatch = typeof store.dispatch;

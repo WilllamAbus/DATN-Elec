@@ -42,6 +42,39 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listOrderAuction", label: "Danh sách đon hàng" },
   ],
+
+  listTimeProduct: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listProdAuc", label: "Danh sách sản phẩm đấu giá" },
+  ],
+
+  addProducTime: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addProdAuc", label: "Thêm sản phẩm" },
+  ],
+
+  editProducTime: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editProdAuc", label: "Cập nhật sản phẩm" },
+  ],
+  listPriceRand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listPriceRand", label: "Danh sách khoảng đấu giá" },
+  ],
+  addPriceRand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addPriceRand", label: "Thêm khoảng giá" },
+  ],
+  editPriceRand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editPriceRand", label: "Cập nhật khoảng giá" },
+  ],
   addProducts: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -147,6 +180,18 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/recycleBinVoucher", label: "Danh sách xóa mềm" },
+  ],
+
+  recycleBinTimeProduct: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinProducTime", label: "Danh sách xóa mềm" },
+  ],
+
+  recycleBinPriceRand: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/recycleBinPriceRand", label: "Danh sách xóa mềm" },
   ],
   recycleBinOrder: [
     { href: "/", label: "Home" },

@@ -75,15 +75,7 @@ const AdminListDetailComments = React.lazy(
 );
 
 /**ConditionAuc */
-const AdminConditionAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/addConditionAuction")
-);
-const AdminEditConditionAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/editCodAuc")
-);
-const AdminListCondAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/listCondAuc")
-);
+
 
 /**CustomerService */
 const AdminListCService = React.lazy(
@@ -110,13 +102,25 @@ const AdminDetailsOrder = React.lazy(
 
 /**productionAuc */
 const AdminAddProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/addProdAuc")
+  () => import("../page/Admin/productTime/addProductTime")
 );
 const AdminEditProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/editProdAuc")
+  () => import("../page/Admin/productTime/editProductTime")
 );
 const AdminListProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/listProdAuc")
+  () => import("../page/Admin/productTime/list")
+);
+
+
+/**priceRand */
+const AdminAddPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/addPriceRand")
+);
+const AdminEditPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/editPriceRand")
+);
+const AdminListPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/listPriceRand")
 );
 /***RecycleBin */
 const AdminRecycleBinCate = React.lazy(
@@ -139,6 +143,14 @@ const AdminRecycleBinBrand = React.lazy(
 );
 const AdminRecycleComment = React.lazy(
   () => import("../page/Admin/recycleBinComment/index")
+);
+
+const AdminRecybinProductTime = React.lazy(
+  () => import("../page/Admin/productTime/deletedProductTime")
+);
+
+const AdminRecybinPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/deletedPriceRand")
 );
 
 /**User */
@@ -210,9 +222,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
       { path: "listComments", element: <AdminListComments /> },
       { path: "listDetailComments/:id", element: <AdminListDetailComments /> },
-      { path: "addConditon", element: <AdminConditionAuc /> },
-      { path: "editCondition", element: <AdminEditConditionAuc /> },
-      { path: "listCondition", element: <AdminListCondAuc /> },
+  
       { path: "listCusSer", element: <AdminListCService /> },
       { path: "addVouchers", element: <AdminAddVoucher /> },
       { path: "editVouchers/:id", element: <AdminEditVoucher /> },
@@ -220,8 +230,13 @@ const AdminRoutes: RouteObject[] = [
       { path: "listOrders", element: <AdminListOrder /> },
       { path: "listDetailOrder/:id", element: <AdminDetailsOrder /> },
       { path: "addProdAuc", element: <AdminAddProdAuc /> },
-      { path: "editProdAuc", element: <AdminEditProdAuc /> },
+      { path: "editProdAuc/:id", element: <AdminEditProdAuc /> },
       { path: "listProdAuc", element: <AdminListProdAuc /> },
+
+      { path: "addPriceRand", element: <AdminAddPriceRand /> },
+      { path: "editPriceRand/:id", element: <AdminEditPriceRand /> },
+      { path: "listPriceRand", element: <AdminListPriceRand /> },
+
       { path: "recycleBin", element: <AdminRecycleBin /> },
       { path: "recycleBinCate", element: <AdminRecycleBinCate /> },
       { path: "recycleBinOrder", element: <AdminRecycleBinOrder /> },
@@ -229,6 +244,8 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinSupplier", element: <AdminRecycleBinSupplier /> },
       { path: "recycleBinBrand", element: <AdminRecycleBinBrand /> },
       { path: "recycleBinComment", element: <AdminRecycleComment /> },
+      { path: "recycleBinProducTime", element: <AdminRecybinProductTime /> },
+      { path: "recycleBinPriceRand", element: <AdminRecybinPriceRand /> },
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },
