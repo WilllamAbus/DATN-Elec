@@ -70,10 +70,11 @@ const watchlistSlice = createSlice({
           state.status = "succeeded";
           // Lọc các item dựa trên ID sản phẩm
           state.items = state.items.filter(
-            (item) => item.product._id !== action.payload
+            (item) => item.product && item.product._id !== action.payload
           );
         }
       )
+
       .addCase(
         deleteWatchlistThunk.rejected,
         (state, action: PayloadAction<string | undefined>) => {

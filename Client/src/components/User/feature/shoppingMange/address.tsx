@@ -393,8 +393,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({ address }) => {
               {...field}
               type="text"
               id="houseNumber"
-              className={`form-input mt-1 block w-full ${
-                errors.houseNumber ? "border-red-500" : ""
+              className={`form-input mt-1 block w-full border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.houseNumber ? "border-red-500" : "border-gray-300"
               }`}
               aria-label="Số nhà"
             />
@@ -421,8 +421,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({ address }) => {
             <select
               {...field}
               id="province"
-              className={`form-select mt-1 block w-full ${
-                errors.province ? "border-red-500" : ""
+              className={`form-select mt-1 block w-full border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.province ? "border-red-500" : "border-gray-300"
               }`}
               aria-label="Chọn tỉnh thành"
               onChange={(e) => {
@@ -460,8 +460,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({ address }) => {
             <select
               {...field}
               id="district"
-              className={`form-select mt-1 block w-full ${
-                errors.district ? "border-red-500" : ""
+              className={`form-select mt-1 block w-full border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.district ? "border-red-500" : "border-gray-300"
               }`}
               aria-label="Chọn quận huyện"
               onChange={(e) => {
@@ -499,8 +499,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({ address }) => {
             <select
               {...field}
               id="ward"
-              className={`form-select mt-1 block w-full ${
-                errors.ward ? "border-red-500" : ""
+              className={`form-select mt-1 block w-full border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                errors.ward ? "border-red-500" : "border-gray-300"
               }`}
               aria-label="Chọn phường xã"
             >
@@ -518,26 +518,27 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({ address }) => {
         )}
       </div>
 
-      {/* Submit Button */}
+      {/* Địa chỉ đầy đủ */}
       <div>
-        {" "}
         <label
           htmlFor="fullAddress"
           className="block text-sm font-medium text-gray-700"
         >
           Địa chỉ đầy đủ
         </label>
-        <input
-          type="text"
+        <textarea
+          rows={4}
           id="fullAddress"
           value={fullAddress}
           readOnly
-          className="form-input mt-1 block w-full"
+          className="form-input mt-1 block w-full border rounded-md shadow-sm"
         />
       </div>
+
+      {/* Submit Button */}
       <button
         type="submit"
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2"
       >
         Cập nhật địa chỉ
       </button>

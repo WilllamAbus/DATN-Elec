@@ -597,10 +597,18 @@ const CartPage: React.FC = () => {
 
     if (item) {
       const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
-      if (newQuantity > stock) {
+
+      // Giới hạn số lượng không được vượt quá tồn kho và 99
+      const maxQuantity = Math.min(99, stock);
+      if (newQuantity > maxQuantity) {
+        toast.dismiss();
         toast.error(
-          `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
+          `Số lượng không được vượt quá ${maxQuantity} sản phẩm có sẵn.`
         );
+        setItemQuantities((prevQuantities) => ({
+          ...prevQuantities,
+          [itemId]: item.quantity, // Đặt lại về số lượng mặc định ban đầu
+        }));
         return;
       }
     }
@@ -616,7 +624,7 @@ const CartPage: React.FC = () => {
       ).unwrap();
       setItemQuantities((prevQuantities) => ({
         ...prevQuantities,
-        [itemId]: validQuantity,
+        [itemId]: validQuantity, // Cập nhật khi số lượng hợp lệ
       }));
     } catch (error) {
       console.error("Failed to update quantity:", error);
@@ -624,15 +632,15 @@ const CartPage: React.FC = () => {
     }
   };
 
-  const handleBlur = async (
-    cartId: string,
-    itemId: string,
-    currentQuantity: string
-  ) => {
-    const newQuantity =
-      currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
-    await handleQuantityChange(cartId, itemId, newQuantity);
-  };
+  // const handleBlur = async (
+  //   cartId: string,
+  //   itemId: string,
+  //   currentQuantity: string
+  // ) => {
+  //   const newQuantity =
+  //     currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
+  //   await handleQuantityChange(cartId, itemId, newQuantity);
+  // };
 
   const handleDecreaseQuantity = (
     cartId: string,
@@ -656,7 +664,7 @@ const CartPage: React.FC = () => {
   };
 
   const handleDeleteProduct = async (cartId: string, productId: string) => {
-    setLoading(true); // Bắt đầu loading
+    setLoading(true);
     try {
       await dispatch(deleteCart({ cartId, productId })).unwrap();
       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
@@ -719,7 +727,7 @@ const CartPage: React.FC = () => {
   });
 
   return (
-    <div className="container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
+    <div className="min-h-[calc(71vh-10rem)] container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 p-4 rounded-md">
           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
@@ -832,22 +840,36 @@ const CartPage: React.FC = () => {
                           className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
                           value={
                             itemQuantities[cart.items[0].product._id] ||
-                            cart.items[0].quantity
+                            cart.items[0].quantity // Hiển thị số lượng hiện tại
                           }
                           onChange={(e) => {
                             const newQuantity = Number(e.target.value);
-                            if (!isNaN(newQuantity) && newQuantity >= 1) {
+
+                            // Giới hạn số lượng không vượt quá 99
+                            if (
+                              !isNaN(newQuantity) &&
+                              newQuantity >= 1 &&
+                              newQuantity <= 99
+                            ) {
                               setItemQuantities((prev) => ({
                                 ...prev,
-                                [cart.items[0].product._id]: newQuantity,
+                                [cart.items[0].product._id]: newQuantity, // Cập nhật số lượng tạm thời
+                              }));
+                            } else if (newQuantity > 99) {
+                              toast.dismiss();
+                              toast.error("Số lượng không được vượt quá 99.");
+
+                              setItemQuantities((prev) => ({
+                                ...prev,
+                                [cart.items[0].product._id]: 99, // Đặt lại về 99 nếu vượt quá
                               }));
                             }
                           }}
                           onBlur={(e) =>
-                            handleBlur(
+                            handleQuantityChange(
                               cart._id,
                               cart.items[0].product._id,
-                              e.target.value
+                              Number(e.target.value) // Kiểm tra và cập nhật khi người dùng rời khỏi input
                             )
                           }
                         />

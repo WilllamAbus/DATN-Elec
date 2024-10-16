@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { RootState, useAppDispatch } from "../../../../redux/store";
 import { logoutThunk } from "../../../../redux/auth/authThunk";
-import { getProfileThunk } from "../../../../redux/auth/authThunk"; // Nhập thunk lấy thông tin người dùng
+import { getProfileThunk } from "../../../../redux/auth/authThunk";
 import Cookies from "js-cookie";
+import { Transition } from "@headlessui/react";
 
 const UserMenuDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -15,7 +16,6 @@ const UserMenuDropdown: React.FC = () => {
     setIsOpen((prev) => !prev);
   };
 
-  // Lấy thông tin người dùng và trạng thái xác thực từ Redux store
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.login.isAuthenticated
@@ -24,7 +24,6 @@ const UserMenuDropdown: React.FC = () => {
 
   const isAdmin = profile?.roles?.includes("admin");
 
-  // Kiểm tra xem người dùng có đăng nhập hay không
   const isLoggedIn =
     isAuthenticated && profile !== null && profile !== undefined;
   useEffect(() => {
@@ -64,7 +63,15 @@ const UserMenuDropdown: React.FC = () => {
             />
           </button>
 
-          {isOpen && (
+          <Transition
+            show={isOpen}
+            enter="transition ease-out duration-300"
+            enterFrom="opacity-0 translate-y-[-10%]"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-[-10%]"
+          >
             <div
               className="absolute right-0 mt-2 z-50 w-56 text-base bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
               id="userMenuDropdown"
@@ -101,7 +108,7 @@ const UserMenuDropdown: React.FC = () => {
                 </li>
               </ul>
             </div>
-          )}
+          </Transition>
         </>
       ) : (
         <div>

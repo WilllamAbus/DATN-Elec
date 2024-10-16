@@ -23,7 +23,7 @@ router.patch(
 router.patch("/restore/:id", restore);
 router.get("/deleted", deletedList);
 router.get("/list", list);
-router.get("/listRole", listRole);
+router.get("/listRole", middlewareController.verifyTokenAdminAuth, listRole);
 router.get("/get-one/:id", getOne);
 router.put(
   "/edit/:id",

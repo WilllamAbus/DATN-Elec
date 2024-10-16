@@ -70,7 +70,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
           <input
             type="password"
             id="currentPassword"
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             {...register("currentPassword", {
               required: "Mật khẩu hiện tại là bắt buộc",
             })}
@@ -91,7 +91,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
           <input
             type="password"
             id="newPassword"
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             {...register("newPassword", {
               required: "Mật khẩu mới là bắt buộc",
               validate: (value) =>
@@ -115,7 +115,7 @@ const UpdatePassword: React.FC<UpdatePasswordProps> = ({}) => {
           <input
             type="password"
             id="confirmNewPassword"
-            className="form-input mt-1 block w-full"
+            className="form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             {...register("confirmNewPassword", {
               required: "Xác nhận mật khẩu mới là bắt buộc",
               validate: (value) =>

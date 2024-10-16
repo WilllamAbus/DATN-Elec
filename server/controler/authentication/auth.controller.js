@@ -385,6 +385,16 @@ const authController = {
       const { name, address, phone, gender, birthday, addressID } = req.body;
       const avatar = req.file ? req.file : undefined;
       let avatarURL;
+
+      const currentUser = await User.findById(id);
+
+      if (!currentUser) {
+        return res.status(404).json({ message: "Người dùng không tìm thấy" });
+      }
+
+      const updatedAddress = address || currentUser.address;
+      const updatedAddressID = addressID || currentUser.addressID;
+
       if (avatar) {
         const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
         const file = bucket.file(`avatars/${filename}`);
@@ -403,15 +413,17 @@ const authController = {
 
             const updatedUser = await User.findByIdAndUpdate(
               id,
-              { name, address, phone, birthday, gender, avatar: avatarURL },
+              {
+                name: name || currentUser.name,
+                address: updatedAddress,
+                phone: phone || currentUser.phone,
+                birthday: birthday || currentUser.birthday,
+                gender: gender || currentUser.gender,
+                avatar: avatarURL,
+                addressID: updatedAddressID,
+              },
               { new: true }
             );
-
-            if (!updatedUser) {
-              return res
-                .status(404)
-                .json({ message: "Người dùng không tìm thấy" });
-            }
 
             return res
               .status(200)
@@ -428,13 +440,17 @@ const authController = {
       } else {
         const updatedUser = await User.findByIdAndUpdate(
           id,
-          { name, address, phone, gender, birthday, addressID },
+          {
+            name: name || currentUser.name,
+            address: updatedAddress,
+            phone: phone || currentUser.phone,
+            birthday: birthday || currentUser.birthday,
+            gender: gender || currentUser.gender,
+            addressID: updatedAddressID,
+          },
           { new: true }
         );
 
-        if (!updatedUser) {
-          return res.status(404).json({ message: "Người dùng không tìm thấy" });
-        }
         return res
           .status(200)
           .json({ message: "Cập Nhật Thành Công", user: updatedUser });

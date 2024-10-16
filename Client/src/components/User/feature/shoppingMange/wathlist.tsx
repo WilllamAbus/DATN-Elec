@@ -41,7 +41,11 @@ const Watchlist: React.FC<WatchlistProps> = () => {
   const handleDeleteFromWatchlist = async (productId: string) => {
     try {
       await dispatch(deleteWatchlistThunk(productId)).unwrap();
-      setWatchlist(watchlist.filter((item) => item.product._id !== productId));
+      setWatchlist(
+        watchlist.filter(
+          (item) => item.product && item.product._id !== productId
+        )
+      );
       toast.success("Sản phẩm đã bị xóa khỏi danh sách yêu thích.");
     } catch (error) {
       console.error("Error deleting item from watchlist:", error);
@@ -77,8 +81,7 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                     {product.product_name}
                   </p>
                   <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                    {product.product_attributes[0].k} -{" "}
-                    {product.product_attributes[0].v}
+                    {product.product_ratingAvg}
                   </p>
                 </div>
                 <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">

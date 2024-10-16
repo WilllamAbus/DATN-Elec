@@ -35,7 +35,7 @@ export interface UserProfile {
   accessToken: string;
   email: string;
   VerifiedEmail: string;
-  status: number | null;
+  status: string | null;
   message: string | null;
   refreshToken: string;
   roles: string[];
@@ -47,7 +47,6 @@ export interface UserProfile {
   addressID: string;
   createdAt: string;
   updatedAt?: string;
-
   currentUser: string;
   redirectTo: string;
 }
@@ -55,7 +54,9 @@ export interface ErrorResponse {
   status: number;
   message: string;
 }
-
+export interface SoftDeleteResponse {
+  message: string;
+}
 export interface ForgotState {
   status: number | null;
   message: string | null;
@@ -70,7 +71,7 @@ export interface ResetPassState {
 export interface UpdateUser {
   _id: string;
   name: string;
-  roles: string[];
+  roles: Role[];
   birthday: string;
   gender: string;
   phone: string;
@@ -106,5 +107,5 @@ export interface LoginResponse {
 export interface LinkAccountData {
   email: string;
   password: string;
-  token: string; 
+  token: string;
 }

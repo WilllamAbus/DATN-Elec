@@ -24,36 +24,21 @@ import {
 } from "../../services/authentication/authAdmin";
 import { Role, UserProfile } from "../../types/user";
 
-// export const loginUserThunk = createAsyncThunk<
-//   UserProfile,
-//   { email: string; password: string }
-// >("auth/login", async (user, { rejectWithValue }) => {
-//   try {
-//     const response = await loginUserService(user);
-//     console.log("API :", response);
-//     return response as UserProfile;
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       return rejectWithValue(error.message);
-//     }
-//     return rejectWithValue("An unknown error occurred");
-//   }
-// });
 export const loginUserThunk = createAsyncThunk<
   UserProfile,
   { email: string; password: string },
-  { rejectValue: string } // Cấu hình rejectValue để trả về dạng string
+  { rejectValue: string }
 >("auth/login", async (user, { rejectWithValue }) => {
   try {
     const response = await loginUserService(user);
     console.log("API Response:", response);
-    return response as UserProfile; // Trả về UserProfile nếu đăng nhập thành công
+    return response as UserProfile;
   } catch (error: any) {
     // Xử lý lỗi từ API
     if (error.response?.data?.message) {
-      return rejectWithValue(error.response.data.message); // Trả về message từ server nếu có
+      return rejectWithValue(error.response.data.message);
     }
-    return rejectWithValue(error.message || "Đã xảy ra lỗi khi đăng nhập."); // Trả về lỗi chung nếu không có thông tin chi tiết
+    return rejectWithValue(error.message || "Đã xảy ra lỗi khi đăng nhập.");
   }
 });
 
@@ -69,7 +54,7 @@ export const getProfileThunk = createAsyncThunk<
     return rejectWithValue((error as Error).message);
   }
 });
-// Thunk cho việc lấy danh sách người dùng
+
 export const getListThunk = createAsyncThunk<
   any[],
   void,
@@ -237,14 +222,30 @@ export const softDeleteUserThunk = createAsyncThunk(
   "auth/softDeleteUser",
   async (userId: string, { rejectWithValue }) => {
     try {
-      await softDeleteUser(userId);
-      return userId;
+      const response = await softDeleteUser(userId);
+      return response;
     } catch (error) {
-      return rejectWithValue((error as Error).message);
+      const errorMessage =
+        (error as any).response?.data?.message ||
+        "Đã xảy ra lỗi. Vui lòng thử lại.";
+      return rejectWithValue(errorMessage);
     }
   }
 );
-
+export const restoreUserThunk = createAsyncThunk(
+  "auth/restoreUser",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const response = await restore(userId);
+      return response;
+    } catch (error) {
+      const errorMessage =
+        (error as any).response?.data?.message ||
+        "Đã xảy ra lỗi. Vui lòng thử lại.";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 // Thunk để lấy danh sách người dùng đã bị xóa mềm
 export const getDeletedListThunk = createAsyncThunk(
   "auth/getDeletedList",
@@ -260,26 +261,12 @@ export const getDeletedListThunk = createAsyncThunk(
 );
 
 //Lấy danh sách tk là active
-// Thunk để lấy danh sách người dùng đã bị xóa mềm
+
 export const getActiveListThunk = createAsyncThunk(
   "auth/getActiveList",
   async (_, { rejectWithValue }) => {
     try {
-      const result = await listActive(); // Giả sử listActive là hàm gọi API
-      console.log(result);
-      return result; // Giả sử kết quả trả về có cấu trúc { data: User[] }
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);
-
-//Thunk list role
-export const getlistRoleThunk = createAsyncThunk<Role[]>(
-  "auth/getlistRole",
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await listRole();
+      const result = await listActive();
       console.log(result);
       return result;
     } catch (error) {
@@ -287,27 +274,19 @@ export const getlistRoleThunk = createAsyncThunk<Role[]>(
     }
   }
 );
-// Thunk để khôi phục người dùng
-// export const restoreUserThunk = createAsyncThunk(
-//   "auth/restoreUser",
-//   async (userId: string, { rejectWithValue }) => {
-//     try {
-//       const result = await restore(userId);
-//       return result.data;
-//     } catch (error) {
-//       return rejectWithValue((error as Error).message);
-//     }
-//   }
-// );
 
-export const restoreUserThunk = createAsyncThunk(
-  "auth/restoreUser",
-  async (userId: string, { rejectWithValue }) => {
+//Thunk list role
+export const getlistRoleThunk = createAsyncThunk<Role[], void>(
+  "auth/getlistRole",
+  async (_, { rejectWithValue }) => {
     try {
-      await restore(userId);
-      return userId;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
+      const result = await listRole();
+      console.log(result);
+      return result;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Lỗi khi lấy danh sách role.";
+      return rejectWithValue(errorMessage);
     }
   }
 );
