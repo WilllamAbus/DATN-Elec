@@ -4,12 +4,19 @@ const Product_v2 = require("../../../model/product_v2");
 const pricRangeBidService = {
   createPriceRange: async (productId, bidInput) => {
     try {
+      const existingpricRangeBid = await PriceRangeBid.findOne({"product_randBib.productId": productId });
+ 
+      
+      if (existingpricRangeBid) {
+        throw new Error("Khoảng định giá cho sản phẩm này đã tồn tại.");
+      }
       // Truy vấn sản phẩm từ cơ sở dữ liệu
       const product = await Product_v2.findOne({
         _id: productId,
         status: { $ne: "disable" },
       }).populate("product_format");
-
+  
+      
       if (!product) {
         throw new Error("Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.");
       }
@@ -57,7 +64,9 @@ const pricRangeBidService = {
         _id: productId,
         status: { $ne: "disable" },
       }).populate("product_format", 'formats');
-  
+      
+    
+      
       if (!product) {
         throw new Error("Product not found or is disabled.");
       }
@@ -69,13 +78,17 @@ const pricRangeBidService = {
       if (format !== "Đấu giá") {
         return null; // Không phải sản phẩm đấu giá
       }
-  
+
+      const produtct = product._id
+ 
       // Bước 2: Lấy danh sách các tài liệu từ mô hình priceRangeBid
       const priceRanges = await PriceRangeBid.find({
-        "product_randBib.productId": productId,
+        "product_randBib.productId": produtct,
         status: { $ne: "disable" } // Lọc những tài liệu không bị vô hiệu hóa
       });
-  
+    
+      
+      
       if (!priceRanges || priceRanges.length === 0) {
         return [];
       }
@@ -110,6 +123,7 @@ const pricRangeBidService = {
       }).map(product => {
         return {
           _id: product._id,
+          product_price_unit: product.product_price_unit,
           product_name: product.product_name,
           image: product.image
         };
@@ -122,22 +136,25 @@ const pricRangeBidService = {
     }
   },
 
-  getAllPriceRange: async (page = 1, pageSize = 5, search = "") => {
+  getAllPriceRange: async (page = 1, pageSize = 5, search ) => {
     try {
-      const skip = (page - 1) * pageSize;
+      // const skip = (page - 1) * pageSize;
       const priceRange = await PriceRangeBid.find({ status: "active" })
       .select("product_randBib minBid midBid maxBid bidInput")
       .populate("product_randBib" , "productId", "product_price_unit", "product_name") // Chỉ lấy các trường cần thiết từ TimeTrack
       .lean();
-
+    
       const productIds = priceRange.map((priceRange) => priceRange.product_randBib.productId);
-
+  
+      
       const products = await Product_v2.find({
         _id: { $in: productIds },
       })
         .select("image product_format")
         .populate("product_format", "formats") // Populate product_format
         .lean();
+
+      
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
       const filteredProducts = products.filter(
@@ -151,7 +168,7 @@ const pricRangeBidService = {
       });
 
       const matchedPriceRandge = priceRange.map(priceRange => {
-        const productIdStr = priceRange.productId.toString(); // Chuyển ObjectId thành chuỗi
+        const productIdStr = priceRange.product_randBib?.productId?.toString(); // Chuyển ObjectId thành chuỗi
         const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
 
         // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
@@ -163,14 +180,24 @@ const pricRangeBidService = {
         }
         return null; // Trả về null nếu không tìm thấy sản phẩm
       }).filter(track => track !== null); // Lọc các phần tử null
-
+  
+      
       const allPriceRand = matchedPriceRandge.map(track => ({
         priceRandId: track._id,
        
-      
+     
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
       
       }));
+
+    
+      
+      const searchResults = search
+      ? matchedPriceRandge.filter((priceRange) => {
+          const productName = priceRange.product.product_name.toLowerCase();
+          return productName.includes(search.toLowerCase());
+        })
+      : matchedPriceRandge;
       const totalItems = searchResults.length; // Tổng số mục sau khi lọc
       const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
       const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
@@ -180,7 +207,7 @@ const pricRangeBidService = {
       const totalPages = totalBuckets;
 
       return {
-        timeTracks: paginatedResults,
+        priceRanges: paginatedResults,
         totalPages: totalPages,
         currentPage: bucket,
         allPriceRand, // Trả về danh sách hình ảnh
@@ -276,76 +303,80 @@ const pricRangeBidService = {
     }
   },
   getDeletedPriceRangeBid: async (
-    page = 1,
-    limit = 10,
-    search = "",
-    parentBucket
+    page = 1, pageSize = 5, search
   ) => {
     try {
-      const skip = (page - 1) * limit;
+  
+      const priceRange = await PriceRangeBid.find({ status: "disable" })
+      .select("product_randBib minBid midBid maxBid bidInput")
+      .populate("product_randBib" , "productId", "product_price_unit", "product_name") // Chỉ lấy các trường cần thiết từ TimeTrack
+      .lean();
 
-      // Tạo query tìm kiếm
-      const query = {
-        status: "disable", // Lọc theo status là 'disable'
-        "product_randBib.product_format": "Đấu giá", // Lọc theo product_format là 'Đấu giá'
-      };
+      const productIds = priceRange.map((priceRange) => priceRange.product_randBib.productId);
 
-      // Thêm điều kiện tìm kiếm theo tên sản phẩm nếu có
-      if (search) {
-        query["product_randBib.product_name"] = {
-          $regex: search,
-          $options: "i",
-        };
-      }
+      const products = await Product_v2.find({
+        _id: { $in: productIds },
+      })
+        .select("image product_format")
+        .populate("product_format", "formats") // Populate product_format
+        .lean();
 
-      // Thêm điều kiện lọc theo parentBucket nếu có
-      if (parentBucket) {
-        query["product_randBib.productId"] = {
-          $in: await Product_v2.find({ parentBucket }).distinct("_id"),
-        };
-      }
+      // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
+      const filteredProducts = products.filter(
+        (product) => product.product_format.formats === "Đấu giá"
+      );
 
-      // Thực hiện truy vấn với phân trang
-      const priceRanges = await PriceRangeBid.aggregate([
-        { $match: query },
-        {
-          $lookup: {
-            from: "product_v2s", // Tên collection của Product_v2
-            localField: "product_randBib.productId",
-            foreignField: "_id",
-            as: "product",
-          },
-        },
-        { $unwind: "$product" }, // Unwind để truy cập các trường của product
-        {
-          $project: {
-            _id: 1,
-            productId: "$product_randBib.productId",
-            productName: "$product_randBib.product_name",
-            minBid: 1,
-            midBid: 1,
-            maxBid: 1,
-            bidInput: 1,
-            status: 1,
-            createdAt: 1,
-            parentBucket: "$product.parentBucket", // Thêm trường parentBucket vào kết quả
-          },
-        },
-        { $skip: skip },
-        { $limit: limit },
-      ]);
+      // Bước 4: Tạo map productId -> product để dễ dàng truy cập
+      const productMap = {};
+      filteredProducts.forEach((product) => {
+        productMap[product._id] = product;
+      });
 
-      // Đếm tổng số lượng kết quả
-      const totalCount = await PriceRangeBid.countDocuments(query);
+      const matchedPriceRandge = priceRange.map(priceRange => {
+        const productIdStr = priceRange.productId.toString(); // Chuyển ObjectId thành chuỗi
+        const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
+
+        // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+        if (product) {
+          return {
+            ...priceRange, // Thêm thông tin timeTrack
+            product // Thêm thông tin sản phẩm
+          };
+        }
+        return null; // Trả về null nếu không tìm thấy sản phẩm
+      }).filter(track => track !== null); // Lọc các phần tử null
+
+      const allPriceRand = matchedPriceRandge.map(track => ({
+        priceRandId: track._id,
+       
+      
+        image: track.product.image, // Lấy hình ảnh từ sản phẩm
+      
+      }));
+
+      const searchResults = search
+      ? matchedPriceRandge.filter((priceRange) => {
+          const productName = priceRange.product.product_name.toLowerCase();
+          return productName.includes(search.toLowerCase());
+        })
+      : matchedPriceRandge;
+      const totalItems = searchResults.length; // Tổng số mục sau khi lọc
+      const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
+      const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
+      const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
+  
+      // Bước 8: Tính toán tổng số trang
+      const totalPages = totalBuckets;
 
       return {
-        priceRanges,
-        totalCount,
+        priceRanges: paginatedResults,
+        totalPages: totalPages,
+        currentPage: bucket,
+        allPriceRand, // Trả về danh sách hình ảnh
       };
+
     } catch (error) {
-      throw new Error(
-        `Có lỗi xảy ra khi lấy danh sách đấu giá đã xóa: ${error.message}`
-      );
+      throw new Error(`Có lỗi xảy ra khi lấy danh sách đấu giá: ${error.message}`);
     }
   }
 };

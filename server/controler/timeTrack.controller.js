@@ -67,11 +67,14 @@ const timeTrackController = {
 
   getTimeTrackById: async (req, res) => {
     try {
-      const timeTrack = await TimeTrackService.getTimeTrackById(req.params.id);
+      const id = req.params.id
+      const timeTrack = await TimeTrackService.getTimeTrackById(id);
       if (!timeTrack) {
         return res.status(404).json({ message: 'TimeTrack not found' });
       }
-      res.status(200).json(timeTrack);
+      res.status(200).json({
+        uccess: true, status: 200, data: timeTrack 
+      });
     } catch (error) {
       res.status(500).json({ message: 'Error retrieving TimeTrack', error });
     }
@@ -159,7 +162,7 @@ const timeTrackController = {
       const id = req.params.id; // Lấy id từ params
       const data = req.body; // Lấy dữ liệu cần cập nhật từ body
 
-      const updatedTimeTrack = await TimeTrackService.editTimeTrack(id, data);
+      const updatedTimeTrack = await TimeTrackService.editTimeTrackAdmin(id, data);
 
       return res.status(200).json({
         status: 200,

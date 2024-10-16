@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 const inventorySchema = Schema(
   {
     product_variant: { type: Schema.Types.ObjectId, ref: 'productVariant', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'product_v2' }, // id của sản phẩm
     quantityShelf: {type:Number}, // totalQuantity - quantityStock  số lượng này sẽ là số lượng đưa qua product
     quantityStock: {type:Number},
     totalQuantity : {type: Number, required: true}, // số lượng từ inbound

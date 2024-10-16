@@ -5,7 +5,7 @@ const orderDetailAuctionSchema = new Schema(
   
     order: { type: Schema.Types.ObjectId, ref: "orderAuctions"},
     auction: { type: Schema.Types.ObjectId, ref: "auctions" },
-    productID: { type: Schema.Types.ObjectId, ref: 'inventory', required: true },
+    productID: { type: Schema.Types.ObjectId, ref: 'product_v2', required: true },
     nameProduct:{type:String},
     quantityDetails:{ type: Number,  require:true },
     totalAmount: { type: Number, required: true }, 

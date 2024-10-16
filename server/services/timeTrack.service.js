@@ -15,6 +15,11 @@ const timeTrackService = {
    */
   createTimeTrack: async (productId, data) => {
     try {
+      const existingTimeTrack = await Time_Track.findOne({ productId });
+
+    if (existingTimeTrack) {
+      throw new Error("Time track cho sản phẩm này đã tồn tại.");
+    }
       // Tìm sản phẩm và chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
       const product = await Product_v2.findOne({
         _id: productId,
@@ -183,28 +188,40 @@ const timeTrackService = {
   getTimeTrackById: async (id) => {
     try {
       const timeTrack = await Time_Track.findById(id);
+  
+      
       if (!timeTrack) return null;
-
-      // Chuyển đổi thời gian từ UTC sang giờ Việt Nam
+      
+      // Step 2: Convert times from UTC to Vietnam time
       const startTime = moment(timeTrack.startTime)
         .tz("Asia/Ho_Chi_Minh")
         .format("DD/MM/YYYY HH:mm:ss");
       const endTime = moment(timeTrack.endTime)
         .tz("Asia/Ho_Chi_Minh")
         .format("DD/MM/YYYY HH:mm:ss");
-
-      // Xác định trạng thái của bản ghi
-      const status = moment(timeTrack.endTime, "DD/MM/YYYY HH:mm:ss").isBefore(
-        moment()
-      )
+  
+      // Step 3: Determine the status
+      const status = moment(timeTrack.endTime, "DD/MM/YYYY HH:mm:ss").isBefore(moment())
         ? "expired"
         : "active";
-
-      // Trả về đối tượng với dữ liệu đã được định dạng
+  
+      // Step 4: Extract productId from TimeTrack
+      const productId = timeTrack.productId; // Adjust according to your Time_Track schema
+ 
+      
+      // Step 5: Fetch product details from product_v2 using productId
+      const product = await Product_v2.findById(productId);
+      if (!product) return null;
+  
+      // Step 6: Return combined data
       return {
         _id: timeTrack._id,
+        product_id: product._id,
+          name: product.product_name,
+          price: product.product_price_unit,
         startTime,
         endTime,
+        endTimeBid: timeTrack.endTimeBid, // Assuming you have this field in your Time_Track schema
         status,
       };
     } catch (error) {
@@ -328,7 +345,7 @@ const timeTrackService = {
 
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "active" })
-        .select("_id startTime endTime stateTime productId") // Chỉ lấy các trường cần thiết từ TimeTrack
+        .select("_id startTime endTime endTimeBid stateTime productId") // Chỉ lấy các trường cần thiết từ TimeTrack
         .lean();
 
       // Bước 2: Lấy danh sách productId từ timeTracks
@@ -369,7 +386,7 @@ const timeTrackService = {
       }).filter(track => track !== null); // Lọc các phần tử null
 
       // In ra kết quả
-      console.log('Matched Time Tracks with Products:', matchedTimeTracks);
+  
 
       // Lấy danh sách hình ảnh từ matchedTimeTracks
       const allTimeTrack = matchedTimeTracks.map(track => ({
@@ -414,62 +431,52 @@ const timeTrackService = {
 
   editTimeTrackAdmin: async (id, data) => {
     try {
-      const { startTime, endTime, endTimeBid } = data;
-
+      const { endTime, endTimeBid } = data;
+  
       // Kiểm tra xem TimeTrack có tồn tại không
       const timeTrack = await Time_Track.findById(id);
       if (!timeTrack) {
         throw new Error("TimeTrack không tồn tại");
       }
-
-      // Validate startTime, endTime, endTimeBid (nếu có)
+  
+      // Lấy thời gian hiện tại
       const now = moment.tz("Asia/Ho_Chi_Minh");
+  
+      // Validate endTime, endTimeBid (nếu có)
       const maxAllowedEndTime = now.clone().add(30, "days");
-
-      if (startTime && moment.tz(startTime, "Asia/Ho_Chi_Minh").isAfter(now)) {
-        throw new Error("startTime không được lớn hơn thời gian hiện tại");
+  
+      if (endTime && moment.tz(endTime, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)) {
+        throw new Error("endTime không được vượt quá 30 ngày so với thời gian hiện tại");
       }
-
-      if (
-        endTime &&
-        moment.tz(endTime, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)
-      ) {
-        throw new Error(
-          "endTime không được vượt quá 30 ngày so với thời gian hiện tại"
-        );
+  
+      if (endTimeBid && moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)) {
+        throw new Error("endTimeBid không được vượt quá 30 ngày so với thời gian hiện tại");
       }
-
-      if (
-        endTimeBid &&
-        moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)
-      ) {
-        throw new Error(
-          "endTimeBid không được vượt quá 30 ngày so với thời gian hiện tại"
-        );
+  
+      // Tạo đối tượng dữ liệu cập nhật
+      const updateData = {
+        startTime: now.toDate(), // Gán startTime với thời gian hiện tại
+        ...(endTime && { endTime: moment.tz(endTime, "Asia/Ho_Chi_Minh").toDate() }),
+        ...(endTimeBid && { endTimeBid: moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").toDate() }),
+      };
+  
+      // Cập nhật TimeTrack với findByIdAndUpdate
+      const updatedTimeTrack = await Time_Track.findByIdAndUpdate(id, updateData, {
+        new: true, // Trả về tài liệu đã được cập nhật
+        runValidators: true, // Kiểm tra các bộ quy tắc xác thực
+      });
+  
+      if (!updatedTimeTrack) {
+        throw new Error("Không thể cập nhật TimeTrack");
       }
-
-      // Cập nhật TimeTrack
-      if (startTime) {
-        timeTrack.startTime = moment.tz(startTime, "Asia/Ho_Chi_Minh").toDate();
-      }
-      if (endTime) {
-        timeTrack.endTime = moment.tz(endTime, "Asia/Ho_Chi_Minh").toDate();
-      }
-      if (endTimeBid) {
-        timeTrack.endTimeBid = moment
-          .tz(endTimeBid, "Asia/Ho_Chi_Minh")
-          .toDate();
-      }
-
-      // Lưu thay đổi
-      await timeTrack.save();
-
-      return timeTrack;
+  
+      return updatedTimeTrack;
     } catch (error) {
       console.error("Error in editTimeTrack service:", error);
       throw new Error(`Error updating TimeTrack: ${error.message}`);
     }
   },
+  
 
   softDelTimeTrack: async (id) => {
     try {
@@ -629,6 +636,7 @@ const timeTrackService = {
         .map((product) => {
           return {
             _id: product._id,
+            product_price_unit: product.product_price_unit,
             product_name: product.product_name,
             image: product.image,
           };
