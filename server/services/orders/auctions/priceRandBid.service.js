@@ -249,7 +249,7 @@ const pricRangeBidService = {
       throw new Error(`Có lỗi xảy ra khi chỉnh sửa đấu giá: ${error.message}`);
     }
   },
-  softDeletePriceRangeBid: async (priceRangeBidId) => {
+  softDeletePriceRangeBid: async (id) => {
     try {
       const nowUtc = new Date();
     
@@ -259,7 +259,7 @@ const pricRangeBidService = {
       const now = new Date(nowUtc.getTime() + offset);
       // Tìm kiếm và cập nhật bản ghi priceRangeBid theo ID
       const updatedBid = await PriceRangeBid.findByIdAndUpdate(
-        priceRangeBidId,
+        id,
         { status: "disable" , disabledAt: now, },
         { new: true } // Trả về bản ghi đã được cập nhật
       );
@@ -269,9 +269,7 @@ const pricRangeBidService = {
       }
 
       // Kiểm tra trạng thái trước khi cập nhật
-      if (updatedBid.status === "disable") {
-        throw new Error("Bản ghi đã bị vô hiệu hóa.");
-      }
+   
 
       return updatedBid;
     } catch (error) {
@@ -279,11 +277,11 @@ const pricRangeBidService = {
     }
   },
 
-  restorePriceRangeBid: async (priceRangeBidId) => {
+  restorePriceRangeBid: async (id) => {
     try {
       // Tìm kiếm và cập nhật bản ghi priceRangeBid theo ID
       const updatedBid = await PriceRangeBid.findByIdAndUpdate(
-        priceRangeBidId,
+        id,
         { status: "active" },
         { new: true }
       );
@@ -293,9 +291,7 @@ const pricRangeBidService = {
       }
 
       // Kiểm tra trạng thái trước khi cập nhật
-      if (updatedBid.status === "active") {
-        throw new Error("Bản ghi đã được kích hoạt.");
-      }
+    
 
       return updatedBid;
     } catch (error) {

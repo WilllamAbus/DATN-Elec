@@ -45,4 +45,24 @@ export const PriceRandService = {
     const response = await axios.get<PriceRandResponseAdd>("/getProductBy");
     return response.data;
   },
+
+
+  async softDelPriceRand  (id: string)  {
+    try {
+      const response = await axios.patch(`/admin/randBid/softDelRandBid/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error('Error fetching order data');
+    }
+  },
+
+
+  async restorePriceRand  (id: string)  {
+    try {
+      const response = await axios.patch(`/admin/randBid/restoreRandBid/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error('Error fetching order data');
+    }
+  },
 };

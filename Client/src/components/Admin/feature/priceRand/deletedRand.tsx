@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { fetchPriceRandDeleted } from "../../../../redux/adminPriceRand/deleted/deletedPriceRandThunk";
+import { fetchPriceRandDeleted, restorePriceRandAdminThunk } from "../../../../redux/adminPriceRand/deleted/deletedPriceRandThunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "./searchForm/searchFormPriceRand";
 import "../../../../assets/css/admin.style.css";
-import { Link } from "react-router-dom";
 
+import { PriceRangeRestore } from "../../../../types/adminPriceRand/restorePriceRand";
+import withReactContent from "sweetalert2-react-content";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer ,toast} from "react-toastify";
+import Swal, { SweetAlertResult } from "sweetalert2";
+
+const MySwal = withReactContent(Swal);
 // Hàm để định dạng thời gian theo giờ Việt Nam
 
 
 const deletedPriceRand: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { deletedPriceRand, loading, error, totalPages } = useSelector(
+  const { deletedPriceRand, totalPages } = useSelector(
     (state: RootState) => state.adminDeltedPriceRand
   );
-
+  const [, setPriceRand] = useState<PriceRangeRestore[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
@@ -33,13 +39,29 @@ const deletedPriceRand: React.FC = () => {
     setPage(1);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleRestorePriceRand = async (id: string) => {
+    MySwal.fire({
+      title: "Hủy sản phẩm?",
+      text: "Bạn có chắc muốn khôi phục sản phẩm này không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+ await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
+ setPriceRand((prevRestore) =>
+  prevRestore.filter((rand) => rand._id!== id)
+      );
+      toast.success("Khôi phục sản phẩm thành công");
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+      }else {
+        toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+      }
+    });
+  };
 
   return (
     <>
@@ -48,29 +70,7 @@ const deletedPriceRand: React.FC = () => {
           <SearchFormProduct onSearch={handleSearch} />
         </div>
 
-        <div className="flex-shrink-0">
-          <Link
-            to="/admin/addProdAuc"
-            id="createProductButton"
-            className="inline-flex items-center justify-center text-white bg-blue-500 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-            style={{ height: "40px", display: "flex", alignItems: "center" }}
-          >
-            <svg
-              className="h-4 w-4 mr-1.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                clipRule="evenodd"
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-              />
-            </svg>
-            Thêm sản phẩm
-          </Link>
-        </div>
+   
       </div>
 
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -110,15 +110,10 @@ const deletedPriceRand: React.FC = () => {
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <div className="flex items-center space-x-4">
-                  <button className="lex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
-                    Xóa
+                  <button onClick={()=>  handleRestorePriceRand(rand._id)} className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-600-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Khôi phục
                   </button>
-                  <Link
-                    to={`/admin/editPriceRand/${rand._id}`} // Add ID for editing specific item
-                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-700"
-                  >
-                    Chỉnh sửa
-                  </Link>
+               
                 </div>
               </td>
             </tr>
@@ -136,6 +131,8 @@ const deletedPriceRand: React.FC = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
+
+      <ToastContainer/>
     </>
   );
 };

@@ -183,10 +183,10 @@ const randBinController = {
   },
   restorePriceRangeBid: async (req, res) => {
     try {
-      const { priceRangeBidId } = req.params;
+      const { id } = req.params;
 
-      const updatedBid = await pricRangeBidService.restorePriceRangeBid(
-        priceRangeBidId
+      const updatedBid = await randBidService.restorePriceRangeBid(
+        id
       );
 
       return res.status(200).json({
@@ -204,10 +204,10 @@ const randBinController = {
 
   softDeletePriceRangeBid: async (req, res) => {
     try {
-      const { priceRangeBidId } = req.params;
+      const { id } = req.params;
 
       const updatedBid = await randBidService.softDeletePriceRangeBid(
-        priceRangeBidId
+        id
       );
 
       return res.status(200).json({
