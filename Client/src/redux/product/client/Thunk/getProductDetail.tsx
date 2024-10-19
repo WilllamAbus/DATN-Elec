@@ -1,16 +1,21 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getProductDetail } from "../../../../services/detailProduct/getDetailProduct";
-import { GetDetailProductResponse } from "../../../../services/detailProduct/types/getDetailProduct";
+import { GetDetailProductResponse } from "../../../../services/detailProduct/types/getDetailProduct";  
 
 export const getProductDetailThunk = createAsyncThunk<
-  GetDetailProductResponse,
-  string, 
+  GetDetailProductResponse, 
+  { slug: string; storage?: string }, 
   { rejectValue: string }
 >(
   "productClient/getProductDetail",
-  async (slug, { rejectWithValue }) => {
+  async ({ slug, storage }, { rejectWithValue }) => {
     try {
-      const response = await getProductDetail(slug);
+      if (!slug) {
+        return rejectWithValue("Slug là bắt buộc");
+      }
+
+      const response = await getProductDetail(slug, storage || null); 
+
       if (response.success) {
         return response;
       } else {

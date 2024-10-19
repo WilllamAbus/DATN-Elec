@@ -94,14 +94,14 @@ export interface ProductVariant {
   variant_name: string;                
   variant_description: string;         
   variant_price: number;               
-  battery: BATTERY[];                    
-  color: COLOR[];                   
-  cpu: CPU[];                     
-  graphicsCard: GRAPHICSCARD[];             
-  operatingSystem: OPERATINGSYSTEM[];          
-  ram: RAM[];                    
-  screen: SCREEN[];                   
-  storage: STORAGE[];                    
+  battery: BATTERY;                    
+  color?: COLOR[];                 
+  cpu?: CPU;                     
+  graphicsCard?: GRAPHICSCARD;             
+  operatingSystem?: OPERATINGSYSTEM;          
+  ram?: RAM;                    
+  screen?: SCREEN;                   
+  storage?: STORAGE;                    
   image?: FileList;                   
   sku: string;                         
   pid: string;                        
@@ -221,8 +221,28 @@ export interface GetDetailProductResponse {
     status: string;
     createdAt: string;
     updatedAt: string;
+    slug?: string;  
   };
+}
+export interface GetAllStorageBySlugUrlResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: STORAGE;
+}
+
+export interface FilterState {
+  storage?: string | null;  
+  [key: string]: string | number | null | undefined;
 }
 
 
+
+  
+export interface QueryParamAuction {
+  [key: string]: string | number | undefined; 
+  storage?: string; 
+  }
+  
 
