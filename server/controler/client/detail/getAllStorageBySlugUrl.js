@@ -1,12 +1,10 @@
-const Product = require('../../../model/product_v2');
 const ProductDetailService = require('./productDetailSV');
-
-const getProductDetail = async (req, res) => {
-  const { slug } = req.params;  // Lấy slug từ URL params
-  const { storage } = req.query; 
+const Product = require('../../../model/product_v2');
+const getAllStorageBySlugUrl = async (req, res) => {
+  const { slug } = req.params;  
 
   try {
-    // Bước 1: Kiểm tra sản phẩm trong bảng Product
+
     const product = await Product.findOne({ slug });
     if (!product) {
       return res.status(404).json({
@@ -17,8 +15,8 @@ const getProductDetail = async (req, res) => {
       });
     }
 
-    // Bước 2: Lấy chi tiết sản phẩm từ ProductDetailService
-    const response = await ProductDetailService.getProductDetail(slug, storage);
+
+    const response = await ProductDetailService.getAllVariantStorage(slug);
 
     if (!response.success) {
       return res.status(response.status).json({
@@ -38,7 +36,7 @@ const getProductDetail = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in getProductDetail:', error);
+    console.error('Error in getAllStorageBySlugUrl:', error);
     return res.status(500).json({
       success: false,
       err: -1,
@@ -49,5 +47,5 @@ const getProductDetail = async (req, res) => {
 };
 
 module.exports = {
-  getProductDetail,
+  getAllStorageBySlugUrl,
 };

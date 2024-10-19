@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Select, { StylesConfig, SingleValue } from "react-select";
+import Select, { StylesConfig, MultiValue } from "react-select";
 import { AppDispatch, RootState } from "../../../../../redux/store"; 
 import { getAllColorThunk } from "../../../../../redux/product/attributes/Thunk"; 
 import { Color } from "../../../../../services/product_v2/types/attributes/getAllColor"; 
 
-const colorStyles: StylesConfig<Color, false> = {
+const colorStyles: StylesConfig<Color, true> = {
   control: (styles) => ({ ...styles, backgroundColor: "white" }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     const backgroundColor = isDisabled
@@ -31,6 +31,23 @@ const colorStyles: StylesConfig<Color, false> = {
       },
     };
   },
+  multiValue: (styles, { data }) => ({
+    ...styles,
+    backgroundColor: data.code,
+    color: 'white', // hoặc tùy chỉnh theo nhu cầu
+  }),
+  multiValueLabel: (styles) => ({
+    ...styles,
+    color: 'white',
+  }),
+  multiValueRemove: (styles) => ({
+    ...styles,
+    color: 'white',
+    ':hover': {
+      backgroundColor: 'red', // Hoặc màu tùy ý
+      color: 'white',
+    },
+  }),
   singleValue: (styles, { data }) => ({
     ...styles,
     color: data.code, 
@@ -38,8 +55,8 @@ const colorStyles: StylesConfig<Color, false> = {
 };
 
 interface ColorSelectProps {
-  onChange: (selectedOption: SingleValue<Color>) => void;
-  value: SingleValue<Color> | null;
+  onChange: (selectedOptions: MultiValue<Color>) => void;
+  value: MultiValue<Color> | null;
   className?: string;
 }
 
@@ -65,8 +82,8 @@ const ColorSelect: React.FC<ColorSelectProps> = ({ onChange, value, className })
   return (
     <Select
       classNamePrefix="react-select"
-      closeMenuOnSelect={true}
-      isMulti={false}
+      closeMenuOnSelect={false} // Thay đổi thành false để cho phép chọn nhiều
+      isMulti={true} // Bật chế độ chọn nhiều
       options={colorOptions}
       styles={colorStyles}
       value={value}

@@ -7,3 +7,4 @@ export * from "./getAllConditionShopping";
 export * from "./getAllRam";
 export * from "./getAllStorage";
 export * from "./getProductDetail";
+export * from "./getAllStorageBySlugUrl";

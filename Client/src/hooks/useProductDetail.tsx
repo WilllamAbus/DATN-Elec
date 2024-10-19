@@ -1,18 +1,21 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/store"; 
-import { getProductDetailThunk } from "../redux/product/client/Thunk";
+// import { useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { AppDispatch, RootState } from "../redux/store";
+// import { getProductDetailThunk } from "../redux/product/client/Thunk";
+// import { STORAGE } from "../services/detailProduct/types/getDetailProduct"; 
 
-export const useProductDetail = (slug: string) => {
-  const dispatch = useAppDispatch();
+// export const useProductDetail = (slug: string, storage: STORAGE) => {
+//   const dispatch: AppDispatch = useDispatch();
 
-  const { productDetail, status, error, isLoading } = useAppSelector(
-    (state) => state.productClient.getProductDetail
-  );
-  useEffect(() => {
-    if (slug) {
-      dispatch(getProductDetailThunk(slug)); 
-    }
-  }, [slug, dispatch]);
+//   const { productDetail, status, error, isLoading } = useSelector(
+//     (state: RootState) => state.productClient.getProductDetail
+//   );
 
-  return { productDetail, status, error, isLoading };
-};
+//   useEffect(() => {
+//     if (slug) {
+//       dispatch(getProductDetailThunk({ slug, storage }));
+//     }
+//   }, [slug, dispatch]);
+
+//   return { productDetail, status, error, isLoading };
+// };
