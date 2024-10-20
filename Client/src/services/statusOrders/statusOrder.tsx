@@ -4,7 +4,8 @@ import { ApiResponseShipping } from '../../types/iterationOrder/shippingStatusOr
 import {  ApiResponseAll } from '../../types/iterationOrder/allOrderStatus';
 import { ApiResponseReceve } from '../../types/iterationOrder/reciveStatusOrder';
 import { ApiResponseComplete } from '../../types/iterationOrder/completeStatusOrder';
-
+import { ApiResponsePending } from '../../types/iterationOrder/pendingStatusOrder';
+import { ApiResponseConfirmed } from '../../types/iterationOrder/confirmedStatusOrder';
 export const shippingStatusOrder = async (userId: string): Promise<ApiResponseShipping> => {
   try {
     const response = await axios.get('client/iteracOder/shippStateOrderAuc', {
@@ -16,6 +17,27 @@ export const shippingStatusOrder = async (userId: string): Promise<ApiResponseSh
   }
 };
 
+export const pendingStatusOrder = async (userId: string): Promise<ApiResponsePending> => {
+  try {
+    const response = await axios.get('client/iteracOder/pendingStateOrderAuc', {
+      params: { userId: userId }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Error fetching order data');
+  }
+};
+
+export const confirmedStatusOrder = async (userId: string): Promise<ApiResponseConfirmed> => {
+  try {
+    const response = await axios.get('client/iteracOder/confirmStateOrderAuc', {
+      params: { userId: userId }
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Error fetching order data');
+  }
+};
 
 
 export const fetchListData = async (userId: string): Promise<ApiResponseAll> => {

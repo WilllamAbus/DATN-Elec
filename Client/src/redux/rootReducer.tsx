@@ -40,6 +40,9 @@ import adminTimeTrackReducer from "./adminTimeTrack/list/listTimeTrackSlice"
 import adminTimeTrackDeletedReducer from "./adminTimeTrack/deleted/deletedTimeProdSlice"
 import adminListPriceRandReducer from "./adminPriceRand/list/listPriceRandSlice"
 import adminDeletedPriceRandReducer from "./adminPriceRand/deleted/deletedPriceRandSlice"
+
+import  pendingStatusOrderReducer from "./statusOrderUser/pendingStatus/pendingStatusSlice"
+import  confirmedStatusOrderReducer from "./statusOrderUser/confirmedStatus/confirmedStatusSlice"
 const authConfig = {
   key: "auth",
   storage,
@@ -89,6 +92,8 @@ const rootReducer = combineReducers({
   adminDeletedTimeProd: adminTimeTrackDeletedReducer,
   adminListPriceRand: adminListPriceRandReducer,
   adminDeltedPriceRand: adminDeletedPriceRandReducer,
+  pendingStatusOrder: pendingStatusOrderReducer, 
+  confirmedStatusOrder: confirmedStatusOrderReducer,
   // Add other reducers here to combine them with the persisted state.
 });
 

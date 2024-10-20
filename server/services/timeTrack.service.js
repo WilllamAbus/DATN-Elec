@@ -341,7 +341,7 @@ const timeTrackService = {
 
   getAllTimeTracks: async (page = 1, pageSize = 5, search) => {
     try {
-      const skip = (page - 1) * pageSize;
+    
 
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "active" })
@@ -496,9 +496,7 @@ const timeTrackService = {
         { new: true } // Trả về document đã được cập nhật
       );
 
-      if (!updatedTimeTrack) {
-        throw new Error("TimeTrack không tồn tại");
-      }
+ 
 
       return updatedTimeTrack;
     } catch (error) {
@@ -519,9 +517,7 @@ const timeTrackService = {
         { new: true } // Trả về document đã được cập nhật
       );
 
-      if (!updatedTimeTrack) {
-        throw new Error("TimeTrack không tồn tại");
-      }
+
 
       return updatedTimeTrack;
     } catch (error) {
@@ -532,7 +528,7 @@ const timeTrackService = {
 
   deletedTimeTrackAdmin: async (page = 1, pageSize = 5, search) => {
     try {
-      const skip = (page - 1) * pageSize;
+
 
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "disable" })
@@ -541,7 +537,7 @@ const timeTrackService = {
 
       // Bước 2: Lấy danh sách productId từ timeTracks
       const productIds = timeTracks.map((timeTrack) => timeTrack.productId);
-
+      
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
         _id: { $in: productIds },

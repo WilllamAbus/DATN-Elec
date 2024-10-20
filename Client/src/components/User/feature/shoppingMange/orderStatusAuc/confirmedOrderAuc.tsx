@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { fetchOrderDataShippingThunk } from "../../../../../redux/statusOrderUser/shippingStatusOrder/shippingStatusThunk";
-
-import { OrderProductShipping, OrderDataAllShipping } from "../../../../../types/iterationOrder/shippingStatusOrder";
+import { fetchOrderDataConfirmThunk } from "../../../../../redux/statusOrderUser/confirmedStatus/confirmedStatusThunk";
+import { softDelThunk } from "../../../../../redux/statusOrderUser/softDelByUser/softDellOrderThunk";
+import { OrderProductConfirmed, OrderDataAllConfirmed } from "../../../../../types/iterationOrder/confirmedStatusOrder";
 
 import currencyFormatter from "currency-formatter";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer,  } from "react-toastify";
+import { ToastContainer,  toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
 
-const OrderListShippingStatus: React.FC = () => {
+const OrderListConfirmedStatus: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const ordersFromStore = useSelector(
     (state: RootState) => state.statusShippingOrder.orderShipping
@@ -34,7 +34,7 @@ const OrderListShippingStatus: React.FC = () => {
   // console.log('orderId', orderId);
   
   const [showAll, setShowAll] = useState(false);
-  const [orders, setOrders] = useState<OrderDataAllShipping[]>([]);
+  const [orders, setOrders] = useState<OrderDataAllConfirmed[]>([]);
 
   // const [, setLocalOrder] = useState(orders);
 
@@ -50,19 +50,35 @@ const OrderListShippingStatus: React.FC = () => {
 
   useEffect(() => {
     if (userId) {
-      dispatch(fetchOrderDataShippingThunk(userId));
+      dispatch(fetchOrderDataConfirmThunk(userId));
     }
   }, [dispatch, userId]);
 
   const goBack = () => {
     navigate("/auction");
   };
+  const handleSoftDelOrder = (orderId: string) => {
+    if (orderId && userId ) {
 
+      
+      // Assuming orderId is an array and you want to delete multiple orders
+      dispatch(softDelThunk({orderId})).unwrap();
+      // dispatch(fetchOrderDataShippingThunk(userId));
+      setOrders((prevCategories) =>
+        prevCategories.filter((order) => order.orderId !== orderId)
+      );
+      toast.success("Xóa đơn hàng thành công");
+    } else {
+      toast.error("Không tìm thấy ID đơn hàng để xóa");
+    }
+
+
+  };
   return (
     <div className="mt-6 border border-gray-300 pt-7 rounded-lg shadow-md bg-white">
       {orders
-        .filter((order: OrderDataAllShipping) => order.stateOrder === "Vận chuyển") // Filter orders with 'Vận chuyển' state
-        .map((order: OrderDataAllShipping, index: number) => (
+        .filter((order: OrderDataAllConfirmed) => order.stateOrder === "Vận chuyển") // Filter orders with 'Vận chuyển' state
+        .map((order: OrderDataAllConfirmed, index: number) => (
           <div key={index} className="order-item mb-6 px-4 md:px-11">
             <div className="flex flex-col md:flex-row items-center justify-between mb-6">
               <div className="order-info mb-4 md:mb-0">
@@ -83,7 +99,7 @@ const OrderListShippingStatus: React.FC = () => {
             <div className="border-t border-gray-300 pt-6">
               {order.products
                 .slice(0, showAll ? order.products.length : 2)
-                .map((product: OrderProductShipping, index: number) => (
+                .map((product: OrderProductConfirmed, index: number) => (
                   <div
                     key={index}
                     className="flex flex-col items-center gap-4 sm:flex-row mb-4 w-full border-b border-gray-200 pb-4"
@@ -118,7 +134,7 @@ const OrderListShippingStatus: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-4 w-full md:w-auto md:flex-row mt-4 md:mt-0 md:ml-auto justify-center md:justify-end">
                       <button
-                  // Truy cập _id từ đối tượng order
+                     onClick={() => handleSoftDelOrder(order.orderId)} // Truy cập _id từ đối tượng order
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
                       >
                         Hủy đơn hàng
@@ -150,4 +166,4 @@ const OrderListShippingStatus: React.FC = () => {
   );
 };
 
-export default OrderListShippingStatus;
+export default OrderListConfirmedStatus;
