@@ -1,7 +1,7 @@
 import React from "react";
-import AdminFetAddProduct from "../../../components/Admin/feature/productV2/list";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
-import ProductSummary from "../../../components/Admin/summary/ProductSummary";
+import AdminFetAddProduct from "../../../../components/Admin/feature/productV2/list";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import ProductSummary from "../../../../components/Admin/summary/ProductSummary";
 const listProd: React.FC = () => {
 
   return (

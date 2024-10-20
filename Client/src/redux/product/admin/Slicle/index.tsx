@@ -8,3 +8,6 @@ export { default as deletedProductSlice } from "./deletedList ";
 export { default as hardDeleteSlice } from "./hardDelete";
 export { default as restoreSlice } from "./restore";
 export { default as addVariantSlice } from "./addVariant";
+export { default as addProductAuctionSlice } from "./addProductAuction";
+export { default as LimitProductAuctionSlice } from "./listProductAuction";
+export { default as softDeleteAuctionSlice } from "./softdeleteAuction";

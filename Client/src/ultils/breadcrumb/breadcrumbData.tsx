@@ -80,6 +80,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
   ],
+  listroductAuction: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/list-auction", label: "danh sách sản phẩm đấu giá" },
+  ],
 
   addInbounds: [
     { href: "/", label: "Home" },

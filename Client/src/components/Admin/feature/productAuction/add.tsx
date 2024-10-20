@@ -7,14 +7,14 @@ import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
-import { Product } from "../../../../services/product_v2/admin/types/add-product";
+import { ProductAuction } from "../../../../services/product_v2/admin/types/add-product-auction";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
-import { add } from "../../../../redux/product/admin/Thunk";
-import { selectFetchData } from "../productAuction/FetchData";
-import SubmitButtonAdd from "../productAuction/btn/SubmitButtonAdd";
-import Productdescription from "../productAuction/description/product_description";
+import { addProductAuctionThunk } from "../../../../redux/product/admin/Thunk";
+import { selectFetchData } from "./FetchData";
+import SubmitButtonAdd from "./btn/SubmitButtonAdd";
+import Productdescription from "./description/product_description";
 import FormInput from "./Form/forminput";
 import FormSelect from "./Form/formselect";
 import ImageUpload from "./Form/imageUpload";
@@ -22,13 +22,13 @@ import CategoryDiscountSelect from "./Form/cate_Discount";
 import BrandSupplierSelect from "./Form/Brand_Supplier";
 
 
-const AddProduct: React.FC = () => {
+const AddProductAuction: React.FC = () => {
   const {
     register,
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<Product>({
+  } = useForm<ProductAuction>({
     defaultValues: {
       hasVariants: false,
     },
@@ -38,12 +38,12 @@ const AddProduct: React.FC = () => {
   const { imgPreview, handleImageChange } = useImageUpload();
 
   const navigate = useNavigate();
-  const { brands, suppliers, discounts, productFormats, conditionShoppingList, categories } =
+  const { brands, suppliers, discounts,  conditionShoppingList, categories } =
     selectFetchData();
-  const submitFormAdd: SubmitHandler<Product> = async (data) => {
+  const submitFormAdd: SubmitHandler<ProductAuction> = async (data) => {
     setIsLoading(true);
     try {
-      const actionResult = await dispatch(add(data)).unwrap();
+      const actionResult = await dispatch(addProductAuctionThunk(data)).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
         navigate("/admin/listproduct");
@@ -171,16 +171,7 @@ const AddProduct: React.FC = () => {
                 }}
               />
 
-              <FormSelect
-                label="Định dạng sản phẩm"
-                id="product_format"
-                options={productFormats.map((format) => ({
-                  _id: format._id,
-                  name: format.formats,
-                }))}
-                register={register}
-                errorMessage={errors.product_format?.message}
-              />
+
               <FormSelect
                 label="Điều kiện mua sắm"
                 id="product_condition"
@@ -208,4 +199,4 @@ const AddProduct: React.FC = () => {
   );
 };
 
-export default AddProduct;
+export default AddProductAuction;

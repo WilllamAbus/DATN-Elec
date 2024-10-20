@@ -34,7 +34,7 @@ import {
   handleStorageChange
 } from "./handlersVariant";
 import { SingleValue,MultiValue } from "react-select";
-import Productdescription from "./description/product_description";
+import Productdescription from "../productAuction/description/product_description";
 import FormInput from "./Form/forminput";
 const AddVariant: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
