@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useAppDispatch } from "../../../redux/store"; 
-import { DeleteListProductThunk } from "../../../redux/product/admin/Thunk";
+import { listProductAuctionThunk } from "../../../redux/product/admin/Thunk";
 
-const SearchFomDeletelistProduct: React.FC = () => {
+const SearchFomAuctionProduct: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useAppDispatch();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(DeleteListProductThunk({ page: 1, search: searchTerm }));
+    dispatch(listProductAuctionThunk({ page: 1, search: searchTerm }));
   };
 
   return (
@@ -49,4 +49,4 @@ const SearchFomDeletelistProduct: React.FC = () => {
   );
 };
 
-export default SearchFomDeletelistProduct;
+export default SearchFomAuctionProduct;

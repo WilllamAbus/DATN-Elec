@@ -42,4 +42,4 @@ categorySchema.pre('findOneAndUpdate', function (next) {
   next();
 });
 
-module.exports = model("Category", categorySchema);
+module.exports = model("categories", categorySchema);

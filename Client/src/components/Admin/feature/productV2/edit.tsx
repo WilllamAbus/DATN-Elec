@@ -15,7 +15,7 @@ import { useImageUpload } from "../../../../hooks/useImageUpload";
 
 
 
-import { selectFetchData } from "./FetchData";
+import { selectFetchData } from "../productAuction/FetchData";
 import BrandSupplierSelect from "./Form/Brand_Supplier";
 import CategoryDiscountSelect from "./Form/cate_Discount";
 const EditProduct: React.FC = () => {
