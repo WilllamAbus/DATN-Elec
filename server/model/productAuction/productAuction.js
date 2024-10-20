@@ -6,7 +6,7 @@ const productAuctionSchema = new Schema({
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
   slug: { type: String, unique: true }, 
-  product_type: { type: Schema.Types.ObjectId, ref: 'categories', required: true },
+  product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_discount: {
     discountId: { type: Schema.Types.ObjectId, ref: 'discounts' }, 
     code: { type: String },
@@ -15,9 +15,9 @@ const productAuctionSchema = new Schema({
     status: { type: String },
     disabledAt: { type: Date }
   },
-  product_brand: { type: Schema.Types.ObjectId, ref: 'brands', required: true },
+  product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
-  product_supplier: { type: Schema.Types.ObjectId, ref: 'suppliers', required: true },
+  product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
   product_ratingAvg: {
     type: Number,
     default: 4.5,

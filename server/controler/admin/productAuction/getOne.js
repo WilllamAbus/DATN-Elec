@@ -6,7 +6,6 @@ const getOne = async (req, res) => {
     const product = await modelProductAuction.findById(id)
     .populate('product_type', 'name')
     .populate('product_brand', 'name') 
-    .populate('product_format', 'formats')
     .populate('product_condition', 'nameCondition') 
     .populate('product_supplier', 'name'); 
 

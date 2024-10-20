@@ -10,7 +10,6 @@ export const links: Record<string, Link[]> = {
   ],
   product: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
-    { label: "Sản phẩm đấu giá", to: "/admin/listProdAuc" },
     { label: "Khoảng định giá", to: "/admin/listPriceRand" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },
