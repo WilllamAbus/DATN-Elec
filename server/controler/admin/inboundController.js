@@ -3,6 +3,7 @@ const modelInbound = require("../../model/inboundShipments.model");
 const modelProductVariant = require("../../model/product_v2/productVariant");
 const modelSupplier = require("../../model/suppliers.model");
 const modelInventory = require("../../model/inventory/inventory.model");
+const modelProductAution = require("../../model/productAuction/productAuction");
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccount.json");
@@ -26,18 +27,59 @@ const bucket = storage.bucket();
 
 const multerStorage = multer.memoryStorage();
 
-
 const inboundController = {
     listInbounds: async (req, res) => {
         try {
-            const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+            const page = parseInt(req.query.page, 10) || 1; // Trang hiện tại, mặc định là 1
+            const limit = parseInt(req.query.limit, 5) || 5; // Số kết quả mỗi trang, mặc định là 5
+    
+            // Tạo điều kiện truy vấn
+            let query = { 
+                status: { $ne: "disable" },
+                product_variant_id: { $exists: true }
+            };
+    
+            // Đếm tổng số lô hàng dựa trên điều kiện đã tạo
+            const count = await modelInbound.countDocuments(query);
+            const totalPages = Math.ceil(count / limit);
+    
+            // Truy vấn dữ liệu các lô hàng với phân trang
+            const inbounds = await modelInbound
+                .find(query)
+                .populate("product_variant_id", "variant_name") // Chỉ lấy variant_name từ product_variant
+                .populate("inbound_supplier", "name") // Chỉ lấy name từ nhà cung cấp
+                .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
+                .limit(limit); // Giới hạn kết quả theo số lượng trang
+    
+            // Trả về kết quả
+            res.status(200).json({
+                success: true,
+                msg: "Lấy danh sách lô hàng thành công",
+                data: inbounds,
+                totalPages: totalPages,
+            });
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách lô hàng:", error);
+            res.status(500).json({
+                success: false,
+                msg: "Lỗi khi lấy danh sách lô hàng",
+                error: error.message,
+            });
+        }
+    },
+    
+
+    listInboundV2: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1; // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
             const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
 
-            const count = await modelInbound.countDocuments({ });
+            const count = await modelInbound.countDocuments({ status: { $ne: "disable" },productAuction: { $exists: true } });
             const totalPages = Math.ceil(count / limit);
-            const inbounds = await modelInbound.find({})
-                .populate('product_variant_id', 'variant_name')
-                .populate('inbound_supplier', 'name')
+            const inbounds = await modelInbound
+                .find({ status: { $ne: "disable" }, productAuction: { $exists: true } })
+                .populate("productAuction", "product_name")
+                .populate("inbound_supplier", "name")
                 .skip((page - 1) * limit)
                 .limit(limit);
             res.status(200).json({
@@ -76,21 +118,39 @@ const inboundController = {
                     .json({ message: "Bạn không có quyền thêm mới lô hàng" });
             }
 
-            let {product_variant_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price } = req.body;
+            let {
+                product_variant_id,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            } = req.body;
 
-            if (!product_variant_id || !inbound_supplier || !inbound_quantity || !inbound_description || !inbound_price) {
+            if (
+                !product_variant_id ||
+                !inbound_supplier ||
+                !inbound_quantity ||
+                !inbound_description ||
+                !inbound_price
+            ) {
                 return res
                     .status(400)
                     .json({ message: "Vui lòng nhập đầy đủ thông tin lô hàng" });
             }
 
-            const data = { product_variant_id, inbound_supplier, inbound_quantity, inbound_description, inbound_price };
+            const data = {
+                product_variant_id,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            };
             const savedInbound = await modelInbound.create(data);
 
             // Tìm kiếm sản phẩm trong inventory
             const existingInventory = await modelInventory.findOne({
                 product_variant: product_variant_id,
-                supplier: inbound_supplier
+                supplier: inbound_supplier,
             });
 
             if (existingInventory) {
@@ -98,7 +158,8 @@ const inboundController = {
                 existingInventory.totalQuantity += inbound_quantity;
                 existingInventory.quantityStock += inbound_quantity;
                 existingInventory.price = inbound_price;
-                existingInventory.totalPrice = existingInventory.quantityStock * inbound_price;
+                existingInventory.totalPrice =
+                    existingInventory.quantityStock * inbound_price;
                 await existingInventory.save();
             } else {
                 // Tạo mới bản ghi inventory
@@ -110,61 +171,337 @@ const inboundController = {
                     quantityShelf: 0,
                     price: inbound_price,
                     totalPrice: inbound_quantity * inbound_price,
-                    status: 'active'
                 };
                 await modelInventory.create(inventoryData);
             }
 
             res
                 .status(201)
-                .json({ message: "Lô hàng được tạo thành công và cập nhật kho hàng", savedInbound });
+                .json({
+                    message: "Lô hàng được tạo thành công và cập nhật kho hàng",
+                    savedInbound,
+                });
         } catch (error) {
             console.error("Lỗi khi thêm lô hàng:", error);
             res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+
+    addInboundProduct: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: "admin" });
+
+            if (!adminRole) {
+                return res
+                    .status(500)
+                    .json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            const isAdmin = req.user.roles.some(
+                (role) => role._id.toString() === adminRole._id.toString()
+            );
+
+            if (!isAdmin) {
+                return res
+                    .status(401)
+                    .json({ message: "Bạn không có quyền thêm mới lô hàng" });
+            }
+
+            let {
+                productAuction,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            } = req.body;
+
+            if (
+                !productAuction ||
+                !inbound_supplier ||
+                !inbound_quantity ||
+                !inbound_description ||
+                !inbound_price
+            ) {
+                return res
+                    .status(400)
+                    .json({ message: "Vui lòng nhập đầy đủ thông tin lô hàng" });
+            }
+
+            const data = {
+                productAuction,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            };
+            const savedInbound = await modelInbound.create(data);
+
+            // Tìm kiếm sản phẩm trong inventory
+            const existingInventory = await modelInventory.findOne({
+                productAuction: productAuction,
+                supplier: inbound_supplier,
+            });
+
+            if (existingInventory) {
+                // Cập nhật bản ghi inventory hiện có
+                existingInventory.totalQuantity += inbound_quantity;
+                existingInventory.quantityStock += inbound_quantity;
+                existingInventory.price = inbound_price;
+                existingInventory.totalPrice =
+                    existingInventory.quantityStock * inbound_price;
+                await existingInventory.save();
+            } else {
+                // Tạo mới bản ghi inventory
+                const inventoryData = {
+                    productAuction: productAuction,
+                    supplier: inbound_supplier,
+                    totalQuantity: inbound_quantity,
+                    quantityStock: inbound_quantity,
+                    quantityShelf: 0,
+                    price: inbound_price,
+                    totalPrice: inbound_quantity * inbound_price,
+                };
+                await modelInventory.create(inventoryData);
+            }
+
+            res
+                .status(201)
+                .json({
+                    message: "Lô hàng được tạo thành công và cập nhật kho hàng",
+                    savedInbound,
+                });
+        } catch (error) {
+            console.error("Lỗi khi thêm lô hàng:", error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+    editInbound: async (req, res) => {
+        try {
+            const { id } = req.params;
+            let {
+                product_variant_id,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            } = req.body;
+
+            if (
+                !id ||
+                !product_variant_id ||
+                !inbound_supplier ||
+                !inbound_quantity ||
+                !inbound_description ||
+                !inbound_price
+            ) {
+                return res
+                    .status(400)
+                    .json({ message: "Vui lòng nhập đầy đủ thông tin lô hàng" });
+            }
+
+            // Tìm kiếm lô hàng cần chỉnh sửa
+            const inbound = await modelInbound.findById(id);
+            if (!inbound) {
+                return res.status(404).json({ message: "Không tìm thấy lô hàng" });
+            }
+
+            // Cập nhật thông tin lô hàng
+            inbound.product_variant_id = product_variant_id;
+            inbound.inbound_supplier = inbound_supplier;
+            inbound.inbound_quantity = inbound_quantity;
+            inbound.inbound_description = inbound_description;
+            inbound.inbound_price = inbound_price;
+
+            await inbound.save();
+
+            // Tìm kiếm sản phẩm trong inventory
+            const existingInventory = await modelInventory.findOne({
+                product_variant: product_variant_id,
+                supplier: inbound_supplier,
+            });
+
+            if (existingInventory) {
+                // Cập nhật bản ghi inventory hiện có
+                existingInventory.totalQuantity +=
+                    inbound_quantity - inbound.inbound_quantity; // Cập nhật số lượng tổng
+                existingInventory.quantityStock +=
+                    inbound_quantity - inbound.inbound_quantity; // Cập nhật số lượng tồn kho
+                existingInventory.price = inbound_price; // Cập nhật giá
+                existingInventory.totalPrice =
+                    existingInventory.quantityStock * inbound_price; // Cập nhật tổng giá
+                await existingInventory.save();
+            } else {
+                // Nếu không có inventory, tạo mới
+                const inventoryData = {
+                    product_variant: product_variant_id,
+                    supplier: inbound_supplier,
+                    totalQuantity: inbound_quantity,
+                    quantityStock: inbound_quantity,
+                    quantityShelf: 0,
+                    price: inbound_price,
+                    totalPrice: inbound_quantity * inbound_price,
+                    status: "active",
+                };
+                await modelInventory.create(inventoryData);
+            }
+
+            res
+                .status(200)
+                .json({
+                    message: "Lô hàng được chỉnh sửa thành công và cập nhật kho hàng",
+                    updatedInbound: inbound,
+                });
+        } catch (error) {
+            console.error("Lỗi khi chỉnh sửa lô hàng:", error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+
+    editInboundV2: async (req, res) => {
+        try {
+            const { id } = req.params;
+            let {
+                productAuction,
+                inbound_supplier,
+                inbound_quantity,
+                inbound_description,
+                inbound_price,
+            } = req.body;
+
+            if (
+                !id ||
+                !productAuction ||
+                !inbound_supplier ||
+                !inbound_quantity ||
+                !inbound_description ||
+                !inbound_price
+            ) {
+                return res
+                    .status(400)
+                    .json({ message: "Vui lòng nhập đầy đủ thông tin lô hàng" });
+            }
+
+            // Tìm kiếm lô hàng cần chỉnh sửa
+            const inbound = await modelInbound.findById(id);
+            if (!inbound) {
+                return res.status(404).json({ message: "Không tìm thấy lô hàng" });
+            }
+
+            // Cập nhật thông tin lô hàng
+            inbound.productAuction = productAuction;
+            inbound.inbound_supplier = inbound_supplier;
+            inbound.inbound_quantity = inbound_quantity;
+            inbound.inbound_description = inbound_description;
+            inbound.inbound_price = inbound_price;
+
+            await inbound.save();
+
+            // Tìm kiếm sản phẩm trong inventory
+            const existingInventory = await modelInventory.findOne({
+                productAuction: productAuction,
+                supplier: inbound_supplier,
+            });
+
+            if (existingInventory) {
+                // Cập nhật bản ghi inventory hiện có
+                existingInventory.totalQuantity +=
+                    inbound_quantity - inbound.inbound_quantity; // Cập nhật số lượng tổng
+                existingInventory.quantityStock +=
+                    inbound_quantity - inbound.inbound_quantity; // Cập nhật số lượng tồn kho
+                existingInventory.price = inbound_price; // Cập nhật giá
+                existingInventory.totalPrice =
+                    existingInventory.quantityStock * inbound_price; // Cập nhật tổng giá
+                await existingInventory.save();
+            } else {
+                // Nếu không có inventory, tạo mới
+                const inventoryData = {
+                    productAuction: productAuction,
+                    supplier: inbound_supplier,
+                    totalQuantity: inbound_quantity,
+                    quantityStock: inbound_quantity,
+                    quantityShelf: 0,
+                    price: inbound_price,
+                    totalPrice: inbound_quantity * inbound_price,
+                    status: "active",
+                };
+                await modelInventory.create(inventoryData);
+            }
+
+            res
+                .status(200)
+                .json({
+                    message: "Lô hàng được chỉnh sửa thành công và cập nhật kho hàng",
+                    updatedInbound: inbound,
+                });
+        } catch (error) {
+            console.error("Lỗi khi chỉnh sửa lô hàng:", error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+
     getProductController: async (req, res) => {
         try {
+            const productVariants = await modelProductVariant
+                .find({ status: { $ne: "disable" } })
+                .exec();
 
-
-            const productVariants = await modelProductVariant.find({ status: { $ne: "disable" } }).exec();
-
-            const productReady = productVariants.map(product => ({
+            const productReady = productVariants.map((product) => ({
                 productVariant: product._id,
-                product_name: product.variant_name,
-                _id: product._id
+                variant_name: product.variant_name,
+                _id: product._id,
             }));
 
             res.status(200).json({ productReady });
         } catch (error) {
-            console.error('Error fetching categories:', error);
-            res.status(500).json({ error: 'Server error' });
+            console.error("Error fetching categories:", error);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    getProductV2Controller: async (req, res) => {
+        try {
+            const products = await modelProductAution
+                .find({ status: { $ne: "disable" } })
+                .exec();
+
+            const productReady = products.map((product) => ({
+                productAuction: product._id,
+                product_name: product.product_name,
+                _id: product._id,
+            }));
+
+            res.status(200).json({ productReady });
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            res.status(500).json({ error: "Server error" });
         }
     },
     getAllSuppliersController: async (req, res) => {
         try {
+            const suppliers = await modelSupplier
+                .find({ status: { $ne: "disable" } })
+                .exec();
 
-            const suppliers = await modelSupplier.find({ status: { $ne: "disable" } }).exec();
-
-            const supplierReady = suppliers.map(supplier => ({
+            const supplierReady = suppliers.map((supplier) => ({
                 supplier: supplier._id,
                 name: supplier.name,
-                _id: supplier._id
+                _id: supplier._id,
             }));
             // console.log(supplierReady);
 
             res.status(200).json({ supplierReady });
         } catch (error) {
-            console.error('Error fetching suppliers:', error);
-            res.status(500).json({ error: 'Server error' });
+            console.error("Error fetching suppliers:", error);
+            res.status(500).json({ error: "Server error" });
         }
     },
     getOne: async (req, res) => {
         try {
             const { id } = req.params;
-            const inbound = await modelInbound.findById(id)
-                .populate('product_id', 'product_name')
-                .populate('inbound_supplier', 'name');
+            const inbound = await modelInbound
+                .findById(id)
+                .populate("product_variant_id", "variant_name")
+                .populate("inbound_supplier", "name");
 
             if (!inbound) {
                 return res.status(404).json({ message: "Không tìm thấy lô hàng" });
@@ -174,6 +511,29 @@ const inboundController = {
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+
+    getOneV2: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const inbound = await modelInbound
+                .findById(id)
+                .populate("productAuction", "product_name")
+                .populate("inbound_supplier", "name");
+    
+            if (!inbound) {
+                return res.status(404).json({ message: "Không tìm thấy lô hàng" });
+            }
+    
+            res.status(200).json(inbound);
+        } catch (error) {
+            console.error("Error in getOneV2:", error);
+            if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
+                res.status(504).json({ message: "Thời gian kết nối đến cơ sở dữ liệu quá lâu" });
+            } else {
+                res.status(500).json({ message: "Lỗi server", error: error.message });
+            }
         }
     },
     search: async (req, res) => {
@@ -200,18 +560,22 @@ const inboundController = {
                 });
             }
     
-            // Sử dụng `populate` để tìm kiếm theo product_name trong product_v2
-
+            // Tìm kiếm sản phẩm dựa trên variant_name
+            const products = await modelProductVariant.find({
+                variant_name: { $regex: keyword, $options: "i" }
+            });
     
-            // Tính tổng kết quả
-            const totalResults = await modelInbound
-                .find()
-                .populate({
-                    path: 'product_id', // Tên tham chiếu trong inboundShipmentSchema
-                    match: { product_name: { $regex: keyword, $options: 'i' } }, // Tìm kiếm theo tên sản phẩm
-                    select: 'product_name', // Chỉ lấy trường `product_name`
-                })
-                .countDocuments();
+            const productIds = products.map(product => product._id);
+    
+            const searchQuery = {
+                status: { $ne: "disable" },
+                $or: [
+                    { product_variant_id: { $in: productIds } }
+                ]
+            };
+    
+            // Đếm số lượng kết quả
+            const totalResults = await modelInbound.countDocuments(searchQuery);
     
             if (totalResults === 0) {
                 return res.status(200).json({
@@ -221,24 +585,327 @@ const inboundController = {
                 });
             }
     
-            // Lấy kết quả với phân trang và tìm kiếm
+            // Tìm kiếm với phân trang
             const result = await modelInbound
-                .find()
-                .populate({
-                    path: 'product_id', 
-                    match: { product_name: { $regex: keyword, $options: 'i' } }, 
-                    select: 'product_name',
-                })
-                .populate('inbound_supplier', 'name') // Tham chiếu đến nhà cung cấp
+                .find(searchQuery)
+                .populate('product_variant_id', 'variant_name')
+                .populate('inbound_supplier', 'name')
                 .skip((page - 1) * limit)
                 .limit(limit);
     
-            // Lọc ra những kết quả không khớp (populate sẽ trả về null cho những kết quả không có product_name khớp với keyword)
-            const filteredResults = result.filter(item => item.product_id !== null);
+            // Tính toán tổng số trang
+            const totalPages = Math.ceil(totalResults / limit);
     
+            // Trả về kết quả tìm kiếm
             res.status(200).json({
                 message: "Tìm kiếm thành công",
-                data: filteredResults,
+                data: result,
+                currentPage: page,
+                totalResults,
+                totalPages,
+            });
+    
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
+        }
+    },
+    
+    searchV2: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+    
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+    
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+    
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+    
+            // Tìm kiếm sản phẩm dựa trên product_name
+            const products = await modelProductAution.find({
+                product_name: { $regex: keyword, $options: "i" }
+            });
+    
+            const productIds = products.map(product => product._id);
+    
+            const searchQuery = {
+                status: { $ne: "disable" },
+                $or: [
+                    { productAuction: { $in: productIds } }
+                ]
+            };
+    
+            // Đếm số lượng kết quả
+            const totalResults = await modelInbound.countDocuments(searchQuery);
+    
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+    
+            // Tìm kiếm với phân trang
+            const result = await modelInbound
+                .find(searchQuery)
+                .populate('productAuction', 'product_name')
+                .populate('inbound_supplier', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+    
+            // Tính toán tổng số trang
+            const totalPages = Math.ceil(totalResults / limit);
+    
+            // Trả về kết quả tìm kiếm
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: result,
+                currentPage: page,
+                totalResults,
+                totalPages,
+            });
+    
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
+        }
+    },
+    
+    
+    hardDelete: async (req, res) => {
+        const { id } = req.params;
+        try {
+            const adminRole = await Role.findOne({ name: "admin" });
+
+            if (!adminRole) {
+                return res
+                    .status(500)
+                    .json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            const isAdmin = req.user.roles.some(
+                (role) => role._id.toString() === adminRole._id.toString()
+            );
+
+            if (!isAdmin) {
+                return res
+                    .status(403)
+                    .json({
+                        message:
+                            "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa đơn nhập hàng",
+                    });
+            }
+
+            const hardDeletedInbound = await modelInbound.findByIdAndDelete(id);
+            if (!hardDeletedInbound) {
+                return res
+                    .status(404)
+                    .json({ message: "Không tìm thấy đơn nhập hàng" });
+            }
+            res.status(200).json({ message: "Đơn hàng đã được xóa thành công" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Lỗi server" });
+        }
+    },
+    softDelete: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: "admin" });
+
+            if (!adminRole) {
+                return res
+                    .status(500)
+                    .json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            const isAdmin = req.user.roles.some(
+                (role) => role._id.toString() === adminRole._id.toString()
+            );
+
+            if (!isAdmin) {
+                return res
+                    .status(403)
+                    .json({
+                        message:
+                            "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa đơn nhập hàng",
+                    });
+            }
+
+            const id = req.params.id;
+            // Cập nhật trạng thái của danh mục thành "Đã xóa"
+            const softDeletedInbound = await modelInbound.findByIdAndUpdate(
+                id,
+                { status: "disable" },
+                { new: true }
+            );
+
+            if (!softDeletedInbound) {
+                return res.status(404).json({ message: "Không tìm thấy thương hiệu" });
+            }
+
+            // Trả về phản hồi thành công
+            res
+                .status(200)
+                .json({ message: "Đã xóa thành công", data: softDeletedInbound });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+    restore: async (req, res) => {
+        try {
+            const adminRole = await Role.findOne({ name: "admin" });
+
+            if (!adminRole) {
+                return res
+                    .status(500)
+                    .json({ message: "Không tìm thấy vai trò quản trị viên" });
+            }
+
+            const isAdmin = req.user.roles.some(
+                (role) => role._id.toString() === adminRole._id.toString()
+            );
+
+            if (!isAdmin) {
+                return res
+                    .status(403)
+                    .json({
+                        message:
+                            "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể khôi phục đơn hàng ",
+                    });
+            }
+
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({ message: "Thiếu id đơn hàng" });
+            }
+
+            // Cập nhật trạng thái của sản phẩm thành 'active'
+            const restoreInbound = await modelInbound.findByIdAndUpdate(
+                id,
+                { status: "active" },
+                { new: true }
+            );
+
+            if (!restoreInbound) {
+                return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+            }
+
+            // Trả về phản hồi thành công
+            res
+                .status(200)
+                .json({
+                    message: "Đơn hàng đã được khôi phục thành công",
+                    data: restoreInbound,
+                });
+        } catch (error) {
+            // Xử lý lỗi và trả về phản hồi lỗi server
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    
+    deletedList: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1; // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+            const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+
+            const count = await modelInbound.countDocuments({
+                status: "disable",
+            });
+            const totalPages = Math.ceil(count / limit);
+
+            const deleteListInbound = await modelInbound
+                .find({ status: "disable" })
+                .populate("product_variant_id", "variant_name")
+                .populate("product_id", "product_name")
+                .populate("inbound_supplier", "name")
+                .skip((page - 1) * limit)
+                .limit(limit);
+            res.status(200).json({
+                success: true,
+                data: deleteListInbound,
+                totalPages: totalPages,
+            });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    searchDelete: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+            const searchQuery = {
+                name: { $regex: keyword, $options: "i" },
+                status: "disable",
+            };
+
+            // Get the total count for pagination purposes
+            const totalResults = await modelInbound.countDocuments(searchQuery);
+
+            // If no results, return a suitable message
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+
+            // Execute the search query with pagination
+            const result = await modelInbound
+                .find(searchQuery)
+                .populate('product_variant_id', 'variant_name')
+                .populate('product_id', 'product_name')
+                .populate('inbound_supplier', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            // Return the search results with pagination info
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: result,
                 currentPage: page,
                 totalResults,
                 totalPages: Math.ceil(totalResults / limit),
@@ -252,8 +919,6 @@ const inboundController = {
         }
     },
 
-
 };
-
 
 module.exports = inboundController;

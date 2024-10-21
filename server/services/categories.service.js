@@ -53,7 +53,7 @@ const upLoadImgBucket = {
   },
   deletedList: async (req, res) => {
     try {
-      return await _Category.find({ status: 'deleted' });
+      return await _Category.find({ status: 'disable' });
     } catch (error) {
       console.error(error)
     }

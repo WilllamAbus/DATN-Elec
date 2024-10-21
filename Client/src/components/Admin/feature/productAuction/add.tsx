@@ -29,9 +29,6 @@ const AddProductAuction: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ProductAuction>({
-    defaultValues: {
-      hasVariants: false,
-    },
   });
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
@@ -46,7 +43,7 @@ const AddProductAuction: React.FC = () => {
       const actionResult = await dispatch(addProductAuctionThunk(data)).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
-        navigate("/admin/listproduct");
+        navigate("/admin/list-auction");
       }, 2000);
     } catch (error) {
       const errorMsg = (error as ApiResponse<null>).msg || "Có lỗi xảy ra khi thêm sản phẩm";

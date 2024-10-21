@@ -1,3 +1,4 @@
+const { nextui } = require("@nextui-org/react");
 import flowbite from "flowbite-react/tailwind";
 import { addIconSelectors } from "@iconify/tailwind";
 /** @type {import('tailwindcss').Config} */
@@ -12,6 +13,7 @@ export default {
     "./node_modules/flowbite/**/*.js",
     "./node_modules/flowbite-react/**/*.js",
     flowbite.content(),
+     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   darkMode: "class",
   safelist: [
@@ -69,6 +71,7 @@ export default {
       },
       fontFamily: {
         sans: [
+          "Be Vietnam Pro",
           "Inter",
           "ui-sans-serif",
           "system-ui",
@@ -112,7 +115,6 @@ export default {
           "Courier New",
           "monospace",
         ],
-        barlow: ["Barlow", "sans-serif"],
       },
       fontSize: {
         xs: '0.75rem',       
@@ -229,5 +231,6 @@ export default {
       },
     },
   },
-  plugins: [flowbite.plugin(), addIconSelectors(["mdi-light", "mdi"])],
+  plugins: [flowbite.plugin(), addIconSelectors(["mdi-light", "mdi"]),nextui()],
+  
 };

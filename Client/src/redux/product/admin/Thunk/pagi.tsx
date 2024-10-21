@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { pagiCrudProduct } from "../../../../services/product_v2/admin";
-import { LimitCrudProductResponse } from "../types/pagi";
+import { LimitCrudProductResponse } from "../../../../services/product_v2/admin/types/pagination";
 
 export const fetchPaginatedProducts = createAsyncThunk<
   LimitCrudProductResponse,

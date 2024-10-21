@@ -89,6 +89,7 @@ const ProductCategoryService = {
       const products = await Product.find({
         product_type: categoryId,
         status: { $ne: 'disable' },
+        variants: { $exists: true, $ne: [] }, 
         ...brandFilter,
         ...conditionShoppingFilter,
         ...priceFilter,
@@ -111,6 +112,7 @@ const ProductCategoryService = {
       const total = await Product.countDocuments({
         product_type: categoryId,
         status: { $ne: 'disable' },
+        variants: { $exists: true, $ne: [] }, 
         ...brandFilter,
         ...conditionShoppingFilter,
         ...priceFilter,

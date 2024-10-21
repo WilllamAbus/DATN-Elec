@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
-import { addInbound, getListProducts, getListSuppliers } from "../../../../services/inbound/crudInbound.service";
+import { addInbound, getListProducts, getListSuppliers} from "../../../../services/inbound/crudInbound.service";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductV2 } from "../../../../types/ProductV2";
+import { ProductVariant } from "../../../../types/ProductV2";
 import { Supplier } from "../../../../types/Suppliers.d";
 
 interface IFormInput {
@@ -28,9 +28,8 @@ const AddInbound: React.FC = () => {
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [products, setProducts] = useState<ProductV2[]>([]);
+    const [products, setProducts] = useState<ProductVariant[]>([]); //Product Variant
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
@@ -46,6 +45,7 @@ const AddInbound: React.FC = () => {
         const fetchProducts = async () => {
             try {
                 const data = await getListProducts();
+                console.log("Variant:", data.productReady)
                 setProducts(data.productReady || []);
             } catch (error) {
                 console.error("Error fetching products:", error);
@@ -62,6 +62,7 @@ const AddInbound: React.FC = () => {
         fetchSuppliers();
         fetchProducts();
     }, []);
+    //Product Variant
     const submitFormAdd = async (data: IFormInput) => {
         try {
             const payload = {
@@ -84,7 +85,8 @@ const AddInbound: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
+        <>
+        <div>
             <ToastContainer />
             <ReusableBreadcrumb items={breadcrumbItems.addInbounds} />
             <div className="mb-4 ml-4 col-span-full xl:mb-2">
@@ -92,7 +94,7 @@ const AddInbound: React.FC = () => {
                     Thêm lô hàng
                 </h1>
             </div>
-            <div className=" px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
+            <form className=" px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900"  onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
                 <div className="col-span-full xl:col-auto">
                     <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
                         <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan lô hàng</h3>
@@ -114,7 +116,7 @@ const AddInbound: React.FC = () => {
                                     {products.length > 0 ? (
                                         products.map((product, index) => (
                                             <option key={product._id || index} value={product._id}>
-                                                {product.product_name}
+                                                {product.variant_name}
                                             </option>
                                         ))
                                     ) : (
@@ -166,7 +168,7 @@ const AddInbound: React.FC = () => {
                                 <input
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     id="inbound_quantity"
-                                    type="text"
+                                    type="number"
                                     {...register("inbound_quantity",
                                         {
                                             required: "Số lượng không được bỏ trống",
@@ -192,7 +194,7 @@ const AddInbound: React.FC = () => {
                                 <input
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     id="inbound_price"
-                                    type="text"
+                                    type="number"
                                     {...register("inbound_price",
                                         {
                                             required: "Giá tiền không được bỏ trống",
@@ -426,8 +428,13 @@ const AddInbound: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+
+        </>
+
+        
+        
     );
 };
 
