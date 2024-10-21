@@ -1,10 +1,24 @@
+const Product = require('../../../model/product_v2');
 const ProductDetailService = require('./productDetailSV');
 
 const getProductDetail = async (req, res) => {
-  const { slug } = req.params;
+  const { slug } = req.params;  // Lấy slug từ URL params
+  const { storage } = req.query; 
 
   try {
-    const response = await ProductDetailService.getProductDetail(slug);
+    // Bước 1: Kiểm tra sản phẩm trong bảng Product
+    const product = await Product.findOne({ slug });
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        err: 'Lỗi',
+        msg: 'Không tìm thấy sản phẩm',
+        status: 404
+      });
+    }
+
+    // Bước 2: Lấy chi tiết sản phẩm từ ProductDetailService
+    const response = await ProductDetailService.getProductDetail(slug, storage);
 
     if (!response.success) {
       return res.status(response.status).json({

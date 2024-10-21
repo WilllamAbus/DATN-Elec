@@ -6,35 +6,20 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const softDeleteUser = async (userId: string) => {
   try {
     const response = await instance.patch(
-      `${API_URL}/admin/soft-delete/${userId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
+      `${API_URL}/admin/soft-delete/${userId}`
     );
     return response.data;
   } catch (error) {
-    throw new Error((error as Error).message);
+    throw error;
   }
 };
-
 //Khôi Phục
 export const restore = async (userId: string) => {
   try {
-    const response = await instance.patch(
-      `${API_URL}/admin/restore/${userId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await instance.patch(`${API_URL}/admin/restore/${userId}`);
     return response.data;
   } catch (error) {
-    throw new Error((error as Error).message);
+    throw error;
   }
 };
 //danh sách tài khoản xóa mềm

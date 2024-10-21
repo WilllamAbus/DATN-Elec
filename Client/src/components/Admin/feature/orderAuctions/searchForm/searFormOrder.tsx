@@ -12,7 +12,7 @@ const SearchFormOrders: React.FC<SearchFormOrdersProps> = ({ setSearchTerm }) =>
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchTerm);
+   
     setSearchTerm(searchTerm); // Pass the actual searchTerm value
     dispatch(getOrders({ page: 1, search: searchTerm }));
   };

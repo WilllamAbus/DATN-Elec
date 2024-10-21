@@ -10,27 +10,23 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import { AvatarFallback } from "../../../../ultils/avatar/avataAdmin";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const MySwal = withReactContent(Swal);
 
 const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.activeUsers);
-  const userListStatus = useSelector(
-    (state: RootState) => state.auth.activeUsersStatus
-  );
-  const userListError = useSelector(
-    (state: RootState) => state.auth.activeUsersError
-  );
 
   useEffect(() => {
     dispatch(getActiveListThunk());
   }, [dispatch]);
 
-  const handlesoftDelete = async (userId: string) => {
+  const handlesoftDelete = async (id: string) => {
     MySwal.fire({
-      title: "Khóa người dùng?",
-      text: "Bạn có chắc muốn khóa người dùng này không!",
+      title: `Khóa người dùng?`,
+      text: `Bạn có chắc muốn khóa người dùng không?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -40,53 +36,28 @@ const UserList: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await dispatch(softDeleteUserThunk(userId)).unwrap();
-
-          // Không cần gọi lại getActiveListThunk nếu dữ liệu đã được cập nhật trong slice
-          MySwal.fire({
-            title: "Đã Khóa!",
-            text: "Người dùng đã bị khóa.",
-            icon: "success",
-          });
+          const response = await dispatch(softDeleteUserThunk(id)).unwrap();
+          toast.dismiss();
+          const successMessage = response?.message;
+          toast.success(successMessage);
         } catch (error) {
-          console.error("Error deleting user:", error);
-          MySwal.fire({
-            title: "Lỗi!",
-            text: "Đã xảy ra sự cố khi khóa người dùng.",
-            icon: "error",
-          });
+          console.error("Lỗi khóa TK:", error);
+
+          const errorMessage = (error as string) || "Không thể khóa.";
+          toast.dismiss();
+          toast.error(errorMessage);
         }
       }
     });
   };
-
-  if (userListStatus === "loading") {
-    return <p>Loading...</p>;
+  if (!Array.isArray(users) || users.length === 0) {
+    return <p>Không có người dùng nào .</p>;
   }
 
-  if (userListStatus === "failed") {
-    return <p>Error: {userListError}</p>;
-  }
-
-  if (!Array.isArray(users)) {
-    return <p>Invalid data format</p>;
-  }
   return (
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
-          <th scope="col" className="p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-all"
-                type="checkbox"
-                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label htmlFor="checkbox-all" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </th>
           <th scope="col" className="p-4">
             Stt
           </th>
@@ -115,18 +86,6 @@ const UserList: React.FC = () => {
               key={user._id}
               className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <td className="p-4 w-4">
-                <div className="flex items-center">
-                  <input
-                    id="checkbox-table-search-1"
-                    type="checkbox"
-                    className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <label htmlFor="checkbox-table-search-1" className="sr-only">
-                    checkbox
-                  </label>
-                </div>
-              </td>
               <td className="py-4 px-6 border-b border-grey-light">
                 {index + 1}
               </td>
@@ -181,6 +140,7 @@ const UserList: React.FC = () => {
           <p>Không có người dùng nào.</p>
         )}
       </tbody>
+      <ToastContainer />
     </table>
   );
 };

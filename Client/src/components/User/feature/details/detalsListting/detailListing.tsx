@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 //css carosel sản phẩm liên quan
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination ,} from 'swiper/modules';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import {
   AppDispatch,
   RootState,
@@ -18,8 +18,14 @@ import {
   deleteWatchlistThunk,
   getWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
-import { getProductByID, upViewProduct } from "../../../../../services/product_v2/client/homeAllProduct";
-import { ProductAttribute, ProductRelated } from "../../../../../services/product_v2/client/types/homeAllProduct";
+import {
+  getProductByID,
+  upViewProduct,
+} from "../../../../../services/product_v2/client/homeAllProduct";
+import {
+  ProductAttribute,
+  ProductRelated,
+} from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -35,9 +41,7 @@ import { HeartIcon, StarIcon } from "../../page-auction/svg";
 import { fetchRelatedProducts } from "../../../../../services/detailProduct/relatedProducts";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
-import {
-  addInteractionView,
-} from "../../../../../services/interaction/interaction.service";
+import { addInteractionView } from "../../../../../services/interaction/interaction.service";
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -72,9 +76,7 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
-  const watchlistItems = useSelector(
-    (state: RootState) => state.watchlist
-  );
+  const watchlistItems = useSelector((state: RootState) => state.watchlist);
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
@@ -88,12 +90,12 @@ const ProductDetail: React.FC = () => {
         console.log("Product ID is not available.");
         return; // Nếu không có ID, không thực hiện
       }
-  
+
       if (!profile?._id) {
         console.log("User profile is not available.");
         return; // Nếu không có profile, không thực hiện
       }
-  
+
       const interactionData = {
         user: profile._id,
         orderAuctions: null,
@@ -104,50 +106,58 @@ const ProductDetail: React.FC = () => {
         type: "view",
         score: 2,
       };
-  
+
       try {
         console.log("Fetching product with ID:", id);
-        
+
         const productID = await getProductByID(id);
         setProduct(productID.product);
         console.log(productID.product);
-  
+
         await upViewProduct(id); // Cập nhật lượt xem sản phẩm
         await addInteractionView(interactionData);
         const updatedProduct = await getProductByID(id);
         setProduct(updatedProduct);
-  
+
         const relatedData = await fetchRelatedProducts(id);
         // Kiểm tra và thiết lập giá trị cho relatedProducts
         if (relatedData && Array.isArray(relatedData.relatedProducts)) {
           setRelatedProducts(relatedData.relatedProducts);
         } else {
-          console.error('Error: relatedData is not an array', relatedData);
+          console.error("Error: relatedData is not an array", relatedData);
         }
-  
-        // Ghi lại tương tác
-  
-        // Lấy danh sách yêu thích của người dùng
-        const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
-        const isFavoriteProduct = watchlistResponse.some(
-          (item: WatchlistItem) => item.product._id === id
-        );
-        setIsFavorite(isFavoriteProduct);
-        console.log("Sản phẩm có trong danh sách yêu thích:", isFavoriteProduct);
-  
       } catch (error) {
-        console.error("Không thể lấy dữ liệu sản phẩm hoặc danh sách yêu thích:", error);
+        console.error("Không thể lấy dữ liệu sản phẩm:", error);
       }
     };
-  
+
     // Gọi hàm fetchData
     fetchData();
-  
+    fetchWatchlist();
     // Lấy thông tin profile
     dispatch(getProfileThunk());
-  
   }, [id, dispatch]); // Thêm profile vào dependency array
-  
+  const fetchWatchlist = async () => {
+    try {
+      const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
+
+      if (Array.isArray(watchlistResponse)) {
+        const isFavoriteProduct = watchlistResponse.some(
+          (item: WatchlistItem) => item?.product?._id === id
+        );
+        setIsFavorite(isFavoriteProduct);
+        console.log(
+          "Sản phẩm có trong danh sách yêu thích:",
+          isFavoriteProduct
+        );
+      } else {
+        console.error("Danh sách yêu thích không hợp lệ:", watchlistResponse);
+        setIsFavorite(false);
+      }
+    } catch (error) {
+      console.error("Không thể lấy danh sách yêu thích:", error);
+    }
+  };
 
   const handleAddToCart = async () => {
     if (userId && id) {
@@ -269,8 +279,9 @@ const ProductDetail: React.FC = () => {
                 <img
                   key={index}
                   src={imgSrc}
-                  className={`w-20 h-16 object-cover cursor-pointer border border-gray-300 rounded ${index === currentIndex ? "border-blue-500" : ""
-                    }`}
+                  className={`w-20 h-16 object-cover cursor-pointer border border-gray-300 rounded ${
+                    index === currentIndex ? "border-blue-500" : ""
+                  }`}
                   onClick={() => changeMainImage(index)}
                 />
               ))}
@@ -311,7 +322,7 @@ const ProductDetail: React.FC = () => {
                 <p className="text-xl text-red-600 font-semibold">
                   {formatCurrency(
                     products?.product_price *
-                    (1 - products?.product_discount?.discountPercent / 100)
+                      (1 - products?.product_discount?.discountPercent / 100)
                   )}
                   đ
                 </p>
@@ -332,9 +343,10 @@ const ProductDetail: React.FC = () => {
             </h3>
             <div className="flex flex-wrap gap-2">
               {products?.product_attributes?.length ? (
-                products.product_attributes?.filter((attribute: ProductAttribute) =>
-                  ["Ram", "Color"].includes(attribute.k)
-                )
+                products.product_attributes
+                  ?.filter((attribute: ProductAttribute) =>
+                    ["Ram", "Color"].includes(attribute.k)
+                  )
                   .map((attribute: ProductAttribute, index: number) => (
                     <div key={index} className="flex flex-col gap-1">
                       <strong className="text-gray-800">{attribute.k}:</strong>
@@ -356,10 +368,11 @@ const ProductDetail: React.FC = () => {
                             />
                             <label
                               htmlFor={`${attribute.k}-${i}`}
-                              className={`border rounded-sm h-8 w-32 flex items-center justify-center cursor-pointer text-gray-600 ${selectedValues[attribute.k] === value.trim()
-                                ? "border-blue-500"
-                                : "border-gray-300"
-                                }`}
+                              className={`border rounded-sm h-8 w-32 flex items-center justify-center cursor-pointer text-gray-600 ${
+                                selectedValues[attribute.k] === value.trim()
+                                  ? "border-blue-500"
+                                  : "border-gray-300"
+                              }`}
                             >
                               {value.trim()}
                             </label>
@@ -416,8 +429,9 @@ const ProductDetail: React.FC = () => {
               className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
-                className={`fas fa-heart ${isFavorite ? "text-red-500" : "text-gray-500"
-                  }`}
+                className={`fas fa-heart ${
+                  isFavorite ? "text-red-500" : "text-gray-500"
+                }`}
               ></i>
               <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>
@@ -445,9 +459,10 @@ const ProductDetail: React.FC = () => {
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            {products?.product_attributes?.filter((attribute: ProductAttribute) =>
-              attributesToShow.includes(attribute.k)
-            )
+            {products?.product_attributes
+              ?.filter((attribute: ProductAttribute) =>
+                attributesToShow.includes(attribute.k)
+              )
               .map((attribute: ProductAttribute, index: number) => (
                 <li key={index} className="mb-1">
                   <strong>{attribute.k}: </strong>
@@ -457,15 +472,11 @@ const ProductDetail: React.FC = () => {
             <li>
               <strong>Khối lượng:</strong> <span>{products?.weight_g} kg</span>
             </li>
-
-       
           </table>
         </div>
       </div>
 
-
       <Comment />
-
 
       <div className="container pb-16">
         <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
@@ -505,7 +516,8 @@ const ProductDetail: React.FC = () => {
                   <div className="mb-4 px-2 flex items-center justify-between gap-4">
                     {productRelated.product_discount.discountPercent > 0 ? (
                       <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                        Giảm giá {productRelated.product_discount.discountPercent}%
+                        Giảm giá{" "}
+                        {productRelated.product_discount.discountPercent}%
                       </span>
                     ) : null}
                     <div className="flex items-center justify-end gap-1">
@@ -531,13 +543,13 @@ const ProductDetail: React.FC = () => {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {productRelated.product_ratingAvg
                         ? productRelated.product_ratingAvg.toFixed(1)
-                        : 'N/A'}
+                        : "N/A"}
                     </p>
                     <StarIcon />
                     <div className="text-xs text-gray-500 items-center">
                       {productRelated.product_quantity > 0
                         ? `(Còn ${productRelated.product_quantity} sản phẩm)`
-                        : 'Hết hàng'}
+                        : "Hết hàng"}
                     </div>
                   </div>
                   <div className="mt-2 px-2 flex items-center gap-2">
@@ -546,8 +558,11 @@ const ProductDetail: React.FC = () => {
                         <p className="text-xs font-medium text-rose-700 flex-grow">
                           {formatCurrency(
                             productRelated.product_price *
-                            (1 - productRelated.product_discount.discountPercent / 100)
-                          )}{' '}
+                              (1 -
+                                productRelated.product_discount
+                                  .discountPercent /
+                                  100)
+                          )}{" "}
                           đ
                         </p>
                         <p className="text-xs font-medium text-gray-400 line-through flex-shrink-0">

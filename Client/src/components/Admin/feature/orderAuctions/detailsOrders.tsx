@@ -88,10 +88,12 @@ const OrderDetails: React.FC = () => {
                 <p className="text-lg font-medium mb-2">Tổng quan trạng thái</p>
                 <Select value={selectedStatus} onChange={handleStatusChange}>
                 <option >Trạng thái đơn hàng</option>
+                <option value="Chờ xử lý">Chờ xử lý</option>
+                <option value="Đã xác nhận">Đã xác nhận</option>
                   <option value="Vận chuyển">Vận chuyển</option>
                   <option value="Nhận hàng">Nhận hàng</option>
                   <option value="Hoàn tất">Hoàn tất</option>
-                  <option value="Hủy đơn hàng">Hủy đơn hàng</option>
+                  {/* <option value="Hủy đơn hàng">Hủy đơn hàng</option> */}
                 </Select>
                 <Button onClick={handleUpdateStatus}
                    className="mt-4 bg-blue-500 text-white p-2 rounded-md">

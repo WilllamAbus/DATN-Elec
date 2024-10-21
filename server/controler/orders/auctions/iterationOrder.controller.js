@@ -16,6 +16,52 @@ const iteractionOrderAuController = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  getPendingOrderByUser : async(req,res)=>{
+    try {
+        const { userId } = req.query; // Lấy userId từ req.body
+    
+        // Gọi hàm từ Service
+        const result = await iteractionOrderAucService.getPendingOrdersByUser(userId);
+    
+        // Trả về kết quả cho client
+        return res.status(200).json({
+          success: true,
+          status: 200,
+          data: result,
+        });
+    
+      } catch (error) {
+        // Xử lý lỗi
+        return res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+},
+
+getConfirmedOrderByUser : async(req,res)=>{
+  try {
+      const { userId } = req.query; // Lấy userId từ req.body
+  
+      // Gọi hàm từ Service
+      const result = await iteractionOrderAucService.getConfirmedOrdersByUser(userId);
+  
+      // Trả về kết quả cho client
+      return res.status(200).json({
+        success: true,
+        status: 200,
+        data: result,
+      });
+  
+    } catch (error) {
+      // Xử lý lỗi
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+},
     getShippingOrderByUser : async(req,res)=>{
         try {
             const { userId } = req.query; // Lấy userId từ req.body

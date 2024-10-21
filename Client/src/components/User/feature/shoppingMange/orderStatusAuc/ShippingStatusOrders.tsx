@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { fetchOrderDataShippingThunk } from "../../../../../redux/statusOrderUser/shippingStatusOrder/shippingStatusThunk";
-import { softDelThunk } from "../../../../../redux/statusOrderUser/softDelByUser/softDellOrderThunk";
+
 import { OrderProductShipping, OrderDataAllShipping } from "../../../../../types/iterationOrder/shippingStatusOrder";
 
 import currencyFormatter from "currency-formatter";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer,  toast} from "react-toastify";
+import { ToastContainer,  } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -57,23 +57,7 @@ const OrderListShippingStatus: React.FC = () => {
   const goBack = () => {
     navigate("/auction");
   };
-  const handleSoftDelOrder = (orderId: string) => {
-    if (orderId && userId ) {
 
-      
-      // Assuming orderId is an array and you want to delete multiple orders
-      dispatch(softDelThunk({orderId})).unwrap();
-      // dispatch(fetchOrderDataShippingThunk(userId));
-      setOrders((prevCategories) =>
-        prevCategories.filter((order) => order.orderId !== orderId)
-      );
-      toast.success("Xóa đơn hàng thành công");
-    } else {
-      toast.error("Không tìm thấy ID đơn hàng để xóa");
-    }
-
-
-  };
   return (
     <div className="mt-6 border border-gray-300 pt-7 rounded-lg shadow-md bg-white">
       {orders
@@ -134,7 +118,7 @@ const OrderListShippingStatus: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-4 w-full md:w-auto md:flex-row mt-4 md:mt-0 md:ml-auto justify-center md:justify-end">
                       <button
-                     onClick={() => handleSoftDelOrder(order.orderId)} // Truy cập _id từ đối tượng order
+                  // Truy cập _id từ đối tượng order
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
                       >
                         Hủy đơn hàng

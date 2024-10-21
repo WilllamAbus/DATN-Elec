@@ -11,28 +11,26 @@ const AdminEditCategories = React.lazy(
 const AdminListCategories = React.lazy(
   () => import("../page/Admin/categories/listCategories")
 );
-/**Products */
-const AdminAddProducts = React.lazy(
-  () => import("../page/Admin/products/addProd")
-);
-const AdminEditProducts = React.lazy(
-  () => import("../page/Admin/products/editProd")
-);
-const AdminListProducts = React.lazy(
-  () => import("../page/Admin/products/listProd")
-);
+
+
 /**ProductsV2 */
 const AdminAddProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/add")
+  () => import("../page/Admin/product/add/add")
+);
+const AdminFetAddProductAuction = React.lazy(
+  () => import("../page/Admin/product/add/addAuction")
 );
 const AdminAddVariant = React.lazy(
-  () => import("../page/Admin/productV2/addVariant")
+  () => import("../page/Admin/product/variant/addVariant")
 );
 const AdminListProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/list")
+  () => import("../page/Admin/product/list/list")
+);
+const AdminFetListProductAuction = React.lazy(
+  () => import("../page/Admin/product/list/listAuction")
 );
 const AdminEditProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/edit")
+  () => import("../page/Admin/product/edit/edit")
 );
 /**Brands */
 const AdminAddBrands = React.lazy(
@@ -75,15 +73,7 @@ const AdminListDetailComments = React.lazy(
 );
 
 /**ConditionAuc */
-const AdminConditionAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/addConditionAuction")
-);
-const AdminEditConditionAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/editCodAuc")
-);
-const AdminListCondAuc = React.lazy(
-  () => import("../page/Admin/conditionAuction/listCondAuc")
-);
+
 
 /**CustomerService */
 const AdminListCService = React.lazy(
@@ -110,13 +100,25 @@ const AdminDetailsOrder = React.lazy(
 
 /**productionAuc */
 const AdminAddProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/addProdAuc")
+  () => import("../page/Admin/productTime/addProductTime")
 );
 const AdminEditProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/editProdAuc")
+  () => import("../page/Admin/productTime/editProductTime")
 );
 const AdminListProdAuc = React.lazy(
-  () => import("../page/Admin/productAuction/listProdAuc")
+  () => import("../page/Admin/productTime/list")
+);
+
+
+/**priceRand */
+const AdminAddPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/addPriceRand")
+);
+const AdminEditPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/editPriceRand")
+);
+const AdminListPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/listPriceRand")
 );
 /***RecycleBin */
 const AdminRecycleBinCate = React.lazy(
@@ -139,6 +141,14 @@ const AdminRecycleBinBrand = React.lazy(
 );
 const AdminRecycleComment = React.lazy(
   () => import("../page/Admin/recycleBinComment/index")
+);
+
+const AdminRecybinProductTime = React.lazy(
+  () => import("../page/Admin/productTime/deletedProductTime")
+);
+
+const AdminRecybinPriceRand = React.lazy(
+  () => import("../page/Admin/priceRand/deletedPriceRand")
 );
 
 /**User */
@@ -208,12 +218,11 @@ const AdminRoutes: RouteObject[] = [
       { path: "editCategories/:id", element: <AdminEditCategories /> },
       { path: "listCategories", element: <AdminListCategories /> },
       { path: "addproduct", element: <AdminAddProductV2 /> },
+      { path: "add-product-auction", element: <AdminFetAddProductAuction /> },
+      { path: "list-auction", element: <AdminFetListProductAuction /> },
       { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
       { path: "listproduct", element: <AdminListProductV2 /> },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
-      { path: "addProducts", element: <AdminAddProducts /> },
-      { path: "editProducts/:id", element: <AdminEditProducts /> },
-      { path: "listProducts", element: <AdminListProducts /> },
       { path: "addBrands", element: <AdminAddBrands /> },
       { path: "editBrands/:id", element: <AdminEditBrands /> },
       { path: "listBrands", element: <AdminListBrands /> },
@@ -236,9 +245,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
       { path: "listComments", element: <AdminListComments /> },
       { path: "listDetailComments/:id", element: <AdminListDetailComments /> },
-      { path: "addConditon", element: <AdminConditionAuc /> },
-      { path: "editCondition", element: <AdminEditConditionAuc /> },
-      { path: "listCondition", element: <AdminListCondAuc /> },
+  
       { path: "listCusSer", element: <AdminListCService /> },
       { path: "addVouchers", element: <AdminAddVoucher /> },
       { path: "editVouchers/:id", element: <AdminEditVoucher /> },
@@ -246,8 +253,13 @@ const AdminRoutes: RouteObject[] = [
       { path: "listOrders", element: <AdminListOrder /> },
       { path: "listDetailOrder/:id", element: <AdminDetailsOrder /> },
       { path: "addProdAuc", element: <AdminAddProdAuc /> },
-      { path: "editProdAuc", element: <AdminEditProdAuc /> },
+      { path: "editProdAuc/:id", element: <AdminEditProdAuc /> },
       { path: "listProdAuc", element: <AdminListProdAuc /> },
+
+      { path: "addPriceRand", element: <AdminAddPriceRand /> },
+      { path: "editPriceRand/:id", element: <AdminEditPriceRand /> },
+      { path: "listPriceRand", element: <AdminListPriceRand /> },
+
       { path: "recycleBin", element: <AdminRecycleBin /> },
       { path: "recycleBinCate", element: <AdminRecycleBinCate /> },
       { path: "recycleBinOrder", element: <AdminRecycleBinOrder /> },
@@ -255,6 +267,8 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinSupplier", element: <AdminRecycleBinSupplier /> },
       { path: "recycleBinBrand", element: <AdminRecycleBinBrand /> },
       { path: "recycleBinComment", element: <AdminRecycleComment /> },
+      { path: "recycleBinProducTime", element: <AdminRecybinProductTime /> },
+      { path: "recycleBinPriceRand", element: <AdminRecybinPriceRand /> },
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },

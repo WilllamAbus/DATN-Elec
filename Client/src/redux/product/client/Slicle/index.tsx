@@ -7,3 +7,4 @@ export { default as getAllConditionShoppingSlice } from "./getAllConditionShoppi
 export { default as getAllRamSlice } from "./getAllRam";
 export { default as getAllStorageSlice } from "./getAllStorage";
 export { default as getProductDetailSlice } from "./getProductDetail";
+export { default as getAllStorageBySlugUrlSlice } from "./getAllStorageBySlugUrl";

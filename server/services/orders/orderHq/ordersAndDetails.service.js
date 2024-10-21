@@ -13,6 +13,7 @@ const crypto = require("crypto");
 // const momoService  = require('./momo.service');
 const mongoose = require("mongoose");
 const vnpaySService = require("./vnpay.service");
+const { log } = require("console");
 // const InventoryOut = require("../../../model/inventory/invenOut.model");
 
 const orderAndDetailService = {
@@ -40,9 +41,10 @@ const orderAndDetailService = {
       const nameProduct = product.product_name;
 
       // const testProductID = mongoose.Types.ObjectId("66e3eb3506aa43ec4bc5686b");
-      const inven = await Inventory.findOne({ product: productID }).lean();
+      
+      // const inven = await Inventory.findOne({ product: productID }).lean();
 
-      if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
+      // if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
 
       // Extract details from auction
       const quantityDetails = auction.auction_quantity;
@@ -118,37 +120,37 @@ const orderAndDetailService = {
         hashLinkPayment,
       });
 
-      console.log("orderDetailAuction", orderDetailAuction);
+
 
       await orderDetailAuction.save();
 
       // Update product quantity in Inventory
-      const updatedProductQuantity = inven.quantityShelf - quantityDetails;
-      if (updatedProductQuantity < 0) {
-        throw new Error("Số lượng sản phẩm không đủ");
-      }
+      // const updatedProductQuantity = inven.quantityShelf - quantityDetails;
+      // if (updatedProductQuantity < 0) {
+      //   throw new Error("Số lượng sản phẩm không đủ");
+      // }
 
-      const numInventoriesShelf = inven.quantityShelf;
-      const numQuantityDetails = quantityDetails;
-      const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
+      // const numInventoriesShelf = inven.quantityShelf;
+      // const numQuantityDetails = quantityDetails;
+      // const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
 
-      await Inventory.findOneAndUpdate(
-        { product: productID },
-        {
-          $set: {
-            product: productID,
-            quantityShelf: remainingQuantityShelf,
-            quantityStock: inven.quantityStock,
-            totalQuantity: inven.totalQuantity,
-            supplier: inven.supplier,
-            price: inven.price,
-            totalPrice: inven.totalPrice,
-            status: "active",
-            createdAt: Date.now(),
-            updateAt: Date.now(),
-          },
-        }
-      );
+      // await Inventory.findOneAndUpdate(
+      //   { product: productID },
+      //   {
+      //     $set: {
+      //       product: productID,
+      //       quantityShelf: remainingQuantityShelf,
+      //       quantityStock: inven.quantityStock,
+      //       totalQuantity: inven.totalQuantity,
+      //       supplier: inven.supplier,
+      //       price: inven.price,
+      //       totalPrice: inven.totalPrice,
+      //       status: "active",
+      //       createdAt: Date.now(),
+      //       updateAt: Date.now(),
+      //     },
+      //   }
+      // );
 
       // Send confirmation email to user
       const orderDetails = {
@@ -208,19 +210,22 @@ const orderAndDetailService = {
       const order = await OrderAuction.findById(orderId)
         .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
-
+      console.log('order found', order);
+      
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order
       const orderDetails = await OrderDetailAuction.find({
         order: orderId,
       }).lean();
-
+      console.log('OrderDetails', orderDetails);
+      
       // Fetch product details for each order detail
       const productDetails = await Promise.all(
         orderDetails.map(async (detail) => {
           const product = await Product_v2.findById(detail.productID).lean();
-
+          console.log('products', product);
+          
           return {
             name: product.product_name,
             price: detail.totalAmount,
@@ -228,7 +233,8 @@ const orderAndDetailService = {
           };
         })
       );
-
+      console.log('productDetails' , productDetails);
+      
       // Extract the user and address information from the shippingAddress
       const shippingInfo = {
         userId: order.shippingAddress.userID._id,
@@ -238,6 +244,7 @@ const orderAndDetailService = {
         email: order.shippingAddress.userID.email, // Assuming the user's email is stored here
       };
       const orderIds = order._id;
+
       // Return the consolidated order information
       return {
         orderIds,

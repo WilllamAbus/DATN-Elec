@@ -264,10 +264,11 @@ import {
   updateProfileThunk,
   getProfileThunk,
 } from "../../../../redux/auth/authThunk";
-import axios from "axios";
+
 import moment from "moment";
 import { useForm } from "react-hook-form";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 interface EditProfileProps {
   profile: UserProfile | null;
 }
@@ -279,7 +280,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
     setValue,
     formState: { errors },
   } = useForm<UserProfile>();
-  const [message, setMessage] = useState<string | null>(null);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -316,7 +317,6 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
 
   const onSubmit = async (data: UserProfile) => {
     setLoading(true);
-    setMessage(null);
 
     try {
       const formData = new FormData();
@@ -329,25 +329,23 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
         formData.append("avatar", selectedImage);
       }
 
-      await dispatch(updateProfileThunk(formData)).unwrap();
+      const response = await dispatch(updateProfileThunk(formData)).unwrap();
 
       const updatedProfile = await dispatch(getProfileThunk()).unwrap();
+      const successMessage = response?.message || "Cập nhật thành công!";
+      toast.dismiss();
+      toast.success(successMessage);
       dispatch(setProfile(updatedProfile));
-
-      setMessage("Profile updated successfully!");
-    } catch (err) {
-      console.error("Error updating profile:", err);
+    } catch (error) {
+      console.error("Error updating profile:", error);
       const errorMessage =
-        axios.isAxiosError(err) && err.response?.data?.msg
-          ? `Lỗi: ${err.response.status} - ${err.response.data.msg}`
-          : "Đã xảy ra lỗi không xác định";
-      setMessage(errorMessage);
+        (error as Error).message || "Registration failed. Please try again.";
+      toast.dismiss();
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  // if (loading) return <p>Loading...</p>;
 
   return (
     <div className="col-span-9 shadow-lg rounded-lg px-8 py-6 bg-white">
@@ -357,7 +355,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label
                 htmlFor="name"
@@ -368,9 +366,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               <input
                 type="text"
                 {...register("name", { required: "Họ tên là bắt buộc" })}
-                className={`form-input mt-1 block w-full ${
-                  errors.name ? "border-red-500" : ""
-                }`}
+                className={`form-input mt-1 block w-full border ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
               />
               {errors.name && (
                 <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -392,9 +390,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                     message: "Số điện thoại phải gồm 9-10 số",
                   },
                 })}
-                className={`form-input mt-1 block w-full ${
-                  errors.phone ? "border-red-500" : ""
-                }`}
+                className={`form-input mt-1 block w-full border ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
               />
               {errors.phone && (
                 <p className="text-red-500 text-sm">{errors.phone.message}</p>
@@ -412,9 +410,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                 {...register("birthday", {
                   required: "Ngày sinh không được để trống",
                 })}
-                className={`form-input mt-1 block w-full ${
-                  errors.birthday ? "border-red-500" : ""
-                }`}
+                className={`form-input mt-1 block w-full border ${
+                  errors.birthday ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
               />
               {errors.birthday && (
                 <p className="text-red-500 text-sm">
@@ -433,9 +431,9 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                 {...register("gender", {
                   required: "Giới tính không được để trống",
                 })}
-                className={`form-select mt-1 block w-full ${
-                  errors.gender ? "border-red-500" : ""
-                }`}
+                className={`form-select mt-1 block w-full border ${
+                  errors.gender ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
               >
                 <option value="">Chọn giới tính</option>
                 <option value="Nam">Nam</option>
@@ -457,9 +455,11 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                 id="avatar"
                 accept="image/*"
                 onChange={handleImageChange}
-                className={`form-input mt-1 block w-full ${
-                  !selectedImage && errors.avatar ? "border-red-500" : ""
-                }`}
+                className={`form-input mt-1 block w-full border ${
+                  !selectedImage && errors.avatar
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded-md shadow-sm`}
               />
               {errors.avatar && (
                 <p className="text-red-500 text-sm">{errors.avatar.message}</p>
@@ -491,15 +491,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
           </button>
         </div>
       </form>
-      {message && (
-        <p
-          className={`mt-4 text-sm font-medium ${
-            message.includes("thành công") ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {message}
-        </p>
-      )}
+
+      <ToastContainer />
     </div>
   );
 };

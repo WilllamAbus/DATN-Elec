@@ -7,6 +7,7 @@ import {
   updateCart,
   SelectCart as SelectCartService,
   deleteCart as deleteCartService,
+  CheckVoucher,
 } from "../../services/cart/cart";
 import { CartType } from "../../types/cart/carts";
 import axios from "axios";
@@ -137,6 +138,34 @@ export const SelectCart = createAsyncThunk(
     try {
       const response = await SelectCartService({ productId, items }); // Gọi service với một đối tượng
       return response; // Trả về response nếu chọn thành công
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(
+          error.response.data.message || "Chọn giỏ hàng thất bại."
+        );
+      } else {
+        return rejectWithValue(
+          (error as Error).message || "Chọn giỏ hàng thất bại."
+        );
+      }
+    }
+  }
+);
+export const CheckVoucherThunk = createAsyncThunk(
+  "cart/CheckVoucher",
+  async (
+    {
+      cartId,
+      voucherId,
+    }: {
+      cartId: string;
+      voucherId: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await CheckVoucher({ cartId, voucherId });
+      return response;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(

@@ -13,8 +13,8 @@ const Forgot: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); // Bắt đầu quá trình loading
-    toast.dismiss(); // Xóa thông báo trước đó
+    setIsLoading(true);
+    toast.dismiss();
 
     try {
       const resultAction = await dispatch(forgotPasswordThunk(email));
@@ -46,10 +46,9 @@ const Forgot: React.FC = () => {
 
   return (
     <>
-      <div className="container mx-auto py-16">
-        <ToastContainer />
+      <div className="py-60  bg-gray-100">
         <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-          <div className="px-6 py-8">
+          <div className="px-8 py-10">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Quên mật khẩu
             </h2>
@@ -119,6 +118,7 @@ const Forgot: React.FC = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };

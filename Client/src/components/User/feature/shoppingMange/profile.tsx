@@ -1,10 +1,332 @@
+// import React, { useEffect, useState } from "react";
+// import {
+//   RootState,
+//   useAppDispatch,
+//   useAppSelector,
+// } from "../../../../redux/store";
+// import { Link, useNavigate } from "react-router-dom";
+// import { logoutThunk } from "../../../../redux/auth/authThunk";
+// import EditProfile from "./edit-profile";
+// import Info from "./info";
+// import Watchlist from "./wathlist";
+// import UpdatePassword from "./changePassword";
+// import CountrySelector from "./address";
+// import OrderList from "./order";
+// import OrderAuct from "./orderAuctStatus";
+// import useAuth from "../../../../hooks/useAuth";
+
+// import Cookies from "js-cookie";
+// import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
+// // import SidebarDrawer from "../../../../ultils/dropdown/client/nav/Sidebar.prodile";
+// const ProfileUse: React.FC = () => {
+//   const dispatch = useAppDispatch();
+//   const navigate = useNavigate();
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isDropdownOpen, setDropdownOpen] = useState(false);
+//   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
+//   const [view, setView] = useState<
+//     | "order"
+//     | "orderAuct"
+//     | "info"
+//     | "edit"
+//     | "address"
+//     | "password"
+//     | "watchlist"
+//     | "detail"
+//   >("info");
+//   const toggleDrawer = () => {
+//     setIsOpen(!isOpen);
+//   };
+
+//   const profile = useAppSelector(
+//     (state: RootState) => state.auth.profile.profile
+//   );
+//   const profileStatus = useAppSelector(
+//     (state: RootState) => state.auth.profile.status
+//   );
+//   const profileError = useAppSelector(
+//     (state: RootState) => state.auth.profile.error
+//   );
+//   const [, setAddress] = useState<string>("");
+//   useEffect(() => {
+//     dispatch(fetchUserOrdersThunk());
+//   }, [dispatch]);
+//   (newAddress: string) => {
+//     setAddress(newAddress);
+//   };
+//   useAuth();
+
+//   if (profileStatus === "failed") {
+//     return <p>Error: {profileError || "Unknown error occurred"}</p>;
+//   }
+//   const handleLogout = async () => {
+//     try {
+//       await dispatch(logoutThunk()).unwrap();
+
+//       Cookies.remove("token");
+//       Cookies.remove("refreshToken");
+
+//       navigate("/login", { replace: true });
+//     } catch (error) {
+//       console.error("Error logging out:", error);
+//     }
+//   };
+
+//   return (
+//     <>
+//       {/* Breadcrumb */}
+
+//       <nav className=" py-4 flex items-center space-x-3 bg-gray-50 rounded-lg shadow-sm">
+//         <Link to="/" className="text-primary text-lg">
+//           <i className="fa-solid fa-house"></i>
+//         </Link>
+//         <span className="text-gray-400">
+//           <i className="fa-solid fa-chevron-right"></i>
+//         </span>
+//         <h4 className="text-gray-600 py-2 font-medium">HỒ SƠ KHÁCH HÀNG</h4>
+//       </nav>
+
+//       {/* Wrapper */}
+//       <div className="container grid grid-cols-12 items-start gap-6 pt-4 pb-16">
+//         {/* <SidebarDrawer /> */}
+//         <div className=" -z-14">
+//           <button
+//             onClick={toggleDrawer}
+//             className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+//           >
+//             <span className="sr-only">Open sidebar</span>
+//             <svg
+//               className="w-6 h-6"
+//               aria-hidden="true"
+//               fill="currentColor"
+//               viewBox="0 0 20 20"
+//               xmlns="http://www.w3.org/2000/svg"
+//             >
+//               <path
+//                 clipRule="evenodd"
+//                 fillRule="evenodd"
+//                 d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+//               ></path>
+//             </svg>
+//           </button>
+
+//           {/* Sidebar */}
+
+//           <aside
+//             className={`fixed top-40 left-0 z-10 w-64 h-96 transition-transform transform ${
+//               isOpen ? "translate-x-0" : "-translate-x-full"
+//             } sm:translate-x-0`}
+//             aria-label="Sidebar"
+//           >
+//             <div className="px-4 py-4 bg-gray-50 dark:bg-gray-800 h-screen overflow-y-auto">
+//               <div className="flex justify-between items-center mb-4">
+//                 <a href="/" className="flex items-center">
+//                   <img
+//                     src={profile?.avatar}
+//                     className="h-6 me-3 sm:h-7"
+//                     alt="Flowbite Logo"
+//                   />
+//                   <h4 className="text-gray-600">Xin chào,</h4>
+//                   <h4 className="text-gray-800 font-semibold">
+//                     {profile?.name}
+//                   </h4>
+//                 </a>
+
+//                 {/* Close Button */}
+//                 <button
+//                   type="button"
+//                   onClick={toggleDrawer}
+//                   className="text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 rounded-lg p-2 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+//                 >
+//                   <svg
+//                     className="w-6 h-6"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     viewBox="0 0 24 24"
+//                     xmlns="http://www.w3.org/2000/svg"
+//                   >
+//                     <path
+//                       strokeLinecap="round"
+//                       strokeLinejoin="round"
+//                       strokeWidth="2"
+//                       d="M6 18L18 6M6 6l12 12"
+//                     ></path>
+//                   </svg>
+//                   <span className="sr-only">Close sidebar</span>
+//                 </button>
+//               </div>
+
+//               <ul className="space-y-2 font-medium">
+//                 <li>
+//                   <a
+//                     href="#"
+//                     className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                       view === "info"
+//                         ? "bg-gray-100  text-gray-900"
+//                         : "text-gray-600"
+//                     }`}
+//                     onClick={() => setView("info")}
+//                   >
+//                     <span className="iconify mdi--account w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+
+//                     <span className="ms-3"> Quản lý tài khoản</span>
+//                   </a>
+
+//                   <a
+//                     href="#"
+//                     className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                       view === "edit"
+//                         ? "bg-gray-100  text-gray-900"
+//                         : "text-gray-600"
+//                     }`}
+//                     onClick={() => setView("edit")}
+//                   >
+//                     <svg
+//                       className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+//                       aria-hidden="true"
+//                       xmlns="http://www.w3.org/2000/svg"
+//                       width="24"
+//                       height="24"
+//                       fill="currentColor"
+//                       viewBox="0 0 24 24"
+//                     >
+//                       <path
+//                         fill-rule="evenodd"
+//                         d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4Zm10 5a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm0 3a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm0 3a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm-8-5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm1.942 4a3 3 0 0 0-2.847 2.051l-.044.133-.004.012c-.042.126-.055.167-.042.195.006.013.02.023.038.039.032.025.08.064.146.155A1 1 0 0 0 6 17h6a1 1 0 0 0 .811-.415.713.713 0 0 1 .146-.155c.019-.016.031-.026.038-.04.014-.027 0-.068-.042-.194l-.004-.012-.044-.133A3 3 0 0 0 10.059 14H7.942Z"
+//                         clip-rule="evenodd"
+//                       />
+//                     </svg>
+
+//                     <span className="ms-3"> Cập nhật thông tin</span>
+//                   </a>
+
+//                   <a
+//                     href="#"
+//                     className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                       view === "password"
+//                         ? "bg-gray-100  text-gray-900"
+//                         : "text-gray-600"
+//                     }`}
+//                     onClick={() => setView("password")}
+//                   >
+//                     <span className="iconify mdi--password w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                     <span className="ms-3"> Đổi mật khẩu</span>
+//                   </a>
+
+//                   <a
+//                     href="#"
+//                     className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                       view === "address"
+//                         ? "bg-gray-100  text-gray-900"
+//                         : "text-gray-600"
+//                     }`}
+//                     onClick={() => setView("address")}
+//                   >
+//                     <span className="iconify mdi--map-marker w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                     <span className="ms-3"> Địa chỉ</span>
+//                   </a>
+
+//                   <a
+//                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+//                     onClick={toggleDropdown}
+//                   >
+//                     <span className="iconify mdi--cart w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                     <span className="ms-3">Quản lý đơn hàng</span>
+//                   </a>
+
+//                   {isDropdownOpen && (
+//                     <div className="absolute mt-2 w-full z-50 bg-white rounded-lg shadow-lg dark:bg-gray-800">
+//                       <a
+//                         href="#"
+//                         className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                           view === "order"
+//                             ? "bg-gray-100 text-gray-900"
+//                             : "text-gray-600"
+//                         }`}
+//                         onClick={() => {
+//                           setView("order");
+//                           setDropdownOpen(false);
+//                         }}
+//                       >
+//                         <span className="iconify mdi--cart-outline w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                         <span className="ms-3"> Đơn hàng</span>
+//                       </a>
+
+//                       <a
+//                         href="#"
+//                         className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                           view === "orderAuct"
+//                             ? "bg-gray-100 text-gray-900"
+//                             : "text-gray-600"
+//                         }`}
+//                         onClick={() => {
+//                           setView("orderAuct");
+//                           setDropdownOpen(false);
+//                         }}
+//                       >
+//                         <span className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                         <span className="ms-3"> Đơn hàng đấu giá</span>
+//                       </a>
+//                     </div>
+//                   )}
+
+//                   <a
+//                     href="#"
+//                     className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+//                       view === "watchlist"
+//                         ? "bg-gray-100  text-gray-900"
+//                         : "text-gray-600"
+//                     }`}
+//                     onClick={() => setView("watchlist")}
+//                   >
+//                     <span className="iconify mdi--heart w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                     <span className="ms-3">Yếu thích</span>
+//                   </a>
+
+//                   <a
+//                     href="#"
+//                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+//                     onClick={handleLogout}
+//                   >
+//                     <span className="iconify mdi--logout w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></span>
+//                     <span className="ms-3"> Đăng Xuất</span>
+//                   </a>
+//                 </li>
+//               </ul>
+//             </div>
+//           </aside>
+//         </div>
+//         {/* Main Content Section */}
+
+//         <section className="col-span-9 bg-white shadow-sm rounded-lg p-6">
+//           {view === "info" && <Info profiles={profile} />}
+//           {view === "edit" && <EditProfile profile={profile} />}
+//           {view === "address" && (
+//             <CountrySelector
+//               address={profile?.address || ""}
+//               onAddressChange={() => {}}
+//               profile={profile}
+//             />
+//           )}
+//           {view === "password" && <UpdatePassword profile={profile} />}
+//           {view === "watchlist" && <Watchlist profiles={profile} />}
+//           {view === "order" && <OrderList />}
+//           {view === "orderAuct" && <OrderAuct />}
+//         </section>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default ProfileUse;
+
 import React, { useEffect, useState } from "react";
 import {
   RootState,
   useAppDispatch,
   useAppSelector,
 } from "../../../../redux/store";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logoutThunk } from "../../../../redux/auth/authThunk";
 import EditProfile from "./edit-profile";
 import Info from "./info";
@@ -12,16 +334,23 @@ import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
 import OrderList from "./order";
-import OrderAuct from "./orderAuctStatus"
+import OrderAuct from "./orderAuctStatus";
 import useAuth from "../../../../hooks/useAuth";
-
 import Cookies from "js-cookie";
 import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
+import { Transition } from "@headlessui/react";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<
-    "order"|"orderAuct" | "info" | "edit" | "address" | "password" | "watchlist" | "detail"
+    | "order"
+    | "orderAuct"
+    | "info"
+    | "edit"
+    | "address"
+    | "password"
+    | "watchlist"
   >("info");
 
   const profile = useAppSelector(
@@ -33,216 +362,250 @@ const ProfileUse: React.FC = () => {
   const profileError = useAppSelector(
     (state: RootState) => state.auth.profile.error
   );
-  const [, setAddress] = useState<string>("");
+
   useEffect(() => {
     dispatch(fetchUserOrdersThunk());
   }, [dispatch]);
-  (newAddress: string) => {
-    setAddress(newAddress);
-  };
+
   useAuth();
 
   if (profileStatus === "failed") {
     return <p>Error: {profileError || "Unknown error occurred"}</p>;
   }
+
   const handleLogout = async () => {
     try {
       await dispatch(logoutThunk()).unwrap();
-
       Cookies.remove("token");
       Cookies.remove("refreshToken");
-
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
 
+  const MenuItem = ({
+    item,
+  }: {
+    item:
+      | "order"
+      | "orderAuct"
+      | "info"
+      | "edit"
+      | "address"
+      | "password"
+      | "watchlist";
+  }) => (
+    <li>
+      <button
+        className={`w-full text-left p-2 rounded-lg flex items-center ${
+          view === item
+            ? "bg-blue-200 text-blue-800"
+            : "text-gray-600 hover:bg-blue-100"
+        }`}
+        onClick={() => {
+          setView(item);
+          isOpen && setIsOpen(false);
+        }}
+      >
+        {item === "info" && (
+          <>
+            <i className="iconify mdi--account w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Quản lý tài khoản</span>
+          </>
+        )}
+        {item === "edit" && (
+          <>
+            <i className="iconify mdi--edit w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Cập nhật thông tin</span>
+          </>
+        )}
+        {item === "address" && (
+          <>
+            <i className="iconify mdi--map-marker w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Địa chỉ</span>
+          </>
+        )}
+        {item === "password" && (
+          <>
+            <i className="iconify mdi--password w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Đổi mật khẩu</span>
+          </>
+        )}
+        {item === "watchlist" && (
+          <>
+            <i className="iconify mdi--heart w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3">Yếu thích</span>
+          </>
+        )}
+        {item === "order" && (
+          <>
+            <i className="iconify mdi--cart-outline w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Đơn hàng</span>
+          </>
+        )}
+        {item === "orderAuct" && (
+          <>
+            <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Đơn hàng đấu giá</span>
+          </>
+        )}
+      </button>
+    </li>
+  );
+
   return (
     <>
       {/* Breadcrumb */}
-      <nav className="container py-4 flex items-center space-x-3 bg-gray-50 rounded-lg shadow-sm">
-        <Link to="/" className="text-primary text-lg">
+      <nav className="py-4  flex items-center space-x-3 bg-blue-50 rounded-lg shadow-sm">
+        {/* <a className="text-blue-600 text-lg">
           <i className="fa-solid fa-house"></i>
-        </Link>
-        <span className="text-gray-400">
-          <i className="fa-solid fa-chevron-right"></i>
-        </span>
-        <p className="text-gray-600 font-medium">HỒ SƠ KHÁCH HÀNG</p>
-      </nav>
+        </a> */}
 
+        {/* Nút button được thêm vào đây */}
+        <div className="flex pl-8 items-center">
+          <span
+            onClick={() => setIsOpen(!isOpen)}
+            className="ml-auto lg:hidden p-3 text-white rounded-full"
+          >
+            <span className="iconify mdi--menu w-7 h-7 text-gray-500"></span>
+          </span>
+
+          <h4 className="text-gray-600 py-2 font-medium">HỒ SƠ KHÁCH HÀNG</h4>
+        </div>
+      </nav>
       {/* Wrapper */}
-      <div className="container grid grid-cols-12 items-start gap-6 pt-4 pb-16">
-        {/* Sidebar */}
-        <aside className="col-span-3">
-          <div className="bg-white shadow-sm rounded-lg p-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={profile?.avatar}
-                alt="profile"
-                className="rounded-full w-16 h-16 border-2 border-gray-200 p-1 object-cover"
-              />
-              <div>
-                <p className="text-gray-600">Xin chào,</p>
-                <h4 className="text-gray-800 font-semibold">{profile?.name}</h4>
+
+      <div className="pb-0 pt-10 min-h-[calc(76vh-10rem)]">
+        <div className="container  mx-auto grid grid-cols-12 gap-6 pt-4 pb-16">
+          {/* Sidebar */}
+          <div className="hidden lg:block lg:col-span-3 ">
+            <aside className="bg-white shadow-md rounded-lg p-4 h-full min-h-[calc(64vh-10rem)]">
+              <div className="flex items-center mb-4">
+                <img
+                  src={profile?.avatar}
+                  alt="Avatar"
+                  className="h-10 w-10 rounded-full mr-2"
+                />
+                <h4 className="text-gray-800 font-semibold">
+                  Xin chào, {profile?.name}
+                </h4>
               </div>
-            </div>
+              <ul className="space-y-2">
+                {[
+                  "info",
+                  "edit",
+                  "address",
+                  "password",
+                  "watchlist",
+                  "order",
+                  "orderAuct",
+                ].map((item) => (
+                  <MenuItem
+                    key={item}
+                    item={
+                      item as
+                        | "order"
+                        | "orderAuct"
+                        | "info"
+                        | "edit"
+                        | "address"
+                        | "password"
+                        | "watchlist"
+                    }
+                  />
+                ))}
+                <li>
+                  <button
+                    className="w-full text-left p-2 text-gray-600 hover:bg-red-100 rounded-lg"
+                    onClick={handleLogout}
+                  >
+                    <i className="iconify mdi--logout w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+                    <span className="ms-3"> Đăng Xuất</span>
+                  </button>
+                </li>
+              </ul>
+            </aside>
           </div>
 
-          <div className="mt-6 bg-white shadow-sm rounded-lg p-4 divide-y divide-gray-200">
-            <nav className="space-y-4">
-              <a
-                href="#"
-                className={`relative text-base block font-medium capitalize transition ${
-                  view === "info" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("info")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
+          {/* Main Content Section */}
+          <section className="col-span-12 lg:col-span-9 pl-8 bg-white shadow-sm rounded-lg ">
+            {view === "info" && <Info profiles={profile} />}
+            {view === "edit" && <EditProfile profile={profile} />}
+            {view === "address" && (
+              <CountrySelector
+                address={profile?.address || ""}
+                onAddressChange={() => {}}
+                profile={profile}
+              />
+            )}
+            {view === "password" && <UpdatePassword profile={profile} />}
+            {view === "watchlist" && <Watchlist profiles={profile} />}
+            {view === "order" && <OrderList />}
+            {view === "orderAuct" && <OrderAuct />}
+          </section>
+        </div>
+      </div>
+      {/* Mobile Sidebar */}
+      {/* flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200 dark:bg-gray-800
+      dark:divide-gray-700 */}
+      <div className="lg:hidden ">
+        <Transition
+          show={isOpen}
+          enter="transition-all ease-out duration-300"
+          enterFrom="opacity-0 -translate-x-full"
+          enterTo="opacity-100 translate-x-0"
+          leave="transition-all ease-in duration-200"
+          leaveFrom="opacity-100 translate-x-0"
+          leaveTo="opacity-0 -translate-x-full"
+        >
+          <aside className=" fixed inset-y-20 left-0 bg-opacity-75 w-64 bg-white h-full p-5 shadow-lg ">
+            <div className="absolute w-64 bg-white h-full pt-2">
+              <div className="flex justify-between items-center">
+                <h4 className="text-gray-800 font-semibold">Menu</h4>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-500"
                 >
-                  <path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
-                Quản lý tài khoản
-              </a>
-              <a
-                href="#"
-                className={`relative text-base block capitalize transition ${
-                  view === "password" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("password")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 2C9.243 2 7 4.243 7 7v2H6c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm-5 7h10v2H7V9zm5-5c1.654 0 3 1.346 3 3v2H9V7c0-1.654 1.346-3 3-3z" />
-                </svg>
-                Đổi mật khẩu
-              </a>
-              <a
-                href="#"
-                className={`relative text-base block capitalize transition ${
-                  view === "edit" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("edit")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1 17.93V15h-2v5h5v-2H11zM14 11v-1.414l-6.707 6.707L7 18h2l5-5V11z" />
-                </svg>
-                Cập nhật thông tin
-              </a>
-              <a
-                href="#"
-                className={`relative text-base block capitalize transition ${
-                  view === "address" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("address")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 2C8.136 2 5 5.136 5 9c0 3.174 3.614 7.702 6.238 10.794a1 1 0 0 0 1.524 0C15.386 16.703 19 12.174 19 9c0-3.864-3.136-7-7-7zm0 9c-1.104 0-2-.896-2-2s.896-2 2-2 2 .896 2 2-.896 2-2 2z" />
-                </svg>
-                Địa chỉ
-              </a>
-              <a
-                href="#"
-                className={`relative text-base block capitalize transition ${
-                  view === "order" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("order")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M22 7H2V5h20v2zM7 11H5v10h2V11zm4 0H9v10h2V11zm4 0h-2v10h2V11zm4 0h-2v10h2V11z" />
-                </svg>
-                Đơn hàng
-              </a>
-              <a
-                href="#"
-                className={`relative text-base block capitalize transition ${
-                  view === "edit" ? "text-primary" : "text-gray-600"
-                }`}
-                onClick={() => setView("orderAuct")}
-              >
-             <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M22 7H2V5h20v2zM7 11H5v10h2V11zm4 0H9v10h2V11zm4 0h-2v10h2V11zm4 0h-2v10h2V11z" />
-                </svg>
-                Đơn hàng đấu giá
-              </a>
-              <a
-                href="#"
-                className="relative text-base block capitalize text-gray-600 transition hover:text-primary"
-                onClick={() => setView("watchlist")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                Yêu thích
-              </a>
-              <a
-                href="#"
-                className="relative text-base block font-medium capitalize text-gray-600 transition hover:text-primary"
+                  <i className="iconify mdi--close w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
+                </button>
+              </div>
+              <ul className=" mt-4 space-y-2 ">
+                {[
+                  "info",
+                  "edit",
+                  "address",
+                  "password",
+                  "watchlist",
+                  "order",
+                  "orderAuct",
+                ].map((item) => (
+                  <MenuItem
+                    key={item}
+                    item={
+                      item as
+                        | "info"
+                        | "edit"
+                        | "address"
+                        | "password"
+                        | "watchlist"
+                        | "order"
+                        | "orderAuct"
+                    }
+                  />
+                ))}
+              </ul>
+
+              <button
+                className="  w-full text-left p-2 text-gray-600 hover:bg-red-100 rounded-lg mt-4"
                 onClick={handleLogout}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block w-5 h-5 mr-2"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M13 3h-2v10h2V3zm-7.293.707l-1.414 1.414L10.586 10H16v2h-5.414l-6.293 6.293 1.414 1.414L13.414 12H18V8h-4.586L5.707 3.707z" />
-                </svg>
-                Đăng Xuất
-              </a>
-            </nav>
-          </div>
-        </aside>
-
-        {/* Info */}
-        <section className="col-span-9 bg-white shadow-sm rounded-lg p-6">
-          {view === "info" && <Info profiles={profile} />}
-          {view === "edit" && <EditProfile profile={profile} />}
-          {view === "address" && (
-            <CountrySelector
-              address={profile?.address || ""}
-              onAddressChange={() => {}}
-              profile={profile}
-            />
-          )}
-          {view === "password" && <UpdatePassword profile={profile} />}
-          {view === "watchlist" && <Watchlist profiles={profile} />}
-          {view === "order" && <OrderList />}
-          {view === "orderAuct" && <OrderAuct />}
-        </section>
+                <i className="iconify mdi--logout w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
+                <span className="ml-3">Đăng Xuất</span>
+              </button>
+            </div>
+          </aside>
+        </Transition>
       </div>
     </>
   );

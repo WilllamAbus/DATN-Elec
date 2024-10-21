@@ -81,3 +81,26 @@ export const SelectCart = async ({
     }
   }
 };
+export const CheckVoucher = async ({
+  cartId,
+  voucherId,
+}: {
+  cartId: string;
+  voucherId: string;
+}) => {
+  try {
+    const response = await instance.post(`${API_URL}/cart/apply-voucher`, {
+      cartId,
+      voucherId,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Đã xảy ra lỗi không xác định khi chọn giỏ hàng.");
+    }
+  }
+};

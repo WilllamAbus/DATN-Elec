@@ -78,15 +78,15 @@ interface AuthState {
     error: string | null;
   };
 
-  users: any[];
+  users: UserProfile[];
   userListStatus: "idle" | "loading" | "succeeded" | "failed";
   userListError: string | null;
 
-  deletedUsers: any[];
+  deletedUsers: UserProfile[];
   deletedUsersStatus: "idle" | "loading" | "succeeded" | "failed";
   deletedUsersError: string | null;
 
-  activeUsers: any[];
+  activeUsers: UserProfile[];
   activeUsersStatus: "idle" | "loading" | "succeeded" | "failed";
   activeUsersError: string | null;
 
@@ -227,10 +227,10 @@ const authSlice = createSlice({
       state.profile.roles = action.payload.roles || [];
       state.profile.status = "succeeded";
     },
-    setUserList: (state, action: PayloadAction<any[]>) => {
+    setUserList: (state, action: PayloadAction<UserProfile[]>) => {
       state.users = action.payload;
     },
-    setDeletedUsers: (state, action: PayloadAction<any[]>) => {
+    setDeletedUsers: (state, action: PayloadAction<UserProfile[]>) => {
       state.deletedUsers = action.payload;
     },
     profileLoading(state) {
@@ -282,7 +282,7 @@ const authSlice = createSlice({
       })
       .addCase(
         getListThunk.fulfilled,
-        (state, action: PayloadAction<any[]>) => {
+        (state, action: PayloadAction<UserProfile[]>) => {
           state.userListStatus = "succeeded";
           state.users = action.payload;
           state.userListError = null;
@@ -333,19 +333,33 @@ const authSlice = createSlice({
           action.error.message || "Đã xảy ra lỗi khi cập nhật mật khẩu.";
       })
 
+      // .addCase(restoreUserThunk.fulfilled, (state, action) => {
+      //   const userId = action.payload;
+      //   if (userId) {
+      //     state.deletedUsers = state.deletedUsers.filter(
+      //       (user) => user._id !== userId
+      //     );
+      //   } else {
+      //     console.error("Ko Hợp lệ . Lỗi");
+      //   }
+      // })
+      // .addCase(restoreUserThunk.rejected, (state, action) => {
+      //   state.deletedUsersError =
+      //     (action.payload as string) || "An unknown error occurred";
+      // })
+      .addCase(restoreUserThunk.pending, (state) => {
+        state.deletedUsersStatus = "loading";
+      })
       .addCase(restoreUserThunk.fulfilled, (state, action) => {
-        const userId = action.payload;
-        if (userId) {
-          state.deletedUsers = state.deletedUsers.filter(
-            (user) => user._id !== userId
-          );
-        } else {
-          console.error("Ko Hợp lệ . Lỗi");
-        }
+        state.deletedUsersStatus = "succeeded";
+
+        state.deletedUsers = state.deletedUsers.filter(
+          (user) => user._id !== action.meta.arg
+        );
       })
       .addCase(restoreUserThunk.rejected, (state, action) => {
-        state.deletedUsersError =
-          (action.payload as string) || "An unknown error occurred";
+        state.deletedUsersStatus = "failed";
+        state.deletedUsersError = action.payload as string;
       })
 
       .addCase(verifyEmailThunk.pending, (state) => {
@@ -379,21 +393,21 @@ const authSlice = createSlice({
         state.activeUsersError =
           (action.payload as string) || "An unknown error occurred";
       })
+      .addCase(softDeleteUserThunk.pending, (state) => {
+        state.activeUsersStatus = "loading";
+      })
       .addCase(softDeleteUserThunk.fulfilled, (state, action) => {
-        const userId = action.payload;
-        if (userId) {
-          state.activeUsers = state.activeUsers.filter(
-            (user) => user._id !== userId
-          );
-        } else {
-          console.error("Invalid payload in softDeleteUserThunk fulfilled");
-        }
+        state.activeUsersStatus = "succeeded";
+
+        state.activeUsers = state.activeUsers.filter(
+          (user) => user._id !== action.meta.arg
+        );
+      })
+      .addCase(softDeleteUserThunk.rejected, (state, action) => {
+        state.activeUsersStatus = "failed";
+        state.activeUsersError = action.payload as string;
       })
 
-      .addCase(softDeleteUserThunk.rejected, (state, action) => {
-        state.activeUsersError =
-          (action.payload as string) || "An unknown error occurred";
-      })
       .addCase(getDeletedListThunk.pending, (state) => {
         state.deletedUsersStatus = "loading";
         state.deletedUsersError = null;
@@ -469,34 +483,34 @@ const authSlice = createSlice({
           (action.payload as string) || "An unknown error occurred";
       })
       .addCase(fetchUserById.pending, (state) => {
-        state.profile.status = "loading";
+        state.fetchUser.status = "loading";
       })
       .addCase(
         fetchUserById.fulfilled,
         (state, action: PayloadAction<UserProfile>) => {
-          state.profile.status = "succeeded";
-          state.profile.profile = action.payload;
-          state.profile.error = null;
+          state.fetchUser.status = "succeeded";
+          state.fetchUser.user = action.payload;
+          state.fetchUser.error = null;
         }
       )
       .addCase(fetchUserById.rejected, (state, action) => {
-        state.profile.status = "failed";
-        state.profile.error = action.payload as string;
+        state.fetchUser.status = "failed";
+        state.fetchUser.error = action.payload as string;
       })
       .addCase(updateUserThunk.pending, (state) => {
-        state.profile.status = "loading";
+        state.fetchUser.status = "loading";
       })
       .addCase(
         updateUserThunk.fulfilled,
         (state, action: PayloadAction<UserProfile>) => {
-          state.profile.status = "succeeded";
-          state.profile.profile = action.payload;
-          state.profile.error = null;
+          state.fetchUser.status = "succeeded";
+          state.fetchUser.user = action.payload;
+          state.fetchUser.error = null;
         }
       )
       .addCase(updateUserThunk.rejected, (state, action) => {
-        state.profile.status = "failed";
-        state.profile.error = action.payload as string;
+        state.fetchUser.status = "failed";
+        state.fetchUser.error = action.payload as string;
       })
       .addCase(getlistRoleThunk.pending, (state) => {
         if (state.role) {
@@ -577,60 +591,6 @@ const authSlice = createSlice({
         state.login.isAuthenticated = false;
         state.login.isLoggedIn = false;
       });
-    // builder
-    //   .addCase(loginUserThunk.pending, (state) => {
-    //     state.login.isFetching = true;
-    //     state.login.error = null;
-    //     state.login.isAuthenticated = false;
-    //   })
-    //   .addCase(
-    //     loginUserThunk.fulfilled,
-    //     (state, action: PayloadAction<any>) => {
-    //       // Sửa kiểu payload thành kiểu phù hợp
-    //       state.login.isFetching = false;
-
-    //       // Kiểm tra và cập nhật các thông tin trả về từ API
-    //       if (action.payload._id && action.payload.name) {
-    //         state.login.currentUser = {
-    //           id: action.payload._id,
-    //           name: action.payload.name,
-    //           email: action.payload.email,
-    //         };
-    //         state.login.token = action.payload.token ?? null; // Giả sử token có thể trả về, nếu không thì null
-    //         state.login.isAuthenticated = true; // Đăng nhập thành công
-    //         state.login.isLoggedIn = true;
-    //       } else {
-    //         state.login.isAuthenticated = false;
-    //         state.login.isLoggedIn = false;
-    //       }
-
-    //       state.login.error = null;
-    //     }
-    //   )
-    //   .addCase(loginUserThunk.rejected, (state, action) => {
-    //     state.login.isFetching = false;
-    //     state.login.error = action.payload as string;
-    //     state.login.isAuthenticated = false;
-    //     state.login.isLoggedIn = false;
-    //     state.login.currentUser = null;
-    //     state.login.token = null;
-    //   });
-
-    // .addCase(getlistRoleThunk.pending, (state) => {
-    //   state.status = "loading";
-    //   state.error = null;
-    // })
-    // .addCase(
-    //   getlistRoleThunk.fulfilled,
-    //   (state, action: PayloadAction<string[]>) => {
-    //     state.status = "succeeded";
-    //     state.roles = action.payload;
-    //   }
-    // )
-    // .addCase(getlistRoleThunk.rejected, (state, action) => {
-    //   state.status = "failed";
-    //   state.error = action.payload as string;
-    // });
   },
 });
 

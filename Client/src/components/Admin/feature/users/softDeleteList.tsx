@@ -10,18 +10,13 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { AvatarFallback } from "../../../../ultils/avatar/avataAdmin";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const MySwal = withReactContent(Swal);
 
 const ListDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.auth.deletedUsers);
-  const userListStatus = useSelector(
-    (state: RootState) => state.auth.deletedUsersStatus
-  );
-  const userListError = useSelector(
-    (state: RootState) => state.auth.deletedUsersError
-  );
 
   useEffect(() => {
     dispatch(getDeletedListThunk());
@@ -40,13 +35,11 @@ const ListDelete: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await dispatch(restoreUserThunk(userId)).unwrap();
+          const response = await dispatch(restoreUserThunk(userId)).unwrap();
 
-          MySwal.fire({
-            title: "Đã Khôi phục!",
-            text: "Người dùng đã khôi phục.",
-            icon: "success",
-          });
+          toast.dismiss();
+          const successMessage = response?.message;
+          toast.success(successMessage);
         } catch (error) {
           console.error("Error deleting user:", error);
           MySwal.fire({
@@ -58,18 +51,6 @@ const ListDelete: React.FC = () => {
       }
     });
   };
-
-  if (userListStatus === "loading") {
-    return <p>Loading...</p>;
-  }
-
-  if (userListStatus === "failed") {
-    return <p>Error: {userListError}</p>;
-  }
-
-  if (!Array.isArray(users) || users.length === 0) {
-    return <p>Không có người dùng nào bị Khóa.</p>;
-  }
 
   return (
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -174,6 +155,7 @@ const ListDelete: React.FC = () => {
           <p>Không có người dùng nào.</p>
         )}
       </tbody>
+      <ToastContainer />
     </table>
   );
 };

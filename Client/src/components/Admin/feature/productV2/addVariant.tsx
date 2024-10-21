@@ -33,8 +33,8 @@ import {
   handleOsChange,
   handleStorageChange
 } from "./handlersVariant";
-import { SingleValue } from "react-select";
-import Productdescription from "./description/product_description";
+import { SingleValue,MultiValue } from "react-select";
+import Productdescription from "../productAuction/description/product_description";
 import FormInput from "./Form/forminput";
 const AddVariant: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -52,7 +52,7 @@ const AddVariant: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { imgPreview, handleImageChange } = useImageUpload();
   const [selectedRam, setSelectedRam] = useState<SingleValue<RAM>>(null);
-  const [selectedColors, setSelectedColors] = useState<SingleValue<COLOR>>(null);
+  const [selectedColors, setSelectedColors] = useState<MultiValue<COLOR>>([]);
   const [selectedScreen, setSelectedScreen] = useState<SingleValue<SCREEN>>(null);
   const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPU>>(null);
   const [selectedCard, setSelectedCard] = useState<SingleValue<GRAPHICSCARD>>(null);
@@ -63,7 +63,7 @@ const AddVariant: React.FC = () => {
     handleRamChange(selectedOptions, setSelectedRam, setValue);
   };
 
-  const onColorChange = (selectedOptions: SingleValue<COLOR>) => {
+  const onColorChange = (selectedOptions: MultiValue<COLOR>) => {
     handleColorChange(selectedOptions, setSelectedColors, setValue);
   };
   const onScreenChange = (selectedOptions: SingleValue<SCREEN>) => {

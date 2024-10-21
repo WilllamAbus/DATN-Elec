@@ -1,18 +1,24 @@
 import instance from "../axios";
 import { GetDetailProductResponse } from "./types/getDetailProduct";  
 
-export const getProductDetail = async (slug: string): Promise<GetDetailProductResponse> => {
+export const getProductDetail = async (slug: string, storage: string | null): Promise<GetDetailProductResponse> => {
   try {
-    const response = await instance.get<GetDetailProductResponse>(`/client/product-detail/product/${slug}`);
+    const queryParams = new URLSearchParams();
+    if (storage) {
+      queryParams.append('storage', storage);
+    }
+
+    const response = await instance.get<GetDetailProductResponse>(`/client/product-detail/product/${slug}?${queryParams.toString()}`);
+
     return response.data;
   } catch (error) {
-    console.error('Error fetching product detail:', error);
+    console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
     return {
       success: false,
       err: -1,
-      msg: 'Error fetching product detail',
-      status: 500,  
-      data: {} as GetDetailProductResponse['data'], 
+      msg: 'Lỗi khi lấy chi tiết sản phẩm',
+      status: 500,
+      data: {} as GetDetailProductResponse['data'],
     };
   }
 };

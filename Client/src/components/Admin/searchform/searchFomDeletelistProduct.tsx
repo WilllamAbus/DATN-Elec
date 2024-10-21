@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAppDispatch } from "../../../redux/store"; 
 import { DeleteListProductThunk } from "../../../redux/product/admin/Thunk";
 
-const searchFomDeletelistProduct: React.FC = () => {
+const SearchFomDeletelistProduct: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useAppDispatch();
 
@@ -49,4 +49,4 @@ const searchFomDeletelistProduct: React.FC = () => {
   );
 };
 
-export default searchFomDeletelistProduct;
+export default SearchFomDeletelistProduct;

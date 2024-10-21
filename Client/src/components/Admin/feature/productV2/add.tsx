@@ -12,9 +12,9 @@ import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResp
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
 import { add } from "../../../../redux/product/admin/Thunk";
-import { selectFetchData } from "./FetchData";
-import SubmitButtonAdd from "./btn/SubmitButtonAdd";
-import Productdescription from "./description/product_description";
+import { selectFetchData } from "../productAuction/FetchData";
+import SubmitButtonAdd from "../productAuction/btn/SubmitButtonAdd";
+import Productdescription from "../productAuction/description/product_description";
 import FormInput from "./Form/forminput";
 import FormSelect from "./Form/formselect";
 import ImageUpload from "./Form/imageUpload";

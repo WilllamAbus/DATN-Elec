@@ -154,6 +154,7 @@ import {
   updateCartItem,
   deleteCart,
   SelectCart,
+  CheckVoucherThunk,
 } from "./cartThunk";
 import { CartItem, CartType } from "../../types/cart/carts";
 
@@ -397,6 +398,34 @@ const cartSlice = createSlice({
       .addCase(SelectCart.rejected, (state, action) => {
         state.status = "failed"; // Khi xử lý thất bại
         state.error = action.error.message || "Cập nhật giỏ hàng thất bại"; // Ghi nhận thông báo lỗi
+      })
+      .addCase(CheckVoucherThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        CheckVoucherThunk.fulfilled,
+        (state, action: PayloadAction<CartType>) => {
+          const updatedCart = action.payload;
+
+          // Tìm giỏ hàng cần cập nhật dựa trên ID
+          const cartIndex = state.carts.findIndex(
+            (cart) => cart._id === updatedCart._id
+          );
+
+          if (cartIndex >= 0) {
+            // Cập nhật giỏ hàng với thông tin mới sau khi áp dụng voucher
+            state.carts[cartIndex] = updatedCart;
+          }
+
+          state.status = "succeeded";
+          state.error = null;
+        }
+      )
+      .addCase(CheckVoucherThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          action.error.message || "Đã xảy ra lỗi khi áp dụng voucher.";
       });
   },
 });

@@ -19,7 +19,8 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
         Thông tin cá nhân
       </h4>
       <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
+        {/* Sử dụng grid với responsive classes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
               htmlFor="first"
@@ -53,7 +54,8 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative">
             <label
               htmlFor="gender"
@@ -102,7 +104,8 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
               htmlFor="phone"
@@ -120,6 +123,7 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
             />
           </div>
         </div>
+
         <div>
           <label
             htmlFor="address"
@@ -127,8 +131,8 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
           >
             Địa chỉ
           </label>
-          <input
-            type="text"
+          <textarea
+            rows={4}
             name="address"
             id="address"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
