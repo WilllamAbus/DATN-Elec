@@ -1,16 +1,17 @@
 import { useForm } from "react-hook-form";
-import { updateQuantityShelf, getListProducts, getOneInventoryItem } from "../../../../services/inventory/crudInventory.service";
+import { updateQuantityShelfV2, getListProductsV2, getOneInventoryItemV2 } from "../../../../services/inventory/crudInventory.service";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductVariant } from "../../../../types/ProductV2";
+import { ProductAuction } from "../../../../services/product_v2/admin/types/add-product-auction";
+
 import { Inventory } from "../../../../types/Inventories";
 
 interface IFormInput {
-    product_variant: string;
+    productAuction: string;
     quantity: number;
 
 }
@@ -25,7 +26,7 @@ const AddInventory: React.FC = () => {
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [product_variant, setProducts] = useState<ProductVariant[]>([]);
+    const [products, setProducts] = useState<ProductAuction[]>([]);
     const [selectedProductInventory, setSelectedProductInventory] = useState<Inventory | null>(null);
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -43,7 +44,7 @@ const AddInventory: React.FC = () => {
     
         if (productId) {
             try {
-                const inventoryItem = await getOneInventoryItem(productId);
+                const inventoryItem = await getOneInventoryItemV2(productId);
                 setSelectedProductInventory(inventoryItem);
             } catch (error: unknown) {
                 const typedError = error as Error;
@@ -57,7 +58,7 @@ const AddInventory: React.FC = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await getListProducts();
+                const data = await getListProductsV2();
                 console.log("Fetched products:", data);
                 setProducts(data.productsInInventory || []);
             } catch (error) {
@@ -78,13 +79,13 @@ const AddInventory: React.FC = () => {
                 return;
             }
             const payload = {
-                product_variant: data.product_variant,
+                productAuction: data.productAuction,
                 quantity: data.quantity,
             };
-            await updateQuantityShelf(payload);
+            await updateQuantityShelfV2(payload);
             notify();
             setTimeout(() => {
-                navigate("/admin/listInventory");
+                navigate("/admin/listInventoryV2");
             }, 2000);
         } catch (error) {
             console.error("Error:", error);
@@ -96,10 +97,10 @@ const AddInventory: React.FC = () => {
     return (
         <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
             <ToastContainer />
-            <ReusableBreadcrumb items={breadcrumbItems.addInventory} />
+            <ReusableBreadcrumb items={breadcrumbItems.addInventoryV2} />
             <div className="mb-4 ml-4 col-span-full xl:mb-2">
                 <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-                    Cập nhật kho hàng lên kệ
+                    Cập nhật kho hàng đấu giá
                 </h1>
             </div>
             <div className=" px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
@@ -116,25 +117,25 @@ const AddInventory: React.FC = () => {
                                     Tên sản phẩm
                                 </label>
                                 <select
-                                    id="product_variant"
+                                    id="productAuction"
                                     className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    {...register("product_variant", { required: "Sản phẩm không được bỏ trống" })}
+                                    {...register("productAuction", { required: "Sản phẩm không được bỏ trống" })}
                                     onChange={handleProductChange}
                                 >
                                     <option value="">Chọn sản phẩm</option>
-                                    {product_variant.length > 0 ? (
-                                        product_variant.map((product, index) => (
+                                    {products.length > 0 ? (
+                                        products.map((product, index) => (
                                             <option key={product._id || index} value={product._id}>
-                                                {product.variant_name}
+                                                {product.product_name}
                                             </option>
                                         ))
                                     ) : (
                                         <option disabled>Không có sản phẩm nào</option>
                                     )}
                                 </select>
-                                {errors.product_variant && (
+                                {errors.productAuction && (
                                     <span className="text-red-500 text-xs italic">
-                                        {errors.product_variant.message?.toString()}
+                                        {errors.productAuction.message?.toString()}
                                     </span>
                                 )}
                             </div>
@@ -154,9 +155,9 @@ const AddInventory: React.FC = () => {
                                             required: "Số lượng không được bỏ trống",
                                             valueAsNumber: true,
                                             validate: value => {
+
                                                 console.log("Validating quantity:", value);
                                                 console.log("selectedProductInventory:", selectedProductInventory);
-                                            
                                                 if (!selectedProductInventory) {
                                                     return "Vui lòng chọn sản phẩm trước.";
                                                 }
@@ -185,7 +186,6 @@ const AddInventory: React.FC = () => {
                                                     return "Số lượng phải là số dương";
                                                 }
                                             
-                                    
                                                 return true;
                                             }
                                         })}

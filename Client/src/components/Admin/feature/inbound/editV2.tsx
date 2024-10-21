@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { getOneInbound, updateInbound } from "../../../../services/inbound/crudInbound.service";
+import { getOneInboundV2, updateInboundV2 } from "../../../../services/inbound/crudInbound.service";
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -12,7 +12,7 @@ import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcru
 
 
 interface IFormInput {
-    product_variant_id: string;
+    productAuction: string;
     inbound_supplier: string;
     inbound_description: string;
     inbound_quantity: number;
@@ -55,13 +55,13 @@ const EditInbound: React.FC = () => {
 
         const fetchData = async () => {
             try {
-                const inbound = await getOneInbound(id);
-                setValue("product_variant_id", inbound.product_variant_id);
+                const inbound = await getOneInboundV2(id);
+                setValue("productAuction", inbound.productAuction);
                 setValue("inbound_supplier", inbound.inbound_supplier);
                 setValue("inbound_quantity", inbound.inbound_quantity);
                 setValue("inbound_price", inbound.inbound_price);
                 setValue("inbound_description", inbound.inbound_description);
-                setProducts(inbound.product_variant_id.variant_name);
+                setProducts(inbound.productAuction.product_name);
                 setSuppliers(inbound.inbound_supplier.name);
 
                 setLoading(false);
@@ -81,7 +81,7 @@ const EditInbound: React.FC = () => {
         if (id) {
             try {
                 const payload = {
-                    product_variant_id: data.product_variant_id,
+                    productAuction: data.productAuction,
                     inbound_supplier: data.inbound_supplier,
                     inbound_quantity: data.inbound_quantity,
                     inbound_price: data.inbound_price,
@@ -89,13 +89,13 @@ const EditInbound: React.FC = () => {
                 };
         
                 // Gửi request cập nhật inbound
-                await updateInbound(id, payload);
+                await updateInboundV2(id, payload);
     
                 notifyUpdate();
     
                 // Điều hướng đến danh sách inbound sau khi cập nhật thành công
                 setTimeout(() => {
-                navigate("/admin/listInbound");
+                navigate("/admin/listInboundV2");
                 }, 2000);
             } catch (error) {
                 console.error("Lỗi cập nhật lô hàng:", error);
@@ -109,10 +109,10 @@ const EditInbound: React.FC = () => {
     return (
         <form encType="multipart/form-data" onSubmit={handleSubmit(onSubmit)}>
             <ToastContainer />
-            <ReusableBreadcrumb items={breadcrumbItems.editInbounds} />
+            <ReusableBreadcrumb items={breadcrumbItems.editInboundV2} />
             <div className="mb-4 ml-4 col-span-full xl:mb-2">
                 <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-                    Chi tiết lô hàng
+                    Chi tiết lô hàng đấu giá
                 </h1>
             </div>
             <div className=" px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
@@ -130,7 +130,7 @@ const EditInbound: React.FC = () => {
                                 </label>
                                 <input
                                     type="text"
-                                    id="product_variant_id"
+                                    id="productAuction"
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     placeholder="Tên sản phẩm"
                                     value={products}

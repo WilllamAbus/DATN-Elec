@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listInbound, searchInbound, softDeleteInbound } from "../../../../services/inbound/crudInbound.service";
+import { listInboundV2, searchInboundV2, softDeleteInbound } from "../../../../services/inbound/crudInbound.service";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -33,13 +33,13 @@ const InboundList: React.FC = () => {
 
         // Gọi API tùy theo có từ khóa hay không
         const response = keyword.trim()
-          ? await searchInbound(keyword, page)
-          : await listInbound(page);
+          ? await searchInboundV2(keyword, page)
+          : await listInboundV2(page);
 
         if (response && response.data) {
           setInbounds(response.data);
           setTotalPages(response.totalPages);
-          setSearchTerm(keyword); // Cập nhật state của searchTerm để giữ input đồng bộ với URL
+          setSearchTerm(keyword); 
         } else {
           setError("Dữ liệu không hợp lệ từ server.");
         }
@@ -76,8 +76,8 @@ const InboundList: React.FC = () => {
 
       // Gọi API tìm kiếm hoặc lấy danh sách nhà cung cấp
       const response = searchTerm.trim()
-        ? await searchInbound(searchTerm.trim(), 1)  // Luôn tìm từ trang 1 khi có từ khóa
-        : await listInbound(1);  // Nếu không có từ khóa, trả về trang đầu tiên của danh sách
+        ? await searchInboundV2(searchTerm.trim(), 1)  // Luôn tìm từ trang 1 khi có từ khóa
+        : await listInboundV2(1);  // Nếu không có từ khóa, trả về trang đầu tiên của danh sách
 
       // Kiểm tra dữ liệu phản hồi trước khi cập nhật state
       if (response && response.data) {
@@ -183,7 +183,7 @@ const InboundList: React.FC = () => {
         </div>
         <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
           <Link
-            to="/admin/addInbound"
+            to="/admin/addInboundV2"
             id="createProductButton"
             data-modal-toggle="createProductModal"
             className="flex items-center justify-center text-white bg-blue-500 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
@@ -242,9 +242,9 @@ const InboundList: React.FC = () => {
         </thead>
         <tbody>
           {inbounds && inbounds.length > 0 ? (
-            inbounds.some((inbound) => inbound.product_variant_id && inbound.product_variant_id.variant_name) ? (
+            inbounds.some((inbound) => inbound.productAuction && inbound.productAuction.product_name) ? (
               inbounds.map((inbound) =>
-                inbound.product_variant_id && inbound.product_variant_id.variant_name ? (
+                inbound.productAuction && inbound.productAuction.product_name ? (
                   <tr key={inbound._id} className="hover:bg-grey-lighter">
                     <td className="p-4 w-4">
                       <div className="flex items-center">
@@ -259,7 +259,7 @@ const InboundList: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {inbound.product_variant_id.variant_name}
+                      {inbound.productAuction.product_name}
                     </td>
                     <td className="px-4 py-3">{inbound.inbound_supplier.name}</td>
                     <td className="px-4 py-3">{inbound.inbound_quantity}</td>
@@ -280,7 +280,7 @@ const InboundList: React.FC = () => {
                     Xoá
                   </button>
                         <Link
-                          to={`/admin/editInbound/${inbound._id}`}
+                          to={`/admin/editInboundV2/${inbound._id}`}
                           className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         >
                           Xem

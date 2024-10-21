@@ -1,7 +1,8 @@
 const { Schema, model } = require("mongoose");
 const inventorySchema = Schema(
   {
-    product_variant: { type: Schema.Types.ObjectId, ref: 'productVariant', required: true },
+    product_variant: { type: Schema.Types.ObjectId, ref: 'productVariant'},
+    productAuction: { type: Schema.Types.ObjectId, ref: 'productAuction' },
     quantityShelf: {type:Number}, // totalQuantity - quantityStock  số lượng này sẽ là số lượng đưa qua product
     quantityStock: {type:Number},
     totalQuantity : {type: Number, required: true}, // số lượng từ inbound

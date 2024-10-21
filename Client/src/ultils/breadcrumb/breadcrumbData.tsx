@@ -32,6 +32,11 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listInbound", label: "Danh sách lô hàng" },
   ],
+  listInboundsV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInboundV2", label: "Danh sách lô hàng đấu giá" },
+  ],
   listInventory: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
@@ -48,10 +53,21 @@ export const breadcrumbItems = {
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
   ],
 
+  addProductV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addProductV2", label: "Thêm sản phẩm đấu giá" },
+  ],
+
   addInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInbound", label: "Thêm lô hàng" },
+  ],
+  addInboundV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInboundV2", label: "Thêm lô hàng đấu giá" },
   ],
 
   addInventory: [
@@ -59,11 +75,23 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInventory", label: "Cập nhật kho hàng lên kệ" },
   ],
+
+  addInventoryV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInventoryV2", label: "Cập nhật kho hàng đấu giá" },
+  ],
     
   editInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/editInbound", label: "Chi tiết lô hàng" },
+  ],
+
+  editInboundV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editInboundV2", label: "Chi tiết lô hàng đấu giá" },
   ],
   //addproduct v2
   addproduct: [

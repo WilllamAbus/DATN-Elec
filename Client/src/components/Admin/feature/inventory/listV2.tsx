@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { listInbound, searchInbound, softDeleteInbound } from "../../../../services/inbound/crudInbound.service";
-import Swal, { SweetAlertResult } from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { listInventoryV2, searchInventoryV2 } from "../../../../services/inventory/crudInventory.service";
+// import Swal, { SweetAlertResult } from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
-const MySwal = withReactContent(Swal);
+// const MySwal = withReactContent(Swal);
 
-const InboundList: React.FC = () => {
-  const [inbounds, setInbounds] = useState<any[]>([]);
+const InventoryList: React.FC = () => {
+  const [inventories, setInventory] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -22,7 +22,7 @@ const InboundList: React.FC = () => {
   const currentPage = parseInt(queryParams.get("page") || "1", 10);
 
   useEffect(() => {
-    const fetchInbounds = async () => {
+    const fetchInventory = async () => {
       setLoading(true);
       setIsSearching(true);
 
@@ -33,26 +33,26 @@ const InboundList: React.FC = () => {
 
         // Gọi API tùy theo có từ khóa hay không
         const response = keyword.trim()
-          ? await searchInbound(keyword, page)
-          : await listInbound(page);
+          ? await searchInventoryV2(keyword, page)
+          : await listInventoryV2(page);
 
         if (response && response.data) {
-          setInbounds(response.data);
+          setInventory(response.data);
           setTotalPages(response.totalPages);
           setSearchTerm(keyword); // Cập nhật state của searchTerm để giữ input đồng bộ với URL
         } else {
           setError("Dữ liệu không hợp lệ từ server.");
         }
       } catch (error) {
-        console.error("Error fetching inbounds:", error);
-        setError("Lỗi khi tìm kiếm nhập hàng.");
+        console.error("Error fetching invenroy:", error);
+        setError("Lỗi khi tìm kiếm kho hàng.");
       } finally {
         setLoading(false);
         setIsSearching(false);
       }
     };
 
-    fetchInbounds();
+    fetchInventory();
   }, [location.search]); // Theo dõi sự thay đổi của URL để gọi lại API
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -74,21 +74,20 @@ const InboundList: React.FC = () => {
       url.searchParams.set('page', "1");
       window.history.pushState({}, '', url.toString());
 
-      // Gọi API tìm kiếm hoặc lấy danh sách nhà cung cấp
       const response = searchTerm.trim()
-        ? await searchInbound(searchTerm.trim(), 1)  // Luôn tìm từ trang 1 khi có từ khóa
-        : await listInbound(1);  // Nếu không có từ khóa, trả về trang đầu tiên của danh sách
+        ? await searchInventoryV2(searchTerm.trim(), 1)  // Luôn tìm từ trang 1 khi có từ khóa
+        : await listInventoryV2(1);  // Nếu không có từ khóa, trả về trang đầu tiên của danh sách
 
       // Kiểm tra dữ liệu phản hồi trước khi cập nhật state
       if (response && response.data) {
-        setInbounds(response.data);
+        setInventory(response.data);
         setTotalPages(response.totalPages);
       } else {
         setError("Dữ liệu không hợp lệ từ server.");
       }
     } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      setError("Lỗi khi tìm kiếm nhà cung cấp.");
+      console.error("Error fetching inventory:", error);
+      setError("Lỗi khi tìm kiếm kho hàng.");
     } finally {
       setIsSearching(false);
     }
@@ -97,39 +96,6 @@ const InboundList: React.FC = () => {
     // Cập nhật URL khi trang thay đổi
     navigate(`?page=${page}`);
   };
-
-  const handlesoftDeleteInbound = async (inboundId: string) => {
-    MySwal.fire({
-      title: "Xóa đơn hàng?",
-      text: "Bạn có chắc muốn xóa đơn hàng này không!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
-    }).then(async (result: SweetAlertResult) => {
-      if (result.isConfirmed) {
-        try {
-          await softDeleteInbound(inboundId);
-          setInbounds(inbounds.filter((inbound) => inbound._id !== inboundId));
-          MySwal.fire({
-            title: "Đã xóa!",
-            text: "Đơn hàng đã bị xóa.",
-            icon: "success",
-          });
-        } catch (error) {
-          console.error("Error deleting inbounds:", error);
-          MySwal.fire({
-            title: "Lỗi!",
-            text: "Đã xảy ra sự cố khi xóa đơn hàng.",
-            icon: "error",
-          });
-        }
-      }
-    });
-  };
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -139,7 +105,7 @@ const InboundList: React.FC = () => {
         <div className="flex-1 flex items-center space-x-2">
           <h5>
             <span className="text-gray-500">Tổng có: </span>
-            <span className="dark:text-white"> {inbounds.length}</span>
+            <span className="dark:text-white"> {inventories.length}</span>
           </h5>
           <h5 className="text-gray-500 dark:text-gray-400 ml-1">Đơn hàng</h5>
         </div>
@@ -183,7 +149,7 @@ const InboundList: React.FC = () => {
         </div>
         <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
           <Link
-            to="/admin/addInbound"
+            to="/admin/addInventoryV2"
             id="createProductButton"
             data-modal-toggle="createProductModal"
             className="flex items-center justify-center text-white bg-blue-500 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
@@ -201,7 +167,7 @@ const InboundList: React.FC = () => {
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
               />
             </svg>
-            Thêm đơn hàng
+            Thêm số lượng kệ
           </Link>
         </div>
       </div>
@@ -220,87 +186,89 @@ const InboundList: React.FC = () => {
                 </label>
               </div>
             </th>
-            <th scope="col" className="p-4">
-              Tên sản phẩm
-            </th>
-            <th scope="col" className="p-4">
-              Tên nhà cung cấp
-            </th>
-            <th scope="col" className="p-4">
-              Số lượng nhập
-            </th>
-            <th scope="col" className="p-4">
-              Giá tiền
-            </th>
-            <th scope="col" className="p-4">
-              Ngày nhập
-            </th>
-            <th scope="col" className="p-4">
-              Chức năng
-            </th>
+            <th scope="col" className="p-4">Tên sản phẩm</th>
+            <th scope="col" className="p-4">Tên nhà cung cấp</th>
+            <th scope="col" className="p-4">Số lượng kho</th>
+            <th scope="col" className="p-4">Số lượng kệ</th>
+            <th scope="col" className="p-4">Giá tiền</th>
+            <th scope="col" className="p-4">Trạng thái kệ</th>
           </tr>
         </thead>
         <tbody>
-          {inbounds && inbounds.length > 0 ? (
-            inbounds.some((inbound) => inbound.product_variant_id && inbound.product_variant_id.variant_name) ? (
-              inbounds.map((inbound) =>
-                inbound.product_variant_id && inbound.product_variant_id.variant_name ? (
-                  <tr key={inbound._id} className="hover:bg-grey-lighter">
-                    <td className="p-4 w-4">
-                      <div className="flex items-center">
-                        <input
-                          id="checkbox-table-search-1"
-                          type="checkbox"
-                          className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                        />
-                        <label htmlFor="checkbox-table-search-1" className="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {inbound.product_variant_id.variant_name}
-                    </td>
-                    <td className="px-4 py-3">{inbound.inbound_supplier.name}</td>
-                    <td className="px-4 py-3">{inbound.inbound_quantity}</td>
-                    <td className="px-4 py-3">{inbound.inbound_price}</td>
-                    <td className="px-4 py-3">
-                      {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      <div className="flex items-center space-x-4">
-                      <button
-                    className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                    onClick={() => handlesoftDeleteInbound(inbound._id)}
-                  >
-                    Xoá
-                  </button>
+          {inventories && inventories.length > 0 ? (
+            inventories.map((inventory) => {
+              const { productAuction, supplier, quantityStock, quantityShelf, price, _id } = inventory;
+
+              let buttonText = "Còn trống";
+              let buttonClass =
+                "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800";
+              let buttonDisabled = false;
+              let quantityWarning = "";
+              let quantityStockWarning = "";
+
+              if (quantityShelf <= 5) {
+                quantityWarning = "Cần nhập hàng lên kệ!";
+              } 
+              else if(quantityStock < 10){
+                quantityStockWarning = "Cần nhập thêm hàng!"
+              }else if (quantityShelf >= 30) {
+                buttonText = "Kệ đầy";
+                buttonClass =
+                  "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-gray-400 rounded-lg cursor-not-allowed";
+                buttonDisabled = true;
+              }
+
+              return (
+                <tr key={_id} className="hover:bg-grey-lighter">
+                  <td className="p-4 w-4">
+                    <div className="flex items-center">
+                      <input
+                        id={`checkbox-table-search-${_id}`}
+                        type="checkbox"
+                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label htmlFor={`checkbox-table-search-${_id}`} className="sr-only">
+                        checkbox
+                      </label>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {productAuction.product_name}
+                  </td>
+                  <td className="px-4 py-3">{supplier.name}</td>
+                  <td className="px-4 py-3">{quantityStock}
+                    {quantityStockWarning && (
+                      <p className="text-red-500 text-xs italic">{quantityStockWarning}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {quantityShelf}
+                    {quantityWarning && (
+                      <p className="text-red-500 text-xs italic">{quantityWarning}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{price}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <div className="flex items-center space-x-4">
+                      {buttonDisabled ? (
+                        <span className={buttonClass}>{buttonText}</span>
+                      ) : (
                         <Link
-                          to={`/admin/editInbound/${inbound._id}`}
-                          className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                          to={`/admin/addInventoryV2`}
+                          className={buttonClass}
                         >
-                          Xem
+                          {buttonText}
                         </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ) : null
-              )
-            ) : (
-              <tr>
-                <td colSpan={6} className="text-center p-4">
-                  Không có lô hàng nào để hiển thị
-                </td>
-              </tr>
-            )
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
-              <td colSpan={6} className="text-center p-4">
-                Không có lô hàng nào để hiển thị
+              <td colSpan={7} className="text-center p-4">
+                Không có kho hàng nào để hiển thị
               </td>
             </tr>
           )}
@@ -375,4 +343,4 @@ const InboundList: React.FC = () => {
 };
 
 
-export default InboundList;
+export default InventoryList;

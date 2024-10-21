@@ -1,10 +1,10 @@
 "use strict";
-const modelInbound = require("../../model/inboundShipments.model");
-const modelProduct = require("../../model/product_v2");
-const modelSupplier = require("../../model/suppliers.model");
-const ProductVariant = require('../../model/product_v2/productVariant'); 
+const modelProductV2 = require("../../model/product_v2/index");
+const modelProductVariant = require('../../model/product_v2/productVariant'); 
 const modelInventory = require("../../model/inventory/inventory.model");
 const { checkInventoryAndNotify } = require('../../services/inventoryChecker');
+const modelProductAution = require("../../model/productAution/productAution");
+
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccount.json");
@@ -32,29 +32,67 @@ const multerStorage = multer.memoryStorage();
 const inventoryController = {
     listInventory: async (req, res) => {
         try {
-            const page = parseInt(req.query.page, 10) || 1;  // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
+            const page = parseInt(req.query.page, 10) || 1; // Trang hiện tại, mặc định là 1
+            const limit = parseInt(req.query.limit, 5) || 5; // Số kết quả mỗi trang, mặc định là 5
+    
+            // Tạo điều kiện truy vấn
+            let query = { 
+                status: { $ne: "disable" },
+                product_variant: { $exists: true }
+            };
+    
+            // Đếm tổng số lô hàng dựa trên điều kiện đã tạo
+            const count = await modelInventory.countDocuments(query);
+            const totalPages = Math.ceil(count / limit);
+    
+            // Truy vấn dữ liệu các lô hàng với phân trang
+            const inbounds = await modelInventory
+                .find(query)
+                .populate("product_variant", "variant_name") // Chỉ lấy variant_name từ product_variant
+                .populate("supplier", "name") // Chỉ lấy name từ nhà cung cấp
+                .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
+                .limit(limit); // Giới hạn kết quả theo số lượng trang
+    
+            // Trả về kết quả
+            res.status(200).json({
+                success: true,
+                msg: "Lấy danh sách lô hàng thành công",
+                data: inbounds,
+                totalPages: totalPages,
+            });
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách lô hàng:", error);
+            res.status(500).json({
+                success: false,
+                msg: "Lỗi khi lấy danh sách lô hàng",
+                error: error.message,
+            });
+        }
+    },
+    listInventoryV2: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1; // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
             const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
 
-            const count = await modelInventory.countDocuments({
-                status: { $ne: "disable" },
-            });
+            const count = await modelInventory.countDocuments({ status: { $ne: "disable" },productAuction: { $exists: true } });
             const totalPages = Math.ceil(count / limit);
-            const inventories = await modelInventory.find({})
-                .populate('product_variant', 'variant_name')
-                .populate('supplier', 'name')
+            const inbounds = await modelInventory
+                .find({ status: { $ne: "disable" }, productAuction: { $exists: true } })
+                .populate("productAuction", "product_name")
+                .populate("supplier", "name")
                 .skip((page - 1) * limit)
                 .limit(limit);
             res.status(200).json({
                 success: true,
-                msg: "Lấy danh sách kho hàng thành công",
-                data: inventories,
+                msg: "Lấy danh sách lô hàng thành công",
+                data: inbounds,
                 totalPages: totalPages,
             });
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách kho hàng:", error);
+            console.error("Lỗi khi lấy danh sách lô hàng:", error);
             res.status(500).json({
                 success: false,
-                msg: "Lỗi khi lấy danh sách kho hàng",
+                msg: "Lỗi khi lấy danh sách lô hàng",
                 error: error.message,
             });
         }
@@ -98,10 +136,57 @@ const inventoryController = {
             res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+
+    updateQuantityShelfProductV2: async (req, res) => {
+        try {
+            const { productAuction, quantity } = req.body;
+            if (!productAuction || quantity == null) {
+                return res.status(400).json({ message: "Vui lòng cung cấp thông tin sản phẩm và số lượng." });
+            }
+    
+            // Tìm sản phẩm trong kho (inventory)
+            const inventory = await modelInventory.findOne({ productAuction: productAuction });
+    
+            if (!inventory) {
+                return res.status(404).json({ message: "Không tìm thấy sản phẩm trong kho." });
+            }
+    
+            // Kiểm tra nếu quantity cần cập nhật vượt quá quantityStock
+            if (quantity > inventory.quantityStock) {
+                return res.status(400).json({ message: "Số lượng chuyển lên kệ vượt quá số lượng trong kho." });
+            }
+    
+            // Cập nhật số lượng trên kệ và trong kho
+            inventory.quantityShelf += quantity;
+            inventory.quantityStock -= quantity;
+    
+            await inventory.save();
+    
+            const products = await modelProductV2.findById(productAuction);
+            if (products) {
+                // Kiểm tra nếu `products.inventory` tồn tại và là một mảng
+                if (!Array.isArray(products.inventory)) {
+                    products.inventory = []; // Khởi tạo thành mảng nếu chưa có
+                }
+    
+                // Kiểm tra nếu inventory._id chưa có trong products.inventory
+                if (!products.inventory.includes(inventory._id)) {
+                    products.inventory.push(inventory._id);
+                    await products.save();
+                }
+            }
+    
+            res.status(200).json({ message: "Cập nhật thành công.", inventory });
+        } catch (error) {
+            console.error("Lỗi khi cập nhật quantityShelf:", error);
+            res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
+        }
+    },
+    
     getProductsInInventoryController : async (req, res) => {
         try {
             // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
-            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' } }, 'product')
+            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' } , product_variant: { $exists: true }})
             .populate('product_variant', 'variant_name')
             .exec();
     
@@ -110,6 +195,27 @@ const inventoryController = {
                 product_variant: item.product_variant._id,
                 variant_name: item.product_variant.variant_name, // Assuming product_name is populated
                 _id: item.product_variant._id
+            }));
+    
+            res.status(200).json({ productsInInventory });
+        } catch (error) {
+            console.error('Error fetching products in inventory:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    },
+
+    getProductV2InInventoryController : async (req, res) => {
+        try {
+            // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
+            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' }, productAuction: { $exists: true }})
+            .populate('productAuction', 'product_name')
+            .exec();
+    
+            // Duyệt qua các bản ghi inventory và tạo danh sách các
+            const productsInInventory = inventoryItems.map(item => ({
+                productAuction: item.productAuction._id,
+                product_name: item.productAuction.product_name, // Assuming product_name is populated
+                _id: item.productAuction._id
             }));
     
             res.status(200).json({ productsInInventory });
@@ -127,6 +233,31 @@ const inventoryController = {
             // Tìm sản phẩm trong inventory dựa trên productId
             const inventoryItem = await modelInventory.findOne({ product_variant: productId })
                 .populate('product_variant', 'variant_name')
+                .exec();
+    
+            if (inventoryItem) {
+                res.status(200).json({
+                    success: true,
+                    msg: "Lấy thông tin sản phẩm thành công",
+                    data: inventoryItem,
+                });
+            } else {
+                res.status(404).json({ message: 'Product not found' });
+            }
+        } catch (error) {
+            console.error('Error retrieving product:', error);
+            res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        }
+    },
+    getOneV2: async (req, res) => {
+        try {
+            // Lấy productId từ params
+            const productId = req.params.productId;
+
+
+            // Tìm sản phẩm trong inventory dựa trên productId
+            const inventoryItem = await modelInventory.findOne({ productAuction: productId })
+                .populate('productAuction', 'product_name')
                 .exec();
     
             if (inventoryItem) {
@@ -166,17 +297,23 @@ const inventoryController = {
                     message: "Từ khóa tìm kiếm không hợp lệ",
                 });
             }
-
     
-            // Đếm tổng số kết quả khớp với keyword
-            const totalResults = await modelInventory
-                .find()
-                .populate({
-                    path: 'product',
-                    match: { product_name: { $regex: keyword, $options: 'i' } },
-                    select: 'product_name',
-                })
-                .then(results => results.filter(item => item.product !== null).length);
+            // Tìm kiếm sản phẩm dựa trên variant_name
+            const products = await modelProductVariant.find({
+                variant_name: { $regex: keyword, $options: "i" }
+            });
+    
+            const productIds = products.map(product => product._id);
+    
+            const searchQuery = {
+                status: { $ne: "disable" },
+                $or: [
+                    { product_variant: { $in: productIds } }
+                ]
+            };
+    
+            // Đếm số lượng kết quả
+            const totalResults = await modelInventory.countDocuments(searchQuery);
     
             if (totalResults === 0) {
                 return res.status(200).json({
@@ -186,28 +323,103 @@ const inventoryController = {
                 });
             }
     
-            // Lấy kết quả với phân trang và tìm kiếm
+            // Tìm kiếm với phân trang
             const result = await modelInventory
-                .find()
-                .populate({
-                    path: 'product',
-                    match: { product_name: { $regex: keyword, $options: 'i' } },
-                    select: 'product_name',
-                })
+                .find(searchQuery)
+                .populate('product_variant', 'variant_name')
                 .populate('supplier', 'name')
                 .skip((page - 1) * limit)
                 .limit(limit);
     
-            // Lọc ra những kết quả không khớp
-            const filteredResults = result.filter(item => item.product !== null);
+            // Tính toán tổng số trang
+            const totalPages = Math.ceil(totalResults / limit);
     
+            // Trả về kết quả tìm kiếm
             res.status(200).json({
                 message: "Tìm kiếm thành công",
-                data: filteredResults,
+                data: result,
                 currentPage: page,
                 totalResults,
-                totalPages: Math.ceil(totalResults / limit),
+                totalPages,
             });
+    
+        } catch (error) {
+            console.error("Lỗi trong quá trình tìm kiếm:", error);
+            res.status(500).json({
+                message: "Lỗi máy chủ",
+                error: error.message,
+            });
+        }
+    },
+    searchV2: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 10;
+            const keyword = req.query.keyword;
+    
+            if (isNaN(page) || page <= 0) {
+                return res.status(400).json({
+                    message: "Số trang không hợp lệ",
+                });
+            }
+    
+            if (isNaN(limit) || limit <= 0 || limit > 100) {
+                return res.status(400).json({
+                    message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
+                });
+            }
+    
+            if (!keyword || keyword.trim() === "") {
+                return res.status(400).json({
+                    message: "Từ khóa tìm kiếm không hợp lệ",
+                });
+            }
+    
+            // Tìm kiếm sản phẩm dựa trên product_name
+            const products = await modelProductAution.find({
+                product_name: { $regex: keyword, $options: "i" }
+            });
+    
+            const productIds = products.map(product => product._id);
+    
+            const searchQuery = {
+                status: { $ne: "disable" },
+                $or: [
+                    { productAuction: { $in: productIds } }
+                ]
+            };
+    
+            // Đếm số lượng kết quả
+            const totalResults = await modelInventory.countDocuments(searchQuery);
+    
+            if (totalResults === 0) {
+                return res.status(200).json({
+                    message: "Không tìm thấy kết quả nào",
+                    data: [],
+                    totalResults: 0,
+                });
+            }
+    
+            // Tìm kiếm với phân trang
+            const result = await modelInventory
+                .find(searchQuery)
+                .populate('productAuction', 'product_name')
+                .populate('supplier', 'name')
+                .skip((page - 1) * limit)
+                .limit(limit);
+    
+            // Tính toán tổng số trang
+            const totalPages = Math.ceil(totalResults / limit);
+    
+            // Trả về kết quả tìm kiếm
+            res.status(200).json({
+                message: "Tìm kiếm thành công",
+                data: result,
+                currentPage: page,
+                totalResults,
+                totalPages,
+            });
+    
         } catch (error) {
             console.error("Lỗi trong quá trình tìm kiếm:", error);
             res.status(500).json({
