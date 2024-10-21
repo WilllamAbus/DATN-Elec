@@ -2,7 +2,7 @@ export interface Product {
   _id: string;
   product_name: string;
   product_description: string;
-  product_type: { name: string };
+  product_type: { name: string,imgURL:string };
   createdAt: string;
   product_discount: number;
   product_supplier: string;

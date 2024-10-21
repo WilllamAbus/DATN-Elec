@@ -1,5 +1,6 @@
 
 
+
 export const breadcrumbItems = {
   listProducts: [
     { href: "/admin", label: "Home" },
@@ -155,6 +156,11 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/editproduct", label: "Cập nhật sản phẩm" },
+  ],
+  editProductAuction: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/edit-product-auction", label: "Cập nhật sản phẩm đấu giá" },
   ],
   editSuppliers: [
     { href: "/", label: "Home" },

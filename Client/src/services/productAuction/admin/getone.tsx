@@ -1,11 +1,12 @@
 import instance from "../../axios";
-import { GetOneResponse } from "./types";
+import { GetOneResponse } from "../types/getone";
 
 export const getOneProduct = async (id: string): Promise<GetOneResponse> => {
   try {
-    const response = await instance.get<GetOneResponse>(`/admin/product/getone/${id}`);
+    const response = await instance.get<GetOneResponse>(`/admin/productAuction/get-one/${id}`);
     return response.data;
   } catch (error: any) {
+    console.error("Error fetching product:", error);
     return {
       success: false,
       err: 1,

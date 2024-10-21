@@ -13,9 +13,7 @@ export interface ProductAuction {
   product_description: string;
   product_type: string;
   product_discount: number;
-  hasVariants: boolean;
   product_brand: string;
-  product_format: string;
   product_condition: string;
   product_supplier: string;
   product_ratingAvg: number;

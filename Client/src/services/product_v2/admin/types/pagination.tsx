@@ -1,8 +1,103 @@
+export interface Variant {
+  _id: string;
+  variant_name: string;
+  variant_price: number;
+  battery: {
+    _id: string;
+    name: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  };
+  color: {
+    _id: string;
+    name: string;
+    code: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  }[];
+  cpu: {
+    _id: string;
+    name: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  };
+  operatingSystem: {
+    _id: string;
+    name: string;
+    version: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  };
+  ram: {
+    _id: string;
+    name: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  };
+  screen: {
+    _id: string;
+    name: string;
+    status: string;
+    sku: string;
+    pid: string;
+    createdAt: string;
+    updatedAt: string;
+    slug: string;
+  };
+  storage: {
+    _id: string;
+    name: string;
+    status: string;
+    sku: string;
+    pid: string;
+    slug: string;
+  };
+  image: string[];
+  sku: string;
+  pid: string;
+  status: string;
+  product_id: string; 
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+  inventory: {
+    _id: string;
+    quantityShelf: number;
+    quantityStock: number;
+    totalQuantity: number;
+    price: number;
+    totalPrice: number;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+}
+
 export interface Product {
   _id: string;
   product_name: string;
   product_description: string;
-  product_type: { name: string };
+  product_type: { name: string; imgURL: string };
   createdAt: string;
   product_discount: number;
   product_supplier: string;
@@ -15,10 +110,11 @@ export interface Product {
   weight_g: number;
   image: string[];
   status: string;
+  variantCount: number; 
+  variants: Variant[]; 
 }
 
-
-interface Pagination {
+export interface Pagination {
   currentPage: number;
   totalPages: number;
   hasNextPage: boolean;
@@ -33,6 +129,7 @@ export interface LimitCrudProductResponse {
   data: {
     total: number;
     products: Product[];
+    variants: Variant[]; 
   };
   pagination: Pagination;
 }

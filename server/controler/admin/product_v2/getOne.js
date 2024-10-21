@@ -1,9 +1,5 @@
 const modelProduct = require('../../../model/product_v2');
-const Category = require('../../../model/catgories.model');
-const Brand = require('../../../model/brands.model');
-const ProductFormat = require('../../../model/formatShopping.model');
-const Condition = require('../../../model/condition-shop.model');
-const Supplier = require('../../../model/suppliers.model');
+
 
 const getOne = async (req, res) => {
   try {
