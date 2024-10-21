@@ -3,7 +3,7 @@ const modelProductV2 = require("../../model/product_v2/index");
 const modelProductVariant = require('../../model/product_v2/productVariant'); 
 const modelInventory = require("../../model/inventory/inventory.model");
 const { checkInventoryAndNotify } = require('../../services/inventoryChecker');
-const modelProductAution = require("../../model/productAution/productAution");
+const modelProductAution = require("../../model/productAuction/productAuction");
 
 
 const admin = require("firebase-admin");

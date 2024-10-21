@@ -3,7 +3,7 @@ const modelInbound = require("../../model/inboundShipments.model");
 const modelProductVariant = require("../../model/product_v2/productVariant");
 const modelSupplier = require("../../model/suppliers.model");
 const modelInventory = require("../../model/inventory/inventory.model");
-const modelProductAution = require("../../model/productAution/productAution");
+const modelProductAution = require("../../model/productAuction/productAuction");
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccount.json");

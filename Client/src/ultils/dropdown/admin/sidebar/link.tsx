@@ -13,7 +13,7 @@ export const links: Record<string, Link[]> = {
     { label: "Khoảng định giá", to: "/admin/listPriceRand" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },
-    { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" }
+    { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
   ],
   orderCart: [

@@ -8,6 +8,7 @@ import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductVariant } from "../../../../types/ProductV2";
 import { Inventory } from "../../../../types/Inventories";
+import SubmitButtonAdd from "../productAuction/btn/SubmitButtonAdd";
 
 interface IFormInput {
     product_variant: string;
@@ -22,6 +23,7 @@ const AddInventory: React.FC = () => {
         formState: { errors },
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -67,6 +69,7 @@ const AddInventory: React.FC = () => {
         fetchProducts();
     }, []);
     const submitFormAdd = async (data: IFormInput) => {
+        setIsLoading(true);
         try {
             if (!selectedProductInventory) {
                 setError("Vui lòng chọn một sản phẩm hợp lệ.");
@@ -89,6 +92,7 @@ const AddInventory: React.FC = () => {
         } catch (error) {
             console.error("Error:", error);
             setError("Đã xảy ra lỗi khi cập nhật kệ. Vui lòng thử lại.");
+            setIsLoading(false);
         }
     };
 
@@ -203,13 +207,8 @@ const AddInventory: React.FC = () => {
                         </div>
 
                         <div className="col-span-6 sm:col-full">
-                            <button
-                                type="submit"
-                                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            >
-                                Cập nhật kệ
-                            </button>
-                        </div>
+              <SubmitButtonAdd isLoading={isLoading} />
+            </div>
                     </div>
                 </div>
             </div>
