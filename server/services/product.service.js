@@ -10,19 +10,45 @@ const ProductService = {
             status: { $ne: 'disable' },
             product_name: { $regex: search, $options: 'i' }
           }
-        : { status: { $ne: 'disable' } };
+        : { status: { $ne: 'disable' },
+          variants: { $exists: true, $ne: [] }, 
+       };
+        
 
       const products = await Product.find(searchQuery)
         .skip(offset)
         .limit(limit)
-        .populate('product_type', 'name')  
+        .populate('product_type', 'name imgURL')  
         .populate('product_brand', 'name')
         .populate('product_format', 'name')
         .populate('product_condition', 'name')
         .populate('product_supplier', 'name')
+        .populate({
+          path: 'variants',
+          populate: [
+            'battery',
+            'color',
+            'cpu',
+            'operatingSystem',
+            'ram',
+            'screen',
+            {
+              path: 'storage',
+              select: 'slug name sku pid status',
+            },
+            {
+              path: 'inventory',
+              select:
+                'quantityShelf quantityStock totalQuantity price totalPrice status createdAt updatedAt',
+            },
+          ],
+        })
         .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
         .lean();
-
+        const productsWithVariantCount = products.map((product) => ({
+          ...product,
+          variantCount: product.variants ? product.variants.length : 0, // Thêm trường variantCount
+        }));
       const total = await Product.countDocuments(searchQuery); 
 
       resolve({
@@ -32,7 +58,7 @@ const ProductService = {
         status: 200,
         response: {
           total,
-          products
+          products: productsWithVariantCount,
         }
       });
 

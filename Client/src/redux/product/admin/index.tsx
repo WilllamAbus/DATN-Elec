@@ -9,7 +9,8 @@ import {
   deletedProductSlice,
   addVariantSlice,
   LimitProductAuctionSlice,
-  softDeleteAuctionSlice
+  softDeleteAuctionSlice,
+  getOneAuctionSlice
 } from "./Slicle";
 const productsReducer = combineReducers({
   list: listSclice,
@@ -21,7 +22,8 @@ const productsReducer = combineReducers({
   update: updateSlice,
   pagilistActive: paginatedProductSlice,
   pagiDeletedList:deletedProductSlice,
-  LimitProductAuction:LimitProductAuctionSlice
+  LimitProductAuction:LimitProductAuctionSlice,
+  getOneAuction:getOneAuctionSlice
 });
 
 export default productsReducer;

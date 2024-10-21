@@ -121,7 +121,7 @@ const ProductListAuction: React.FC = () => {
                       </svg>
                     </button>
                     <Link
-                      to={`/admin/editproduct/${product._id}`}
+                      to={`/admin/edit-product-auction/${product._id}`}
                       className="py-2 px-2 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                     >
                       <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
@@ -142,6 +142,7 @@ const ProductListAuction: React.FC = () => {
                         <path d="M5 5h2v2H5V5M1 1h10v10H1V1m2 2v6h6V3H3m2 14h2v2H5v-2m-4-4h10v10H1V13m2 2v6h6v-6H3m10-2h4v2h2v-2h4v2h-4v2h4v6h-4v-2h-4v2h-2v-2h2v-2h-2v-6m8 8v-2h-2v2h2m-2-4h-2v-2h-2v4h4v-2m3.7-13.65l-1 1-2.05-2 1-1c.2-.21.54-.22.77 0l1.28 1.23c.21.2.22.54 0 .77M13 8.94l6.07-6.06 2.05 2.05L15.06 11H13V8.94z" />
                       </svg>
                     </Link>
+                    
                   </div>
                 </td>
               </tr>

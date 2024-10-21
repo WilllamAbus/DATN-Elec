@@ -31,7 +31,7 @@
 
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/redux/orderAucAdmin"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/redux/orderAucAdmin", "src/common/Icons/EditDocumentIcon.tsx"],
   "exclude": ["node_modules", "dist", "lib"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
