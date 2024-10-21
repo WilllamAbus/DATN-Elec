@@ -5,7 +5,7 @@ const { Schema, model } = require("mongoose");
 
 const timeTrackSchema = new Schema(
   {
-    productId :{type: Schema.Types.ObjectId , ref :'product_v2'},
+    productId :{type: Schema.Types.ObjectId , ref :'productAuction'},
     startTime: {
       type: Date,
       default: Date.now, // Optional: sets default to the current time if not provided

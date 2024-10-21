@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const biddingSchema = Schema(
     {
         product_bidding: {
-          productId: { type: Schema.Types.ObjectId, ref: 'product_v2' }, 
+          productId: { type: Schema.Types.ObjectId, ref: 'productAuction' }, 
           product_name: { type: String },
         }, // Sản phẩm duy nhất đang được đấu giá
      

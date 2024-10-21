@@ -1,14 +1,11 @@
 // src/types/timeTrack.ts
-export interface ProductFormat {
-    _id: string;
-    formats: string;
-  }
+
   
   export interface ProductDeleted {
     _id: string;
     product_name: string;
     image: string[];
-    product_format: ProductFormat;
+ 
   }
   
   export interface TimeTrackDeleted {
@@ -17,6 +14,7 @@ export interface ProductFormat {
     startTime: string;
     endTime: string;
     stateTime: string;
+    status:  string
     product: ProductDeleted;
   }
   

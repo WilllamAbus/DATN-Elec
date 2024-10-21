@@ -39,12 +39,12 @@ const upLoadImgBucket = {
     return await _Category.findByIdAndDelete(id);
   },
   getAllCategories: async () => {
-    return await _Category.find({ status: { $ne: 'deleted' } });
+    return await _Category.find({ status: { $ne: 'disable' } });
   },
   softDeleteCategory: async (id) => {
 
     try {
-      return await _Category.findByIdAndUpdate(id, { status: 'deleted' }, { new: true });
+      return await _Category.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
 
     } catch (error) {
       console.error(error)

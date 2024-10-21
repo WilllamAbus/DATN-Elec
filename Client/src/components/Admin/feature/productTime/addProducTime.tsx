@@ -93,7 +93,7 @@ const AddTimeProduct: React.FC = () => {
    
     
     } catch (error) {
-      toast.error("Đã xảy ra lỗi khi tạo thời gian");
+      toast.error("Sản phẩm đã tồn tại");
     }
   };
 
