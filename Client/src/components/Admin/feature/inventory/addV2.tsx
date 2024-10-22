@@ -28,6 +28,7 @@ const AddInventory: React.FC = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState<ProductAuction[]>([]);
     const [selectedProductInventory, setSelectedProductInventory] = useState<Inventory | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
@@ -41,7 +42,7 @@ const AddInventory: React.FC = () => {
     };
     const handleProductChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const productId = e.target.value;
-    
+
         if (productId) {
             try {
                 const inventoryItem = await getOneInventoryItemV2(productId);
@@ -68,6 +69,8 @@ const AddInventory: React.FC = () => {
         fetchProducts();
     }, []);
     const submitFormAdd = async (data: IFormInput) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             if (!selectedProductInventory) {
                 setError("Vui lòng chọn một sản phẩm hợp lệ.");
@@ -89,7 +92,11 @@ const AddInventory: React.FC = () => {
             }, 2000);
         } catch (error) {
             console.error("Error:", error);
-            setError("Đã xảy ra lỗi khi cập nhật kệ. Vui lòng thử lại.");
+            setError("Đã xảy ra lỗi khi thêm lô hàng. Vui lòng thử lại.");
+        } finally {
+            setTimeout(() => {
+                setIsSubmitting(false);
+            }, 3000);
         }
     };
 
@@ -161,31 +168,31 @@ const AddInventory: React.FC = () => {
                                                 if (!selectedProductInventory) {
                                                     return "Vui lòng chọn sản phẩm trước.";
                                                 }
-                                            
+
                                                 const currentShelfQuantity = selectedProductInventory.quantityShelf || 0;
                                                 const maxShelfCapacity = 30;
                                                 const availableStock = selectedProductInventory.quantityStock || 0;
-                                            
+
                                                 // Kiểm tra nếu số lượng kệ ban đầu đã lớn hơn hoặc bằng 30
                                                 if (currentShelfQuantity >= maxShelfCapacity) {
                                                     return `Kệ đã đạt sức chứa tối đa (${maxShelfCapacity}). Không thể thêm sản phẩm.`;
                                                 }
-                                            
+
                                                 // Kiểm tra nếu tổng số lượng trên kệ (hiện tại + mới) vượt quá 30
                                                 if (currentShelfQuantity + value > maxShelfCapacity) {
                                                     return `Số lượng vượt quá sức chứa của kệ. Tối đa có thể thêm: ${maxShelfCapacity - currentShelfQuantity}`;
                                                 }
-                                            
+
                                                 // Kiểm tra nếu số lượng nhập vào lớn hơn số lượng tồn kho khả dụng
                                                 if (value > availableStock) {
                                                     return `Số lượng nhập lên kệ vượt quá số lượng tồn kho. Tối đa có thể thêm: ${availableStock}`;
                                                 }
-                                            
+
                                                 // Kiểm tra nếu số lượng là số âm hoặc 0
                                                 if (value <= 0) {
                                                     return "Số lượng phải là số dương";
                                                 }
-                                            
+
                                                 return true;
                                             }
                                         })}
@@ -206,8 +213,9 @@ const AddInventory: React.FC = () => {
                             <button
                                 type="submit"
                                 className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                disabled={isSubmitting}
                             >
-                                Cập nhật kệ
+                                {isSubmitting ? "Đang xử lý..." : "Thêm hàng"}
                             </button>
                         </div>
                     </div>

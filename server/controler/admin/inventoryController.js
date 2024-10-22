@@ -48,8 +48,19 @@ const inventoryController = {
             // Truy vấn dữ liệu các lô hàng với phân trang
             const inbounds = await modelInventory
                 .find(query)
-                .populate("product_variant", "variant_name") // Chỉ lấy variant_name từ product_variant
-                .populate("supplier", "name") // Chỉ lấy name từ nhà cung cấp
+                .populate({
+                    path: 'product_variant',
+                    select: 'variant_name',
+                    populate: {
+                        path: 'product',
+                        select: 'product_supplier',
+                        populate: {
+                            path: 'product_supplier',
+                            model: 'Supplier',
+                            select: '_id name'
+                        }
+                    }
+                })
                 .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
                 .limit(limit); // Giới hạn kết quả theo số lượng trang
     
@@ -78,8 +89,15 @@ const inventoryController = {
             const totalPages = Math.ceil(count / limit);
             const inbounds = await modelInventory
                 .find({ status: { $ne: "disable" }, productAuction: { $exists: true } })
-                .populate("productAuction", "product_name")
-                .populate("supplier", "name")
+                .populate({
+                    path: 'productAuction',
+                    select: 'product_name',
+                    populate: {
+                        path: 'product_supplier',
+                        model: 'Supplier',
+                        select: '_id name'
+                    }
+                })
                 .skip((page - 1) * limit)
                 .limit(limit);
             res.status(200).json({
@@ -122,7 +140,7 @@ const inventoryController = {
             inventory.quantityStock -= quantity;
 
             await inventory.save();
-            const productVariant = await ProductVariant.findById(product_variant);
+            const productVariant = await modelProductVariant.findById(product_variant);
             if (productVariant) {
                 if (!productVariant.inventory.includes(inventory._id)) {
                     productVariant.inventory.push(inventory._id);
@@ -326,8 +344,19 @@ const inventoryController = {
             // Tìm kiếm với phân trang
             const result = await modelInventory
                 .find(searchQuery)
-                .populate('product_variant', 'variant_name')
-                .populate('supplier', 'name')
+                .populate({
+                    path: 'product_variant',
+                    select: 'variant_name',
+                    populate: {
+                        path: 'product',
+                        select: 'product_supplier',
+                        populate: {
+                            path: 'product_supplier',
+                            model: 'Supplier',
+                            select: '_id name'
+                        }
+                    }
+                })
                 .skip((page - 1) * limit)
                 .limit(limit);
     
@@ -403,8 +432,15 @@ const inventoryController = {
             // Tìm kiếm với phân trang
             const result = await modelInventory
                 .find(searchQuery)
-                .populate('productAuction', 'product_name')
-                .populate('supplier', 'name')
+                .populate({
+                    path: 'productAuction',
+                    select: 'product_name',
+                    populate: {
+                        path: 'product_supplier',
+                        model: 'Supplier',
+                        select: '_id name'
+                    }
+                })
                 .skip((page - 1) * limit)
                 .limit(limit);
     
