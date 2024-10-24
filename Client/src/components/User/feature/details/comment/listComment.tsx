@@ -5,15 +5,22 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import RepComment from "./repComment";
 import RatingStats from "./ratingStats";
+import { getProfileThunk } from "../../../../../redux/auth/authThunk";
+import {
+  RootState,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../redux/store";
 
 import {
   getCommentProduct,
   Comment as CommentType,
-  getUserComment
+  getUserComment,
 } from "../../../../../services/commnet/comment.service";
 
 interface ListcommentProps {
   comments: CommentType[];
+  onDelete: (commentId: string) => void;
 }
 
 interface User {
@@ -22,15 +29,23 @@ interface User {
   avatar?: string;
 }
 
-const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
+const ListCmt: React.FC<ListcommentProps> = ({ comments, onDelete }) => {
   const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
   const { id } = useParams<{ id: string }>();
   const [visibleCount, setVisibleCount] = useState(2);
 
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
+  );
+
   const handleShowMore = () => {
     setVisibleCount(comments.length);
   };
-
+  if (!profile?._id) {
+    console.log("User profile is not available.");
+    return;
+  }
   const fetchComments = async () => {
     if (!id) {
       // console.log("ID sản phẩm không tồn tại");
@@ -39,7 +54,7 @@ const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
 
     try {
       const productComments: CommentType[] = await getCommentProduct(id);
-      
+
       const userIds = Array.from(
         new Set(productComments.map((comment) => comment.id_user.toString()))
       );
@@ -47,18 +62,18 @@ const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
       const userNameResponses = await Promise.all(
         userIds.map((userId) => getUserComment(userId))
       );
-    
+
       const userNameMap = userNameResponses.reduce((map, response) => {
         const user = response;
         if (user?._id) {
           map[user?._id] = {
-            name: user?.name ,
-            avatar: user?.avatar ,
+            name: user?.name,
+            avatar: user?.avatar,
           };
         }
         return map;
       }, {} as { [key: string]: User });
-    
+
       setUserNames(userNameMap);
 
       // console.log("User Name Map:", userNameMap);
@@ -66,14 +81,16 @@ const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
       console.error("Lỗi:", error);
     }
   };
-
+  useEffect(() => {
+    dispatch(getProfileThunk());
+  }, [dispatch]);
   useEffect(() => {
     fetchComments();
   }, [id]);
 
   return (
     <>
-      {comments.length > 0 ? (
+      {comments?.length > 0 ? (
         <section className="bg-white py-4 dark:bg-gray-900">
           <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
             <div className="flex flex-col md:flex-row items-start justify-between">
@@ -91,14 +108,25 @@ const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
                         <div className="shrink-0 space-y-2 sm:w-48 md:w-72">
                           <div className="space-y-0.5">
                             <div className="flex items-start space-x-4">
-                              <img
-                                className="h-10 w-10 rounded-full"
-                                src={userNames[comment.id_user]?.avatar}
-                                alt="No avatar"
-                              />
+                              {userNames[comment.id_user]?.avatar ? (
+                                <img
+                                  className="h-10 w-10 rounded-full"
+                                  src={userNames[comment.id_user]?.avatar}
+                                />
+                              ) : (
+                                <img
+                                  className="h-10 w-10 rounded-full"
+                                  src="/src/assets/images/cmt-Noavatar.png"
+                                  alt="No avatar"
+                                />
+                              )}
+
                               <div>
                                 <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
-                                <p>{userNames[comment.id_user]?.name || "Loading..."}</p>
+                                  <p>
+                                    {userNames[comment.id_user]?.name ||
+                                      "Loading..."}
+                                  </p>
                                 </p>
                                 <div className="flex items-center gap-1 mt-1">
                                   {[...Array(5)].map((_, index) => (
@@ -125,6 +153,18 @@ const ListCmt: React.FC<ListcommentProps> = ({ comments }) => {
                                   <p className="text-base font-normal text-gray-500 dark:text-gray-400">
                                     {comment.content}
                                   </p>
+                                  {comment.id_user === profile._id ? (
+                                    <div className="space-x-3">
+                                      <button
+                                        onClick={() => onDelete(comment._id)}
+                                      >
+                                        Xoá
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="h-4"></div>
+                                  )}
+
                                   <div className="flex items-center gap-4">
                                     {/* RepComment */}
                                     <RepComment id_comment={comment._id} />

@@ -2,12 +2,23 @@ import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import ListCmt from "./listComment";
-import { RootState, useAppDispatch, useAppSelector } from "../../../../../redux/store";
+import {
+  RootState,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../redux/store";
 import { notify } from "../../../../../ultils/success";
-import { addComment, getCommentProduct, Comment as CommentType } from "../../../../../services/commnet/comment.service";
-import { addInteraction} from "../../../../../services/interaction/interaction.service";
+import {
+  addComment,
+  getCommentProduct,
+  softDeleteComment,
+  Comment as CommentType,
+} from "../../../../../services/commnet/comment.service";
+import { addInteraction } from "../../../../../services/interaction/interaction.service";
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
-
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
 }
@@ -22,10 +33,10 @@ const Comment = () => {
   const { id } = useParams<{ id: string }>();
 
   const dispatch = useAppDispatch();
-  const profile = useAppSelector((state: RootState) => state.auth.profile.profile);
+  const profile = useAppSelector(
+    (state: RootState) => state.auth.profile.profile
+  );
   const isLoggedIn = !!profile?._id;
-
-
 
   const fetchComments = async () => {
     if (id) {
@@ -54,42 +65,45 @@ const Comment = () => {
       setErrorMessage("User profile is not available.");
       return;
     }
-  
+
     const interactionData = {
       user: profile._id,
-      orderAuctions:  null,
+      orderAuctions: null,
       item: id,
-      OrderCart:  null,
+      OrderCart: null,
       productID: id,
-      Watchlist:  null,
+      Watchlist: null,
       type: "comment",
-      score: 3
+      score: 3,
     };
-    
-  
+
     const commentData = {
       content: data.content,
       rating: rating,
       id_user: profile?._id,
     };
-  
+
     try {
       // Sử dụng Promise.all để gọi cả hai API cùng một lúc
-      const [commentResponse,interactionResponse] = await Promise.all([
-        addComment(id,commentData ),
-        addInteraction(interactionData)
+      const [commentResponse, interactionResponse] = await Promise.all([
+        addComment(id, commentData),
+        addInteraction(interactionData),
       ]);
-  
+
       console.log("Comment submitted:", commentResponse);
       console.log("Interaction submitted:", interactionResponse);
-  
+
       const newComment = {
-        ...commentResponse.data, // Đảm bảo sử dụng commentResponse 
+        ...commentResponse.data, // Đảm bảo sử dụng commentResponse
         id_user: profile.name,
       };
-  
+
       // Cập nhật danh sách comments
-      setComments((prevComments) => [...prevComments, newComment]);
+      setComments((prevComments) =>
+        Array.isArray(prevComments)
+          ? [...prevComments, newComment]
+          : [newComment]
+      );
       notify();
       reset();
       setRating(0);
@@ -101,15 +115,56 @@ const Comment = () => {
       setSuccessMessage(null);
     }
   };
-  
-  
- 
+
+  const deleteComment = async (commentId: string) => {
+    if (!commentId) {
+      return console.log("No comment ID provided");
+    }
+    try {
+      const result = await MySwal.fire({
+        title: "Xóa bình luận?",
+        text: "Bạn có chắc muốn xóa bình luận này không!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Xóa!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await softDeleteComment(commentId);
+
+          // Cập nhật state để xoá comment ngay mà không cần reload
+          setComments((prevComments) =>
+            prevComments.filter((comment) => comment._id !== commentId)
+          );
+
+          MySwal.fire({
+            title: "Đã Xóa!",
+            text: "Bình luận đã được xóa.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting comment:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi xóa bình luận.",
+            icon: "error",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error showing confirmation dialog:", error);
+    }
+  };
   useEffect(() => {
     dispatch(getProfileThunk());
   }, [dispatch]);
   useEffect(() => {
-    console.log(profile);
-    
+    // console.log(profile);
+
     if (id) {
       fetchComments();
     }
@@ -124,21 +179,29 @@ const Comment = () => {
     <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
       <div className="container">
         {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded" role="alert">
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded"
+            role="alert"
+          >
             {successMessage}
           </div>
         )}
         {errorMessage && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded" role="alert">
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded"
+            role="alert"
+          >
             {errorMessage}
           </div>
-        )}  
+        )}
 
-        <ListCmt comments={comments} />
+        <ListCmt comments={comments} onDelete={deleteComment} />
 
         {isLoggedIn ? (
           <div className="mt-8 md:mt-0 w-full">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Gửi đánh giá của bạn</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Gửi đánh giá của bạn
+            </h2>
             <form onSubmit={handleSubmit(submitComment)}>
               <div className="space-y-4 max-w-full">
                 <textarea
@@ -152,7 +215,11 @@ const Comment = () => {
                     return (
                       <p
                         key={index}
-                        className={`fa fa-star ${index <= (hover || rating) ? "text-yellow-400" : "text-gray-400"}`}
+                        className={`fa fa-star ${
+                          index <= (hover || rating)
+                            ? "text-yellow-400"
+                            : "text-gray-400"
+                        }`}
                         onClick={() => handleRatingClick(index)}
                         onMouseEnter={() => setHover(index)}
                         onMouseLeave={() => setHover(rating)}
