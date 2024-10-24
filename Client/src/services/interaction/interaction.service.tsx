@@ -33,8 +33,7 @@ export const addInteraction = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+   return console.log('Error adding interaction:', error.response?.data || error.message);
   }
 };
 export const addInteractionView = async (
@@ -58,8 +57,7 @@ export const addInteractionView = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+  return  console.log('Error adding interaction:', error.response?.data || error.message);
   }
 };
 export const addInteractionAuction = async (
@@ -83,8 +81,7 @@ export const addInteractionAuction = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+    return  console.log('Error adding interaction:', error.response?.data || error.message);
   }
 };
 
