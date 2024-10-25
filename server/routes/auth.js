@@ -38,5 +38,26 @@ router.post("/resendEmail", authController.resendEmail);
 //resetpass
 router.post("/forgot-password", authController.forgotPassword);
 router.put("/resetPassword", authController.resetPassword);
+//address
+router.post(
+  "/add",
+  middlewareController.verifyToken,
+  authController.addAddress
+);
+router.get(
+  "/listAddress",
+  middlewareController.verifyToken,
+  authController.getAddressList
+);
+router.put(
+  "/update",
+  middlewareController.verifyToken,
+  authController.updateAddress
+);
+router.delete(
+  "/deleteAddress",
+  middlewareController.verifyToken,
+  authController.removeAddress
+);
 
 module.exports = router;

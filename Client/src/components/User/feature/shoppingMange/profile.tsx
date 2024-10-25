@@ -332,7 +332,8 @@ import EditProfile from "./edit-profile";
 import Info from "./info";
 import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
-import CountrySelector from "./address";
+// import CountrySelector from "./address/address";
+import ListAddress from "./address/listAddress";
 import OrderList from "./order";
 import OrderAuct from "./orderAuctStatus";
 import useAuth from "../../../../hooks/useAuth";
@@ -351,6 +352,7 @@ const ProfileUse: React.FC = () => {
     | "address"
     | "password"
     | "watchlist"
+    | "listAddress"
   >("info");
 
   const profile = useAppSelector(
@@ -532,13 +534,9 @@ const ProfileUse: React.FC = () => {
           <section className="col-span-12 lg:col-span-9 pl-8 bg-white shadow-sm rounded-lg ">
             {view === "info" && <Info profiles={profile} />}
             {view === "edit" && <EditProfile profile={profile} />}
-            {view === "address" && (
-              <CountrySelector
-                address={profile?.address || ""}
-                onAddressChange={() => {}}
-                profile={profile}
-              />
-            )}
+            {/* {view === "address" && <listAddress  />} */}
+            {view === "address" && <ListAddress />}
+            {/* {view === "listAddress" && <listAddress />} */}
             {view === "password" && <UpdatePassword profile={profile} />}
             {view === "watchlist" && <Watchlist profiles={profile} />}
             {view === "order" && <OrderList />}

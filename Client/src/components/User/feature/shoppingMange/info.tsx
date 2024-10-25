@@ -124,7 +124,7 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <label
             htmlFor="address"
             className="block text-sm font-medium text-gray-700"
@@ -136,10 +136,10 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
             name="address"
             id="address"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            value={profiles.address || ""}
+            value={profiles.addresses[0].address || ""}
             readOnly
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

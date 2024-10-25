@@ -1,5 +1,6 @@
 const WathList = require("../../model/wathlist");
 const Product = require("../../model/product_v2/index");
+// const productVariant = require("../../model/product_v2/productVariant");
 const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
@@ -56,7 +57,6 @@ const WathListController = {
         score: 1,
       });
 
-      
       await newInteraction.save();
 
       return res.status(200).json({
@@ -73,6 +73,7 @@ const WathListController = {
       });
     }
   },
+
   getWatchlist: async (req, res) => {
     try {
       const userId = req.user.id;

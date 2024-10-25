@@ -448,8 +448,9 @@ const CheckoutPage: React.FC = () => {
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
-  const address = useSelector(
-    (state: RootState) => state.auth.profile.profile?.address
+  const address = useSelector((state: RootState) => state.auth.profile);
+  const defaultAddress = address?.profile?.addresses.find(
+    (address) => address.isDefault === true
   );
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
   const carts = useSelector((state: RootState) => state.cart.carts);
@@ -505,7 +506,7 @@ const CheckoutPage: React.FC = () => {
       shipping: {
         recipientName: profile?.name || "",
         phoneNumber: profile?.phone || "",
-        address: address || "",
+        address: defaultAddress?.address || "",
       },
       voucher: [],
       formatShipping: "Nhanh",
@@ -754,7 +755,7 @@ const CheckoutPage: React.FC = () => {
                     id="text"
                     name="text"
                     className="w-full rounded-md border border-gray-200 px-4 py-3 pl-11 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-                    value={profile?.name}
+                    value={defaultAddress?.fullName}
                   />
                   <div className="pointer-events-none absolute inset-y-0 left-0 inline-flex items-center px-3">
                     <svg
@@ -783,7 +784,7 @@ const CheckoutPage: React.FC = () => {
                   type="text"
                   id="card_number"
                   className="w-full rounded-md border border-gray-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-                  value={profile?.phone}
+                  value={defaultAddress?.phone}
                 />
                 <label
                   htmlFor="card_address"
@@ -795,7 +796,7 @@ const CheckoutPage: React.FC = () => {
                   id="card_address"
                   rows={4}
                   className="w-full rounded-md border border-gray-200 px-4 py-3 text-sm shadow-sm outline-none focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-                  value={profile?.address}
+                  value={defaultAddress?.address}
                 />
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

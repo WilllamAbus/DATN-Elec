@@ -1,7 +1,7 @@
 import axios from "axios";
 import instance from "../axios";
 import Cookies from "js-cookie";
-import { UserProfile } from "../../types/user";
+import { Address, AddressResponse, UserProfile } from "../../types/user";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const registerUser = async (user: {
@@ -291,6 +291,81 @@ export const DeleteWatchlist = async (productId: string) => {
       throw new Error(
         "Error deleting from watchlist: An unknown error occurred"
       );
+    }
+  }
+};
+export const addAddress = async (addressData: Address) => {
+  try {
+    const response = await instance.post(`${API_URL}/auth/add`, addressData);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error updating order detail: An unknown error occurred");
+    }
+  }
+};
+// UPDATE: Cập nhật địa chỉ
+export const updateAddress = async (
+  addressIndex: number,
+  addressData: Address
+) => {
+  try {
+    const response = await instance.put(`${API_URL}/addresses/update`, {
+      addressIndex,
+      ...addressData,
+    });
+    return {
+      status: response.status,
+      message: response.data.message,
+      user: response.data.user,
+    };
+  } catch (error: any) {
+    return {
+      status: error.response?.status || 500,
+      message:
+        error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật địa chỉ.",
+    };
+  }
+};
+//GET: danh sách địa chỉ
+export const fetchAddressList = async (): Promise<AddressResponse> => {
+  try {
+    const response = await instance.get(`${API_URL}/auth/listAddress`);
+    console.log(response);
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error fetching listAddress: An unknown error occurred");
+    }
+  }
+};
+
+// DELETE: Xóa địa chỉ
+export const deleteAddress = async (_id: string) => {
+  try {
+    const response = await instance.delete(`${API_URL}/auth/deleteAddress`, {
+      data: {
+        addressId: _id,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error fetching listAddress: An unknown error occurred");
     }
   }
 };

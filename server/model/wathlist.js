@@ -13,6 +13,12 @@ const watchlistSchema = new Schema(
       ref: "product_v2",
       required: true,
     },
+    productVariant: {
+      type: Schema.Types.ObjectId,
+      ref: "ProductVariant",
+      required: true,
+    },
+
     createdAt: {
       type: Date,
       default: Date.now,
