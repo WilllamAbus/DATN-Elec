@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { updateQuantityShelf, getListProducts,getOneInventoryItem } from "../../../../services/inventory/crudInventory.service";
+import { updateQuantityShelf, getListProducts, getOneInventoryItem } from "../../../../services/inventory/crudInventory.service";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -8,6 +8,7 @@ import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductVariant } from "../../../../types/ProductV2";
 import { Inventory } from "../../../../types/Inventories";
+import SubmitButtonAdd from "../productAuction/btn/SubmitButtonAdd";
 
 interface IFormInput {
     product_variant: string;
@@ -22,6 +23,7 @@ const AddInventory: React.FC = () => {
         formState: { errors },
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -43,14 +45,14 @@ const AddInventory: React.FC = () => {
     
         if (productId) {
             try {
-                const inventoryItem = await getOneInventoryItem(productId); 
-                setSelectedProductInventory(inventoryItem); 
+                const inventoryItem = await getOneInventoryItem(productId);
+                setSelectedProductInventory(inventoryItem);
             } catch (error: unknown) {
-                const typedError = error as Error; 
-                setError(typedError.message); 
+                const typedError = error as Error;
+                setError(typedError.message);
             }
         } else {
-            setSelectedProductInventory(null); 
+            setSelectedProductInventory(null);
         }
     };
 
@@ -67,6 +69,7 @@ const AddInventory: React.FC = () => {
         fetchProducts();
     }, []);
     const submitFormAdd = async (data: IFormInput) => {
+        setIsLoading(true);
         try {
             if (!selectedProductInventory) {
                 setError("Vui lòng chọn một sản phẩm hợp lệ.");
@@ -89,9 +92,10 @@ const AddInventory: React.FC = () => {
         } catch (error) {
             console.error("Error:", error);
             setError("Đã xảy ra lỗi khi cập nhật kệ. Vui lòng thử lại.");
+            setIsLoading(false);
         }
     };
- 
+
 
     return (
         <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
@@ -154,25 +158,44 @@ const AddInventory: React.FC = () => {
                                             required: "Số lượng không được bỏ trống",
                                             valueAsNumber: true,
                                             validate: value => {
-                                                if (selectedProductInventory) {
-                                                    // Check if quantityShelf is 30
-                                                    if (selectedProductInventory.quantityShelf === 30) {
-                                                        return "Số lượng kệ đã đầy.";
-                                                    }
-                                    
-                                                    // Check if the quantity exceeds quantityStock
-                                                    if (value > selectedProductInventory.quantityStock) {
-                                                        return "Số lượng nhập lên kệ nhiều hơn số lượng tồn kho.";
-                                                    }
-                                                    
-                                                    return true;
+                                                console.log("Validating quantity:", value);
+                                                console.log("selectedProductInventory:", selectedProductInventory);
+                                            
+                                                if (!selectedProductInventory) {
+                                                    return "Vui lòng chọn sản phẩm trước.";
                                                 }
-                                                return "Vui lòng chọn sản phẩm.";
+                                            
+                                                const currentShelfQuantity = selectedProductInventory.quantityShelf || 0;
+                                                const maxShelfCapacity = 30;
+                                                const availableStock = selectedProductInventory.quantityStock || 0;
+                                            
+                                                // Kiểm tra nếu số lượng kệ ban đầu đã lớn hơn hoặc bằng 30
+                                                if (currentShelfQuantity >= maxShelfCapacity) {
+                                                    return `Kệ đã đạt sức chứa tối đa (${maxShelfCapacity}). Không thể thêm sản phẩm.`;
+                                                }
+                                            
+                                                // Kiểm tra nếu tổng số lượng trên kệ (hiện tại + mới) vượt quá 30
+                                                if (currentShelfQuantity + value > maxShelfCapacity) {
+                                                    return `Số lượng vượt quá sức chứa của kệ. Tối đa có thể thêm: ${maxShelfCapacity - currentShelfQuantity}`;
+                                                }
+                                            
+                                                // Kiểm tra nếu số lượng nhập vào lớn hơn số lượng tồn kho khả dụng
+                                                if (value > availableStock) {
+                                                    return `Số lượng nhập lên kệ vượt quá số lượng tồn kho. Tối đa có thể thêm: ${availableStock}`;
+                                                }
+                                            
+                                                // Kiểm tra nếu số lượng là số âm hoặc 0
+                                                if (value <= 0) {
+                                                    return "Số lượng phải là số dương";
+                                                }
+                                            
+                                    
+                                                return true;
                                             }
                                         })}
                                     onInput={handleInput}
                                     onPaste={handlePaste}
-                                    
+
                                 />
                                 {errors.quantity && (
                                     <span className="text-red-500 text-xs italic">
@@ -184,13 +207,8 @@ const AddInventory: React.FC = () => {
                         </div>
 
                         <div className="col-span-6 sm:col-full">
-                            <button
-                                type="submit"
-                                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            >
-                                Cập nhật kệ
-                            </button>
-                        </div>
+              <SubmitButtonAdd isLoading={isLoading} />
+            </div>
                     </div>
                 </div>
             </div>

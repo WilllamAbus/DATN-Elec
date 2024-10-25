@@ -11,28 +11,29 @@ const AdminEditCategories = React.lazy(
 const AdminListCategories = React.lazy(
   () => import("../page/Admin/categories/listCategories")
 );
-/**Products */
-const AdminAddProducts = React.lazy(
-  () => import("../page/Admin/products/addProd")
-);
-const AdminEditProducts = React.lazy(
-  () => import("../page/Admin/products/editProd")
-);
-const AdminListProducts = React.lazy(
-  () => import("../page/Admin/products/listProd")
-);
+
+
 /**ProductsV2 */
 const AdminAddProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/add")
+  () => import("../page/Admin/product/add/add")
+);
+const AdminFetAddProductAuction = React.lazy(
+  () => import("../page/Admin/product/add/addAuction")
 );
 const AdminAddVariant = React.lazy(
-  () => import("../page/Admin/productV2/addVariant")
+  () => import("../page/Admin/product/variant/addVariant")
 );
 const AdminListProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/list")
+  () => import("../page/Admin/product/list/list")
+);
+const AdminFetListProductAuction = React.lazy(
+  () => import("../page/Admin/product/list/listAuction")
 );
 const AdminEditProductV2 = React.lazy(
-  () => import("../page/Admin/productV2/edit")
+  () => import("../page/Admin/product/edit/edit")
+);
+const AdminFetEditProductAuction = React.lazy(
+  () => import("../page/Admin/product/edit/editAuction")
 );
 /**Brands */
 const AdminAddBrands = React.lazy(
@@ -171,12 +172,32 @@ const AdminEditInbound = React.lazy(
   () => import("../page/Admin/inbound/editInbound")
 );
 
+//Inbound V2
+const AdminListInboundV2 = React.lazy(
+  () => import("../page/Admin/inbound/listInboundV2")
+);
+const AdminAddInboundV2 = React.lazy(
+  () => import("../page/Admin/inbound/addInboundV2")
+);
+const AdminEditInboundV2 = React.lazy(
+  () => import("../page/Admin/inbound/editInboundV2")
+);
+
+
 //Inventory
 const AdminAddInventory = React.lazy(
   () => import("../page/Admin/inventory/addInventory")
 );
 const AdminListInventory = React.lazy(
   () => import("../page/Admin/inventory/listInventory")
+);
+
+//Inventory V2
+const AdminAddInventoryV2 = React.lazy(
+  () => import("../page/Admin/inventory/addInventoryV2")
+);
+const AdminListInventoryV2 = React.lazy(
+  () => import("../page/Admin/inventory/listInventoryV2")
 );
 
 // OrderAuction 
@@ -200,12 +221,12 @@ const AdminRoutes: RouteObject[] = [
       { path: "editCategories/:id", element: <AdminEditCategories /> },
       { path: "listCategories", element: <AdminListCategories /> },
       { path: "addproduct", element: <AdminAddProductV2 /> },
+      { path: "add-product-auction", element: <AdminFetAddProductAuction /> },
+      { path: "list-auction", element: <AdminFetListProductAuction /> },
       { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
       { path: "listproduct", element: <AdminListProductV2 /> },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
-      { path: "addProducts", element: <AdminAddProducts /> },
-      { path: "editProducts/:id", element: <AdminEditProducts /> },
-      { path: "listProducts", element: <AdminListProducts /> },
+      { path: "edit-product-auction/:id", element: <AdminFetEditProductAuction /> },
       { path: "addBrands", element: <AdminAddBrands /> },
       { path: "editBrands/:id", element: <AdminEditBrands /> },
       { path: "listBrands", element: <AdminListBrands /> },
@@ -216,7 +237,13 @@ const AdminRoutes: RouteObject[] = [
       { path: "addInbound", element: <AdminAddInbound /> },
       { path: "listInventory", element: <AdminListInventory /> },
       { path: "addInventory", element: <AdminAddInventory /> },
+      { path: "addInventoryV2", element: <AdminAddInventoryV2 /> },
+      { path: "listInventoryV2", element: <AdminListInventoryV2 /> },
       { path: "editInbound/:id", element: <AdminEditInbound /> },
+      { path: "editInboundV2/:id", element: <AdminEditInboundV2 /> },
+
+      { path: "listInboundV2", element: <AdminListInboundV2 /> },
+      { path: "addInboundV2", element: <AdminAddInboundV2 /> },
       { path: "addBuyingFormat", element: <AdminAddBuyingFormat /> },
       { path: "editBuyingFormat", element: <AdminEditBuyingFormat /> },
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },

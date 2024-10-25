@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { listInbound, searchInbound } from "../../../../services/inbound/crudInbound.service";
-// import Swal, { SweetAlertResult } from "sweetalert2";
-// import withReactContent from "sweetalert2-react-content";
+import { listInbound, searchInbound, softDeleteInbound } from "../../../../services/inbound/crudInbound.service";
+import Swal, { SweetAlertResult } from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
-// const MySwal = withReactContent(Swal);
+const MySwal = withReactContent(Swal);
 
 const InboundList: React.FC = () => {
   const [inbounds, setInbounds] = useState<any[]>([]);
@@ -97,6 +97,39 @@ const InboundList: React.FC = () => {
     // Cập nhật URL khi trang thay đổi
     navigate(`?page=${page}`);
   };
+
+  const handlesoftDeleteInbound = async (inboundId: string) => {
+    MySwal.fire({
+      title: "Xóa đơn hàng?",
+      text: "Bạn có chắc muốn xóa đơn hàng này không!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        try {
+          await softDeleteInbound(inboundId);
+          setInbounds(inbounds.filter((inbound) => inbound._id !== inboundId));
+          MySwal.fire({
+            title: "Đã xóa!",
+            text: "Đơn hàng đã bị xóa.",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting inbounds:", error);
+          MySwal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra sự cố khi xóa đơn hàng.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -240,6 +273,12 @@ const InboundList: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex items-center space-x-4">
+                      <button
+                    className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                    onClick={() => handlesoftDeleteInbound(inbound._id)}
+                  >
+                    Xoá
+                  </button>
                         <Link
                           to={`/admin/editInbound/${inbound._id}`}
                           className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"

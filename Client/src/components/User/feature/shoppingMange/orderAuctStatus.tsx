@@ -5,13 +5,15 @@ import ListOrders from "./orderStatusAuc/allListOrderAuc";
 import ShippingOrders from "./orderStatusAuc/ShippingStatusOrders";
 import ReceiveOrders from "./orderStatusAuc/ReciveStatusOrder";
 import CompletedOrders from "./orderStatusAuc/CompleteStatusOrder";
-
-
+import PendingOrders from "./orderStatusAuc/pendingOrderAuc"
+import Confirmed from "./orderStatusAuc/confirmedOrderAuc"
 const Order: React.FC = () => {
   const [view, setView] = useState<
     | "list"
 
-    | "detail"
+    | "pending"
+    | "confirmed"
+  
     | "shipping"
     | "recieve"
     | "completed"
@@ -62,6 +64,10 @@ const Order: React.FC = () => {
   
   
         {view === "list" && <ListOrders />}
+
+        {view === "pending" && <PendingOrders />}
+        {view === "confirmed" && <Confirmed />}
+
         {view === "shipping" && <ShippingOrders />}
         {view === "recieve" && < ReceiveOrders/>}
         {view === "completed" && <CompletedOrders />}

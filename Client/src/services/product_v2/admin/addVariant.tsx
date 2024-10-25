@@ -23,9 +23,11 @@ export const addVariant = async (
     }
     
     if (variant.color) {
-      formData.append("color", variant.color.map((item) => item._id).join(","));
+      const colorIds = variant.color.map(item => item._id); 
+      colorIds.forEach(id => {
+        formData.append("color", id);
+      });
     }
-    
     if (variant.cpu) {
       formData.append("cpu", variant.cpu.map((item) => item._id).join(","));
     }

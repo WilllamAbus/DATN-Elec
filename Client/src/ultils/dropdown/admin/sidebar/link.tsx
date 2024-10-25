@@ -10,10 +10,12 @@ export const links: Record<string, Link[]> = {
   ],
   product: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
-    { label: "Sản phẩm đấu giá", to: "/admin/listProdAuc" },
+    { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
     { label: "Khoảng định giá", to: "/admin/listPriceRand" },
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },
+    { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
+    { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
   ],
   orderCart: [
     { label: "Đơn hàng", to: "/admin/listOrders" },
@@ -37,5 +39,9 @@ export const links: Record<string, Link[]> = {
   categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
-  inbound: [{ label: "Nhập hàng", to: "/admin/listInbound" }],
+  inbound: [
+    { label: "Nhập hàng biến thể", to: "/admin/listInbound" },
+    { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" }
+  
+  ],
 };

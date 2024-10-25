@@ -6,7 +6,7 @@ const productVariantSchema = new Schema({
   variant_description: { type: String }, 
   variant_price: { type: Number },
   battery: { type: Schema.Types.ObjectId, ref: 'Battery' },
-  color: { type: Schema.Types.ObjectId, ref: 'Color' },
+  color: [{ type: Schema.Types.ObjectId, ref: 'Color' }], 
   cpu: { type: Schema.Types.ObjectId, ref: 'Cpu' },
   graphicsCard: { type: Schema.Types.ObjectId, ref: 'GraphicsCard' },
   operatingSystem: { type: Schema.Types.ObjectId, ref: 'OperatingSystem' },

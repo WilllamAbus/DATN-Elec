@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 
 const auctionSchema = Schema(
   {
-    productId: { type: Schema.Types.ObjectId, ref: 'product_v2'},
+    productId: { type: Schema.Types.ObjectId, ref: 'productAuction'},
     auction_winner: { type: String, default: 'A' }, // Tên của người chiến thắng
     auction_total: { type: Number, default: 0 }, // Tổng giá trị đấu giá
     auction_quantity: { type: Number, default: 1 }, // Số lượng đấu giá

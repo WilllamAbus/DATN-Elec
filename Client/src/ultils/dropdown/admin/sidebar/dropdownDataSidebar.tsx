@@ -49,6 +49,12 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.inbound,
     label: labels.inbound,
   },
+
+  inboundV2: {
+    icon: icons.inboundV2,
+    links: links.inboundV2,
+    label: labels.inboundV2,
+  },
   homeAdmin: {
     icon: icons.homeAdmin,
     links: links.homeAdmin,

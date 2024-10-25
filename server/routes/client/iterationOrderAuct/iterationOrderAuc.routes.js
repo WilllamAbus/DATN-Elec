@@ -8,6 +8,10 @@ const middlewareController = require("../../../middleware/auth");
 // Route to create a payment link
 router.get('/allOrder', iteractionOrderAuController.getOrderByUser);
 router.get('/shippStateOrderAuc', iteractionOrderAuController.getShippingOrderByUser);
+
+router.get('/pendingStateOrderAuc', iteractionOrderAuController.getPendingOrderByUser);
+router.get('/confirmStateOrderAuc', iteractionOrderAuController.getConfirmedOrderByUser);
+
 router.get('/reciveStateOrderAuc', iteractionOrderAuController.getReciveOrderByUser);
 router.get('/completStateOrderAuc', iteractionOrderAuController.getCompleteOrderByUser);
 router.patch('/received/soft-delete/:orderId',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);

@@ -27,7 +27,7 @@ export const softDelTimeTrackAdminThunk = createAsyncThunk<TimeTrackSoftDel , { 
   async ({id}, { rejectWithValue }) => {
     try {
       const response  = await TimeTrackService.softDelTimeProduct(id);
-      console.log('softDelTimeTrack', response.data);
+  
       
       return response.data;
     } catch (error: any) {

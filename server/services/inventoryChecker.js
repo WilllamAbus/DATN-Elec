@@ -32,12 +32,12 @@ async function checkInventoryAndNotify() {
     }
 
     // Tìm tất cả các bản ghi tồn kho
-    const inventories = await Inventory.find().populate('product');
+    const inventories = await Inventory.find().populate('product_variant');
 
     inventories.forEach(async (inventory) => {
         // Kiểm tra nếu quantityStock <= 10
         if (inventory.quantityStock <= 10) {
-          const productName = inventory.product.product_name; // Lấy tên sản phẩm từ object product
+          const productName = inventory.product_variant.variant_name; // Lấy tên sản phẩm từ object product
   
           // Gửi email cảnh báo với tên sản phẩm
           const mailOptions = {
@@ -56,7 +56,7 @@ async function checkInventoryAndNotify() {
             }
           });
   
-          SocketServices.emitInventory(inventory.product._id, productName, inventory.quantityStock);
+          SocketServices.emitInventory(inventory.product_variant._id, productName, inventory.quantityStock);
         }
       });
 

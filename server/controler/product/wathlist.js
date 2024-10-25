@@ -59,12 +59,33 @@ const WathListController = {
 
       await newInteraction.save();
 
-      return res.status(200).json({
-        success: true,
-        message:
-          "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
-        data: newWatchlist,
-      });
+
+        // // Gọi script Python với đường dẫn đầy đủ
+        // const pythonScriptPath = path.join(__dirname, '../../../Python Client Server/recommendation_service.py');
+        
+        // exec(`python3 ${pythonScriptPath} ${userId}`, (error, stdout, stderr) => {
+        //     if (error) {
+        //         console.error(`Error executing Python script: ${error}`);
+        //         return res.status(500).json({
+        //             success: false,
+        //             message: "Lỗi khi tính toán gợi ý sản phẩm",
+        //         });
+        //     }
+        //     if (stderr) {
+        //       console.error(`Python script error: ${stderr}`);
+        //       return res.status(500).json({
+        //           success: false,
+        //           message: "Có lỗi từ script Python",
+        //       });
+        //   }
+        //     console.log(`Python script output: ${stdout}`);
+        // });
+
+        return res.status(200).json({
+            success: true,
+            message: "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
+            data: newWatchlist,
+        });
     } catch (error) {
       console.error("Error adding to watchlist:", error);
       return res.status(500).json({

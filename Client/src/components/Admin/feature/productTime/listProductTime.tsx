@@ -112,7 +112,7 @@ const ListProductTime: React.FC = () => {
             <th scope="col" className="p-4">Tên sản phẩm</th>
             <th scope="col" className="p-4">Giờ bắt đầu</th>
             <th scope="col" className="p-4">Giờ kết thúc</th>
-     
+            <th scope="col" className="p-4">Trạng thái</th>
             <th scope="col" className="p-4">Chức năng</th>
           </tr>
         </thead>
@@ -144,7 +144,14 @@ const ListProductTime: React.FC = () => {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {formatDateVN(track.endTime)}
                 </td>
-             
+                <td className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
+                      track.status === "active"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-red-50 text-red-700"
+                    }`}>
+                {track.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                </td>
+              
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
                     <button onClick={()=>  handleSoftDelTimeTrack(track._id)} className="lex items-center text-red-700 bg-red-200 hover:text-white border 

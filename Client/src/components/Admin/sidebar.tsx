@@ -81,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
                 <NavItem type="comment" />
                 <NavItem type="supplier" />
                 <NavItem type="brand" />
-                <NavItem type="inbound" />
+                <DropdownItem type="inbound" />
               </ul>
               <div className="pt-2 space-y-2">
                 <ul className="pb-2 space-y-2">

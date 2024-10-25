@@ -1,5 +1,6 @@
 
 
+
 export const breadcrumbItems = {
   listProducts: [
     { href: "/admin", label: "Home" },
@@ -31,6 +32,11 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/listInbound", label: "Danh sách lô hàng" },
+  ],
+  listInboundsV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/listInboundV2", label: "Danh sách lô hàng đấu giá" },
   ],
   listInventory: [
     { href: "/", label: "Home" },
@@ -80,11 +86,27 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addProducts", label: "Thêm sản phẩm" },
   ],
+  listroductAuction: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/list-auction", label: "danh sách sản phẩm đấu giá" },
+  ],
+
+  addProductV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addProductV2", label: "Thêm sản phẩm đấu giá" },
+  ],
 
   addInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInbound", label: "Thêm lô hàng" },
+  ],
+  addInboundV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInboundV2", label: "Thêm lô hàng đấu giá" },
   ],
 
   addInventory: [
@@ -92,11 +114,23 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/addInventory", label: "Cập nhật kho hàng lên kệ" },
   ],
+
+  addInventoryV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/addInventoryV2", label: "Cập nhật kho hàng đấu giá" },
+  ],
     
   editInbounds: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/editInbound", label: "Chi tiết lô hàng" },
+  ],
+
+  editInboundV2: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/editInboundV2", label: "Chi tiết lô hàng đấu giá" },
   ],
   //addproduct v2
   addproduct: [
@@ -122,6 +156,11 @@ export const breadcrumbItems = {
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
     { href: "/admin/editproduct", label: "Cập nhật sản phẩm" },
+  ],
+  editProductAuction: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/edit-product-auction", label: "Cập nhật sản phẩm đấu giá" },
   ],
   editSuppliers: [
     { href: "/", label: "Home" },

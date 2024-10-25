@@ -1,6 +1,7 @@
 export interface Inventory {
     _id: string;
-    product: string;
+    product_id: string,
+    product_variant: string,
     quantityShelf: number;
     quantityStock: number;
     totalQuantity: number;

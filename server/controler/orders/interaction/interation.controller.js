@@ -71,7 +71,6 @@ const interactionController = {
   },
   postInteractionView: async (req, res) => {
     try {
-      // Gọi service postInteractions để lưu dữ liệu vào database
       const result = await interactionService.postInteractionsView(req.body);
   
       res.status(200).json(result);
@@ -79,6 +78,8 @@ const interactionController = {
       res.status(500).json({ error: `Error creating interactions: ${error.message}` });
     }
   },
+
+  
   postInteraction: async (req, res) => {
     try {
       const result = await interactionService.postInteractions(req.body);

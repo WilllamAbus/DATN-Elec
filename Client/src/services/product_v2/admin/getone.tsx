@@ -6,7 +6,6 @@ export const getOneProduct = async (id: string): Promise<GetOneResponse> => {
     const response = await instance.get<GetOneResponse>(`/admin/product/getone/${id}`);
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching product:", error);
     return {
       success: false,
       err: 1,

@@ -113,9 +113,9 @@ const ViewBidPage: React.FC = () => {
     const groupedBids: { [key: string]: Bid[] } = {};
 
     bids.forEach((bid: Bid) => {
-      console.log('Checking bid:', bid);
+   
       const productId = bid.product_bidding?.productId?._id;
-      console.log('productId', productId);
+    
       
       if (productId) {
         if (!groupedBids[productId]) {

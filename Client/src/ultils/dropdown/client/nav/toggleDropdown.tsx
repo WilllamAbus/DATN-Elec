@@ -20,10 +20,8 @@ const UserMenuDropdown: React.FC = () => {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.login.isAuthenticated
   );
-  console.log(isAuthenticated);
 
   const isAdmin = profile?.roles?.includes("admin");
-
   const isLoggedIn =
     isAuthenticated && profile !== null && profile !== undefined;
   useEffect(() => {

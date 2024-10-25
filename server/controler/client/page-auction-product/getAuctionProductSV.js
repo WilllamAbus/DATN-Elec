@@ -1,5 +1,4 @@
-const Product = require('../../../model/product_v2');
-const mongoose = require('mongoose');
+const Product = require('../../../model/productAuction/productAuction');
 const { getBrandFilter, getConditionShoppingFilter, getDiscountFilter, getPriceFilter } = require('./filter-auction-product');
 
 
@@ -30,15 +29,7 @@ const ProductAuctionService = {
       const [sortField, sortDirection] = _sort.split(":");
       const sortOptions = { [sortField]: sortDirection === "ASC" ? 1 : -1 };
 
-      const format = await mongoose.model('formatShopping').findOne({ formats: "Đấu giá" }).exec();
-      if (!format) {
-        return resolve({
-          success: false,
-          err: 1,
-          msg: 'Không thấy sản phẩm đấu giá.',
-          status: 404
-        });
-      }
+
 
 
       const brandFilter = getBrandFilter(brand);
@@ -47,7 +38,6 @@ const ProductAuctionService = {
       const discountFilter = getDiscountFilter(minDiscountPercent, maxDiscountPercent);
 
       const products = await Product.find({
-        product_format: format._id,
         status: { $ne: 'disable' },
         ...brandFilter,
         ...conditionShoppingFilter,
@@ -59,15 +49,12 @@ const ProductAuctionService = {
         .limit(limit)
         .populate('product_type')
         .populate('product_brand')
-        .populate('product_format')
         .populate('product_condition')
         .populate('product_supplier')
-        .populate('variants')
-        .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier variants product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
+        .select('product_name image product_description slug product_discount product_brand product_condition product_supplier  product_quantity product_ratingAvg product_view product_price product_price_unit weight_g isActive status disabledAt comments')
         .lean();
       console.log("Products:", products);
       const total = await Product.countDocuments({
-        product_format: format._id,
         status: { $ne: 'disable' },
         ...brandFilter,
         ...conditionShoppingFilter,
@@ -86,7 +73,7 @@ const ProductAuctionService = {
     } catch (error) {
       reject({
         success: false,
-        err: 1,
+        err: -1,
         msg: 'LỗI không có sản phẩm: ' + error.message,
         status: 500
       });

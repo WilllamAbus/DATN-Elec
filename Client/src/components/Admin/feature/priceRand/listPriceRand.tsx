@@ -1,25 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { fetchPriceRand } from "../../../../redux/adminPriceRand/list/listPriceRandThunk";
+import { fetchPriceRand, softDelPriceRandAdminThunk } from "../../../../redux/adminPriceRand/list/listPriceRandThunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "./searchForm/searchFormPriceRand";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
-
+import {PriceRangeSoftDel} from '../../../../types/adminPriceRand/softDelPriceRand'
+import withReactContent from "sweetalert2-react-content";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer ,toast} from "react-toastify";
+import Swal, { SweetAlertResult } from "sweetalert2";
+const MySwal = withReactContent(Swal);
 // Hàm để định dạng thời gian theo giờ Việt Nam
 
 
 const ListPriceRand: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { listPriceRand, loading, error, totalPages } = useSelector(
+  const { listPriceRand,  totalPages } = useSelector(
     (state: RootState) => state.adminListPriceRand
   );
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
-
+  const [, setPriceRand] = useState<PriceRangeSoftDel[]>([]);
   useEffect(() => {
     dispatch(fetchPriceRand({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
@@ -33,13 +38,29 @@ const ListPriceRand: React.FC = () => {
     setPage(1);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleSoftDelPriceRand = async (id: string) => {
+    MySwal.fire({
+      title: "Hủy sản phẩm?",
+      text: "Bạn có chắc muốn hủy sản phẩm này không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+ await dispatch(softDelPriceRandAdminThunk({ id })).unwrap();
+ setPriceRand((prevSoftDel) =>
+  prevSoftDel.filter((rand) => rand._id!== id)
+      );
+      toast.success("Xóa sản phẩm thành công");
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+      }else {
+        toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+      }
+    });
+  };
 
   return (
     <>
@@ -82,6 +103,7 @@ const ListPriceRand: React.FC = () => {
           <th scope="col" className="p-4">Giá trung bình</th>
           <th scope="col" className="p-4">Giá cao nhất</th>
           <th scope="col" className="p-4">Giá kích hoạt</th>
+          <th scope="col" className="p-4">Trạng thái</th>
           <th scope="col" className="p-4">Chức năng</th>
         </tr>
       </thead>
@@ -112,9 +134,16 @@ const ListPriceRand: React.FC = () => {
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {rand.bidInput.toLocaleString()} VND
               </td>
+              <td className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
+                      rand.status === "active"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-red-50 text-red-700"
+                    }`}>
+                {rand.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <div className="flex items-center space-x-4">
-                  <button className="lex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
+                  <button onClick={()=>  handleSoftDelPriceRand(rand._id)} className="lex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
                     Xóa
                   </button>
                 
@@ -135,6 +164,8 @@ const ListPriceRand: React.FC = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
+
+      <ToastContainer/>
     </>
   );
 };

@@ -1,10 +1,10 @@
 import React from "react";
 import FilterByBrand from "./filterAuction/filterbybrand";
 import FilterByPrice from "./filterAuction/filterbyPrice";
-import FilterByRam from "./filterAuction/filterbyRam";
+
 import FilterByConditionShopping from "./filterAuction/filterbyConditionShopping";
 import FilterByService from "./filterAuction/filterbyService";
-import { FilterState,ProductCondition,ProductBrand,RAM } from "../../../../services/product_v2/client/types/listPageAuction"; 
+import { FilterState,ProductCondition,ProductBrand } from "../../../../services/product_v2/client/types/listPageAuction"; 
 interface ProductFiltersProps {
   filters: FilterState;
   onChange?: (newFilters: FilterState) => void;
@@ -17,13 +17,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
     };
     onChange(newFilters);
   };
-  const handleRamChange = (selectedBrands: RAM[]) => {
-    const newFilters: FilterState = {
-      ...filters,
-      rams: selectedBrands.length > 0 ? selectedBrands : undefined,
-    };
-    onChange(newFilters);
-  };
+
   const handleConditionShoppingChange = (selectedConditions: ProductCondition[]) => {
     const newFilters: FilterState = {
       ...filters,
@@ -51,7 +45,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
     <div>
       <FilterByPrice onchange={handlePriceChange} />
       <FilterByBrand filters={filters} onchange={handleBrandChange} />
-      <FilterByRam filters={filters} onchange={handleRamChange} />
       <FilterByConditionShopping filters={filters} onchange={handleConditionShoppingChange} />
       <FilterByService filters={filters} onchange={handleServiceChange} />
     </div>

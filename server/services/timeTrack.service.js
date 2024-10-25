@@ -1,6 +1,6 @@
 const moment = require("moment-timezone");
 const Time_Track = require("../model/time-track.model");
-const Product_v2 = require("../model/product_v2");
+const Product_v2 = require("../model/productAuction/productAuction");
 // Your local time zone
 
 const currentTimeInHCM = moment()
@@ -25,8 +25,8 @@ const timeTrackService = {
         _id: productId,
         status: { $ne: "disable" },
       })
-        .select("product_format")
-        .populate("product_format", "formats")
+        
+    
         .lean();
 
       if (!product) {
@@ -34,11 +34,7 @@ const timeTrackService = {
       }
 
       // Kiểm tra xem `product_format` có tồn tại không và lấy thông tin định dạng
-      const format = product.product_format.formats.trim();
 
-      if (format !== "Đấu giá") {
-        return null;
-      }
 
       const timeZone = "Asia/Ho_Chi_Minh";
       const now = moment.tz(timeZone).toDate();
@@ -130,21 +126,15 @@ const timeTrackService = {
         _id: timeTracks,
         status: { $ne: "disable" },
       })
-        .populate("product_format", "formats")
+     
         .populate("product_condition", "nameCondition")
         .populate("product_supplier", "name")
         .lean();
 
-      if (!product) {
-        throw new Error("Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.");
-      }
+    
 
       // Check if product format exists and get the format information
-      const format = product.product_format?.formats.trim();
-
-      if (format !== "Đấu giá") {
-        return null;
-      }
+   
 
       // Extract images (assuming they are stored as an array of URLs or image objects)
       const images = product.image.map((img) => ({
@@ -341,13 +331,14 @@ const timeTrackService = {
 
   getAllTimeTracks: async (page = 1, pageSize = 5, search) => {
     try {
-      const skip = (page - 1) * pageSize;
+    
 
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "active" })
-        .select("_id startTime endTime endTimeBid stateTime productId") // Chỉ lấy các trường cần thiết từ TimeTrack
+        .select("_id startTime endTime endTimeBid stateTime productId status") // Chỉ lấy các trường cần thiết từ TimeTrack
         .lean();
 
+        
       // Bước 2: Lấy danh sách productId từ timeTracks
       const productIds = timeTracks.map((timeTrack) => timeTrack.productId);
 
@@ -355,18 +346,17 @@ const timeTrackService = {
       const products = await Product_v2.find({
         _id: { $in: productIds },
       })
-        .select("_id product_name image product_format")
-        .populate("product_format", "formats") // Populate product_format
+        .select("_id product_name image ")
+      
         .lean();
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
-      const filteredProducts = products.filter(
-        (product) => product.product_format.formats === "Đấu giá"
-      );
+ 
+      
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
-      filteredProducts.forEach((product) => {
+      products.forEach((product) => {
         productMap[product._id] = product;
       });
 
@@ -394,7 +384,7 @@ const timeTrackService = {
         productId: track.product._id,
         productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
-        format: track.product.product_format.formats // Lấy format từ product_format
+    
       }));
 
       // In ra danh sách hình ảnh
@@ -496,9 +486,7 @@ const timeTrackService = {
         { new: true } // Trả về document đã được cập nhật
       );
 
-      if (!updatedTimeTrack) {
-        throw new Error("TimeTrack không tồn tại");
-      }
+ 
 
       return updatedTimeTrack;
     } catch (error) {
@@ -519,9 +507,7 @@ const timeTrackService = {
         { new: true } // Trả về document đã được cập nhật
       );
 
-      if (!updatedTimeTrack) {
-        throw new Error("TimeTrack không tồn tại");
-      }
+
 
       return updatedTimeTrack;
     } catch (error) {
@@ -532,32 +518,30 @@ const timeTrackService = {
 
   deletedTimeTrackAdmin: async (page = 1, pageSize = 5, search) => {
     try {
-      const skip = (page - 1) * pageSize;
+
 
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "disable" })
-        .select("_id startTime endTime stateTime productId") // Chỉ lấy các trường cần thiết từ TimeTrack
+        .select("_id startTime endTime stateTime productId status") // Chỉ lấy các trường cần thiết từ TimeTrack
         .lean();
 
       // Bước 2: Lấy danh sách productId từ timeTracks
       const productIds = timeTracks.map((timeTrack) => timeTrack.productId);
-
+      
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
         _id: { $in: productIds },
       })
-        .select("_id product_name image product_format")
-        .populate("product_format", "formats") // Populate product_format
+        .select("_id product_name image ")
+    
         .lean();
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
-      const filteredProducts = products.filter(
-        (product) => product.product_format.formats === "Đấu giá"
-      );
+     
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
-      filteredProducts.forEach((product) => {
+      products.forEach((product) => {
         productMap[product._id] = product;
       });
 
@@ -585,7 +569,7 @@ const timeTrackService = {
         productId: track.product._id,
         productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
-        format: track.product.product_format.formats // Lấy format từ product_format
+     
       }));
 
       // In ra danh sách hình ảnh
@@ -625,14 +609,11 @@ const timeTrackService = {
       // Bước 1: Tìm tất cả sản phẩm có status khác 'disable', populate 'product_format'
       const products = await Product_v2.find({
         status: { $ne: "disable" },
-      }).populate("product_format", "formats"); // Populate để lấy thông tin từ collection 'formatshoppings'
+      }) // Populate để lấy thông tin từ collection 'formatshoppings'
 
       // Bước 2: Lọc ra các sản phẩm có product_format là 'Đấu giá'
       const filteredProducts = products
-        .filter((product) => {
-          // So sánh formats (trường trong collection 'formatshoppings') với 'Đấu giá'
-          return product.product_format.formats === "Đấu giá";
-        })
+      
         .map((product) => {
           return {
             _id: product._id,
