@@ -1,4 +1,5 @@
 const modelProduct = require('../../../model/product_v2');
+
 const Repcomment = require('../../../model/repComment.model');
 const mongoose = require('mongoose'); 
 const homeAllProduct = async (req, res) => {
@@ -150,10 +151,8 @@ const auction = async (req, res) => {
 const upView = async (req, res) => {
   try {
     const { id } = req.params;
-
     // Tìm sản phẩm theo ID
     const product = await modelProduct.findById(id);
-
     if (!product) {
         console.error('Product not found with id:', id);
         return res.status(404).json({
@@ -161,7 +160,6 @@ const upView = async (req, res) => {
             message: 'Product not found'
         });
     }
-
     // Tăng số lượng lượt xem của sản phẩm
     product.product_view = (product.product_view || 0) + 1;
 

@@ -5,10 +5,10 @@ const priceRangeBidSchema = new Schema(
  
     {
         product_randBib: {
-            productId: { type: Schema.Types.ObjectId, ref: 'product_v2' }, 
+            productId: { type: Schema.Types.ObjectId, ref: 'productAuction' }, 
             product_price_unit: { type: Number },
             product_name:{type: String}, 
-            product_format: { type: String },
+        
         
           },
 

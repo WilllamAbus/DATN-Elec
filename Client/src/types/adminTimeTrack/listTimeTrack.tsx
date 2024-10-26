@@ -18,6 +18,7 @@ export interface ProductFormat {
     endTime: string;
     endTimeBid: string;
     stateTime: string;
+    status:  string
     product: Product;
   }
   
