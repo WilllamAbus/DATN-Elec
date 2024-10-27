@@ -14,9 +14,9 @@ const RepComment: React.FC<RepCommentProps> = ({ id_comment }) => {
       try {
         const commentList = await getRepComment(id_comment);
         setRepComments(commentList);
-        console.log(commentList);
+        // console.log(commentList);
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách phản hồi:", error);
+        return error;
       }
     };
 

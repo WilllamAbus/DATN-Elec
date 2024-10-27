@@ -1,5 +1,5 @@
 const PriceRangeBid = require("../../../model/orders/priceRange.model");
-const Product_v2 = require("../../../model/product_v2");
+const Product_v2 = require("../../../model/productAuction/productAuction");
 
 const pricRangeBidService = {
   createPriceRange: async (productId, bidInput) => {
@@ -14,18 +14,15 @@ const pricRangeBidService = {
       const product = await Product_v2.findOne({
         _id: productId,
         status: { $ne: "disable" },
-      }).populate("product_format");
+      })
   
+      console.log('product', product);
       
       if (!product) {
         throw new Error("Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.");
       }
 
-      const format = product.product_format.formats.trim();
-
-      if (format !== "Đấu giá") {
-        return null;
-      }
+   
 
       // Tính toán giá trị minBid, midBid và maxBid
     
@@ -41,7 +38,7 @@ const pricRangeBidService = {
           productId: product._id,
           product_price_unit: product.product_price_unit,
           product_name: product.product_name,
-          product_format: product.product_format.formats,
+      
         },
         minBid,
         midBid,
@@ -63,7 +60,7 @@ const pricRangeBidService = {
       const product = await Product_v2.findOne({
         _id: productId,
         status: { $ne: "disable" },
-      }).populate("product_format", 'formats');
+      })
       
     
       
@@ -73,11 +70,7 @@ const pricRangeBidService = {
       
    
       
-      const format = product.product_format.formats.trim();
   
-      if (format !== "Đấu giá") {
-        return null; // Không phải sản phẩm đấu giá
-      }
 
       const produtct = product._id
  
@@ -114,13 +107,10 @@ const pricRangeBidService = {
     try {
       // Bước 1: Tìm tất cả sản phẩm có status khác 'disable', populate 'product_format'
       const products = await Product_v2.find({ status: { $ne: 'disable' } })
-        .populate('product_format', 'formats'); // Populate để lấy thông tin từ collection 'formatshoppings'
+       // Populate để lấy thông tin từ collection 'formatshoppings'
 
       // Bước 2: Lọc ra các sản phẩm có product_format là 'Đấu giá'
-      const filteredProducts = products.filter(product => {
-        // So sánh formats (trường trong collection 'formatshoppings') với 'Đấu giá'
-        return product.product_format.formats === 'Đấu giá'; 
-      }).map(product => {
+      const filteredProducts = products.map(product => {
         return {
           _id: product._id,
           product_price_unit: product.product_price_unit,
@@ -140,7 +130,7 @@ const pricRangeBidService = {
     try {
       // const skip = (page - 1) * pageSize;
       const priceRange = await PriceRangeBid.find({ status: "active" })
-      .select("product_randBib minBid midBid maxBid bidInput")
+      .select("product_randBib minBid midBid maxBid bidInput status")
       .populate("product_randBib" , "productId", "product_price_unit", "product_name") // Chỉ lấy các trường cần thiết từ TimeTrack
       .lean();
     
@@ -150,20 +140,18 @@ const pricRangeBidService = {
       const products = await Product_v2.find({
         _id: { $in: productIds },
       })
-        .select("image product_format")
-        .populate("product_format", "formats") // Populate product_format
+        .select("_id image product_name ")
+    
         .lean();
 
       
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
-      const filteredProducts = products.filter(
-        (product) => product.product_format.formats === "Đấu giá"
-      );
+    
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
-      filteredProducts.forEach((product) => {
+      products.forEach((product) => {
         productMap[product._id] = product;
       });
 
@@ -185,7 +173,8 @@ const pricRangeBidService = {
       const allPriceRand = matchedPriceRandge.map(track => ({
         priceRandId: track._id,
        
-     
+        productId: track.product._id,
+        productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
       
       }));
@@ -304,7 +293,7 @@ const pricRangeBidService = {
     try {
   
       const priceRange = await PriceRangeBid.find({ status: "disable" })
-      .select("product_randBib minBid midBid maxBid bidInput")
+      .select("product_randBib minBid midBid maxBid bidInput status")
       .populate("product_randBib" , "productId", "product_price_unit", "product_name") // Chỉ lấy các trường cần thiết từ TimeTrack
       .lean();
 
@@ -313,18 +302,18 @@ const pricRangeBidService = {
       const products = await Product_v2.find({
         _id: { $in: productIds },
       })
-        .select("image product_format")
-        .populate("product_format", "formats") // Populate product_format
+        .select("_id image product_name ")
+    
         .lean();
 
+      
+
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
-      const filteredProducts = products.filter(
-        (product) => product.product_format.formats === "Đấu giá"
-      );
+    
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
-      filteredProducts.forEach((product) => {
+      products.forEach((product) => {
         productMap[product._id] = product;
       });
 
@@ -345,7 +334,8 @@ const pricRangeBidService = {
       const allPriceRand = matchedPriceRandge.map(track => ({
         priceRandId: track._id,
        
-      
+        productId: track.product._id,
+        productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
       
       }));

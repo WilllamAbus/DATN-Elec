@@ -197,7 +197,7 @@ const InventoryList: React.FC = () => {
         <tbody>
           {inventories && inventories.length > 0 ? (
             inventories.map((inventory) => {
-              const { productAuction, supplier, quantityStock, quantityShelf, price, _id } = inventory;
+              const { productAuction,quantityStock, quantityShelf, price, _id } = inventory;
 
               let buttonText = "Còn trống";
               let buttonClass =
@@ -235,7 +235,7 @@ const InventoryList: React.FC = () => {
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {productAuction.product_name}
                   </td>
-                  <td className="px-4 py-3">{supplier.name}</td>
+                  <td className="px-4 py-3">{productAuction.product_supplier.name}</td>
                   <td className="px-4 py-3">{quantityStock}
                     {quantityStockWarning && (
                       <p className="text-red-500 text-xs italic">{quantityStockWarning}</p>

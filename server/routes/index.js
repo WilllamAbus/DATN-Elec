@@ -41,7 +41,10 @@ const orderAucIteraction = require('./client/iterationOrderAuct/iterationOrderAu
 const commentAdminRouter = require("./admin/comment");
 const commentClientRouter = require("./client/comment");
 
+const statistical = require('./admin/statistical');
 const routes = (app) => {
+  app.use("/api/admin/statistical", statistical);
+
   app.use("/api/auth", authRouter);
   app.use("/api/auth", googleRouter);
   app.use("/api/user", userRouter);

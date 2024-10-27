@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { getListSuppliers, getListProductV2, addInboundV2 } from "../../../../services/inbound/crudInbound.service";
+import { getListProductV2, addInboundV2 } from "../../../../services/inbound/crudInbound.service";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -7,14 +7,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductAuction } from "../../../../services/product_v2/admin/types/add-product-auction";
-import { Supplier } from "../../../../types/Suppliers.d";
 
 interface IFormInput {
     productAuction: string;
-    inbound_supplier: string;
     inbound_description: string;
     inbound_quantity: number;
     inbound_price: number;
+    totalPriceInbound: number;
 
 }
 
@@ -22,14 +21,16 @@ const AddInbound: React.FC = () => {
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [productV2, setProductV2] = useState<ProductAuction[]>([]); 
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
@@ -42,14 +43,6 @@ const AddInbound: React.FC = () => {
         }
     };
     useEffect(() => {
-        const fetchSuppliers = async () => {
-            try {
-                const data = await getListSuppliers();
-                setSuppliers(data.supplierReady || []);
-            } catch (error) {
-                console.error("Error fetching suppliers:", error);
-            }
-        };
         const fetchProductV2 = async () => {
             try {
                 const data = await getListProductV2();
@@ -59,19 +52,35 @@ const AddInbound: React.FC = () => {
                 console.error("Error fetching products:", error);
             }
         };
-        fetchSuppliers();
         fetchProductV2();
     }, []);
 
+     // Tính toán giá tổng lô hàng
+     const calculateTotalPrice = (quantity: number, price: number) => {
+        return quantity * price;
+    };
+
+    // Theo dõi sự thay đổi của số lượng và giá tiền
+    useEffect(() => {
+        const subscription = watch((value) => {
+            const totalPrice = calculateTotalPrice(value.inbound_quantity || 0, value.inbound_price || 0);
+            setValue("totalPriceInbound", totalPrice); // Cập nhật giá tổng lô hàng
+        });
+
+        return () => subscription.unsubscribe(); // Dọn dẹp subscription khi component unmount
+    }, [watch, setValue]);
+
     //Product V2
     const submitForm = async (data: IFormInput) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             const payload = {
                 productAuction: data.productAuction,
-                inbound_supplier: data.inbound_supplier,
                 inbound_description: data.inbound_description || '',
                 inbound_quantity: data.inbound_quantity,
                 inbound_price: data.inbound_price,
+                totalPriceInbound: data.totalPriceInbound,
             };
     
             await addInboundV2(payload); // Gửi JSON
@@ -82,6 +91,10 @@ const AddInbound: React.FC = () => {
         } catch (error) {
             console.error("Error:", error);
             setError("Đã xảy ra lỗi khi thêm lô hàng. Vui lòng thử lại.");
+        } finally {
+            setTimeout(() => {
+                setIsSubmitting(false);
+            }, 3000);
         }
     };
 
@@ -102,7 +115,7 @@ const AddInbound: React.FC = () => {
                         <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan lô hàng</h3>
 
                         <div className="grid grid-cols-6 gap-6">
-                            <div className="col-span-6 sm:col-span-3">
+                            <div className="col-span-6 sm:col-span-6">
                                 <label
                                     htmlFor="first-name"
                                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -131,89 +144,87 @@ const AddInbound: React.FC = () => {
                                     </span>
                                 )}
                             </div>
-                            <div className="col-span-6 sm:col-span-3">
-                                <label
-                                    htmlFor="first-name"
-                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
-                                    Tên nhà cung cấp
-                                </label>
-                                <select
-                                    id="inbound_supplier"
-                                    className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    {...register("inbound_supplier", { required: "Nhà cung cấp không được bỏ trống" })}
-                                >
-                                    <option value="">Chọn nhà cung cấp</option>
-                                    {suppliers.length > 0 ? (
-                                        suppliers.map((supplier, index) => (
-                                            <option key={supplier._id || index} value={supplier._id}>
-                                                {supplier.name}
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option disabled>Không có sản phẩm nào</option>
-                                    )}
-                                </select>
-                                {errors.inbound_supplier && (
-                                    <span className="text-red-500 text-xs italic">
-                                        {errors.inbound_supplier.message?.toString()}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="col-span-6 sm:col-span-3">
-                                <label
-                                    htmlFor="quantity"
-                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
-                                    Số lượng
-                                </label>
-                                <input
-                                    className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    id="inbound_quantity"
-                                    type="number"
-                                    {...register("inbound_quantity",
-                                        {
-                                            required: "Số lượng không được bỏ trống",
-                                            valueAsNumber: true,
-                                            validate: value => value > 0 || "Số lượng phải lớn hơn 0"
-                                        })}
-                                    onInput={handleInput}
-                                    onPaste={handlePaste}
-                                />
-                                {errors.inbound_quantity && (
-                                    <span className="text-red-500 text-xs italic">
-                                        {errors.inbound_quantity.message?.toString()}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="col-span-6 sm:col-span-3">
-                                <label
-                                    htmlFor="quantity"
-                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                >
-                                    Giá tiền
-                                </label>
-                                <input
-                                    className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    id="inbound_price"
-                                    type="number"
-                                    {...register("inbound_price",
-                                        {
-                                            required: "Giá tiền không được bỏ trống",
-                                            valueAsNumber: true,
-                                            validate: value => value > 0 || "Giá tiền phải lớn hơn 0"
-                                        })}
-                                    onInput={handleInput}
-                                    onPaste={handlePaste}
-                                />
-                                {errors.inbound_price && (
-                                    <span className="text-red-500 text-xs italic">
-                                        {errors.inbound_price.message?.toString()}
-                                    </span>
-                                )}
-                            </div>
 
                         </div>
+                        <div className="grid grid-cols-3 gap-6 mt-3 sm:grid-cols-1">
+                                <div className="sm:col-span-1">
+                                    <label
+                                        htmlFor="quantity"
+                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Số lượng
+                                    </label>
+                                    <input
+                                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        id="inbound_quantity"
+                                        type="number"
+                                        {...register("inbound_quantity",
+                                            {
+                                                required: "Số lượng không được bỏ trống",
+                                                valueAsNumber: true,
+                                                validate: value => value > 0 || "Số lượng phải lớn hơn 0"
+                                            })}
+                                        onInput={handleInput}
+                                        onPaste={handlePaste}
+                                    />
+                                    {errors.inbound_quantity && (
+                                        <span className="text-red-500 text-xs italic">
+                                            {errors.inbound_quantity.message?.toString()}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="sm:col-span-1">
+                                    <label
+                                        htmlFor="quantity"
+                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Giá tiền
+                                    </label>
+                                    <input
+                                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        id="inbound_price"
+                                        type="number"
+                                        {...register("inbound_price",
+                                            {
+                                                required: "Giá tiền không được bỏ trống",
+                                                valueAsNumber: true,
+                                                validate: value => value > 0 || "Giá tiền phải lớn hơn 0"
+                                            })}
+                                        onInput={handleInput}
+                                        onPaste={handlePaste}
+                                    />
+                                    {errors.inbound_price && (
+                                        <span className="text-red-500 text-xs italic">
+                                            {errors.inbound_price.message?.toString()}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="sm:col-span-1">
+                                    <label
+                                        htmlFor="quantity"
+                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                    >
+                                        Giá tổng lô hàng
+                                    </label>
+                                    <input
+                                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        id="totalPriceInbound"
+                                        type="number"
+                                        {...register("totalPriceInbound",
+                                            {
+                                                required: "Giá tổng  không được bỏ trống",
+                                                valueAsNumber: true,
+                                                validate: value => value > 0 || "Giá tổng phải lớn hơn 0"
+                                            })}
+                                        readOnly
+                                    />
+                                    {errors.totalPriceInbound && (
+                                        <span className="text-red-500 text-xs italic">
+                                            {errors.totalPriceInbound.message?.toString()}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
                         <div className="w-full mb-4 border mt-6 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                             <div className="flex items-center justify-between px-3 py-2 border-b dark:border-gray-600">
                                 <div className="flex flex-wrap items-center divide-gray-200 sm:divide-x sm:rtl:divide-x-reverse dark:divide-gray-600">
@@ -411,7 +422,7 @@ const AddInbound: React.FC = () => {
                                     id="inbound_description"
                                     rows={8}
                                     className="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                                    placeholder="Nhập mô tả nhà cung cấp..."
+                                    placeholder="Nhập mô tả..."
                                     {...register("inbound_description")}
                                 />
                                 {errors.inbound_description && (
@@ -421,12 +432,13 @@ const AddInbound: React.FC = () => {
                         </div>
 
                         <div className="col-span-6 sm:col-full">
-                            <button
-                                type="submit"
-                                className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            >
-                                Thêm lô hàng
-                            </button>
+                        <button
+                                    type="submit"
+                                    className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Đang xử lý..." : "Thêm lô hàng"}
+                                </button>
                         </div>
                     </div>
                 </div>

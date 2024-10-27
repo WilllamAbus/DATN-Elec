@@ -1,13 +1,10 @@
 // types/auctionTypes.ts
-export interface ProductFormat {
-    _id: string;
-    formats: string;
-  }
+
   
   export interface Product {
     _id: string;
     image: string[];
-    product_format: ProductFormat;
+
   }
   
   export interface ProductRandBibDeleted {
@@ -25,6 +22,7 @@ export interface ProductFormat {
     maxBid: number;
     bidInput: number;
     product: Product;
+    status: string;
   }
   
   export interface PriceRangeResponseDeleted {

@@ -3,6 +3,7 @@ import instance from "../axios";
 export const listInbound = async (page = 1, limit = 5) => {
   try {
     const response = await instance.get(`/inbound/list?page=${page}&limit=${limit}`);
+    console.log("hahahah",response.data);
     return {
       data: response.data.data,  // Phản hồi chứa danh sách nhà cung cấp
       totalPages: response.data.totalPages,  // Tổng số trang
@@ -122,6 +123,7 @@ export const getListSuppliers = async () => {
 export const getOneInbound = async (id: string) => {
   try {
     const response = await instance.get(`/inbound/get-one/${id}`);
+    console.log("hahaha", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching inbounds:", error);
