@@ -1,14 +1,14 @@
 import React from "react";
 import FilterStorage from "./filter/StorageSelector";
-import { FilterState, STORAGE, ProductVariant } from "../../../../../services/detailProduct/types/getDetailProduct";
+import FilterColor from "./filter/ColorSelector";
+import { FilterState, STORAGE,COLOR } from "../../../../../services/detailProduct/types/getDetailProduct";
 
 interface DetailFiltersProps {
-  filters: FilterState;
-  variants: ProductVariant[];  
+  filters: FilterState;  
   onChange?: (newFilters: FilterState) => void;
 }
 
-const DetailFilters: React.FC<DetailFiltersProps> = ({ filters, variants, onChange = () => {} }) => {
+const DetailFilters: React.FC<DetailFiltersProps> = ({ filters, onChange = () => {} }) => {
   const handleStorageChange = (selectedStorage: STORAGE | null) => {
     const newFilters: FilterState = {
       ...filters,
@@ -16,13 +16,20 @@ const DetailFilters: React.FC<DetailFiltersProps> = ({ filters, variants, onChan
     };
     onChange(newFilters);
   };
-  
-  
+  const handleColorChange = (selectedColor: COLOR | null) => {
+    const newFilters: FilterState = {
+      ...filters,
+      color: selectedColor ? selectedColor.slug : null,  
+    };
+    onChange(newFilters);
+  };
+
 
   return (
-    <div>
-      <FilterStorage variants={variants} filters={filters} onChange={handleStorageChange} />
-    </div>
+    <div className="flex justify-between space-x-4"> {/* Sử dụng Flexbox và tạo khoảng cách */}
+    <FilterStorage filters={filters} onChange={handleStorageChange} />
+    <FilterColor filters={filters} onChange={handleColorChange} />
+  </div>
   );
 };
 

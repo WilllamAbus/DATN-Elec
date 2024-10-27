@@ -1,10 +1,9 @@
 
-import VariantImageGallery from "./cpnDetailPage/VariantImageGallery";
 import VariantName from "./cpnDetailPage/VariantName";
 import VariantPrice from "./cpnDetailPage/VariantPrice";
 import FavoriteButton from "./cpnDetailPage/FavoriteButton";
 import AddToCartButton from "./cpnDetailPage/AddToCartButton";
-import ColorSelector from "./cpnDetailPage/ColorSelector";
+
 import StorageSelector from "./filter/StorageSelector";
 import { Star } from "./svg";
 import { GetDetailProductResponse,FilterState } from "../../../../../services/detailProduct/types/getDetailProduct";
@@ -15,10 +14,7 @@ const ProductDetailLayout = ({ productDetail }: { productDetail: GetDetailProduc
   return (
     <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
       <div className="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
-        <VariantImageGallery
-          variants={productDetail.variants ?? []}
-          product_name={productDetail.product_name}
-        />
+
         <div className="mt-6 sm:mt-8 lg:mt-0">
         {firstVariant && <VariantName variant={firstVariant} product={productDetail} />}
           <div className="mt-4 sm:items-center sm:gap-4 sm:flex">
@@ -44,9 +40,9 @@ const ProductDetailLayout = ({ productDetail }: { productDetail: GetDetailProduc
           </div>
           <hr className="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
           <div className="grid grid-cols-2 gap-6 mt-6">
-          <ColorSelector colors={productDetail.variants?.[0]?.color || []} />
+     
           <StorageSelector
-              variants={productDetail.variants ?? []}
+
               filters={filters}  
             />
           </div>

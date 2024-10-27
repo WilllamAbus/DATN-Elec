@@ -1,22 +1,26 @@
 import React from "react";
+import { motion } from "framer-motion"; 
+import { Tooltip } from "@nextui-org/react";
 import { Heart } from "../svg";
 
 interface FavoriteButtonProps {
   onClick?: () => void;
 }
-
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({ onClick }) => {
   return (
-    <a
-      href="#"
-      title="Thêm vào danh sách yêu thích"
-       className="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-      role="button"
-      onClick={onClick}
-    >
-      <Heart />
-      Yêu thích
-    </a>
+    <Tooltip content="Thêm vào danh sách yêu thích" placement="top">
+      <motion.a
+        href="#"
+        className="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-white focus:outline-none bg-customPink rounded-lg border border-gray-200"
+        role="button"
+        onClick={onClick}
+        whileHover={{ opacity: 0.8 }} 
+        transition={{ duration: 0.3 }} 
+      >
+        <Heart />
+        Yêu thích
+      </motion.a>
+    </Tooltip>
   );
 };
 

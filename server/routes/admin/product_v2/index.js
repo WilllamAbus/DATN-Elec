@@ -6,6 +6,7 @@ const {
    list,
    add,
    addVariant,
+   addImageVariant,
    softDelete,
    update,
    selectbrand,
@@ -15,30 +16,40 @@ const {
    selectProductFormat,
    selectConditionShopping,
    selectCategories,
+   getVariantColorsById,
+   getVariantsByProductId,
+   searchVariants,
+   getOneProductVariant,
    getOne,
    getProductLimit,
    deletedList,
    hardDelete} = require('../../../controler/admin/product_v2');
+   router.post('/:product_id/addvariant', upload.array('image'), addVariant);
 router.get('/list',middlewareController.verifyTokenAdminAuth,list);
 router.post('/add', upload.array('image'), add);
-router.post('/:product_id/addvariant', upload.array('image'), addVariant);
+router.post('/:product_variant_id/add-image-variant', upload.array('image'), addImageVariant);
 router.patch('/softDelete/:id',middlewareController.verifyToken,softDelete);
 router.get('/selectbrand',selectbrand);
+router.get('/get-color-variant/:product_variant_id',getVariantColorsById);
 router.get('/selectsupplier',selectSupplier);
 router.get('/selectdiscount',selectDiscount);
 router.get('/selectProductFormat',selectProductFormat);
 router.get('/selectConditionSP',selectConditionShopping);
 router.get('/selectCategories',selectCategories);
 router.get("/getone/:id", getOne);
+router.get("/get-one-product-variant/:id", getOneProductVariant);
 router.patch("/restore/:id", middlewareController.verifyToken, restore);
 router.delete("/hardDelete/:id", middlewareController.verifyToken, hardDelete);
 router.get("/deletedlist", middlewareController.verifyToken, deletedList);
 router.get("/limit", getProductLimit);
+router.get("/get-variant-by-product/:id", getVariantsByProductId);
+router.get("/:id?", searchVariants);
 router.put(
   "/update/:id",
   middlewareController.verifyToken,
   upload.array("image"),
   update
 );
+
 
 module.exports = router;

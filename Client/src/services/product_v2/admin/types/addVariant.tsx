@@ -117,7 +117,7 @@ export interface ProductVariant {
   ram: RAM[];                    
   screen: SCREEN[];                   
   storage: STORAGE[];                    
-  image?: FileList;                   
+  image?: FileList;          
   sku: string;                         
   pid: string;                        
   status: 'active' | 'inactive';      
@@ -126,8 +126,7 @@ export interface ProductVariant {
   _id: string;                         
   createdAt: string;                   
   updatedAt: string;                   
-  slug: string;                        
-  __v: number;                         
+  slug: string;                                           
 }
 
 

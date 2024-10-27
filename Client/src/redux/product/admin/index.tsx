@@ -10,7 +10,10 @@ import {
   addVariantSlice,
   LimitProductAuctionSlice,
   softDeleteAuctionSlice,
-  getOneAuctionSlice
+  getOneAuctionSlice,
+  getVariantColorsByIdSlice,
+  addImageVariantSlice,
+  getVariantsByProductIdSlice
 } from "./Slicle";
 const productsReducer = combineReducers({
   list: listSclice,
@@ -23,7 +26,10 @@ const productsReducer = combineReducers({
   pagilistActive: paginatedProductSlice,
   pagiDeletedList:deletedProductSlice,
   LimitProductAuction:LimitProductAuctionSlice,
-  getOneAuction:getOneAuctionSlice
+  getOneAuction:getOneAuctionSlice,
+  getVariantColorsById:getVariantColorsByIdSlice,
+  addImageVariant:addImageVariantSlice,
+  getVariantsByProductId:getVariantsByProductIdSlice
 });
 
 export default productsReducer;

@@ -23,8 +23,14 @@ const AdminFetAddProductAuction = React.lazy(
 const AdminAddVariant = React.lazy(
   () => import("../page/Admin/product/variant/addVariant")
 );
+const AdminFetAddImageVariant = React.lazy(
+  () => import("../page/Admin/product/add/addImageVariant")
+);
 const AdminListProductV2 = React.lazy(
   () => import("../page/Admin/product/list/list")
+);
+const AdminFetVariantsByProductId = React.lazy(
+  () => import("../page/Admin/product/list/getVariantsByProductId")
 );
 const AdminFetListProductAuction = React.lazy(
   () => import("../page/Admin/product/list/listAuction")
@@ -224,7 +230,9 @@ const AdminRoutes: RouteObject[] = [
       { path: "add-product-auction", element: <AdminFetAddProductAuction /> },
       { path: "list-auction", element: <AdminFetListProductAuction /> },
       { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
+      { path: "product/:product_variant_id/add-image-variant", element: <AdminFetAddImageVariant /> },
       { path: "listproduct", element: <AdminListProductV2 /> },
+      { path: "listproduct/:productId", element: <AdminFetVariantsByProductId /> },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
       { path: "edit-product-auction/:id", element: <AdminFetEditProductAuction /> },
       { path: "addBrands", element: <AdminAddBrands /> },

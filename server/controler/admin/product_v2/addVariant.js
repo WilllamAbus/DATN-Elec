@@ -3,7 +3,7 @@ const ProductVariant = require('../../../model/product_v2/productVariant');
 const { uploadImage } = require('../../../utils/uploadImage');
 const { v4: uuidv4 } = require('uuid');
 const generateSKU = require('./sku/skuGenerator');
-const { RESPONSE_MESSAGES, STATUS_CODES } = require('./constants');
+
 const addVariant = async (req, res) => {
   try {
     const { product_id } = req.params;
@@ -25,31 +25,33 @@ const addVariant = async (req, res) => {
 
     const product = await ProductV2.findById(product_id);
     if (!product) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
+      return res.status(404).json({
         success: false,
         err: 1,
-        msg: RESPONSE_MESSAGES.PRODUCT_NOT_FOUND,
-        status: STATUS_CODES.NOT_FOUND,
+        msg: 'Sản phẩm không tồn tại',
+        status: 404,
       });
     }
 
     if (variant_name === product.product_name) {
-      return res.status(STATUS_CODES.BAD_REQUEST).json({
+      return res.status(400).json({
         success: false,
         err: 1,
-        msg: RESPONSE_MESSAGES.VARIANT_NAME_DUPLICATE_PRODUCT,
-        status: STATUS_CODES.BAD_REQUEST,
+        msg: 'Tên biến thể không được trùng với tên sản phẩm gốc',
+        status: 400,
       });
     }
+    
     const existingVariantByName = await ProductVariant.findOne({ variant_name, product: product_id });
     if (existingVariantByName) {
-      return res.status(STATUS_CODES.BAD_REQUEST).json({
+      return res.status(400).json({
         success: false,
         err: 1,
-        msg: RESPONSE_MESSAGES.VARIANT_NAME_EXISTS(variant_name),
-        status: STATUS_CODES.BAD_REQUEST,
+        msg: `Tên biến thể '${variant_name}' đã tồn tại cho sản phẩm này`,
+        status: 400,
       });
     }
+
     let imageUrls = [];
     if (req.files && req.files.length) {
       for (const file of req.files) {
@@ -57,6 +59,7 @@ const addVariant = async (req, res) => {
         imageUrls.push(imageUrl);
       }
     }
+
     const newVariant = new ProductVariant({
       variant_name,
       status,
@@ -79,20 +82,20 @@ const addVariant = async (req, res) => {
     await newVariant.save();
     product.variants.push(newVariant._id);
     await product.save();
-    return res.status(STATUS_CODES.SUCCESS).json({
+    return res.status(201).json({
       success: true,
       err: 0,
-      msg: RESPONSE_MESSAGES.VARIANT_ADDED_SUCCESS,
-      status: STATUS_CODES.SUCCESS,
+      msg: 'Biến thể mới đã được thêm thành công',
+      status: 201,
       variant: newVariant,
     });
     
   } catch (error) {
-    return res.status(STATUS_CODES.SERVER_ERROR).json({
+    return res.status(500).json({
       success: false,
       err: 1,
-      msg: RESPONSE_MESSAGES.VARIANT_ADD_ERROR,
-      status: STATUS_CODES.SERVER_ERROR,
+      msg: 'Có lỗi xảy ra khi thêm biến thể sản phẩm',
+      status: 500,
       error: error.message,
     });
   }
@@ -101,6 +104,3 @@ const addVariant = async (req, res) => {
 module.exports = {
   addVariant
 };
-
-
-

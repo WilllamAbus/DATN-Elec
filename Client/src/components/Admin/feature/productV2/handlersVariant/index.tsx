@@ -7,3 +7,4 @@ export { handleCardChange } from './card';
 export { handleBatteryChange } from './battery';
 export { handleOsChange } from './operatingSystem';
 export { handleStorageChange } from './storage';
+export { handleColorImageVariantChange } from './colorImageVariant';

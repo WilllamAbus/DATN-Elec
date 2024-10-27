@@ -5,7 +5,7 @@ import { Star } from "./svg";
 import VariantImageGallery from "./cpnDetailPage/VariantImageGallery";
 import FavoriteButton from "./cpnDetailPage/FavoriteButton";
 import AddToCartButton from "./cpnDetailPage/AddToCartButton";
-import ColorSelector from "./cpnDetailPage/ColorSelector";
+
 import VariantName from "./cpnDetailPage/VariantName";
 import VariantPrice from "./cpnDetailPage/VariantPrice";
 import { FilterState, QueryParamAuction } from "../../../../../services/detailProduct/types/getDetailProduct";
@@ -14,6 +14,7 @@ import queryString from "query-string";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
+import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
 
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -30,7 +31,7 @@ const DetailPage: React.FC = () => {
     storage: queryParams.storage ? String(queryParams.storage) : "",
     color: queryParams.color ? String(queryParams.color) : "",
   });
-
+  const [selectedColor] = useState<string | null>(null);
   useEffect(() => {
     const hasFilters = Object.values(filters).some((value) => value !== "");
 
@@ -48,6 +49,11 @@ const DetailPage: React.FC = () => {
     const newQueryParams: QueryParamAuction = {};
     if (filters.storage?.length) {
       newQueryParams.storage = filters.storage;
+     
+    }
+    if (filters.color?.length) {
+      newQueryParams.color = filters.color;
+     
     }
 
     navigate({
@@ -62,6 +68,7 @@ const DetailPage: React.FC = () => {
         getProductDetailThunk({
           slug,
           storage: filters.storage || undefined,
+          color: filters.color || undefined,
         })
       );
     }
@@ -69,24 +76,32 @@ const DetailPage: React.FC = () => {
 
   const handleFilterChange = useCallback(
     (newFilters: FilterState) => {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        ...newFilters,
-      }));
+      setFilters((prevFilters) => {
+        if (newFilters.storage && newFilters.storage !== prevFilters.storage) {
+          return { ...newFilters, color: "" };
+        }
+        return { ...prevFilters, ...newFilters };
+      });
     },
     []
   );
-
+  
   const firstVariant = productDetail?.variants?.length ? productDetail.variants[0] : null;
-
+  if (!productDetail || productDetail.variants?.length === 0) {
+    return <NotFoundProduct />;
+  }
 
   return (
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
+      {firstVariant && (
+              <>
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-16">
-          <VariantImageGallery
+
+        <VariantImageGallery
             variants={productDetail?.variants || []}
             product_name={productDetail?.product_name || ""}
+            selectedColor={selectedColor} 
           />
           <div className="mt-6 sm:mt-8 lg:mt-0">
             {firstVariant && (
@@ -115,12 +130,11 @@ const DetailPage: React.FC = () => {
                   <AddToCartButton />
                 </div>
                 <hr className="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
-                <div className="grid grid-cols-2 gap-6 mt-6">
-                  <ColorSelector colors={firstVariant.color || []} />
+                <div className="grid grid-cols-1 gap-6 mt-6">
+
                   <DetailFilters
                     filters={filters}
                     onChange={handleFilterChange}
-                    variants={productDetail?.variants || []}
                   />
 
                 </div>
@@ -128,6 +142,8 @@ const DetailPage: React.FC = () => {
             )}
           </div>
         </div>
+        </>
+          )}
       </div>
     </section>
   );
