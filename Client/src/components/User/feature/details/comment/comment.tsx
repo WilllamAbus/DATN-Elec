@@ -50,16 +50,7 @@ const Comment = () => {
   const handleShowMore = () => {
     setVisibleCount(comments.length);
   };
-  // const fetchComments = async () => {
-  //   if (id) {
-  //     try {
-  //       const productComments = await getCommentProduct(id);
-  //       setComments(productComments);
-  //     } catch (error) {
-  //       console.error("Failed to fetch comments:", error);
-  //     }
-  //   }
-  // };
+
   const fetchComments = async () => {
     if (!id) {
       // console.log("ID sản phẩm không tồn tại");
