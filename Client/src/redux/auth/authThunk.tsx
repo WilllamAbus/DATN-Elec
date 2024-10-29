@@ -14,6 +14,8 @@ import {
   addAddress,
   fetchAddressList,
   deleteAddress,
+  setDefaultAddress,
+  updateAddress,
   // addAddress,
   // updateAddress,
   // deleteAddress,
@@ -222,20 +224,9 @@ export const updatePasswordThunk = createAsyncThunk(
     }
   }
 );
-// // Thêm địa chỉ
-export const addAddressThunk = createAsyncThunk(
-  "auth/addAddress",
-  async (addressData: Address, { rejectWithValue }) => {
-    try {
-      const response = await addAddress(addressData);
-      return response;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);
+
 export const fetchAddressListThunk = createAsyncThunk<
-  AddressResponse, // Single response object
+  AddressResponse,
   void,
   { rejectValue: string }
 >("auth/fetchAddressList", async (_, { rejectWithValue }) => {
@@ -243,27 +234,74 @@ export const fetchAddressListThunk = createAsyncThunk<
     const response = await fetchAddressList();
     console.log(response);
 
-    return response; // Ensure this is a single object, not an array
+    return response;
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }
 });
-export const deleteAddressThunk = createAsyncThunk<
-  string, // Kiểu dữ liệu trả về là string (ID của địa chỉ đã xóa)
-  { _id: string }, // Tham số truyền vào là một đối tượng chứa _id
-  { rejectValue: string }
->("watchlist/deleteAddress", async ({ _id }, thunkAPI) => {
-  try {
-    const response = await deleteAddress(_id); // Gọi API để xóa địa chỉ
-    return response.data; // Trả về ID của địa chỉ đã xóa
-  } catch (error) {
-    if (error instanceof Error) {
-      return thunkAPI.rejectWithValue(error.message);
-    } else {
-      return thunkAPI.rejectWithValue("An unknown error occurred");
+
+// export const setDefaultAddressThunk = createAsyncThunk<
+//   AddressResponse,
+//   string,
+//   { rejectValue: string }
+// >("address/setDefault", async (addressId, thunkAPI) => {
+//   try {
+//     const response = await setDefaultAddress(addressId);
+//     return response;
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       return thunkAPI.rejectWithValue(error.message);
+//     } else {
+//       return thunkAPI.rejectWithValue("An unknown error occurred");
+//     }
+//   }
+// });
+
+export const setDefaultAddressThunk = createAsyncThunk(
+  "auth/setDefaultAddress",
+  async (addressId: string, { rejectWithValue }) => {
+    try {
+      const response = await setDefaultAddress(addressId);
+      return response;
+    } catch (error) {
+      const errorMessage =
+        (error as any).response?.data?.message ||
+        "Đã xảy ra lỗi. Vui lòng thử lại.";
+      return rejectWithValue(errorMessage);
     }
   }
-});
+);
+
+// export const deleteAddressThunk = createAsyncThunk<
+//   AddressResponse, // Định nghĩa kiểu trả về
+//   { _id: string }, // Định nghĩa kiểu tham số đầu vào
+//   { rejectValue: string } // Định nghĩa kiểu giá trị lỗi
+// >("watchlist/deleteAddress", async ({ _id }, thunkAPI) => {
+//   try {
+//     const response = await deleteAddress(_id);
+//     return response; // Trả về toàn bộ response từ API
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       return thunkAPI.rejectWithValue(error.message); // Trả về thông báo lỗi
+//     } else {
+//       return thunkAPI.rejectWithValue("An unknown error occurred"); // Thông báo lỗi mặc định
+//     }
+//   }
+// });
+export const deleteAddressThunk = createAsyncThunk(
+  "auth/deleteAddress",
+  async (_id: string, { rejectWithValue }) => {
+    try {
+      const response = await deleteAddress(_id);
+      return response;
+    } catch (error) {
+      const errorMessage =
+        (error as any).response?.data?.message ||
+        "Đã xảy ra lỗi. Vui lòng thử lại.";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 
 // export const fetchAddressListThunk = createAsyncThunk<
 //   AddressResponse, // Thay đổi kiểu trả về
@@ -283,22 +321,36 @@ export const deleteAddressThunk = createAsyncThunk<
 //     }
 //   }
 // });
-// // Cập nhật địa chỉ
-// export const updateAddressThunk = createAsyncThunk(
-//   "address/updateAddress",
-//   async (
-//     { index, addressData }: { index: number; addressData: Address },
-//     { rejectWithValue }
-//   ) => {
-//     try {
-//       const response = await updateAddress(index, addressData);
-//       return response.user;
-//     } catch (error: any) {
-//       return rejectWithValue(error.message);
-//     }
-//   }
-// );
+// Cập nhật địa chỉ
 
+export const editAddressThunk = createAsyncThunk(
+  "address/edit",
+  async (
+    { id, addressData }: { id: string; addressData: Address }, // Định nghĩa kiểu đúng
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await updateAddress(id, addressData);
+      return response;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+// // Thêm địa chỉ
+export const addAddressThunk = createAsyncThunk(
+  "auth/addAddress",
+  async (addressData: Address, { rejectWithValue }) => {
+    try {
+      const response = await addAddress(addressData);
+      console.log(response);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
 // Xóa địa chỉ
 // export const deleteAddressThunk = createAsyncThunk(
 //   "address/deleteAddress",

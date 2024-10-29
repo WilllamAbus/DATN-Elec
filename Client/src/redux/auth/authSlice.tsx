@@ -30,6 +30,8 @@ import {
   fetchAddressListThunk,
   deleteAddressThunk,
   addAddressThunk,
+  setDefaultAddressThunk,
+  editAddressThunk,
   // addAddressThunk,
   // updateAddressThunk,
   // deleteAddressThunk,
@@ -621,20 +623,19 @@ const authSlice = createSlice({
         state.error = null;
       })
 
-      // Trạng thái fulfilled khi lấy danh sách địa chỉ thành công
       .addCase(
         fetchAddressListThunk.fulfilled,
         (state, action: PayloadAction<AddressResponse>) => {
           state.loading = false;
-          state.addresses = action.payload.addresses; // Cập nhật danh sách địa chỉ
+          state.addresses = action.payload.addresses;
         }
       )
 
-      // Trạng thái rejected khi có lỗi xảy ra
       .addCase(fetchAddressListThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string; // Lưu lỗi vào state
       })
+
       .addCase(deleteAddressThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -642,50 +643,85 @@ const authSlice = createSlice({
       .addCase(deleteAddressThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
 
-        // Sử dụng action.meta.arg để lấy _id đã truyền vào thunk
-        const addressId = action.meta.arg._id; // Lấy _id từ tham số đã truyền
+        const addressId = action.meta.arg;
 
         state.addresses = state.addresses.filter(
-          (address) => address._id !== addressId // So sánh với _id
+          (address) => address._id !== addressId
         );
       })
-      .addCase(
-        deleteAddressThunk.rejected,
-        (state, action: PayloadAction<string | undefined>) => {
-          state.status = "failed";
-          state.error = action.payload || "Failed to delete address";
-        }
-      )
 
-      .addCase(addAddressThunk.pending, (state) => {
+      .addCase(deleteAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(setDefaultAddressThunk.pending, (state) => {
         state.status = "loading";
+        state.error = null;
+      })
+
+      .addCase(setDefaultAddressThunk.fulfilled, (state, action) => {
+        const updatedAddressId = action.meta.arg;
+
+        state.addresses = state.addresses.map((address) => ({
+          ...address,
+          isDefault: address._id === updatedAddressId,
+        }));
+      })
+
+      .addCase(setDefaultAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // .addCase(addAddressThunk.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(
+      //   addAddressThunk.fulfilled,
+      //   (state, action: PayloadAction<Address>) => {
+      //     state.loading = false;
+      //     state.addresses.push(action.payload);
+      //     state.error = null;
+      //   }
+      // )
+      // .addCase(addAddressThunk.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error =
+      //     (action.payload as string) || "Có lỗi xảy ra khi thêm địa chỉ";
+      // });
+      .addCase(addAddressThunk.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(
         addAddressThunk.fulfilled,
-        (state, action: PayloadAction<AddressResponse>) => {
-          state.addresses.push(...action.payload.addresses); // Thêm địa chỉ mới vào danh sách
+        (state, action: PayloadAction<Address>) => {
+          state.loading = false;
+          state.addresses.push(action.payload); // Thêm địa chỉ mới vào cuối danh sách
+          state.error = null;
         }
       )
 
       .addCase(addAddressThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string; // Lưu thông báo lỗi
-      });
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Có lỗi xảy ra khi thêm địa chỉ";
+      })
 
-    // // Cập nhật địa chỉ
-    // .addCase(updateAddressThunk.pending, (state) => {
-    //   state.AddressState.loading = true;
-    //   state.error = null;
-    // })
-    // .addCase(updateAddressThunk.fulfilled, (state, action) => {
-    //   state.AddressState.loading = false;
-    //   state.AddressState.addresses = action.payload.addresses;
-    // })
-    // .addCase(updateAddressThunk.rejected, (state, action) => {
-    //   state.AddressState.loading = false;
-    //   state.error = action.payload as string;
-    // })
+      // Cập nhật địa chỉ
+      .addCase(editAddressThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editAddressThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.addresses = action.payload.addresses;
+      })
+      .addCase(editAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
     // // Xóa địa chỉ
     // .addCase(deleteAddressThunk.pending, (state) => {
     //   state.AddressState.loading = true;

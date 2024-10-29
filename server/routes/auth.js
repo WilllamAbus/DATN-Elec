@@ -44,13 +44,18 @@ router.post(
   middlewareController.verifyToken,
   authController.addAddress
 );
+router.put(
+  "/set-default",
+  middlewareController.verifyToken,
+  authController.setDefaultAddress
+);
 router.get(
   "/listAddress",
   middlewareController.verifyToken,
   authController.getAddressList
 );
 router.put(
-  "/update",
+  "/update/:id",
   middlewareController.verifyToken,
   authController.updateAddress
 );

@@ -1,18 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UserProfile } from "../../../../types/user";
 import moment from "moment";
+
+import { useAppDispatch } from "../../../../redux/store";
+import { getProfileThunk } from "../../../../redux/auth/authThunk";
 
 interface InfoProps {
   profiles: UserProfile | null;
 }
 
 const Info: React.FC<InfoProps> = ({ profiles }) => {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(getProfileThunk());
+  }, [dispatch]);
   if (!profiles) return <p>No profile data available</p>;
 
   const formattedBirthday = profiles.birthday
     ? moment(profiles.birthday).format("DD/MM/YYYY") // Định dạng ngày theo ý muốn
     : "";
-
+  const defaultAddress = profiles.addresses.find(
+    (address) => address.isDefault
+  );
   return (
     <div className="col-span-9 shadow-lg rounded-lg px-6 pt-5 pb-7 bg-white">
       <h4 className="text-lg font-semibold text-gray-800 capitalize mb-4">
@@ -124,7 +133,7 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
           </div>
         </div>
 
-        {/* <div>
+        <div>
           <label
             htmlFor="address"
             className="block text-sm font-medium text-gray-700"
@@ -136,10 +145,10 @@ const Info: React.FC<InfoProps> = ({ profiles }) => {
             name="address"
             id="address"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            value={profiles.addresses[0].address || ""}
+            value={defaultAddress?.address || "Không có địa chỉ mặc định"}
             readOnly
           />
-        </div> */}
+        </div>
       </div>
     </div>
   );

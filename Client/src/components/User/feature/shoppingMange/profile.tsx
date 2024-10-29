@@ -340,6 +340,7 @@ import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
 import { Transition } from "@headlessui/react";
+import { User } from "@nextui-org/react";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -483,16 +484,16 @@ const ProfileUse: React.FC = () => {
           {/* Sidebar */}
           <div className="hidden lg:block lg:col-span-3 ">
             <aside className="bg-white shadow-md rounded-lg p-4 h-full min-h-[calc(64vh-10rem)]">
-              <div className="flex items-center mb-4">
-                <img
-                  src={profile?.avatar}
-                  alt="Avatar"
-                  className="h-10 w-10 rounded-full mr-2"
-                />
-                <h4 className="text-gray-800 font-semibold">
-                  Xin chào, {profile?.name}
-                </h4>
-              </div>
+              <User
+                name={profile?.name || "Người dùng"}
+                description="Xin Chào!"
+                avatarProps={{
+                  src:
+                    profile?.avatar ||
+                    "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                }}
+              />
+
               <ul className="space-y-2">
                 {[
                   "info",

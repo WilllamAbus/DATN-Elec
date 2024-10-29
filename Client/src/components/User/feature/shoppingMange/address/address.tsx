@@ -284,7 +284,10 @@ import {
   fetchWards,
 } from "../../../../../redux/country/province";
 import { Address } from "../../../../../types/user";
-import { addAddressThunk } from "../../../../../redux/auth/authThunk";
+import {
+  addAddressThunk,
+  fetchAddressListThunk,
+} from "../../../../../redux/auth/authThunk";
 
 // import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
@@ -365,27 +368,23 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
 
       console.log("Address String for Server:", addressString);
 
-      // Tạo đối tượng address với đầy đủ thông tin
       const addressData: Address = {
         address: addressString,
         addressID: JSON.stringify({
           provinceId: data.province,
           districtId: data.district,
           wardId: data.ward,
-        }), // Chuyển đổi đối tượng thành chuỗi JSON
+        }),
         fullName: data.fullName,
         phone: data.phone,
       };
-
-      // Gửi đối tượng address qua addAddressThunk
       const response = await dispatch(addAddressThunk(addressData)).unwrap();
-
+      await dispatch(fetchAddressListThunk());
       toast.dismiss();
       const successMessage = response?.message || "Đăng ký thành công!";
       toast.success(successMessage);
-      console.log(response);
     } catch (error) {
-      // console.error("error", error);
+      console.error("error", error);
       const errorMessage =
         typeof error === "string"
           ? error

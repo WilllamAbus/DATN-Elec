@@ -538,10 +538,54 @@ const authController = {
     }
   },
 
+  // addAddress: async (req, res) => {
+  //   try {
+  //     const id = req.user.id;
+  //     const { fullName, address, addressID, phone } = req.body;
+
+  //     const currentUser = await User.findById(id);
+
+  //     if (!currentUser) {
+  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
+  //     }
+
+  //     let updatedAddresses = currentUser.addresses || [];
+
+  //     if (updatedAddresses.length >= 10) {
+  //       return res.status(400).json({
+  //         message: "Bạn chỉ có thể thêm tối đa 10 địa chỉ",
+  //       });
+  //     }
+
+  //     updatedAddresses.push({
+  //       fullName,
+  //       address,
+  //       addressID,
+  //       phone,
+  //     });
+
+  //     const updatedUser = await User.findByIdAndUpdate(
+  //       id,
+  //       { addresses: updatedAddresses },
+  //       { new: true }
+  //     );
+
+  //     return res.status(200).json({
+  //       message: "Địa chỉ đã được thêm thành công",
+  //       user: updatedUser,
+  //     });
+  //   } catch (error) {
+  //     console.error("Lỗi khi thêm địa chỉ:", error);
+  //     return res.status(500).json({
+  //       message: "Lỗi khi thêm địa chỉ",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
   addAddress: async (req, res) => {
     try {
       const id = req.user.id;
-      const { fullName, address, addressID, phone } = req.body; // Bao gồm trường fullName
+      const { fullName, address, addressID, phone } = req.body;
 
       const currentUser = await User.findById(id);
 
@@ -558,12 +602,13 @@ const authController = {
         });
       }
 
-      // Thêm địa chỉ mới
+      // Thêm địa chỉ mới, mặc định nếu là địa chỉ đầu tiên
       updatedAddresses.push({
-        fullName, // Gán fullName từ req.body
+        fullName,
         address,
         addressID,
         phone,
+        isDefault: updatedAddresses.length === 0, // Đặt làm mặc định nếu là địa chỉ đầu tiên
       });
 
       const updatedUser = await User.findByIdAndUpdate(
@@ -574,7 +619,7 @@ const authController = {
 
       return res.status(200).json({
         message: "Địa chỉ đã được thêm thành công",
-        user: updatedUser,
+        addresses: updatedUser.addresses,
       });
     } catch (error) {
       console.error("Lỗi khi thêm địa chỉ:", error);
@@ -585,42 +630,141 @@ const authController = {
     }
   },
 
-  updateAddress: async (req, res) => {
+  setDefaultAddress: async (req, res) => {
     try {
-      const id = req.user.id;
-      const { addressIndex, name, address, addressID, phone } = req.body;
+      const userId = req.user.id;
+      const { addressId } = req.body; // `addressId` là `_id` của địa chỉ
 
-      const currentUser = await User.findById(id);
+      const currentUser = await User.findById(userId);
 
       if (!currentUser) {
         return res.status(404).json({ message: "Người dùng không tìm thấy" });
       }
 
-      // Cập nhật địa chỉ theo chỉ số
-      if (currentUser.addresses && currentUser.addresses[addressIndex]) {
-        currentUser.addresses[addressIndex] = {
-          fullName: name || currentUser.addresses[addressIndex].fullName,
-          address: address || currentUser.addresses[addressIndex].address,
-          addressID: addressID || currentUser.addresses[addressIndex].addressID,
-          phone: phone || currentUser.addresses[addressIndex].phone,
-        };
+      // Kiểm tra nếu địa chỉ được yêu cầu đã là địa chỉ mặc định
+      const currentDefaultAddress = currentUser.addresses.find(
+        (addr) => addr.isDefault
+      );
 
-        const updatedUser = await currentUser.save();
-        return res.status(200).json({
-          message: "Địa chỉ đã được cập nhật thành công",
-          user: updatedUser,
+      if (
+        currentDefaultAddress &&
+        currentDefaultAddress._id.toString() === addressId
+      ) {
+        return res.status(400).json({
+          message: "Địa chỉ này đã là địa chỉ mặc định.",
         });
-      } else {
-        return res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
+
+      // Cập nhật tất cả các địa chỉ về isDefault: false, sau đó đặt địa chỉ có _id tương ứng là isDefault: true
+      const updatedAddresses = currentUser.addresses.map((addr) => ({
+        ...addr.toObject(),
+        isDefault: addr._id.toString() === addressId, // So sánh `_id` với `addressId` từ request
+      }));
+
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { addresses: updatedAddresses },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        message: "Địa chỉ mặc định đã được cập nhật thành công",
+        user: updatedUser,
+      });
     } catch (error) {
-      console.error("Lỗi khi cập nhật địa chỉ:", error);
+      console.error("Lỗi khi đặt địa chỉ mặc định:", error);
       return res.status(500).json({
-        message: "Lỗi khi cập nhật địa chỉ",
+        message: "Lỗi khi đặt địa chỉ mặc định",
         error: error.message,
       });
     }
   },
+
+  // updateAddress: async (req, res) => {
+  //   try {
+  //     const id = req.user.id;
+  //     const { addressIndex, name, address, addressID, phone } = req.body;
+
+  //     const currentUser = await User.findById(id);
+
+  //     if (!currentUser) {
+  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
+  //     }
+
+  //     // Cập nhật địa chỉ theo chỉ số
+  //     if (currentUser.addresses && currentUser.addresses[addressIndex]) {
+  //       currentUser.addresses[addressIndex] = {
+  //         fullName: name || currentUser.addresses[addressIndex].fullName,
+  //         address: address || currentUser.addresses[addressIndex].address,
+  //         addressID: addressID || currentUser.addresses[addressIndex].addressID,
+  //         phone: phone || currentUser.addresses[addressIndex].phone,
+  //       };
+
+  //       const updatedUser = await currentUser.save();
+  //       return res.status(200).json({
+  //         message: "Địa chỉ đã được cập nhật thành công",
+  //         user: updatedUser,
+  //       });
+  //     } else {
+  //       return res.status(404).json({ message: "Địa chỉ không tồn tại" });
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi khi cập nhật địa chỉ:", error);
+  //     return res.status(500).json({
+  //       message: "Lỗi khi cập nhật địa chỉ",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
+  updateAddress: async (req, res) => {
+    try {
+      const userId = req.user.id; // Lấy ID của người dùng từ token
+      const addressId = req.params.id; // Lấy ID địa chỉ từ URL
+      const { fullName, address, addressID, phone, isDefault } = req.body;
+
+      // Tìm người dùng trong cơ sở dữ liệu
+      const currentUser = await User.findById(userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "Người dùng không tìm thấy" });
+      }
+
+      // Tìm địa chỉ cần chỉnh sửa
+      const addressIndex = currentUser.addresses.findIndex(
+        (addr) => addr._id.toString() === addressId
+      );
+      if (addressIndex === -1) {
+        return res.status(404).json({ message: "Địa chỉ không tìm thấy" });
+      }
+
+      // Cập nhật thông tin địa chỉ
+      currentUser.addresses[addressIndex] = {
+        ...currentUser.addresses[addressIndex], // Giữ lại các thông tin cũ
+        fullName,
+        address,
+        addressID,
+        phone,
+        isDefault:
+          isDefault !== undefined
+            ? isDefault
+            : currentUser.addresses[addressIndex].isDefault, // Giữ nguyên trạng thái mặc định nếu không được cập nhật
+      };
+
+      // Lưu người dùng với địa chỉ đã cập nhật
+      const updatedUser = await currentUser.save();
+
+      return res.status(200).json({
+        message: "Địa chỉ đã được cập nhật thành công",
+        addresses: updatedUser.addresses,
+      });
+    } catch (error) {
+      console.error("Lỗi khi chỉnh sửa địa chỉ:", error);
+      return res.status(500).json({
+        message: "Lỗi khi chỉnh sửa địa chỉ",
+        error: error.message,
+      });
+    }
+  },
+
   removeAddress: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -639,6 +783,13 @@ const authController = {
 
       if (!addressToRemove) {
         return res.status(404).json({ message: "Địa chỉ không tìm thấy" });
+      }
+
+      // Kiểm tra xem địa chỉ muốn xóa có phải là địa chỉ mặc định không
+      if (addressToRemove.isDefault) {
+        return res
+          .status(400)
+          .json({ message: "Không thể xóa địa chỉ mặc định" });
       }
 
       // Xóa địa chỉ
@@ -666,29 +817,63 @@ const authController = {
     }
   },
 
+  // getAddressList: async (req, res) => {
+  //   try {
+  //     // Kiểm tra xem req.user có tồn tại không
+  //     if (!req.user || !req.user.id) {
+  //       return res.status(401).json({ message: "Không được phép" });
+  //     }
+
+  //     const id = req.user.id;
+
+  //     // Tìm người dùng theo ID
+  //     const currentUser = await User.findById(id).catch((error) => {
+  //       throw new Error("Lỗi tìm người dùng: " + error.message);
+  //     });
+
+  //     // Kiểm tra xem người dùng có tồn tại không
+  //     if (!currentUser) {
+  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
+  //     }
+
+  //     // Trả về danh sách địa chỉ của người dùng
+  //     return res.status(200).json({
+  //       message: "Danh sách địa chỉ",
+  //       addresses: currentUser.addresses,
+  //     });
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy danh sách địa chỉ:", error);
+  //     return res.status(500).json({
+  //       message: "Lỗi khi lấy danh sách địa chỉ",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
   getAddressList: async (req, res) => {
     try {
-      // Kiểm tra xem req.user có tồn tại không
       if (!req.user || !req.user.id) {
         return res.status(401).json({ message: "Không được phép" });
       }
 
       const id = req.user.id;
 
-      // Tìm người dùng theo ID
       const currentUser = await User.findById(id).catch((error) => {
         throw new Error("Lỗi tìm người dùng: " + error.message);
       });
 
-      // Kiểm tra xem người dùng có tồn tại không
       if (!currentUser) {
         return res.status(404).json({ message: "Người dùng không tìm thấy" });
       }
 
-      // Trả về danh sách địa chỉ của người dùng
+      const sortedAddresses = currentUser.addresses.sort((a, b) => {
+        if (a.isDefault && !b.isDefault) return -1;
+        if (!a.isDefault && b.isDefault) return 1;
+        return 0;
+      });
+
       return res.status(200).json({
         message: "Danh sách địa chỉ",
-        addresses: currentUser.addresses,
+        addresses: sortedAddresses,
       });
     } catch (error) {
       console.error("Lỗi khi lấy danh sách địa chỉ:", error);
