@@ -90,6 +90,12 @@ export interface STORAGE {
   updatedAt: string;
   slug: string;
 }
+export interface Image {
+  _id: string; 
+  image: string[]; 
+  productVariant: string;
+  color: string;
+}
 export interface ProductVariant {
   variant_name: string;                
   variant_description: string;         
@@ -102,7 +108,7 @@ export interface ProductVariant {
   ram?: RAM;                    
   screen?: SCREEN;                   
   storage?: STORAGE;                    
-  image?: FileList;                   
+  image?: Image[];                 
   sku: string;                         
   pid: string;                        
   status: 'active' | 'inactive';      
@@ -234,6 +240,7 @@ export interface GetAllStorageBySlugUrlResponse {
 
 export interface FilterState {
   storage?: string | null;  
+  color?: string | null;
   [key: string]: string | number | null | undefined;
 }
 
@@ -243,6 +250,7 @@ export interface FilterState {
 export interface QueryParamAuction {
   [key: string]: string | number | undefined; 
   storage?: string; 
+  color?: string;
   }
   
 

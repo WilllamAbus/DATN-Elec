@@ -4,17 +4,17 @@ import { GetDetailProductResponse } from "../../../../services/detailProduct/typ
 
 export const getProductDetailThunk = createAsyncThunk<
   GetDetailProductResponse, 
-  { slug: string; storage?: string }, 
+  { slug: string; storage?: string; color?: string }, 
   { rejectValue: string }
 >(
   "productClient/getProductDetail",
-  async ({ slug, storage }, { rejectWithValue }) => {
+  async ({ slug, storage, color }, { rejectWithValue }) => {
     try {
       if (!slug) {
         return rejectWithValue("Slug là bắt buộc");
       }
 
-      const response = await getProductDetail(slug, storage || null); 
+      const response = await getProductDetail(slug, storage || null, color || null);
 
       if (response.success) {
         return response;

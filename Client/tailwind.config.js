@@ -48,7 +48,7 @@ export default {
     },
     extend: {
       colors: {
-        primary: {
+        primary_flowbite: {
           50: "#eff6ff",
           100: "#dbeafe",
           200: "#bfdbfe",
@@ -68,6 +68,8 @@ export default {
         bgf3f4f6: "#f3f4f6",
         btnDeletesweetalertOk: "##a0de86",
         redCustom: "#e22920",
+        customPink: "#f21260",
+        veryPaleBlue:"#eef9ff"
       },
       fontFamily: {
         sans: [

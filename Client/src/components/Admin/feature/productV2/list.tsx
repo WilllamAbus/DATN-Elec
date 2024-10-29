@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPaginatedProducts } from "../../../../redux/product/admin/Thunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { truncateText } from "./truncate/truncateText";
-import { handleSoftDeleteProduct } from "./handlers/softDelete";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../../components/Admin/searchform/searchFomProduct";
 import AddProductButton from "../../../../components/Admin/buttonAdd";
@@ -125,33 +124,26 @@ const ProductList: React.FC = () => {
                     <Chip
                       startContent={<CheckIcon size={18} />}
                       variant="faded"
-                      color="success"
+                      color={product.variants && product.variants.length > 0 ? "success" : "warning"} 
                     >
-                      {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
+                      {product.variants && product.variants.length > 0
+                        ? (product.status === "active" ? "Hiển thị" : "Chưa có biến thể")
+                        : "Chưa có biến thể"
+                      }
                     </Chip>
                   </div>
+
                 </td>
                 <td className="px-4 py-3 border-b border-grey-light">
                   <div className="flex gap-4">
-                    <DropdownVariant variants={product.variants} />
+                    <DropdownVariant variants={product.variants} productId={product._id} />
                   </div>
                 </td>
 
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
-                    <DropdownCRUD productId={product._id} />
-                    <button
-                      type="button"
-                      className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                      onClick={() =>
-                        handleSoftDeleteProduct(product._id, dispatch, currentPage, searchTerm)
-                      }
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
-                        <path fill="none" d="M0 0h24v24H0z" />
-                        <path d="M17 6h5v2h-2v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8H2V6h5V3a1 1 0 011-1h8a1 1 0 011 1v3zm1 2H6v12h12V8zm-9 3h2v6H9v-6zm4 0h2v6h-2v-6zM9 4v2h6V4H9z" />
-                      </svg>
-                    </button>
+                    <DropdownCRUD productId={product._id} currentPage={currentPage} searchTerm={searchTerm} />
+
 
                   </div>
                 </td>

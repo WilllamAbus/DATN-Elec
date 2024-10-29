@@ -1,5 +1,5 @@
 import instance from "../../axios";
-import { ProductVariantResponse, ProductVariant,RESPONSE_MESSAGES, STATUS_CODES} from "./types/addVariant";
+import { ProductVariantResponse, ProductVariant, RESPONSE_MESSAGES, STATUS_CODES } from "./types/addVariant";
 import { AxiosError } from "axios";
 
 export const addVariant = async (
@@ -7,60 +7,80 @@ export const addVariant = async (
   variant: ProductVariant
 ): Promise<ProductVariantResponse> => {
   try {
+    if (!productId || !variant) {
+      console.error("Missing productId or variant data.");
+      return {
+        success: false,
+        err: 1,
+        msg: "Thiếu thông tin sản phẩm hoặc biến thể.",
+        status: STATUS_CODES.BAD_REQUEST,
+        variant: null,
+      };
+    }
+    console.log("Product ID:", productId);
+    console.log("Variant Data:", variant);
+    
+    // Ensure productId is assigned to variant.product if it's meant to be the same
+    if (!variant.product) {
+      variant.product = productId;
+    }
+
     const formData = new FormData();
     formData.append("variant_name", variant.variant_name);
 
     if (variant.variant_description) {
       formData.append("variant_description", variant.variant_description);
     }
-    
+
     if (variant.variant_price !== undefined) {
       formData.append("variant_price", variant.variant_price.toString());
     }
 
-    if (variant.battery) {
+    if (variant.battery && variant.battery.length > 0) {
       formData.append("battery", variant.battery.map((item) => item._id).join(","));
     }
-    
-    if (variant.color) {
-      const colorIds = variant.color.map(item => item._id); 
-      colorIds.forEach(id => {
-        formData.append("color", id);
-      });
+
+    if (variant.color && variant.color.length > 0) {
+      variant.color.forEach(item => formData.append("color", item._id));
     }
-    if (variant.cpu) {
+
+    if (variant.cpu && variant.cpu.length > 0) {
       formData.append("cpu", variant.cpu.map((item) => item._id).join(","));
     }
-    
-    if (variant.graphicsCard) {
+
+    if (variant.graphicsCard && variant.graphicsCard.length > 0) {
       formData.append("graphicsCard", variant.graphicsCard.map((item) => item._id).join(","));
     }
-    
-    if (variant.operatingSystem) {
+
+    if (variant.operatingSystem && variant.operatingSystem.length > 0) {
       formData.append("operatingSystem", variant.operatingSystem.map((item) => item._id).join(","));
     }
-    
-    if (variant.ram) {
+
+    if (variant.ram && variant.ram.length > 0) {
       formData.append("ram", variant.ram.map((item) => item._id).join(","));
     }
-    
-    if (variant.screen) {
+
+    if (variant.screen && variant.screen.length > 0) {
       formData.append("screen", variant.screen.map((item) => item._id).join(","));
     }
-    
-    if (variant.storage) {
+
+    if (variant.storage && variant.storage.length > 0) {
       formData.append("storage", variant.storage.map((item) => item._id).join(","));
     }
 
-    if (variant.image && variant.image.length > 0) {
-      for (let i = 0; i < variant.image.length; i++) {
-        formData.append("image", variant.image[i]);
-      }
+    // Add the product ID
+    if (variant.product) {
+      formData.append("product", variant.product);
     } else {
-      console.warn("Không có ảnh");
+      console.error("Product ID is missing in the variant data");
+      return {
+        success: false,
+        err: 1,
+        msg: "Thiếu ID sản phẩm trong dữ liệu biến thể.",
+        status: STATUS_CODES.BAD_REQUEST,
+        variant: null,
+      };
     }
-
-    formData.append("product", variant.product); // Product is still required
 
     const response = await instance.post(`/admin/product/${productId}/addvariant`, formData, {
       headers: {
@@ -68,23 +88,23 @@ export const addVariant = async (
       },
     });
 
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       return {
         success: false,
         err: error.response?.data.err || 1,
-        msg: error.response?.data.msg || RESPONSE_MESSAGES.VARIANT_ADD_ERROR, 
+        msg: error.response?.data.msg || RESPONSE_MESSAGES.VARIANT_ADD_ERROR,
         status: error.response?.status || STATUS_CODES.SERVER_ERROR,
-        variant: null, 
+        variant: null,
       };
     } else {
       console.error("Lỗi không xác định khi thêm biến thể:", error);
       return {
         success: false,
         err: 1,
-        msg: RESPONSE_MESSAGES.VARIANT_ADD_ERROR, 
-        status: STATUS_CODES.SERVER_ERROR, 
+        msg: RESPONSE_MESSAGES.VARIANT_ADD_ERROR,
+        status: STATUS_CODES.SERVER_ERROR,
         variant: null,
       };
     }

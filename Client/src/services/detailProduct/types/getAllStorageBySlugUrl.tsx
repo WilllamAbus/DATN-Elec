@@ -1,7 +1,12 @@
 
-export interface StorageItem {
+export interface STORAGE {
   _id: string;
   name: string;
+  status: string;
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string;
   slug: string;
 }
 
@@ -10,5 +15,5 @@ export interface GetAllStorageBySlugUrlResponse {
   err: number;
   msg: string;
   status: number;
-  data: StorageItem[];
+  data: STORAGE[];
 }

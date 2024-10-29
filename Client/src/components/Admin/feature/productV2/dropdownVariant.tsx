@@ -1,4 +1,5 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
+import { Link } from 'react-router-dom'; // Import Link
 
 interface Variant {
   _id: string;
@@ -7,24 +8,24 @@ interface Variant {
 
 interface DropdownVariantProps {
   variants: Variant[];
+  productId: string; // Thêm prop để nhận productId
 }
 
-export default function DropdownVariant({ variants }: DropdownVariantProps) {
+export default function DropdownVariant({ variants, productId }: DropdownVariantProps) {
   const variantCount = variants.length;
+
   return (
     <Dropdown>
       <DropdownTrigger>
         <Button variant="bordered">
-        {variantCount} Biến thể
+          {variantCount} Biến thể
         </Button>
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions">
-        {variants.length > 0 ? (
-          variants.map((variant) => (
-            <DropdownItem key={variant._id}>
-              {variant.variant_name}
-            </DropdownItem>
-          ))
+        {variantCount > 0 ? (
+          <DropdownItem>
+            <Link to={`/admin/listproduct/${productId}`}>Danh sách sản phẩm biến thể</Link>
+          </DropdownItem>
         ) : (
           <DropdownItem isDisabled>No variants available</DropdownItem> 
         )}

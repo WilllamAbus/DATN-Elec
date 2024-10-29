@@ -261,7 +261,7 @@ const InboundList: React.FC = () => {
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       {inbound.product_variant_id.variant_name}
                     </td>
-                    <td className="px-4 py-3">{inbound.inbound_supplier.name}</td>
+                    <td className="px-4 py-3">{inbound.product_variant_id.product.product_supplier.name}</td>
                     <td className="px-4 py-3">{inbound.inbound_quantity}</td>
                     <td className="px-4 py-3">{inbound.inbound_price}</td>
                     <td className="px-4 py-3">

@@ -23,6 +23,13 @@ const upload = multer({ storage: multerStorage });
 
 const uploadImage = async (image) => {
     return new Promise((resolve, reject) => {
+        console.log('Đang tải lên hình ảnh với thông tin sau:', {
+            originalname: image.originalname,
+            mimetype: image.mimetype,
+            size: image.size,
+            bufferLength: image.buffer ? image.buffer.length : 0,
+        });
+
         if (!image || !Buffer.isBuffer(image.buffer)) {
             return reject(new Error("Dữ liệu hình ảnh không hợp lệ"));
         }

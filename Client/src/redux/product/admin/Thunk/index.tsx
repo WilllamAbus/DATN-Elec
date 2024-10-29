@@ -13,5 +13,7 @@ export * from './listProductAuction';
 export * from './softdeleteAuction';
 export * from './getoneAuction';
 export * from './updateAuction';
-
+export * from './getVariantColorsById';
+export * from './addImageVariant';
+export * from './getVariantsByProductId';
 

@@ -1,0 +1,171 @@
+import React, { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { notify, notifyError } from "./toast/msgtoast";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../../redux/store";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import "../../../../assets/css/admin.style.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { addImageVariantThunk } from "../../../../redux/product/admin/Thunk";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { ImageVariant } from "../../../../services/product_v2/admin/types/imageVariant";
+import { Color } from "../../../../services/product_v2/admin/types/getVariantColorsById";
+import { useImageUpload } from "../../../../hooks/useImageUpload";
+import {
+  ColorImageVariantSelect
+} from "./selectVariant";
+import {
+  handleColorImageVariantChange,
+
+} from "./handlersVariant";
+import { SingleValue } from "react-select";
+const AddImageVariant: React.FC = () => {
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ImageVariant>({});
+  const navigate = useNavigate();
+
+  const { product_variant_id } = useParams<{ product_variant_id: string }>();
+  const productVariantIdString = product_variant_id ?? "";
+  const dispatch: AppDispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const { imgPreview, handleImageChange } = useImageUpload();
+  const [selectedColor, setSelectedColor] = useState<SingleValue<Color> | null>(null);
+  const onColorChange = (selectedOption: SingleValue<Color> | null) => {
+    handleColorImageVariantChange(selectedOption, setSelectedColor, setValue);
+  };
+  const submitFormAdd: SubmitHandler<ImageVariant> = async (data) => {
+    setIsLoading(true);
+
+    try {
+      const actionResult = await dispatch(
+        addImageVariantThunk({ product_variant_id: productVariantIdString, imageVariant: data })
+      ).unwrap();
+      notify(actionResult.msg);
+      setTimeout(() => {
+        navigate("/admin/listproduct");
+      }, 2000);
+    } catch (error) {
+      notifyError((error as { msg: string }).msg);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
+      <ToastContainer />
+      <ReusableBreadcrumb items={breadcrumbItems.addCategories} />
+      <div className="mb-4 ml-4 col-span-full xl:mb-2">
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          Thêm hình ảnh cho biến thể
+        </h1>
+      </div>
+      <div className="m-4 bg-white shadow-md sm:rounded-lg overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4">
+        <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
+          <div className="col-span-full xl:col-auto">
+            <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+              <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
+                {imgPreview && (
+                  <div className="mb-4 rounded-lg w-24 h-24 sm:mb-0 xl:mb-4 2xl:mb-0">
+                    <img src={imgPreview} alt="Image Preview" />
+                  </div>
+                )}
+                <div>
+                  <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">Hình ảnh</h3>
+                  <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                    JPG, GIF or PNG. Max size of 800KB
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <input
+                      type="file"
+                      multiple
+                      id="image"
+                      {...register("image")}
+                      onChange={handleImageChange}
+                      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    />
+                    {errors.image && <span className="text-red-600">{errors.image.message}</span>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-full xl:col-auto">
+            <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+              <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan sản phẩm</h3>
+
+              <div className="grid grid-cols-1 gap-6">
+                <div className="col-span-3 sm:col-span-3">
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Màu sắc
+                  </label>
+                  <ColorImageVariantSelect
+                    value={selectedColor}
+                    onChange={onColorChange}
+                    variantId={product_variant_id}
+                  />
+                  {errors.color && (
+                    <span className="text-red-600">
+                      {errors.color.message?.toString()}
+                    </span>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div className="col-span-full mt-4 sm:col-full flex space-x-4 justify-end ">
+            <button
+              type="submit"
+              className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <svg
+                    className="animate-spin mr-2 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Đang thêm...
+                </div>
+              ) : (
+                "Thêm sản phẩm"
+              )}
+            </button>
+            <Link
+              to="/admin/listproduct"
+              className="text-white bg-emerald-700 hover:bg-lime-600 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >
+              Danh sách
+            </Link>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  );
+};
+
+export default AddImageVariant;

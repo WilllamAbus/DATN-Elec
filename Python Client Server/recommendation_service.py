@@ -44,21 +44,28 @@ def create_user_item_matrix(interactions_df):
     interactions_df['user'] = interactions_df['user'].astype(str)
     return interactions_df.pivot_table(index='user', columns='productID', values='score', fill_value=0)
 
-# Function to generate item-based recommendations
+# Hàm tạo gợi ý dựa trên sự tương đồng giữa các sản phẩm (item-based recommendation)
 def item_based_recommendation(user_item_matrix, user_id):
+    # Lấy danh sách các sản phẩm mà người dùng đã tương tác (sản phẩm có điểm số > 0)
     interacted_products = user_item_matrix.loc[user_id][user_item_matrix.loc[user_id] > 0].index
+
+    # Tính toán độ tương đồng giữa các sản phẩm bằng cosine similarity
     product_similarity_df = pd.DataFrame(
-        cosine_similarity(user_item_matrix.T),
-        index=user_item_matrix.columns,
-        columns=user_item_matrix.columns
+        cosine_similarity(user_item_matrix.T),  # Chuyển ma trận và tính toán tương đồng
+        index=user_item_matrix.columns,  # Đặt index là productID
+        columns=user_item_matrix.columns  # Đặt cột là productID
     )
     
-    recommended_items = set()
+    recommended_items = {}  # Tạo từ điển để lưu các sản phẩm được gợi ý và điểm tương đồng
     for product in interacted_products:
-        similar_items = product_similarity_df[product].sort_values(ascending=False)[1:3]  # Top 2 similar products
-        recommended_items.update(similar_items.index.tolist())
+        # Lấy các sản phẩm tương tự nhất với sản phẩm hiện tại (bỏ qua chính sản phẩm đó)
+        similar_items = product_similarity_df[product].sort_values(ascending=False)[1:3]  # Chỉ lấy 2 sản phẩm tương tự
+        for item, similarity in similar_items.items():
+            if item not in recommended_items:
+                recommended_items[item] = similarity  # Lưu sản phẩm và điểm tương đồng
     
-    return list(recommended_items)
+    return recommended_items  # Trả về từ điển sản phẩm gợi ý và điểm tương đồng
+
 
 # Function to get product details from the database
 def get_product_details(product_ids):
@@ -79,45 +86,52 @@ def get_product_details(product_ids):
             print(f"Error fetching product with ID {product_id}: {str(e)}")
     return products
 
-# Function to recommend products for a user
+# Hàm gợi ý sản phẩm cho người dùng dựa trên tương tác của họ
 def recommend_products_for_user(user_id):
-    interactions_df = get_interactions(user_id)
+    interactions_df = get_interactions(user_id)  # Lấy dữ liệu tương tác của người dùng
     if interactions_df is None:
         return []
 
-    user_item_matrix = create_user_item_matrix(interactions_df)
-    recommended_items = item_based_recommendation(user_item_matrix, user_id)
-    
+    user_item_matrix = create_user_item_matrix(interactions_df)  # Tạo ma trận user-item
+
+    recommended_items = item_based_recommendation(user_item_matrix, user_id)  # Tạo gợi ý dựa trên sản phẩm
+
     if not recommended_items:
-        print("No products to recommend.")
+        print("Không có sản phẩm nào để gợi ý.")
         return []
     
-    recommended_products = get_product_details(recommended_items)
-    save_recommendation(user_id, recommended_products, interactions_df.to_dict('records')) 
+    recommended_products = get_product_details(recommended_items.keys())  # Lấy chi tiết các sản phẩm được gợi ý
+    # Thêm điểm số (similarity score) cho các sản phẩm gợi ý
+    for product in recommended_products:
+        product['score'] = recommended_items[product['productID']]
+    
+    save_recommendation(user_id, recommended_products, interactions_df.to_dict('records'))  # Lưu gợi ý vào CSDL
     return recommended_products
 
-# Function to save recommendations to the database
+
+# Hàm lưu gợi ý vào CSDL (model recommendation)
 def save_recommendation(user_id, recommended_products, interactions):
     try:
+        # Tạo đối tượng recommendation để lưu vào CSDL
         recommendation = {
             "user": ObjectId(user_id),
             "recommendedItems": [
-                {"item": ObjectId(product["productID"]), "score": 0.8} for product in recommended_products
-            ],
-            "interactions": [ObjectId(interaction['_id']) for interaction in interactions],
-            "algorithm": "collaborative_filtering",
-            "generatedAt": datetime.now(),
-            "expiresAt": datetime.now() + timedelta(days=7),
-            "stateRecommendation": "pending",
+                {"item": ObjectId(product["productID"]), "score": product["score"]} for product in recommended_products
+            ],  # Lưu sản phẩm gợi ý và điểm score (từ cosine similarity)
+            "interactions": [ObjectId(interaction['_id']) for interaction in interactions],  # Lưu các tương tác đã xảy ra
+            "algorithm": "collaborative_filtering",  # Thuật toán gợi ý sử dụng
+            "generatedAt": datetime.now(),  # Thời gian tạo gợi ý
+            "expiresAt": datetime.now() + timedelta(days=7),  # Thời gian hết hạn của gợi ý (sau 7 ngày)
+            "stateRecommendation": "pending",  # Trạng thái gợi ý ban đầu là "chờ"
             "modifieon": datetime.now(),
-            "status": "active",
+            "status": "active",  # Trạng thái gợi ý
             "disabledAt": None
         }
+        # Lưu vào collection 'recommendation'
         recommendation_collection.insert_one(recommendation)
-        print("Recommendation saved successfully.")
+        print("Lưu gợi ý thành công.")
     except Exception as e:
-        print(f"Error saving recommendation: {str(e)}")
-
+        print(f"Lỗi khi lưu gợi ý vào CSDL: {str(e)}")
 # Main function to run the script
 if __name__ == "__main__":
     if len(sys.argv) > 1:

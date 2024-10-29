@@ -11,7 +11,6 @@ const ProductService = {
             product_name: { $regex: search, $options: 'i' }
           }
         : { status: { $ne: 'disable' },
-          variants: { $exists: true, $ne: [] }, 
        };
         
 

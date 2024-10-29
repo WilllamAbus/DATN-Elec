@@ -6,7 +6,6 @@ const inventorySchema = Schema(
     quantityShelf: {type:Number}, // totalQuantity - quantityStock  số lượng này sẽ là số lượng đưa qua product
     quantityStock: {type:Number},
     totalQuantity : {type: Number, required: true}, // số lượng từ inbound
-    supplier: { type: Schema.Types.ObjectId, ref: "Supplier", required: true },
     // Giá mỗi đơn vị sản phẩm
     price: { type: Number, required: true }, // giá từ inbound
     // Tổng giá trị tồn kho

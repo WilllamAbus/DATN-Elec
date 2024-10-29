@@ -38,7 +38,7 @@ const DropdownNav: React.FC<DropdownProps> = ({ items, buttonText }) => {
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-44 bg-primary-901 rounded shadow-lg dark:bg-gray-700 z-20">
+        <div className="absolute left-0 mt-2 w-44 bg-primary_flowbite-901 rounded shadow-lg dark:bg-gray-700 z-20">
           <ul className="py-1 text-sm text-gray-700 dark:text-gray-400">
             {items.map((item, index) => (
               <li key={index}>

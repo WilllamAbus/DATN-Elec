@@ -57,7 +57,7 @@ const Navbar: React.FC = () => {
   };
   return (
     <header>
-      <nav className="fixed z-30 w-full bg-primary-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
+      <nav className="fixed z-30 w-full bg-primary_flowbite-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
         <div className="flex justify-between items-center max-w-screen-2xl mx-auto">
           <div className="flex justify-start items-center">
             <a href="/" className="flex mr-14">
