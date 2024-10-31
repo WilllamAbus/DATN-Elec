@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
+import RelatedProduct from "./relatedProduct/relatedProduct";
 
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -92,6 +93,7 @@ const DetailPage: React.FC = () => {
   }
 
   return (
+    <>
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
       {firstVariant && (
@@ -146,6 +148,10 @@ const DetailPage: React.FC = () => {
           )}
       </div>
     </section>
+    <section>
+        <RelatedProduct/>
+    </section>
+    </>
   );
 };
 

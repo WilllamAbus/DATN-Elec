@@ -37,15 +37,25 @@ export interface ProductResponse {
 }
 export interface ProductRelated {
   _id: string;
-  image: string[];
+  image: {
+    image: string[]; 
+    color: { _id: string; name: string };
+    slug: string;
+}[];
+  variant_name: string;
+  variant_price: number;
+  product_ratingAvg: number;
+  weight_g: number; 
   product_discount: {
-    discountPercent: number;
+    discountId: string;
+    code: string; 
+    discountPercent: number; 
+    isActive: boolean; 
+    status: string; 
+    disabledAt: Date | null;
   };
-  product_name: string;
-  product_ratingAvg: number | null;
-  product_quantity: number;
-  product_price: number;
 }
+
 export interface RelatedProductsResponse {
-  relatedProducts: ProductRelated[];
+  relatedVariants: ProductRelated[]; 
 }
