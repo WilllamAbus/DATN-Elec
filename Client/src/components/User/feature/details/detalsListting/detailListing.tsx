@@ -82,61 +82,64 @@ const ProductDetail: React.FC = () => {
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
+  // const fetchData = async () => {
+  //   // Kiểm tra sự tồn tại của ID sản phẩm và profile
+  //   if (!id) {
+  //     console.log("Product ID is not available.");
+  //     return; // Nếu không có ID, không thực hiện
+  //   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Kiểm tra sự tồn tại của ID sản phẩm và profile
-      if (!id) {
-        console.log("Product ID is not available.");
-        return; // Nếu không có ID, không thực hiện
-      }
+  //   if (!profile?._id) {
+  //     console.log("User profile is not available.");
+  //     return; // Nếu không có profile, không thực hiện
+  //   }
 
-      if (!profile?._id) {
-        console.log("User profile is not available.");
-        return; // Nếu không có profile, không thực hiện
-      }
+  //   const interactionData = {
+  //     user: profile._id,
+  //     orderAuctions: null,
+  //     item: id,
+  //     OrderCart: null,
+  //     productID: id,
+  //     Watchlist: null,
+  //     type: "view",
+  //     score: 2,
+  //   };
 
-      const interactionData = {
-        user: profile._id,
-        orderAuctions: null,
-        item: id,
-        OrderCart: null,
-        productID: id,
-        Watchlist: null,
-        type: "view",
-        score: 2,
-      };
+  //   try {
+  //     console.log("Fetching product with ID:", id);
 
-      try {
-        console.log("Fetching product with ID:", id);
+  //     const productID = await getProductByID(id);
+  //     setProduct(productID.product);
+  //     console.log(productID.product);
 
-        const productID = await getProductByID(id);
-        setProduct(productID.product);
-        console.log(productID.product);
+  //     Promise.all([
+  //       upViewProduct(id), // Cập nhật lượt xem sản phẩm
+  //       addInteractionView(interactionData) // Cập nhật lượt tương tác
+  //   ])
+    
+  //     const updatedProduct = await getProductByID(id);
+  //     setProduct(updatedProduct);
 
-        await upViewProduct(id); // Cập nhật lượt xem sản phẩm
-        await addInteractionView(interactionData);
-        const updatedProduct = await getProductByID(id);
-        setProduct(updatedProduct);
+  //     const relatedData = await fetchRelatedProducts(id);
+  //     // Kiểm tra và thiết lập giá trị cho relatedProducts
+  //     if (relatedData && Array.isArray(relatedData.relatedProducts)) {
+  //       setRelatedProducts(relatedData.relatedProducts);
+  //     } else {
+  //       console.error("Error: relatedData is not an array", relatedData);
+  //     }
+  //   } catch (error) {
+  //     console.error("Không thể lấy dữ liệu sản phẩm:", error);
+  //   }
+  // };
+  // useEffect(() => {
+   
 
-        const relatedData = await fetchRelatedProducts(id);
-        // Kiểm tra và thiết lập giá trị cho relatedProducts
-        if (relatedData && Array.isArray(relatedData.relatedProducts)) {
-          setRelatedProducts(relatedData.relatedProducts);
-        } else {
-          console.error("Error: relatedData is not an array", relatedData);
-        }
-      } catch (error) {
-        console.error("Không thể lấy dữ liệu sản phẩm:", error);
-      }
-    };
-
-    // Gọi hàm fetchData
-    fetchData();
-    fetchWatchlist();
-    // Lấy thông tin profile
-    dispatch(getProfileThunk());
-  }, [id, dispatch]); // Thêm profile vào dependency array
+  //   // Gọi hàm fetchData
+  //   fetchData();
+  //   fetchWatchlist();
+  //   // Lấy thông tin profile
+  //   dispatch(getProfileThunk());
+  // }, [id, dispatch]); // Thêm profile vào dependency array
   const fetchWatchlist = async () => {
     try {
       const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
@@ -158,7 +161,64 @@ const ProductDetail: React.FC = () => {
       console.error("Không thể lấy danh sách yêu thích:", error);
     }
   };
-
+  const fetchData = async () => {
+    if (!id) {
+      console.log("Thiếu ID sản phẩm hoặc profile người dùng.");
+      return;
+    }
+  
+    const interactionData = {
+      user: profile?._id,
+      orderAuctions: null,
+      item: id,
+      OrderCart: null,
+      productID: id,
+      Watchlist: null,
+      type: "view",
+      score: 2,
+    };
+  
+    try {
+      console.log("Đang lấy thông tin sản phẩm với ID:", id);
+      const [productResponse, relatedData] = await Promise.all([
+        getProductByID(id),
+        fetchRelatedProducts(id)
+      ]);
+  
+      setProduct(productResponse.product);
+  
+      if (relatedData && Array.isArray(relatedData.relatedProducts)) {
+        setRelatedProducts(relatedData.relatedProducts);
+      } else {
+        console.error("Lỗi: relatedData không phải là mảng", relatedData);
+      }
+  
+      await Promise.all([
+        upViewProduct(id),
+        addInteractionView(interactionData)
+      ]);
+  
+      if (Array.isArray(watchlistItems)) {
+        const isFavoriteProduct = watchlistItems.some(
+          (item) => item.product && item.product._id === id
+        );
+        setIsFavorite(isFavoriteProduct);
+      }
+    } catch (error) {
+      console.error("Không thể lấy hoặc cập nhật dữ liệu sản phẩm:", error);
+    }
+  };
+  
+  useEffect(() => {
+    if (id) {
+      fetchData();
+    }
+  }, [id]); // Chỉ theo dõi `id` để tránh gọi lại khi các dependency khác thay đổi
+  
+  useEffect(() => {
+    fetchWatchlist();
+    dispatch(getProfileThunk());
+  }, [dispatch]); // Tách riêng useEffect để tránh ảnh hưởng đến fetchData
   const handleAddToCart = async () => {
     if (userId && id) {
       try {
@@ -228,31 +288,31 @@ const ProductDetail: React.FC = () => {
     setCurrentIndex(index);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!id) {
-        console.log("Không có ID sản phẩm nào được cung cấp");
-        return;
-      }
-      try {
-        const productID = await getProductByID(id);
-        setProduct(productID.product);
-        console.log(productID.product);
-        if (Array.isArray(watchlistItems)) {
-          const isFavoriteProduct = watchlistItems.some(
-            (item) => item.product && item.product._id === id
-          );
-          setIsFavorite(isFavoriteProduct);
-        }
-      } catch (error) {
-        console.log(
-          "Không thể lấy dữ liệu sản phẩm hoặc tăng số lượt xem:",
-          error
-        );
-      }
-    };
-    fetchData();
-  }, [id, userId, dispatch, watchlistItems]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (!id) {
+  //       console.log("Không có ID sản phẩm nào được cung cấp");
+  //       return;
+  //     }
+  //     try {
+  //       const productID = await getProductByID(id);
+  //       setProduct(productID.product);
+  //       // console.log(productID.product);
+  //       if (Array.isArray(watchlistItems)) {
+  //         const isFavoriteProduct = watchlistItems.some(
+  //           (item) => item.product && item.product._id === id
+  //         );
+  //         setIsFavorite(isFavoriteProduct);
+  //       }
+  //     } catch (error) {
+  //       console.log(
+  //         "Không thể lấy dữ liệu sản phẩm hoặc tăng số lượt xem:",
+  //         error
+  //       );
+  //     }
+  //   };
+  //   fetchData();
+  // }, [id, userId, dispatch, watchlistItems]);
   return (
     <>
       {/* breadcrumb */}
