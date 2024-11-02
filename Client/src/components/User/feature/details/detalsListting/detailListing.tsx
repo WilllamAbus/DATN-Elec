@@ -187,8 +187,8 @@ const ProductDetail: React.FC = () => {
   
       setProduct(productResponse.product);
   
-      if (relatedData && Array.isArray(relatedData.relatedProducts)) {
-        setRelatedProducts(relatedData.relatedProducts);
+      if (relatedData && Array.isArray(relatedData.relatedVariants)) {
+        setRelatedProducts(relatedData.relatedVariants);
       } else {
         console.error("Lỗi: relatedData không phải là mảng", relatedData);
       }
@@ -565,7 +565,7 @@ const ProductDetail: React.FC = () => {
                     <figure className="relative w-full h-0 pb-[75%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
                       <img
                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                        src={productRelated.image[0]}
+                        src={productRelated.image[0].image[0] || 'null'}
                         alt={`product ${index + 1}`}
                       />
                     </figure>
@@ -593,7 +593,7 @@ const ProductDetail: React.FC = () => {
                     <div className="mt-1 px-2 pb-1">
                       <a href="#">
                         <h5 className="text-sm tracking-tight text-slate-900 font-medium">
-                          {productRelated.product_name}
+                          {productRelated.variant_name}
                         </h5>
                       </a>
                     </div>
@@ -606,18 +606,18 @@ const ProductDetail: React.FC = () => {
                         : "N/A"}
                     </p>
                     <StarIcon />
-                    <div className="text-xs text-gray-500 items-center">
+                    {/* <div className="text-xs text-gray-500 items-center">
                       {productRelated.product_quantity > 0
                         ? `(Còn ${productRelated.product_quantity} sản phẩm)`
                         : "Hết hàng"}
-                    </div>
+                    </div> */}
                   </div>
                   <div className="mt-2 px-2 flex items-center gap-2">
                     {productRelated.product_discount.discountPercent > 0 ? (
                       <div className="flex w-full">
                         <p className="text-xs font-medium text-rose-700 flex-grow">
                           {formatCurrency(
-                            productRelated.product_price *
+                            productRelated.variant_price *
                               (1 -
                                 productRelated.product_discount
                                   .discountPercent /
@@ -626,12 +626,12 @@ const ProductDetail: React.FC = () => {
                           đ
                         </p>
                         <p className="text-xs font-medium text-gray-400 line-through flex-shrink-0">
-                          {formatCurrency(productRelated.product_price)} đ
+                          {formatCurrency(productRelated.variant_price)} đ
                         </p>
                       </div>
                     ) : (
                       <p className="text-xs font-medium text-rose-700">
-                        {formatCurrency(productRelated.product_price)} đ
+                        {formatCurrency(productRelated.variant_price)} đ
                       </p>
                     )}
                   </div>
