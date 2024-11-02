@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import {fetchOrderDataPendingThunk } from "../../../../../redux/statusOrderUser/pendingStatus/pendingStatusThunk";
-import { softDelThunk } from "../../../../../redux/statusOrderUser/softDelByUser/softDellOrderThunk";
+// import { softDelThunk } from "../../../../../redux/statusOrderUser/softDelByUser/softDellOrderThunk";
 import {OrderProductPendding, OrderDataAllPendding } from "../../../../../types/iterationOrder/pendingStatusOrder";
 
 import currencyFormatter from "currency-formatter";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer,  toast} from "react-toastify";
+import { ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DeleteOrderModal from './modalSoftDel/orderSoftDelModal'; // Ensure correct path
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
@@ -37,15 +38,20 @@ const OrderListPendingStatus: React.FC = () => {
   const [orders, setOrders] = useState<OrderDataAllPendding[]>([]);
 
   // const [, setLocalOrder] = useState(orders);
+  const [selectedOrderId, setSelectedOrderId] = useState<OrderDataAllPendding | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  
   const toggleShowAll = () => {
     setShowAll(!showAll);
   };
 
   useEffect(() => {
     // Set orders to ordersFromStore or an empty array if it's null
-    setOrders(ordersFromStore ?? []); // Use nullish coalescing operator
+    if (Array.isArray(ordersFromStore) && ordersFromStore.length > 0) {
+      setOrders(ordersFromStore);
+    } else {
+      setOrders([]);
+    }
   }, [ordersFromStore]);
 
   useEffect(() => {
@@ -57,23 +63,37 @@ const OrderListPendingStatus: React.FC = () => {
   const goBack = () => {
     navigate("/auction");
   };
-  const handleSoftDelOrder = (orderId: string) => {
-    if (orderId && userId ) {
+  const handleDeleteClick = (orderId: OrderDataAllPendding) => {
+  
+    
+    setSelectedOrderId(orderId);
+
+   
+    setOrders((prevOrders) =>
+      prevOrders.filter((o) => o.orderId !== orderId.orderId) // Assuming orderId is a property of order
+    );
+    setIsModalOpen(true);
+ 
+ 
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrderId(null);
+  };
+  // const handleSoftDelOrder = (orderId: string) => {
+  //   if (orderId && userId ) {
 
       
-      // Assuming orderId is an array and you want to delete multiple orders
-      dispatch(softDelThunk({orderId})).unwrap();
-      // dispatch(fetchOrderDataShippingThunk(userId));
-      setOrders((prevCategories) =>
-        prevCategories.filter((order) => order.orderId !== orderId)
-      );
-      toast.success("Xóa đơn hàng thành công");
-    } else {
-      toast.error("Không tìm thấy ID đơn hàng để xóa");
-    }
+  //     // Assuming orderId is an array and you want to delete multiple orders
+  //     dispatch(softDelThunk({orderId})).unwrap();
+  //     // dispatch(fetchOrderDataShippingThunk(userId));
+   
+  //     toast.success("Xóa đơn hàng thành công");
+  //   }
 
 
-  };
+  // };
   return (
     <div className="mt-6 border border-gray-300 pt-7 rounded-lg shadow-md bg-white">
       {orders
@@ -133,8 +153,9 @@ const OrderListPendingStatus: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-4 w-full md:w-auto md:flex-row mt-4 md:mt-0 md:ml-auto justify-center md:justify-end">
+ 
                       <button
-                     onClick={() => handleSoftDelOrder(order.orderId)} // Truy cập _id từ đối tượng order
+                      onClick={() => handleDeleteClick(order)} // Truy cập _id từ đối tượng order
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
                       >
                         Hủy đơn hàng
@@ -161,7 +182,15 @@ const OrderListPendingStatus: React.FC = () => {
             </div>
           </div>
         ))}
+
         <ToastContainer />
+        {isModalOpen && selectedOrderId && (
+  <DeleteOrderModal
+  orderId={selectedOrderId.orderId}
+  onClose={handleCloseModal}
+  isOpen={isModalOpen}
+/>
+)}
     </div>
   );
 };

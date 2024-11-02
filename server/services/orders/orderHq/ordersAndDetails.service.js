@@ -4,7 +4,7 @@ const Auction = require("../../../model/orders/auction.model");
 const Inventory = require("../../../model/inventory/inventory.model");
 const OrderAuction = require("../../../model/orders/auctionsOrders/aucOrders.model");
 const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrderDetail.model");
-const Product_v2 = require("../../../model/product_v2");
+const Product_v2 = require("../../../model/productAuction/productAuction");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
@@ -14,37 +14,45 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const vnpaySService = require("./vnpay.service");
 const { log } = require("console");
+const { populate } = require("../../../model/role.model");
 // const InventoryOut = require("../../../model/inventory/invenOut.model");
 
 const orderAndDetailService = {
   createOrderWithDetails: async (orderData) => {
     try {
       const { userId, auctionDetails, payment } = orderData;
-
+// 
+/**
+ * 
+ * @readonly Sau 24h ; nếu người dùng ko thanh toán thì thì auction bị hủy
+ */
       // Find user
       const user = await User.findById(userId).lean();
-      if (!user) throw new Error("Người dùng không tồn tại");
+      if (!user || user.status === "disable") throw new Error("Người dùng không tồn tại");
 
       // Find auction details
       const auction = await Auction.findById(auctionDetails)
         .populate("productId")
         .lean();
-
+        if (!auction || auction.status === "disable") throw new Error("Đấu giá không tồn tại");
       const auctionID = auction._id;
       // Extract productID from auction details
       const productID = mongoose.Types.ObjectId(auction.productId._id);
 
       // Validate productID format
 
-      const product = await Product_v2.findById(productID).lean();
-
+      const product = await Product_v2.findById(
+        productID
+   
+        ).lean();
+        if (!product || !product.status === "active") throw new Error("Sản phẩm không tồn tại");
       const nameProduct = product.product_name;
-
+        const namImage = product.image
       // const testProductID = mongoose.Types.ObjectId("66e3eb3506aa43ec4bc5686b");
       
-      // const inven = await Inventory.findOne({ product: productID }).lean();
+      const inven = await Inventory.findOne({ productAuction: productID , status:"active"} ).lean();
 
-      // if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
+      if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
 
       // Extract details from auction
       const quantityDetails = auction.auction_quantity;
@@ -125,40 +133,39 @@ const orderAndDetailService = {
       await orderDetailAuction.save();
 
       // Update product quantity in Inventory
-      // const updatedProductQuantity = inven.quantityShelf - quantityDetails;
-      // if (updatedProductQuantity < 0) {
-      //   throw new Error("Số lượng sản phẩm không đủ");
-      // }
+      const updatedProductQuantity = inven.quantityShelf - quantityDetails;
+      if (updatedProductQuantity < 0) {
+        throw new Error("Số lượng sản phẩm không đủ");
+      }
 
-      // const numInventoriesShelf = inven.quantityShelf;
-      // const numQuantityDetails = quantityDetails;
-      // const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
+      const numInventoriesShelf = inven.quantityShelf;
+      const numQuantityDetails = quantityDetails;
+      const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
 
-      // await Inventory.findOneAndUpdate(
-      //   { product: productID },
-      //   {
-      //     $set: {
-      //       product: productID,
-      //       quantityShelf: remainingQuantityShelf,
-      //       quantityStock: inven.quantityStock,
-      //       totalQuantity: inven.totalQuantity,
-      //       supplier: inven.supplier,
-      //       price: inven.price,
-      //       totalPrice: inven.totalPrice,
-      //       status: "active",
-      //       createdAt: Date.now(),
-      //       updateAt: Date.now(),
-      //     },
-      //   }
-      // );
+      await Inventory.findOneAndUpdate(
+        { productAuction: productID },
+      
+        {
+          $set: {
+            productAuction: productID,
+            quantityShelf: remainingQuantityShelf,
+            quantityStock: inven.quantityStock,
+            totalQuantity: inven.totalQuantity,
+            supplier: inven.supplier,
+            price: inven.price,
+            totalPrice: inven.totalPrice,
+            status: "active",
+            createdAt: Date.now(),
+            updateAt: Date.now(),
+          },
+        }
+      );
 
       // Send confirmation email to user
       const orderDetails = {
-        products: [
-          {
-            name: nameProduct, // Use product name for the email
-          },
-        ],
+        name: nameProduct,
+
+        productImage : namImage,
         quantityShopping: quantityDetails,
         totalPrice: totalPriceWithShipping,
         shipping: {
@@ -210,7 +217,8 @@ const orderAndDetailService = {
       const order = await OrderAuction.findById(orderId)
         .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
-      console.log('order found', order);
+    
+
       
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
@@ -218,13 +226,13 @@ const orderAndDetailService = {
       const orderDetails = await OrderDetailAuction.find({
         order: orderId,
       }).lean();
-      console.log('OrderDetails', orderDetails);
+ 
       
       // Fetch product details for each order detail
       const productDetails = await Promise.all(
         orderDetails.map(async (detail) => {
           const product = await Product_v2.findById(detail.productID).lean();
-          console.log('products', product);
+  
           
           return {
             name: product.product_name,
@@ -233,7 +241,9 @@ const orderAndDetailService = {
           };
         })
       );
-      console.log('productDetails' , productDetails);
+      
+      console.log('Order Details', productDetails);
+      
       
       // Extract the user and address information from the shippingAddress
       const shippingInfo = {
@@ -363,7 +373,8 @@ const orderAndDetailService = {
           return await Interaction.create({
             user: order.shippingAddress.userID,
             orderAuctions: orderId,
-            productID: detail.productID,
+            productID: null,
+            productAuction: detail.productID,
             OrderCart: null,
             Watchlist: null,
             Cart: null,
@@ -405,7 +416,7 @@ const orderAndDetailService = {
       order.stateOrder = "Nhận hàng";
       await order.save(); // Save the updated document
 
-      console.log("Updated Order:", order);
+
 
       return order;
     } catch (error) {
@@ -446,39 +457,111 @@ const orderAndDetailService = {
       );
     }
   },
-  getAllOrders: async (search, page, limit) => {
+  getAllOrders: async (page = 1, pageSize = 5, search) => {
     try {
-      const offset = (page - 1) * limit;
+      const orders = await OrderAuction.find({ status: "active" })
+      .select("_id shippingAddress stateOrder  status") 
+    
+      .lean();
+      const orderMatch = orders.map(orders => {
+    // Lấy thông tin sản phẩm từ productMap
 
-      const searchQuery = search
-        ? {
-            status: { $ne: "disable" },
-            "shippingAddress.phoneNumber": { $regex: search, $options: "i" },
-          }
-        : { status: { $ne: "disable" } };
+        // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+        return {
+          ...orders, // Thêm thông tin timeTrack
+        // Thêm thông tin sản phẩm
+        };
+      
+      }).filter(track => track !== null); // Lọc các phần tử null
 
-      const orders = await OrderAuction.find(searchQuery)
-        .skip(offset)
-        .limit(limit)
-        .populate("shippingAddress.userID") // nếu cần thiết
-        .sort({ createdAt: -1 });
-      const totalOrders = await OrderAuction.countDocuments(searchQuery);
-      const totalPages = Math.ceil(totalOrders / limit);
+      const allOrders = orderMatch.map(track => ({
+        orderId: track._id,
+
+      }));
+
+      // In ra danh sách hình ảnh
+    
+
+      // Bước 6: Áp dụng tìm kiếm (nếu có)
+      const searchResults = search
+        ? orderMatch.filter((orderM) => {
+            const phoneNumber = orderM.shippingAddress.phoneNumber
+            return phoneNumber.includes(search);
+          })
+        : orderMatch;
+
+      // Bước 7: Phân trang
+      const totalItems = searchResults.length; // Tổng số mục sau khi lọc
+      const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
+      const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
+      const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
+  
+      // Bước 8: Tính toán tổng số trang
+      const totalPages = totalBuckets;
+
       return {
-        success: true,
-        data: {
-          orders,
-          pagination: {
-            totalOrders,
-            totalPages,
-            currentPage: page,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-          },
-        },
+        ordersDeleted: paginatedResults,
+        totalPages: totalPages,
+        currentPage: bucket,
+        allOrders, // Trả về danh sách hình ảnh
       };
     } catch (error) {
       return { success: false, message: error.message };
+    }
+  },
+
+  getDeletedOrders: async (page = 1, pageSize = 5, search) => {
+    try {
+      // Tính toán skip và limit dựa trên số trang và giới hạn (limit)
+      const orders = await OrderAuction.find({ status: "disable" })
+      .select("_id shippingAddress stateOrder  status") 
+    
+      .lean();
+      const orderMatch = orders.map(orders => {
+    // Lấy thông tin sản phẩm từ productMap
+
+        // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+        return {
+          ...orders, // Thêm thông tin timeTrack
+        // Thêm thông tin sản phẩm
+        };
+      
+      }).filter(track => track !== null); // Lọc các phần tử null
+
+      const allOrders = orderMatch.map(track => ({
+        orderId: track._id,
+
+      }));
+
+      // In ra danh sách hình ảnh
+    
+
+      // Bước 6: Áp dụng tìm kiếm (nếu có)
+      const searchResults = search
+        ? orderMatch.filter((orderM) => {
+            const phoneNumber = orderM.shippingAddress.phoneNumber
+            return phoneNumber.includes(search);
+          })
+        : orderMatch;
+
+      // Bước 7: Phân trang
+      const totalItems = searchResults.length; // Tổng số mục sau khi lọc
+      const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
+      const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
+      const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
+  
+      // Bước 8: Tính toán tổng số trang
+      const totalPages = totalBuckets;
+
+      return {
+        ordersDeleted: paginatedResults,
+        totalPages: totalPages,
+        currentPage: bucket,
+        allOrders, // Trả về danh sách hình ảnh
+      };
+    
+    } catch (error) {
+      throw new Error(`Error retrieving deleted orders: ${error.message}`);
     }
   },
 
@@ -571,50 +654,10 @@ const orderAndDetailService = {
       throw new Error(`Lỗi khi xóa mềm đơn hàng: ${error.message}`);
     }
   },
-  getDeletedOrders: async (page, limit) => {
-    try {
-      // Tính toán skip và limit dựa trên số trang và giới hạn (limit)
-      // const skip = (page - 1) * limit;
-      const pageNum =
-        page && !isNaN(parseInt(page, 10)) ? parseInt(page, 10) : 1;
-      const limitNum =
-        limit && !isNaN(parseInt(limit, 10)) ? parseInt(limit, 10) : 5;
-      // Sử dụng Bucket Pattern để phân trang
-      const orders = await OrderAuction.find({
-        status: "disable",
-        stateOrder: "Hủy đơn hàng",
-      })
-        .populate("shippingAddress.userID")
+ 
 
-        .skip((pageNum - 1) * limitNum) // Skip documents based on page
-        .limit(limitNum) // Limit the number of documents per page
-        .exec();
 
-      //  const shippingInfo = {
-      //   userId: orders[0].shippingAddress.userID._id,
-      //   recipientName: orders[0].shippingAddress.recipientName,
-      //   phoneNumber: orders[0].shippingAddress.phoneNumber,
-      //   address: orders[0].shippingAddress.address,
-      //   email: orders[0].shippingAddress.userID.email, // Assuming the user's email is stored here
-      // };
-      // const stateOrder = orders[0].stateOrder
 
-      // Đếm tổng số lượng đơn hàng thỏa mãn điều kiện
-      const totalOrders = await OrderAuction.countDocuments({
-        status: "disable",
-        stateOrder: "Hủy đơn hàng",
-      });
-
-      return {
-        orders,
-        totalOrders,
-        totalPages: Math.ceil(totalOrders / limit),
-        currentPage: pageNum,
-      };
-    } catch (error) {
-      throw new Error(`Error retrieving deleted orders: ${error.message}`);
-    }
-  },
 };
 // const calculateScore = (interactions) => {
 //   let score = 0;

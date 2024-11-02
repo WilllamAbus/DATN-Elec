@@ -4,7 +4,7 @@ const Product_v2 = require("../../../model/productAuction/productAuction");
 const pricRangeBidService = {
   createPriceRange: async (productId, bidInput) => {
     try {
-      const existingpricRangeBid = await PriceRangeBid.findOne({"product_randBib.productId": productId });
+      const existingpricRangeBid = await PriceRangeBid.findOne({"product_randBib.productId": productId , status: { $ne: "disable" }});
  
       
       if (existingpricRangeBid) {
@@ -135,16 +135,16 @@ const pricRangeBidService = {
       .lean();
     
       const productIds = priceRange.map((priceRange) => priceRange.product_randBib.productId);
-  
+   
       
       const products = await Product_v2.find({
-        _id: { $in: productIds },
-      })
+        _id: { $in: productIds }, status: "active"
+      },)
         .select("_id image product_name ")
     
         .lean();
 
-      
+     
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
     
@@ -292,19 +292,21 @@ const pricRangeBidService = {
   ) => {
     try {
   
-      const priceRange = await PriceRangeBid.find({ status: "disable" })
+      const priceRangeDelted = await PriceRangeBid.find({ status: "disable" })
       .select("product_randBib minBid midBid maxBid bidInput status")
       .populate("product_randBib" , "productId", "product_price_unit", "product_name") // Chỉ lấy các trường cần thiết từ TimeTrack
       .lean();
 
-      const productIds = priceRange.map((priceRange) => priceRange.product_randBib.productId);
-
-      const products = await Product_v2.find({
-        _id: { $in: productIds },
-      })
-        .select("_id image product_name ")
+      
+      const productIds = priceRangeDelted.map((rnas) => rnas.product_randBib.productId);
     
+      
+      const productsRandBid = await Product_v2.find({
+        _id: { $in: productIds }, status: "disable"
+      })
+        .select("_id image product_name")
         .lean();
+
 
       
 
@@ -313,12 +315,12 @@ const pricRangeBidService = {
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
-      products.forEach((product) => {
+      productsRandBid.forEach((product) => {
         productMap[product._id] = product;
       });
 
-      const matchedPriceRandge = priceRange.map(priceRange => {
-        const productIdStr = priceRange.productId.toString(); // Chuyển ObjectId thành chuỗi
+      const matchedPriceRandge = priceRangeDelted.map(priceRange => {
+        const productIdStr = priceRange.product_randBib.productId.toString(); // Chuyển ObjectId thành chuỗi
         const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
 
         // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product

@@ -1,29 +1,31 @@
 // src/types/Checkout.d.ts
 
-export interface OrdersResponse {
-  success: boolean;
-  data: Order[]; // Array of order objects
-  pagination: {
-    totalOrders: number;
-    totalPages: number;
-    currentPage: number;
-  };
+export interface OrdersDeletedResponse {
+  status: number;
+    message: string;
+    data: {
+      ordersDeleted: OrderDeleted[];
+      totalPages: number;
+      currentPage: number;
+    };
 }
 
-export interface Order {
+export interface OrderDeleted {
   _id: string;
   stateOrder: string;
   status: string;
-  disabledAt: string | null;
+  disabledAt: string ;
   order_date: string;
   createdAt: string;
   updatedAt: string;
-  shippingAddress: {
-    userID: string;
+  shippingAddress: ShippingAddressDeleted
+}
+
+export interface ShippingAddressDeleted {
+  userID: string;
     recipientName: string;
     phoneNumber: string;
     address: string;
     email: string;
     addressID: string;
-  };
 }

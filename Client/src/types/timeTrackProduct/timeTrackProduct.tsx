@@ -11,7 +11,7 @@ export interface timeTrackProducts {
     weight_g: number;
     product_slug?: string; // Optional property
     images: ProductImage[]; // Use the Image interface for images array
-    productAttributes: ProductAttribute[]; // Correct property name
+   
     endTime: string;
   }
 
@@ -24,10 +24,7 @@ export interface ProductImage {
     alt: string;
   }
   
-  export interface ProductAttribute {
-    key: string;
-    value: string;
-  }
+ 
   
   export interface ProductDetails {
     _id: string;
@@ -42,7 +39,7 @@ export interface ProductImage {
     weight_g: number;
     product_slug: string;
     images: ProductImage[];
-    productAttributes: ProductAttribute[];
+
     endTime: string;
     endTimeBid: string
   }

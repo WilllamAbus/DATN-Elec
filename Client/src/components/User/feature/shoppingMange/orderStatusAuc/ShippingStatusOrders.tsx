@@ -45,7 +45,11 @@ const OrderListShippingStatus: React.FC = () => {
 
   useEffect(() => {
     // Set orders to ordersFromStore or an empty array if it's null
-    setOrders(ordersFromStore ?? []); // Use nullish coalescing operator
+    if (Array.isArray(ordersFromStore) && ordersFromStore.length > 0) {
+      setOrders(ordersFromStore);
+    } else {
+      setOrders([]);
+    } // Use nullish coalescing operator
   }, [ordersFromStore]);
 
   useEffect(() => {
@@ -117,12 +121,7 @@ const OrderListShippingStatus: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-4 w-full md:w-auto md:flex-row mt-4 md:mt-0 md:ml-auto justify-center md:justify-end">
-                      <button
-                  // Truy cập _id từ đối tượng order
-                        className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
-                      >
-                        Hủy đơn hàng
-                      </button>
+                    
                       <button
                         onClick={() => goBack()}
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"

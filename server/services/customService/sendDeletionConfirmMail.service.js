@@ -15,7 +15,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-const sendDeletionConfirmationEmail = async (userEmail, serviceDetails) => {
+const sendDeletionConfirmationEmail = async (userEmail, serviceDetails , customerSelect) => {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
     if (!accessToken.token) {
@@ -37,135 +37,780 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails) => {
       from: "haotri335@gmail.com",
       to: userEmail,
       subject: "XÁC NHẬN HỦY DỊCH VỤ",
-      html: `  <title>Empty template</title><!--[if (mso 16)]>
-    <style type="text/css">
-    a {text-decoration: none;}
-    </style>
-    <![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>
-<noscript>
-         <xml>
-           <o:OfficeDocumentSettings>
-           <o:AllowPNG></o:AllowPNG>
-           <o:PixelsPerInch>96</o:PixelsPerInch>
-           </o:OfficeDocumentSettings>
-         </xml>
-      </noscript>
-<![endif]-->
-  <style type="text/css">
-.rollover:hover .rollover-first {
-  max-height:0px!important;
-  display:none!important;
-}
-.rollover:hover .rollover-second {
-  max-height:none!important;
-  display:block!important;
-}
-.rollover span {
-  font-size:0px;
-}
-u + .body img ~ div div {
-  display:none;
-}
-#outlook a {
-  padding:0;
-}
-span.MsoHyperlink,
-span.MsoHyperlinkFollowed {
-  color:inherit;
-  mso-style-priority:99;
-}
-a.es-button {
-  mso-style-priority:100!important;
-  text-decoration:none!important;
-}
-a[x-apple-data-detectors],
-#MessageViewBody a {
-  color:inherit!important;
-  text-decoration:none!important;
-  font-size:inherit!important;
-  font-family:inherit!important;
-  font-weight:inherit!important;
-  line-height:inherit!important;
-}
-.es-desk-hidden {
-  display:none;
-  float:left;
-  overflow:hidden;
-  width:0;
-  max-height:0;
-  line-height:0;
-  mso-hide:all;
-}
-@media only screen and (max-width:600px) {.es-m-p20b { padding-bottom:20px!important } .es-m-p0t { padding-top:0px!important } .es-p-default { } *[class="gmail-fix"] { display:none!important } p, a { line-height:150%!important } h1, h1 a { line-height:120%!important } h2, h2 a { line-height:120%!important } h3, h3 a { line-height:120%!important } h4, h4 a { line-height:120%!important } h5, h5 a { line-height:120%!important } h6, h6 a { line-height:120%!important } .es-header-body p { } .es-content-body p { } .es-footer-body p { } .es-infoblock p { } h1 { font-size:30px!important; text-align:left } h2 { font-size:24px!important; text-align:left } h3 { font-size:20px!important; text-align:left } h4 { font-size:24px!important; text-align:left } h5 { font-size:20px!important; text-align:left } h6 { font-size:16px!important; text-align:left } .es-header-body h1 a, .es-content-body h1 a, .es-footer-body h1 a { font-size:30px!important } .es-header-body h2 a, .es-content-body h2 a, .es-footer-body h2 a { font-size:24px!important } .es-header-body h3 a, .es-content-body h3 a, .es-footer-body h3 a { font-size:20px!important } .es-header-body h4 a, .es-content-body h4 a, .es-footer-body h4 a { font-size:24px!important } .es-header-body h5 a, .es-content-body h5 a, .es-footer-body h5 a { font-size:20px!important } .es-header-body h6 a, .es-content-body h6 a, .es-footer-body h6 a { font-size:16px!important } .es-menu td a { font-size:14px!important } .es-header-body p, .es-header-body a { font-size:14px!important } .es-content-body p, .es-content-body a { font-size:14px!important } .es-footer-body p, .es-footer-body a { font-size:14px!important } .es-infoblock p, .es-infoblock a { font-size:12px!important } .es-m-txt-c, .es-m-txt-c h1, .es-m-txt-c h2, .es-m-txt-c h3, .es-m-txt-c h4, .es-m-txt-c h5, .es-m-txt-c h6 { text-align:center!important } .es-m-txt-r, .es-m-txt-r h1, .es-m-txt-r h2, .es-m-txt-r h3, .es-m-txt-r h4, .es-m-txt-r h5, .es-m-txt-r h6 { text-align:right!important } .es-m-txt-j, .es-m-txt-j h1, .es-m-txt-j h2, .es-m-txt-j h3, .es-m-txt-j h4, .es-m-txt-j h5, .es-m-txt-j h6 { text-align:justify!important } .es-m-txt-l, .es-m-txt-l h1, .es-m-txt-l h2, .es-m-txt-l h3, .es-m-txt-l h4, .es-m-txt-l h5, .es-m-txt-l h6 { text-align:left!important } .es-m-txt-r img, .es-m-txt-c img, .es-m-txt-l img { display:inline!important } .es-m-txt-r .rollover:hover .rollover-second, .es-m-txt-c .rollover:hover .rollover-second, .es-m-txt-l .rollover:hover .rollover-second { display:inline!important } .es-m-txt-r .rollover span, .es-m-txt-c .rollover span, .es-m-txt-l .rollover span { line-height:0!important; font-size:0!important; display:block } .es-spacer { display:inline-table } a.es-button, button.es-button { font-size:18px!important; padding:10px 20px 10px 20px!important; line-height:120%!important } a.es-button, button.es-button, .es-button-border { display:inline-block!important } .es-m-fw, .es-m-fw.es-fw, .es-m-fw .es-button { display:block!important } .es-m-il, .es-m-il .es-button, .es-social, .es-social td, .es-menu { display:inline-block!important } .es-adaptive table, .es-left, .es-right { width:100%!important } .es-content table, .es-header table, .es-footer table, .es-content, .es-footer, .es-header { width:100%!important; max-width:600px!important } .adapt-img { width:100%!important; height:auto!important } .es-mobile-hidden, .es-hidden { display:none!important } .es-desk-hidden { width:auto!important; overflow:visible!important; float:none!important; max-height:inherit!important; line-height:inherit!important } tr.es-desk-hidden { display:table-row!important } table.es-desk-hidden { display:table!important } td.es-desk-menu-hidden { display:table-cell!important } .es-menu td { width:1%!important } table.es-table-not-adapt, .esd-block-html table { width:auto!important } .h-auto { height:auto!important } }
-@media screen and (max-width:384px) {.mail-message-content { width:414px!important } }
-</style>
-            <body class="body" style="width:100%;height:100%;padding:0;Margin:0">
-  <div dir="ltr" class="es-wrapper-color" lang="en" style="background-color:#F6F6F6">
-		
+      html:   `  
 
-       <table cellspacing="0" cellpadding="0" align="center" class="es-content" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
-         <tr>
-          <td align="center" style="padding:0;Margin:0">
-           <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="es-content-body" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
-             <tr class="es-visible-simple-html-only">
-              <td align="left" class="es-struct-html" style="padding:0;Margin:0;padding-right:20px;padding-left:20px;padding-top:45px">
-               <table cellspacing="0" align="left" cellpadding="0" class="es-left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
-                 <tr>
-                  <td align="left" class="es-m-p20b" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                     <tr>
-                      <td align="left" class="es-m-p0t" style="padding:0;Margin:0;padding-top:5px"><h2 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;
-                      font-weight:normal;line-height:28.8px;color:#333333">Chúng tôi nhận được yêu cầu hủy dịch vụ của bạn</h2></td>
-                     </tr>
-                     <tr>
-                      <td align="left" style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px">
-                      <p style="Margin:0;mso-line-height-rule:exactly;font-family:arial,
-                       'helvetica neue', helvetica, 
-                       sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Thông tin dịch vụ</p></td>
-                     </tr>
-                   </table></td>
-                 </tr>
-                 <tr>
-                  <td align="left" class="es-m-p20b" style="padding:0;Margin:0;padding-bottom:10px;width:560px">
-                   <table width="100%" cellpadding="0" cellspacing="0" class="es-table-not-adapt" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                     <tr>
-                      <td valign="top" align="left" style="padding:0;Margin:0;width:30px;font-size:0px"><img alt="" src="https://fnwoxnh.stripocdn.email/content/guids/CABINET_df7d769760b2358dc7694fb849eba358f3dda2b7ba9f6642c52218e0885a1f59/images/546322344.png" width="20" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></td>
-                      <td align="left" style="padding:0;Margin:0">
-                       <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                         <tr>
-                          <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica,
-                           sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">${serviceDetails.service_name}</p></td>
-                         </tr>
-                       </table></td>
-                     </tr>
-                   </table></td>
-                 </tr>
-          
-                 <tr>
-                  <td align="left" class="es-m-p20b" style="padding:0;Margin:0;padding-bottom:10px;width:560px">
-                   <table width="100%" cellpadding="0" cellspacing="0" class="es-table-not-adapt" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                     <tr>
-                      <td align="left" valign="top" style="padding:0;Margin:0;width:30px;font-size:0px"><img alt="" src="https://fnwoxnh.stripocdn.email/content/guids/CABINET_df7d769760b2358dc7694fb849eba358f3dda2b7ba9f6642c52218e0885a1f59/images/546322344.png" width="20" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></td>
-                      <td align="left" style="padding:0;Margin:0">
-                       <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                         <tr>
-                          <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial,
-                           'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi.</p></td>
-                         </tr>
-                       </table></td>
-                     </tr>
-                   </table></td>
-                 </tr>
-               </table></td>
-             </tr>
-           </table></td>
-         </tr>
-       </table></td>
-     </tr>
-   </table>
+      <head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <!--[if !mso]>-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!--<![endif]-->
+  <meta name="x-apple-disable-message-reformatting" content="" />
+  <meta content="target-densitydpi=device-dpi" name="viewport" />
+  <meta content="true" name="HandheldFriendly" />
+  <meta content="width=device-width" name="viewport" />
+  <meta
+    name="format-detection"
+    content="telephone=no, date=no, address=no, email=no, url=no"
+  />
+  <style type="text/css">
+    table {
+      border-collapse: separate;
+      table-layout: fixed;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    table td {
+      border-collapse: collapse;
+    }
+    .ExternalClass {
+      width: 100%;
+    }
+    .ExternalClass,
+    .ExternalClass p,
+    .ExternalClass span,
+    .ExternalClass font,
+    .ExternalClass td,
+    .ExternalClass div {
+      line-height: 100%;
+    }
+    .gmail-mobile-forced-width {
+      display: none;
+      display: none !important;
+    }
+    body,
+    a,
+    li,
+    p,
+    h1,
+    h2,
+    h3 {
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+    html {
+      -webkit-text-size-adjust: none !important;
+    }
+    body,
+    #innerTable {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    #innerTable img + div {
+      display: none;
+      display: none !important;
+    }
+    img {
+      margin: 0;
+      padding: 0;
+      -ms-interpolation-mode: bicubic;
+    }
+    h1,
+    h2,
+    h3,
+    p,
+    a {
+      line-height: inherit;
+      overflow-wrap: normal;
+      white-space: normal;
+      word-break: break-word;
+    }
+    a {
+      text-decoration: none;
+    }
+    h1,
+    h2,
+    h3,
+    p {
+      min-width: 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      display: inline-block !important;
+      border: 0;
+      padding: 0;
+      margin: 0;
+    }
+    a[x-apple-data-detectors] {
+      color: inherit !important;
+      text-decoration: none !important;
+      font-size: inherit !important;
+      font-family: inherit !important;
+      font-weight: inherit !important;
+      line-height: inherit !important;
+    }
+    u + #body a {
+      color: inherit;
+      text-decoration: none;
+      font-size: inherit;
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+    a[href^="mailto"],
+    a[href^="tel"],
+    a[href^="sms"] {
+      color: inherit;
+      text-decoration: none;
+    }
+  </style>
+  <style type="text/css">
+    @media (min-width: 481px) {
+      .hd {
+        display: none !important;
+      }
+    }
+  </style>
+  <style type="text/css">
+    @media (max-width: 480px) {
+      .hm {
+        display: none !important;
+      }
+    }
+  </style>
+  <style type="text/css">
+    @media (max-width: 480px) {
+      .t29,
+      .t32,
+      .t5,
+      .t9 {
+        width: 398px !important;
+      }
+      .t31,
+      .t34 {
+        mso-line-height-alt: 0px !important;
+        line-height: 0 !important;
+        display: none !important;
+      }
+      .t32 {
+        padding: 40px !important;
+        border-radius: 0 !important;
+      }
+      .t24 {
+        text-align: left !important;
+      }
+      .t17 {
+        display: revert !important;
+      }
+      .t19,
+      .t23 {
+        vertical-align: top !important;
+        width: auto !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+  <style type="text/css">
+    @media (max-width: 480px) {
+      [class~="x_t31"] {
+        mso-line-height-alt: 0px !important;
+        line-height: 0px !important;
+        display: none !important;
+      }
+      [class~="x_t34"] {
+        mso-line-height-alt: 0px !important;
+        line-height: 0px !important;
+        display: none !important;
+      }
+      [class~="x_t32"] {
+        padding-left: 40px !important;
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+        padding-right: 40px !important;
+        border-top-left-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        border-bottom-right-radius: 0px !important;
+        border-bottom-left-radius: 0px !important;
+        width: 398px !important;
+      }
+      [class~="x_t5"] {
+        width: 398px !important;
+      }
+      [class~="x_t9"] {
+        width: 398px !important;
+      }
+      [class~="x_t29"] {
+        width: 398px !important;
+      }
+      [class~="x_t24"] {
+        text-align: left !important;
+      }
+      [class~="x_t17"] {
+        display: revert !important;
+      }
+      [class~="x_t19"] {
+        vertical-align: top !important;
+        width: auto !important;
+        max-width: 100% !important;
+      }
+      [class~="x_t23"] {
+        vertical-align: top !important;
+        width: auto !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+  <!--[if !mso]>-->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&amp;family=Sofia+Sans:wght@700&amp;family=Open+Sans:wght@400;500;600&amp;display=swap"
+    rel="stylesheet"
+    type="text/css"
+  />
+  <!--<![endif]-->
+  <!--[if mso]>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:AllowPNG />
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  <![endif]-->
+</head>
+        <body
+  id="body"
+  class="t37"
+  style="
+    min-width: 100%;
+    margin: 0px;
+    padding: 0px;
+    background-color: #ffffff;
+  "
+>
+  <div class="t36" style="background-color: #ffffff">
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      align="center"
+    >
+      <tr>
+        <td
+          class="t35"
+          style="
+            font-size: 0;
+            line-height: 0;
+            mso-line-height-rule: exactly;
+            background-color: #ffffff;
+          "
+          valign="top"
+          align="center"
+        >
+          <!--[if mso]>
+            <v:background
+              xmlns:v="urn:schemas-microsoft-com:vml"
+              fill="true"
+              stroke="false"
+            >
+              <v:fill color="#FFFFFF" />
+            </v:background>
+          <![endif]-->
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            align="center"
+            id="innerTable"
+          >
+            <tr>
+              <td>
+                <div
+                  class="t31"
+                  style="
+                    mso-line-height-rule: exactly;
+                    mso-line-height-alt: 50px;
+                    line-height: 50px;
+                    font-size: 1px;
+                    display: block;
+                  "
+                >
+                  &nbsp;&nbsp;
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <table
+                  class="t33"
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="margin-left: auto; margin-right: auto"
+                >
+                  <tr>
+                    <!--[if mso]>
+<td width="600" class="t32" style="background-color:#FFFFFF;border:1px solid #EBEBEB;overflow:hidden;padding:44px 42px 32px 42px;border-radius:3px 3px 3px 3px;">
+<![endif]-->
+                    <!--[if !mso]>-->
+                    <td
+                      class="t32"
+                      style="
+                        background-color: #ffffff;
+                        border: 1px solid #ebebeb;
+                        overflow: hidden;
+                        width: 514px;
+                        padding: 44px 42px 32px 42px;
+                        border-radius: 3px 3px 3px 3px;
+                      "
+                    >
+                      <!--<![endif]-->
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        style="width: 100% !important"
+                      >
+                        <tr>
+                          <td align="left">
+                            <table
+                              class="t2"
+                              role="presentation"
+                              cellpadding="0"
+                              cellspacing="0"
+                              style="margin-right: auto"
+                            >
+                              <tr>
+                                <!--[if mso]>
+<td width="42" class="t1">
+<![endif]-->
+                                <!--[if !mso]>-->
+                                <td class="t1" style="width: 42px">
+                                  <!--<![endif]-->
+                                  <div style="font-size: 0px">
+                                    <img
+                                      class="t0"
+                                      style="
+                                        display: block;
+                                        border: 0;
+                                        height: auto;
+                                        width: 100%;
+                                        margin: 0;
+                                        max-width: 100%;
+                                      "
+                                      width="42"
+                                      height="42"
+                                     src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=c0403c39-cf96-4a4f-8a0d-6884fcbe0bd6"
+                                          alt="Logo"
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div
+                              class="t3"
+                              style="
+                                mso-line-height-rule: exactly;
+                                mso-line-height-alt: 42px;
+                                line-height: 42px;
+                                font-size: 1px;
+                                display: block;
+                              "
+                            >
+                              &nbsp;&nbsp;
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center">
+                            <table
+                              class="t6"
+                              role="presentation"
+                              cellpadding="0"
+                              cellspacing="0"
+                              style="margin-left: auto; margin-right: auto"
+                            >
+                              <tr>
+                                <!--[if mso]>
+<td width="514" class="t5" style="border-bottom:1px solid #EFF1F4;padding:0 0 18px 0;">
+<![endif]-->
+                                <!--[if !mso]>-->
+                                <td
+                                  class="t5"
+                                  style="
+                                    border-bottom: 1px solid #eff1f4;
+                                    width: 514px;
+                                    padding: 0 0 18px 0;
+                                  "
+                                >
+                                  <!--<![endif]-->
+                                  <h1
+                                    class="t4"
+                                    style="
+                                      margin: 0;
+                                      margin: 0;
+                                      font-family: Montserrat,
+                                        BlinkMacSystemFont, Segoe UI,
+                                        Helvetica Neue, Arial, sans-serif;
+                                      line-height: 28px;
+                                      font-weight: 700;
+                                      font-style: normal;
+                                      font-size: 24px;
+                                      text-decoration: none;
+                                      text-transform: none;
+                                      letter-spacing: -1px;
+                                      direction: ltr;
+                                      color: #141414;
+                                      text-align: left;
+                                      mso-line-height-rule: exactly;
+                                      mso-text-raise: 1px;
+                                    "
+                                  >
+                                 ${serviceDetails.service_name}
+                                  </h1>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div
+                              class="t7"
+                              style="
+                                mso-line-height-rule: exactly;
+                                mso-line-height-alt: 18px;
+                                line-height: 18px;
+                                font-size: 1px;
+                                display: block;
+                              "
+                            >
+                              &nbsp;&nbsp;
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center">
+                            <table
+                              class="t10"
+                              role="presentation"
+                              cellpadding="0"
+                              cellspacing="0"
+                              style="margin-left: auto; margin-right: auto"
+                            >
+                              <tr>
+                                <!--[if mso]>
+<td width="514" class="t9">
+<![endif]-->
+                                <!--[if !mso]>-->
+                                <td class="t9" style="width: 514px">
+                                  <!--<![endif]-->
+                                  <p
+                                    class="t8"
+                                    style="
+                                      margin: 0;
+                                      margin: 0;
+                                      font-family: Open Sans,
+                                        BlinkMacSystemFont, Segoe UI,
+                                        Helvetica Neue, Arial, sans-serif;
+                                      line-height: 25px;
+                                      font-weight: 400;
+                                      font-style: normal;
+                                      font-size: 15px;
+                                      text-decoration: none;
+                                      text-transform: none;
+                                      letter-spacing: -0.1px;
+                                      direction: ltr;
+                                      color: #141414;
+                                      text-align: left;
+                                      mso-line-height-rule: exactly;
+                                      mso-text-raise: 3px;
+                                    "
+                                  >
+                               ${customerSelect.customerReson}
+                                  </p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div
+                              class="t12"
+                              style="
+                                mso-line-height-rule: exactly;
+                                mso-line-height-alt: 24px;
+                                line-height: 24px;
+                                font-size: 1px;
+                                display: block;
+                              "
+                            >
+                              &nbsp;&nbsp;
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="left">
+                            <table
+                              class="t14"
+                              role="presentation"
+                              cellpadding="0"
+                              cellspacing="0"
+                              style="margin-right: auto"
+                            >
+                              <tr>
+                                <!--[if mso]>
+<td class="t13" style="background-color:#0666EB;overflow:hidden;text-align:center;line-height:34px;mso-line-height-rule:exactly;mso-text-raise:5px;padding:0 23px 0 23px;border-radius:40px 40px 40px 40px;">
+<![endif]-->
+                                <!--[if !mso]>-->
+                                <td
+                                  class="t13"
+                                  style="
+                                    background-color: #0666eb;
+                                    overflow: hidden;
+                                    width: auto;
+                                    text-align: center;
+                                    line-height: 34px;
+                                    mso-line-height-rule: exactly;
+                                    mso-text-raise: 5px;
+                                    padding: 0 23px 0 23px;
+                                    border-radius: 40px 40px 40px 40px;
+                                  "
+                                >
+                                  <!--<![endif]-->
+                                  <span
+                                    class="t11"
+                                    style="
+                                      display: block;
+                                      margin: 0;
+                                      margin: 0;
+                                      font-family: Sofia Sans,
+                                        BlinkMacSystemFont, Segoe UI,
+                                        Helvetica Neue, Arial, sans-serif;
+                                      line-height: 34px;
+                                      font-weight: 700;
+                                      font-style: normal;
+                                      font-size: 16px;
+                                      text-decoration: none;
+                                      text-transform: none;
+                                      letter-spacing: -0.2px;
+                                      direction: ltr;
+                                      color: #ffffff;
+                                      text-align: center;
+                                      mso-line-height-rule: exactly;
+                                      mso-text-raise: 5px;
+                                    "
+                                    >Trở lại</span
+                                  >
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div
+                              class="t28"
+                              style="
+                                mso-line-height-rule: exactly;
+                                mso-line-height-alt: 40px;
+                                line-height: 40px;
+                                font-size: 1px;
+                                display: block;
+                              "
+                            >
+                              &nbsp;&nbsp;
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center">
+                            <table
+                              class="t30"
+                              role="presentation"
+                              cellpadding="0"
+                              cellspacing="0"
+                              style="margin-left: auto; margin-right: auto"
+                            >
+                              <tr>
+                                <!--[if mso]>
+<td width="514" class="t29" style="border-top:1px solid #DFE1E4;padding:24px 0 0 0;">
+<![endif]-->
+                                <!--[if !mso]>-->
+                                <td
+                                  class="t29"
+                                  style="
+                                    border-top: 1px solid #dfe1e4;
+                                    width: 514px;
+                                    padding: 24px 0 0 0;
+                                  "
+                                >
+                                  <!--<![endif]-->
+                                  <div
+                                    class="t27"
+                                    style="width: 100%; text-align: left"
+                                  >
+                                    <div
+                                      class="t26"
+                                      style="display: inline-block"
+                                    >
+                                      <table
+                                        class="t25"
+                                        role="presentation"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        align="left"
+                                        valign="top"
+                                      >
+                                        <tr class="t24">
+                                          <td></td>
+                                          <td class="t19" valign="top">
+                                            <table
+                                              role="presentation"
+                                              width="100%"
+                                              cellpadding="0"
+                                              cellspacing="0"
+                                              class="t18"
+                                              style="width: auto"
+                                            >
+                                              <tr>
+                                                <td
+                                                  class="t16"
+                                                  style="
+                                                    background-color: #ffffff;
+                                                    text-align: center;
+                                                    line-height: 20px;
+                                                    mso-line-height-rule: exactly;
+                                                    mso-text-raise: 2px;
+                                                  "
+                                                >
+                                                  <span
+                                                    class="t15"
+                                                    style="
+                                                      display: block;
+                                                      margin: 0;
+                                                      margin: 0;
+                                                      font-family: Open Sans,
+                                                        BlinkMacSystemFont,
+                                                        Segoe UI,
+                                                        Helvetica Neue, Arial,
+                                                        sans-serif;
+                                                      line-height: 20px;
+                                                      font-weight: 600;
+                                                      font-style: normal;
+                                                      font-size: 14px;
+                                                      text-decoration: none;
+                                                      direction: ltr;
+                                                      color: #222222;
+                                                      text-align: center;
+                                                      mso-line-height-rule: exactly;
+                                                      mso-text-raise: 2px;
+                                                    "
+                                                    >E-com</span
+                                                  >
+                                                </td>
+                                                <td
+                                                  class="t17"
+                                                  style="width: 20px"
+                                                  width="20"
+                                                ></td>
+                                              </tr>
+                                            </table>
+                                          </td>
+                                          <td class="t23" valign="top">
+                                            <table
+                                              role="presentation"
+                                              width="100%"
+                                              cellpadding="0"
+                                              cellspacing="0"
+                                              class="t22"
+                                              style="width: auto"
+                                            >
+                                              <tr>
+                                                <td
+                                                  class="t21"
+                                                  style="
+                                                    background-color: #ffffff;
+                                                    text-align: center;
+                                                    line-height: 20px;
+                                                    mso-line-height-rule: exactly;
+                                                    mso-text-raise: 2px;
+                                                  "
+                                                >
+                                                  <span
+                                                    class="t20"
+                                                    style="
+                                                      display: block;
+                                                      margin: 0;
+                                                      margin: 0;
+                                                      font-family: Open Sans,
+                                                        BlinkMacSystemFont,
+                                                        Segoe UI,
+                                                        Helvetica Neue, Arial,
+                                                        sans-serif;
+                                                      line-height: 20px;
+                                                      font-weight: 500;
+                                                      font-style: normal;
+                                                      font-size: 14px;
+                                                      text-decoration: none;
+                                                      direction: ltr;
+                                                      color: #b4becc;
+                                                      text-align: center;
+                                                      mso-line-height-rule: exactly;
+                                                      mso-text-raise: 2px;
+                                                    "
+                                                    ><a hreft="http://localhost:3150/auction">Tiếp tục mua sắm</a></span
+                                                  >
+                                                </td>
+                                              </tr>
+                                            </table>
+                                          </td>
+                                          <td></td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  class="t34"
+                  style="
+                    mso-line-height-rule: exactly;
+                    mso-line-height-alt: 50px;
+                    line-height: 50px;
+                    font-size: 1px;
+                    display: block;
+                  "
+                >
+                  &nbsp;&nbsp;
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </div>
- </body>
-          `,
+  <div
+    class="gmail-mobile-forced-width"
+    style="white-space: nowrap; font: 15px courier; line-height: 0"
+  >
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  </div>
+</body>
+
+        `,
     };
 
     await transporter.sendMail(mailOptions);

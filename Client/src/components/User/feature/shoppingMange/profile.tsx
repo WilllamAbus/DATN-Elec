@@ -335,6 +335,7 @@ import UpdatePassword from "./changePassword";
 import CountrySelector from "./address";
 import OrderList from "./order";
 import OrderAuct from "./orderAuctStatus";
+import ListBid from "./listBidding";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
@@ -351,6 +352,7 @@ const ProfileUse: React.FC = () => {
     | "address"
     | "password"
     | "watchlist"
+    | "listBid"
   >("info");
 
   const profile = useAppSelector(
@@ -394,7 +396,8 @@ const ProfileUse: React.FC = () => {
       | "edit"
       | "address"
       | "password"
-      | "watchlist";
+      | "watchlist"
+   | "listBid"
   }) => (
     <li>
       <button
@@ -435,7 +438,7 @@ const ProfileUse: React.FC = () => {
         {item === "watchlist" && (
           <>
             <i className="iconify mdi--heart w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
-            <span className="ms-3">Yếu thích</span>
+            <span className="ms-3">Yêu thích</span>
           </>
         )}
         {item === "order" && (
@@ -450,7 +453,13 @@ const ProfileUse: React.FC = () => {
             <span className="ms-3"> Đơn hàng đấu giá</span>
           </>
         )}
-      </button>
+            {item === "listBid" && (
+          <>
+            <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Lịch sử lệnh đấu giá</span>
+          </>
+        )}
+        </button>
     </li>
   );
 
@@ -500,6 +509,7 @@ const ProfileUse: React.FC = () => {
                   "watchlist",
                   "order",
                   "orderAuct",
+             "listBid"
                 ].map((item) => (
                   <MenuItem
                     key={item}
@@ -507,11 +517,14 @@ const ProfileUse: React.FC = () => {
                       item as
                         | "order"
                         | "orderAuct"
+                        | "listBid"
+                     
                         | "info"
                         | "edit"
                         | "address"
                         | "password"
                         | "watchlist"
+                    
                     }
                   />
                 ))}
@@ -543,6 +556,7 @@ const ProfileUse: React.FC = () => {
             {view === "watchlist" && <Watchlist profiles={profile} />}
             {view === "order" && <OrderList />}
             {view === "orderAuct" && <OrderAuct />}
+            {view === "listBid" && <ListBid />}
           </section>
         </div>
       </div>
@@ -591,6 +605,7 @@ const ProfileUse: React.FC = () => {
                         | "watchlist"
                         | "order"
                         | "orderAuct"
+                          | "listBid"
                     }
                   />
                 ))}

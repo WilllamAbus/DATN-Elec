@@ -61,7 +61,7 @@ const EditModal: React.FC<EditModalProps> = ({ productId, bid, onClose }) => {
 
     const minBid = currentBid.minBid; // Use currentBid to avoid naming conflict
     const maxBid = minBid * 1.07; // 7% above minBid
-    const validBids = [minBid, minBid * 1.03, minBid * 1.06]; // Backend-specific valid bids
+    const validBids = [minBid, minBid * 1.03, minBid * 1.07]; // Backend-specific valid bids
     const isValidBid = finalBidAmount >= minBid &&
       finalBidAmount <= maxBid && validBids.includes(finalBidAmount);
 

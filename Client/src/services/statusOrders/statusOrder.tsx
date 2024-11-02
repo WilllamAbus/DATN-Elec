@@ -6,6 +6,7 @@ import { ApiResponseReceve } from '../../types/iterationOrder/reciveStatusOrder'
 import { ApiResponseComplete } from '../../types/iterationOrder/completeStatusOrder';
 import { ApiResponsePending } from '../../types/iterationOrder/pendingStatusOrder';
 import { ApiResponseConfirmed } from '../../types/iterationOrder/confirmedStatusOrder';
+import { DeleteOrderItearacRequest, SoftDeleteOrderData } from '../../types/iterationOrder/softDeleteForUser';
 export const shippingStatusOrder = async (userId: string): Promise<ApiResponseShipping> => {
   try {
     const response = await axios.get('client/iteracOder/shippStateOrderAuc', {
@@ -89,3 +90,26 @@ export const softDelOrderUser = async (orderId: string) => {
 };
 
 
+
+
+
+
+export const deleteOrderSoftMail = async ({
+  userId,
+  orderId,
+  serviceRequestId,
+  reason,
+  notes,
+}: DeleteOrderItearacRequest): Promise<SoftDeleteOrderData> => {
+  const response = await axios.post(`client/orderAuc/softOrderByUserEmail`, {
+    userId,
+    orderId,
+    serviceRequestId,
+    reason,
+    notes,
+  });
+  console.log('response.data.result',response.data.result);
+  return response.data.result as SoftDeleteOrderData;
+ 
+   // Return typed result
+};

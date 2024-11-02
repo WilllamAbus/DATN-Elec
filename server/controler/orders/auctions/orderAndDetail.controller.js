@@ -1,5 +1,5 @@
 const orderService = require("../../../services/orders/orderHq/ordersAndDetails.service");
-
+const deleOrderService = require("../../../services/orders/orderHq/relationSoftDelOrder/deletedOrderIterUser");
 
 const orderAndDetailControler = {
     createOrder : async (req, res) => {
@@ -154,24 +154,56 @@ const orderAndDetailControler = {
         }
     },
     getAllOrders: async (req, res) => {
-      const { search } = req.query; // Lấy từ query string
-      const page = parseInt(req.query.page) || 1; // Trang mặc định là 1
-      const limit = parseInt(req.query.limit) || 5; // Giới hạn mặc định là 5
-
-      const result = await orderService.getAllOrders(search, page, limit);
-
-      if (result.success) {
-          return res.status(200).json({
-            status: 200 ,
-            data: {
-              success: true,
-              data: result.data, // Ensure you're sending back the orders and pagination details
-            },
-          });
-      } else {
-          return res.status(500).json({ success: false, message: result.message });
+      try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 5;
+        const search = req.query.search   
+   || '';
+  
+        const { ordersDeleted, totalPages, currentPage } = await orderService.getAllOrders(page, pageSize, search);
+  
+        return res.status(200).json({
+          status: 200,
+          message: 'Lấy danh sách đơn hàng  thành công',
+          data: {
+            ordersDeleted,
+            totalPages,
+            currentPage,
+          },
+        });
+      } catch (error) {
+        return res.status(500).json({
+          status: 500,
+          message: 'Lỗi server: ' + error.message,
+        });
       }
   },
+
+  getDeletedOrders : async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 5;
+      const search = req.query.search   
+ || '';
+
+      const { ordersDeleted, totalPages, currentPage } = await orderService.getDeletedOrders(page, pageSize, search);
+
+      return res.status(200).json({
+        status: 200,
+        message: 'Lấy danh sách đơn hàng đã xóa thành công',
+        data: {
+          ordersDeleted,
+          totalPages,
+          currentPage,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        message: 'Lỗi server: ' + error.message,
+      });
+    }
+},
       getOrderById : async (req, res) => {
         try {
           const { id } = req.params;
@@ -208,25 +240,7 @@ const orderAndDetailControler = {
         }
       },
 
-      getDeletedOrders : async (req, res) => {
-        try {
-            const { page, limit } = req.query; // Lấy số trang và giới hạn từ query params
-            const paginationResult = await orderService.getDeletedOrders(page, limit );
-    
-            res.status(200).json({
-              success: true,
-              data: paginationResult.orders,
-              pagination: {
-                totalOrders: paginationResult.totalOrders,
-                totalPages: paginationResult.totalPages,
-                currentPage: paginationResult.currentPage,
-              },
-
-            }); // Trả về kết quả phân trang
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    },
+ 
 
       searchOrdersByPhoneNumber : async (req, res) => {
          // Get page and limit from query params
@@ -247,6 +261,33 @@ const orderAndDetailControler = {
             success: false,
             message: error.message,
           });
+        }
+      },
+
+
+      deleteOrderAndByUser: async (req, res) => {
+        try {
+          // Extracting parameters from the request body
+          const { userId, orderId,serviceRequestId, reason, notes } = req.body;
+        
+          if (!orderId) {
+            return res.status(400).json({ error: "Order ID is required." });
+          }
+        
+          // Proceed with your logic using orderId
+      
+          
+          // Validate required fields
+        
+          // Handle the auction deletion and service logging
+          const result = await deleOrderService.handleAuctionDeletion(userId, orderId,serviceRequestId, reason, notes);
+
+          
+          // Respond with success and result
+          res.status(200).json({ success: true,  result });
+        } catch (error) {
+          // Respond with error message
+          res.status(500).json({ success: false, message: error.message });
         }
       }
 

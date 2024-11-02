@@ -37,11 +37,10 @@ const OrderListAuc: React.FC = () => {
 
   // Update local orders state when orders from store change
   useEffect(() => {
-    if (ordersFromStore && ordersFromStore.length > 0) {
-   
+    if (Array.isArray(ordersFromStore) && ordersFromStore.length > 0) {
       setOrders(ordersFromStore);
     } else {
-      setOrders([]); // Đảm bảo orders được cập nhật lại khi không có dữ liệu
+      setOrders([]);
     }
   }, [ordersFromStore]);
   // useEffect(() => {
@@ -59,7 +58,7 @@ const OrderListAuc: React.FC = () => {
       {orders.length > 0 ? (
         // Lọc chỉ đơn hàng có trạng thái "Chờ giao hàng"
         orders
-          .filter((order) => order.stateOrder === 'Chờ giao hàng')
+          .filter((order) => order?.stateOrder === 'Chờ giao hàng')
           .map((order: OrderDataAll, index: number) => (
             <div key={index} className="order-item mb-6 px-4 md:px-11">
               <div className="flex flex-col md:flex-row items-center justify-between mb-6">

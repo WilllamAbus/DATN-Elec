@@ -7,7 +7,7 @@ import {
   deleteWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
 import { fetchProductByTimeTrack } from "../../../../../redux/timeTrackProduct/timeTrackProdThunk";
-import { ProductAttribute, ProductDetails, ProductImage, ProductResponse } from "../../../../../types/timeTrackProduct/timeTrackProduct";
+import { ProductDetails, ProductImage, ProductResponse } from "../../../../../types/timeTrackProduct/timeTrackProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -24,7 +24,7 @@ interface ProductDetailsProps {
     // Dữ liệu người dùng
   }
 
-const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
+// const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -75,7 +75,7 @@ function formatCurrency(value: number) {
 const AuctDetail: React.FC<ProductDetailsProps> = () => {
     const [currentTime, setCurrentTime] = useState<string>('');
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>({});
+    // const [, setSelectedValues] = useState<Record<string, string | null>>({});
     const { productId } = useParams<{ productId: string }>();
     const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
     const dispatch = useDispatch<AppDispatch>();
@@ -87,12 +87,12 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
     const profile = useAppSelector(
       (state: RootState) => state.auth.profile.profile
     );
-    const handleChange = (attributeKey: string, value: string) => {
-      setSelectedValues((prev) => ({
-        ...prev,
-        [attributeKey]: value,
-      }));
-    };
+    // const handleChange = (attributeKey: string, value: string) => {
+    //   setSelectedValues((prev) => ({
+    //     ...prev,
+    //     [attributeKey]: value,
+    //   }));
+    // };
   
     const handleAddToWatchlist = async () => {
       if (userId && productId) {
@@ -160,7 +160,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
     
     useEffect(() => {
       if (productId) {
-        console.log('productId:', productId);
+   
         dispatch(fetchProductByTimeTrack(productId))
           .unwrap()
           .then((data: ProductResponse) => {
@@ -359,42 +359,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
           <div className="pt-2">
             {/* <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">Các phiên bản</h3> */}
             <div className="flex flex-wrap gap-2">
-            {product. productAttributes.length ? (
-  product?.productAttributes
-    .filter((attribute: ProductAttribute) => ["Ram", "Color"].includes(attribute.key))
-    .map((attribute: ProductAttribute, index: number) => (
-      <div key={index} className="flex flex-col gap-1">
-        <strong className="text-gray-800">{attribute.key}:</strong>
-        <div className="flex flex-wrap gap-2">
-          {attribute.value.split(",").map((value, i) => (
-            <div key={i} className="flex items-center">
-              <input
-                type="radio"
-                id={`${attribute.key}-${i}`}
-                name={attribute.key}
-                value={value.trim()}
-                checked={selectedValues[attribute.key] === value.trim()}
-                onChange={() => handleChange(attribute.key, value.trim())}
-                className="hidden"
-              />
-              <label
-                htmlFor={`${attribute.key}-${i}`}
-                className={`border rounded-sm h-8 w-32 flex items-center justify-center cursor-pointer text-gray-600 ${
-                  selectedValues[attribute.key] === value.trim()
-                    ? "border-blue-500"
-                    : "border-gray-300"
-                }`}
-              >
-                {value.trim()}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-    ))
-) : (
-  <p>Không có thông tin</p>
-)}
+
 
             </div>
           </div>
@@ -427,16 +392,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            {product. productAttributes
-              .filter((attribute: ProductAttribute) =>
-                attributesToShow.includes(attribute.key)
-              )
-              .map((attribute: ProductAttribute, index: number) => (
-                <li key={index} className="mb-1">
-                  <strong>{attribute.key}: </strong>
-                  <span>{attribute.value}</span>
-                </li>
-              ))}
+         
             <li>
               <strong>Khối lượng:</strong> <span>{product.weight_g} g</span>
             </li>

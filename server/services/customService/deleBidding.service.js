@@ -59,9 +59,17 @@ const deleBidingService = {
           // Lấy thông tin người dùng và dịch vụ
           const userEmail = await getUserAndService.getUserEmailById(userId);
           const serviceDetails = await getUserAndService.getServiceDetailsById(serviceRequestId); // Dịch vụ có thể là đấu giá hoặc dịch vụ liên quan
-        
+          const customerRef = await CustomerService.findOne({
+            assignedAgent:userId,
+            status: { $ne: "disable" },
+        }).lean()
+    const customerSelect = {
+        customerId: customerRef._id,
+         customerReson:  customerRef.reason,
+         cutomerNotes: customerRef.notes 
+    }
           // Gửi email xác nhận hủy dịch vụ
-          await sendDeletionConfirmationEmail(userEmail, serviceDetails);
+          await sendDeletionConfirmationEmail(userEmail, serviceDetails, customerSelect);
           const notificationMessage = `Yêu cầu hủy dịch vụ của bạn đối với dịch vụ ${serviceDetails.name} đã được xử lý.`;
           const newNotification = new Notification({
             user: userId,

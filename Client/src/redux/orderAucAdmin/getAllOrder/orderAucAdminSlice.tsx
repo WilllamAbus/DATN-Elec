@@ -1,19 +1,14 @@
 import { createSlice,  PayloadAction } from '@reduxjs/toolkit';
 import {getOrders , getOrderAuctionDetailsAdmin } from './orderAucAdminThunk'; // Adjust path as necessary
-import { OrderResponse, Order,  } from '../../types/adminOrder/orderAll';
-import { OrderAuctionDetailsAdmin} from '../../types/adminOrder/orderDetailAdmin';
+import {  Order,  } from '../../../types/adminOrder/orderAll';
+import { OrderAuctionDetailsAdmin} from '../../../types/adminOrder/orderDetailAdmin';
 // Define the initial state type
 interface OrdersState {
   orders: Order[];
-  pagination: {
-    totalOrders: number;
-    totalPages: number;
-    currentPage: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  } | null;
-  confirmOrder: OrderAuctionDetailsAdmin | null;
 
+  confirmOrder: OrderAuctionDetailsAdmin | null;
+  totalPages: number;
+  currentPage: number;
   loading: boolean;
   error: string | null;
 }
@@ -21,13 +16,9 @@ interface OrdersState {
 // Define the initial state
 const initialState: OrdersState = {
   orders: [],
-  pagination: { 
-    totalOrders: 0,
-    totalPages: 0,
-    currentPage: 1,
-    hasNextPage: false,
-    hasPrevPage: false,
-  },
+
+  totalPages: 1,
+  currentPage: 1,
   confirmOrder: null,
   loading: false,
   error: null,
@@ -64,17 +55,14 @@ const orderAdminsSlice = createSlice({
       state.loading = true;
       state.error = null;
     })
-    .addCase(getOrders.fulfilled, (state, action: PayloadAction<OrderResponse>) => {
+    .addCase(getOrders.fulfilled, (state, action: PayloadAction<any>) => {
       state.loading = false;
    
-      state.orders = action.payload.orders;
-      state.pagination = {
-        totalOrders: action.payload.pagination.totalOrders,
-        totalPages: action.payload.pagination.totalPages,
-        currentPage: action.payload.pagination.currentPage,
-        hasNextPage: action.payload.pagination.hasNextPage,
-        hasPrevPage: action.payload.pagination.hasPrevPage,
-      };
+      state.orders = action.payload.data.ordersDeleted;
+   
+      
+      state.totalPages = action.payload.data.totalPages;
+      state.currentPage = action.payload.data.currentPage;
   
     })
     .addCase(getOrders.rejected, (state, action) => {

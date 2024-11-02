@@ -65,13 +65,13 @@ getAuctionDetails: async (req, res) => {
 
   try {
     const {productId} = req.query;
-
-    
-    // Validate input
   
 
-    // Get auction details from the service
+    
+
     const details = await autionService.getAuctionDetails(productId);
+
+    
     res.status(200).json({
       success:true,
         status: 201,

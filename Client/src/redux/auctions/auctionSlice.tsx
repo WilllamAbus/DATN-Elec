@@ -11,7 +11,7 @@ interface AuctionState {
 }
 
 const initialState: AuctionState = {
-  auction: null,
+  auction:null,
   isLoading: false,
   error: null,
 };
@@ -19,7 +19,14 @@ const initialState: AuctionState = {
 const auctionSlice = createSlice({
   name: 'auction',
   initialState,
-  reducers: {},
+  reducers: {
+    resetState: (state) => {
+      state.auction = null;
+      state.isLoading = false;
+      state.error = null;
+ 
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(completeAuction.pending, (state) => {
@@ -36,5 +43,5 @@ const auctionSlice = createSlice({
       });
   },
 });
-
+export const { resetState } = auctionSlice.actions;
 export default auctionSlice.reducer;

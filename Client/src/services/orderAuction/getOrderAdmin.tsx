@@ -1,21 +1,20 @@
 import axios from '../axios';
 // import { Order } from '../../types/adminOrder/orderAll';
 import { OrderDetailAdminResponse} from '../../types/adminOrder/orderDetailAdmin';
-
+import { OrderResponse} from '../../types/adminOrder/orderAll';
 // import  { AxiosResponse } from 'axios';
 // import {Order} from '../../types/adminOrder/orderUpdateStatus';
 
-export const getAllOrders = async (page: number, search: string,  ) => {
+export const getAllOrders = async (page: number, pageSize: number, search: string = '' ) => {
   try {
-    const queryParams = new URLSearchParams({ page: page.toString() });
+ 
 
-    // Append the search parameter if provided
-    if (search) {
-      queryParams.append("search", search);
-    }
-
-    const response = await axios.get('/client/orderAuc/getAll', {
-      params: queryParams,
+    const response = await axios.get<OrderResponse>('/client/orderAuc/getAll', {
+      params: {
+        page,
+        pageSize,
+        search,
+      },
     });
 
     

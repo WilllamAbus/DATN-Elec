@@ -7,7 +7,8 @@ export const fetchAuction = createAsyncThunk<AuctionData, string>(
   'auction/fetchAuctionData',
   async (productId: string) => {
     const data = await fetchAuctionData(productId);
-
+    console.log('auction', data);
+    
     return data;
   }
 );

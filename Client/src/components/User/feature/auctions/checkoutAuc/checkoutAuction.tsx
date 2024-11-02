@@ -19,10 +19,16 @@ const paymentService = new SanboxPayment(signatureService);
 const CheckoutPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
-  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId) ;
 
+  
+  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); ;
+  console.log('Bids: ', bids);
+  
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
+
+
+  
      // Access order data from `orderAuction`
   const loading = useSelector((state: RootState) => state.orderAuction.loading); // Use loading from `orderAuction`
   const navigate = useNavigate(); // Create navigate instance
@@ -114,6 +120,7 @@ const onSubmit = async (data: FormData) => {
   const totalPriceWithShipping = auctionData && auctionData.auctionTotal !== undefined
     ? auctionData.auctionTotal + shippingFee
     : shippingFee;
+
 
   return (
     <>

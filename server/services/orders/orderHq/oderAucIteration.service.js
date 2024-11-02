@@ -1,7 +1,7 @@
 const OrderAuction = require("../../../model/orders/auctionsOrders/aucOrders.model");
 const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrderDetail.model");
 
-const Product_v2 = require("../../../model/product_v2");
+const Product_v2 = require("../../../model/productAuction/productAuction");
 
 const Inventory = require("../../../model/inventory/inventory.model");
 const iteractionOrderAucService = {
@@ -300,7 +300,7 @@ const iteractionOrderAucService = {
    
       
       const orderIds = orders.map(order => order._id);
-      console.log('orderIds', orderIds);
+
       
       // Lấy chi tiết các đơn hàng theo orderIds
       const orderDetails = await OrderDetailAuction.find({
@@ -582,14 +582,14 @@ const iteractionOrderAucService = {
             const orderDetail = await OrderDetailAuction.find({order:orderIds}).lean()
             const inven  = orderDetail[0].productID
             const inventories =  await Inventory.findOne({
-              product_id: inven}).lean();
+              productAuction: inven}).lean();
       
             const invenSheld = inventories.quantityShelf + 1
 
           await Inventory.findOneAndUpdate(
               {
                 
-              product_id:inven
+                productAuction:inven
             },
            {$set:{
          
@@ -621,79 +621,43 @@ const iteractionOrderAucService = {
 
       updateOrderStatus : async (orderId, stateOrder) => {
         try {
-      
-          
-          const statusOrderFlow = ["Chờ xử lý", "Đã xác nhận","Vận chuyển", "Nhận hàng", "Hoàn tất"];
-          
+          const statusOrderFlow = ["Chờ giao hàng","Chờ xử lý", "Đã xác nhận", "Vận chuyển", "Nhận hàng", "Hoàn tất"];
+        
           // Tìm đơn hàng
           const order = await OrderAuction.findById(orderId);
-          if (!order) {
-      
-            throw new Error("Đơn hàng không tồn tại");
-          }
-     
-          
-          
-          // Nếu trạng thái hiện tại là "Hủy đơn hàng", không thể cập nhật nữa
-       
 
-          if (order.stateOrder === "Chờ xử lý" && 
-            stateOrder === "Chờ giao hàng" ||  stateOrder === "Vận chuyển" 
-            ||  stateOrder === "Nhận hàng" || stateOrder === "Hoàn tất") {
-            return  "Đơn hàng ở trạng thái 'Chờ xử lý ' không thể chuyển sang trạng thái 'Chờ giao hàng' hoặc 'Vận chuyển' ";
-       
+        
+          if (!order || order.status === 'disable') {
+            throw new Error("Đơn hàng không tồn tại hoặc đã bị vô hiệu hóa");
           }
-
-          if (order.stateOrder === "Đã xác nhận" && 
-            stateOrder === "Chờ xử lý" ||  stateOrder === "Nhận hàng"||  stateOrder === "Hoàn tất") {
-            return    "Đơn hàng ở trạng thái 'Đã xác nhận' không thể chuyển sang trạng thái 'Chờ xử lý' hoặc 'Nhận hàng' hoặc 'Hoàn tất' ";
-       
-          }
-
-          if (
-            order.stateOrder === "Vận chuyển" &&
-            (stateOrder === "Đã xác nhận" || stateOrder === "Chờ xử lý" || stateOrder === "Hoàn tất")
-          ) {
-            return   "Đơn hàng đang 'Vận chuyển' không thể chuyển về trạng thái 'Đã xác nhận' hoặc 'Chờ xử lý' hoặc 'Hoàn tất'.";
-          }
-
-          if (
-            order.stateOrder === "Nhận hàng" &&
-           stateOrder === "Vận chuyển" ||  stateOrder === "Đã xử lý" || stateOrder === "Chờ xác nhận"
-          ) {
-            return  "Đơn hàng ở trạng thái 'Nhận hàng' không thể chuyển sang trạng thái 'Vận chuyển'.";
-          }
-          if (
-            order.stateOrder === "Hoàn tất" &&
-            (stateOrder === "Chờ xử lý" ||stateOrder === "Đã xác nhận"
-               || stateOrder === "Vận chuyển" || stateOrder === "Nhận hàng" )
-          ) {
-            return  "Đơn hàng ở trạng thái 'Hoàn tất' không thể chuyển sang trạng thái khác."
-          }
-      
-    
-         
-         
-       
-          // Kiểm tra trạng thái mới có hợp lệ không
+        
+          // Kiểm tra trạng thái hiện tại
           const currentIndex = statusOrderFlow.indexOf(order.stateOrder);
           const newIndex = statusOrderFlow.indexOf(stateOrder);
-          
-       
-          
-          // Nếu trạng thái mới là "Hủy đơn hàng" hoặc là trạng thái tiếp theo hợp lệ
-          if (newIndex === statusOrderFlow.length - 1 || newIndex === currentIndex + 1) {
+        
+          // Nếu trạng thái hiện tại hoặc trạng thái mới không hợp lệ
+          if (currentIndex === -1 || newIndex === -1) {
+            throw new Error("Trạng thái hiện tại hoặc trạng thái mới không hợp lệ.");
+          }
+        
+          // Ngăn cản cập nhật khi đơn hàng đã "Hoàn tất"
+          if (order.stateOrder === "Hoàn tất") {
+            return { message: "Đơn hàng đã 'Hoàn tất' và không thể chuyển sang trạng thái khác." };
+          }
+        
+          // Ràng buộc chỉ có thể chuyển tới trạng thái tiếp theo
+          if (newIndex > currentIndex && newIndex === currentIndex + 1) {
             const updatedOrder = await OrderAuction.findOneAndUpdate(
               { _id: orderId },
-              { $set: { stateOrder: stateOrder } }, // Use $set to specify the field to update
-              { new: true, runValidators: true } // Options: return updated doc, run validation
+              { $set: { stateOrder: stateOrder } },
+              { new: true, runValidators: true }
             );
         
-         
+            console.log('updated order:', updatedOrder);
             return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
           } else {
             console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);
-            throw new Error("Trạng thái không hợp lệ.");
+            throw new Error("Không thể chuyển về trạng thái trước đó hoặc nhảy qua trạng thái.");
           }
         } catch (error) {
           console.error("Error updating order status:", error.message || "Lỗi cập nhật trạng thái đơn hàng.");

@@ -7,6 +7,7 @@ export const fetchAuctionData = async (productId: string): Promise<AuctionData> 
     params: { productId: productId }
   });
 
+console.log('response', response);
 
   
   return response.data.data;

@@ -35,6 +35,22 @@ const Order: React.FC = () => {
               Tất cả đơn hàng
             </li>
             <li
+              onClick={() => setView("pending")}
+              className={` text-lg leading-8 cursor-pointer text-indigo-600 transition-all duration-500 hover:text-indigo-700 ${
+                view === "list" ? "text-primary" : "text-gray-600"
+              }`}
+            >
+              Chờ xử lý
+            </li>
+            <li
+              onClick={() => setView("confirmed")}
+              className={` text-lg leading-8 cursor-pointer text-indigo-600 transition-all duration-500 hover:text-indigo-700 ${
+                view === "list" ? "text-primary" : "text-gray-600"
+              }`}
+            >
+              Đã xác nhận
+            </li>
+            <li
               onClick={() => setView("shipping")}
               className={` text-lg leading-8 cursor-pointer text-indigo-600 transition-all duration-500 hover:text-indigo-700 ${
                 view === "shipping" ? "text-primary" : "text-gray-600"

@@ -99,7 +99,8 @@ For what reason would it be advisable for me to think about business content? Th
                 <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
                     <tr>
                         <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
-                            <img src="https://img.icons8.com/carbon-copy/100/000000/checked-checkbox.png" width="125" height="120" style="display: block; border: 0px;" /><br>
+                            <img   src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=c0403c39-cf96-4a4f-8a0d-6884fcbe0bd6"
+              alt="Logo" width="125" height="120" style="display: block; border: 0px;" /><br>
                             <h2 style="font-size: 30px; font-weight: 800; line-height: 36px; color: #333333; margin: 0;">
                                THANH TOÁN CỦA QUÝ KHÁCH
                             </h2>
@@ -110,27 +111,27 @@ For what reason would it be advisable for me to think about business content? Th
                         <td align="left" style="padding-top: 20px;">
                             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
-                                    <td width="75%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
-                                       Xác thực thanh toán #
+                                    <td width="55%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                        Hình ảnh
                                     </td>
-                                   
-                                    <td width="25%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                       <td width="30%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                        Tên sản phẩm
+                                    </td>
+                                    <td width="15%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
                                         Số lượng
                                     </td>
                                    
                                 </tr>
+                                 
                                 <tr>
-                                    ${orderDetails.products
-                                      .map(
-                                        (product) => `
-     
-      
-       <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
-                                       ${product.name}
+                                  <td width="30%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+                                       <img src="${
+                                         orderDetails.productImage
+                                       }" alt="Auction Product" width="100" height="100"/>
                                     </td>
-     `
-                                      )
-                                      .join("")}
+                                     <td width="45%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                       ${orderDetails.name}
+                                    </td>
                                   
                                     <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
                                       ${orderDetails.quantityShopping}
@@ -147,7 +148,7 @@ For what reason would it be advisable for me to think about business content? Th
                             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
-                                        THANH TOÁN
+                                        Thanh toán
                                     </td>
                                     <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                           ${orderDetails.totalPrice.toLocaleString(
@@ -162,7 +163,7 @@ For what reason would it be advisable for me to think about business content? Th
 
                                  <tr>
                                     <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
-                                        SỐ ĐIỆN THOẠI 
+                                        Số điện thoại
                                     </td>
                                     <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                       ${orderDetails.shipping.sdt}
@@ -177,7 +178,7 @@ For what reason would it be advisable for me to think about business content? Th
                             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
                                     <td width="35%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
-                                           ĐỊA CHỈ
+                                           Địa chỉ
                                     </td>
                                     <td width="65%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
                                         ${orderDetails.shipping.address}
@@ -228,30 +229,3 @@ For what reason would it be advisable for me to think about business content? Th
     console.error("Error sending email:", error);
   }
 };
-
-// <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-
-// </td>
-
-// <tr>
-// <td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
-// <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
-//     <tr>
-//         <td align="center" valign="top" style="font-size:0;">
-//             <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
-
-//                 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
-//                     <tr>
-//                         <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
-//                             <p style="font-weight: 800;">Địa chỉ giao đến</p>
-
-//                         </td>
-//                     </tr>
-//                 </table>
-//             </div>
-
-//         </td>
-//     </tr>
-// </table>
-// </td>
-// </tr>

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../../redux/store";
 import { fetchBidsByUserThunk } from "../../../../redux/bidding/biddingThunk";
-import { completeAuction } from "../../../../redux/auctions/auctionThunk";
+import { completeAuction  } from "../../../../redux/auctions/auctionThunk";
+
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bid } from "../../../../types/bidding/bidding";
@@ -10,11 +12,14 @@ import { parseISO } from "date-fns";
 import EditModalPopUp from "./modalEditAmout";
 import DeleteBidModal from "./deleteBid";
 import BidGroup from "./bidGroup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
 
 const ViewBidPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+
+  // const aucttionData = useSelector((state: RootState) => state.auction.auction);
+
 
   
   const bids = useSelector((state: RootState) => state.bidding.bids) || [];
@@ -24,7 +29,7 @@ const ViewBidPage: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [bidToDelete, setBidToDelete] = useState<Bid | null>(null);
   const [stats, setStats] = useState<{ [key: string]: { averageBid: number, totalBids: number, totalPayment: number } }>({});
-  const [completedAuctionAmount, setCompletedAuctionAmount] = useState<number | null>(null); // Add state for completed auction amount
+  // const [completedAuctionAmount, setCompletedAuctionAmount] = useState<number | null>(null); // Add state for completed auction amount
 
   const navigate = useNavigate();
 
@@ -38,6 +43,7 @@ const ViewBidPage: React.FC = () => {
 
   useEffect(() => {
     if (userId) {
+
       dispatch(fetchBidsByUserThunk(userId));
     }
   }, [userId, dispatch]);
@@ -130,19 +136,28 @@ const ViewBidPage: React.FC = () => {
 
   const bidGroups = groupBidsByProduct();
 
-  const handleCompleteAuction = (productId: string, timeTrackID: string) => {
-    dispatch(completeAuction({ productId, timeTrackID }))
+  const handleCompleteAuction = async (productId: string, timeTrackID: string ) => {
+ 
+    dispatch( completeAuction({ productId, timeTrackID }))
       .then(() => {
         // Calculate and display the total amount for the completed auction
-        const averageAmount = bids.find(bid => bid._id === timeTrackID)?.amount || 0;
-        const totalAmount = averageAmount * 1; // Adjust this calculation as needed
-        setCompletedAuctionAmount(totalAmount); // Use the state variable to store the amount
-
-        // Show success toast
-        toast.success("Hoàn thành đấu giá");
-
-        // Navigate to a different route, e.g., the auction list page
-        navigate("/checkoutAuc");
+        // const averageAmount =  aucttionData?.auction_total 
+        // // console.log('auction', averageAmount);
+        
+        // if(averageAmount !== undefined){
+        //   const totalAmount = averageAmount * 1; // Adjust this calculation as needed
+     
+        
+        //   setCompletedAuctionAmount(totalAmount); // Use the state variable to store the amount
+      
+        //  // Show success toast
+     
+        // }
+        toast.success("Hoàn thành đấu giá", {
+          onClose: () => {
+            navigate("/checkoutAuc"); // Điều hướng sau khi toast hiển thị xong
+          },
+        });
       })
       .catch((error: any) => {
         // Show error toast if something goes wrong
@@ -156,7 +171,16 @@ const ViewBidPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
           <div className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16">
-            <h2 className="text-2xl font-bold text-gray-800">Lượt đấu giá</h2>
+        
+            <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-800">Lượt đấu giá</h2>
+          <Link to={'/profile'}
+           
+            className="bg-indigo-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition duration-200"
+          >
+         Lịch sử lệnh đấu giá
+          </Link>
+        </div>
             <hr className="border-gray-300 mt-4 mb-8" />
 
             <div className="space-y-8">
@@ -183,17 +207,17 @@ const ViewBidPage: React.FC = () => {
           {Object.entries(stats).map(([productId, { averageBid, totalBids, totalPayment }]) => (
             <div key={productId} className="mb-4">
               <h3 className="text-md font-medium text-gray-700">Sản phẩm: {productId}</h3>
-              <p className="text-gray-600">Trung bình giá đấu: {averageBid.toLocaleString()} đ</p>
+              <p className="text-gray-600">Trung bình giá đấu: { Math.floor(averageBid).toLocaleString()} đ</p>
               <p className="text-gray-600">Tổng số lượt đấu giá: {totalBids}</p>
               <p className="text-gray-600">Tổng thanh toán: {totalPayment.toLocaleString()} đ</p>
             </div>
           ))}
-          {completedAuctionAmount !== null && (
+          {/* {completedAuctionAmount !== null && (
             <div className="mt-4 p-4 bg-green-100 rounded-md">
               <p className="text-lg font-semibold">Tổng số tiền hoàn thành đấu giá:</p>
               <p className="text-xl font-bold">{completedAuctionAmount.toLocaleString()} đ</p>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 

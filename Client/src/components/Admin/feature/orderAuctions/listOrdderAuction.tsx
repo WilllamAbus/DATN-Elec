@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getOrders } from "../../../../redux/orderAucAdmin/orderAucAdminThunk";
+import { getOrders } from "../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,26 +15,31 @@ import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 const ListOrderAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const { orders } = useSelector((state: RootState) => state.orderAucAdmin);
+
+  const { orders, totalPages } = useSelector((state: RootState) => state.orderAucAdmin);
+
+
+  
+
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(5);
+  const [search, setSearch] = useState("");
+  
   const [, setOrders] = useState<Order[]>([]);
-
-  const pagination = useSelector(
-    (state: RootState) => state.orderAucAdmin.pagination
-  );
-  // const loading = useSelector((state: RootState) => state.orderAucAdmin.loading);
-  // const error = useSelector((state: RootState) => state.orderAucAdmin.error);
-
-  const currentPage = pagination ? pagination.currentPage : 1;
-  const totalPages = pagination ? pagination.totalPages : 0; // Extract totalPages
-
   useEffect(() => {
-    dispatch(getOrders({ page: currentPage, search: searchTerm }));
-  }, [dispatch, currentPage, searchTerm]);
+    dispatch(getOrders({ page, pageSize, search }));
+  }, [dispatch, page, pageSize, search]);
 
-  const handlePageChange = (page: number) => {
-    dispatch(getOrders({ page, search: searchTerm }));
+
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    setSearch(searchTerm);
+    setPage(1);
   };
   const handleSoftDelOrder = async (orderId: string) => {
     MySwal.fire({
@@ -50,13 +55,13 @@ const ListOrderAuction: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await dispatch(softDelAdminThunk({ orderId })).unwrap();
-          dispatch(getOrders({ page: currentPage, search: searchTerm }));
+          dispatch(getOrders({ page, pageSize, search }));
           // dispatch(fetchOrderDataShippingThunk(userId));
           setOrders((prevCategories) =>
             prevCategories.filter((order) => order._id !== orderId)
           );
 
-          toast.success("Đơn hàng của bạn đã bị hủy.");
+          toast.success("Đơn hàng của bạn đã hủy.");
         } catch (error) {
           toast.error("Đã xảy ra sự cố khi hủy đơn hàng.");
         }
@@ -67,7 +72,7 @@ const ListOrderAuction: React.FC = () => {
   return (
     <>
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
-        <SearchFormOrders setSearchTerm={setSearchTerm} />
+        <SearchFormOrders onSearch={handleSearch} />
       </div>
 
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -95,7 +100,7 @@ const ListOrderAuction: React.FC = () => {
         </thead>
         <tbody>
           {Array.isArray(orders) && orders.length > 0 ? (
-            orders.map((order: Order) => (
+            orders?.map((order: Order) => (
               <tr
                 key={order._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -335,7 +340,7 @@ const ListOrderAuction: React.FC = () => {
         </tbody>
       </table>
       <PaginationComponent
-        currentPage={currentPage}
+        currentPage={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />

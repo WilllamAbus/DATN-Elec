@@ -6,11 +6,11 @@ import { AuctionDataComplete } from '../../types/auctions/auctions';
 
 export const completeAuction = createAsyncThunk<
 AuctionDataComplete, // Return type
-  { productId: string; timeTrackID: string }, // Arguments type
+  { productId: string; timeTrackID: string,  }, // Arguments type
   { rejectValue: string } // Rejection type
 >(
   'auction/completeAuction',
-  async ({ productId, timeTrackID }, thunkAPI) => {
+  async ({ productId, timeTrackID,}, thunkAPI) => {
     try {
       const updatedAuction = await auctionService.completeAuction(productId, timeTrackID);
    

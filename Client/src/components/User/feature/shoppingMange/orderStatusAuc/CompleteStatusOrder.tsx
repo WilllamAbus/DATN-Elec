@@ -29,8 +29,13 @@ const OrderListCompleteStatus: React.FC = () => {
   };
 
   useEffect(() => {
+    if (Array.isArray(ordersFromStore) && ordersFromStore.length > 0) {
+      setOrders(ordersFromStore);
+    } else {
+      setOrders([]);
+    }
     // Lấy danh sách đơn hàng từ store
-    setOrders(ordersFromStore ?? []); // Sử dụng nullish coalescing operator để tránh null hoặc undefined
+    // setOrders(ordersFromStore ?? []); // Sử dụng nullish coalescing operator để tránh null hoặc undefined
   }, [ordersFromStore]);
 
   useEffect(() => {
