@@ -142,7 +142,7 @@ const AddSupplier: React.FC = () => {
                                     type="text"
                                     id="name"
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Bonnie"
+                                    placeholder=""
                                     {...register("name", {
                                         required: {
                                             value: true,
@@ -195,7 +195,7 @@ const AddSupplier: React.FC = () => {
                                 <input
                                     type="text"
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="Green"
+                                    placeholder=""
                                     id="address"
                                         {...register("address",
                                             {
@@ -410,7 +410,7 @@ const AddSupplier: React.FC = () => {
                                     id="description"
                                     rows={8}
                                     className="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                                    placeholder="Nhập mô tả nhà cung cấp..."
+                                    placeholder="Nhập mô tả..."
                                     {...register("description")}
                                 />
                                 {errors.description && (

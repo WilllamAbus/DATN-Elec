@@ -12,3 +12,6 @@ export { default as addProductAuctionSlice } from "./addProductAuction";
 export { default as LimitProductAuctionSlice } from "./listProductAuction";
 export { default as softDeleteAuctionSlice } from "./softdeleteAuction";
 export { default as getOneAuctionSlice } from "./getoneAuction";
+export { default as addImageVariantSlice } from "./addImageVariant";
+export { default as getVariantColorsByIdSlice } from "./getVariantColorsById";
+export { default as getVariantsByProductIdSlice } from "./getVariantsByProductId";

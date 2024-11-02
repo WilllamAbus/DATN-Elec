@@ -2,7 +2,7 @@ import instance from "../axios";
 const API_URL = "http://localhost:4000/api/interaction";
 
 export interface Instance {
-    user:string;
+    user:string | undefined ;
     orderAuctions:string | null;
     item:string;
     OrderCart:string | null;
@@ -12,18 +12,7 @@ export interface Instance {
     score:number;
 }
 
-export const addInteraction = async (
-  interactionData: {
-    user: string;
-    orderAuctions: string | null;
-    item: string;
-    OrderCart: string | null;
-    productID: string;
-    Watchlist: string | null;
-    type: string;
-    score: number;
-  }
-) => {
+export const addInteraction = async ( interactionData: Instance) => {
   try {
     const response = await instance.post(`${API_URL}/interactions`, interactionData, {
       headers: {
@@ -33,22 +22,10 @@ export const addInteraction = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+   return console.log('Error adding interaction:', error.response?.data || error.message);
   }
 };
-export const addInteractionView = async (
-  interactionData: {
-    user: string;
-    orderAuctions: string | null;
-    item: string;
-    OrderCart: string | null;
-    productID: string;
-    Watchlist: string | null;
-    type: string;
-    score: number;
-  }
-) => {
+export const addInteractionView = async (interactionData : Instance) => {
   try {
     const response = await instance.post(`${API_URL}/interactions-view`, interactionData, {
       headers: {
@@ -58,22 +35,11 @@ export const addInteractionView = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+  return error;
   }
 };
 export const addInteractionAuction = async (
-  interactionData: {
-    user: string;
-    orderAuctions: string | null;
-    item: string;
-    OrderCart: string | null;
-    productID: string;
-    Watchlist: string | null;
-    type: string;
-    score: number;
-  }
-) => {
+  interactionData: Instance) => {
   try {
     const response = await instance.post(`${API_URL}/auctions`, interactionData, {
       headers: {
@@ -83,8 +49,7 @@ export const addInteractionAuction = async (
 
     return response.data; 
   } catch (error: any) {
-    console.error('Error adding interaction:', error.response?.data || error.message);
-    throw new Error(`Failed to add interaction: ${error.response?.data?.error || error.message}`);
+    return  console.log('Error adding interaction:', error.response?.data || error.message);
   }
 };
 

@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
-import { useImageUpload } from "../../../../hooks/useImageUpload";
 import { ProductVariant, RAM, CPU, COLOR, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
@@ -44,13 +43,9 @@ const AddVariant: React.FC = () => {
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<ProductVariant>({
-    defaultValues: {
-    },
-  });
+  } = useForm<ProductVariant>({});
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
-  const { imgPreview, handleImageChange } = useImageUpload();
   const [selectedRam, setSelectedRam] = useState<SingleValue<RAM>>(null);
   const [selectedColors, setSelectedColors] = useState<MultiValue<COLOR>>([]);
   const [selectedScreen, setSelectedScreen] = useState<SingleValue<SCREEN>>(null);
@@ -90,20 +85,24 @@ const AddVariant: React.FC = () => {
 
   const submitFormAdd: SubmitHandler<ProductVariant> = async (data) => {
     setIsLoading(true);
+    
+    console.log("Submitted data:", data); // Kiểm tra dữ liệu
 
     try {
-      const actionResult = await dispatch(
-        addVariantThunk({ productId: productIdString, variant: data })
-      ).unwrap();
-      notify(actionResult.msg);
-      setTimeout(() => {
-        navigate("/admin/listproduct");
-      }, 2000);
+        const actionResult = await dispatch(
+            addVariantThunk({ productId: productIdString, variant: data })
+        ).unwrap();
+        notify(actionResult.msg);
+        setTimeout(() => {
+            navigate("/admin/listproduct");
+        }, 2000);
     } catch (error) {
-      console.error("Error submitting variant:", error);
-      notifyError((error as ProductVariantResponse).msg); 
+        notifyError((error as ProductVariantResponse).msg);
+    } finally {
+        setIsLoading(false);
     }
-  };
+};
+
 
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
@@ -114,36 +113,8 @@ const AddVariant: React.FC = () => {
           Thêm biến thể sản phẩm
         </h1>
       </div>
-      <div className="grid grid-cols-[1fr_2fr] px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
-        <div className="col-span-full xl:col-auto">
-          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
-              {imgPreview && (
-                <div className="mb-4 rounded-lg w-24 h-24 sm:mb-0 xl:mb-4 2xl:mb-0">
-                  <img src={imgPreview} alt="Image Preview" />
-                </div>
-              )}
-              <div>
-                <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">Hình ảnh</h3>
-                <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                  JPG, GIF or PNG. Max size of 800KB
-                </div>
+      <div className="grid grid-cols-1 px-4 pt-4 xl:grid-cols-2 xl:gap-4 dark:bg-gray-900">
 
-                <div className="flex items-center space-x-4">
-                  <input
-                    type="file"
-                    multiple
-                    id="image"
-                    {...register("image")}
-                    onChange={handleImageChange}
-                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                  />
-                  {errors.image && <span className="text-red-600">{errors.image.message}</span>}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan sản phẩm</h3>

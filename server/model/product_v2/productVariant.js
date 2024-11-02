@@ -13,7 +13,7 @@ const productVariantSchema = new Schema({
   ram: { type: Schema.Types.ObjectId, ref: 'Ram' },
   screen: { type: Schema.Types.ObjectId, ref: 'Screen' },
   storage: { type: Schema.Types.ObjectId, ref: 'Storage' },
-  image: { type: [String], required: true },
+  image: [{ type: Schema.Types.ObjectId, ref: 'ImageVariant' }],
   slug: { type: String, unique: true },
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },

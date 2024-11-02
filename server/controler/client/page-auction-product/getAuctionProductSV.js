@@ -3,7 +3,7 @@ const { getBrandFilter, getConditionShoppingFilter, getDiscountFilter, getPriceF
 
 
 const ProductAuctionService = {
-  getAuctionProducts: (page = 1, limit = 12, _sort = "product_price:ASC", brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent) => new Promise(async (resolve, reject) => {
+  getAuctionProducts: (page = 1, limit = 2, _sort = "product_price:ASC", brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent) => new Promise(async (resolve, reject) => {
     try {
       page = parseInt(page, 10) || 1;
       limit = parseInt(limit, 10) || 12;

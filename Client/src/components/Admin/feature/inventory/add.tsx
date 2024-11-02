@@ -8,7 +8,7 @@ import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductVariant } from "../../../../types/ProductV2";
 import { Inventory } from "../../../../types/Inventories";
-import SubmitButtonAdd from "../productAuction/btn/SubmitButtonAdd";
+
 
 interface IFormInput {
     product_variant: string;
@@ -23,7 +23,8 @@ const AddInventory: React.FC = () => {
         formState: { errors },
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
     const [] = useState<boolean>(true);
     const [, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -69,7 +70,8 @@ const AddInventory: React.FC = () => {
         fetchProducts();
     }, []);
     const submitFormAdd = async (data: IFormInput) => {
-        setIsLoading(true);
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             if (!selectedProductInventory) {
                 setError("Vui lòng chọn một sản phẩm hợp lệ.");
@@ -91,8 +93,11 @@ const AddInventory: React.FC = () => {
             }, 2000);
         } catch (error) {
             console.error("Error:", error);
-            setError("Đã xảy ra lỗi khi cập nhật kệ. Vui lòng thử lại.");
-            setIsLoading(false);
+            setError("Đã xảy ra lỗi khi thêm lô hàng. Vui lòng thử lại.");
+        } finally {
+            setTimeout(() => {
+                setIsSubmitting(false);
+            }, 3000);
         }
     };
 
@@ -207,8 +212,14 @@ const AddInventory: React.FC = () => {
                         </div>
 
                         <div className="col-span-6 sm:col-full">
-              <SubmitButtonAdd isLoading={isLoading} />
-            </div>
+                                <button
+                                    type="submit"
+                                    className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Đang xử lý..." : "Thêm hàng"}
+                                </button>
+                            </div>
                     </div>
                 </div>
             </div>

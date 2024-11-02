@@ -64,7 +64,6 @@ export const getRepComment = async (id:string) =>{
     const response = await instance.get(`${API_URL_CLIENT}/repComment/${id}`);
     return response.data;
   }catch(error){
-    console.error("Error fetching product comments:", error);
     throw error;
   }
 };
@@ -82,7 +81,7 @@ export const getCommentProduct = async (id: string) => {
     const response = await instance.get(`${API_URL_CLIENT}/${id}`);
     return response.data;
   } catch (error) {
-    throw error; 
+    throw error;
   }
 };
 export const getCommentAdmin = async () => {

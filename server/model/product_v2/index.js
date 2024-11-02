@@ -36,7 +36,7 @@ const productV2Schema = new Schema({
   product_color: { type: String, },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
-  status: { type: String, default: 'active' },
+  status: { type: String, default: 'disable' },
   disabledAt: { type: Date, default: null },
   variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],

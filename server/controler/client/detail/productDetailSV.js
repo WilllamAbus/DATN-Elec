@@ -1,7 +1,10 @@
+const mongoose = require('mongoose');
 const Product = require('../../../model/product_v2');
-
+const productVariant = require('../../../model/product_v2/productVariant');
+const Imagevariant = require('../../../model/product_v2/imagevariant');
+const Color = require('../../../model/attributes/color');
 const ProductDetailService = {
-  getProductDetail: async (slug, storage) => { 
+  getProductDetail: async (slug, storage,color) => { 
     try {
       const query = { slug: slug, status: { $ne: 'disable' } };
       const product = await Product.findOne(query)
@@ -13,8 +16,15 @@ const ProductDetailService = {
         .populate({
           path: 'variants',
           populate: [
+            {
+              path: 'image',
+              select: 'image color slug', 
+            },
             'battery',
-            'color',
+            {
+              path: 'color',
+              select: 'name slug code', 
+            },
             'cpu',
             'operatingSystem',
             'ram',
@@ -29,9 +39,10 @@ const ProductDetailService = {
                 'quantityShelf quantityStock totalQuantity price totalPrice status createdAt updatedAt',
             },
           ],
+          
         })
         .select(
-          'product_name image product_description slug product_discount product_brand variants product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments inventory'
+          'product_name product_description slug product_discount product_brand variants product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments inventory'
         )
         .lean();
 
@@ -44,35 +55,40 @@ const ProductDetailService = {
         };
       }
 
-      if (storage) {
-        // Lọc các biến thể có `storage` khớp với giá trị `storage`
-        const variantsWithStorage = product.variants.map((variant) => {
-          let isMatch = false;
-        
-          if (Array.isArray(variant.storage)) {
-            isMatch = variant.storage.some((storageItem) =>
-              storageItem.slug.toLowerCase().includes(storage.toLowerCase())
-            );
-          } else if (variant.storage && variant.storage.slug) {
-            isMatch = variant.storage.slug.toLowerCase().includes(storage.toLowerCase());
+         // Kiểm tra nếu không có tham số storage hoặc color
+         if (!storage && !color) {
+          // Nếu không có tham số nào, trả về biến thể đầu tiên
+          if (product.variants && product.variants.length > 0) {
+            product.variants = [product.variants[0]]; // Lấy biến thể đầu tiên
           }
-        
-          // Thêm cờ `isMatch` vào mỗi biến thể để có thể hiển thị thêm các storage phù hợp
-          return {
-            ...variant,
-            isMatch: isMatch,
-          };
-        });
+        } else {
+          // Lọc theo storage nếu có
+          if (storage) {
+            product.variants = product.variants.filter((variant) => {
+              if (Array.isArray(variant.storage)) {
+                return variant.storage.some((storageItem) =>
+                  storageItem.slug.toLowerCase().includes(storage.toLowerCase())
+                );
+              } else if (variant.storage && variant.storage.slug) {
+                return variant.storage.slug.toLowerCase().includes(storage.toLowerCase());
+              }
+              return false;
+            });
+          }
+          // Lọc theo color nếu có
+          if (color) {
+            product.variants = product.variants
+              .filter((variant) => {
+                const filteredImages = variant.image.filter((img) => img.slug === color);
+                return filteredImages.length > 0; 
+              })
+              .map((variant) => {
+                variant.image = variant.image.filter((img) => img.slug === color);
+                return variant;
+              });
+          }
+        }
       
-        // Lọc chỉ hiển thị các `variant` có `isMatch = true`, nhưng vẫn giữ lại tất cả `storage` của các variant
-        product.variants = variantsWithStorage;
-      } else {
-        // Nếu không có `storage`, hiển thị tất cả các `variant` như cũ
-        product.variants = product.variants;
-      }
-      
-      
-
       return {
         success: true,
         err: 0,

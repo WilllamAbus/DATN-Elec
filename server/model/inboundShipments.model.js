@@ -6,7 +6,7 @@ const inboundShipmentSchema = new Schema(
       inbound_description: {type: String},
       inbound_quantity: { type: Number, required: true }, // Số lượng hàng nhập khẩu
       inbound_price: {type: Number, required: true},
-      inbound_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true }, // Tham chiếu đến nhà cung cấp
+      totalPriceInbound: {type : Number, required: true},
       status: { type: String, default: 'active' }, // Trạng thái của lô hàng (pending, completed, canceled, etc.)
       createdAt: { type: Date, default: Date.now }, // Ngày tạo bản ghi
       updatedAt: { type: Date, default: Date.now }, // Ngày cập nhật bản ghi gần nhất
