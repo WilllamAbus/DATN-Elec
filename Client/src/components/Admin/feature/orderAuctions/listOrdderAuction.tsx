@@ -310,8 +310,7 @@ const ListOrderAuction: React.FC = () => {
                           ? "text-yellow-700 bg-yellow-200 hover:text-white border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900"
                           : order.stateOrder === "Đã xác nhận"
                           ? "text-blue-700 bg-blue-200 hover:text-white border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
-                          : order.stateOrder === "Hủy đơn hàng" ||
-                            order.stateOrder === "Hoàn tất"
+                          : order.stateOrder === "Hủy đơn hàng" 
                           ? "text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                           : "text-gray-500 bg-gray-200 border-gray-500 cursor-not-allowed dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
                       }`}
@@ -327,8 +326,8 @@ const ListOrderAuction: React.FC = () => {
                         !(
                           order.stateOrder === "Chờ xử lý" ||
                           order.stateOrder === "Đã xác nhận" ||
-                          order.stateOrder === "Hủy đơn hàng" ||
-                          order.stateOrder === "Hoàn tất"
+                          order.stateOrder === "Hủy đơn hàng" 
+                          
                         )
                       }
                     >
