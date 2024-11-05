@@ -8,13 +8,14 @@ const Product_v2 = require("../../../model/productAuction/productAuction");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
+const PDFDocument = require('pdfkit');
+const moment = require("moment-timezone");
 // const InventoryOut = require("../../../model/inventories/invenOut.model");
 const crypto = require("crypto");
 // const momoService  = require('./momo.service');
 const mongoose = require("mongoose");
 const vnpaySService = require("./vnpay.service");
-const { log } = require("console");
-const { populate } = require("../../../model/role.model");
+
 // const InventoryOut = require("../../../model/inventory/invenOut.model");
 
 const orderAndDetailService = {
@@ -654,7 +655,8 @@ const orderAndDetailService = {
       throw new Error(`Lỗi khi xóa mềm đơn hàng: ${error.message}`);
     }
   },
- 
+
+  
 
 
 

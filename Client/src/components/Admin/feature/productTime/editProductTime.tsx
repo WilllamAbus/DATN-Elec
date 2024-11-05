@@ -154,7 +154,7 @@ const EditTimeProduct: React.FC = () => {
 
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Cập nhật sản phẩm
+          Cập nhật thời gian đấu giá 
         </h1>
       </div>
 

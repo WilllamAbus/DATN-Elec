@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { getOrders } from "../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
+import {
+  downloadInvoiceExcel,
+  getInvoicePDF,
+} from "../../../../services/orderAuction/getOrderAdmin";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,22 +20,18 @@ const MySwal = withReactContent(Swal);
 const ListOrderAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
-
-  const { orders, totalPages } = useSelector((state: RootState) => state.orderAucAdmin);
-
-
-  
+  const { orders, totalPages } = useSelector(
+    (state: RootState) => state.orderAucAdmin
+  );
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
-  
+
   const [, setOrders] = useState<Order[]>([]);
   useEffect(() => {
     dispatch(getOrders({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
-
-
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -68,7 +68,25 @@ const ListOrderAuction: React.FC = () => {
       }
     });
   };
+  const handleDownloadInvoice = async (orderId: string) => {
+    try {
+      await downloadInvoiceExcel(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
 
+  const handleDownloadInvoicePDF = async (orderId: string) => {
+    try {
+      await getInvoicePDF(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
   return (
     <>
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
@@ -316,16 +334,81 @@ const ListOrderAuction: React.FC = () => {
                     >
                       {order.stateOrder}
                     </button>
-                    <Link
-                      to={`/admin/detailOrderAuction/${order._id}`}
-                      className="py-2 px-3 flex items-center
-                      text-sm font-medium text-center
-                       text-white bg-lime-600 rounded-lg
-                        hover:bg-lime-500 focus:ring-4 
-                        focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                    >
-                      Xem chi tiết
+                    <Link to={`/admin/detailOrderAuction/${order._id}`}>
+                      {/* SVG Icon embedded directly */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 12c0 5 9 9 9 9s9-4 9-9-9-9-9-9-9 4-9 9z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"
+                        />
+                      </svg>
+                      {/* Xem chi tiết */}
                     </Link>
+                    {order.stateOrder === "Hoàn tất" && (
+                      <div
+                        onClick={() => handleDownloadInvoice(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#27AE60" />
+                          <path d="M20 20H44V44H20z" fill="#FFF" />
+                          <path
+                            d="M24 24L40 40M40 24L24 40"
+                            stroke="#27AE60"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-white">Đơn hàng Excel</span> */}
+                      </div>
+                    )}
+
+                    {order.stateOrder === "Vận chuyển" && (
+                      <div
+                        onClick={() => handleDownloadInvoicePDF(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#E74C3C" />
+                          <path
+                            d="M32 12V52M22 22H42M22 32H42M22 42H32"
+                            stroke="#FFF"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-black">Đơn hàng PDF</span> */}
+                      </div>
+                    )}
                   </div>
                 </td>
               </tr>
