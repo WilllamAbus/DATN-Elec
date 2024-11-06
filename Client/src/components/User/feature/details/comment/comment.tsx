@@ -42,7 +42,6 @@ const Comment = () => {
   const { slug } = useParams<{ slug: string }>();
   const [visibleCount, setVisibleCount] = useState(2);
   const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
-
   const dispatch = useAppDispatch();
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
