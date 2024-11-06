@@ -43,13 +43,34 @@ export interface UserProfile {
   gender: string;
   phone: string;
   avatar: string;
-  address: string;
-  addressID: string;
+  addresses: Address[]; // Thay đổi từ string sang mảng Address
   createdAt: string;
   updatedAt?: string;
   currentUser: string;
   redirectTo: string;
 }
+
+// Định nghĩa interface Address cho cấu trúc địa chỉ
+// export interface Address {
+//   name: string;
+//   address: string;
+//   addressID: string;
+//   phone: string;
+// }
+export interface Address {
+  _id?: string;
+  fullName?: string; // fullName có thể không có (optional)
+  address: string;
+  addressID: string; // ID địa chỉ (JSON string)
+  phone: string;
+  isDefault?: boolean;
+}
+
+export interface AddressResponse {
+  message: string; // Thông điệp từ API
+  addresses: Address[]; // Mảng các địa chỉ
+}
+
 export interface ErrorResponse {
   status: number;
   message: string;

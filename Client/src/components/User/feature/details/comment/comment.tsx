@@ -24,6 +24,7 @@ import RatingStats from "./ratingStats";
 const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
+  rating:number;
 }
 interface User {
   _id?: string;
@@ -36,11 +37,11 @@ const Comment = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [comments, setComments] = useState<CommentType[]>([]);
-  const { register, handleSubmit, reset } = useForm<FormValues>();
-  const { id } = useParams<{ id: string }>();
+  const { register, handleSubmit, reset, formState, setValue } =
+    useForm<FormValues>();
+  const { slug } = useParams<{ slug: string }>();
   const [visibleCount, setVisibleCount] = useState(2);
   const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
-
   const dispatch = useAppDispatch();
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
@@ -52,13 +53,13 @@ const Comment = () => {
   };
 
   const fetchComments = async () => {
-    if (!id) {
+    if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
       return;
     }
 
     try {
-      const productComments: CommentType[] = await getCommentProduct(id);
+      const productComments: CommentType[] = await getCommentProduct(slug);
       setComments(productComments);
       const userIds = Array.from(
         new Set(productComments.map((comment) => comment.id_user.toString()))
@@ -88,13 +89,14 @@ const Comment = () => {
   };
   const handleRatingClick = (rate: number) => {
     setRating(rate);
+    setValue("rating", rate);
   };
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
       setErrorMessage("You need to be logged in to submit a comment.");
       return;
     }
-    if (!id) {
+    if (!slug) {
       setErrorMessage("Product ID is missing.");
       return;
     }
@@ -106,9 +108,9 @@ const Comment = () => {
     const interactionData = {
       user: profile._id,
       orderAuctions: null,
-      item: id,
+      item: slug,
       OrderCart: null,
-      productID: id,
+      productID: slug,
       Watchlist: null,
       type: "comment",
       score: 3,
@@ -123,7 +125,7 @@ const Comment = () => {
     try {
       // Sử dụng Promise.all để gọi cả hai API cùng một lúc
       const [commentResponse, interactionResponse] = await Promise.all([
-        addComment(id, commentData),
+        addComment(slug, commentData),
         addInteraction(interactionData),
       ]);
 
@@ -201,7 +203,7 @@ const Comment = () => {
   }, [dispatch]);
   useEffect(() => {
     fetchComments();
-  }, [id]);
+  }, [slug]);
   // useEffect(() => {
   //   if (comments.length > 0) {
   //     console.log("Comments updated:", comments);
@@ -347,8 +349,15 @@ const Comment = () => {
                 <textarea
                   className="block w-full h-32 p-3 text-sm border border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   placeholder="Viết bình luận của bạn..."
-                  {...register("content", { required: true })}
+                  {...register("content", {
+                    required: "Đánh giá chưa nó nội dung",
+                  })}
                 ></textarea>
+                {formState.errors.content && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formState.errors.content.message}
+                  </p>
+                )}
                 <div className="flex items-center gap-1 mt-1">
                   {[...Array(5)].map((_, index) => {
                     index += 1;
@@ -367,6 +376,20 @@ const Comment = () => {
                     );
                   })}
                 </div>
+                <input
+                  type="hidden"
+                  {...register("rating", {
+                    required: "Vui lòng chọn đánh giá của bạn",
+                    validate: (value) =>
+                      value > 0 || "Vui lòng chọn đánh giá của bạn",
+                  })}
+                  value={rating}
+                />
+                {formState.errors.rating && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formState.errors.rating.message}
+                  </p>
+                )}
                 <button
                   type="submit"
                   className="inline-flex items-center justify-center px-4 py-2 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500"

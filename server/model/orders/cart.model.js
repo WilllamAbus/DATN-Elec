@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const cartItemSchema = new Schema({
   product: { type: Schema.Types.ObjectId, ref: "product_v2", required: true },
+  productVariant: { type: Schema.Types.ObjectId, ref: "productVariant" },
   quantity: { type: Number, default: 1 },
   price: { type: Number, required: true },
   totalItemPrice: { type: Number, required: true },

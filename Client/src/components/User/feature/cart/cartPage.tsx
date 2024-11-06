@@ -22,6 +22,8 @@
 //   const carts = useSelector((state: RootState) => state.cart.carts);
 //   const cartStatus = useSelector((state: RootState) => state.cart.status);
 //   const cartError = useSelector((state: RootState) => state.cart.error);
+//   const [loading, setLoading] = useState(false);
+
 //   const [itemQuantities, setItemQuantities] = useState<{
 //     [key: string]: number;
 //   }>({});
@@ -34,67 +36,66 @@
 //   }, [dispatch, userId]);
 
 //   useEffect(() => {
-//     console.log("Carts updated:", carts);
-
-//     const newItemQuantities: { [key: string]: number } = {};
+//     const updatedItemQuantities: { [key: string]: number } = {};
 //     carts.forEach((cart) => {
 //       cart.items.forEach((item) => {
-//         newItemQuantities[item.product._id] = item.quantity;
+//         updatedItemQuantities[item.product._id] = item.quantity;
 //       });
 //     });
-//     setItemQuantities(newItemQuantities);
+//     setItemQuantities(updatedItemQuantities);
 //   }, [carts]);
+//   console.log(carts);
 
-//   // Tính tổng giá trị giỏ hàng dựa trên trạng thái isSelected
 //   useEffect(() => {
 //     const total = carts.reduce((total, cart) => {
 //       return (
 //         total +
 //         cart.items.reduce((itemTotal, item) => {
-//           // Kiểm tra trạng thái isSelected từ state
 //           if (item.isSelected) {
-//             // Thay đổi ở đây
 //             const quantity = itemQuantities[item.product._id] || item.quantity;
 //             return (
 //               itemTotal + (item.product.product_price_unit || 0) * quantity
 //             );
 //           }
-//           return itemTotal; // Không tính nếu không được chọn
+//           return itemTotal;
 //         }, 0)
 //       );
 //     }, 0);
 //     setTotalCartPrice(total);
 //   }, [carts, itemQuantities]);
 
-//   // Hàm chọn sản phẩm
-//   const handleSelectCart = (productId: string, item: CartItem) => {
+//   const handleSelectCart = async (productId: string, item: CartItem) => {
 //     const updatedItem = {
 //       productId: item.product._id,
-//       isSelected: item.isSelected, // Giữ trạng thái được truyền vào
+//       isSelected: !item.isSelected,
 //     };
-
-//     dispatch(SelectCart({ productId, items: [updatedItem] }))
-//       .unwrap()
-//       .then((response) => {
-//         console.log("Giỏ hàng đã được chọn:", response);
-//         toast.success("Giỏ hàng đã được cập nhật thành công!");
-//       })
-//       .catch((error) => {
-//         console.error("Lỗi khi chọn giỏ hàng:", error);
-//         toast.error("Lỗi khi cập nhật giỏ hàng.");
-//       });
+//     toast.dismiss();
+//     setLoading(true);
+//     try {
+//       await dispatch(SelectCart({ productId, items: [updatedItem] })).unwrap();
+//     } catch (error) {
+//       console.error("Lỗi khi chọn giỏ hàng:", error);
+//       toast.error("Lỗi khi cập nhật giỏ hàng.");
+//     } finally {
+//       setLoading(false);
+//     }
 //   };
 
-//   // Hàm xử lý chọn tất cả sản phẩm
-//   const handleSelectAll = (isSelected: boolean) => {
-//     carts.forEach((cart) => {
-//       cart.items.forEach((item) => {
-//         // Chỉ cập nhật những sản phẩm có trạng thái isSelected khác với yêu cầu
-//         if (item.isSelected !== isSelected) {
-//           handleSelectCart(cart._id, { ...item, isSelected });
+//   const handleSelectAll = async (isSelected: boolean) => {
+//     setLoading(true);
+//     try {
+//       for (const cart of carts) {
+//         for (const item of cart.items) {
+//           if (item.isSelected !== isSelected) {
+//             await handleSelectCart(cart._id, { ...item, isSelected });
+//           }
 //         }
-//       });
-//     });
+//       }
+//     } catch (error) {
+//       toast.error("Lỗi khi chọn tất cả sản phẩm.");
+//     } finally {
+//       setLoading(false);
+//     }
 //   };
 
 //   const handleQuantityChange = async (
@@ -108,10 +109,18 @@
 
 //     if (item) {
 //       const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
-//       if (newQuantity > stock) {
+
+//       // Giới hạn số lượng không được vượt quá tồn kho và 99
+//       const maxQuantity = Math.min(99, stock);
+//       if (newQuantity > maxQuantity) {
+//         toast.dismiss();
 //         toast.error(
-//           `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
+//           `Số lượng không được vượt quá ${maxQuantity} sản phẩm có sẵn.`
 //         );
+//         setItemQuantities((prevQuantities) => ({
+//           ...prevQuantities,
+//           [itemId]: item.quantity, // Đặt lại về số lượng mặc định ban đầu
+//         }));
 //         return;
 //       }
 //     }
@@ -127,7 +136,7 @@
 //       ).unwrap();
 //       setItemQuantities((prevQuantities) => ({
 //         ...prevQuantities,
-//         [itemId]: validQuantity,
+//         [itemId]: validQuantity, // Cập nhật khi số lượng hợp lệ
 //       }));
 //     } catch (error) {
 //       console.error("Failed to update quantity:", error);
@@ -135,35 +144,15 @@
 //     }
 //   };
 
-//   const handleBlur = async (
-//     cartId: string,
-//     itemId: string,
-//     currentQuantity: string
-//   ) => {
-//     const newQuantity =
-//       currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
-
-//     const item = carts
-//       .flatMap((cart) => cart.items)
-//       .find((i) => i.product._id === itemId);
-
-//     if (item) {
-//       const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
-
-//       if (newQuantity > stock) {
-//         toast.error(
-//           `Số lượng không được vượt quá ${stock} sản phẩm có sẵn trong kho.`
-//         );
-//         setItemQuantities((prevQuantities) => ({
-//           ...prevQuantities,
-//           [itemId]: item.quantity,
-//         }));
-//         return;
-//       }
-//     }
-
-//     await handleQuantityChange(cartId, itemId, newQuantity);
-//   };
+//   // const handleBlur = async (
+//   //   cartId: string,
+//   //   itemId: string,
+//   //   currentQuantity: string
+//   // ) => {
+//   //   const newQuantity =
+//   //     currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
+//   //   await handleQuantityChange(cartId, itemId, newQuantity);
+//   // };
 
 //   const handleDecreaseQuantity = (
 //     cartId: string,
@@ -183,21 +172,20 @@
 //   };
 
 //   const handleCheckout = () => {
-//     navigate("/checkout", { state: { groupedCarts, totalCartPrice } });
+//     navigate(`/checkout/${carts[0]._id}`, {});
 //   };
 
 //   const handleDeleteProduct = async (cartId: string, productId: string) => {
+//     setLoading(true);
 //     try {
 //       await dispatch(deleteCart({ cartId, productId })).unwrap();
 //       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
 //     } catch (error) {
 //       toast.error("Xóa sản phẩm thất bại.");
+//     } finally {
+//       setLoading(false);
 //     }
 //   };
-
-//   if (cartStatus === "loading") {
-//     return <p>Loading...</p>;
-//   }
 
 //   if (cartStatus === "failed") {
 //     toast.error(`Error: ${cartError}`);
@@ -211,12 +199,13 @@
 //   const groupedMap = new Map<string, CartType>();
 //   const groupedCarts: CartType[] = [];
 //   const filteredCarts = carts.filter(
-//     (cart): cart is CartType =>
-//       cart !== null && cart !== undefined && Array.isArray(cart.items)
+//     (cart) => cart !== null && cart !== undefined && Array.isArray(cart.items)
 //   );
 
 //   filteredCarts.forEach((cart) => {
 //     cart.items.forEach((item) => {
+//       console.log(item.productVariant.image);
+
 //       const key = item.product._id;
 //       if (key) {
 //         if (!groupedMap.has(key)) {
@@ -224,11 +213,9 @@
 //         } else {
 //           const existingCart = groupedMap.get(key)!;
 //           const updatedItems = [...existingCart.items];
-
 //           const itemIndex = updatedItems.findIndex(
 //             (i) => i.product._id === item.product._id
 //           );
-
 //           if (itemIndex !== -1) {
 //             updatedItems[itemIndex] = {
 //               ...updatedItems[itemIndex],
@@ -238,13 +225,11 @@
 //                 item.product.product_price_unit * item.quantity,
 //             };
 //           } else {
-//             // Trường hợp thêm mới sản phẩm vào giỏ hàng
 //             updatedItems.push({
 //               ...item,
 //               totalItemPrice: item.product.product_price_unit * item.quantity,
 //             });
 //           }
-
 //           existingCart.items = updatedItems;
 //         }
 //       }
@@ -256,7 +241,7 @@
 //   });
 
 //   return (
-//     <div className="container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
+//     <div className="min-h-[calc(71vh-10rem)] container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
 //       <div className="grid md:grid-cols-3 gap-4">
 //         <div className="md:col-span-2 p-4 rounded-md">
 //           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
@@ -270,7 +255,7 @@
 //                 onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
 //                 checked={carts.every((cart) =>
 //                   cart.items.every((item) => item.isSelected)
-//                 )} // Kiểm tra nếu tất cả sản phẩm được chọn
+//                 )}
 //               />
 //               <label htmlFor="checkbox-all-orders" className="ml-2">
 //                 Chọn tất cả
@@ -288,13 +273,12 @@
 //                   <th scope="col" className="p-4">
 //                     <div className="flex items-center">
 //                       <input
-//                         id={`checkbox-${cart._id}`} // Đảm bảo ID duy nhất cho từng giỏ hàng
+//                         id={`checkbox-${cart._id}`}
 //                         type="checkbox"
-//                         checked={cart.items.every((item) => item.isSelected)} // Kiểm tra nếu tất cả sản phẩm trong giỏ hàng đã được chọn
+//                         checked={cart.items.every((item) => item.isSelected)}
 //                         onChange={() => {
-//                           // Lặp qua từng sản phẩm trong giỏ hàng để cập nhật trạng thái
 //                           cart.items.forEach((item) => {
-//                             handleSelectCart(cart._id, item); // Gọi hàm handleSelectCart với cart ID và item
+//                             handleSelectCart(cart._id, item);
 //                           });
 //                         }}
 //                         className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -309,13 +293,16 @@
 //                   </th>
 
 //                   <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
-//                     <img
+//                     {/* <img
 //                       src={
-//                         cart.items[0].product.image[0] || "default-image-url"
+//                         cart.items[0]?.productVariant?.image[0].image[0] ||
+//                         "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
 //                       }
-//                       alt={`product ${cart.items[0].product.product_name}`}
+//                       alt={`product ${
+//                         cart.items[0]?.productVariant?.variant_name || "Unknown"
+//                       }`}
 //                       className="w-full h-full object-contain"
-//                     />
+//                     /> */}
 //                   </div>
 
 //                   <div>
@@ -326,7 +313,9 @@
 //                       onClick={() =>
 //                         handleDeleteProduct(cart._id, cart.items[0].product._id)
 //                       }
-//                       className="text-xs text-red-500 cursor-pointer mt-0.5"
+//                       className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
+//                         loading ? "opacity-50" : ""
+//                       }`}
 //                     >
 //                       Xóa
 //                     </h6>
@@ -368,22 +357,36 @@
 //                           className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
 //                           value={
 //                             itemQuantities[cart.items[0].product._id] ||
-//                             cart.items[0].quantity
+//                             cart.items[0].quantity // Hiển thị số lượng hiện tại
 //                           }
 //                           onChange={(e) => {
 //                             const newQuantity = Number(e.target.value);
-//                             if (!isNaN(newQuantity) && newQuantity >= 1) {
-//                               setItemQuantities((prevQuantities) => ({
-//                                 ...prevQuantities,
-//                                 [cart.items[0].product._id]: newQuantity,
+
+//                             // Giới hạn số lượng không vượt quá 99
+//                             if (
+//                               !isNaN(newQuantity) &&
+//                               newQuantity >= 1 &&
+//                               newQuantity <= 99
+//                             ) {
+//                               setItemQuantities((prev) => ({
+//                                 ...prev,
+//                                 [cart.items[0].product._id]: newQuantity, // Cập nhật số lượng tạm thời
+//                               }));
+//                             } else if (newQuantity > 99) {
+//                               toast.dismiss();
+//                               toast.error("Số lượng không được vượt quá 99.");
+
+//                               setItemQuantities((prev) => ({
+//                                 ...prev,
+//                                 [cart.items[0].product._id]: 99, // Đặt lại về 99 nếu vượt quá
 //                               }));
 //                             }
 //                           }}
 //                           onBlur={(e) =>
-//                             handleBlur(
+//                             handleQuantityChange(
 //                               cart._id,
 //                               cart.items[0].product._id,
-//                               e.target.value
+//                               Number(e.target.value) // Kiểm tra và cập nhật khi người dùng rời khỏi input
 //                             )
 //                           }
 //                         />
@@ -412,12 +415,13 @@
 //                     </div>
 //                   </div>
 //                 </div>
+
 //                 <div className="ml-auto">
 //                   <h4 className="text-base font-bold text-gray-800">
 //                     {cart.items[0].product.product_price_unit.toLocaleString(
 //                       "vi-VN",
 //                       { style: "currency", currency: "VND" }
-//                     )}{" "}
+//                     )}
 //                   </h4>
 //                 </div>
 //               </div>
@@ -429,6 +433,7 @@
 //           <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
 //           <hr className="border-gray-300 mt-4 mb-8" />
 //           <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
+
 //           {groupedCarts.map((cart) => (
 //             <div key={cart._id} className="flex justify-between mt-2">
 //               <span className="text-gray-800">
@@ -438,6 +443,7 @@
 //               </span>
 //             </div>
 //           ))}
+
 //           <div className="space-y-4">
 //             <div className="flex justify-between items-center">
 //               <p className="text-gray-800">Tạm tính:</p>
@@ -466,14 +472,20 @@
 //               })}
 //             </p>
 //           </div>
+
 //           <div className="mt-8 space-y-2">
 //             <Button
 //               onClick={handleCheckout}
 //               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-//               disabled={!groupedCarts.length}
+//               disabled={
+//                 !groupedCarts.some((cart) =>
+//                   cart.items.some((item) => item.isSelected)
+//                 )
+//               }
 //             >
 //               Thanh toán
 //             </Button>
+
 //             <Button className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light">
 //               Tiếp tục mua sắm
 //             </Button>
@@ -496,7 +508,7 @@ import {
   SelectCart,
 } from "../../../../redux/cart/cartThunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { CartItem, CartType } from "../../../../types/cart/carts";
+import { CartType } from "../../../../types/cart/carts";
 import { useNavigate } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { ToastContainer, toast } from "react-toastify";
@@ -512,6 +524,7 @@ const CartPage: React.FC = () => {
   const cartStatus = useSelector((state: RootState) => state.cart.status);
   const cartError = useSelector((state: RootState) => state.cart.error);
   const [loading, setLoading] = useState(false);
+  console.log(carts);
 
   const [itemQuantities, setItemQuantities] = useState<{
     [key: string]: number;
@@ -526,12 +539,22 @@ const CartPage: React.FC = () => {
 
   useEffect(() => {
     const updatedItemQuantities: { [key: string]: number } = {};
-    carts.forEach((cart) => {
-      cart.items.forEach((item) => {
-        updatedItemQuantities[item.product._id] = item.quantity;
+
+    // Kiểm tra nếu carts là một mảng
+    if (Array.isArray(carts)) {
+      carts.forEach((cart) => {
+        if (Array.isArray(cart.items)) {
+          cart.items.forEach((item) => {
+            updatedItemQuantities[item.product._id] = item.quantity;
+          });
+        } else {
+          console.warn("Cart items are not in an array format:", cart.items);
+        }
       });
-    });
-    setItemQuantities(updatedItemQuantities);
+      setItemQuantities(updatedItemQuantities);
+    } else {
+      console.error("Expected carts to be an array but received:", carts);
+    }
   }, [carts]);
 
   useEffect(() => {
@@ -542,7 +565,7 @@ const CartPage: React.FC = () => {
           if (item.isSelected) {
             const quantity = itemQuantities[item.product._id] || item.quantity;
             return (
-              itemTotal + (item.product.product_price_unit || 0) * quantity
+              itemTotal + (item.productVariant.variant_price || 0) * quantity
             );
           }
           return itemTotal;
@@ -552,15 +575,56 @@ const CartPage: React.FC = () => {
     setTotalCartPrice(total);
   }, [carts, itemQuantities]);
 
-  const handleSelectCart = async (productId: string, item: CartItem) => {
-    const updatedItem = {
-      productId: item.product._id,
-      isSelected: !item.isSelected,
-    };
+  // const handleSelectCart = async (productId: string, item: CartItem) => {
+  //   const updatedItem = {
+  //     productId: item.product._id,
+  //     isSelected: !item.isSelected,
+  //   };
+
+  //   toast.dismiss();
+  //   setLoading(true);
+  //   try {
+  //     await dispatch(SelectCart({ productId, items: [updatedItem] })).unwrap();
+
+  //     // Lấy lại danh sách giỏ hàng sau khi cập nhật
+  //     await dispatch(fetchCartList()); // Đảm bảo dispatch để lấy lại giỏ hàng
+  //   } catch (error) {
+  //     console.error("Lỗi khi chọn giỏ hàng:", error);
+  //     toast.error("Lỗi khi cập nhật giỏ hàng.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const handleSelectAll = async (isSelected: boolean) => {
+  //   setLoading(true);
+  //   try {
+  //     for (const cart of carts) {
+  //       for (const item of cart.items) {
+  //         if (item.isSelected !== isSelected) {
+  //           await handleSelectCart(cart._id, item);
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     toast.error("Lỗi khi chọn tất cả sản phẩm.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleSelectCart = async (productId: string, cart: CartType) => {
+    const updatedItems = cart.items.map((cartItem) => ({
+      productId: cartItem.product._id,
+      isSelected: !cartItem.isSelected,
+    }));
+
     toast.dismiss();
     setLoading(true);
     try {
-      await dispatch(SelectCart({ productId, items: [updatedItem] })).unwrap();
+      await dispatch(SelectCart({ productId, items: updatedItems })).unwrap();
+
+      // Lấy lại danh sách giỏ hàng sau khi cập nhật
+      await dispatch(fetchCartList()); // Đảm bảo dispatch để lấy lại giỏ hàng
     } catch (error) {
       console.error("Lỗi khi chọn giỏ hàng:", error);
       toast.error("Lỗi khi cập nhật giỏ hàng.");
@@ -573,11 +637,14 @@ const CartPage: React.FC = () => {
     setLoading(true);
     try {
       for (const cart of carts) {
-        for (const item of cart.items) {
-          if (item.isSelected !== isSelected) {
-            await handleSelectCart(cart._id, { ...item, isSelected });
-          }
-        }
+        const updatedCart = {
+          ...cart,
+          items: cart.items.map((item) => ({
+            ...item,
+            isSelected,
+          })),
+        };
+        await handleSelectCart(cart._id, updatedCart);
       }
     } catch (error) {
       toast.error("Lỗi khi chọn tất cả sản phẩm.");
@@ -596,9 +663,8 @@ const CartPage: React.FC = () => {
       .find((i) => i.product._id === itemId);
 
     if (item) {
-      const stock = item.inventory.quantityShelf; // Số lượng tồn kho từ `inventory`
+      const stock = item.inventory.quantityShelf;
 
-      // Giới hạn số lượng không được vượt quá tồn kho và 99
       const maxQuantity = Math.min(99, stock);
       if (newQuantity > maxQuantity) {
         toast.dismiss();
@@ -607,7 +673,7 @@ const CartPage: React.FC = () => {
         );
         setItemQuantities((prevQuantities) => ({
           ...prevQuantities,
-          [itemId]: item.quantity, // Đặt lại về số lượng mặc định ban đầu
+          [itemId]: item.quantity,
         }));
         return;
       }
@@ -615,16 +681,23 @@ const CartPage: React.FC = () => {
 
     const validQuantity = Math.max(1, newQuantity);
     try {
+      const variantId = item?.productVariant._id;
+      if (!variantId) {
+        throw new Error("Thiếu biến thể sản phẩm.");
+      }
+
       await dispatch(
         updateCartItem({
           cartId,
           itemId,
+          variantId,
           quantity: validQuantity,
         })
       ).unwrap();
+
       setItemQuantities((prevQuantities) => ({
         ...prevQuantities,
-        [itemId]: validQuantity, // Cập nhật khi số lượng hợp lệ
+        [itemId]: validQuantity,
       }));
     } catch (error) {
       console.error("Failed to update quantity:", error);
@@ -680,8 +753,8 @@ const CartPage: React.FC = () => {
     return <p>Error: {cartError}</p>;
   }
 
-  if (!Array.isArray(carts) || carts.length === 0) {
-    return <p>Giỏ hàng trống</p>;
+  if (!Array.isArray(carts)) {
+    return <p>Dữ liệu giỏ hàng không hợp lệ</p>;
   }
 
   const groupedMap = new Map<string, CartType>();
@@ -708,12 +781,12 @@ const CartPage: React.FC = () => {
               quantity: updatedItems[itemIndex].quantity + item.quantity,
               totalItemPrice:
                 updatedItems[itemIndex].totalItemPrice +
-                item.product.product_price_unit * item.quantity,
+                item.productVariant.variant_price * item.quantity,
             };
           } else {
             updatedItems.push({
               ...item,
-              totalItemPrice: item.product.product_price_unit * item.quantity,
+              totalItemPrice: item.productVariant.variant_price * item.quantity,
             });
           }
           existingCart.items = updatedItems;
@@ -725,6 +798,10 @@ const CartPage: React.FC = () => {
   groupedMap.forEach((cart) => {
     groupedCarts.push(cart);
   });
+
+  if (!Array.isArray(carts)) {
+    return <p>Dữ liệu giỏ hàng không hợp lệ</p>;
+  }
 
   return (
     <div className="min-h-[calc(71vh-10rem)] container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
@@ -757,9 +834,9 @@ const CartPage: React.FC = () => {
               >
                 <div className="col-span-2 flex items-center gap-4">
                   <th scope="col" className="p-4">
-                    <div className="flex items-center">
+                    {/* <div className="flex items-center">
                       <input
-                        id={`checkbox-${cart._id}`} // Đảm bảo ID duy nhất cho từng giỏ hàng
+                        id={`checkbox-${cart._id}`}
                         type="checkbox"
                         checked={cart.items.every((item) => item.isSelected)}
                         onChange={() => {
@@ -775,22 +852,56 @@ const CartPage: React.FC = () => {
                       >
                         checkbox
                       </label>
+                      
+                    </div> */}
+                    <div className="flex items-center">
+                      <input
+                        id={`checkbox-${cart._id}`}
+                        type="checkbox"
+                        checked={cart.items.every((item) => item.isSelected)}
+                        onChange={() => {
+                          handleSelectCart(cart._id, cart); // Truyền toàn bộ đối tượng cart
+                        }}
+                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label
+                        htmlFor={`checkbox-${cart._id}`}
+                        className="sr-only"
+                      >
+                        checkbox
+                      </label>
                     </div>
                   </th>
 
                   <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
                     <img
                       src={
-                        cart.items[0].product.image[0] || "default-image-url"
+                        cart.items[0]?.productVariant?.image?.[0]?.image?.[0] ||
+                        "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
                       }
-                      alt={`product ${cart.items[0].product.product_name}`}
+                      alt={`product ${
+                        cart.items[0]?.productVariant?.variant_name || "Unknown"
+                      }`}
                       className="w-full h-full object-contain"
                     />
+
+                    {/* {cart.items.map((item, index) => (
+                      <div key={index}>
+                        {item.productVariant?.image?.[0]?.image?.[0] ? (
+                          <img
+                            src={item.productVariant.image[0].image[0]}
+                            alt="Product"
+                          />
+                        ) : (
+                          <p>Không có hình ảnh</p>
+                        )}
+                      </div>
+                    ))} */}
                   </div>
 
                   <div>
                     <h3 className="text-base font-bold text-gray-800">
-                      {cart.items[0].product.product_name}
+                      {cart.items[0].productVariant.variant_name}
                     </h3>
                     <h6
                       onClick={() =>
@@ -809,7 +920,7 @@ const CartPage: React.FC = () => {
                         className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
                       >
                         <h5 className="text-gray-800 font-semibold">
-                          {cart.items[0].product.weight_g} kg
+                          {cart.items[0].productVariant.screen?.name}
                         </h5>
                       </button>
 
@@ -840,12 +951,11 @@ const CartPage: React.FC = () => {
                           className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
                           value={
                             itemQuantities[cart.items[0].product._id] ||
-                            cart.items[0].quantity // Hiển thị số lượng hiện tại
+                            cart.items[0].quantity
                           }
                           onChange={(e) => {
                             const newQuantity = Number(e.target.value);
 
-                            // Giới hạn số lượng không vượt quá 99
                             if (
                               !isNaN(newQuantity) &&
                               newQuantity >= 1 &&
@@ -853,7 +963,7 @@ const CartPage: React.FC = () => {
                             ) {
                               setItemQuantities((prev) => ({
                                 ...prev,
-                                [cart.items[0].product._id]: newQuantity, // Cập nhật số lượng tạm thời
+                                [cart.items[0].product._id]: newQuantity,
                               }));
                             } else if (newQuantity > 99) {
                               toast.dismiss();
@@ -861,7 +971,7 @@ const CartPage: React.FC = () => {
 
                               setItemQuantities((prev) => ({
                                 ...prev,
-                                [cart.items[0].product._id]: 99, // Đặt lại về 99 nếu vượt quá
+                                [cart.items[0].product._id]: 99,
                               }));
                             }
                           }}
@@ -901,10 +1011,17 @@ const CartPage: React.FC = () => {
 
                 <div className="ml-auto">
                   <h4 className="text-base font-bold text-gray-800">
-                    {cart.items[0].product.product_price_unit.toLocaleString(
-                      "vi-VN",
-                      { style: "currency", currency: "VND" }
-                    )}
+                    {cart.items.length > 0 &&
+                    cart.items[0].productVariant &&
+                    cart.items[0].productVariant.variant_price
+                      ? cart.items[0].productVariant.variant_price.toLocaleString(
+                          "vi-VN",
+                          {
+                            style: "currency",
+                            currency: "VND",
+                          }
+                        )
+                      : "Giá chưa được cập nhật"}
                   </h4>
                 </div>
               </div>

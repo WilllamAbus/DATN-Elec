@@ -1,25 +1,99 @@
-import React from "react";
+// import React from "react";
+// import { Cart } from "../svg";
+// import { motion } from "framer-motion";
+// import { Tooltip } from "@nextui-org/react";
+// interface AddToCartButtonProps {
+//   onClick?: () => void;
+// }
+
+// const AddToCartButton: React.FC<AddToCartButtonProps> = ({ onClick }) => {
+//   return (
+//     <Tooltip content="Thêm vào danh giỏ hàng của bạn" placement="top">
+//       <motion.a
+//       href="#"
+//       title=""
+//       className="text-white mt-4 sm:mt-0 bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
+//       role="button"
+//       onClick={onClick}
+//       whileHover={{ opacity: 0.8 }}
+//       transition={{ duration: 0.3 }}
+//     >
+//       <Cart />
+//       Thêm vào giỏ
+//       </motion.a>
+//     </Tooltip>
+//   );
+// };
+
+// export default AddToCartButton;
+import React, { useEffect } from "react";
 import { Cart } from "../svg";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import { Tooltip } from "@nextui-org/react";
+import {
+  addProductToCart,
+  fetchCartList,
+} from "../../../../../../redux/cart/cartThunk";
+import { AppDispatch, RootState } from "../../../../../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 interface AddToCartButtonProps {
-  onClick?: () => void;
+  productId: string; // Thêm productId vào props
 }
 
-const AddToCartButton: React.FC<AddToCartButtonProps> = ({ onClick }) => {
+const AddToCartButton: React.FC<AddToCartButtonProps> = ({}) => {
+  const dispatch: AppDispatch = useDispatch();
+  const { productDetail } = useSelector(
+    (state: RootState) => state.productClient.getProductDetail
+  );
+
+  const firstVariant = productDetail?.variants?.length
+    ? productDetail.variants[0]
+    : null;
+
+  const handleAddToCart = async () => {
+    const variantId = firstVariant?._id;
+    const productId = productDetail?._id;
+
+    if (variantId && productId) {
+      // Kiểm tra cả variantId và productId
+      try {
+        const response = await dispatch(
+          addProductToCart({ productId, quantity: 1, variantId })
+        ).unwrap();
+        toast.dismiss();
+        const successMessage = response?.message || "Đăng ký thành công!";
+        toast.success(successMessage);
+
+        dispatch(fetchCartList());
+        console.log("Thêm thành công");
+      } catch (err) {
+        console.error("Lỗi thêm giỏ hàng", err);
+      }
+    } else {
+      console.error("Không tìm thấy biến thể sản phẩm hoặc ID sản phẩm.");
+    }
+  };
+
+  useEffect(() => {
+    if (!productDetail || productDetail.variants?.length === 0) {
+      console.error("Không tìm thấy thông tin sản phẩm hoặc biến thể.");
+    }
+  }, [productDetail]);
+
   return (
     <Tooltip content="Thêm vào danh giỏ hàng của bạn" placement="top">
       <motion.a
-      href="#"
-      title=""
-      className="text-white mt-4 sm:mt-0 bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
-      role="button"
-      onClick={onClick}
-      whileHover={{ opacity: 0.8 }} 
-      transition={{ duration: 0.3 }} 
-    >
-      <Cart />
-      Thêm vào giỏ
+        href="#"
+        className="text-white mt-4 sm:mt-0 bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
+        role="button"
+        onClick={handleAddToCart}
+        whileHover={{ opacity: 0.8 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Cart />
+        Thêm vào giỏ
       </motion.a>
     </Tooltip>
   );

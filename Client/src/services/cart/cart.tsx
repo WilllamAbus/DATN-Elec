@@ -1,23 +1,81 @@
 import axios from "axios";
 import instance from "../axios";
+import { CartType } from "../../types/cart/carts";
 const API_URL = import.meta.env.VITE_API_URL;
-
-export const getCartList = async () => {
-  const response = await instance.get(`${API_URL}/cart/list`);
-  return response.data;
+interface FetchCartListResponse {
+  message: string;
+  carts: CartType[]; // Sử dụng CartType[] để mô tả danh sách giỏ hàng
+}
+// export const getCartList = async (): Promise<CartType[]> => {
+//   try {
+//     const response = await instance.get(`${API_URL}/cart/list`);
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error(
+//         "Đã xảy ra lỗi không xác định khi lấy danh sách giỏ hàng."
+//       );
+//     }
+//   }
+// };
+export const getCartList = async (): Promise<FetchCartListResponse> => {
+  try {
+    const response = await instance.get(`${API_URL}/cart/list`);
+    return response.data; // Giả sử response.data có cấu trúc { message: string, carts: CartType[] }
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(
+        "Đã xảy ra lỗi không xác định khi lấy danh sách giỏ hàng."
+      );
+    }
+  }
 };
 
+// export const addToCart = async (
+//   userId: string,
+//   productId: string,
+//   quantity: number = 1 // Đặt mặc định quantity là 1
+// ) => {
+//   try {
+//     const response = await instance.post(`${API_URL}/cart/add`, {
+//       user: userId,
+//       items: [
+//         {
+//           product: productId,
+//           quantity: quantity > 0 ? quantity : 1, // Đảm bảo quantity không nhỏ hơn 1
+//         },
+//       ],
+//     });
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error("An unknown error occurred while add the cart.");
+//     }
+//   }
+// };
 export const addToCart = async (
-  userId: string,
   productId: string,
+  variantId: string, // Thêm variantId làm tham số
   quantity: number = 1 // Đặt mặc định quantity là 1
 ) => {
   try {
     const response = await instance.post(`${API_URL}/cart/add`, {
-      user: userId,
       items: [
         {
           product: productId,
+          variantId: variantId, // Truyền variantId vào payload
           quantity: quantity > 0 ? quantity : 1, // Đảm bảo quantity không nhỏ hơn 1
         },
       ],
@@ -29,13 +87,19 @@ export const addToCart = async (
     } else if (error instanceof Error) {
       throw new Error(error.message);
     } else {
-      throw new Error("An unknown error occurred while add the cart.");
+      throw new Error("An unknown error occurred while adding the cart.");
     }
   }
 };
+
 export const updateCart = async (
   cartId: string,
-  items: { product: string; quantity: number; isSelected?: boolean }[]
+  items: {
+    product: string;
+    variantId: string;
+    quantity: number;
+    isSelected?: boolean;
+  }[]
 ) => {
   try {
     const response = await instance.put(`${API_URL}/cart/${cartId}`, { items });
@@ -50,6 +114,7 @@ export const updateCart = async (
     }
   }
 };
+
 export const getCartById = async (cartId: string) => {
   const response = await instance.get(`${API_URL}/cart/${cartId}`);
   return response.data;

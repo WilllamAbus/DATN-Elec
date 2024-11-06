@@ -13,8 +13,9 @@ const CompletePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const address = useSelector(
-    (state: RootState) => state.auth.profile.profile?.address
+  const address = useSelector((state: RootState) => state.auth.profile);
+  const defaultAddress = address?.profile?.addresses.find(
+    (address) => address.isDefault === true
   );
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
   const carts = useSelector((state: RootState) => state.cart.carts);
@@ -69,7 +70,7 @@ const CompletePage: React.FC = () => {
       shipping: {
         recipientName: profile?.name || "",
         phoneNumber: profile?.phone || "",
-        address: address || "",
+        address: defaultAddress?.address || "",
       },
       voucher: [],
       formatShipping: "Nhanh",

@@ -36,16 +36,14 @@ import statusReceiveOrderReducer from "./statusOrderUser/reciveOrderStatus/recei
 import softDelOrderStatus from "./statusOrderUser/softDelByUser/softDellOrderSlice";
 import orderPagiReducer from "./order/pagiOrder/pagislice";
 import linkAccountReducer from "./linkAccount/Slice/linkAccount";
-import adminTimeTrackReducer from "./adminTimeTrack/list/listTimeTrackSlice"
-import adminTimeTrackDeletedReducer from "./adminTimeTrack/deleted/deletedTimeProdSlice"
-import adminListPriceRandReducer from "./adminPriceRand/list/listPriceRandSlice"
-import adminDeletedPriceRandReducer from "./adminPriceRand/deleted/deletedPriceRandSlice"
-
-import  pendingStatusOrderReducer from "./statusOrderUser/pendingStatus/pendingStatusSlice"
-import  confirmedStatusOrderReducer from "./statusOrderUser/confirmedStatus/confirmedStatusSlice"
-
-import listBidReducer from "./listBiddings/listBidSlice"
-import mailSoftDelOrderUserReducer from "./statusOrderUser/MailSoftOrder/mailSoftOrderSlicce"
+import adminTimeTrackReducer from "./adminTimeTrack/list/listTimeTrackSlice";
+import adminTimeTrackDeletedReducer from "./adminTimeTrack/deleted/deletedTimeProdSlice";
+import adminListPriceRandReducer from "./adminPriceRand/list/listPriceRandSlice";
+import adminDeletedPriceRandReducer from "./adminPriceRand/deleted/deletedPriceRandSlice";
+import pendingStatusOrderReducer from "./statusOrderUser/pendingStatus/pendingStatusSlice";
+import confirmedStatusOrderReducer from "./statusOrderUser/confirmedStatus/confirmedStatusSlice";
+import listBidReducer from "./listBiddings/listBidSlice";
+import mailSoftDelOrderUserReducer from "./statusOrderUser/MailSoftOrder/mailSoftOrderSlicce";
 const authConfig = {
   key: "auth",
   storage,
@@ -95,10 +93,10 @@ const rootReducer = combineReducers({
   adminDeletedTimeProd: adminTimeTrackDeletedReducer,
   adminListPriceRand: adminListPriceRandReducer,
   adminDeltedPriceRand: adminDeletedPriceRandReducer,
-  pendingStatusOrder: pendingStatusOrderReducer, 
+  pendingStatusOrder: pendingStatusOrderReducer,
   confirmedStatusOrder: confirmedStatusOrderReducer,
   listBid: listBidReducer,
-  mailSoftDelOrderUser: mailSoftDelOrderUserReducer
+  mailSoftDelOrderUser: mailSoftDelOrderUserReducer,
   // Add other reducers here to combine them with the persisted state.
 });
 

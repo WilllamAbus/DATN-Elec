@@ -38,5 +38,31 @@ router.post("/resendEmail", authController.resendEmail);
 //resetpass
 router.post("/forgot-password", authController.forgotPassword);
 router.put("/resetPassword", authController.resetPassword);
+//address
+router.post(
+  "/add",
+  middlewareController.verifyToken,
+  authController.addAddress
+);
+router.put(
+  "/set-default",
+  middlewareController.verifyToken,
+  authController.setDefaultAddress
+);
+router.get(
+  "/listAddress",
+  middlewareController.verifyToken,
+  authController.getAddressList
+);
+router.put(
+  "/update/:id",
+  middlewareController.verifyToken,
+  authController.updateAddress
+);
+router.delete(
+  "/deleteAddress",
+  middlewareController.verifyToken,
+  authController.removeAddress
+);
 
 module.exports = router;

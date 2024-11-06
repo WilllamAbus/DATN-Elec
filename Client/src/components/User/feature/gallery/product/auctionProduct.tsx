@@ -24,7 +24,7 @@ const AuctionProduct: React.FC = () => {
   const handleAddToWatchlist = async (productId: string) => {
     if (userId) {
       try {
-        await dispatch(addToWatchlistThunk({ userId, productId })).unwrap();
+        await dispatch(addToWatchlistThunk({ productId })).unwrap();
       } catch (err) {
         console.error("Error adding product to watchlist", err);
       }
@@ -50,17 +50,16 @@ const AuctionProduct: React.FC = () => {
   }, [id]);
   return (
     <>
-     <div className="container py-4 flex items-center gap-3">
+      <div className="container py-4 flex items-center gap-3">
         <a href="/" className="text-primary text-base flex items-center">
           <span className="ml-2">Trang chủ</span>
         </a>
         <span className="text-sm text-gray-400 mx-2">
           <i className="fa-solid fa-chevron-right"></i>
         </span>
-    
       </div>
       <div className="container grid md:grid-cols-4 grid-cols-2 gap-6 pt-4 pb-16 items-start">
-         <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hidden md:block hidden">
+        <div className="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hidden md:block hidden">
           <div className="divide-y divide-gray-200 space-y-5">
             <div className="pt-4 block">
               <Sidebar />
@@ -81,7 +80,7 @@ const AuctionProduct: React.FC = () => {
         </div>
         <div className="col-span-3">
           <div className="grid md:grid-cols-4 grid-cols-2 gap-6">
-          {products.map((product, index) => (
+            {products.map((product, index) => (
               <div
                 key={index}
                 className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
@@ -377,10 +376,8 @@ const AuctionProduct: React.FC = () => {
               </div>
             ))}
           </div>
-    
         </div>
       </div>
-    
     </>
   );
 };

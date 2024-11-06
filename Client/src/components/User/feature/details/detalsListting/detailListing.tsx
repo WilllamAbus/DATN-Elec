@@ -30,11 +30,11 @@ import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Comment from "../../../../User/feature/details/comment/comment";
-import {
-  addProductToCart,
-  fetchCartList,
-} from "../../../../../redux/cart/cartThunk";
-import { toast, ToastContainer } from "react-toastify";
+// import {
+//   addProductToCart,
+//   fetchCartList,
+// } from "../../../../../redux/cart/cartThunk";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { WatchlistItem } from "../../../../../types/cart/profile/wathlist";
 import { HeartIcon, StarIcon } from "../../page-auction/svg";
@@ -116,7 +116,7 @@ const ProductDetail: React.FC = () => {
   //       upViewProduct(id), // Cập nhật lượt xem sản phẩm
   //       addInteractionView(interactionData) // Cập nhật lượt tương tác
   //   ])
-    
+
   //     const updatedProduct = await getProductByID(id);
   //     setProduct(updatedProduct);
 
@@ -132,7 +132,6 @@ const ProductDetail: React.FC = () => {
   //   }
   // };
   // useEffect(() => {
-   
 
   //   // Gọi hàm fetchData
   //   fetchData();
@@ -166,7 +165,7 @@ const ProductDetail: React.FC = () => {
       console.log("Thiếu ID sản phẩm hoặc profile người dùng.");
       return;
     }
-  
+
     const interactionData = {
       user: profile?._id,
       orderAuctions: null,
@@ -177,27 +176,27 @@ const ProductDetail: React.FC = () => {
       type: "view",
       score: 2,
     };
-  
+
     try {
       console.log("Đang lấy thông tin sản phẩm với ID:", id);
       const [productResponse, relatedData] = await Promise.all([
         getProductByID(id),
-        fetchRelatedProducts(id)
+        fetchRelatedProducts(id),
       ]);
-  
+
       setProduct(productResponse.product);
-  
+
       if (relatedData && Array.isArray(relatedData.relatedVariants)) {
         setRelatedProducts(relatedData.relatedVariants);
       } else {
         console.error("Lỗi: relatedData không phải là mảng", relatedData);
       }
-  
+
       await Promise.all([
         upViewProduct(id),
-        addInteractionView(interactionData)
+        addInteractionView(interactionData),
       ]);
-  
+
       if (Array.isArray(watchlistItems)) {
         const isFavoriteProduct = watchlistItems.some(
           (item) => item.product && item.product._id === id
@@ -208,32 +207,32 @@ const ProductDetail: React.FC = () => {
       console.error("Không thể lấy hoặc cập nhật dữ liệu sản phẩm:", error);
     }
   };
-  
+
   useEffect(() => {
     if (id) {
       fetchData();
     }
   }, [id]); // Chỉ theo dõi `id` để tránh gọi lại khi các dependency khác thay đổi
-  
+
   useEffect(() => {
     fetchWatchlist();
     dispatch(getProfileThunk());
   }, [dispatch]); // Tách riêng useEffect để tránh ảnh hưởng đến fetchData
-  const handleAddToCart = async () => {
-    if (userId && id) {
-      try {
-        await dispatch(addProductToCart({ userId, productId: id })).unwrap();
-        toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
-        dispatch(fetchCartList());
+  // const handleAddToCart = async () => {
+  //   if (userId && id) {
+  //     try {
+  //       await dispatch(addProductToCart({ productId: id })).unwrap();
+  //       toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
+  //       dispatch(fetchCartList());
 
-        console.log("Thêm Thành công");
-      } catch (err) {
-        console.error("Lỗi thêm giỏ hàng", err);
-      }
-    } else {
-      console.log("chưa login");
-    }
-  };
+  //       console.log("Thêm Thành công");
+  //     } catch (err) {
+  //       console.error("Lỗi thêm giỏ hàng", err);
+  //     }
+  //   } else {
+  //     console.log("chưa login");
+  //   }
+  // };
   const handleAddToWatchlist = async () => {
     if (userId && id) {
       try {
@@ -254,7 +253,7 @@ const ProductDetail: React.FC = () => {
           }
         } else {
           resultAction = await dispatch(
-            addToWatchlistThunk({ userId, productId: id })
+            addToWatchlistThunk({ productId: id })
           ).unwrap();
           console.log("Add result action:", resultAction);
 
@@ -478,7 +477,7 @@ const ProductDetail: React.FC = () => {
             </a>
             <a
               // href="/cart"
-              onClick={() => handleAddToCart()}
+              // onClick={() => handleAddToCart()}
               className="bg-green-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-green-700 transition"
             >
               <i className="fa-solid fa-bag-shopping"></i> Thêm giỏ hàng
@@ -565,7 +564,7 @@ const ProductDetail: React.FC = () => {
                     <figure className="relative w-full h-0 pb-[75%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
                       <img
                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                        src={productRelated.image[0].image[0] || 'null'}
+                        src={productRelated.image[0].image[0] || "null"}
                         alt={`product ${index + 1}`}
                       />
                     </figure>

@@ -4,6 +4,8 @@ import {
   Role,
   ResetPassState,
   ForgotState,
+  Address,
+  AddressResponse,
 
   // LoginResponse,
 } from "../../types/user";
@@ -25,6 +27,14 @@ import {
   resendEmailThunk,
   fetchUserById,
   getlistRoleThunk,
+  fetchAddressListThunk,
+  deleteAddressThunk,
+  addAddressThunk,
+  setDefaultAddressThunk,
+  editAddressThunk,
+  // addAddressThunk,
+  // updateAddressThunk,
+  // deleteAddressThunk,
 } from "./authThunk";
 import { apiLoginSuccessThunk } from "./apiLoginSuccessThunk";
 import { LoginResponse } from "../../types/user";
@@ -98,6 +108,15 @@ interface AuthState {
   roles: string[] | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+
+  addresses: Address[]; // Mảng các địa chỉ
+  loading: boolean; // Trạng thái loading
+
+  // AddressState: {
+  //   addresses: AddressResponse[];
+  //   status: "idle" | "loading" | "succeeded" | "failed";
+  //   error: string | null;
+  // };
 }
 
 const initialState: AuthState = {
@@ -175,6 +194,14 @@ const initialState: AuthState = {
   restoreUserError: null,
   updateUserStatus: "idle",
   updateUserError: null,
+  addresses: [],
+  loading: false,
+
+  // AddressState: {
+  //   addresses: [],
+  //   status: "idle",
+  //   error: null,
+  // },
 };
 
 const authSlice = createSlice({
@@ -590,7 +617,124 @@ const authSlice = createSlice({
         state.login.error = action.payload as string;
         state.login.isAuthenticated = false;
         state.login.isLoggedIn = false;
+      })
+      .addCase(fetchAddressListThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(
+        fetchAddressListThunk.fulfilled,
+        (state, action: PayloadAction<AddressResponse>) => {
+          state.loading = false;
+          state.addresses = action.payload.addresses;
+        }
+      )
+
+      .addCase(fetchAddressListThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; // Lưu lỗi vào state
+      })
+
+      .addCase(deleteAddressThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(deleteAddressThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+
+        const addressId = action.meta.arg;
+
+        state.addresses = state.addresses.filter(
+          (address) => address._id !== addressId
+        );
+      })
+
+      .addCase(deleteAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(setDefaultAddressThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+
+      .addCase(setDefaultAddressThunk.fulfilled, (state, action) => {
+        const updatedAddressId = action.meta.arg;
+
+        state.addresses = state.addresses.map((address) => ({
+          ...address,
+          isDefault: address._id === updatedAddressId,
+        }));
+      })
+
+      .addCase(setDefaultAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // .addCase(addAddressThunk.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(
+      //   addAddressThunk.fulfilled,
+      //   (state, action: PayloadAction<Address>) => {
+      //     state.loading = false;
+      //     state.addresses.push(action.payload);
+      //     state.error = null;
+      //   }
+      // )
+      // .addCase(addAddressThunk.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error =
+      //     (action.payload as string) || "Có lỗi xảy ra khi thêm địa chỉ";
+      // });
+      .addCase(addAddressThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        addAddressThunk.fulfilled,
+        (state, action: PayloadAction<Address>) => {
+          state.loading = false;
+          state.addresses.push(action.payload); // Thêm địa chỉ mới vào cuối danh sách
+          state.error = null;
+        }
+      )
+
+      .addCase(addAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Có lỗi xảy ra khi thêm địa chỉ";
+      })
+
+      // Cập nhật địa chỉ
+      .addCase(editAddressThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editAddressThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.addresses = action.payload.addresses;
+      })
+      .addCase(editAddressThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
+    // // Xóa địa chỉ
+    // .addCase(deleteAddressThunk.pending, (state) => {
+    //   state.AddressState.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(deleteAddressThunk.fulfilled, (state, action) => {
+    //   state.AddressState.loading = false;
+    //   state.AddressState.addresses = action.payload.addresses;
+    // })
+    // .addCase(deleteAddressThunk.rejected, (state, action) => {
+    //   state.AddressState.loading = false;
+    //   state.error = action.payload as string;
+    // });
   },
 });
 

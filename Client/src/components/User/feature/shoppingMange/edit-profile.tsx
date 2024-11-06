@@ -321,7 +321,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
-      formData.append("address", data.address || "");
+      // formData.append("address", data.address || "");
       formData.append("gender", data.gender || "");
       formData.append("phone", data.phone || "");
       formData.append("birthday", data.birthday || "");

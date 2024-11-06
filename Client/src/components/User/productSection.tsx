@@ -9,7 +9,7 @@ import {
   deleteWatchlistThunk,
 } from "../../redux/product/wathList/wathlist";
 import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
-import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
+// import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
@@ -52,7 +52,7 @@ const ProductSection: React.FC = () => {
           }
         } else {
           resultAction = await dispatch(
-            addToWatchlistThunk({ userId, productId })
+            addToWatchlistThunk({ productId })
           ).unwrap();
           console.log("Add result action:", resultAction);
 
@@ -81,19 +81,19 @@ const ProductSection: React.FC = () => {
       setError("User ID or Product ID is missing");
     }
   };
-  const handleAddToCart = async (productId: string) => {
-    if (userId) {
-      try {
-        await dispatch(addProductToCart({ userId, productId })).unwrap();
-        dispatch(fetchCartList());
-        console.log("Thêm Thành công");
-      } catch (err) {
-        console.error("Lỗi thêm giỏ hàng", err);
-      }
-    } else {
-      console.log("chưa login");
-    }
-  };
+  // const handleAddToCart = async (productId: string) => {
+  //   if (userId) {
+  //     try {
+  //       await dispatch(addProductToCart({ userId, productId })).unwrap();
+  //       dispatch(fetchCartList());
+  //       console.log("Thêm Thành công");
+  //     } catch (err) {
+  //       console.error("Lỗi thêm giỏ hàng", err);
+  //     }
+  //   } else {
+  //     console.log("chưa login");
+  //   }
+  // };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -391,7 +391,7 @@ const ProductSection: React.FC = () => {
                   {" "}
                   <button
                     type="button"
-                    onClick={() => handleAddToCart(product._id)}
+                    // onClick={() => handleAddToCart(product._id)}
                     className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
                   >
                     <svg
