@@ -14,6 +14,8 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
   const handleRepurchase = (productId: string) => {
     navigate(`/detailProd/${productId}`);
   };
+  console.log(order.cartDetails[0].items[0]);
+
   return (
     <Card className="p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-semibold mb-4">Chi tiết đơn hàng</h2>
@@ -29,7 +31,7 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
         </p>
         <p className="text-lg text-red-600 mb-2">
           <span className="font-medium">Tổng tiền:</span>{" "}
-          {order.totalAmount.toLocaleString()} VND
+          {order.cartDetails[0].items[0].totalItemPrice} VND
         </p>
         <p className="text-lg">
           <span className="font-medium">Trạng thái:</span> {order.stateOrder}
@@ -70,17 +72,27 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
                 className="flex justify-between items-center p-4 bg-gray-100 rounded-md shadow-sm"
               >
                 <div className="flex items-center space-x-4">
-                  {item.product.image && item.product.image.length > 0 && (
-                    <img
-                      onClick={() => handleRepurchase(item.product._id)}
-                      src={item.product.image[0]} // Hiển thị hình ảnh đầu tiên
-                      alt={item.product.product_name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                  )}
+                  {/* <img
+                    onClick={() => handleRepurchase(item.product._id)}
+                    src={item.productVariant.image[0].image[0]} // Hiển thị hình ảnh đầu tiên
+                    alt={item.product.product_name}
+                    className="w-16 h-16 object-cover rounded-md"
+                  /> */}
+                  <img
+                    src={
+                      item?.productVariant?.image?.[0]?.image?.[0] ||
+                      "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
+                    }
+                    onClick={() => handleRepurchase(item.product._id)}
+                    alt={`product ${
+                      item.productVariant?.variant_name || "Unknown"
+                    }`}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+
                   <div>
                     <h4 className="font-medium text-lg mb-1">
-                      {item.product.product_name}
+                      {item.productVariant.variant_name}
                     </h4>
                     <p className="text-sm text-gray-600">
                       Số lượng: {item.quantity}
@@ -88,7 +100,7 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
                   </div>
                 </div>
                 <p className="text-lg">
-                  {item.product.product_price_unit.toLocaleString()} VND
+                  {item.productVariant.variant_price} VND
                 </p>
               </ListGroup.Item>
             ))

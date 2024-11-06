@@ -622,21 +622,25 @@ const CheckoutPage: React.FC = () => {
                       <div className="flex flex-col rounded-lg bg-white sm:flex-row">
                         <img
                           className="m-2 h-24 w-28 rounded-md border object-cover object-center"
-                          src={item.product.image}
-                          alt={item.product.product_name}
+                          src={item.productVariant?.image?.[0]?.image?.[0]}
+                          alt={item.productVariant.variant_name}
                         />
+
                         <div className="flex w-full flex-col px-4 py-4">
                           <span className="font-semibold">
-                            {item.product.product_name}
+                            {item.productVariant.variant_name}
                           </span>
                           <span className="float-right text-gray-400">
                             Số lượng: {item.quantity}
                           </span>
                           <p className="mt-auto text-lg font-bold">
                             {" "}
-                            {item.product.product_price_unit.toLocaleString(
+                            {item.productVariant.variant_price.toLocaleString(
                               "vi-VN",
-                              { style: "currency", currency: "VND" }
+                              {
+                                style: "currency",
+                                currency: "VND",
+                              }
                             )}{" "}
                           </p>
                         </div>
@@ -652,7 +656,7 @@ const CheckoutPage: React.FC = () => {
                 <Card>
                   <h4 className="text-md font-medium">Tổng giá trị đơn hàng</h4>
                   <p className="text-lg font-semibold">
-                    {carts[0].totalPrice.toLocaleString("vi-VN", {
+                    {carts[0].items[0].totalItemPrice.toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })}

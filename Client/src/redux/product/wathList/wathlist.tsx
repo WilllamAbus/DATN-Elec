@@ -6,19 +6,19 @@ import {
   DeleteWatchlist,
 } from "../../../services/authentication/auth.services";
 
-interface WatchlistItem {
-  userId: string;
-  productId: string;
-}
+// interface WatchlistItem {
+//   userId: string;
+//   productId: string;
+// }
 
 export const addToWatchlistThunk = createAsyncThunk<
   any,
-  WatchlistItem,
+  { productId: string; variantId?: string },
   { rejectValue: string }
->("watchlist/addToWatchlist", async ({ userId, productId }, thunkAPI) => {
+>("watchlist/addToWatchlist", async ({ productId, variantId }, thunkAPI) => {
   try {
-    const response = await addToWatchlist(userId, productId);
-    return response.data;
+    const response = await addToWatchlist(productId, variantId);
+    return response;
   } catch (error) {
     if (error instanceof Error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -27,7 +27,6 @@ export const addToWatchlistThunk = createAsyncThunk<
     }
   }
 });
-
 export const getWatchlistThunk = createAsyncThunk<
   any[],
   void,

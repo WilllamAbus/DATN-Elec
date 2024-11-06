@@ -1,3 +1,4 @@
+import { ProductVariant } from "../../../types/ProductV2";
 export interface WatchlistItem {
   _id: string;
   user: string;
@@ -19,6 +20,7 @@ export interface WatchlistItem {
     weight_g: number;
     image: string[];
   };
+  productVariant: ProductVariant[];
   createdAt: string;
   updatedAt: string;
 }

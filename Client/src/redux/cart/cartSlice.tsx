@@ -196,7 +196,9 @@ const cartSlice = createSlice({
             state.carts[cartIndex].items[itemIndex].isSelected = selected;
           }
           state.carts[cartIndex].items[itemIndex].totalItemPrice =
-            quantity * state.carts[cartIndex].items[itemIndex].price;
+            quantity *
+            state.carts[cartIndex].items[itemIndex].productVariant
+              .variant_price;
 
           // Update total price of the cart
           state.carts[cartIndex].totalPrice = state.carts[
@@ -225,17 +227,16 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
       .addCase(fetchCartList.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchCartList.fulfilled, (state, action) => {
         state.status = "succeeded";
-        if (Array.isArray(action.payload)) {
-          state.carts = action.payload;
-        } else {
-          state.error = "Invalid data format";
-        }
+        console.log("Fetched carts:", action.payload.carts); // Kiểm tra dữ liệu được trả về
+        state.carts = action.payload.carts; // Cập nhật với giỏ hàng từ payload
       })
+
       .addCase(fetchCartList.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Cập nhật giỏ hàng thất bại";
@@ -267,7 +268,9 @@ const cartSlice = createSlice({
               state.carts[cartIndex].items[itemIndex].isSelected = isSelected;
             }
             state.carts[cartIndex].items[itemIndex].totalItemPrice =
-              quantity * state.carts[cartIndex].items[itemIndex].price;
+              quantity *
+              state.carts[cartIndex].items[itemIndex].productVariant
+                .variant_price;
 
             // Update total price of the cart
             state.carts[cartIndex].totalPrice = state.carts[
@@ -341,35 +344,44 @@ const cartSlice = createSlice({
       .addCase(SelectCart.pending, (state) => {
         state.status = "loading"; // Khi bắt đầu xử lý
       })
+
       // .addCase(SelectCart.fulfilled, (state, action) => {
       //   console.log("action payload:", action.payload);
-      //   const { productId, items } = action.payload;
+      //   const { allItems } = action.payload;
 
-      //   // Tìm giỏ hàng có chứa sản phẩm được chọn
-      //   const cart = state.carts.find((cart) =>
-      //     cart.items.some((item) => item.product._id === productId)
-      //   );
-
-      //   if (cart) {
-      //     // Cập nhật trạng thái `isSelected` của sản phẩm
-      //     cart.items = cart.items.map((item) =>
-      //       item.product._id === productId ? { ...item, ...items[0] } : item
+      //   // Lặp qua tất cả các sản phẩm trong allItems để cập nhật trạng thái của chúng trong giỏ hàng
+      //   allItems.forEach((updatedItem: CartType) => {
+      //     const cart = state.carts.find((cart) =>
+      //       cart.items.some(
+      //         (item) => item.product._id === updatedItem.items[0].product._id
+      //       )
       //     );
 
-      //     // Tính toán lại tổng giá nếu cần
-      //     cart.totalPrice = cart.items.reduce((total, item) => {
-      //       const itemPrice = item.totalItemPrice || 0;
-      //       return total + itemPrice;
-      //     }, 0);
-      //   }
-      //   console.log("Redux state after update:", cart);
+      //     if (cart) {
+      //       // Cập nhật sản phẩm trong giỏ hàng
+      //       cart.items = cart.items.map((item) =>
+      //         item.product._id === updatedItem.items[0].product._id
+      //           ? { ...item, ...updatedItem }
+      //           : item
+      //       );
+
+      //       // Cập nhật tổng giá tiền
+      //       cart.totalPrice = cart.items.reduce((total, item) => {
+      //         const itemPrice = item.totalItemPrice || 0;
+      //         return total + itemPrice;
+      //       }, 0);
+      //     }
+      //   });
+
+      //   console.log("Redux state after update:", state.carts);
       // })
       .addCase(SelectCart.fulfilled, (state, action) => {
         console.log("action payload:", action.payload);
         const { allItems } = action.payload;
 
-        // Lặp qua tất cả các sản phẩm trong allItems để cập nhật trạng thái của chúng trong giỏ hàng
+        // Duyệt qua tất cả các phần tử được cập nhật trong allItems
         allItems.forEach((updatedItem: CartItem) => {
+          // Tìm giỏ hàng chứa sản phẩm được cập nhật
           const cart = state.carts.find((cart) =>
             cart.items.some(
               (item) => item.product._id === updatedItem.product._id
@@ -377,14 +389,14 @@ const cartSlice = createSlice({
           );
 
           if (cart) {
-            // Cập nhật sản phẩm trong giỏ hàng
+            // Cập nhật trạng thái của sản phẩm trong giỏ hàng
             cart.items = cart.items.map((item) =>
               item.product._id === updatedItem.product._id
-                ? { ...item, ...updatedItem }
+                ? { ...item, isSelected: updatedItem.isSelected }
                 : item
             );
 
-            // Cập nhật tổng giá tiền
+            // Tính lại tổng giá tiền của giỏ hàng
             cart.totalPrice = cart.items.reduce((total, item) => {
               const itemPrice = item.totalItemPrice || 0;
               return total + itemPrice;
@@ -396,8 +408,8 @@ const cartSlice = createSlice({
       })
 
       .addCase(SelectCart.rejected, (state, action) => {
-        state.status = "failed"; // Khi xử lý thất bại
-        state.error = action.error.message || "Cập nhật giỏ hàng thất bại"; // Ghi nhận thông báo lỗi
+        state.status = "failed";
+        state.error = action.error.message || "Cập nhật giỏ hàng thất bại";
       })
       .addCase(CheckVoucherThunk.pending, (state) => {
         state.status = "loading";

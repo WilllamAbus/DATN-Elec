@@ -237,12 +237,12 @@ export const resetPassword = async (token: string, password: string) => {
     }
   }
 };
-export const addToWatchlist = async (userId: string, productId: string) => {
+export const addToWatchlist = async (productId: string, variantId?: string) => {
   try {
     const response = await instance.post(
       `${API_URL}/wathlist/add/${productId}`,
       {
-        user: userId,
+        variantId,
       }
     );
     return response.data;

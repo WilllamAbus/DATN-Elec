@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../../../controler/admin/vnpay/order");
+
 router.get("/", (req, res) =>
   res.render("orderlist", { title: "Danh sách đơn hàng" })
 );

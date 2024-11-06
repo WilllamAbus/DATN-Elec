@@ -1,6 +1,6 @@
 import { Voucher as Voucher } from "../Voucher.d";
 import { UserProfile } from "../user";
-
+import { ProductVariant } from "../cart/carts";
 export interface ProductAttribute {
   k: string;
   v: string;
@@ -26,6 +26,7 @@ export interface CartDetail {
 
   items: {
     product: Product;
+    productVariant: ProductVariant;
     quantity: number;
     price: number;
     totalItemPrice: number;

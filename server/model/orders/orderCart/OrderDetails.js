@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 const orderDetailSchema = new Schema(
   {
-    order: { type: Schema.Types.ObjectId, ref: "OrderCart", required: true },
+    order: { type: Schema.Types.ObjectId, ref: "OrderCart", required: true }, // Liên kết tới OrderCart
     items: [
       {
         product: {
@@ -10,18 +11,25 @@ const orderDetailSchema = new Schema(
           ref: "product_v2",
           required: true,
         },
-        inventory: {
+        productVariant: {
           type: Schema.Types.ObjectId,
-          ref: "Inventory", // Đảm bảo tên mô hình chính xác
+          ref: "productVariant",
           required: true,
         },
+        inventory: {
+          type: Schema.Types.ObjectId,
+          ref: "Inventory",
+          required: true,
+        },
+
+        // Số lượng và giá từng sản phẩm
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
-        // totalItemPrice: { type: Number, required: true },
+        totalItemPrice: { type: Number, required: true }, // Tổng giá cho từng sản phẩm (quantity * price)
       },
     ],
-    // quantity: { type: Number, required: true },
-    // price: { type: Number, required: true },
+
+    // Tổng giá của tất cả các sản phẩm trong đơn hàng
     totalItemPrice: { type: Number, required: true },
   },
   {

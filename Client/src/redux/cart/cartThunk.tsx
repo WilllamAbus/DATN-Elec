@@ -11,28 +11,60 @@ import {
 } from "../../services/cart/cart";
 import { CartType } from "../../types/cart/carts";
 import axios from "axios";
+export interface FetchCartListResponse {
+  message: string;
+  carts: CartType[]; // Sử dụng CartType[] để mô tả danh sách giỏ hàng
+}
 
-export const fetchCartList = createAsyncThunk<CartType[]>(
-  "categories/fetchAll",
-  async () => {
-    return await getCartList();
+// Sửa đổi createAsyncThunk
+export const fetchCartList = createAsyncThunk<FetchCartListResponse>(
+  "cart/fetchAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getCartList();
+      console.log("API response:", response);
+      // Giả sử API trả về đối tượng chứa carts
+      if (!response || !response.carts) {
+        throw new Error("No data returned from the API.");
+      }
+      return response; // Phải đảm bảo rằng response là một đối tượng chứa thuộc tính carts
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      return rejectWithValue((error as Error).message);
+    }
   }
 );
+// export const fetchCartList = createAsyncThunk<CartType[]>(
+//   "cart/fetchAll",
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const response = await getCartList();
+//       console.log("API response:", response);
+//       if (!response) {
+//         throw new Error("No data returned from the API.");
+//       }
+//       return response;
+//     } catch (error) {
+//       console.error("Error fetching cart:", error);
+//       return rejectWithValue((error as Error).message);
+//     }
+//   }
+// );
 
 // Thêm sản phẩm vào giỏ hàng
 export const addProductToCart = createAsyncThunk(
   "cart/addProductToCart",
   async ({
-    userId,
     productId,
+    variantId, // Thêm variantId làm tham số
     quantity = 1,
   }: {
-    userId: string;
     productId: string;
+    variantId: string; // Khai báo kiểu cho variantId
     quantity?: number;
   }) => {
     try {
-      const response = await addToCart(userId, productId, quantity);
+      const response = await addToCart(productId, variantId, quantity); // Truyền variantId vào addToCart
       return response;
     } catch (error: any) {
       throw new Error(
@@ -49,11 +81,13 @@ export const updateCartItem = createAsyncThunk(
       cartId,
       itemId,
       quantity,
+      variantId, // Thêm variantId vào tham số
       isSelected = false,
     }: {
       cartId: string;
       itemId: string;
       quantity: number;
+      variantId: string; // Thêm kiểu dữ liệu cho variantId
       isSelected?: boolean;
     },
     { rejectWithValue } // Tham số `rejectWithValue` để trả về giá trị lỗi
@@ -62,6 +96,7 @@ export const updateCartItem = createAsyncThunk(
       const response = await updateCart(cartId, [
         {
           product: itemId,
+          variantId, // Đảm bảo thêm variantId
           quantity,
           isSelected,
         },
@@ -71,6 +106,7 @@ export const updateCartItem = createAsyncThunk(
         cartId,
         itemId,
         quantity,
+        variantId, // Trả về variantId
         isSelected,
       };
     } catch (error) {
@@ -86,6 +122,7 @@ export const updateCartItem = createAsyncThunk(
     }
   }
 );
+
 // Lấy giỏ hàng theo ID
 export const fetchCartById = createAsyncThunk(
   "cart/fetchCartById",

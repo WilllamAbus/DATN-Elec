@@ -1,15 +1,112 @@
 const WathList = require("../../model/wathlist");
 const Product = require("../../model/product_v2/index");
-// const productVariant = require("../../model/product_v2/productVariant");
+const productVariant = require("../../model/product_v2/productVariant");
 const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
 
 const WathListController = {
+  // addWatchlist: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
+  //     const { productId, variantId } = req.body;
+
+  //     if (!productId) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: " Product là bắt buộc",
+  //       });
+  //     }
+
+  //     // Kiểm tra người dùng
+  //     const foundUser = await User.findById(userId);
+  //     if (!foundUser) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: "Người dùng không tồn tại",
+  //       });
+  //     }
+
+  //     // Kiểm tra sản phẩm
+  //     const foundProduct = await Product.findById(productId);
+  //     if (!foundProduct) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: "Sản phẩm không tồn tại",
+  //       });
+  //     }
+
+  //     // Kiểm tra biến thể sản phẩm (nếu có `variantId`)
+  //     let selectedVariant = null;
+  //     if (variantId) {
+  //       selectedVariant = await productVariant.findOne({
+  //         _id: variantId,
+  //         product: productId,
+  //       });
+
+  //       if (!selectedVariant) {
+  //         return res.status(404).json({
+  //           success: false,
+  //           message: "Biến thể không tồn tại hoặc không thuộc về sản phẩm",
+  //         });
+  //       }
+  //     }
+
+  //     // Kiểm tra sản phẩm hoặc biến thể đã có trong danh sách yêu thích
+  //     const existingWatchlist = await WathList.findOne({
+  //       user: userId,
+  //       product: productId,
+  //       productVariant: variantId || null,
+  //     });
+
+  //     if (existingWatchlist) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Sản phẩm đã có trong danh sách yêu thích",
+  //       });
+  //     }
+
+  //     // Tạo danh sách yêu thích mới
+  //     let newWatchlist = new WathList({
+  //       user: userId,
+  //       product: productId,
+  //       productVariant: selectedVariant ? selectedVariant._id : null, // Thêm `productVariant`
+  //     });
+
+  //     await newWatchlist.save();
+  //     newWatchlist = await newWatchlist.populate("product productVariant");
+
+  //     // Ghi nhận tương tác
+  //     const newInteraction = new Interaction({
+  //       user: userId,
+  //       Watchlist: newWatchlist._id,
+  //       productID: productId,
+  //       productVariant: variantId || null,
+  //       type: "add wishlist",
+  //       score: 1,
+  //     });
+
+  //     await newInteraction.save();
+
+  //     return res.status(200).json({
+  //       success: true,
+  //       message:
+  //         "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
+  //       data: newWatchlist,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error adding to watchlist:", error);
+  //     return res.status(500).json({
+  //       message: "Có lỗi xảy ra",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
   addWatchlist: async (req, res) => {
     try {
-      const userId = req.user.id; // Giả sử bạn đang sử dụng middleware để thêm `user` vào `req`
-      const { productId } = req.params;
+      const userId = req.user.id;
+      const productId = req.params.productId;
+      const { variantId } = req.body;
 
       if (!userId || !productId) {
         return res.status(400).json({
@@ -18,6 +115,7 @@ const WathListController = {
         });
       }
 
+      // Kiểm tra người dùng
       const foundUser = await User.findById(userId);
       if (!foundUser) {
         return res.status(404).json({
@@ -26,6 +124,7 @@ const WathListController = {
         });
       }
 
+      // Kiểm tra sản phẩm
       const foundProduct = await Product.findById(productId);
       if (!foundProduct) {
         return res.status(404).json({
@@ -34,10 +133,28 @@ const WathListController = {
         });
       }
 
+      // Kiểm tra biến thể sản phẩm (nếu có `variantId`)
+      let selectedVariant = null;
+      if (variantId) {
+        selectedVariant = await productVariant.findOne({
+          _id: variantId,
+          product: productId,
+        });
+
+        if (!selectedVariant) {
+          return res.status(404).json({
+            success: false,
+            message: "Biến thể không tồn tại hoặc không thuộc về sản phẩm",
+          });
+        }
+      }
+      // Kiểm tra sản phẩm hoặc biến thể đã có trong danh sách yêu thích
       const existingWatchlist = await WathList.findOne({
         user: userId,
         product: productId,
+        productVariant: variantId || null,
       });
+
       if (existingWatchlist) {
         return res.status(400).json({
           success: false,
@@ -45,47 +162,33 @@ const WathListController = {
         });
       }
 
-      let newWatchlist = new WathList({ user: userId, product: productId });
-      await newWatchlist.save();
-      newWatchlist = await newWatchlist.populate("product");
+      let newWatchlist = new WathList({
+        user: userId,
+        product: productId,
+        productVariant: selectedVariant ? selectedVariant._id : null,
+      });
 
+      await newWatchlist.save();
+      newWatchlist = await newWatchlist.populate("product productVariant");
+
+      // Ghi nhận tương tác
       const newInteraction = new Interaction({
         user: userId,
         Watchlist: newWatchlist._id,
         productID: productId,
+        productVariant: variantId || null,
         type: "add wishlist",
         score: 1,
       });
 
       await newInteraction.save();
 
-
-        // // Gọi script Python với đường dẫn đầy đủ
-        // const pythonScriptPath = path.join(__dirname, '../../../Python Client Server/recommendation_service.py');
-        
-        // exec(`python3 ${pythonScriptPath} ${userId}`, (error, stdout, stderr) => {
-        //     if (error) {
-        //         console.error(`Error executing Python script: ${error}`);
-        //         return res.status(500).json({
-        //             success: false,
-        //             message: "Lỗi khi tính toán gợi ý sản phẩm",
-        //         });
-        //     }
-        //     if (stderr) {
-        //       console.error(`Python script error: ${stderr}`);
-        //       return res.status(500).json({
-        //           success: false,
-        //           message: "Có lỗi từ script Python",
-        //       });
-        //   }
-        //     console.log(`Python script output: ${stdout}`);
-        // });
-
-        return res.status(200).json({
-            success: true,
-            message: "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
-            data: newWatchlist,
-        });
+      return res.status(200).json({
+        success: true,
+        message:
+          "Sản phẩm đã được thêm vào danh sách yêu thích và ghi nhận tương tác",
+        data: newWatchlist,
+      });
     } catch (error) {
       console.error("Error adding to watchlist:", error);
       return res.status(500).json({
@@ -94,7 +197,40 @@ const WathListController = {
       });
     }
   },
+  // getWatchlist: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
 
+  //     if (!userId) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "ID người dùng không hợp lệ",
+  //       });
+  //     }
+
+  //     const watchlist = await WathList.find({ user: userId }).populate(
+  //       "product"
+  //     );
+
+  //     if (!watchlist.length) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: "Không có sản phẩm nào trong danh sách yêu thích",
+  //       });
+  //     }
+
+  //     return res.status(200).json({
+  //       success: true,
+  //       data: watchlist,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching watchlist:", error);
+  //     return res.status(500).json({
+  //       message: "Có lỗi xảy ra",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
   getWatchlist: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -106,16 +242,35 @@ const WathListController = {
         });
       }
 
-      const watchlist = await WathList.find({ user: userId }).populate(
-        "product"
-      );
+      // Tìm danh sách yêu thích và populate cả product và productVariant
+      // const watchlist = await WathList.find({ user: userId })
+      //   .populate("product")
+      //   .populate("productVariant");
 
-      if (!watchlist.length) {
-        return res.status(404).json({
-          success: false,
-          message: "Không có sản phẩm nào trong danh sách yêu thích",
+      // if (!watchlist.length) {
+      //   return res.status(404).json({
+      //     success: false,
+      //     message: "Không có sản phẩm nào trong danh sách yêu thích",
+      //   });
+      // }
+      const watchlist = await WathList.find({ user: userId })
+        .populate({
+          path: "product",
+        })
+        .populate({
+          path: "productVariant",
+          populate: [
+            {
+              path: "image",
+            },
+            {
+              path: "ram",
+            },
+            {
+              path: "storage",
+            },
+          ],
         });
-      }
 
       return res.status(200).json({
         success: true,
@@ -129,6 +284,7 @@ const WathListController = {
       });
     }
   },
+
   // DeleteWatchlist: async (req, res) => {
   //   try {
   //     const userId = req.user.id;

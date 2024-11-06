@@ -100,7 +100,7 @@ const OrderList: React.FC = () => {
 
                 <div className="border-t border-gray-300 my-6">
                   <div className="flex flex-col lg:flex-row gap-8 px-3 md:px-11 mb-8">
-                    {order.cartDetails?.length > 0 && (
+                    {order.cartDetails?.length > 0 ? (
                       <div className="w-full">
                         <div className="relative h-auto">
                           {order.cartDetails
@@ -109,39 +109,50 @@ const OrderList: React.FC = () => {
                               cartDetail.items?.length > 0 ? (
                                 cartDetail.items.map((item) => (
                                   <div
-                                    key={item.product._id}
+                                    key={item.product?._id} // Sử dụng optional chaining
                                     className="flex flex-col items-center gap-4 sm:flex-row mb-4"
                                   >
-                                    {item.product.image?.length > 0 && (
-                                      <Link
-                                        to={`/detailProd/${item.product._id}`}
-                                      >
-                                        <img
-                                          src={item.product.image[0]} // Hiển thị hình ảnh đầu tiên từ danh sách hình ảnh
-                                          onClick={() =>
-                                            handleRepurchase(item.product._id)
-                                          }
-                                          alt={`Hình ảnh sản phẩm ${item.product.product_name}`}
-                                          className="w-24 h-24 object-cover sm:w-32 sm:h-32 cursor-pointer"
-                                        />
-                                      </Link>
-                                    )}
+                                    <Link
+                                      to={`/detailProd/${item.product._id}`}
+                                    >
+                                      <img
+                                        src={
+                                          item?.productVariant?.image?.[0]
+                                            ?.image?.[0] ||
+                                          "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
+                                        }
+                                        onClick={() =>
+                                          handleRepurchase(item.product._id)
+                                        }
+                                        alt={`product ${
+                                          item.productVariant?.variant_name ||
+                                          "Unknown"
+                                        }`}
+                                        className="w-24 h-24 object-cover sm:w-32 sm:h-32 cursor-pointer"
+                                      />
+                                    </Link>
                                     <div className="flex flex-col justify-center sm:ml-4">
                                       <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-black">
-                                        {item.product.product_name}
+                                        {item.productVariant?.variant_name ||
+                                          "Tên sản phẩm không có"}{" "}
+                                        {/* Hiển thị tên sản phẩm hoặc thông báo */}
                                       </h6>
                                       <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
-                                        Số lượng: {item.quantity}
+                                        Số lượng: {item.quantity || 0}{" "}
+                                        {/* Hiển thị số lượng hoặc 0 nếu không có */}
                                       </div>
                                       <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-500 mt-2">
                                         Giá:{" "}
-                                        {item.product.product_price_unit.toLocaleString(
-                                          "vi-VN",
-                                          {
-                                            style: "currency",
-                                            currency: "VND",
-                                          }
-                                        )}{" "}
+                                        {item.productVariant.variant_price
+                                          ? item.productVariant.variant_price.toLocaleString(
+                                              "vi-VN",
+                                              {
+                                                style: "currency",
+                                                currency: "VND",
+                                              }
+                                            )
+                                          : "Không có giá"}{" "}
+                                        {/* Hiển thị giá hoặc thông báo */}
                                       </div>
                                     </div>
                                   </div>
@@ -162,6 +173,8 @@ const OrderList: React.FC = () => {
                           )}
                         </div>
                       </div>
+                    ) : (
+                      <p className="text-red-500">Giỏ hàng trống.</p> // Thông báo nếu giỏ hàng không có sản phẩm
                     )}
                   </div>
                 </div>
