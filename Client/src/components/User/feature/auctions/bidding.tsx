@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../../redux/store";
 import { fetchBidsByUserThunk } from "../../../../redux/bidding/biddingThunk";
 import { completeAuction  } from "../../../../redux/auctions/auctionThunk";
-
+// import { resetState } from "../../../../redux/auctions/auctionSlice";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +13,7 @@ import EditModalPopUp from "./modalEditAmout";
 import DeleteBidModal from "./deleteBid";
 import BidGroup from "./bidGroup";
 import { useNavigate, Link} from "react-router-dom";
+
 
 const ViewBidPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -137,7 +138,7 @@ const ViewBidPage: React.FC = () => {
   const bidGroups = groupBidsByProduct();
 
   const handleCompleteAuction = async (productId: string, timeTrackID: string ) => {
- 
+    // dispatch( resetState())
     dispatch( completeAuction({ productId, timeTrackID }))
       .then(() => {
         // Calculate and display the total amount for the completed auction
@@ -151,7 +152,7 @@ const ViewBidPage: React.FC = () => {
         //   setCompletedAuctionAmount(totalAmount); // Use the state variable to store the amount
       
         //  // Show success toast
-     
+      
         // }
         toast.success("Hoàn thành đấu giá", {
           onClose: () => {
@@ -204,7 +205,7 @@ const ViewBidPage: React.FC = () => {
 
         <div className="md:col-span-1 bg-white border border-gray-500 p-4 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Sổ lệnh</h2>
-          {Object.entries(stats).map(([productId, { averageBid, totalBids, totalPayment }]) => (
+          {Object.entries(stats).map(([productId, {averageBid,  totalBids, totalPayment }]) => (
             <div key={productId} className="mb-4">
               <h3 className="text-md font-medium text-gray-700">Sản phẩm: {productId}</h3>
               <p className="text-gray-600">Trung bình giá đấu: { Math.floor(averageBid).toLocaleString()} đ</p>
