@@ -12,9 +12,9 @@ export interface Comment {
 }
 // import { HomeAllProductResponse} from "../product_v2/client/types/homeAllProduct";
 
-export const addComment = async (id: string, commentData: { content: string; id_user: string; rating: number }) => {
+export const addComment = async (slug: string, commentData: { content: string; id_user: string; rating: number }) => {
   try {
-    const response = await instance.post(`${API_URL_CLIENT}/addComment/${id}`, commentData, {
+    const response = await instance.post(`${API_URL_CLIENT}/addComment/${slug}`, commentData, {
       headers: {
         'Content-Type': 'application/json', 
       },
@@ -76,9 +76,9 @@ export const postRepComment = async (id:string, commentData: { content: string }
     throw error;
   }
 };
-export const getCommentProduct = async (id: string) => {
+export const getCommentProduct = async (slug: string) => {
   try {
-    const response = await instance.get(`${API_URL_CLIENT}/${id}`);
+    const response = await instance.get(`${API_URL_CLIENT}/${slug}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -89,7 +89,7 @@ export const getCommentAdmin = async () => {
     const response = await instance.get(`${API_URL_ADMIN}/getCommentAdmin`);
     return response.data;
   } catch (error) {
-    throw error; 
+    return error; 
   }
 };
 export const deleteCommentAdmin = async (idProduct:string,idComment:string) => {

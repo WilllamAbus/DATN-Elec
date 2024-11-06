@@ -45,8 +45,8 @@ const commentController = {
 
   commentProduct: async (req, res) => {
     try {
-      const { id } = req.params;
-      const comments = await commentService.findCommentsByProductId(id);
+      const { slug } = req.params;
+      const comments = await commentService.findCommentsByProductId(slug);
       if (comments.length === 0) {
         return res
           .status(404)
@@ -140,23 +140,24 @@ const commentController = {
   },
   getCommentProduct: async (req, res) => {
     try {
-      const { id } = req.params;
-      // Tìm sản phẩm theo id và populate các bình luận có status là 'active'
-      const product = await modelProduct.findById(id).populate({
+      const { slug } = req.params;
+  
+      // Tìm sản phẩm theo slug và populate các bình luận có status là 'active'
+      const product = await modelProduct.findOne({ slug: slug }).populate({
         path: "comments", // Đường dẫn tới mảng comments
         model: "Comment", // Model tương ứng
         match: { status: "active" }, // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
         select: "content rating id_user id_product createdAt",
         options: { sort: { createdAt: -1 } }, // Sắp xếp từ mới nhất đến cũ nhất
       });
-
+  
       // Kiểm tra xem sản phẩm có tồn tại và có bình luận hay không
       if (!product || product.comments.length === 0) {
         return res
           .status(404)
           .json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
       }
-
+  
       // Trả về các bình luận
       res.status(200).json(product.comments);
     } catch (error) {
@@ -164,6 +165,7 @@ const commentController = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
+  
 
   getCommentAdmin: async (req, res) => {
     try {
@@ -267,47 +269,52 @@ const commentController = {
 
   addCommentProduct: async (req, res) => {
     try {
-      const productId = req.params.id;
+      const slug = req.params.slug;
       const commentData = req.body;
-      if (!mongoose.Types.ObjectId.isValid(productId)) {
-        return res.status(400).json({ error: "Invalid product ID" });
+  
+      // Tìm sản phẩm bằng slug để lấy productId
+      const product = await modelProduct.findOne({ slug: slug });
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
       }
-
+  
+      const productId = product._id; // Lấy productId từ sản phẩm tìm thấy
+  
+      // Kiểm tra nếu không có id_user trong commentData
       if (!commentData.id_user) {
         return res.status(400).json({ error: "User ID is required" });
       }
-
+  
       commentData.id_product = productId;
-
+  
       // Tạo comment mới
       const newComment = await modelComment.Comment.create(commentData);
-
+  
       if (!newComment) {
         return res.status(404).json({ error: "Comment could not be added" });
       }
-
+  
       // Cập nhật trường comments trong bảng product_v2
       const updatedProduct = await modelProduct.findByIdAndUpdate(
         productId,
         { $push: { comments: newComment._id } },
         { new: true }
       );
-
+  
       if (!updatedProduct) {
         return res.status(404).json({ error: "Product not found" });
       }
-
-      return res
-        .status(200)
-        .json({
-          message: "Comment added successfully",
-          product: updatedProduct,
-        });
+  
+      return res.status(200).json({
+        message: "Comment added successfully",
+        product: updatedProduct,
+      });
     } catch (error) {
       console.error("Error adding comment:", error);
       return res.status(500).json({ error: error.message });
     }
   },
+  
 
   listDetailComment: async (req, res) => {
     try {
