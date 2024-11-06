@@ -8,8 +8,7 @@ const Product_v2 = require("../../../model/productAuction/productAuction");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
-const PDFDocument = require('pdfkit');
-const moment = require("moment-timezone");
+
 // const InventoryOut = require("../../../model/inventories/invenOut.model");
 const crypto = require("crypto");
 // const momoService  = require('./momo.service');

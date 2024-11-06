@@ -59,7 +59,7 @@ For what reason would it be advisable for me to think about business content? Th
                     <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
                         <tr>
                             <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
-                                <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">E-COM</h1>
+                                <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;"></h1>
                             </td>
                         </tr>
                     </table>
@@ -89,7 +89,7 @@ For what reason would it be advisable for me to think about business content? Th
                 <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
                     <tr>
                         <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
-                            <img   src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=c0403c39-cf96-4a4f-8a0d-6884fcbe0bd6"
+                            <img   src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogos.png?alt=media&token=078f5f5d-08f4-41e6-99c6-5f0a05afa74d"
               alt="Logo" width="125" height="120" style="display: block; border: 0px;" /><br>
                             <h2 style="font-size: 30px; font-weight: 800; line-height: 36px; color: #333333; margin: 0;">
                                THANH TOÁN CỦA QUÝ KHÁCH

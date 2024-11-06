@@ -7,6 +7,9 @@ const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrde
 // const fs = require('fs');
 const ExcelJS = require('exceljs');
 const path = require('path');
+const { sendMail } = require("./mailer/mailerForPDF");
+const { sendMailExecl } = require("./mailer/mailerForExecl");
+const Product_v2 = require("../../../model/productAuction/productAuction");
 const orderAndDetailControler = {
     createOrder : async (req, res) => {
       try {
@@ -304,7 +307,8 @@ const orderAndDetailControler = {
             _id: orderId,
             status: 'active'
           }).populate('shippingAddress.userID', 'recipientName phoneNumber address');
-      
+          console.log('Order', order);
+          
           const orderDetails = await OrderDetailAuction.find({
             order: orderId,
             status: 'active'
@@ -505,6 +509,34 @@ const orderAndDetailControler = {
              .text('Vui lòng giữ hóa đơn này để đối chiếu khi cần thiết.', { align: 'center' });
       
           doc.end();
+
+          const userMail =  order.shippingAddress.email
+          const orderDetailV2 = await OrderDetailAuction.find({
+            order: orderId,
+            status: 'active'
+          }).lean();
+      
+          const orderDetailSummary = await Promise.all(
+            orderDetailV2.map(async (item) => {
+              const productIds = item.productID
+         
+              
+              const product = await Product_v2.findOne({_id: productIds}).lean();
+       
+              
+              // Log to debug the issue
+            
+          
+              // Check if product exists before accessing image property
+              return {
+                productName: item.nameProduct,
+                quantity: item.quantityDetails,
+                image: product ? product.image[0] : null, // Safe access to image
+              };
+            })
+          );
+          await sendMail(userMail, order,orderDetailSummary)
+          
         } catch (error) {
           console.error('Error generating invoice PDF:', error);
           if (!res.headersSent) {
@@ -657,7 +689,32 @@ const orderAndDetailControler = {
       
           await workbook.xlsx.write(res);
           res.end();
+          const userMail =  order.shippingAddress.email
+          const orderDetailV2 = await OrderDetailAuction.find({
+            order: orderId,
+            status: 'active'
+          }).lean();
       
+          const orderDetailSummary = await Promise.all(
+            orderDetailV2.map(async (item) => {
+              const productIds = item.productID
+         
+              
+              const product = await Product_v2.findOne({_id: productIds}).lean();
+       
+              
+              // Log to debug the issue
+            
+          
+              // Check if product exists before accessing image property
+              return {
+                productName: item.nameProduct,
+                quantity: item.quantityDetails,
+                image: product ? product.image[0] : null, // Safe access to image
+              };
+            })
+          );
+          await sendMailExecl(userMail, order,orderDetailSummary)
         } catch (error) {
           console.error('Error generating invoice Excel:', error);
           if (!res.headersSent) {

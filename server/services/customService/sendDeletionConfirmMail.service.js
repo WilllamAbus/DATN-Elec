@@ -393,7 +393,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails , custome
                                       "
                                       width="42"
                                       height="42"
-                                     src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=c0403c39-cf96-4a4f-8a0d-6884fcbe0bd6"
+                                     src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogos.png?alt=media&token=078f5f5d-08f4-41e6-99c6-5f0a05afa74d"
                                           alt="Logo"
                                     />
                                   </div>

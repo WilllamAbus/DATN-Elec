@@ -393,9 +393,9 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                                           margin: 0;
                                           max-width: 100%;
                                         "
-                                        width="42"
-                                        height="42"
-                                       src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=c0403c39-cf96-4a4f-8a0d-6884fcbe0bd6"
+                                        width="102"
+                                        height="102"
+                                       src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogos.png?alt=media&token=078f5f5d-08f4-41e6-99c6-5f0a05afa74d"
                                             alt="Logo"
                                       />
                                     </div>
@@ -759,7 +759,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                                                         mso-line-height-rule: exactly;
                                                         mso-text-raise: 2px;
                                                       "
-                                                      ><a hreft="http://localhost:3150/auction">Tiếp tục mua sắm</a></span
+                                                      ><a href="http://localhost:3150/auction">Tiếp tục mua sắm</a></span
                                                     >
                                                   </td>
                                                 </tr>
