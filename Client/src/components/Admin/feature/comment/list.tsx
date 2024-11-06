@@ -78,7 +78,7 @@ const ListComment: React.FC = () => {
                       <button
                         className="py-2 px-3 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         onClick={() =>
-                          navigatee(`/admin/listDetailComments/${product?._id}`)
+                          navigatee(`/admin/listDetailComments/${product?.slug}`)
                         }
                       >
                         Xem bình luận
