@@ -11,12 +11,7 @@ import {
   deleteWatchlistThunk,
 } from "../../../../../redux/product/wathList/wathlist";
 import { fetchProductByTimeTrack } from "../../../../../redux/timeTrackProduct/timeTrackProdThunk";
-import {
-  ProductAttribute,
-  ProductDetails,
-  ProductImage,
-  ProductResponse,
-} from "../../../../../types/timeTrackProduct/timeTrackProduct";
+import { ProductDetails, ProductImage, ProductResponse } from "../../../../../types/timeTrackProduct/timeTrackProduct";
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -31,7 +26,7 @@ interface ProductDetailsProps {
   // Dữ liệu người dùng
 }
 
-const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
+// const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
@@ -77,7 +72,181 @@ function formatCurrency(value: number) {
 
 //     return `${hours} giờ ${minutes} phút ${seconds} giây`;
 //   };
-// Function to calculate time left
+  // Function to calculate time left
+ 
+const AuctDetail: React.FC<ProductDetailsProps> = () => {
+    const [currentTime, setCurrentTime] = useState<string>('');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    // const [, setSelectedValues] = useState<Record<string, string | null>>({});
+    const { productId } = useParams<{ productId: string }>();
+    const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+    const dispatch = useDispatch<AppDispatch>();
+    const [product, setProduct] = useState<ProductDetails | null>(null); // Initialize with null or an appropriate type
+    const { productTimeTrack, loading, error } = useSelector((state: RootState) => state.productByTimeTrack);
+    const [timeLeft, setTimeLeft] = useState<string>('');
+    const watchlistItems = useSelector((state: RootState) => state.watchlist.items);
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
+    const profile = useAppSelector(
+      (state: RootState) => state.auth.profile.profile
+    );
+    // const handleChange = (attributeKey: string, value: string) => {
+    //   setSelectedValues((prev) => ({
+    //     ...prev,
+    //     [attributeKey]: value,
+    //   }));
+    // };
+  
+    const handleAddToWatchlist = async () => {
+      if (userId && productId) {
+        try {
+          let resultAction;
+  
+          if (isFavorite) {
+            resultAction = await dispatch(deleteWatchlistThunk(productId)).unwrap();
+            if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+              setIsFavorite(false);
+            } else {
+              console.log(resultAction);
+            }
+          } else {
+            resultAction = await dispatch(addToWatchlistThunk({ userId, productId })).unwrap();
+            if (addToWatchlistThunk.fulfilled.match(resultAction)) {
+              setIsFavorite(true);
+            } else {
+              console.log(resultAction);
+            }
+          }
+        } catch (err) {
+          if (err instanceof Error) {
+            console.log(err.message);
+          }
+        }
+      } else {
+        console.log("User ID or Product ID is missing");
+      }
+    };
+  
+    const changeMainImage = (index: number) => {
+      setCurrentIndex(index);
+    };
+  
+    useEffect(() => {
+      const handleInteraction = async () => {
+        if (!productId || !profile?._id) {
+          console.log("User profile or product ID is not available.");
+          return; 
+        }
+    
+        const interactionData = {
+          user: profile._id,
+          orderAuctions: null,
+          item: productId,
+          OrderCart: null,
+          productID: productId,
+          Watchlist: null,
+          type: "auctions",
+          score: 6,
+        };
+    
+        try {
+          await addInteractionAuction(interactionData);
+          dispatch(getProfileThunk()); 
+        } catch (error) {
+          console.log("Error adding interaction:", error);
+        }
+      };
+    
+      handleInteraction(); 
+    
+    }, [productId, profile?._id, dispatch]); 
+    
+    useEffect(() => {
+      if (productId) {
+   
+        dispatch(fetchProductByTimeTrack(productId))
+          .unwrap()
+          .then((data: ProductResponse) => {
+            if (data?.data) {
+              setProduct(data.data);  // Access the 'data' property to set product details
+            } else {
+              setProduct(null);  // Clear product data if not found
+            }
+          })
+          .catch((error) => console.error('Error fetching product:', error));
+      }
+    }, [productId, dispatch]);
+    useEffect(() => {
+        if (product?.endTime) {
+          const endTime = new Date(product.endTime); // Define endTime here
+    
+          const updateTimes = () => {
+            const now = new Date();
+            setCurrentTime(format(now, 'd/M/yy T HH:mm:ss', { locale: vi }));
+            setTimeLeft(calculateTimeLeft(endTime));
+          };
+    
+          updateTimes();
+          const timer = setInterval(updateTimes, 1000);
+    
+          return () => clearInterval(timer);
+        }
+      }, [product]);
+    
+      useEffect(() => {
+        if (productTimeTrack) {
+          setProduct(productTimeTrack.data); // Extract data from ProductResponse
+        } else {
+          setProduct(null); // Clear product if no productTimeTrack
+        }
+    
+        if (Array.isArray(watchlistItems)) {
+          const isFavoriteProduct = watchlistItems.some(
+            (item) => item.product && item.product._id === productId
+          );
+          setIsFavorite(isFavoriteProduct); // Set favorite status based on watchlist
+        }
+      }, [productTimeTrack, watchlistItems, productId]);
+    
+      const calculateTimeLeft = (endDate: Date) => {
+        const now = new Date();
+        const difference = endDate.getTime() - now.getTime();
+        
+        if (difference <= 0) {
+          return "Hết thời gian";
+        }
+      
+        const totalSeconds = Math.floor(difference / 1000);
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const totalDays = Math.floor(totalHours / 24);
+        
+        // const years = Math.floor(totalDays / 365);
+        // const months = Math.floor((totalDays % 365) / 30);
+        const days = totalDays % 30;
+      
+        const hours = totalHours % 24;
+        const minutes = totalMinutes % 60;
+        const seconds = totalSeconds % 60;
+      
+        return ` ${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+      };
+    
+      if (loading) {
+        return <div>Loading...</div>;
+      }
+    
+      if (error) {
+        return <div>Error: {error}</div>;
+      }
+    
+      if (!product) {
+        return <p>Loading...</p>;
+      }
+    
+      const formattedEndTime = product.endTime
+        ? format(parseISO(product.endTime), "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", { locale: vi })
+        : '';
+    const productPrice = product.product_price_unit ?? 0;
 
 const AuctDetail: React.FC<ProductDetailsProps> = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -374,50 +543,8 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
           <div className="pt-2">
             {/* <h3 className="text-xl text-gray-800 mb-3 uppercase font-medium">Các phiên bản</h3> */}
             <div className="flex flex-wrap gap-2">
-              {product.productAttributes.length ? (
-                product?.productAttributes
-                  .filter((attribute: ProductAttribute) =>
-                    ["Ram", "Color"].includes(attribute.key)
-                  )
-                  .map((attribute: ProductAttribute, index: number) => (
-                    <div key={index} className="flex flex-col gap-1">
-                      <strong className="text-gray-800">
-                        {attribute.key}:
-                      </strong>
-                      <div className="flex flex-wrap gap-2">
-                        {attribute.value.split(",").map((value, i) => (
-                          <div key={i} className="flex items-center">
-                            <input
-                              type="radio"
-                              id={`${attribute.key}-${i}`}
-                              name={attribute.key}
-                              value={value.trim()}
-                              checked={
-                                selectedValues[attribute.key] === value.trim()
-                              }
-                              onChange={() =>
-                                handleChange(attribute.key, value.trim())
-                              }
-                              className="hidden"
-                            />
-                            <label
-                              htmlFor={`${attribute.key}-${i}`}
-                              className={`border rounded-sm h-8 w-32 flex items-center justify-center cursor-pointer text-gray-600 ${
-                                selectedValues[attribute.key] === value.trim()
-                                  ? "border-blue-500"
-                                  : "border-gray-300"
-                              }`}
-                            >
-                              {value.trim()}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-              ) : (
-                <p>Không có thông tin</p>
-              )}
+
+
             </div>
           </div>
 
@@ -446,16 +573,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
         </h3>
         <div className="pt-6">
           <table className="table-auto border-collapse w-full text-left text-gray-600 text-sm">
-            {product.productAttributes
-              .filter((attribute: ProductAttribute) =>
-                attributesToShow.includes(attribute.key)
-              )
-              .map((attribute: ProductAttribute, index: number) => (
-                <li key={index} className="mb-1">
-                  <strong>{attribute.key}: </strong>
-                  <span>{attribute.value}</span>
-                </li>
-              ))}
+         
             <li>
               <strong>Khối lượng:</strong> <span>{product.weight_g} g</span>
             </li>

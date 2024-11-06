@@ -72,16 +72,25 @@ const BiddingController = {
 },
   getAllBids: async (req, res) => {
     try {
-      const { page = 1, limit = 10 } = req.query;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 10;
 
-      const result = await biddingService.getAllBids(
-        parseInt(page),
-        parseInt(limit)
+
+   
+
+      const { Bidding, totalPages, currentPage }  = await biddingService.getAllBids(
+        page,
+        pageSize,
+ 
+      
       );
-
       return res.status(200).json({
         success: true,
-        data: result,
+        data: {
+          Bidding,
+          totalPages,
+          currentPage
+        },
       });
     } catch (error) {
       console.error("Error in getAllBids controller:", error.message);

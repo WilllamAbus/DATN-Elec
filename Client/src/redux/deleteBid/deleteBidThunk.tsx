@@ -9,7 +9,7 @@ export const deleteBiddingThunk = createAsyncThunk<AuctionResult, DeleteBiddingR
   async (biddingData, { rejectWithValue }) => {
     try {
       const result = await biddingService.deleteBidding(biddingData);
-      console.log('result', result);
+  
       
       return result;
     } catch (error: any) {

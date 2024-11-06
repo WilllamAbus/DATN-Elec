@@ -7,6 +7,7 @@ const currentTimeInHCM = moment()
   .tz("Asia/Ho_Chi_Minh")
   .format("DD/MM/YYYY HH:mm:ss");
 
+  
 const timeTrackService = {
   /**
    * Tạo một bản ghi TimeTrack mới với thời gian bắt đầu và kết thúc hiện tại
@@ -15,7 +16,7 @@ const timeTrackService = {
    */
   createTimeTrack: async (productId, data) => {
     try {
-      const existingTimeTrack = await Time_Track.findOne({ productId });
+      const existingTimeTrack = await Time_Track.findOne({ productId , status: { $ne: "disable" }});
 
     if (existingTimeTrack) {
       throw new Error("Time track cho sản phẩm này đã tồn tại.");
@@ -131,10 +132,6 @@ const timeTrackService = {
         .populate("product_supplier", "name")
         .lean();
 
-    
-
-      // Check if product format exists and get the format information
-   
 
       // Extract images (assuming they are stored as an array of URLs or image objects)
       const images = product.image.map((img) => ({
@@ -143,10 +140,10 @@ const timeTrackService = {
       }));
 
       // Extract and format product attributes
-      const productAttributes = product.product_attributes.map((attribute) => ({
-        key: attribute.k, // 'k' for key
-        value: attribute.v, // 'v' for value
-      }));
+      // const productAttributes = product.product_attributes.map((attribute) => ({
+      //   key: attribute.k, // 'k' for key
+      //   value: attribute.v, // 'v' for value
+      // }));
 
       // Construct the product details object
       const productDetails = {
@@ -164,7 +161,7 @@ const timeTrackService = {
         weight_g: product.weight_g,
         product_slug: product.product_slug,
         images, // Array of image objects
-        productAttributes, // Array of attribute objects with key-value pairs
+        // productAttributes, // Array of attribute objects with key-value pairs
         endTime,
         endTimeBid, // End time from the time tracking data
       };
@@ -344,7 +341,7 @@ const timeTrackService = {
 
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
-        _id: { $in: productIds },
+        _id: { $in: productIds },status:"active"
       })
         .select("_id product_name image ")
       
@@ -530,7 +527,7 @@ const timeTrackService = {
       
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
-        _id: { $in: productIds },
+        _id: { $in: productIds }, status:"disable"
       })
         .select("_id product_name image ")
     

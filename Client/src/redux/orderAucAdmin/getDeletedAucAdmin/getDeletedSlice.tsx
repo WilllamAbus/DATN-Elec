@@ -1,24 +1,24 @@
 import { createSlice ,PayloadAction } from '@reduxjs/toolkit';
 import { getOrderDeletedThunk , restoreOrderThunk} from './getDeletedThunk';
-import { Order , OrdersResponse} from '../../../types/adminOrder/getDeletedOrder';
+import { OrderDeleted } from '../../../types/adminOrder/getDeletedOrder';
 import {OrderRestore} from '../../../types/adminOrder/restoreOrderAucAdmin'
 // Define the initial state of the slice
 interface DeletedOrdersState {
-  orders: OrderRestore[];
-  deletedOrders: Order[];
+  ordersRestoresCover: OrderRestore[];
+  deltedOrder: OrderDeleted[];
   restoredOrder: OrderRestore | null;
-  currentPage: number;
   totalPages: number;
+  currentPage: number;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: DeletedOrdersState = {
-  orders: [],
-  deletedOrders: [],
+  ordersRestoresCover: [],
+  deltedOrder: [],
   restoredOrder: null,
-  currentPage: 1,
   totalPages: 1,
+  currentPage: 1,
   loading: false,
   error: null,
 };
@@ -34,12 +34,13 @@ const deletedOrderAucAdminSlice = createSlice({
       state.loading = true;
       state.error = null;
     })
-    .addCase(getOrderDeletedThunk.fulfilled, (state, action: PayloadAction<OrdersResponse>) => {
-      state.deletedOrders = action.payload.data;
+    .addCase(getOrderDeletedThunk.fulfilled, (state, action: PayloadAction<any>) => {
+      state.deltedOrder = action.payload.data.ordersDeleted;
+
     
       
-      state.currentPage = action.payload.pagination.currentPage;
-      state.totalPages = action.payload.pagination.totalPages;
+      state.totalPages = action.payload.data.totalPages;
+      state.currentPage = action.payload.data.currentPage;
       state.loading = false;
     })
     .addCase(getOrderDeletedThunk.rejected, (state, action) => {
@@ -57,10 +58,10 @@ const deletedOrderAucAdminSlice = createSlice({
       state.restoredOrder = action.payload;
 
       // Filter out the restored order from deleted orders
-      state.deletedOrders = state.deletedOrders.filter(
+      state.deltedOrder = state.deltedOrder.filter(
         (order) => order._id !== action.payload._id
       );
-      state.orders = [...state.orders, action.payload];
+      state.ordersRestoresCover = [...state.ordersRestoresCover, action.payload];
       
         
     })

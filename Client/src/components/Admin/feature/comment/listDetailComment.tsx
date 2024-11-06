@@ -9,7 +9,6 @@ import {
 } from "../../../../services/commnet/comment.service";
 // import { getOneUser } from "../../../../services/user/user.service";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOneProduct } from "../../../../services/product_v2/admin/getone";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -20,12 +19,7 @@ import { useForm } from "react-hook-form";
 
 const MySwal = withReactContent(Swal);
 
-interface Product {
-  _id?: string;
-  product_name: string;
-  product_price: number;
-  image: string[];
-}
+
 
 interface Comment {
   _id: string;
@@ -47,7 +41,6 @@ interface Content {
   [key: string]: string; // Định nghĩa content như một đối tượng với key là comment ID và value là nội dung
 }
 const ListDetailComment: React.FC = () => {
-  const [product, setProduct] = useState<Product | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const { id } = useParams<{ id: string }>();
   const [openCommentId, setOpenCommentId] = useState<string | null>(null);
@@ -68,21 +61,14 @@ const ListDetailComment: React.FC = () => {
     }
   
     try {
-      const [productComments, productData] = await Promise.all([
+      const [productComments] = await Promise.all([
         getCommentProduct(id),
-        getOneProduct(id),
       ]);
   
       // Xử lý comments và set state
       setComments(productComments);
   
-      // Xử lý product và set state
-      if (productData && productData.product) {
-        setProduct(productData.product);
-      } else {
-        console.error("No product found for the given ID");
-      }
-  
+    
       // Lấy danh sách các user từ comment
       const userIds = Array.from(
         new Set(productComments.map((comment: Comment) => comment.id_user.toString()))
@@ -291,37 +277,7 @@ const ListDetailComment: React.FC = () => {
   return (
     <>
       {/* Product */}
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th className="p-4">Tên Sản Phẩm</th>
-            <th className="p-4">Giá</th>
-            <th className="p-4">Hình Ảnh</th>
-          </tr>
-        </thead>
-        <tbody>
-          {product ? (
-            <tr className="border-b text-left dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-              <td className="px-4 py-3">{product?.product_name}</td>
-              <td className="px-4 py-3">{product?.product_price}</td>
-              <td className="px-4 py-3">
-                {product?.image && product?.image[0] && (
-                  <img
-                    src={product?.image[0]}
-                    width={100}
-                    height={50}
-                    alt={product?.product_name}
-                  />
-                )}
-              </td>
-            </tr>
-          ) : (
-            <tr>
-              <td colSpan={3}>Loading product...</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+    
 
       {/* Comments */}
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">

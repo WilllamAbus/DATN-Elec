@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getOrders } from "../../../../redux/orderAucAdmin/orderAucAdminThunk";
+import { getOrders } from "../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
+import {
+  downloadInvoiceExcel,
+  getInvoicePDF,
+} from "../../../../services/orderAuction/getOrderAdmin";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,26 +19,27 @@ import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 const ListOrderAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const { orders } = useSelector((state: RootState) => state.orderAucAdmin);
-  const [, setOrders] = useState<Order[]>([]);
-
-  const pagination = useSelector(
-    (state: RootState) => state.orderAucAdmin.pagination
+  const { orders, totalPages } = useSelector(
+    (state: RootState) => state.orderAucAdmin
   );
-  // const loading = useSelector((state: RootState) => state.orderAucAdmin.loading);
-  // const error = useSelector((state: RootState) => state.orderAucAdmin.error);
 
-  const currentPage = pagination ? pagination.currentPage : 1;
-  const totalPages = pagination ? pagination.totalPages : 0; // Extract totalPages
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(5);
+  const [search, setSearch] = useState("");
 
+  const [, setOrders] = useState<Order[]>([]);
   useEffect(() => {
-    dispatch(getOrders({ page: currentPage, search: searchTerm }));
-  }, [dispatch, currentPage, searchTerm]);
+    dispatch(getOrders({ page, pageSize, search }));
+  }, [dispatch, page, pageSize, search]);
 
-  const handlePageChange = (page: number) => {
-    dispatch(getOrders({ page, search: searchTerm }));
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    setSearch(searchTerm);
+    setPage(1);
   };
   const handleSoftDelOrder = async (orderId: string) => {
     MySwal.fire({
@@ -50,24 +55,42 @@ const ListOrderAuction: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await dispatch(softDelAdminThunk({ orderId })).unwrap();
-          dispatch(getOrders({ page: currentPage, search: searchTerm }));
+          dispatch(getOrders({ page, pageSize, search }));
           // dispatch(fetchOrderDataShippingThunk(userId));
           setOrders((prevCategories) =>
             prevCategories.filter((order) => order._id !== orderId)
           );
 
-          toast.success("Đơn hàng của bạn đã bị hủy.");
+          toast.success("Đơn hàng của bạn đã hủy.");
         } catch (error) {
           toast.error("Đã xảy ra sự cố khi hủy đơn hàng.");
         }
       }
     });
   };
+  const handleDownloadInvoice = async (orderId: string) => {
+    try {
+      await downloadInvoiceExcel(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
 
+  const handleDownloadInvoicePDF = async (orderId: string) => {
+    try {
+      await getInvoicePDF(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
   return (
     <>
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
-        <SearchFormOrders setSearchTerm={setSearchTerm} />
+        <SearchFormOrders onSearch={handleSearch} />
       </div>
 
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -95,7 +118,7 @@ const ListOrderAuction: React.FC = () => {
         </thead>
         <tbody>
           {Array.isArray(orders) && orders.length > 0 ? (
-            orders.map((order: Order) => (
+            orders?.map((order: Order) => (
               <tr
                 key={order._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -287,8 +310,7 @@ const ListOrderAuction: React.FC = () => {
                           ? "text-yellow-700 bg-yellow-200 hover:text-white border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900"
                           : order.stateOrder === "Đã xác nhận"
                           ? "text-blue-700 bg-blue-200 hover:text-white border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
-                          : order.stateOrder === "Hủy đơn hàng" ||
-                            order.stateOrder === "Hoàn tất"
+                          : order.stateOrder === "Hủy đơn hàng" 
                           ? "text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                           : "text-gray-500 bg-gray-200 border-gray-500 cursor-not-allowed dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
                       }`}
@@ -304,23 +326,88 @@ const ListOrderAuction: React.FC = () => {
                         !(
                           order.stateOrder === "Chờ xử lý" ||
                           order.stateOrder === "Đã xác nhận" ||
-                          order.stateOrder === "Hủy đơn hàng" ||
-                          order.stateOrder === "Hoàn tất"
+                          order.stateOrder === "Hủy đơn hàng" 
+                          
                         )
                       }
                     >
                       {order.stateOrder}
                     </button>
-                    <Link
-                      to={`/admin/detailOrderAuction/${order._id}`}
-                      className="py-2 px-3 flex items-center
-                      text-sm font-medium text-center
-                       text-white bg-lime-600 rounded-lg
-                        hover:bg-lime-500 focus:ring-4 
-                        focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                    >
-                      Xem chi tiết
+                    <Link to={`/admin/detailOrderAuction/${order._id}`}>
+                      {/* SVG Icon embedded directly */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 12c0 5 9 9 9 9s9-4 9-9-9-9-9-9-9 4-9 9z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"
+                        />
+                      </svg>
+                      {/* Xem chi tiết */}
                     </Link>
+                    {order.stateOrder === "Hoàn tất" && (
+                      <div
+                        onClick={() => handleDownloadInvoice(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#27AE60" />
+                          <path d="M20 20H44V44H20z" fill="#FFF" />
+                          <path
+                            d="M24 24L40 40M40 24L24 40"
+                            stroke="#27AE60"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-white">Đơn hàng Excel</span> */}
+                      </div>
+                    )}
+
+                    {order.stateOrder === "Vận chuyển" && (
+                      <div
+                        onClick={() => handleDownloadInvoicePDF(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#E74C3C" />
+                          <path
+                            d="M32 12V52M22 22H42M22 32H42M22 42H32"
+                            stroke="#FFF"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-black">Đơn hàng PDF</span> */}
+                      </div>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -335,7 +422,7 @@ const ListOrderAuction: React.FC = () => {
         </tbody>
       </table>
       <PaginationComponent
-        currentPage={currentPage}
+        currentPage={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />

@@ -1,5 +1,11 @@
 // src/types/softDeleteOrder.ts
-
+export interface DeleteOrderItearacRequest {
+  userId: string;
+  orderId: string;
+  serviceRequestId: string;
+  reason: string;
+  notes: string;
+}
 export interface SocialLogin {
   googleId: string;
 }

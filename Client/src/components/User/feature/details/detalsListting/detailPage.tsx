@@ -18,6 +18,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
+import RelatedProduct from "./relatedProduct/relatedProduct";
+import Comment from "../../../../User/feature/details/comment/comment";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 import { ToastContainer } from "react-toastify";
 const DetailPage: React.FC = () => {
@@ -94,6 +97,7 @@ const DetailPage: React.FC = () => {
   }
 
   return (
+    <>
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
         {firstVariant && (
@@ -153,6 +157,13 @@ const DetailPage: React.FC = () => {
       </div>
       <ToastContainer />
     </section>
+    <section>
+       <Comment />
+    </section>
+    <section>
+        <RelatedProduct/>
+    </section>
+    </>
   );
 };
 

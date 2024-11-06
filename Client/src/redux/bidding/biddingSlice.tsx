@@ -27,7 +27,19 @@ const initialState: BidState = {
 const bidSlice = createSlice({
   name: 'bids',
   initialState,
-  reducers: {},
+  reducers: {/**Test gan mot65 cai restState */
+    resetStateBidding: (state) => {
+      state.updatedBid = null;
+      state.bidData = null;
+      state.totalBids = 0;
+      state.updatedBid = null;
+      state.bids = [];
+      state.error = null;
+ 
+    }
+
+
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createBidThunk.pending, (state) => {
@@ -60,5 +72,5 @@ const bidSlice = createSlice({
     });
   },
 });
-
+export const { resetStateBidding } = bidSlice.actions;
 export default bidSlice.reducer;

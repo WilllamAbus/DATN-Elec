@@ -107,7 +107,8 @@ const ConfirmOrderPage: React.FC = () => {
                   {product.name}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Giá: {product.price.toLocaleString()} VND
+                
+                Giá: {(product.price + 31000).toLocaleString()} VND
                 </p>
                 {product.image.length > 0 && (
                   <img

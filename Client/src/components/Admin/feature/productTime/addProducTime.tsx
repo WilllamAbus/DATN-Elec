@@ -103,14 +103,14 @@ const AddTimeProduct: React.FC = () => {
       <ReusableBreadcrumb items={breadcrumbItems.addProducTime} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Thêm sản phẩm
+          Thêm thời gian đấu giá sản phẩm
         </h1>
       </div>
       <div className="px-4 pt-4 xl:grid-cols-[1fr_2fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">
-              Tổng quan cập nhật
+              Tổng quan thêm mới
             </h3>
 
             <div className="grid grid-cols-6 gap-6">
@@ -163,7 +163,7 @@ const AddTimeProduct: React.FC = () => {
                     <input
                       className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       id="endTime"
-                      type="date"
+                    type="datetime-local"
                       {...field}
                     />
                   )}
@@ -194,7 +194,7 @@ const AddTimeProduct: React.FC = () => {
                     <input
                       className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       id="endTimeBid"
-                      type="date"
+                    type="datetime-local"
                       {...field}
                       disabled={!endTime}
                     />

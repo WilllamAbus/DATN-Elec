@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getOrderAuctionDetailsAdmin } from "../../../../redux/orderAucAdmin/orderAucAdminThunk";
+import { getOrderAuctionDetailsAdmin } from "../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
 import { updateOrderStatusThunk } from "../../../../redux/orderAucAdmin/updateStatusAdmin/updateStatusAdminThunk";
 import { Card, ListGroup, Select , Button} from "flowbite-react";
 import "react-toastify/dist/ReactToastify.css";

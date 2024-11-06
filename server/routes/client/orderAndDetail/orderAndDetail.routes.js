@@ -17,4 +17,8 @@ router.post('/complete',middlewareController.verifyToken, orderController.comple
 router.put('/received',middlewareController.verifyToken, orderController.updateAndGetReceivedOrdersByUser);
 router.patch('/received/soft-delete',middlewareController.verifyToken, orderController.softDeleteReceivedOrders);
 router.get('/orderDetailAdmin/:orderId',middlewareController.verifyTokenAdminAuth, orderController.getOrderDetailsAdmin)
+
+router.post('/softOrderByUserEmail',middlewareController.verifyToken, orderController.deleteOrderAndByUser)
+router.get('/invoices/:orderId',middlewareController.verifyTokenAdminAuth,orderController.exportInvoiceToPDF);
+router.get('/invoicesExecl/:orderId',middlewareController.verifyTokenAdminAuth,orderController.exportInvoiceToExcel);
 module.exports = router;

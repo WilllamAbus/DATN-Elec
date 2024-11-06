@@ -2,27 +2,36 @@
 
 import {  createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchDeletedOrderAuc, restoreOrder } from '../../../services/orderAuction/getDeletedAdmin'; // Adjust path as necessary
-import { OrdersResponse, } from '../../../types/adminOrder/getDeletedOrder';
+import { OrdersDeletedResponse, } from '../../../types/adminOrder/getDeletedOrder';
 import {OrderRestore} from '../../../types/adminOrder/restoreOrderAucAdmin'
-export const getOrderDeletedThunk = createAsyncThunk<
-  OrdersResponse,
-  { page?: number; limit?: number },
-  { rejectValue: string }
->('orders/getOrders', async ({ page = 1, limit = 5 }, { rejectWithValue }) => {
+
+interface FetchOrdersDeletedsParams {
+  page: number;
+  pageSize: number;
+  search?: string;
+}
+export const getOrderDeletedThunk = createAsyncThunk<OrdersDeletedResponse,FetchOrdersDeletedsParams>('orders/getOrders', async ({ page, pageSize, search = '' }, { rejectWithValue }) => {
   try {
-    const response = await fetchDeletedOrderAuc({ page, limit });
+    const response = await fetchDeletedOrderAuc(page, pageSize, search);
 
 
-    if (!response || !response.data || !response.pagination) {
-      throw new Error('Invalid response structure');
-    }
+    console.log('Order deleted thunk', response);
     
-    return response as OrdersResponse;
+    
+    return response ;
   } catch (error: any) {
     console.error('Fetch error:', error);
     return rejectWithValue(error.message || 'An error occurred');
   }
-});
+})
+
+
+;
+
+
+
+
+
 
 export const restoreOrderThunk = createAsyncThunk<OrderRestore, string>(
   "orders/restoreOrder",

@@ -1,32 +1,62 @@
 'use strict'
 /**Model */
 const Bidding = require('../../../model/orders/bidding.model'); // Model Bidding đã được định nghĩa
-const Product_v2 = require('../../../model/product_v2'); // Model sản phẩm
+const Product_v2 = require('../../../model/productAuction/productAuction'); // Model sản phẩm
 const PriceRangeBid = require('../../../model/orders/priceRange.model'); // Model PriceRangeBid
 const Time_Track = require('../../../model/time-track.model')
-
+const User = require('../../../model/users.model'); // Model User
 /** */
 
+
 const moment = require('moment-timezone');
+const cron = require('node-cron');
+
+ // Đảm bảo đường dẫn đúng đến model Bidding
+
+// Tác vụ cron chạy mỗi ngày lúc nửa đêm
+
+const scheduleBidding = cron.schedule('* * * * *', async()=>{
+  console.log('Running task every minute');
+  const now = new Date();
+ 
+      const thresholdDate = new Date();
+      // thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
+      thresholdDate.setTime(now.getTime() -  24 * 60 * 60 * 1000); //30s để test
+ 
+
+      
+      // Tìm và xóa các bản ghi có `createdAt` cũ hơn 24 giờ
+      const deletedBiddings = await Bidding.find({
+        status: "disable",
+        createdAt: { $lte: thresholdDate }
+      });
+
+  
+
+  
+   
+  
+      await Bidding.deleteMany({
+        _id: { $in: deletedBiddings.map((bid) => bid._id) },
+      });
+  
+  
+      
+      console.log(`Deleted ${deletedBiddings.length} expired bidding records.`);
+})
+
+scheduleBidding.start();
 
 const biddingService = {
    createBid : async (productId, userId,  bidAmount) => {
     try {
         // Find product and only get necessary fields
         const product = await Product_v2.findById({ _id: productId, status: { $ne: "disable" } })
-          .select('product_name product_price_unit product_format')
-          .populate('product_format', 'formats')
+          .select('product_name product_price_unit ')
+       
           .lean();
         
-        if (!product) {
-          throw new Error('Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.');
-        }
-        
-        // Check if product_format exists and get format
-        const format = product.product_format.formats.trim();
-        if (format !== "Đấu giá") {
-          return null;
-        }
+      
       
         // Find priceRangeBid and only get necessary fields
         const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
@@ -40,7 +70,7 @@ const biddingService = {
         const { minBid, midBid, maxBid } = priceRangeBid;
 
         // Điều chỉnh lại công thức để tính maxAllowedBid với 7% thay vì 10%
-        const maxAllowedBid = minBid + (minBid * 0.07); // 7% above minBid
+        const maxAllowedBid = minBid + (minBid * 1.07); // 7% above minBid
         
         // Chuyển đổi bidAmount sang kiểu số
         const bidAmountNumber = Number(bidAmount);
@@ -52,9 +82,7 @@ const biddingService = {
         
         // Kiểm tra nếu bidAmountNumber không phải là minBid, midBid, maxBid 
         // và không nằm trong phạm vi từ minBid đến maxAllowedBid
-        if (![minBid, midBid, maxBid].includes(bidAmountNumber) && !(bidAmountNumber > minBid && bidAmountNumber <= maxAllowedBid)) {
-          throw new Error(`Giá đấu giá phải là ${minBid}, ${midBid}, ${maxBid}, hoặc không vượt quá 7% giá trị minBid (${maxAllowedBid.toFixed(2)}).`);
-        }
+       
         
     
         // Find timeTrack
@@ -94,19 +122,14 @@ const biddingService = {
         try {
             // Step 1: Check if the product exists and is not disabled
             const product = await Product_v2.findOne({ _id: productId, status: { $ne: "disable" } })
-                .select('product_name product_price_unit product_format')
-                .populate('product_format', 'formats')
+                .select('product_name product_price_unit ')
+        
                 .lean();
     
-            if (!product) {
-                throw new Error('Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.');
-            }
+          
     
             // Step 2: Check if product_format is "Đấu giá"
-            const format = product.product_format.formats.trim();
-            if (format !== "Đấu giá") {
-                return null; // Not an auction product, no update needed
-            }
+          
     
             // Step 3: Find price range for bidding
             const priceRangeBid = await PriceRangeBid.findOne({ 'product_randBib.productId': productId })
@@ -172,7 +195,7 @@ const biddingService = {
       try {
         const query = {
           bidder: userId,
-          status: { $ne: 'disable' },
+          status: 'active',
           stateBidding: 'Xử lý' // Lọc theo stateBidding
         };
       
@@ -201,32 +224,159 @@ const biddingService = {
             { auctionId: oldAuctionId }, // Tìm các lượt đấu giá liên kết với phiên đấu giá cũ
             { $set: { auctionId: newAuctionId } } // Cập nhật các lượt đấu giá với auctionId mới
           );
-          console.log('Updated bidding documents successfully.');
+        
         } catch (error) {
           console.error('Error updating bidding documents:', error.message);
           throw new Error(`Không thể cập nhật lượt đấu giá: ${error.message}`);
         }
       },
 
-
-      getAllBids: async (page = 1, limit = 5) => {
+     setupCronJob : () => {
+     
+      },
+      getAllBids: async (page = 1, pageSize = 10) => {
         try {
-            const skip = (page - 1) * limit;
-            const totalBids = await Bidding.countDocuments({ status: { $ne: 'disable' } });
-            const bids = await Bidding.find({ status: { $ne: 'disable' } })
-                .skip(skip)
-                .limit(limit)
+        
+       
+          // Bước 1: Tìm tất cả TimeTrack có status là 'active'
+          const Biddings = await Bidding.find({ status: "disable" })
+            .select("_id product_bidding bidder bidAmount bidTime bidEndTime priceRange status") 
+            .populate("product_bidding" ,"product_name", "productId") // Chỉ lấy các trường cần thiết từ TimeTrack
+            .lean();
+    
+          
+            
+          // Bước 2: Lấy danh sách productId từ timeTracks
+          const productIds = Biddings.map((bis) => bis.product_bidding.productId);
+          const priceRandBids = Biddings.map((bidRand) =>bidRand.priceRange)
+          const bidders = Biddings.map((bidUser) =>bidUser.bidder)
+          const timeBiddings = Biddings.map((timeBiddings) => timeBiddings.bidEndTime)
+          // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
+          const products = await Product_v2.find({
+            _id: { $in: productIds },
+          })
+            .select("_id product_name image ")
+          
+            .lean();
+
+            const priceRand = await PriceRangeBid.find({
+              _id: { $in: priceRandBids },
+            })
+              .select("minBid midBid maxBid")
+            
+              .lean();
+
+
+              const priceRandUSer = await User.find({
+                _id: { $in: bidders },
+              })
+                .select("name")
+              
                 .lean();
 
-            return {
-                totalBids,
-                bids,
-                totalPages: Math.ceil(totalBids / limit),
-                currentPage: page
-            };
+
+                const biddingTime = await User.find({
+                  _id: { $in: timeBiddings },
+                })
+                  .select("endTimeBid")
+                
+                  .lean();
+
+               
+    
+  
+          const productMap = {};
+          const priceRandMap = {};
+          const priceRandUserMap = {};
+          const timeRandMap = {};
+          products.forEach((product) => {
+            productMap[product._id] = product;
+          });
+
+          priceRand.forEach((rand) => {
+            priceRandMap[rand._id] = rand;
+          });
+
+          priceRandUSer.forEach((randUser) => {
+            priceRandUserMap[randUser._id] = randUser;
+          });
+
+          biddingTime.forEach((randUserTime) => {
+            timeRandMap[randUserTime._id] = randUserTime;
+          });
+    
+          // Bước 5: Thêm thông tin sản phẩm vào timeTracks
+          const matchedBidding = Biddings.map(ciddings => {
+            const productIdStr = ciddings.product_bidding?.productId?.toString(); // Chuyển ObjectId thành chuỗi
+            const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
+            
+            const randPrice = ciddings.priceRange.toString(); //
+            const randPriceObj = priceRandMap[randPrice];
+            
+            
+            const bidingUser = ciddings.bidder.toString()
+            const biddingUserObj = priceRandUserMap[bidingUser]
+
+            const bidngTime =  ciddings.bidEndTime.toString()
+            const bidngTimeObj = timeRandMap[bidngTime]
+            // Lấy thông tin giá trị đấu giá từ priceRandMap
+            // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+            if (product) {
+              return {
+                ...ciddings, // Thêm thông tin timeTrack
+                product,
+                randPriceObj,
+                biddingUserObj,
+                bidngTimeObj // Thêm thông tin sản phẩm
+              };
+            }
+            return null; // Trả về null nếu không tìm thấy sản phẩm
+          }).filter(track => track !== null); // Lọc các phần tử null
+    
+          // In ra kết quả
+      
+    
+          // Lấy danh sách hình ảnh từ matchedTimeTracks
+          const allBidding = matchedBidding.map(track => ({
+            timeTrackId: track._id,
+            productId: track.product._id,
+            productName: track.product.product_name,
+            image: track.product.image, // Lấy hình ảnh từ sản phẩm
+            minBib: track.randPriceObj.minBib,
+            midBid: track.randPriceObj.midBid,
+            maxBid: track.randPriceObj.maxBid,
+      
+            biddingUserObj: track.biddingUserObj.name,
+            // Lấy thông tin giá trị đấu giá từ priceRandMap
+          }));
+    
+          // In ra danh sách hình ảnh
+    
+    
+          // Bước 6: Áp dụng tìm kiếm (nếu có)
+          const searchResults =  matchedBidding.filter((priceRange) => {
+            const productName = priceRange.product_bidding.product_name.toLowerCase();
+            return productName
+          })
+    
+          // Bước 7: Phân trang
+          const totalItems = searchResults.length; // Tổng số mục sau khi lọc
+          const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
+          const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
+          const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
+      
+          // Bước 8: Tính toán tổng số trang
+          const totalPages = totalBuckets;
+    
+          return {
+            Bidding: paginatedResults,
+            totalPages: totalPages,
+          currentPage: bucket,
+          allBidding, // Trả về danh sách hình ảnh
+          };
         } catch (error) {
-            console.error('Error fetching bids:', error.message);
-            throw new Error(`Không thể lấy danh sách lượt đấu giá: ${error.message}`);
+          console.error(error);
+          throw new Error(`Error retrieving : ${error.message}`);
         }
     },
 

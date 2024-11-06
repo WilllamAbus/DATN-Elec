@@ -43,27 +43,18 @@ export interface Order {
   __v: number;
 }
 
-export interface Data {
-  orders: Order[];
-  totalOrders: number;
-  totalPages: number;
-}
 
-export interface Pagination {
-  totalOrders: number;
-  totalPages: number;
-  currentPage: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
+
+
 
 export interface OrderResponse {
-  orders: Order[];
-  pagination: {
-    totalOrders: number;
+  status: number;
+message: string;
+
+  data: {
+    ordersDeleted: Order[];
     totalPages: number;
     currentPage: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
   };
 }
+

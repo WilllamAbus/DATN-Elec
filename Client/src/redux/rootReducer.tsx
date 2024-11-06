@@ -26,7 +26,7 @@ import auctionReducer from "./auctions/auctionSlice";
 import deleteBidReducer from "./deleteBid/deleteBidSlice";
 import auctCheckoutReducer from "./aucCheckout/auctCheckoutSlice";
 import confirmReducer from "./confirmOrder/confirmOrderSlice";
-import OrderListAuctionAdminReducer from "./orderAucAdmin/orderAucAdminSlice";
+import OrderListAuctionAdminReducer from "./orderAucAdmin/getAllOrder/orderAucAdminSlice";
 import getDeletedOrderAucAdminReducer from "./orderAucAdmin/getDeletedAucAdmin/getDeletedSlice";
 import statusShippingReducer from "./statusOrderUser/shippingStatusOrder/shiipingStatusSlice";
 import orderAuctionReducer from "./orderAuction/orderAuctionSlice";
@@ -40,9 +40,10 @@ import adminTimeTrackReducer from "./adminTimeTrack/list/listTimeTrackSlice";
 import adminTimeTrackDeletedReducer from "./adminTimeTrack/deleted/deletedTimeProdSlice";
 import adminListPriceRandReducer from "./adminPriceRand/list/listPriceRandSlice";
 import adminDeletedPriceRandReducer from "./adminPriceRand/deleted/deletedPriceRandSlice";
-
 import pendingStatusOrderReducer from "./statusOrderUser/pendingStatus/pendingStatusSlice";
 import confirmedStatusOrderReducer from "./statusOrderUser/confirmedStatus/confirmedStatusSlice";
+import listBidReducer from "./listBiddings/listBidSlice";
+import mailSoftDelOrderUserReducer from "./statusOrderUser/MailSoftOrder/mailSoftOrderSlicce";
 const authConfig = {
   key: "auth",
   storage,
@@ -94,6 +95,8 @@ const rootReducer = combineReducers({
   adminDeltedPriceRand: adminDeletedPriceRandReducer,
   pendingStatusOrder: pendingStatusOrderReducer,
   confirmedStatusOrder: confirmedStatusOrderReducer,
+  listBid: listBidReducer,
+  mailSoftDelOrderUser: mailSoftDelOrderUserReducer,
   // Add other reducers here to combine them with the persisted state.
 });
 

@@ -1,41 +1,34 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { useAppDispatch } from "../../../../../redux/store"; 
-import { getOrders } from "../../../../../redux/orderAucAdmin/orderAucAdminThunk";
+import React, { useState } from "react";
 
-interface SearchFormOrdersProps {
-  setSearchTerm: Dispatch<SetStateAction<string>>;
-}
-
-const SearchFormOrders: React.FC<SearchFormOrdersProps> = ({ setSearchTerm }) => {
-  const dispatch = useAppDispatch();
-  const [searchTerm, localSetSearchTerm] = useState("");
+const SearchFormProduct: React.FC<{ onSearch: (searchTerm: string) => void }> = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-   
-    setSearchTerm(searchTerm); // Pass the actual searchTerm value
-    dispatch(getOrders({ page: 1, search: searchTerm }));
+    onSearch(searchTerm);  // Gửi giá trị search về component cha
   };
 
   return (
     <div className="w-full md:w-1/2">
       <form className="flex items-center" onSubmit={handleSearch}>
-        <label htmlFor="simple-search" className="sr-only">Search</label>
+        <label htmlFor="simple-search" className="sr-only">
+          Search
+        </label>
         <div className="relative w-full">
           <input
             id="simple-search"
             type="search"
-            className="w-full py-1 px-2 border border-gray-300 rounded-md shadow-sm"
-            placeholder="Search"
+            className="w-full py-1 px-2 border border-gray-300 rounded-l-md shadow-sm h-10" // Giảm chiều cao của input
+            placeholder="Tìm kiếm sản phẩm"
             value={searchTerm}
-            onChange={(e) => localSetSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
             type="submit"
-            className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+            className="absolute inset-y-0 right-0 flex items-center justify-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md h-10" // Thay đổi màu kính lúp và giảm chiều cao
           >
             <svg
-              className="h-5 w-5"
+              className="h-4 w-4"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
@@ -53,4 +46,4 @@ const SearchFormOrders: React.FC<SearchFormOrdersProps> = ({ setSearchTerm }) =>
   );
 };
 
-export default SearchFormOrders;
+export default SearchFormProduct;

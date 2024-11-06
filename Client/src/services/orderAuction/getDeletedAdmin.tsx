@@ -1,24 +1,21 @@
 // src/services/orderService.ts
 
 import axios from '../axios';
-import { OrdersResponse } from '../../types/adminOrder/getDeletedOrder';
+import { OrdersDeletedResponse } from '../../types/adminOrder/getDeletedOrder';
 
 import { RestoreOrderResponse } from "../../types/adminOrder/restoreOrderAucAdmin";
 
-interface FetchOrdersParams {
-  page?: number;
-  limit?: number;
-}
 
-export const fetchDeletedOrderAuc = async ({ page = 1, limit = 5 }: FetchOrdersParams = {}): Promise<OrdersResponse> => {
+export const fetchDeletedOrderAuc = async (page: number, pageSize: number, search: string = '') => {
   try {
-    const response = await axios.get<OrdersResponse>('client/orderAuc/deleted', {
+    const response = await axios.get<OrdersDeletedResponse>('client/orderAuc/deleted', {
       params: {
         page,
-        limit,
+        pageSize,
+        search,
       },
     });
-    // console.log('response', response);
+    console.log('response', response);
     
     return response.data;
   } catch (error: any) {

@@ -10,6 +10,7 @@ const interactionSchema = new Schema(
     Watchlist: { type: Schema.Types.ObjectId, ref: "Watchlist" },
     Cart: { type: Schema.Types.ObjectId, ref: "Cart" },
     productID: { type: String },
+    productAuction: { type: String },
     type: {
       type: String,
       enum: ["view", "comment", "add wishlist", "purchase", "auctions", "cart"],

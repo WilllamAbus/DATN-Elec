@@ -58,13 +58,13 @@ export const breadcrumbItems = {
   addProducTime: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
-    { href: "/admin/addProdAuc", label: "Thêm sản phẩm" },
+    { href: "/admin/addProdAuc", label: "Thêm thời gian đấu giá sản phẩm" },
   ],
 
   editProducTime: [
     { href: "/", label: "Home" },
     { href: "/admin", label: "Admin" },
-    { href: "/admin/editProdAuc", label: "Cập nhật sản phẩm" },
+    { href: "/admin/editProdAuc", label: "Cập nhật thời gian đấu giá" },
   ],
   listPriceRand: [
     { href: "/", label: "Home" },
