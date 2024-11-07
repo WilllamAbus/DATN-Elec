@@ -230,6 +230,7 @@ const Comment = () => {
       console.error("Error showing confirmation dialog:", error);
     }
   };
+  
   useEffect(() => {
     dispatch(getProfileThunk());
   }, [dispatch]);
