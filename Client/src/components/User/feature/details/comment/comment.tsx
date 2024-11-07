@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
-// import ListCmt from "./listComment";
 import {
   RootState,
   useAppDispatch,
@@ -15,16 +14,16 @@ import {
   getUserComment,
   Comment as CommentType,
 } from "../../../../../services/commnet/comment.service";
-import { addInteraction } from "../../../../../services/interaction/interaction.service";
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import RepComment from "./repComment";
 import RatingStats from "./ratingStats";
+import Select from "react-select";
 const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
-  rating:number;
+  rating: number;
 }
 interface User {
   _id?: string;
@@ -47,11 +46,45 @@ const Comment = () => {
     (state: RootState) => state.auth.profile.profile
   );
   const isLoggedIn = !!profile?._id;
-
+  const [numberOfProducts, setNumberOfProducts] = useState("all");
+  const [filteredComments, setFilteredComments] = useState<any[]>([]);
   const handleShowMore = () => {
     setVisibleCount(comments.length);
   };
 
+  const options = [
+    { value: "all", label: "Tất cả" },
+    ...[...Array(5)].map((_, index) => ({
+      value: 5 - index ,
+      label: (
+        <span className="flex items-center ">
+          {5 - index }
+          <svg
+            className="h-4 w-4 text-yellow-300 "
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
+          </svg>
+        </span>
+      ),
+    })),
+  ];
+  const handleChange = (selectedOption: any) => {
+    const selectedRating = selectedOption.value;
+    setNumberOfProducts(selectedRating); 
+
+    if (selectedRating === "all") {
+      setFilteredComments(comments); // Hiển thị tất cả bình luận
+    } else {
+      const filtered = comments.filter(
+        (comment) => comment.rating === selectedRating
+      );
+      setFilteredComments(filtered); // Lọc bình luận theo rating
+    }
+  };
   const fetchComments = async () => {
     if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
@@ -61,6 +94,7 @@ const Comment = () => {
     try {
       const productComments: CommentType[] = await getCommentProduct(slug);
       setComments(productComments);
+      setFilteredComments(productComments);
       const userIds = Array.from(
         new Set(productComments.map((comment) => comment.id_user.toString()))
       );
@@ -105,16 +139,16 @@ const Comment = () => {
       return;
     }
 
-    const interactionData = {
-      user: profile._id,
-      orderAuctions: null,
-      item: slug,
-      OrderCart: null,
-      productID: slug,
-      Watchlist: null,
-      type: "comment",
-      score: 3,
-    };
+    // const interactionData = {
+    //   user: profile._id,
+    //   orderAuctions: null,
+    //   item: slug,
+    //   OrderCart: null,
+    //   productID: slug,
+    //   Watchlist: null,
+    //   type: "comment",
+    //   score: 3,
+    // };
 
     const commentData = {
       content: data.content,
@@ -124,13 +158,13 @@ const Comment = () => {
 
     try {
       // Sử dụng Promise.all để gọi cả hai API cùng một lúc
-      const [commentResponse, interactionResponse] = await Promise.all([
+      const [commentResponse] = await Promise.all([
         addComment(slug, commentData),
-        addInteraction(interactionData),
+        // addInteraction(interactionData),
       ]);
 
       console.log("Comment submitted:", commentResponse);
-      console.log("Interaction submitted:", interactionResponse);
+      // console.log("Interaction submitted:", interactionResponse);
 
       const newComment = {
         ...commentResponse.data, // Đảm bảo sử dụng commentResponse
@@ -176,22 +210,20 @@ const Comment = () => {
           await softDeleteComment(commentId);
 
           // Cập nhật state để xoá comment ngay mà không cần reload
-          setComments((prevComments) =>
-            prevComments.filter((comment) => comment._id !== commentId)
-          );
+          
 
           MySwal.fire({
             title: "Đã Xóa!",
             text: "Bình luận đã được xóa.",
             icon: "success",
           });
+          setComments((prevComments) =>
+            prevComments.filter((comment) => comment._id !== commentId)
+          );
+          fetchComments();
         } catch (error) {
           console.error("Error deleting comment:", error);
-          MySwal.fire({
-            title: "Lỗi!",
-            text: "Đã xảy ra sự cố khi xóa bình luận.",
-            icon: "error",
-          });
+        
         }
       }
     } catch (error) {
@@ -204,11 +236,6 @@ const Comment = () => {
   useEffect(() => {
     fetchComments();
   }, [slug]);
-  // useEffect(() => {
-  //   if (comments.length > 0) {
-  //     console.log("Comments updated:", comments);
-  //   }
-  // }, [comments]);
 
   return (
     <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
@@ -237,8 +264,23 @@ const Comment = () => {
                 {/* Phần đánh giá */}
                 <div className="md:w-2/3">
                   <RatingStats comments={comments} />
+
+                  <div className="mt-4 flex items-center space-x-2">
+                    <h1>Lọc đánh giá</h1>
+                    <Select
+                      value={options.find(
+                        (option) => option.value === numberOfProducts
+                      )} 
+                      options={options}
+                      onChange={handleChange}
+                      className="border border-black rounded md:w-1/6"
+                      classNamePrefix="react-select"
+                      defaultValue={options[0]}
+                      isSearchable={false}
+                    />
+                  </div>
                   {/* Nội dung bình luận */}
-                  {comments?.slice(0, visibleCount).map((comment) => {
+                  {filteredComments?.slice(0, visibleCount).map((comment) => {
                     return (
                       <div
                         key={comment?._id}
