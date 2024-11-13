@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { topViewProduct,totalProductsSold } from "../../../services/statistical/statistical.service";
-import currencyFormatter from "currency-formatter";
+// import currencyFormatter from "currency-formatter";
 import { Link } from "react-router-dom";
 
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
-}
+// function formatCurrency(value: number) {
+//   return currencyFormatter.format(value, { code: "VND", symbol: "" });
+// }
 const UserStatistics = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [numberOfProducts, setNumberOfProducts] = useState(3);
@@ -190,7 +190,7 @@ const UserStatistics = () => {
                       </Link>
                     </div>
                     <div className="pt-6">
-                      <div className="mb-4 flex items-center justify-between gap-4">
+                      {/* <div className="mb-4 flex items-center justify-between gap-4">
                         {product.product_discount.discountPercent > 0 ? (
                           <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
                             Giảm giá {product.product_discount.discountPercent}%
@@ -261,7 +261,7 @@ const UserStatistics = () => {
                             />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                       <a
                         href="#"
                         className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
@@ -338,7 +338,7 @@ const UserStatistics = () => {
                       
                       <div className="mt-4 flex items-center justify-between gap-6">
                         <p className="text-xs leading-tight text-gray-900 dark:text-white">
-                          {product.product_discount.discountPercent > 1 ? (
+                          {/* {product.product_discount.discountPercent > 1 ? (
                             <div>
                               <p className="text-xs font-medium text-rose-700">
                                 {formatCurrency(
@@ -357,7 +357,7 @@ const UserStatistics = () => {
                             <p className="text-xs font-medium text-rose-700">
                               {formatCurrency(product.product_price)}đ
                             </p>
-                          )}
+                          )} */}
                         </p>
                       </div>
                     </div>

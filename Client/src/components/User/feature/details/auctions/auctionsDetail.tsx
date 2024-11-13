@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppDispatch,
-  RootState,
-  useAppSelector,
+  RootState
+
 } from "../../../../../redux/store";
 import {
   addToWatchlistThunk,
@@ -23,8 +23,8 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import ModalPopUp from "../../../MoalButton";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
-import { getProfileThunk } from "../../../../../redux/auth/authThunk";
-import { addInteractionAuction } from "../../../../../services/interaction/interaction.service";
+// import { getProfileThunk } from "../../../../../redux/auth/authThunk";
+// import { addInteractionAuction } from "../../../../../services/interaction/interaction.service";
 interface ProductDetailsProps {
   productId: string;
   // Dữ liệu người dùng
@@ -96,9 +96,9 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
     (state: RootState) => state.watchlist.items
   );
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
-  const profile = useAppSelector(
-    (state: RootState) => state.auth.profile.profile
-  );
+  // const profile = useAppSelector(
+  //   (state: RootState) => state.auth.profile.profile
+  // );
   // const handleChange = (attributeKey: string, value: string) => {
   //   setSelectedValues((prev) => ({
   //     ...prev,
@@ -144,34 +144,34 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
     setCurrentIndex(index);
   };
 
-  useEffect(() => {
-    const handleInteraction = async () => {
-      if (!productId || !profile?._id) {
-        console.log("User profile or product ID is not available.");
-        return;
-      }
+  // useEffect(() => {
+  //   const handleInteraction = async () => {
+  //     if (!productId || !profile?._id) {
+  //       console.log("User profile or product ID is not available.");
+  //       return;
+  //     }
 
-      const interactionData = {
-        user: profile._id,
-        orderAuctions: null,
-        item: productId,
-        OrderCart: null,
-        productID: productId,
-        Watchlist: null,
-        type: "auctions",
-        score: 6,
-      };
+  //     const interactionData = {
+  //       user: profile._id,
+  //       orderAuctions: null,
+  //       item: productId,
+  //       OrderCart: null,
+  //       productID: productId,
+  //       Watchlist: null,
+  //       type: "auctions",
+  //       score: 6,
+  //     };
 
-      try {
-        await addInteractionAuction(interactionData);
-        dispatch(getProfileThunk());
-      } catch (error) {
-        console.log("Error adding interaction:", error);
-      }
-    };
+  //     try {
+  //       await addInteractionAuction(interactionData);
+  //       dispatch(getProfileThunk());
+  //     } catch (error) {
+  //       console.log("Error adding interaction:", error);
+  //     }
+  //   };
 
-    handleInteraction();
-  }, [productId, profile?._id, dispatch]);
+  //   handleInteraction();
+  // }, [productId, profile?._id, dispatch]);
 
   useEffect(() => {
     if (productId) {
