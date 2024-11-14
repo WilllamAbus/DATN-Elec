@@ -29,7 +29,7 @@ import {
 import currencyFormatter from "currency-formatter";
 import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Comment from "../../../../User/feature/details/comment/comment";
+// import Comment from "../../../../User/feature/details/comment/comment";
 // import {
 //   addProductToCart,
 //   fetchCartList,
@@ -535,7 +535,7 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      <Comment />
+      {/* <Comment /> */}
 
       <div className="container pb-16">
         <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
