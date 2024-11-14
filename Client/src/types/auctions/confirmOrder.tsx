@@ -25,8 +25,9 @@ export interface ShippingInfo {
   export interface Interaction {
     user: string;
     orderAuctions: string;
-    item: string | null;
-    productID: string;
+    // item:  null;
+    // productID: null;
+    productAuction: string;
     type: string;
     score: number;
     status: string;

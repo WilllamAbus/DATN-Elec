@@ -598,7 +598,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails , custome
                                       mso-line-height-rule: exactly;
                                       mso-text-raise: 5px;
                                     "
-                                    >Trở lại</span
+                                    ><a href='http://localhost:3150/auction?_sort=product_price%3AASC&page=1'>Trở lại</a></span
                                   >
                                 </td>
                               </tr>
@@ -757,7 +757,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails , custome
                                                       mso-line-height-rule: exactly;
                                                       mso-text-raise: 2px;
                                                     "
-                                                    ><a hreft="http://localhost:3150/auction">Tiếp tục mua sắm</a></span
+                                                    ><a hreft="http://localhost:3150/auction?_sort=product_price%3AASC&page=1">Tiếp tục mua sắm</a></span
                                                   >
                                                 </td>
                                               </tr>

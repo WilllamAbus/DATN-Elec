@@ -7,7 +7,6 @@ const currentTimeInHCM = moment()
   .tz("Asia/Ho_Chi_Minh")
   .format("DD/MM/YYYY HH:mm:ss");
 
-  
 const timeTrackService = {
   /**
    * Tạo một bản ghi TimeTrack mới với thời gian bắt đầu và kết thúc hiện tại
@@ -16,26 +15,26 @@ const timeTrackService = {
    */
   createTimeTrack: async (productId, data) => {
     try {
-      const existingTimeTrack = await Time_Track.findOne({ productId , status: { $ne: "disable" }});
+      const existingTimeTrack = await Time_Track.findOne({
+        productId,
+        status: { $ne: "disable" },
+      });
 
-    if (existingTimeTrack) {
-      throw new Error("Time track cho sản phẩm này đã tồn tại.");
-    }
+      if (existingTimeTrack) {
+        throw new Error("Time track cho sản phẩm này đã tồn tại.");
+      }
       // Tìm sản phẩm và chỉ lấy các trường cần thiết, sử dụng lean() để giảm memory overhead
       const product = await Product_v2.findOne({
         _id: productId,
         status: { $ne: "disable" },
       })
-        
-    
-        .lean();
+      .lean();
 
       if (!product) {
         throw new Error("Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.");
       }
 
       // Kiểm tra xem `product_format` có tồn tại không và lấy thông tin định dạng
-
 
       const timeZone = "Asia/Ho_Chi_Minh";
       const now = moment.tz(timeZone).toDate();
@@ -94,6 +93,7 @@ const timeTrackService = {
   getTimeTrackByProduct: async (productId) => {
     try {
       // Fetch the time track for the product
+      const currentTimeInHCM = moment().tz("Asia/Ho_Chi_Minh");
       const timeTrack = await Time_Track.findOne({ productId }).lean();
 
       if (!timeTrack) throw new Error("Time track không tồn tại");
@@ -122,16 +122,19 @@ const timeTrackService = {
       const timeTracks = timeTrack.productId;
       const endTime = timeTrack.endTime || null;
       const endTimeBid = timeTrack.endTimeBid || null;
+      
+      // if (endTime && moment(endTime).isBefore(currentTimeInHCM)) {
+      //   await Product_v2.updateOne({ _id: timeTracks }, { status: "disable" });
+      // }
       // Fetch product details
       const product = await Product_v2.findOne({
         _id: timeTracks,
         status: { $ne: "disable" },
       })
-     
+
         .populate("product_condition", "nameCondition")
         .populate("product_supplier", "name")
         .lean();
-
 
       // Extract images (assuming they are stored as an array of URLs or image objects)
       const images = product.image.map((img) => ({
@@ -175,10 +178,9 @@ const timeTrackService = {
   getTimeTrackById: async (id) => {
     try {
       const timeTrack = await Time_Track.findById(id);
-  
-      
+
       if (!timeTrack) return null;
-      
+
       // Step 2: Convert times from UTC to Vietnam time
       const startTime = moment(timeTrack.startTime)
         .tz("Asia/Ho_Chi_Minh")
@@ -186,26 +188,27 @@ const timeTrackService = {
       const endTime = moment(timeTrack.endTime)
         .tz("Asia/Ho_Chi_Minh")
         .format("DD/MM/YYYY HH:mm:ss");
-  
+
       // Step 3: Determine the status
-      const status = moment(timeTrack.endTime, "DD/MM/YYYY HH:mm:ss").isBefore(moment())
+      const status = moment(timeTrack.endTime, "DD/MM/YYYY HH:mm:ss").isBefore(
+        moment()
+      )
         ? "expired"
         : "active";
-  
+
       // Step 4: Extract productId from TimeTrack
       const productId = timeTrack.productId; // Adjust according to your Time_Track schema
- 
-      
+
       // Step 5: Fetch product details from product_v2 using productId
       const product = await Product_v2.findById(productId);
       if (!product) return null;
-  
+
       // Step 6: Return combined data
       return {
         _id: timeTrack._id,
         product_id: product._id,
-          name: product.product_name,
-          price: product.product_price_unit,
+        name: product.product_name,
+        price: product.product_price_unit,
         startTime,
         endTime,
         endTimeBid: timeTrack.endTimeBid, // Assuming you have this field in your Time_Track schema
@@ -328,28 +331,24 @@ const timeTrackService = {
 
   getAllTimeTracks: async (page = 1, pageSize = 5, search) => {
     try {
-    
-
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "active" })
         .select("_id startTime endTime endTimeBid stateTime productId status") // Chỉ lấy các trường cần thiết từ TimeTrack
         .lean();
 
-        
       // Bước 2: Lấy danh sách productId từ timeTracks
       const productIds = timeTracks.map((timeTrack) => timeTrack.productId);
 
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
-        _id: { $in: productIds },status:"active"
+        _id: { $in: productIds },
+        status: "active",
       })
         .select("_id product_name image ")
-      
+
         .lean();
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
- 
-      
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
@@ -358,34 +357,33 @@ const timeTrackService = {
       });
 
       // Bước 5: Thêm thông tin sản phẩm vào timeTracks
-      const matchedTimeTracks = timeTracks.map(timeTrack => {
-        const productIdStr = timeTrack.productId.toString(); // Chuyển ObjectId thành chuỗi
-        const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
+      const matchedTimeTracks = timeTracks
+        .map((timeTrack) => {
+          const productIdStr = timeTrack.productId.toString(); // Chuyển ObjectId thành chuỗi
+          const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
 
-        // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
-        if (product) {
-          return {
-            ...timeTrack, // Thêm thông tin timeTrack
-            product // Thêm thông tin sản phẩm
-          };
-        }
-        return null; // Trả về null nếu không tìm thấy sản phẩm
-      }).filter(track => track !== null); // Lọc các phần tử null
+          // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+          if (product) {
+            return {
+              ...timeTrack, // Thêm thông tin timeTrack
+              product, // Thêm thông tin sản phẩm
+            };
+          }
+          return null; // Trả về null nếu không tìm thấy sản phẩm
+        })
+        .filter((track) => track !== null); // Lọc các phần tử null
 
       // In ra kết quả
-  
 
       // Lấy danh sách hình ảnh từ matchedTimeTracks
-      const allTimeTrack = matchedTimeTracks.map(track => ({
+      const allTimeTrack = matchedTimeTracks.map((track) => ({
         timeTrackId: track._id,
         productId: track.product._id,
         productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
-    
       }));
 
       // In ra danh sách hình ảnh
-
 
       // Bước 6: Áp dụng tìm kiếm (nếu có)
       const searchResults = search
@@ -399,15 +397,18 @@ const timeTrackService = {
       const totalItems = searchResults.length; // Tổng số mục sau khi lọc
       const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
       const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
-      const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
-  
+      const paginatedResults = searchResults.slice(
+        (bucket - 1) * pageSize,
+        bucket * pageSize
+      ); // Lấy dữ liệu của bucket
+
       // Bước 8: Tính toán tổng số trang
       const totalPages = totalBuckets;
 
       return {
         timeTracks: paginatedResults,
         totalPages: totalPages,
-      currentPage: bucket,
+        currentPage: bucket,
         allTimeTrack, // Trả về danh sách hình ảnh
       };
     } catch (error) {
@@ -419,51 +420,68 @@ const timeTrackService = {
   editTimeTrackAdmin: async (id, data) => {
     try {
       const { endTime, endTimeBid } = data;
-  
+
       // Kiểm tra xem TimeTrack có tồn tại không
       const timeTrack = await Time_Track.findById(id);
       if (!timeTrack) {
         throw new Error("TimeTrack không tồn tại");
       }
-  
+
       // Lấy thời gian hiện tại
       const now = moment.tz("Asia/Ho_Chi_Minh");
-  
+
       // Validate endTime, endTimeBid (nếu có)
       const maxAllowedEndTime = now.clone().add(30, "days");
-  
-      if (endTime && moment.tz(endTime, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)) {
-        throw new Error("endTime không được vượt quá 30 ngày so với thời gian hiện tại");
+
+      if (
+        endTime &&
+        moment.tz(endTime, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)
+      ) {
+        throw new Error(
+          "endTime không được vượt quá 30 ngày so với thời gian hiện tại"
+        );
       }
-  
-      if (endTimeBid && moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)) {
-        throw new Error("endTimeBid không được vượt quá 30 ngày so với thời gian hiện tại");
+
+      if (
+        endTimeBid &&
+        moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").isAfter(maxAllowedEndTime)
+      ) {
+        throw new Error(
+          "endTimeBid không được vượt quá 30 ngày so với thời gian hiện tại"
+        );
       }
-  
+
       // Tạo đối tượng dữ liệu cập nhật
       const updateData = {
         startTime: now.toDate(), // Gán startTime với thời gian hiện tại
-        ...(endTime && { endTime: moment.tz(endTime, "Asia/Ho_Chi_Minh").toDate() }),
-        ...(endTimeBid && { endTimeBid: moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").toDate() }),
+        ...(endTime && {
+          endTime: moment.tz(endTime, "Asia/Ho_Chi_Minh").toDate(),
+        }),
+        ...(endTimeBid && {
+          endTimeBid: moment.tz(endTimeBid, "Asia/Ho_Chi_Minh").toDate(),
+        }),
       };
-  
+
       // Cập nhật TimeTrack với findByIdAndUpdate
-      const updatedTimeTrack = await Time_Track.findByIdAndUpdate(id, updateData, {
-        new: true, // Trả về tài liệu đã được cập nhật
-        runValidators: true, // Kiểm tra các bộ quy tắc xác thực
-      });
-  
+      const updatedTimeTrack = await Time_Track.findByIdAndUpdate(
+        id,
+        updateData,
+        {
+          new: true, // Trả về tài liệu đã được cập nhật
+          runValidators: true, // Kiểm tra các bộ quy tắc xác thực
+        }
+      );
+
       if (!updatedTimeTrack) {
         throw new Error("Không thể cập nhật TimeTrack");
       }
-  
+
       return updatedTimeTrack;
     } catch (error) {
       console.error("Error in editTimeTrack service:", error);
       throw new Error(`Error updating TimeTrack: ${error.message}`);
     }
   },
-  
 
   softDelTimeTrack: async (id) => {
     try {
@@ -482,8 +500,6 @@ const timeTrackService = {
         },
         { new: true } // Trả về document đã được cập nhật
       );
-
- 
 
       return updatedTimeTrack;
     } catch (error) {
@@ -504,8 +520,6 @@ const timeTrackService = {
         { new: true } // Trả về document đã được cập nhật
       );
 
-
-
       return updatedTimeTrack;
     } catch (error) {
       console.error("Error in restoreTimeTrack service:", error);
@@ -515,8 +529,6 @@ const timeTrackService = {
 
   deletedTimeTrackAdmin: async (page = 1, pageSize = 5, search) => {
     try {
-
-
       // Bước 1: Tìm tất cả TimeTrack có status là 'active'
       const timeTracks = await Time_Track.find({ status: "disable" })
         .select("_id startTime endTime stateTime productId status") // Chỉ lấy các trường cần thiết từ TimeTrack
@@ -524,17 +536,17 @@ const timeTrackService = {
 
       // Bước 2: Lấy danh sách productId từ timeTracks
       const productIds = timeTracks.map((timeTrack) => timeTrack.productId);
-      
+
       // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
       const products = await Product_v2.find({
-        _id: { $in: productIds }, status:"disable"
+        _id: { $in: productIds },
+        status: "disable",
       })
         .select("_id product_name image ")
-    
+
         .lean();
 
       // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
-     
 
       // Bước 4: Tạo map productId -> product để dễ dàng truy cập
       const productMap = {};
@@ -543,34 +555,33 @@ const timeTrackService = {
       });
 
       // Bước 5: Thêm thông tin sản phẩm vào timeTracks
-      const matchedTimeTracks = timeTracks.map(timeTrack => {
-        const productIdStr = timeTrack.productId.toString(); // Chuyển ObjectId thành chuỗi
-        const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
+      const matchedTimeTracks = timeTracks
+        .map((timeTrack) => {
+          const productIdStr = timeTrack.productId.toString(); // Chuyển ObjectId thành chuỗi
+          const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
 
-        // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
-        if (product) {
-          return {
-            ...timeTrack, // Thêm thông tin timeTrack
-            product // Thêm thông tin sản phẩm
-          };
-        }
-        return null; // Trả về null nếu không tìm thấy sản phẩm
-      }).filter(track => track !== null); // Lọc các phần tử null
+          // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+          if (product) {
+            return {
+              ...timeTrack, // Thêm thông tin timeTrack
+              product, // Thêm thông tin sản phẩm
+            };
+          }
+          return null; // Trả về null nếu không tìm thấy sản phẩm
+        })
+        .filter((track) => track !== null); // Lọc các phần tử null
 
       // In ra kết quả
-  
 
       // Lấy danh sách hình ảnh từ matchedTimeTracks
-      const allTimeTrack = matchedTimeTracks.map(track => ({
+      const allTimeTrack = matchedTimeTracks.map((track) => ({
         timeTrackId: track._id,
         productId: track.product._id,
         productName: track.product.product_name,
         image: track.product.image, // Lấy hình ảnh từ sản phẩm
-     
       }));
 
       // In ra danh sách hình ảnh
-    
 
       // Bước 6: Áp dụng tìm kiếm (nếu có)
       const searchResults = search
@@ -584,8 +595,11 @@ const timeTrackService = {
       const totalItems = searchResults.length; // Tổng số mục sau khi lọc
       const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
       const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
-      const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
-  
+      const paginatedResults = searchResults.slice(
+        (bucket - 1) * pageSize,
+        bucket * pageSize
+      ); // Lấy dữ liệu của bucket
+
       // Bước 8: Tính toán tổng số trang
       const totalPages = totalBuckets;
 
@@ -606,19 +620,17 @@ const timeTrackService = {
       // Bước 1: Tìm tất cả sản phẩm có status khác 'disable', populate 'product_format'
       const products = await Product_v2.find({
         status: { $ne: "disable" },
-      }) // Populate để lấy thông tin từ collection 'formatshoppings'
+      }); // Populate để lấy thông tin từ collection 'formatshoppings'
 
       // Bước 2: Lọc ra các sản phẩm có product_format là 'Đấu giá'
-      const filteredProducts = products
-      
-        .map((product) => {
-          return {
-            _id: product._id,
-            product_price_unit: product.product_price_unit,
-            product_name: product.product_name,
-            image: product.image,
-          };
-        });
+      const filteredProducts = products.map((product) => {
+        return {
+          _id: product._id,
+          product_price_unit: product.product_price_unit,
+          product_name: product.product_name,
+          image: product.image,
+        };
+      });
 
       return filteredProducts;
     } catch (error) {
