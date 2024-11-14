@@ -89,7 +89,6 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
     const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
     return comments.length > 0 ? (totalRatings / comments.length).toFixed(1) : " ";
   };
-
   const fetchComments = async () => {
     if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
