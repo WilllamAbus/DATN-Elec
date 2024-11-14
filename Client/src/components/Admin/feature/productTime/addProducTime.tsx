@@ -78,23 +78,17 @@ const AddTimeProduct: React.FC = () => {
       return;
     }
 
-    try {
-      if (!selectedProduct) {
-        toast.error("Vui lòng chọn sản phẩm");
-        return;
-      }
-
-     await TimeTrackService.createTimeTrack(selectedProduct, data);
-     if( toast.success("Thời gian cho sản phẩm đã được tạo thành công")){
-        navigate("/admin/listProdAuc");
-
-     }
- 
-   
-    
-    } catch (error) {
-      toast.error("Sản phẩm đã tồn tại");
+    if (!selectedProduct) {
+      toast.error("Vui lòng chọn sản phẩm");
+      return;
     }
+
+   await TimeTrackService.createTimeTrack(selectedProduct, data);
+   toast.success("Thời gian cho sản phẩm đã được tạo thành công")
+   setTimeout(() => {
+    navigate("/admin/listProdAuc");
+}, 2000);
+  
   };
 
   return (

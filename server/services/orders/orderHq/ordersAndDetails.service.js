@@ -373,14 +373,15 @@ const orderAndDetailService = {
           return await Interaction.create({
             user: order.shippingAddress.userID,
             orderAuctions: orderId,
-            productID: null,
             productAuction: detail.productID,
+            productID: null,
+         
             OrderCart: null,
             Watchlist: null,
             Cart: null,
-            item: null, // Lưu thông tin sản phẩm vào productID
+            item: null, 
             type: "auctions",
-            score: 6, // Có thể đặt điểm số chung cho tất cả các sản phẩm, hoặc tùy chỉnh nếu cần
+            score: 6, 
           });
         })
       );

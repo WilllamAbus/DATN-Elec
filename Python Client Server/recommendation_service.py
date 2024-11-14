@@ -1,148 +1,204 @@
 import os
-import sys
 import pandas as pd
-import numpy as np
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from bson import ObjectId
 from sklearn.metrics.pairwise import cosine_similarity
-from datetime import datetime, timedelta
+from bson import ObjectId
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Get environment variables
 MONGODB_URI = os.getenv('MONGODB_URI')
-URL_FE = os.getenv('URL_FE')
-PORT = os.getenv('PORT')
 
 # Connect to MongoDB
 client = MongoClient(MONGODB_URI)
 db = client['BeReacts']  # Database
-interaction_collection = db['interaction']  # Interaction collection
-product_collection = db['product_v2']  # Product collection
-recommendation_collection = db['recommendation']  # Recommendation collection
+order_cart_collection = db["OrderCart"]  # Collection chứa OrderCart
+order_detail_collection = db["OrderDetail"]  # Collection chứa OrderDetail
+interaction_collection = db["interaction"]  # Collection chứa Interaction
+recommendation_collection = db["recommendation"]
+def get_product_variants(user_id):
+    """
+    Lấy danh sách `productVariant` từ các nguồn khác nhau như OrderCart, Interaction, hoặc productAuction.
+    
+    Parameters:
+    user_id (str): ID của người dùng.
+    
+    Returns:
+    list: Danh sách các `productVariant` liên quan đến người dùng từ các nguồn khác nhau.
+    """
+    # 1. Kiểm tra OrderCart và lấy productVariant từ đó
+    order_cart = order_cart_collection.find_one({"user": ObjectId(user_id)})
+    
+    if order_cart:
+        print("Lấy productVariant từ OrderCart...")
+        order_detail_ids = order_cart.get("cartDetails", [])
+        if order_detail_ids:
+            order_details = order_detail_collection.find({"_id": {"$in": order_detail_ids}}, {"items.productVariant": 1})
+            product_variants = []
+            for detail in order_details:
+                for item in detail.get("items", []):
+                    product_variant = item.get("productVariant")
+                    if product_variant:
+                        product_variants.append(str(product_variant))  # Chuyển ID ObjectId sang chuỗi nếu cần
+            return product_variants
+    
+    # 2. Nếu không có OrderCart, kiểm tra Interaction và lấy productVariant từ đó
+    interactions = interaction_collection.find({"user": ObjectId(user_id)})
+    product_variants_from_interactions = []
+    for interaction in interactions:
+        if "productVariant" in interaction:
+            product_variants_from_interactions.append(str(interaction["productVariant"]))
+        elif "productAuction" in interaction:  # Nếu không có productVariant, kiểm tra productAuction
+            product_variants_from_interactions.append(str(interaction["productAuction"]))
+    
+    if product_variants_from_interactions:
+        print("Lấy productVariant từ Interaction hoặc productAuction...")
+        return product_variants_from_interactions
 
-# Function to get interactions of a user
+    print("Không tìm thấy productVariant từ OrderCart hay Interaction.")
+    return []
+
 def get_interactions(user_id):
-    try:
-        interactions = list(interaction_collection.find({
-            'user': ObjectId(user_id),
-            'productID': {'$ne': None}
-        }))
-        if interactions:
-            return pd.DataFrame(interactions)
-        else:
-            print(f"No interactions found for user_id: {user_id}")
-            return None
-    except Exception as e:
-        print(f"Error fetching interactions: {str(e)}")
+    """
+    Lấy tất cả các interaction của người dùng từ collection Interaction.
+
+    Parameters:
+    user_id (str): ID của người dùng.
+
+    Returns:
+    list: Một danh sách các document tương tác của người dùng.
+    """
+    return list(interaction_collection.find({"user": ObjectId(user_id)}))
+
+def create_item_product_matrix():
+    """
+    Tạo ma trận tương tác người dùng - sản phẩm từ collection Interaction.
+
+    Returns:
+    DataFrame: Ma trận người dùng - sản phẩm với điểm số (score) tương ứng.
+    """
+    interactions = list(interaction_collection.find())
+    if not interactions:
+        print("Không có dữ liệu trong collection Interaction.")
         return None
-
-# Function to create a user-item matrix
-def create_user_item_matrix(interactions_df):
-    interactions_df['user'] = interactions_df['user'].astype(str)
-    return interactions_df.pivot_table(index='user', columns='productID', values='score', fill_value=0)
-
-# Hàm tạo gợi ý dựa trên sự tương đồng giữa các sản phẩm (item-based recommendation)
-def item_based_recommendation(user_item_matrix, user_id):
-    # Lấy danh sách các sản phẩm mà người dùng đã tương tác (sản phẩm có điểm số > 0)
-    interacted_products = user_item_matrix.loc[user_id][user_item_matrix.loc[user_id] > 0].index
-
-    # Tính toán độ tương đồng giữa các sản phẩm bằng cosine similarity
-    product_similarity_df = pd.DataFrame(
-        cosine_similarity(user_item_matrix.T),  # Chuyển ma trận và tính toán tương đồng
-        index=user_item_matrix.columns,  # Đặt index là productID
-        columns=user_item_matrix.columns  # Đặt cột là productID
-    )
+    # Chuyển dữ liệu thành DataFrame
+    df = pd.DataFrame(interactions)
+    # Kiểm tra xem các cột 'user', 'productVariant', 'score' có tồn tại không
+    required_columns = ['user', 'productVariant', 'score']
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        print(f"Thiếu các cột: {missing_columns}")
+        return None
     
-    recommended_items = {}  # Tạo từ điển để lưu các sản phẩm được gợi ý và điểm tương đồng
-    for product in interacted_products:
-        # Lấy các sản phẩm tương tự nhất với sản phẩm hiện tại (bỏ qua chính sản phẩm đó)
-        similar_items = product_similarity_df[product].sort_values(ascending=False)[1:3]  # Chỉ lấy 2 sản phẩm tương tự
-        for item, similarity in similar_items.items():
-            if item not in recommended_items:
-                recommended_items[item] = similarity  # Lưu sản phẩm và điểm tương đồng
+    # Chọn các cột cần thiết
+    df = df[['user', 'productVariant', 'score']]
+    df['user'] = df['user'].astype(str)
+    # Tạo ma trận người dùng - sản phẩm, sử dụng productVariant làm cột và user làm chỉ mục
+    user_product_matrix = df.pivot_table(index='user', columns='productVariant', values='score', fill_value=0)
+    return user_product_matrix
+
+def compute_item_similarity(user_product_matrix):
+    """
+    Tính toán sự tương đồng giữa các sản phẩm sử dụng phương pháp cosine similarity.
+
+    Parameters:
+    user_product_matrix (DataFrame): Ma trận người dùng - sản phẩm.
+
+    Returns:
+    DataFrame: Ma trận tương đồng giữa các sản phẩm.
+    """
+    # Sử dụng cosine similarity để tính toán độ tương đồng giữa các sản phẩm
+    similarity_matrix = cosine_similarity(user_product_matrix.T)
     
-    return recommended_items  # Trả về từ điển sản phẩm gợi ý và điểm tương đồng
+    # Chuyển đổi thành DataFrame với các sản phẩm là chỉ mục và cột
+    similarity_df = pd.DataFrame(similarity_matrix, index=user_product_matrix.columns, columns=user_product_matrix.columns)
 
+    return similarity_df
 
-# Function to get product details from the database
-def get_product_details(product_ids):
-    products = []
-    for product_id in product_ids:
-        try:
-            product = product_collection.find_one({"_id": ObjectId(product_id)})
-            if product:
-                products.append({
-                    "name": product.get('product_name', 'Unknown'),
-                    "price": product.get('product_price', 0),
-                    "image": product.get('image', ['no_image.jpg']),
-                    "productID": str(product["_id"])
-                })
-            else:
-                print(f"Product with ID {product_id} not found.")
-        except Exception as e:
-            print(f"Error fetching product with ID {product_id}: {str(e)}")
-    return products
-
-# Hàm gợi ý sản phẩm cho người dùng dựa trên tương tác của họ
-def recommend_products_for_user(user_id):
-    interactions_df = get_interactions(user_id)  # Lấy dữ liệu tương tác của người dùng
-    if interactions_df is None:
+def get_recommendations(user_product_matrix, similarity_matrix, user_id):
+    if user_id not in user_product_matrix.index:
+        print(f"User {user_id} không có trong ma trận người dùng - sản phẩm.")
         return []
 
-    user_item_matrix = create_user_item_matrix(interactions_df)  # Tạo ma trận user-item
-
-    recommended_items = item_based_recommendation(user_item_matrix, user_id)  # Tạo gợi ý dựa trên sản phẩm
-
-    if not recommended_items:
-        print("Không có sản phẩm nào để gợi ý.")
-        return []
+    # Lấy sản phẩm người dùng đã tương tác
+    user_interactions = user_product_matrix.loc[user_id]
+    print(f"User interactions for {user_id}: {user_interactions}")  # In ra các tương tác của người dùng
     
-    recommended_products = get_product_details(recommended_items.keys())  # Lấy chi tiết các sản phẩm được gợi ý
-    # Thêm điểm số (similarity score) cho các sản phẩm gợi ý
-    for product in recommended_products:
-        product['score'] = recommended_items[product['productID']]
+    recommendations = {}
+    for product in user_product_matrix.columns:
+        if user_interactions[product] == 0:  # Chỉ gợi ý sản phẩm người dùng chưa tương tác
+            similar_scores = similarity_matrix[product]
+            weighted_score = sum(similar_scores * user_interactions) / sum(similar_scores)  # Tính điểm gợi ý
+            recommendations[product] = weighted_score
+
+    if not recommendations:
+        print(f"Không có sản phẩm nào được gợi ý cho người dùng {user_id}.")
+    # Sắp xếp gợi ý theo điểm gợi ý giảm dần
+    recommended_products = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)
+    return [product for product, _ in recommended_products]
+
+def save_recommendation(user_id, recommended_items, algorithm="collaborative_filtering"):
+    """
+    Save the generated recommendations to the 'recommendation' collection.
     
-    save_recommendation(user_id, recommended_products, interactions_df.to_dict('records'))  # Lưu gợi ý vào CSDL
-    return recommended_products
+    Parameters:
+    user_id (str): User ID who is receiving the recommendations.
+    recommended_items (list): List of recommended items with their scores.
+    algorithm (str): The algorithm used for recommendation (default is 'collaborative_filtering').
+    
+    Returns:
+    dict: The created recommendation document.
+    """
+    recommendation_data = {
+        "user": ObjectId(user_id),
+        "recommendedItems": [{"item": ObjectId(item[0]), "score": item[1]} for item in recommended_items],
+        "algorithm": algorithm,
+        "generatedAt": datetime.now(),
+        "expiresAt": None,  # You can set an expiration time if needed.
+        "stateRecommendation": "pending",
+        "status": "active"
+    }
+
+    # Insert the recommendation into the collection
+    result = recommendation_collection.insert_one(recommendation_data)
+
+    # Return the inserted recommendation document
+    return recommendation_data
 
 
-# Hàm lưu gợi ý vào CSDL (model recommendation)
-def save_recommendation(user_id, recommended_products, interactions):
-    try:
-        # Tạo đối tượng recommendation để lưu vào CSDL
-        recommendation = {
-            "user": ObjectId(user_id),
-            "recommendedItems": [
-                {"item": ObjectId(product["productID"]), "score": product["score"]} for product in recommended_products
-            ],  # Lưu sản phẩm gợi ý và điểm score (từ cosine similarity)
-            "interactions": [ObjectId(interaction['_id']) for interaction in interactions],  # Lưu các tương tác đã xảy ra
-            "algorithm": "collaborative_filtering",  # Thuật toán gợi ý sử dụng
-            "generatedAt": datetime.now(),  # Thời gian tạo gợi ý
-            "expiresAt": datetime.now() + timedelta(days=7),  # Thời gian hết hạn của gợi ý (sau 7 ngày)
-            "stateRecommendation": "pending",  # Trạng thái gợi ý ban đầu là "chờ"
-            "modifieon": datetime.now(),
-            "status": "active",  # Trạng thái gợi ý
-            "disabledAt": None
-        }
-        # Lưu vào collection 'recommendation'
-        recommendation_collection.insert_one(recommendation)
-        print("Lưu gợi ý thành công.")
-    except Exception as e:
-        print(f"Lỗi khi lưu gợi ý vào CSDL: {str(e)}")
-# Main function to run the script
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        user_id = sys.argv[1]
-        recommendations = recommend_products_for_user(user_id)
-        
-        if recommendations:
-            print("Recommended products:")
-            for product in recommendations:
-                print(f"- {product['name']} | Price: {product['price']} | Image: {product['image']} | ID: {product['productID']}")
-        else:
-            print("No recommendations available.")
+def main():
+    # Ví dụ: Lấy gợi ý sản phẩm cho người dùng
+    user_id = "66c894f1d65ff014f30b8788"  # Thay thế bằng ID của bạn
+
+    # Lấy các `productVariant` từ các nguồn (OrderCart, Interaction, productAuction)
+    product_variants = get_product_variants(user_id)
+    print(f"Product variants for User {user_id}: {product_variants}")
+
+    # Tạo ma trận người dùng - sản phẩm
+    user_product_matrix = create_item_product_matrix()
+    if user_product_matrix is None:
+        print("Không thể tạo ma trận người dùng - sản phẩm.")
+        return
+
+    print("User-Product Matrix Index:", user_product_matrix.index)  # Thêm dòng này để kiểm tra index
+    # Tính toán ma trận tương đồng sản phẩm
+    similarity_matrix = compute_item_similarity(user_product_matrix)
+
+    # Lấy gợi ý sản phẩm cho người dùng
+    recommendations = get_recommendations(user_product_matrix, similarity_matrix, user_id)
+
+    print(f"Recommended products for User {user_id}: {recommendations}")
+
+    if recommendations:
+    # Gợi ý có sẵn, lưu vào MongoDB với điểm thực tế
+        saved_recommendation = save_recommendation(user_id, [(item, recommendations[item]) for item in recommendations])  
+        print(f"Recommendation saved: {saved_recommendation}")
     else:
-        print("Please provide a user_id.")
+        print(f"No recommendations to save for user {user_id}.")
+
+if __name__ == "__main__":
+    main()

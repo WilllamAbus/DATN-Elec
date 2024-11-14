@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { homeAllProduct } from "../../services/product_v2/client/homeAllProduct";
-import currencyFormatter from "currency-formatter";
+// import currencyFormatter from "currency-formatter";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
@@ -12,9 +12,9 @@ import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProd
 // import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
-}
+// function formatCurrency(value: number) {
+//   return currencyFormatter.format(value, { code: "VND", symbol: "" });
+// }
 const ProductSection: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useDispatch<AppDispatch>();
@@ -23,7 +23,7 @@ const ProductSection: React.FC = () => {
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   useParams<{ id: string }>();
   const handleShowMore = () => {
@@ -137,13 +137,13 @@ const ProductSection: React.FC = () => {
               </div>
               <div className="pt-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                  {product.product_discount.discountPercent > 0 ? (
+                  {/* {product.product_discount.discountPercent> 0 ? (
                     <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                      Giảm giá {product.product_discount.discountPercent}%
+                      Giảm giá {product.product_discount.discountPercent || ''}%
                     </span>
                   ) : (
                     <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
-                  )}
+                  )} */}
                   <div className="flex items-center justify-end gap-1">
                     <button
                       type="button"
@@ -188,7 +188,7 @@ const ProductSection: React.FC = () => {
                       fcdsf Quick look
                       <div className="tooltip-arrow" data-popper-arrow="" />
                     </div>
-                    {error && <p className="text-red-500">{error}</p>}
+                
 
                     <button
                       type="button"
@@ -343,7 +343,7 @@ const ProductSection: React.FC = () => {
                 </ul>
                 <div className="mt-4 flex items-center justify-between gap-6">
                   <p className="text-xs leading-tight text-gray-900 dark:text-white">
-                    {product.product_discount.discountPercent > 1 ? (
+                    {/* {product.product_discount.discountPercent > 1 ? (
                       <div>
                         <p className="text-xs font-medium text-rose-700">
                           {formatCurrency(
@@ -361,7 +361,7 @@ const ProductSection: React.FC = () => {
                       <p className="text-xs font-medium text-rose-700">
                         {formatCurrency(product.product_price)}đ
                       </p>
-                    )}
+                    )} */}
                   </p>
                 </div>
                 <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
