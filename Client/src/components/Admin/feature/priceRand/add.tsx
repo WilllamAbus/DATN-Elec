@@ -54,7 +54,10 @@ const AddPriceRand: React.FC = () => {
             };
             await PriceRandService.createPriceRand(selectedProduct, validPrice);
             toast.success("Tạo khoảng định giá thành công!");
-            navigate("/admin/listPriceRand");
+            setTimeout(() => {
+                navigate("/admin/listPriceRand");
+            }, 2000);
+         
             // Thêm sản phẩm vào danh sách đã chọn sau khi tạo thành công
             setSelectedProducts([...selectedProducts, selectedProduct]);
         } catch (error: any) {

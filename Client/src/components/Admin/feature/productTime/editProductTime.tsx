@@ -22,11 +22,11 @@ const EditTimeProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>() || { id: "" };
 
   const [isEndTimeSelected, setIsEndTimeSelected] = useState<boolean>(false);
-  const [selectedProduct, setSelectedProduct] = useState("");
-  const [selectedProductName, setSelectedProductName] = useState("");
-  const [, setErrorMessage] = useState("");
+  // const [selectedProduct, setSelectedProduct] = useState("");
+  // const [selectedProductName, setSelectedProductName] = useState("");
+  // const [, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [, setProducts] = useState<Product[]>([]);
   const {
     control,
     handleSubmit,
@@ -109,21 +109,21 @@ const EditTimeProduct: React.FC = () => {
     clearErrors("endTimeBid");
     return true;
   };
-  const handleProductSelect = (productId: string) => {
-    const selectedProduct = products.find((product) => product._id === productId);
-    if (selectedProduct) {
-      setSelectedProduct(productId);
-      setSelectedProductName(selectedProduct.product_name);
-      // So sánh với giá trị hiện tại
-      const currentName = selectedProductName; // Giá trị tham chiếu từ input
-      if (currentName && currentName !== selectedProduct.product_name) {
-        setErrorMessage("Tên sản phẩm không khớp với sản phẩm đã chọn!");
-      } else {
-        setErrorMessage(""); // Xóa thông báo lỗi nếu khớp
-      }
-      setValue("name", selectedProduct.product_name); // Cập nhật giá trị trong form
-    }
-  };
+  // const handleProductSelect = (productId: string) => {
+  //   const selectedProduct = products.find((product) => product._id === productId);
+  //   if (selectedProduct) {
+  //     setSelectedProduct(productId);
+  //     setSelectedProductName(selectedProduct.product_name);
+  //     // So sánh với giá trị hiện tại
+  //     const currentName = selectedProductName; // Giá trị tham chiếu từ input
+  //     if (currentName && currentName !== selectedProduct.product_name) {
+  //       setErrorMessage("Tên sản phẩm không khớp với sản phẩm đã chọn!");
+  //     } else {
+  //       setErrorMessage(""); // Xóa thông báo lỗi nếu khớp
+  //     }
+  //     setValue("name", selectedProduct.product_name); // Cập nhật giá trị trong form
+  //   }
+  // };
   const onSubmit = async (data: IFormInput) => {
  
       try {
@@ -137,9 +137,11 @@ const EditTimeProduct: React.FC = () => {
         endTimeBid: data.endTimeBid,
       };
       await TimeTrackService.editTimeTrackAdminService(id || "", timeTrackData);
-      if( toast.success("Cập nhật thành công")){
+      toast.success("Cập nhật thành công")
+      setTimeout(() => {
         navigate("/admin/listProdAuc");
-      }
+    }, 2000);
+   
   
    
     } catch (error) {
@@ -165,7 +167,7 @@ const EditTimeProduct: React.FC = () => {
               Tổng quan cập nhật
             </h3>
             <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-4 sm:col-span-3">
+            {/* <div className="col-span-4 sm:col-span-3">
                 <label
                   htmlFor="product_variant"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -195,7 +197,7 @@ const EditTimeProduct: React.FC = () => {
                   )}
                 />
                 {errors.product_id && <p className="text-red-500 text-sm">Vui lòng chọn sản phẩm</p>}
-              </div>
+              </div> */}
               <div className="col-span-4 sm:col-span-3">
                 <label
                   htmlFor="product_variant"

@@ -4,7 +4,7 @@ const modelRepComment = require("../model/repComment.model");
 const modelUser = require("../model/users.model");
 const modelComment = require("../model/comment.model");
 const mongoose = require("mongoose");
-
+const interactionService = require('../services/interaction/interation.service');
 const commentController = {
   userID: async (req, res) => {
     try {
@@ -141,30 +141,36 @@ const commentController = {
   getCommentProduct: async (req, res) => {
     try {
       const { slug } = req.params;
+      // Lấy giá trị số sao từ query, nếu không có sẽ mặc định là null (không lọc theo rating)
+      const rating = req.query.rating ? parseInt(req.query.rating) : null;
   
-      // Tìm sản phẩm theo slug và populate các bình luận có status là 'active'
       const product = await modelProduct.findOne({ slug: slug }).populate({
         path: "comments", // Đường dẫn tới mảng comments
         model: "Comment", // Model tương ứng
-        match: { status: "active" }, // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
-        select: "content rating id_user id_product createdAt",
+        match: {
+          status: "active", // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
+          ...(rating !== null && { rating: rating }), // Nếu có rating thì lọc theo rating
+        },
+        select: "content rating id_user id_product createdAt", // Chỉ lấy các trường cần thiết
         options: { sort: { createdAt: -1 } }, // Sắp xếp từ mới nhất đến cũ nhất
       });
   
-      // Kiểm tra xem sản phẩm có tồn tại và có bình luận hay không
+      // Kiểm tra xem sản phẩm có tồn tại và có bình luận không
       if (!product || product.comments.length === 0) {
         return res
           .status(404)
           .json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
       }
   
-      // Trả về các bình luận
+      // Trả về các bình luận đã lọc
       res.status(200).json(product.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
       res.status(500).json({ message: "Lỗi server" });
     }
   },
+  
+  
   
 
   getCommentAdmin: async (req, res) => {
@@ -304,10 +310,22 @@ const commentController = {
       if (!updatedProduct) {
         return res.status(404).json({ error: "Product not found" });
       }
-  
+      const interactionData = {
+        user: commentData.id_user,
+        orderAuctions: null,
+        OrderCart: null,
+        productID: productId,
+        Watchlist: null,
+        type: "comment",
+        score: 3,
+      };
+
+      const interactionResult = await interactionService.postInteractions(interactionData);
+
       return res.status(200).json({
         message: "Comment added successfully",
         product: updatedProduct,
+        interaction: interactionResult
       });
     } catch (error) {
       console.error("Error adding comment:", error);
