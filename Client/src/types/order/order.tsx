@@ -51,7 +51,7 @@ export interface shipping {
 
 export interface Order {
   _id?: string;
-  cartId: string; // ID của giỏ hàng
+  cartId: string;
   user: UserProfile | null;
   cartDetails: CartDetail[];
   payment: Payment;
@@ -63,6 +63,12 @@ export interface Order {
   totalPriceWithShipping: number;
   stateOrder?: string;
   isDeleted?: boolean;
+  cancelReason?: string;
+  refundBank?: {
+    bankName?: string;
+    accountNumber?: string;
+    accountName?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -99,4 +105,8 @@ export interface LimitDeletedListResponse {
 }
 export interface ApplyVoucherResponse {
   newTotalPrice: number;
+}
+export interface OrderItem {
+  product: Product;
+  productVariant: ProductVariant;
 }

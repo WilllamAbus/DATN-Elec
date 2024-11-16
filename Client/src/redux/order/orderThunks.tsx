@@ -58,19 +58,33 @@ export const fetchUserOrdersThunk = createAsyncThunk<
   }
 });
 
+// export const cancelOrderThunk = createAsyncThunk<
+//   Order,
+//   { orderId: string },
+//   { rejectValue: string }
+// >("order/cancelOrder", async ({ orderId }, { rejectWithValue }) => {
+//   try {
+//     const response = await cancelOrder(orderId);
+//     return response.order;
+//   } catch (error) {
+//     return rejectWithValue((error as Error).message);
+//   }
+// });
 export const cancelOrderThunk = createAsyncThunk<
   Order,
-  { orderId: string },
+  { orderId: string; cancelReason: string },
   { rejectValue: string }
->("order/cancelOrder", async ({ orderId }, { rejectWithValue }) => {
-  try {
-    const response = await cancelOrder(orderId);
-    return response.order;
-  } catch (error) {
-    return rejectWithValue((error as Error).message);
+>(
+  "order/cancelOrder",
+  async ({ orderId, cancelReason }, { rejectWithValue }) => {
+    try {
+      const response = await cancelOrder(orderId, cancelReason);
+      return response.order;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
   }
-});
-
+);
 export const getOrderByIdThunk = createAsyncThunk<
   { orders: Order[] },
   string,

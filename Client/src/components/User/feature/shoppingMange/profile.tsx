@@ -332,6 +332,7 @@ import EditProfile from "./edit-profile";
 import Info from "./info";
 import Watchlist from "./wathlist";
 import UpdatePassword from "./changePassword";
+import Bank from "./bank/listBank";
 // import CountrySelector from "./address/address";
 import ListAddress from "./address/listAddress";
 import OrderList from "./order";
@@ -356,6 +357,7 @@ const ProfileUse: React.FC = () => {
     | "watchlist"
     | "listAddress"
     | "listBid"
+    | "Bank"
   >("info");
 
   const profile = useAppSelector(
@@ -400,7 +402,8 @@ const ProfileUse: React.FC = () => {
       | "address"
       | "password"
       | "watchlist"
-      | "listBid";
+      | "listBid"
+      | "Bank";
   }) => (
     <li>
       <button
@@ -424,6 +427,12 @@ const ProfileUse: React.FC = () => {
           <>
             <i className="iconify mdi--edit w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
             <span className="ms-3"> Cập nhật thông tin</span>
+          </>
+        )}
+        {item === "Bank" && (
+          <>
+            <i className="iconify mdi--bank w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Liên kết ngân hàng</span>
           </>
         )}
         {item === "address" && (
@@ -513,6 +522,7 @@ const ProfileUse: React.FC = () => {
                   "order",
                   "orderAuct",
                   "listBid",
+                  "Bank",
                 ].map((item) => (
                   <MenuItem
                     key={item}
@@ -526,6 +536,7 @@ const ProfileUse: React.FC = () => {
                         | "address"
                         | "password"
                         | "watchlist"
+                        | "Bank"
                     }
                   />
                 ))}
@@ -554,6 +565,7 @@ const ProfileUse: React.FC = () => {
             {view === "order" && <OrderList />}
             {view === "orderAuct" && <OrderAuct />}
             {view === "listBid" && <ListBid />}
+            {view === "Bank" && <Bank />}
           </section>
         </div>
       </div>
@@ -590,6 +602,7 @@ const ProfileUse: React.FC = () => {
                   "watchlist",
                   "order",
                   "orderAuct",
+                  "Bank",
                 ].map((item) => (
                   <MenuItem
                     key={item}
@@ -603,6 +616,7 @@ const ProfileUse: React.FC = () => {
                         | "order"
                         | "orderAuct"
                         | "listBid"
+                        | "Bank"
                     }
                   />
                 ))}

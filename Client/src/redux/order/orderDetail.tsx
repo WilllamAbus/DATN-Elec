@@ -6,10 +6,35 @@ import {
   getAllOrderDetails,
   getAllOUserOrderdetails,
 } from "../../services/order/orderDetail";
-import { Order } from "../../types/order/order";
+import { Order, OrderItem } from "../../types/order/order";
 
+// export const getOrderDetailByIdThunk = createAsyncThunk<
+//   { order: Order[]; items: any[] },
+//   string,
+//   { rejectValue: string }
+// >("order/getOrderDetailById", async (orderId, { rejectWithValue }) => {
+//   try {
+//     const response = await getOrderDetailById(orderId);
+//     console.log("API response:", response);
+
+//     // Kiểm tra cấu trúc dữ liệu trả về
+//     if (!response || !response.order || !Array.isArray(response.items)) {
+//       console.error("Invalid data format:", response);
+//       throw new Error("Invalid data format");
+//     }
+
+//     return {
+//       order: response.order,
+//       items: response.items,
+//     };
+//   } catch (error) {
+//     return rejectWithValue((error as Error).message);
+//   }
+// });
+// Thunk to fetch order detail by ID
+// orderSlice.ts
 export const getOrderDetailByIdThunk = createAsyncThunk<
-  { order: Order[]; items: any[] },
+  { order: Order[]; items: OrderItem[] },
   string,
   { rejectValue: string }
 >("order/getOrderDetailById", async (orderId, { rejectWithValue }) => {
@@ -31,7 +56,6 @@ export const getOrderDetailByIdThunk = createAsyncThunk<
     return rejectWithValue((error as Error).message);
   }
 });
-
 export const getAllOrderDetailsThunk = createAsyncThunk<
   { orderDetails: Order[] },
   void,

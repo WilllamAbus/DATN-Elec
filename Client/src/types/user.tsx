@@ -43,7 +43,8 @@ export interface UserProfile {
   gender: string;
   phone: string;
   avatar: string;
-  addresses: Address[]; // Thay đổi từ string sang mảng Address
+  addresses: Address[];
+  banks: Bank[];
   createdAt: string;
   updatedAt?: string;
   currentUser: string;
@@ -65,10 +66,31 @@ export interface Address {
   phone: string;
   isDefault?: boolean;
 }
+export interface Bank {
+  _id?: string;
+  id?: number;
+  name: string;
+  fullName: string;
+  accountNumber: string;
+  code: string;
+  bin: string;
+  shortName: string;
+  logo: string;
+  transferSupported: number;
+  lookupSupported: number;
+  support: number;
+  isTransfer: boolean;
+  swift_code: string;
+  isDefault?: boolean;
+}
 
 export interface AddressResponse {
   message: string; // Thông điệp từ API
   addresses: Address[]; // Mảng các địa chỉ
+}
+export interface BankResponse {
+  message: string; // Thông điệp từ API
+  banks: Bank[]; // Mảng các địa chỉ
 }
 
 export interface ErrorResponse {

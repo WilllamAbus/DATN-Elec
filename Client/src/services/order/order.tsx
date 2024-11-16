@@ -65,9 +65,25 @@ export const fetchUserOrders = async () => {
   }
 };
 
-export const cancelOrder = async (orderId: string) => {
+// export const cancelOrder = async (orderId: string) => {
+//   try {
+//     const response = await instance.put(`${API_URL}/order/cancel/${orderId}`);
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error("Error canceling order: An unknown error occurred");
+//     }
+//   }
+// };
+export const cancelOrder = async (orderId: string, cancelReason: string) => {
   try {
-    const response = await instance.put(`${API_URL}/order/cancel/${orderId}`);
+    const response = await instance.put(`${API_URL}/order/cancel/${orderId}`, {
+      cancelReason, // Gửi lý do hủy qua body
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

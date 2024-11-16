@@ -1,7 +1,7 @@
 const Product = require("../../model/product_v2");
 const productVariant = require("../../model/product_v2/productVariant");
 const Cart = require("../../model/orders/cart.model");
-const Inventory = require("../../model/inventory/inventory.model");
+// const Inventory = require("../../model/inventory/inventory.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const Voucher = require("../../model/voucher.model");
 const mongoose = require("mongoose");

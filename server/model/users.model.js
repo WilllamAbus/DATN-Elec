@@ -86,7 +86,21 @@ const addressSchema = new Schema({
   phone: { type: String, required: true },
   isDefault: { type: Boolean, default: false },
 });
-
+const bankSchema = new Schema({
+  name: { type: String, required: true },
+  fullName: { type: String, required: true },
+  accountNumber: { type: String, required: true },
+  code: { type: String, required: true },
+  bin: { type: String, required: true },
+  shortName: { type: String, required: true },
+  logo: { type: String },
+  transferSupported: { type: Boolean, default: false },
+  lookupSupported: { type: Boolean, default: false },
+  support: { type: Number, required: true },
+  isTransfer: { type: Boolean, default: false },
+  swift_code: { type: String, required: true },
+  isDefault: { type: Boolean, default: false },
+});
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -109,6 +123,7 @@ const userSchema = new Schema(
     },
     tokenLogin: String,
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
+    banks: { type: [bankSchema], default: [] },
   },
   {
     collection: "users",
