@@ -4,6 +4,7 @@ const productVariant = require("../../model/product_v2/productVariant");
 const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
+const { spawn } = require('child_process');
 
 const WathListController = {
   // addWatchlist: async (req, res) => {
@@ -182,6 +183,23 @@ const WathListController = {
       });
 
       await newInteraction.save();
+
+      // Gọi script Python để tạo gợi ý sản phẩm
+      const pythonProcess = spawn('python', ['recommendation_service.py', userId.toString()]);
+
+      // Lắng nghe kết quả từ script Python
+      pythonProcess.stdout.on('data', (data) => {
+        console.log(`Python Output: ${data.toString()}`);
+        // Xử lý kết quả từ Python nếu cần
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        console.error(`Python Error: ${data.toString()}`);
+      });
+
+      pythonProcess.on('close', (code) => {
+        console.log(`Python script finished with code ${code}`);
+      });
 
       return res.status(200).json({
         success: true,

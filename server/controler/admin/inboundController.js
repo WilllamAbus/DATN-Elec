@@ -36,7 +36,7 @@ const inboundController = {
             // Tạo điều kiện truy vấn
             let query = {
                 status: { $ne: "disable" },
-                product_variant_id: { $exists: true }
+                product_variant_id: { $exists: true, $ne: null }
             };
 
             // Đếm tổng số lô hàng dựa trên điều kiện đã tạo
@@ -61,12 +61,12 @@ const inboundController = {
                 })
                 .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
                 .limit(limit); // Giới hạn kết quả theo số lượng trang
-
+                const filteredInbounds = inbounds.filter(item => item.product_variant_id !== null);
             // Trả về kết quả
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: inbounds,
+                data: filteredInbounds,
                 totalPages: totalPages,
             });
         } catch (error) {
@@ -88,7 +88,7 @@ const inboundController = {
             const count = await modelInbound.countDocuments({ status: { $ne: "disable" }, productAuction: { $exists: true } });
             const totalPages = Math.ceil(count / limit);
             const inbounds = await modelInbound
-                .find({ status: { $ne: "disable" }, productAuction: { $exists: true } })
+                .find({ status: { $ne: "disable" }, productAuction: { $exists: true, $ne: null } })
                 .populate({
                     path: 'productAuction',
                     select: 'product_name',
@@ -100,10 +100,11 @@ const inboundController = {
                 })
                 .skip((page - 1) * limit)
                 .limit(limit);
+                const filteredInbounds = inbounds.filter(item => item.productAuction !== null);
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: inbounds,
+                data: filteredInbounds,
                 totalPages: totalPages,
             });
         } catch (error) {
