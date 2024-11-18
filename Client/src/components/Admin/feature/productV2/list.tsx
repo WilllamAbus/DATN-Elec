@@ -143,19 +143,18 @@ const ProductList: React.FC = () => {
       </TableBody>
     </Table>
       )}
-     {totalPages > 1 && (
-        <div className="flex justify-center my-4">
-          <Pagination
-            isCompact
-            loop
-            showControls
-            color="primary"
-            total={totalPages}
-            initialPage={currentPage}
-            onChange={(page) => handlePageChange(page)}
-          />
-        </div>
-      )}
+     <div className="flex justify-center my-4">
+        <Pagination
+
+          isCompact
+          loop
+          showControls
+          color="primary"
+          total={totalPages}
+          initialPage={currentPage}
+          onChange={(page) => handlePageChange(page)}
+        />
+      </div>
     </>
   );
 };
