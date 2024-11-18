@@ -17,20 +17,47 @@ const AdminListCategories = React.lazy(
 const AdminAddProductV2 = React.lazy(
   () => import("../page/Admin/product/add/add")
 );
+const AddPostProduct = React.lazy(
+  () => import("../page/Admin/post/add/addPostProduct")
+);
+const AdminEditPost = React.lazy(
+  () => import("../page/Admin/post/edit/editPost")
+);
+const AdminFetAddCategoriesPost = React.lazy(
+  () => import("../page/Admin/post/add/addCategoriesPost")
+);
+const AdminFetCategoryPostList = React.lazy(
+  () => import("../page/Admin/post/list/getCategoryPostList")
+);
+const AdminFetPostList = React.lazy(
+  () => import("../page/Admin/post/list/getListPost")
+);
 const AdminFetAddProductAuction = React.lazy(
   () => import("../page/Admin/product/add/addAuction")
+);
+const AdminFetDeleteListProductAuction = React.lazy(
+  () => import("../page/Admin/product/list/getDeleteListAuction")
 );
 const AdminAddVariant = React.lazy(
   () => import("../page/Admin/product/variant/addVariant")
 );
+const AdminFetEditVariant = React.lazy(
+  () => import("../page/Admin/product/edit/editVariant")
+);
 const AdminFetAddImageVariant = React.lazy(
   () => import("../page/Admin/product/add/addImageVariant")
+);
+const AdminFetEditImageVariant = React.lazy(
+  () => import("../page/Admin/product/edit/editImageVariant")
 );
 const AdminListProductV2 = React.lazy(
   () => import("../page/Admin/product/list/list")
 );
 const AdminFetVariantsByProductId = React.lazy(
   () => import("../page/Admin/product/list/getVariantsByProductId")
+);
+const AdminFetImageByVariantId = React.lazy(
+  () => import("../page/Admin/product/list/getImageByVariantId")
 );
 const AdminFetListProductAuction = React.lazy(
   () => import("../page/Admin/product/list/listAuction")
@@ -227,12 +254,21 @@ const AdminRoutes: RouteObject[] = [
       { path: "editCategories/:id", element: <AdminEditCategories /> },
       { path: "listCategories", element: <AdminListCategories /> },
       { path: "addproduct", element: <AdminAddProductV2 /> },
+      { path: "add-post-product", element: <AddPostProduct /> },
+      { path: "edit-post/:id", element: <AdminEditPost /> },
+      { path: "add-categories-post", element: <AdminFetAddCategoriesPost /> },
+      { path: "list-categories-post", element: <AdminFetCategoryPostList /> },
+      { path: "list-post", element: <AdminFetPostList /> },
       { path: "add-product-auction", element: <AdminFetAddProductAuction /> },
       { path: "list-auction", element: <AdminFetListProductAuction /> },
+      { path: "delete-list-auction", element: <AdminFetDeleteListProductAuction /> },
       { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
+      { path: "product/:variantId", element: <AdminFetEditVariant /> },
       { path: "product/:product_variant_id/add-image-variant", element: <AdminFetAddImageVariant /> },
+      { path: "edit-image-and-color/:imageId", element: <AdminFetEditImageVariant /> },
       { path: "listproduct", element: <AdminListProductV2 /> },
-      { path: "listproduct/:productId", element: <AdminFetVariantsByProductId /> },
+      { path: "list-product-variant/:productId", element: <AdminFetVariantsByProductId /> },
+      { path: "list-image-and-color/:variantId", element: <AdminFetImageByVariantId /> },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
       { path: "edit-product-auction/:id", element: <AdminFetEditProductAuction /> },
       { path: "addBrands", element: <AdminAddBrands /> },

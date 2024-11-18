@@ -20,12 +20,7 @@ const addImageVariant = async (req, res) => {
       return res.status(404).json({ success: false, msg: 'Không tìm thấy biến thể sản phẩm', status: 404 });
     }
 
-    const existingColors = productVariant.color.map(c => c._id.toString());
-    const invalidColors = color.filter(colorId => !existingColors.includes(colorId));
 
-    if (invalidColors.length > 0) {
-      return res.status(400).json({ success: false, msg: 'Đã chọn màu không hợp lệ', invalidColors });
-    }
 
     const existingImageVariant = await ImageVariant.find({ productVariant: product_variant_id, color: { $in: color } }).populate('color', '_id name code');
     if (existingImageVariant.length > 0) {
@@ -47,16 +42,23 @@ const addImageVariant = async (req, res) => {
     });
     const savedImageVariant = await newImageVariant.save();
 
+    // Thêm ID của biến thể hình ảnh vào mảng image của productVariant
     productVariant.image = productVariant.image || [];
     productVariant.image.push(savedImageVariant._id);
-    await ProductVariant.findByIdAndUpdate(product_variant_id, { image: productVariant.image }, { new: true });
+
+    // Cập nhật trường color cho productVariant
+    productVariant.color = [...new Set([...productVariant.color.map(c => c._id.toString()), ...color.map(c => c.toString())])];
+
+    await ProductVariant.findByIdAndUpdate(product_variant_id, { 
+      image: productVariant.image,
+      color: productVariant.color // Cập nhật cả trường color
+    }, { new: true });
 
     return res.status(201).json({ success: true, msg: 'Đã thêm thành công', imageVariant: savedImageVariant });
   } catch (error) {
     return res.status(500).json({ success: false, msg: 'Đã xảy ra lỗi', error: error.message });
   }
 };
-
 
 module.exports = {
   addImageVariant,

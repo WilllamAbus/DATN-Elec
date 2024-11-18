@@ -195,6 +195,78 @@ const UserStatistics = () => {
                       </Link>
                     </div>
                     <div className="pt-6">
+                      <div className="mb-4 flex items-center justify-between gap-4">
+                        {/* {product.product_discount.discountPercent > 0 ? (
+                          <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                            Giảm giá {product.product_discount.discountPercent}%
+                          </span>
+                        ) : (
+                          <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
+                        )} */}
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            data-tooltip-target="tooltip-quick-look"
+                            className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                          >
+                            {product.product_view > 0 ? (
+                              <span className="mr-2">
+                                ({product.product_view})
+                              </span>
+                            ) : (
+                              ""
+                            )}
+
+                            <svg
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width={24}
+                              height={24}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeWidth={2}
+                                d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
+                              />
+                              <path
+                                stroke="currentColor"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                              />
+                            </svg>
+                            <span className="sr-only"> Quick look </span>
+                          </button>
+
+                          <div
+                            id="tooltip-quick-look"
+                            role="tooltip"
+                            className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
+                            data-popper-placement="top"
+                          >
+                            fcdsf Quick look
+                            <div
+                              className="tooltip-arrow"
+                              data-popper-arrow=""
+                            />
+                          </div>
+
+                          <div
+                            id="tooltip-add-to-favorites"
+                            role="tooltip"
+                            className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
+                            data-popper-placement="top"
+                          >
+                            Add to favorites
+                            <div
+                              className="tooltip-arrow"
+                              data-popper-arrow=""
+                            />
+                          </div>
+                        </div>
+                      </div>
                       <a
                         href="#"
                         className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
@@ -266,6 +338,31 @@ const UserStatistics = () => {
                               ? `(Còn ${product.product_quantity} sản phẩm)`
                               : " "}
                           </div>
+                        </p>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between gap-6">
+                        <p className="text-xs leading-tight text-gray-900 dark:text-white">
+                          {/* {product.product_discount.discountPercent > 1 ? (
+                            <div>
+                              <p className="text-xs font-medium text-rose-700">
+                                {formatCurrency(
+                                  product.product_price *
+                                    (1 -
+                                      product.product_discount.discountPercent /
+                                        100)
+                                )}
+                                đ
+                              </p>
+                              <p className="text-xs font-medium line-through text-gray-400">
+                                {formatCurrency(product.product_price)}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-xs font-medium text-rose-700">
+                              {formatCurrency(product.product_price)}đ
+                            </p>
+                          )} */}
                         </p>
                       </div>
                     </div>

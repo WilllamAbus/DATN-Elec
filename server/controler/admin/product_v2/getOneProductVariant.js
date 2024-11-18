@@ -3,8 +3,8 @@ const modelProductVariant = require('../../../model/product_v2/productVariant');
 
 const getOneProductVariant = async (req, res) => {
   try {
-    const { id } = req.params;
-    const productVariant = await modelProductVariant.findById(id).populate([
+    const { variantId } = req.params;
+    const variant = await modelProductVariant.findById(variantId).populate([
       { path: 'battery' },
       { path: 'color' },
       { path: 'cpu' },
@@ -17,7 +17,7 @@ const getOneProductVariant = async (req, res) => {
     ]);
     
 
-    if (!productVariant) {
+    if (!variant) {
       return res.status(404).json({
         success: false,
         err: 1,
@@ -31,7 +31,7 @@ const getOneProductVariant = async (req, res) => {
       err: 0,
       msg: 'Lấy sản phẩm thành công',
       status: 200,
-      productVariant
+      variant
     });
   } catch (error) {
     console.error(error);

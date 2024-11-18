@@ -89,11 +89,22 @@ export interface STORAGE {
   createdAt: string;
   updatedAt: string;
   slug: string;
+}export interface Discount {
+  _id: string;
+  code: string;
+  discountPercent: number;
+  isActive: boolean;
+  status: string;
+  disabledAt: Date | null;
+  createdAt: string;
+  updatedAt: string;
 }
 export interface ProductVariant {
   variant_name: string;                
   variant_description: string;         
-  variant_price: number;               
+  variant_price: number;    
+  variant_original_price:number;    
+  product_discount: Discount;                
   battery: BATTERY[];                    
   color: COLOR[];                   
   cpu: CPU[];                     

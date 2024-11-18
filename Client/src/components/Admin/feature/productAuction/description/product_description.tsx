@@ -197,9 +197,7 @@ const Productdescription: React.FC<ProductdescriptionProps> = ({ register, error
       </div>
     </div>
     <div className="px-4 py-2 bg-white rounded-b-lg dark:bg-gray-800">
-      <label htmlFor="editor" className="sr-only">
-        Publish post
-      </label>
+     
       <textarea
         id="product_description"
         rows={8}

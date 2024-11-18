@@ -1,9 +1,7 @@
 const ProductV2 = require('../../../model/product_v2');
 const { uploadImage } = require('../../../utils/uploadImage');
-const { calculateDiscount } = require('./calculator/discount');
 const { 
   checkProductNameExists, 
-  validateProductPrice,
   isValidProductName 
 } = require('./validators');
 
@@ -33,16 +31,6 @@ const update = async (req, res) => {
       }
     }
 
-    const productPrice = parseFloat(req.body.product_price);
-    if (!validateProductPrice(productPrice)) {
-      return res.status(400).json({
-        success: false,
-        err: 3,
-        msg: 'Giá tiền không hợp lệ',
-        status: 400
-      });
-    }
-
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
         success: false,
@@ -52,8 +40,6 @@ const update = async (req, res) => {
       });
     }
 
-    const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
-
     let imageUrls = existingProduct.image; 
     if (req.files && req.files.length) {
       imageUrls = [];
@@ -62,24 +48,13 @@ const update = async (req, res) => {
         imageUrls.push(imageUrl);
       }
     }
-
     existingProduct.product_name = req.body.product_name || existingProduct.product_name;
     existingProduct.image = imageUrls;
     existingProduct.product_description = req.body.product_description || existingProduct.product_description;
     existingProduct.product_type = req.body.product_type || existingProduct.product_type;
-    existingProduct.product_discount = {
-      discountId: discount._id,
-      code: discount.code,
-      discountPercent: discount.discountPercent,
-      isActive: discount.isActive,
-      status: discount.status,
-      disabledAt: discount.disabledAt
-    };
     existingProduct.product_brand = req.body.product_brand || existingProduct.product_brand;
     existingProduct.product_format = req.body.product_format || existingProduct.product_format;
     existingProduct.product_condition = req.body.product_condition || existingProduct.product_condition;
-    existingProduct.product_price = productPrice; 
-    existingProduct.product_price_unit = productPriceUnit;
     existingProduct.weight_g = req.body.weight_g || existingProduct.weight_g;
     existingProduct.product_supplier = req.body.product_supplier || existingProduct.product_supplier;
 

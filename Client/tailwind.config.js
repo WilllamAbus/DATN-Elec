@@ -69,7 +69,8 @@ export default {
         btnDeletesweetalertOk: "##a0de86",
         redCustom: "#e22920",
         customPink: "#f21260",
-        veryPaleBlue:"#eef9ff"
+        veryPaleBlue:"#eef9ff",
+        pastelGreen:"#a0de86"
       },
       fontFamily: {
         sans: [

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { HeartIcon, StarIcon } from "../listPage/svg";
+import { StarIcon } from "../listPage/svg";
 import { truncateText } from "../listPage/truncate/truncateText";
 // import currencyFormatter from "currency-formatter";
 import { products } from "../../../../services/clientcate/client/types/getProuctbyCategory";
@@ -20,7 +20,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
         <Link to={`/product/${product.slug}`}>
           <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
             <img
-              className="absolute inset-0 w-full h-full object-cover rounded-lg p-4"
+              className="absolute inset-0 w-full h-full object-cover rounded-lg p-8"
               src={product.image[0]}
               alt={`product ${index + 1}`}
             />
@@ -46,6 +46,8 @@ export default function ProductItem({ product, index }: ProductItemProps) {
             </button>
           </div>
         </div>
+
+
         <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
           <div className="mt-1 px-2 pb-1">
             <a href="#">
@@ -63,11 +65,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
               : "N/A"}
           </p>
           <StarIcon />
-          <div className="text-xs text-gray-500 items-center">
-            {product.product_quantity > 0
-              ? `(Còn ${product.product_quantity} sản phẩm)`
-              : "Hết hàng"}
-          </div>
+
         </div>
         <div className="mt-2 px-2 flex items-center gap-2">
           {/* {product.product_discount.discountPercent > 1 ? (
@@ -89,6 +87,9 @@ export default function ProductItem({ product, index }: ProductItemProps) {
             </p>
           )} */}
         </div>
+
+
+
       </div>
     </div>
   );

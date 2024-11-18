@@ -19,7 +19,6 @@ const ProductService = {
         .limit(limit)
         .populate('product_type', 'name imgURL')  
         .populate('product_brand', 'name')
-        .populate('product_format', 'name')
         .populate('product_condition', 'name')
         .populate('product_supplier', 'name')
         .populate({

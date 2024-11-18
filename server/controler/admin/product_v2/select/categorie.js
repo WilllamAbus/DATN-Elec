@@ -2,13 +2,13 @@ const modelCategory = require('../../../../model/catgories.model');
 
 const selectCategories = async (req, res) => {
   try {
-    const categories = await modelCategory.find({ status: { $ne: 'disable' } });
+    const selectCategories = await modelCategory.find({ status: { $ne: 'disable' } }).select('_id name');
     return res.status(200).json({
       success: true,
       err: 0,
       msg: 'Chọn danh mục thành công',
       status: 200,
-      categories
+      selectCategories
     });
   } catch (error) {
     return res.status(500).json({

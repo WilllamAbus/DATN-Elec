@@ -2,7 +2,7 @@ const modelBrand = require('../../../../model/brands.model');
 
 const selectbrand = async (req, res) => {
   try {
-    const selectbrand = await modelBrand.find({ status: { $ne: 'disable' } });
+    const selectbrand = await modelBrand.find({ status: { $ne: 'disable' } }).select('_id name');
     return res.status(200).json({
       success: true,
       err: 0,

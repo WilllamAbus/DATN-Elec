@@ -9,7 +9,7 @@
         return rejectWithValue({
           success: false,
           err: STATUS_CODES.BAD_REQUEST,
-          msg: RESPONSE_MESSAGES_CRUD.INVALID_PRODUCT_ID,
+          msg: RESPONSE_MESSAGES_CRUD.INVALID_VARIANT_ID,
           status: STATUS_CODES.BAD_REQUEST,
         });
       }

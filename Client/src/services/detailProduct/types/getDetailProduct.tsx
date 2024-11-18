@@ -117,7 +117,8 @@ export interface ProductVariant {
   _id: string;                         
   createdAt: string;                   
   updatedAt: string;                   
-  slug: string;                        
+  slug: string; 
+  viewCount:number;                       
   __v: number;                         
 }
 
@@ -197,7 +198,20 @@ export interface Pagination {
   limit?: number; 
 }
 
-
+export interface Post {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  status:string;
+  product: string; 
+  thumbnail?: FileList; 
+  category: string; 
+  sku: string;
+  pid: string;
+  createdAt: string;
+  updatedAt: string; 
+}
 export interface GetDetailProductResponse {
   success: boolean;
   err: number;
@@ -228,6 +242,7 @@ export interface GetDetailProductResponse {
     createdAt: string;
     updatedAt: string;
     slug?: string;  
+    posts:Post
   };
 }
 export interface GetAllStorageBySlugUrlResponse {

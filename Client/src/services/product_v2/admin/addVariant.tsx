@@ -17,10 +17,9 @@ export const addVariant = async (
         variant: null,
       };
     }
-    console.log("Product ID:", productId);
-    console.log("Variant Data:", variant);
-    
-    // Ensure productId is assigned to variant.product if it's meant to be the same
+
+  
+
     if (!variant.product) {
       variant.product = productId;
     }
@@ -32,17 +31,21 @@ export const addVariant = async (
       formData.append("variant_description", variant.variant_description);
     }
 
-    if (variant.variant_price !== undefined) {
-      formData.append("variant_price", variant.variant_price.toString());
+    if (variant.variant_original_price !== undefined) {
+      formData.append("variant_original_price", variant.variant_original_price.toString());
     }
+    if (variant.product_discount && typeof variant.product_discount === 'object') {
+      formData.append("product_discount", variant.product_discount._id);
+    } else if (typeof variant.product_discount === 'string') {
+      formData.append("product_discount", variant.product_discount);
+    }
+    
+    
 
     if (variant.battery && variant.battery.length > 0) {
       formData.append("battery", variant.battery.map((item) => item._id).join(","));
     }
 
-    if (variant.color && variant.color.length > 0) {
-      variant.color.forEach(item => formData.append("color", item._id));
-    }
 
     if (variant.cpu && variant.cpu.length > 0) {
       formData.append("cpu", variant.cpu.map((item) => item._id).join(","));
@@ -68,7 +71,6 @@ export const addVariant = async (
       formData.append("storage", variant.storage.map((item) => item._id).join(","));
     }
 
-    // Add the product ID
     if (variant.product) {
       formData.append("product", variant.product);
     } else {

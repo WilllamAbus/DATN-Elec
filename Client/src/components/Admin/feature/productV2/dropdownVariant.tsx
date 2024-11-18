@@ -23,8 +23,9 @@ export default function DropdownVariant({ variants, productId }: DropdownVariant
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions">
         {variantCount > 0 ? (
-          <DropdownItem>
-            <Link to={`/admin/listproduct/${productId}`}>Danh sách sản phẩm biến thể</Link>
+          <DropdownItem
+          textValue="Danh sách sản phẩm biến thể" >
+            <Link to={`/admin/list-product-variant/${productId}`}>Danh sách sản phẩm biến thể</Link>
           </DropdownItem>
         ) : (
           <DropdownItem isDisabled>No variants available</DropdownItem> 

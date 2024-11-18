@@ -8,3 +8,4 @@ export * from "./getAllRam";
 export * from "./getAllStorage";
 export * from "./getProductDetail";
 export * from "./getAllStorageBySlugUrl";
+export * from "./getAllProductVariantsByVariantPrice";

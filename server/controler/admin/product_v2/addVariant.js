@@ -1,5 +1,6 @@
 const ProductV2 = require('../../../model/product_v2');
 const ProductVariant = require('../../../model/product_v2/productVariant'); 
+const Discount = require('../../../model/discount.model');
 const { uploadImage } = require('../../../utils/uploadImage');
 const { v4: uuidv4 } = require('uuid');
 const generateSKU = require('./sku/skuGenerator');
@@ -10,9 +11,9 @@ const addVariant = async (req, res) => {
     const { 
       variant_name, 
       variant_description, 
-      variant_price, 
+      variant_original_price, 
+      product_discount, 
       battery, 
-      color, 
       cpu, 
       graphicsCard, 
       operatingSystem, 
@@ -60,21 +61,32 @@ const addVariant = async (req, res) => {
       }
     }
 
+    let discountPercent = 0;
+    if (product_discount) {
+      const discount = await Discount.findById(product_discount);
+      if (discount && discount.isActive) {
+        discountPercent = discount.discountPercent;
+      }
+    }
+
+    const variant_price = Math.round(variant_original_price * (1 - discountPercent / 100));
+
     const newVariant = new ProductVariant({
       variant_name,
-      status,
-      sku: generateSKU(variant_name),
-      pid,
       variant_description,
-      variant_price,
+      variant_price, 
+      variant_original_price, 
+      product_discount, 
       battery, 
-      color,  
       cpu,  
       graphicsCard,  
       operatingSystem, 
       ram,  
       screen, 
       storage,
+      status,
+      sku: generateSKU(variant_name),
+      pid,
       image: imageUrls,
       product: product_id 
     });
@@ -82,6 +94,7 @@ const addVariant = async (req, res) => {
     await newVariant.save();
     product.variants.push(newVariant._id);
     await product.save();
+
     return res.status(201).json({
       success: true,
       err: 0,
@@ -89,7 +102,7 @@ const addVariant = async (req, res) => {
       status: 201,
       variant: newVariant,
     });
-    
+
   } catch (error) {
     return res.status(500).json({
       success: false,

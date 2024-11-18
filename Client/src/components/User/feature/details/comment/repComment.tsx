@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getRepComment } from "../../../../../services/commnet/comment.service";
-import "../../../../../assets/css/user.style.css";
+
 
 interface RepCommentProps {
   id_comment: string;

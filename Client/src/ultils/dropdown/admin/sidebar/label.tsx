@@ -9,5 +9,5 @@ export const labels: Record<string, string> = {
   product: "Sản phẩm",
   inbound: "Nhập hàng",
   orderCart: "Đơn hàng",
-
+  post: "Bài viết",
 };

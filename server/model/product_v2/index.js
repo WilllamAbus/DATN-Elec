@@ -10,17 +10,8 @@ const productV2Schema = new Schema({
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-  product_discount: {
-    discountId: { type: Schema.Types.ObjectId, ref: 'discounts' },
-    code: { type: String },
-    discountPercent: { type: Number },
-    isActive: { type: Boolean },
-    status: { type: String },
-    disabledAt: { type: Date }
-  },
   hasVariants: { type: String, default: "false" },
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
-  product_format: { type: Schema.Types.ObjectId, ref: 'formatShopping', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
   product_ratingAvg: {
@@ -31,8 +22,6 @@ const productV2Schema = new Schema({
   },
 
   product_view: { type: Number, default: 0 },
-  product_price: { type: Number, required: true },
-  product_price_unit: { type: Number, required: true },
   product_color: { type: String, },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
@@ -40,6 +29,7 @@ const productV2Schema = new Schema({
   disabledAt: { type: Date, default: null },
   variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+  posts: { type: Schema.Types.ObjectId, ref: 'Post' },
   product_attributes: [{
     k: { type: String, required: true },
     v: { type: Schema.Types.Mixed, required: true },

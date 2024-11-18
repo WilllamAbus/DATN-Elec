@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
+import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../../ultils/breadcrumb";
 import { Star } from "./svg";
 import VariantImageGallery from "./cpnDetailPage/VariantImageGallery";
 import FavoriteButton from "./cpnDetailPage/FavoriteButton";
@@ -21,6 +21,9 @@ import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
 import RelatedProduct from "./relatedProduct/relatedProduct";
 import Comment from "../../../../User/feature/details/comment/comment";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import Blog from "./blog";
+import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSameSegment";
+
 
 import { ToastContainer } from "react-toastify";
 const DetailPage: React.FC = () => {
@@ -39,6 +42,8 @@ const DetailPage: React.FC = () => {
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail
   );
+
+
 
   const [filters, setFilters] = useState<FilterState>({
     storage: queryParams.storage ? String(queryParams.storage) : "",
@@ -101,6 +106,8 @@ const DetailPage: React.FC = () => {
   if (!productDetail || productDetail.variants?.length === 0) {
     return <NotFoundProduct />;
   }
+
+
 
   return (
     <>

@@ -6,14 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
-import { ProductVariant, RAM, CPU, COLOR, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
+import { ProductVariant, RAM, CPU, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
 import { addVariantThunk } from "../../../../redux/product/admin/Thunk";
 
 import {
   RamSelect,
-  ColorSelect,
   ScreenSelect,
   CpuSelect,
   CardSelect,
@@ -24,7 +23,6 @@ import {
 } from "./selectVariant";
 import {
   handleRamChange,
-  handleColorChange,
   handleScreenChange,
   handleCPUChange,
   handleCardChange,
@@ -32,9 +30,11 @@ import {
   handleOsChange,
   handleStorageChange
 } from "./handlersVariant";
-import { SingleValue,MultiValue } from "react-select";
+import { SingleValue} from "react-select";
 import Productdescription from "../productAuction/description/product_description";
 import FormInput from "./Form/forminput";
+import FormSelect from "./Form/formselect";
+import { useFetchData } from "./hook/selectFetchData";
 const AddVariant: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const productIdString = productId ?? "";
@@ -42,12 +42,12 @@ const AddVariant: React.FC = () => {
     register,
     setValue,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<ProductVariant>({});
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const [selectedRam, setSelectedRam] = useState<SingleValue<RAM>>(null);
-  const [selectedColors, setSelectedColors] = useState<MultiValue<COLOR>>([]);
   const [selectedScreen, setSelectedScreen] = useState<SingleValue<SCREEN>>(null);
   const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPU>>(null);
   const [selectedCard, setSelectedCard] = useState<SingleValue<GRAPHICSCARD>>(null);
@@ -58,9 +58,7 @@ const AddVariant: React.FC = () => {
     handleRamChange(selectedOptions, setSelectedRam, setValue);
   };
 
-  const onColorChange = (selectedOptions: MultiValue<COLOR>) => {
-    handleColorChange(selectedOptions, setSelectedColors, setValue);
-  };
+
   const onScreenChange = (selectedOptions: SingleValue<SCREEN>) => {
     handleScreenChange(selectedOptions, setSelectedScreen, setValue);
   };
@@ -82,7 +80,7 @@ const AddVariant: React.FC = () => {
     handleStorageChange(selectedOptions, setSelectedStorage, setValue);
   };
   const navigate = useNavigate();
-
+  const { discounts } = useFetchData();
   const submitFormAdd: SubmitHandler<ProductVariant> = async (data) => {
     setIsLoading(true);
     
@@ -147,12 +145,13 @@ const AddVariant: React.FC = () => {
               </div>
 
               <FormInput
-                id="product_price"
+                id="variant_original_price"
                 label="Giá gốc"
                 format
                 suffix=" đ"
                 register={register}
-                error={errors.variant_price}
+                control={control}
+                error={errors.variant_original_price}
                 validation={{
                   required: "Giá sản phẩm không được bỏ trống",
                   min: {
@@ -225,17 +224,7 @@ const AddVariant: React.FC = () => {
                   </span>
                 )}
               </div>
-              <div className="col-span-3 sm:col-span-3">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Màu sắc
-                </label>
-                <ColorSelect value={selectedColors} onChange={onColorChange} />
-                {errors.color && (
-                  <span className="text-red-600">
-                    {errors.color.message?.toString()}
-                  </span>
-                )}
-              </div>
+
               <div className="col-span-3 1sm:col-span-3">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Card Đồ Họa
@@ -259,6 +248,17 @@ const AddVariant: React.FC = () => {
                 )}
               </div>
             </div>
+            <FormSelect
+                label="Giảm giá"
+                id="product_discount"
+                options={(discounts ?? []).map((discount) => ({
+                  _id: discount._id,
+                  name: discount.discountPercent,
+                }))}
+                register={register}
+                validation={{ required: "Giảm giá là bắt buộc" }}
+                errorMessage={errors.product_discount?.message}
+              />
             <Productdescription register={register} errors={errors} />
 
             <div className="col-span-6 sm:col-full">

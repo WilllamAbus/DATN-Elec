@@ -3,7 +3,7 @@ const Role = require("../model/role.model");
 const middlewareController = {
   verifyToken: (req, res, next) => {
     const token = req.headers["authorization"];
-  
+    const jwt = require("jsonwebtoken");
     
     if (token) {
       const accessToken = token.split(" ")[1];
@@ -47,5 +47,27 @@ const middlewareController = {
       }
     });
   },
+
+getHeader:async (req, res, next) => {
+    const token = req.headers["authorization"];
+  
+    if (token) {
+      const accessToken = token.split(" ")[1]; 
+      jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
+        if (err) {
+          req.user = null; 
+          next();
+        } else {
+          req.user = user;
+          next();
+        }
+      });
+    } else {
+      req.user = null; 
+      next();
+    }
+  }
+  
+  
 };
 module.exports = middlewareController;

@@ -1,12 +1,19 @@
 const Product = require('../../../model/product_v2');
+const User = require('../../../model/users.model');
+const ViewHistory = require('../../../model/product_v2/viewHistory');
 const ProductDetailService = require('./productDetailSV');
 
 const getProductDetail = async (req, res) => {
-  const { slug } = req.params;  // Lấy slug từ URL params
+  const { slug } = req.params; 
   const { storage,color } = req.query; 
-
+  console.log('Request Headers:', req.headers); 
+    console.log('User Info:', req.user); 
+    
+    const userId = req.user ? req.user.id : null; 
+    console.log('userId:', userId); 
+    
+  
   try {
-    // Bước 1: Kiểm tra sản phẩm trong bảng Product
     const product = await Product.findOne({ slug });
     if (!product) {
       return res.status(200).json({
@@ -14,7 +21,8 @@ const getProductDetail = async (req, res) => {
         variants: [],  
       });
     }
-    const response = await ProductDetailService.getProductDetail(slug, storage,color);
+
+    const response = await ProductDetailService.getProductDetail(slug, storage,color,userId);
 
     if (!response.success) {
       return res.status(response.status).json({
@@ -24,7 +32,7 @@ const getProductDetail = async (req, res) => {
         status: response.status,
       });
     }
-
+ 
     return res.status(200).json({
       success: true,
       err: 0,

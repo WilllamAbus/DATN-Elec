@@ -8,10 +8,16 @@ const { update } = require('./update');
 const { hardDelete } = require('./hardDelete');
 const { restore } = require('./restore');
 const { getProductLimit } = require('./pagi');
-const { deletedList } = require('./deletedList ');
+const { deletedList } = require('./deletedList');
 const { getVariantsByProductId } = require('./getVariantsByProductId');
 const { searchVariants } = require('./searchVariants');
 const { getOneProductVariant } = require('./getOneProductVariant');
+const { deleteVariant } = require('./deleteVariant');
+const { editVariant } = require('./editVariant');
+const { getOneImageVariant } = require('./getOneImageVariant');
+const { editImageVariant } = require('./editImageVariant');
+const { getImageByVariantId } = require('./getImageByVariantId');
+const { deleteImageVariant } = require('./deleteImageVariant');
 const {
    selectbrand,
    selectSupplier,
@@ -40,6 +46,12 @@ module.exports = {
   addVariant,
   getVariantsByProductId,
   searchVariants,
-  getOneProductVariant
+  getOneProductVariant,
+  deleteVariant,
+  editVariant,
+  getOneImageVariant,
+  editImageVariant,
+  getImageByVariantId,
+  deleteImageVariant
 
 };

@@ -27,6 +27,12 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/listCategories", label: "Danh sách danh mục" },
   ],
+  listPost: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/list-post", label: "Danh sách bài viết" },
+  ],
+
 
   listInbounds: [
     { href: "/", label: "Home" },
@@ -91,6 +97,12 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Admin" },
     { href: "/admin/list-auction", label: "danh sách sản phẩm đấu giá" },
   ],
+  deleteListAuction: [
+    { href: "/", label: "Home" },
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/delete-list-auction", label: "danh sách xóa mềm đấu giá" },
+  ],
+
 
   addProductV2: [
     { href: "/", label: "Home" },
