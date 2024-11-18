@@ -7,6 +7,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notifyUpdate } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { notifyError } from "../productV2/toast/msgtoast";
+
 
 interface IFormInput {
     name: string;
@@ -49,8 +51,9 @@ const EditSupplier: React.FC = () => {
                     setImgPreview(url);
                 }
                 setLoading(false);
-            } catch (error) {
-                setError("Failed to fetch supplier data");
+            } catch (error: any) {
+                console.error("Error:", error);
+                notifyError(error.message);
                 setLoading(false);
             }
         };
@@ -96,9 +99,9 @@ const EditSupplier: React.FC = () => {
                 setTimeout(() => {
                     navigate("/admin/listSuppliers");
                 }, 2000);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Lỗi cập nhật nhà cung cấp:", error);
-                setError("Lỗi khi cập nhật nhà cung cấp");
+                notifyError(error.message);
             }
         }
     };

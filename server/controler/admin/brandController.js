@@ -58,7 +58,7 @@ const brandController = {
             if (!adminRole) {
                 return res.status(500).json({ message: "Không tìm thấy vai trò quản trị viên" });
             }
-            
+
             // Kiểm tra quyền của người dùng
             const isAdmin = req.user.roles.some(role => role._id.toString() === adminRole._id.toString());
 
@@ -75,6 +75,10 @@ const brandController = {
                 return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin thương hiệu" });
             }
 
+            const existingBrand = await modelBrand.findOne({ name, supplier_id });
+            if (existingBrand) {
+                return res.status(400).json({ message: "Tên thương hiệu đã tồn tại cho nhà cung cấp này, vui lòng chọn tên khác" });
+            }
             let imageURL;
 
             if (image) {
@@ -163,28 +167,38 @@ const brandController = {
             const { id } = req.params;
             const { name, category_id, supplier_id, description } = req.body;
             const image = req.file ? req.file : undefined;
-
+    
             if (!name || !description || !category_id || !supplier_id) {
                 return res.status(400).json({ message: 'Vui lòng nhập đủ thông tin' });
             }
-
+    
+            // Kiểm tra trùng tên thương hiệu (trừ chính thương hiệu đang được cập nhật)
+            const existingBrand = await modelBrand.findOne({
+                name: name.trim(),
+                _id: { $ne: id }, // Bỏ qua chính thương hiệu đang được cập nhật
+            });
+    
+            if (existingBrand) {
+                return res.status(400).json({ message: "Tên thương hiệu đã tồn tại, vui lòng chọn tên khác" });
+            }
+    
             let imageURL;
             if (image) {
                 if (!Buffer.isBuffer(image.buffer)) {
                     return res.status(400).json({ message: "Dữ liệu hình ảnh không hợp lệ" });
                 }
-
+    
                 const filename = `${uuidv4()}-${Date.now()}-${image.originalname}`;
                 const file = bucket.file(`brands/${filename}`);
                 const fileStream = file.createWriteStream({
                     metadata: { contentType: image.mimetype },
                 });
-
+    
                 fileStream.on('error', err => {
                     console.error('Lỗi khi tải lên Firebase Storage:', err);
                     return res.status(500).json({ message: 'Không thể tải lên hình ảnh' });
                 });
-
+    
                 fileStream.on('finish', async () => {
                     try {
                         await file.makePublic();
@@ -195,22 +209,22 @@ const brandController = {
                         return res.status(500).json({ message: 'Không thể lấy URL của hình ảnh' });
                     }
                 });
-
+    
                 fileStream.end(image.buffer);
             } else {
                 await updateBrandInDB();
             }
-
+    
             async function updateBrandInDB() {
                 const updatedData = { name, category_id, supplier_id, description };
                 if (imageURL) updatedData.image = imageURL;
-
+    
                 const updatedBrand = await modelBrand.findByIdAndUpdate(id, updatedData, { new: true });
-
+    
                 if (!updatedBrand) {
                     return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 }
-
+    
                 return res.status(200).json({ message: "Sản phẩm được cập nhật thành công", updatedBrand });
             }
         } catch (error) {
@@ -218,6 +232,7 @@ const brandController = {
             return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
         }
     },
+    
 
     hardDelete: async (req, res) => {
         const { id } = req.params;
@@ -319,7 +334,7 @@ const brandController = {
             const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
 
             const count = await modelBrand.countDocuments({
-                status: "disable" ,
+                status: "disable",
             });
             const totalPages = Math.ceil(count / limit);
 

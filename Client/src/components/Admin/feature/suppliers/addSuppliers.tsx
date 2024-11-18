@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { notifyError } from "../productV2/toast/msgtoast";
 
 interface IFormInput {
     name: string;
@@ -81,9 +82,9 @@ const AddSupplier: React.FC = () => {
             setTimeout(() => {
                 navigate("/admin/listSuppliers");
             }, 2000);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error:", error);
-            setError("Đã xảy ra lỗi khi thêm nhà cung cấp. Vui lòng thử lại.");
+            notifyError(error.message);
         }
     };
 
