@@ -24,9 +24,11 @@ export const addSuppliers = async (supplier :FormData) =>{
       ,}
     });
     return response.data;
-  }catch(error){
-    console.error("Error adding supplier:", error);
-    throw error;
+  }catch (error: any) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message); // Trả về lỗi từ API
+    }
+    throw new Error("Không thể kết nối tới server, vui lòng thử lại sau.");
   }
 }
 export const getOneSupplier = async (id: string) => {
@@ -47,9 +49,11 @@ export const updateSupplier = async (id: string, supplierData: FormData) => {
       },
     });
     return response.data;
-  } catch (error) {
-    console.error("Error updating suppliers:", error);
-    throw error;
+  }catch (error: any) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message); // Trả về lỗi từ API
+    }
+    throw new Error("Không thể kết nối tới server, vui lòng thử lại sau.");
   }
 };
 

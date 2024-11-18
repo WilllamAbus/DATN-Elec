@@ -38,7 +38,7 @@ const inventoryController = {
             // Tạo điều kiện truy vấn
             let query = { 
                 status: { $ne: "disable" },
-                product_variant: { $exists: true }
+                product_variant: { $exists: true, $type: "objectId"}
             };
     
             // Đếm tổng số lô hàng dựa trên điều kiện đã tạo
@@ -50,6 +50,7 @@ const inventoryController = {
                 .find(query)
                 .populate({
                     path: 'product_variant',
+                    match: { _id: { $ne: null } },
                     select: 'variant_name',
                     populate: {
                         path: 'product',
@@ -63,12 +64,12 @@ const inventoryController = {
                 })
                 .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
                 .limit(limit); // Giới hạn kết quả theo số lượng trang
-    
+                const filteredInbounds = inbounds.filter(item => item.product_variant !== null);
             // Trả về kết quả
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: inbounds,
+                data: filteredInbounds,
                 totalPages: totalPages,
             });
         } catch (error) {
@@ -88,9 +89,10 @@ const inventoryController = {
             const count = await modelInventory.countDocuments({ status: { $ne: "disable" },productAuction: { $exists: true } });
             const totalPages = Math.ceil(count / limit);
             const inbounds = await modelInventory
-                .find({ status: { $ne: "disable" }, productAuction: { $exists: true } })
+                .find({ status: { $ne: "disable" }, productAuction: { $exists: true, $ne: null } })
                 .populate({
                     path: 'productAuction',
+                    match: { _id: { $ne: null } },
                     select: 'product_name',
                     populate: {
                         path: 'product_supplier',
@@ -100,10 +102,11 @@ const inventoryController = {
                 })
                 .skip((page - 1) * limit)
                 .limit(limit);
+                const filteredInbounds = inbounds.filter(item => item.productAuction !== null);
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: inbounds,
+                data: filteredInbounds,
                 totalPages: totalPages,
             });
         } catch (error) {
@@ -201,19 +204,25 @@ const inventoryController = {
         }
     },
     
-    getProductsInInventoryController : async (req, res) => {
+    getProductsInInventoryController: async (req, res) => {
         try {
-            // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
-            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' } , product_variant: { $exists: true }})
-            .populate('product_variant', 'variant_name')
-            .exec();
+            // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product_variant'
+            const inventoryItems = await modelInventory
+                .find({ 
+                    status: { $ne: 'disable' }, 
+                    product_variant: { $exists: true } 
+                })
+                .populate('product_variant', 'variant_name')
+                .exec();
     
-            // Duyệt qua các bản ghi inventory và tạo danh sách các
-            const productsInInventory = inventoryItems.map(item => ({
-                product_variant: item.product_variant._id,
-                variant_name: item.product_variant.variant_name, // Assuming product_name is populated
-                _id: item.product_variant._id
-            }));
+            // Duyệt qua các bản ghi inventory, lọc các bản ghi có product_variant không null
+            const productsInInventory = inventoryItems
+                .filter(item => item.product_variant !== null) // Lọc bỏ các item có product_variant là null
+                .map(item => ({
+                    product_variant: item.product_variant._id,
+                    variant_name: item.product_variant.variant_name, // Assuming variant_name is populated
+                    _id: item.product_variant._id
+                }));
     
             res.status(200).json({ productsInInventory });
         } catch (error) {
@@ -221,20 +230,24 @@ const inventoryController = {
             res.status(500).json({ error: 'Server error' });
         }
     },
+    
 
-    getProductV2InInventoryController : async (req, res) => {
+    getProductV2InInventoryController: async (req, res) => {
         try {
-            // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'product'
-            const inventoryItems = await modelInventory.find({ status: { $ne: 'disable' }, productAuction: { $exists: true }})
-            .populate('productAuction', 'product_name')
-            .exec();
+            // Tìm tất cả các bản ghi trong inventory và chỉ lấy trường 'productAuction'
+            const inventoryItems = await modelInventory
+                .find({ status: { $ne: 'disable' }, productAuction: { $exists: true } })
+                .populate('productAuction', 'product_name')
+                .exec();
     
-            // Duyệt qua các bản ghi inventory và tạo danh sách các
-            const productsInInventory = inventoryItems.map(item => ({
-                productAuction: item.productAuction._id,
-                product_name: item.productAuction.product_name, // Assuming product_name is populated
-                _id: item.productAuction._id
-            }));
+            // Duyệt qua các bản ghi inventory, lọc ra những bản ghi có productAuction không null
+            const productsInInventory = inventoryItems
+                .filter(item => item.productAuction !== null) // Lọc bỏ các item có productAuction là null
+                .map(item => ({
+                    productAuction: item.productAuction._id,
+                    product_name: item.productAuction.product_name, // Assuming product_name is populated
+                    _id: item.productAuction._id
+                }));
     
             res.status(200).json({ productsInInventory });
         } catch (error) {
@@ -242,6 +255,7 @@ const inventoryController = {
             res.status(500).json({ error: 'Server error' });
         }
     },
+    
     getOne: async (req, res) => {
         try {
             // Lấy productId từ params

@@ -22,9 +22,11 @@ export const addBrands = async (brand :FormData) =>{
       ,}
     });
     return response.data;
-  }catch(error){
-    console.error("Error adding brand:", error);
-    throw error;
+  }catch (error: any) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message); // Trả về lỗi từ API
+    }
+    throw new Error("Không thể kết nối tới server, vui lòng thử lại sau.");
   }
 };
 
@@ -71,9 +73,11 @@ export const updateBrand = async (id: string, brandData: FormData) => {
       },
     });
     return response.data;
-  } catch (error) {
-    console.error("Error updating brands:", error);
-    throw error;
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message); // Trả về lỗi từ API
+    }
+    throw new Error("Không thể kết nối tới server, vui lòng thử lại sau.");
   }
 };
 

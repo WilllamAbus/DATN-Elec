@@ -8,10 +8,12 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import "../../../../assets/css/admin.style.css";
 import { ToastContainer } from "react-toastify";
+import { notifyError } from "../productV2/toast/msgtoast";
 import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { Category } from "../../../../types/Categories.d";
 import { Supplier } from "../../../../types/Suppliers.d";
+
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
@@ -101,10 +103,10 @@ const AddBrand: React.FC = () => {
       setTimeout(() => {
         navigate("/admin/listBrands");
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
-      setError("Đã xảy ra lỗi khi thêm nhà thương hiệu. Vui lòng thử lại.");
-    }
+      notifyError(error.message);
+  }
   };
 
   return (

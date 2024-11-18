@@ -6,7 +6,6 @@ const multer = require("multer");
 const Role = require("../../model/role.model");
 const dotenv = require("dotenv");
 const { v4: uuidv4 } = require("uuid");
-const modelUser = require("../../model/users.model");
 
 dotenv.config();
 
@@ -85,6 +84,11 @@ const supplierController = {
           .json({ message: "Vui lòng nhập đầy đủ thông tin nhà cung cấp" });
       }
 
+      const existingSupplier = await modelSupplier.findOne({ name: name });
+      if (existingSupplier) {
+        return res.status(400).json({ message: "Tên nhà cung cấp đã tồn tại, vui lòng chọn tên khác" });
+      }
+
       let imageURL;
       if (image) {
         if (!Buffer.isBuffer(image.buffer)) {
@@ -142,15 +146,30 @@ const supplierController = {
   },
   update: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { name, description, address, phone } = req.body;
+      const { id } = req.params; // Lấy ID nhà cung cấp từ params
+      const { name, description, address, phone } = req.body; // Lấy thông tin cần cập nhật từ body
       const image = req.file ? req.file : undefined;
 
+      // Kiểm tra đầu vào
       if (!name || !description || !address || !phone) {
         return res.status(400).json({ message: "Vui lòng nhập đủ thông tin" });
       }
 
+      // Kiểm tra xem tên nhà cung cấp có trùng không (ngoại trừ nhà cung cấp hiện tại)
+      const existingSupplier = await modelSupplier.findOne({
+        name: name.trim(),
+        _id: { $ne: id }, // Loại trừ nhà cung cấp đang được cập nhật
+      });
+
+      if (existingSupplier) {
+        return res
+          .status(400)
+          .json({ message: "Tên nhà cung cấp đã tồn tại, vui lòng chọn tên khác" });
+      }
+
       let imageURL;
+
+      // Nếu có hình ảnh, tải lên và lấy URL
       if (image) {
         if (!Buffer.isBuffer(image.buffer)) {
           return res
@@ -177,7 +196,7 @@ const supplierController = {
             await file.makePublic();
             imageURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name
               }/o/${encodeURIComponent(file.name)}?alt=media`;
-            await updateSupplierInDB();
+            await updateSupplierInDB(); // Cập nhật cơ sở dữ liệu sau khi có URL
           } catch (err) {
             console.error("Lỗi khi lấy URL của hình ảnh:", err);
             return res
@@ -188,21 +207,19 @@ const supplierController = {
 
         fileStream.end(image.buffer);
       } else {
-        await updateSupplierInDB();
+        await updateSupplierInDB(); // Cập nhật cơ sở dữ liệu nếu không có hình ảnh mới
       }
 
       async function updateSupplierInDB() {
         const updatedData = { name, address, phone, description };
         if (imageURL) {
-          updatedData.image = imageURL;
-        } else {
-          console.log("Không có URL hình ảnh được cập nhật"); // Thêm log kiểm tra
+          updatedData.image = imageURL; // Cập nhật URL hình ảnh nếu có
         }
 
         const updatedSuppliers = await modelSupplier.findByIdAndUpdate(
           id,
           updatedData,
-          { new: true }
+          { new: true } // Trả về dữ liệu sau khi cập nhật
         );
 
         if (!updatedSuppliers) {
@@ -211,20 +228,17 @@ const supplierController = {
             .json({ message: "Không tìm thấy nhà cung cấp" });
         }
 
-        return res
-          .status(200)
-          .json({
-            message: "Nhà cung cấp được cập nhật thành công",
-            updatedSuppliers,
-          });
+        return res.status(200).json({
+          message: "Nhà cung cấp được cập nhật thành công",
+          updatedSuppliers,
+        });
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật nhà cung cấp:", error);
-      return res
-        .status(500)
-        .json({ message: "Lỗi máy chủ", error: error.message });
+      return res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
     }
   },
+
   hardDelete: async (req, res) => {
     const { id } = req.params;
     try {
@@ -384,35 +398,35 @@ const supplierController = {
       const page = parseInt(req.query.page, 10) || 1;  // Default to page 1 if not provided
       const limit = parseInt(req.query.limit, 10) || 10;  // Default to 10 results per page if not provided
       const keyword = req.query.keyword;  // Use keyword from query parameters
-  
+
       // Validate page and limit
       if (isNaN(page) || page <= 0) {
         return res.status(400).json({
           message: "Số trang không hợp lệ",
         });
       }
-  
+
       if (isNaN(limit) || limit <= 0 || limit > 100) {  // Limit to a max of 100
         return res.status(400).json({
           message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
         });
       }
-  
+
       if (!keyword || keyword.trim() === "") {
         return res.status(400).json({
           message: "Từ khóa tìm kiếm không hợp lệ",
         });
       }
-  
+
       // Search for suppliers using keyword (case-insensitive) and active status
       const searchQuery = {
         name: { $regex: keyword, $options: "i" }, // Case-insensitive search
         status: "active",
       };
-  
+
       // Get the total count for pagination purposes
       const totalResults = await modelSupplier.countDocuments(searchQuery);
-  
+
       // If no results, return a suitable message
       if (totalResults === 0) {
         return res.status(200).json({
@@ -421,13 +435,13 @@ const supplierController = {
           totalResults: 0,
         });
       }
-  
+
       // Execute the search query with pagination
       const result = await modelSupplier
         .find(searchQuery)
         .skip((page - 1) * limit)
         .limit(limit);
-  
+
       // Return the search results with pagination info
       res.status(200).json({
         message: "Tìm kiếm thành công",
@@ -449,35 +463,35 @@ const supplierController = {
       const page = parseInt(req.query.page, 10) || 1;  // Default to page 1 if not provided
       const limit = parseInt(req.query.limit, 10) || 10;  // Default to 10 results per page if not provided
       const keyword = req.query.keyword;  // Use keyword from query parameters
-  
+
       // Validate page and limit
       if (isNaN(page) || page <= 0) {
         return res.status(400).json({
           message: "Số trang không hợp lệ",
         });
       }
-  
+
       if (isNaN(limit) || limit <= 0 || limit > 100) {  // Limit to a max of 100
         return res.status(400).json({
           message: "Giới hạn số lượng kết quả trên mỗi trang không hợp lệ",
         });
       }
-  
+
       if (!keyword || keyword.trim() === "") {
         return res.status(400).json({
           message: "Từ khóa tìm kiếm không hợp lệ",
         });
       }
-  
+
       // Search for suppliers using keyword (case-insensitive) and active status
       const searchQuery = {
         name: { $regex: keyword, $options: "i" }, // Case-insensitive search
         status: "disable",
       };
-  
+
       // Get the total count for pagination purposes
       const totalResults = await modelSupplier.countDocuments(searchQuery);
-  
+
       // If no results, return a suitable message
       if (totalResults === 0) {
         return res.status(200).json({
@@ -486,13 +500,13 @@ const supplierController = {
           totalResults: 0,
         });
       }
-  
+
       // Execute the search query with pagination
       const result = await modelSupplier
         .find(searchQuery)
         .skip((page - 1) * limit)
         .limit(limit);
-  
+
       // Return the search results with pagination info
       res.status(200).json({
         message: "Tìm kiếm thành công",
@@ -509,7 +523,7 @@ const supplierController = {
       });
     }
   },
-  
+
 };
 
 supplierController.upload = upload.single("image");
