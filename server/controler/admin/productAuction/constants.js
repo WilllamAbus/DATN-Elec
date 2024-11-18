@@ -10,6 +10,7 @@ module.exports = {
   },
   SUCCESS: {
     PRODUCT_DELETED: "Đã xóa thành công",
+    PRODUCT_RESTORED: "Sản phẩm đã được khôi phục thành công",
   },
   STATUS_CODES: {
     SUCCESS: 200,
@@ -17,5 +18,6 @@ module.exports = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     SERVER_ERROR: 500,
+    SUCCESS_DELETE: 200,
   }
 };

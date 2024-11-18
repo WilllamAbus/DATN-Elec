@@ -13,7 +13,22 @@ import {
   getOneAuctionSlice,
   getVariantColorsByIdSlice,
   addImageVariantSlice,
-  getVariantsByProductIdSlice
+  getVariantsByProductIdSlice,
+  deleteVariantSlice,
+  editVariantSlice,
+  getOneProductVariantSlice,
+  selectSupplierSlice,
+  selectDiscountSlice,
+  selectConditionShoppingSlice,
+  selectCategoriesSlice,
+  selectBrandSlice,
+  getImageByVariantIdSlice,
+  deleteImageVariantSlice,
+  getOneImageVariantSlice,
+  editImageVariantSlice,
+  getDeleteListAuctionSlice,
+  hardDeleteAuctionSlice,
+  restoreAuctionSlice
 } from "./Slicle";
 const productsReducer = combineReducers({
   list: listSclice,
@@ -29,7 +44,23 @@ const productsReducer = combineReducers({
   getOneAuction:getOneAuctionSlice,
   getVariantColorsById:getVariantColorsByIdSlice,
   addImageVariant:addImageVariantSlice,
-  getVariantsByProductId:getVariantsByProductIdSlice
+  getVariantsByProductId:getVariantsByProductIdSlice,
+  deleteVariant:deleteVariantSlice,
+  editVariant:editVariantSlice,
+  getOneProductVariant:getOneProductVariantSlice,
+  selectSupplier: selectSupplierSlice,
+  selectDiscount: selectDiscountSlice,
+  selectConditionShopping: selectConditionShoppingSlice,
+  selectCategories: selectCategoriesSlice,
+  selectBrand: selectBrandSlice,
+  getImageByVariantId: getImageByVariantIdSlice,
+  deleteImageVariant:deleteImageVariantSlice,
+  getOneImageVariant:getOneImageVariantSlice,
+  editImageVariant:editImageVariantSlice,
+  getDeleteListAuction:getDeleteListAuctionSlice,
+  hardDeleteAuction:hardDeleteAuctionSlice,
+  restoreAuction:restoreAuctionSlice
+
 });
 
 export default productsReducer;

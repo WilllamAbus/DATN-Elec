@@ -27,7 +27,6 @@ import {
   ProductRelated,
 } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import currencyFormatter from "currency-formatter";
-import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Comment from "../../../../User/feature/details/comment/comment";
 import {

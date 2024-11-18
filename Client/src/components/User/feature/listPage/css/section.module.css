@@ -6,7 +6,7 @@
 }
 
 .gridContainer {
-  @apply mb-4 grid gap-2 sm:grid-cols-6 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6;
+  @apply gap-2 grid grid-cols-2 sm:grid-cols-4;
 }
 .productCard {
   @apply relative w-full flex-col overflow-hidden rounded-s-sm border border-gray-100 bg-white shadow-md;

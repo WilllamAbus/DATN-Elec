@@ -1,5 +1,6 @@
-import  NumericFormat  from "../../../../../ultils/numerFormat/numericFormatWrapper";
-import { FieldError } from "react-hook-form";
+import NumericFormat from "../../../../../ultils/numerFormat/numericFormatWrapper";
+import { FieldError, Control } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 interface FormInputProps {
   id: string;
@@ -7,6 +8,7 @@ interface FormInputProps {
   placeholder?: string;
   type?: string;
   register: any;
+  control: Control<any>; 
   error?: FieldError;
   validation?: any;
   format?: boolean;
@@ -14,22 +16,19 @@ interface FormInputProps {
   suffix?: string;
 }
 
-import { useForm, Controller } from "react-hook-form";
-
 const FormInput: React.FC<FormInputProps> = ({
   id,
   label,
   placeholder,
   type = "text",
   register,
+  control,
   error,
   validation,
   format = false,
   onValueChange,
   suffix = "",
 }) => {
-  const { control } = useForm();
-
   return (
     <div className="col-span-6 sm:col-span-3">
       <label htmlFor={id} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -38,7 +37,8 @@ const FormInput: React.FC<FormInputProps> = ({
       {format ? (
         <Controller
           name={id}
-          control={control}
+          control={control} 
+          rules={validation}
           render={({ field: { onChange, value } }) => (
             <NumericFormat
               id={id}
@@ -72,6 +72,5 @@ const FormInput: React.FC<FormInputProps> = ({
     </div>
   );
 };
-
 
 export default FormInput;

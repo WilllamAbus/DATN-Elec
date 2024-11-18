@@ -19,6 +19,11 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.product,
     label: labels.product,
   },
+  post: {
+    icon: icons.post,
+    links: links.post,
+    label: labels.post,
+  },
   supplier: {
     icon: icons.supplier,
     links: links.supplier,

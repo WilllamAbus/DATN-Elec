@@ -4,7 +4,7 @@ import { UseFormRegister } from "react-hook-form";
 interface FormSelectProps {
   label: string;
   id: string;
-  options: { _id: string; name: string }[];
+  options: { _id: string; name: string | number }[];
   register: UseFormRegister<any>;
   validation?: object;
   errorMessage?: string;

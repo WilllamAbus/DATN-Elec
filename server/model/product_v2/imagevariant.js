@@ -5,6 +5,7 @@ const imageVariantSchema = new Schema({
   image: [{ type: String, required: true }],
   productVariant: { type: Schema.Types.ObjectId, ref: 'productVariant', required: true },
   color: { type: Schema.Types.ObjectId, ref: 'Color' },
+  price: { type: Number, required: true, default: 0 },
   slug: { type: String, unique: true }, 
 }, {
   collection: "imagevariants",

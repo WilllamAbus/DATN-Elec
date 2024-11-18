@@ -9,7 +9,7 @@
     const queryParams = { ...initialQueryParams, ...queryString.parse(location.search) };
 
     const [filters, setFilters] = useState<FilterState>({
-      _sort: queryParams._sort as string || "product_price:ASC",
+      _sort: queryParams._sort as string || "variant_price:ASC",
       brand: queryParams.brand ? (queryParams.brand as string).split(',').map(_id => ({
         _id,
         name: getBrandNameById(brands, _id)

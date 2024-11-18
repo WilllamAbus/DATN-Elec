@@ -13,7 +13,7 @@ export const RESPONSE_MESSAGES_CRUD = {
   ADMIN_ROLE_NOT_FOUND: "Không tìm thấy vai trò quản trị viên",
   USER_ACCESS_DENIED: "Người dùng không có quyền truy cập.",
   ACCESS_DENIED: "Quyền truy cập bị từ chối: Chỉ quản trị viên mới có thể xóa sản phẩm",
-  INVALID_PRODUCT_ID: "ID sản phẩm không hợp lệ",
+  INVALID_VARIANT_ID: "ID sản phẩm không hợp lệ",
   PRODUCT_NOT_FOUND: "Không tìm thấy sản phẩm",
   SUCCESS_DELETE: 'Sản phẩm và các biến thể đã được xóa thành công',
   SERVER_ERROR: "Lỗi server",

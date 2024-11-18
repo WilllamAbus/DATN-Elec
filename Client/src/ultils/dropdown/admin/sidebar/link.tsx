@@ -17,6 +17,9 @@ export const links: Record<string, Link[]> = {
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
   ],
+  post: [
+    { label: "Bài viết", to: "/admin/list-post" },
+  ],
   orderCart: [
     { label: "Đơn hàng", to: "/admin/listOrders" },
     { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
@@ -27,6 +30,7 @@ export const links: Record<string, Link[]> = {
   recycleBin: [
     { label: "Danh mục", to: "/admin/recycleBinCate" },
     { label: "Sản phẩm", to: "/admin/recycleBin" },
+    { label: "Sản phẩm đấu giá", to: "/admin/delete-list-auction" },
     { label: "Mã giảm giá", to: "/admin/recycleBinVoucher" },
     { label: "Nhà cung cấp", to: "/admin/recycleBinSupplier" },
     { label: "Thương hiệu", to: "/admin/recycleBinBrand" },
@@ -36,7 +40,10 @@ export const links: Record<string, Link[]> = {
     { label: "Khoảng định giá", to: "/admin/recycleBinPriceRand" },
     { label: "Đấu giá sản phẩm", to: "/admin/recycleBinProducTime" },
   ],
-  categories: [{ label: "Danh mục", to: "/admin/listCategories" }],
+  categories: [
+    { label: "Danh mục sản phẩm", to: "/admin/listCategories" },
+    { label: "Danh mục bài viết", to: "/admin/list-categories-post" }
+  ],
   comment: [{ label: "Tương tác", to: "/admin/listComments" }],
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
   inbound: [

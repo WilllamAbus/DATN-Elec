@@ -25,6 +25,7 @@ export default function DropdownCRUD({ productId, currentPage, searchTerm }: Dro
       <DropdownMenu aria-label="Static Actions">
         <DropdownItem key="new"
           startContent={<EditDocumentIcon className={iconClasses} />}
+          textValue="Sửa sản phẩm" 
         >
           <Link to={`/admin/editproduct/${productId}`}>
             Sửa sản phẩm
@@ -32,6 +33,7 @@ export default function DropdownCRUD({ productId, currentPage, searchTerm }: Dro
         </DropdownItem>
         <DropdownItem key="copy"
           startContent={<AddNoteIcon className={iconClasses} />}
+          textValue="Thêm biến thể" 
         >
           
           <Link to={`/admin/product/${productId}/addvariant`}>
@@ -40,6 +42,7 @@ export default function DropdownCRUD({ productId, currentPage, searchTerm }: Dro
         </DropdownItem>
         <DropdownItem key="delete" className="text-danger" color="danger"
          startContent={<DeleteIcon className={iconClasses} />}
+         textValue="Xóa sản phẩm"
           onClick={() => handleSoftDeleteProduct(productId, dispatch, currentPage, searchTerm)} 
         >
           Xóa sản phẩm

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm,  SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,14 +12,13 @@ import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResp
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
 import { addProductAuctionThunk } from "../../../../redux/product/admin/Thunk";
-import { selectFetchData } from "./FetchData";
 import SubmitButtonAdd from "./btn/SubmitButtonAdd";
 import Productdescription from "./description/product_description";
 import FormInput from "./Form/forminput";
 import FormSelect from "./Form/formselect";
 import ImageUpload from "./Form/imageUpload";
-import CategoryDiscountSelect from "./Form/cate_Discount";
-import BrandSupplierSelect from "./Form/Brand_Supplier";
+import { useFetchData } from "./hook/selectFetchData";
+
 
 
 const AddProductAuction: React.FC = () => {
@@ -33,10 +32,9 @@ const AddProductAuction: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const { imgPreview, handleImageChange } = useImageUpload();
-
+  const { categories, brands, conditionShopping, suppliers, discounts } = useFetchData();
   const navigate = useNavigate();
-  const { brands, suppliers, discounts,  conditionShoppingList, categories } =
-    selectFetchData();
+
   const submitFormAdd: SubmitHandler<ProductAuction> = async (data) => {
     setIsLoading(true);
     try {
@@ -71,24 +69,56 @@ const AddProductAuction: React.FC = () => {
             handleImageChange={handleImageChange}
             error={errors.image?.message}
           />
-          <CategoryDiscountSelect
-            categories={categories}
-            discounts={discounts}
-            register={register}
-            errors={{
-              product_type: errors.product_type?.message,
-              product_discount: errors.product_discount?.message,
-            }}
-          />
-          <BrandSupplierSelect
-            brands={brands}
-            suppliers={suppliers}
-            register={register}
-            errors={{
-              product_brand: errors.product_brand?.message,
-              product_supplier: errors.product_supplier?.message,
-            }}
-          />
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div className="space-y-4">
+              <FormSelect
+                label="Danh mục"
+                id="product_type"
+                options={(categories || []).map((categorie) => ({
+                  _id: categorie._id,
+                  name: categorie.name,
+                }))}
+                register={register}
+                validation={{ required: "Danh mục mua sắm là bắt buộc" }}
+                errorMessage={errors.product_type?.message}
+              />
+              <FormSelect
+                label="Thương hiệu"
+                id="product_brand"
+                options={(brands ?? []).map((brand) => ({
+                  _id: brand._id,
+                  name: brand.name,
+                }))}
+                register={register}
+                validation={{ required: "Thương hiệu mua sắm là bắt buộc" }}
+                errorMessage={errors.product_brand?.message}
+              />
+
+              <FormSelect
+                label="Nhà cung cấp"
+                id="product_supplier"
+                options={(suppliers ?? []).map((supplier) => ({
+                  _id: supplier._id,
+                  name: supplier.name,
+                }))}
+                register={register}
+                validation={{ required: "Nhà cung cấp mua sắm là bắt buộc" }}
+                errorMessage={errors.product_supplier?.message}
+              />
+
+              <FormSelect
+                label="Giảm giá"
+                id="product_discount"
+                options={(discounts ?? []).map((discount) => ({
+                  _id: discount._id,
+                  name: discount.discountPercent,
+                }))}
+                register={register}
+                validation={{ required: "Giảm giá là bắt buộc" }}
+                errorMessage={errors.product_discount?.message}
+              />
+            </div>
+          </div>
         </div>
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -170,19 +200,16 @@ const AddProductAuction: React.FC = () => {
 
 
               <FormSelect
-                label="Điều kiện mua sắm"
+                label="Điều kiện mua sắm"
                 id="product_condition"
-                options={conditionShoppingList.map((condition) => ({
-                  _id: condition._id,
-                  name: condition.nameCondition,
+                options={(conditionShopping || []).map((conditionShopping) => ({
+                  _id: conditionShopping._id,
+                  name: conditionShopping.nameCondition,
                 }))}
                 register={register}
-                validation={{
-                  required: "Vui lòng chọn điều kiện mua sắm",
-                }}
+                validation={{ required: "Điều kiện mua sắm là bắt buộc" }}
                 errorMessage={errors.product_condition?.message}
               />
-
 
             </div>
             <Productdescription register={register} errors={errors} />

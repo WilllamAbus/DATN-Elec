@@ -77,7 +77,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpenMobie, onClose }) => {
                 <DropdownItem type="product" />
                 <DropdownItem type="orderCart" />
                 <DropdownItem type="account" />
-                <NavItem type="categories" />
+                <DropdownItem type="categories" />
+                <DropdownItem type="post" />
                 <NavItem type="comment" />
                 <NavItem type="supplier" />
                 <NavItem type="brand" />

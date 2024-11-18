@@ -9,8 +9,12 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Toolti
 import { Link, useParams } from "react-router-dom";
 import { DeleteIcon } from "../../../../common/Icons/DeleteIcon";
 import { AddNoteIcon } from "../../../../common/Icons/AddNoteIcon";
+import { EditIcon } from "../../../../common/Icons/EditIcon";
+import { EyeIcon } from "../../../../common/Icons/EyeIcon";
 import PlaceholderImage from "../../../../common/images/PlaceholderImage";
-const ProductList: React.FC = () => {
+import { deleteVariant } from "./handlers/deleteVariant";
+
+const GetVariantsByProductId: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const dispatch: AppDispatch = useDispatch();
   const currentPage = useSelector(
@@ -114,8 +118,21 @@ const ProductList: React.FC = () => {
               <AddNoteIcon />
             </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Delete user">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+            <Tooltip content="Xem danh sách ảnh">
+            <Link to={`/admin/list-image-and-color/${variant._id}`} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EyeIcon />
+            </Link>
+            </Tooltip>
+            <Tooltip content="Cập nhật biến thể">
+            <Link to={`/admin/product/${variant._id}`} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <EditIcon />
+            </Link>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete Variant">
+              <span
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+                onClick={() => deleteVariant(variant._id, productId as string, dispatch, currentPage)}
+              >
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -156,7 +173,6 @@ const ProductList: React.FC = () => {
 
       <div className="flex justify-center my-4">
         <Pagination
-
           isCompact
           loop
           showControls
@@ -170,4 +186,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default GetVariantsByProductId;

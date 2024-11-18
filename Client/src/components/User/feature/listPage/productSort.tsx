@@ -21,10 +21,10 @@ const ProductAuctionSort: React.FC<ProductAuctionSortProps> = ({ currentSort, on
       >
         <Tab
           label="Giá thấp tới cao"
-          value="product_price:ASC"
+          value="variant_price:ASC"
           sx={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}
         />
-        <Tab label="Giá cao xuống thấp" value="product_price:DESC"
+        <Tab label="Giá cao xuống thấp" value="variant_price:DESC"
           sx={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}
         />
       </Tabs>

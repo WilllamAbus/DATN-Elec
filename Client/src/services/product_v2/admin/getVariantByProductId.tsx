@@ -6,6 +6,7 @@ export const getVariantsByProductId = async (productId: string, page: number = 1
     const response = await instance.get<VariantsResponse>(`/admin/product/get-variant-by-product/${productId}`, {
       params: { page },
     });
+
     
     return response.data;
   } catch (error) {

@@ -4,6 +4,7 @@ export const RESPONSE_MESSAGES = {
   VARIANT_NAME_EXISTS: (variant_name: string) => `Tên biến thể '${variant_name}' đã tồn tại cho sản phẩm này`,
   VARIANT_ADDED_SUCCESS: 'Biến thể mới đã được thêm thành công',
   VARIANT_ADD_ERROR: 'Có lỗi xảy ra khi thêm biến thể sản phẩm',
+  VARIANT_UPDATE_ERROR:'Có lỗi xảy ra khi thêm biến thể sản phẩm',
   PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại',
 };
 
@@ -105,10 +106,23 @@ export interface STORAGE {
   updatedAt: string;
   slug: string;
 }
+
+export interface Discount {
+  _id: string;
+  code: string;
+  discountPercent: number;
+  isActive: boolean;
+  status: string;
+  disabledAt: Date | null;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface ProductVariant {
   variant_name: string;                
   variant_description: string;         
-  variant_price: number;               
+  variant_price: number;    
+  variant_original_price:number;    
+  product_discount: Discount;       
   battery: BATTERY[];                    
   color: COLOR[];                   
   cpu: CPU[];                     
@@ -116,8 +130,7 @@ export interface ProductVariant {
   operatingSystem: OPERATINGSYSTEM[];          
   ram: RAM[];                    
   screen: SCREEN[];                   
-  storage: STORAGE[];                    
-  image?: FileList;          
+  storage: STORAGE[];                           
   sku: string;                         
   pid: string;                        
   status: 'active' | 'inactive';      

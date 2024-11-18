@@ -1,0 +1,10 @@
+export { default as addCategoryPostSlice } from "./admin/add/addCategoryPost";
+export { default as listCategoryPostSlice } from "./admin/list/getCategoryPostList";
+export { default as softDeleteCategoryPostSlice } from "./admin/delete/softDeleteCategoryPost";
+export { default as selectProductsSlice } from "./admin/select/selectProduct";
+export { default as addPostSlice } from "./admin/add/addPost";
+export { default as selectCategoryPostSlice } from "./admin/select/selectCategoryPost";
+export { default as listPostSlice } from "./admin/list/getListPost";
+export { default as getOnePostSlice } from "./admin/detail/getOnePost";
+export { default as editPostSlice } from "./admin/edit/editPost";
+export { default as softDeletePostSlice } from "./admin/delete/softDeletePost";

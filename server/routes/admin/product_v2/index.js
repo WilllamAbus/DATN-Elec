@@ -23,12 +23,20 @@ const {
    getOne,
    getProductLimit,
    deletedList,
-   hardDelete} = require('../../../controler/admin/product_v2');
+   hardDelete,
+   deleteVariant,
+   editVariant,
+   getOneImageVariant,
+   editImageVariant,
+   getImageByVariantId,
+   deleteImageVariant
+  } = require('../../../controler/admin/product_v2');
    router.post('/:product_id/addvariant', upload.array('image'), addVariant);
 router.get('/list',middlewareController.verifyTokenAdminAuth,list);
 router.post('/add', upload.array('image'), add);
 router.post('/:product_variant_id/add-image-variant', upload.array('image'), addImageVariant);
-router.patch('/softDelete/:id',middlewareController.verifyToken,softDelete);
+router.get("/get-one-image-variant/:image_variant_id", getOneImageVariant);
+router.patch('/softDelete/:id',middlewareController.verifyTokenAdminAuth,softDelete);
 router.get('/selectbrand',selectbrand);
 router.get('/get-color-variant/:product_variant_id',getVariantColorsById);
 router.get('/selectsupplier',selectSupplier);
@@ -37,18 +45,33 @@ router.get('/selectProductFormat',selectProductFormat);
 router.get('/selectConditionSP',selectConditionShopping);
 router.get('/selectCategories',selectCategories);
 router.get("/getone/:id", getOne);
-router.get("/get-one-product-variant/:id", getOneProductVariant);
-router.patch("/restore/:id", middlewareController.verifyToken, restore);
-router.delete("/hardDelete/:id", middlewareController.verifyToken, hardDelete);
-router.get("/deletedlist", middlewareController.verifyToken, deletedList);
+router.get("/get-one-product-variant/:variantId", getOneProductVariant);
+router.patch("/restore/:id", middlewareController.verifyTokenAdminAuth, restore);
+router.delete("/hardDelete/:id", middlewareController.verifyTokenAdminAuth, hardDelete);
+router.delete("/deleteVariant/:variantId", middlewareController.verifyTokenAdminAuth, deleteVariant);
+router.delete("/delete-image-variant/:imageId/:variantId", deleteImageVariant);
+router.get("/deletedlist", middlewareController.verifyTokenAdminAuth, deletedList);
 router.get("/limit", getProductLimit);
 router.get("/get-variant-by-product/:id", getVariantsByProductId);
+router.get("/get-image-by-variant/:id", getImageByVariantId);
 router.get("/:id?", searchVariants);
 router.put(
   "/update/:id",
   middlewareController.verifyToken,
   upload.array("image"),
   update
+);
+router.put(
+  "/updateVariant/:variantId",
+  middlewareController.verifyTokenAdminAuth,
+  upload.array("image"),
+  editVariant
+);
+router.put(
+  "/updateImageVariant/:image_variant_id",
+  middlewareController.verifyTokenAdminAuth,
+  upload.array("image"),
+  editImageVariant
 );
 
 

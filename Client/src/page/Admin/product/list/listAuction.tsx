@@ -1,7 +1,7 @@
 import React from "react";
 import AdminFetListProductAuction from "../../../../components/Admin/feature/productAuction/list";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import ProductSummary from "../../../../components/Admin/summary/ProductSummary";
+import GetListAuction from "../../../../components/Admin/summary/getListAuction";
 const listProd: React.FC = () => {
 
   return (
@@ -15,7 +15,7 @@ const listProd: React.FC = () => {
       <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
         <div className="mb-4 col-span-full xl:mb-2">
           <div className="bg-white dark:bg-gray-800 relative border shadow-md sm:rounded-lg overflow-hidden">
-            <ProductSummary />
+            <GetListAuction />
             <div className="overflow-x-auto">
               <AdminFetListProductAuction />
             </div>

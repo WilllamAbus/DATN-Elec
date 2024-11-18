@@ -7,6 +7,7 @@ const brandRouter = require("./admin/brands/brands");
 const CartRouter = require("./product/cart");
 const supplierRoutes = require("./admin/suppliers/suppliers");
 const adminProduct = require("./admin/product_v2");
+const adminPost = require("./admin/post");
 const adminProductAuction = require("./admin/productAuction");
 const adminAttributes = require("./admin/attributes");
 const clientProduct = require("./client/product");
@@ -53,6 +54,7 @@ const routes = (app) => {
   app.use("/api/suppliers", supplierRoutes);
   app.use("/api/cart", CartRouter);
   app.use("/api/admin/product", adminProduct);
+  app.use("/api/admin/post", adminPost);
   app.use("/api/admin/productAuction", adminProductAuction);
   app.use("/api/admin/attributes", adminAttributes);
   app.use("/api/client/product", clientProduct);

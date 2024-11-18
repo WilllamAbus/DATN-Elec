@@ -117,7 +117,7 @@ export default function ListPage() {
 
   const hasFilters = Object.keys(filters).some((key) => {
     const value = filters[key];
-    if (key === '_sort' && (value === 'product_price:ASC' || value === 'product_price:DESC')) return false;
+    if (key === '_sort' && (value === 'variant_price:ASC' || value === 'variant_price:DESC')) return false;
     if (key === 'page' && value === 1) return false;
     if (Array.isArray(value) && value.length === 0) return false;
     if (value === undefined || value === null || value === '') return false;

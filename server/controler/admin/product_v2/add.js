@@ -1,16 +1,13 @@
 const ProductV2 = require('../../../model/product_v2');
 const { uploadImage } = require('../../../utils/uploadImage');
-const { calculateDiscount } = require('./calculator/discount');
 const { v4: uuidv4 } = require('uuid');
 const generateSKU = require('./sku/skuGenerator');
 const {
   checkProductNameExists,
-  validateProductPrice,
   isValidProductName
 } = require('./validators');
 const add = async (req, res) => {
   try {
-    
     const existingProduct = await checkProductNameExists(req.body.product_name);
     if (existingProduct) {
       return res.status(400).json({
@@ -21,15 +18,6 @@ const add = async (req, res) => {
       });
     }
 
-    const productPrice = parseFloat(req.body.product_price);
-    if (!validateProductPrice(productPrice)) {
-      return res.status(400).json({
-        success: false,
-        err: 2,
-        msg: 'Giá tiền không hợp lệ',
-        status: 400
-      });
-    }
 
     if (!isValidProductName(req.body.product_name)) {
       return res.status(400).json({
@@ -39,8 +27,6 @@ const add = async (req, res) => {
         status: 400
       });
     }
-
-    const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
 
     let imageUrls = [];
     if (req.files && req.files.length) {
@@ -58,19 +44,8 @@ const add = async (req, res) => {
       image: imageUrls,
       product_description: req.body.product_description,
       product_type: req.body.product_type,
-      product_discount: {
-        discountId: discount._id,
-        code: discount.code,
-        discountPercent: discount.discountPercent,
-        isActive: discount.isActive,
-        status: discount.status,
-        disabledAt: discount.disabledAt
-      },
       product_brand: req.body.product_brand,
-      product_format: req.body.product_format,
       product_condition: req.body.product_condition,
-      product_price: productPrice,
-      product_price_unit: productPriceUnit,
       weight_g: req.body.weight_g,
       product_supplier: req.body.product_supplier,
       hasVariants: req.body.hasVariants,

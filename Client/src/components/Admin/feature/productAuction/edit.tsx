@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { NumericFormat } from "react-number-format";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
-import { ProductAuction} from "../../../../services/product_v2/admin/types/add-product-auction";
+import { ProductAuction } from "../../../../services/product_v2/admin/types/add-product-auction";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { updateAuctionThunk, getOneAuctionThunk } from "../../../../redux/product/admin/Thunk";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
-import { selectFetchData } from "../productAuction/FetchData";
-import BrandSupplierSelect from "./Form/Brand_Supplier";
-import CategoryDiscountSelect from "./Form/cate_Discount";
+import FormSelect from "./Form/formselect";
+import { useFetchData } from "./hook/selectFetchData";
+import FormInput from "./Form/forminput";
 const EditProduct: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -22,7 +21,6 @@ const EditProduct: React.FC = () => {
     register,
     handleSubmit,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm<ProductAuction>();
 
@@ -32,8 +30,7 @@ const EditProduct: React.FC = () => {
   const product = useSelector((state: RootState) => state.products.getone.product);
   const fetchStatus = useSelector((state: RootState) => state.products.getone.status);
   const fetchError = useSelector((state: RootState) => state.products.getone.error);
-  const { brands, suppliers, discounts,conditionShoppingList, categories } =
-    selectFetchData();
+  const { categories, brands, conditionShopping, suppliers, discounts } = useFetchData();
   useEffect(() => {
     if (product) {
       if (product.image && product.image.length > 0) {
@@ -130,24 +127,56 @@ const EditProduct: React.FC = () => {
             </div>
           </div>
 
-          <CategoryDiscountSelect
-            categories={categories}
-            discounts={discounts}
-            register={register}
-            errors={{
-              product_type: errors.product_type?.message,
-              product_discount: errors.product_discount?.message,
-            }}
-          />
-          <BrandSupplierSelect
-            brands={brands}
-            suppliers={suppliers}
-            register={register}
-            errors={{
-              product_brand: errors.product_brand?.message,
-              product_supplier: errors.product_supplier?.message,
-            }}
-          />
+          <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div className="space-y-4">
+              <FormSelect
+                label="Danh mục"
+                id="product_type"
+                options={(categories || []).map((categorie) => ({
+                  _id: categorie._id,
+                  name: categorie.name,
+                }))}
+                register={register}
+                validation={{ required: "Danh mục mua sắm là bắt buộc" }}
+                errorMessage={errors.product_type?.message}
+              />
+              <FormSelect
+                label="Thương hiệu"
+                id="product_brand"
+                options={(brands ?? []).map((brand) => ({
+                  _id: brand._id,
+                  name: brand.name,
+                }))}
+                register={register}
+                validation={{ required: "Thương hiệu mua sắm là bắt buộc" }}
+                errorMessage={errors.product_brand?.message}
+              />
+
+              <FormSelect
+                label="Nhà cung cấp"
+                id="product_supplier"
+                options={(suppliers ?? []).map((supplier) => ({
+                  _id: supplier._id,
+                  name: supplier.name,
+                }))}
+                register={register}
+                validation={{ required: "Nhà cung cấp mua sắm là bắt buộc" }}
+                errorMessage={errors.product_supplier?.message}
+              />
+
+              <FormSelect
+                label="Giảm giá"
+                id="product_discount"
+                options={(discounts ?? []).map((discount) => ({
+                  _id: discount._id,
+                  name: discount.discountPercent,
+                }))}
+                register={register}
+                validation={{ required: "Giảm giá là bắt buộc" }}
+                errorMessage={errors.product_discount?.message}
+              />
+            </div>
+          </div>
         </div>
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -179,133 +208,73 @@ const EditProduct: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="product_price"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Giá gốc
-                </label>
-                <NumericFormat
-                  id="product_price"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  suffix=" đ"
-                  value={getValues("product_price")}
-                  onValueChange={(values) => {
-                    const { floatValue } = values;
-                    setValue("product_price", floatValue ?? 0);
-                  }}
-                  {...register("product_price", {
-                    required: "Giá sản phẩm không được bỏ trống",
-                    min: {
-                      value: 1000,
-                      message: "Giá sản phẩm không thể thấp hơn 1000",
-                    },
-                    max: {
-                      value: 2000000000,
-                      message: "Giá sản phẩm không thể vượt quá 2000000000",
-                    },
-                    valueAsNumber: true,
-                  })}
-                />
-                {errors.product_price && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.product_price.message}</span>
-                  </div>
-                )}
-              </div>
+              <FormInput
+                id="product_price"
+                label="Giá gốc"
+                format
+                suffix=" đ"
+                register={register}
+                error={errors.product_price}
+                validation={{
+                  required: "Giá sản phẩm không được bỏ trống",
+                  min: {
+                    value: 1000,
+                    message: "Giá sản phẩm không thể thấp hơn 1000",
+                  },
+                  max: {
+                    value: 2000000000,
+                    message: "Giá sản phẩm không thể vượt quá 2000000000",
+                  },
+                  valueAsNumber: true,
+                }}
+                onValueChange={(values) => {
+                  const { floatValue } = values;
+                  setValue("product_price", floatValue ?? 0);
+                }}
+              />
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="weight_g"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Khối lượng (kg)
-                </label>
-                <NumericFormat
-                  id="weight_g"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  suffix=" kg"
-                  decimalScale={2}
-                  value={getValues("weight_g")}
-                  fixedDecimalScale={true}
-                  {...register("weight_g", {
-                    required: "Khối lượng không được bỏ trống",
-                    min: {
-                      value: 0.01,
-                      message: "Khối lượng phải lớn hơn 0",
-                    },
-                  })}
-                  onValueChange={(values: { floatValue: number | undefined }) => {
-                    const { floatValue } = values;
-                    setValue("weight_g", floatValue ?? 0);
-                  }}
-                />
-                {errors.weight_g && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.weight_g.message}</span>
-                  </div>
-                )}
-              </div>
+              <FormInput
+                id="weight_g"
+                label="Khối lượng (kg)"
+                format
+                suffix=" kg"
+                register={register}
+                error={errors.weight_g}
+                validation={{
+                  required: "Khối lượng không được bỏ trống",
+                  min: {
+                    value: 0.01,
+                    message: "Khối lượng phải lớn hơn 0",
+                  },
+                }}
+                onValueChange={(values: { floatValue: number | undefined }) => {
+                  const { floatValue } = values;
+                  setValue("weight_g", floatValue ?? 0);
+                }}
+              />
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="birthday"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Ngày nhập
-                </label>
-                <input
-                  type="date"
-                  id="createdAt"
-                  className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="12/12/2024"
-                  value={
-                    getValues("createdAt")
-                      ? new Date(getValues("createdAt")).toISOString().split("T")[0]
-                      : ""
-                  }
-                  {...register("createdAt", { required: "Ngày nhập không được bỏ trống" })}
-                />
+              <FormInput
+                id="createdAt"
+                label="Ngày nhập"
+                type="date"
+                register={register}
+                error={errors.createdAt}
+                validation={{
+                  required: "Ngày nhập không được bỏ trống",
+                }}
+              />
 
-                {errors.createdAt && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.createdAt.message}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="condition_shopping"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Điều kiện mua sắm
-                </label>
-                <select
-                  id="product_condition"
-                  className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  {...register("product_condition", {
-                    required: "Vui lòng chọn điều kiện mua sắm",
-                  })}
-                >
-                  <option value="">Chọn điều kiện mua sắm</option>
-                  {conditionShoppingList.map((condition) => (
-                    <option key={condition._id} value={condition._id}>
-                      {condition.nameCondition}
-                    </option>
-                  ))}
-                </select>
-                {errors.product_condition && (
-                  <div className="flex items-center mt-2 text-red-600">
-                    <span className="text-sm font-medium">{errors.product_condition.message}</span>
-                  </div>
-                )}
-              </div>
+              <FormSelect
+                label="Điều kiện mua sắm"
+                id="product_condition"
+                options={(conditionShopping || []).map((conditionShopping) => ({
+                  _id: conditionShopping._id,
+                  name: conditionShopping.nameCondition,
+                }))}
+                register={register}
+                validation={{ required: "Điều kiện mua sắm là bắt buộc" }}
+                errorMessage={errors.product_condition?.message}
+              />
             </div>
             <div className="w-full mb-4 border mt-6 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
               <div className="flex items-center justify-between px-3 py-2 border-b dark:border-gray-600">
@@ -518,9 +487,8 @@ const EditProduct: React.FC = () => {
             <div className="col-span-6 sm:col-full">
               <button
                 type="submit"
-                className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 disabled={isLoading}
               >
                 {isLoading ? (

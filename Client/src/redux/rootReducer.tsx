@@ -10,6 +10,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
 import productClientReducer from "./product/client";
+import postReducer from "./post";
 import attributesReducer from "./product/attributes";
 import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
@@ -63,6 +64,7 @@ const rootReducer = combineReducers({
   voucher: voucherReducer,
   checkout: checkoutSlice,
   products: productAdminReducer,
+  post:postReducer,
   productClient: productClientReducer,
   attributes: attributesReducer,
   cateClients: listCateNavReducer,

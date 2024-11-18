@@ -1,13 +1,13 @@
 const modelSupplier = require('../../../../model/suppliers.model');
 const selectSupplier = async (req, res) => {
   try {
-      const suppliers = await modelSupplier.find({ status: { $ne: 'disable' } });
+      const selectSuppliers = await modelSupplier.find({ status: { $ne: 'disable' } }).select('_id name');
       return res.status(200).json({
         success: true,
         err: 0,
         msg: 'Select Supplier ok',
         status: 200,
-        suppliers
+        selectSuppliers
       });
   } catch (error) {
     return res.status(500).json({

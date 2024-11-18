@@ -1,30 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppDispatch } from "../../../redux/store"; 
 import { DeleteListProductThunk } from "../../../redux/product/admin/Thunk";
 
-const SearchFomDeletelistProduct: React.FC = () => {
+interface Props {
+  onSearchChange: (term: string) => void; 
+}
+
+const SearchFomDeletelistProduct: React.FC<Props> = ({ onSearchChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [timer,] = useState<NodeJS.Timeout | null>(null);
   const dispatch = useAppDispatch();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(DeleteListProductThunk({ page: 1, search: searchTerm }));
+    onSearchChange(searchTerm); 
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value); 
+  };
+
+
+  useEffect(() => {
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [timer]);
 
   return (
     <div className="w-full md:w-1/2">
       <form className="flex items-center" onSubmit={handleSearch}>
         <label htmlFor="simple-search" className="sr-only">
-          Search
+        Tìm kiếm
         </label>
         <div className="relative w-full">
           <input
             id="simple-search"
             type="search"
-            className="w-full py-1 px-2 border border-gray-300 rounded-md shadow-sm"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full py-1 px-2 border text-black border-gray-300 rounded-md shadow-sm"
+            placeholder="Tìm kiếm"
+            value={searchTerm} 
+            onChange={handleInputChange} 
           />
           <button
             type="submit"

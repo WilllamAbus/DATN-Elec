@@ -7,6 +7,7 @@ interface ProductState {
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
   pagination: Pagination | null;
+  total: number | null;
 }
 
 const initialState: ProductState = {
@@ -14,6 +15,7 @@ const initialState: ProductState = {
   status: "idle",
   error: null,
   pagination: null,
+  total: null
 };
 
 const LimitProductAuctionSlice = createSlice({
@@ -31,6 +33,7 @@ const LimitProductAuctionSlice = createSlice({
           state.status = "success";
           state.products = action.payload.data.products;
           state.pagination = action.payload.pagination;
+          state.total = action.payload.data.total;
         }
       )
       .addCase(listProductAuctionThunk.rejected, (state, action) => {
