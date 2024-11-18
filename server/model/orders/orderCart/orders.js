@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
-    cartDetails: [{ type: Schema.Types.ObjectId, ref: "OrderDetail" }], // Link tới các chi tiết sản phẩm trong đơn hàng
+    cartDetails: [{ type: Schema.Types.ObjectId, ref: "OrderDetail" }],
     payment: { type: Schema.Types.ObjectId, ref: "payment", default: null },
     shipping: { type: Schema.Types.ObjectId, ref: "shipping", required: true },
     voucherIds: [{ type: Schema.Types.ObjectId, ref: "voucher" }],
@@ -30,15 +30,20 @@ const orderSchema = new Schema(
         "Đang vận chuyển",
         "Hoàn tất",
         "Hủy đơn hàng",
+        "Đã hoàn tiền",
       ],
       required: true,
     },
 
-    // Trạng thái xóa đơn hàng
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
+    cancelReason: { type: String, default: null },
 
-    // Thời gian tạo và cập nhật
+    refundBank: {
+      bankName: { type: String, required: false }, // Tên ngân hàng
+      accountNumber: { type: String, required: false }, // Số tài khoản
+      accountName: { type: String, required: false }, // Tên chủ tài khoản
+    },
     createdAt: { type: Date, default: moment.tz("Asia/Ho_Chi_Minh").toDate() },
     updatedAt: { type: Date, default: moment.tz("Asia/Ho_Chi_Minh").toDate() },
   },

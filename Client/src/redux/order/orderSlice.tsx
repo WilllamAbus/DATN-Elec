@@ -22,24 +22,30 @@ import {
   updateStatusByIdThunk,
   listSoftOrderThunk,
 } from "./Admin/orderAdmin";
-import { Order } from "../../types/order/order";
+import { Order, OrderItem } from "../../types/order/order";
 
 interface OrderState {
   selectedOrder: Order | null;
   orders: Order[];
 
+  order: Order[] | null;
+
+  items: OrderItem[];
+
   softDeletedOrders: Order[];
-  items: any[];
+
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: OrderState = {
   selectedOrder: null,
+  items: [],
   orders: [],
+  order: null,
 
   softDeletedOrders: [],
-  items: [],
+
   status: "idle",
   error: null,
 };
@@ -203,23 +209,24 @@ const orderSlice = createSlice({
         state.status = "failed";
         state.error = action.payload || "Something went wrong";
       })
-      // Xử lý chi tiết đơn hàng theo ID
+
       .addCase(getOrderDetailByIdThunk.pending, (state) => {
-        state.status = "loading";
         state.error = null;
       })
       .addCase(
         getOrderDetailByIdThunk.fulfilled,
-        (state, action: PayloadAction<{ order: Order[]; items: any[] }>) => {
-          state.status = "succeeded";
-          state.orders = action.payload.order; // Cập nhật với order
+        (
+          state,
+          action: PayloadAction<{ order: Order[]; items: OrderItem[] }>
+        ) => {
+          state.order = action.payload.order;
           state.items = action.payload.items;
         }
       )
       .addCase(getOrderDetailByIdThunk.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string; // Error message from thunk
+        state.error = action.payload as string;
       })
+
       // Handle getAllOrderDetailsThunk
       .addCase(getAllOrderDetailsThunk.pending, (state) => {
         state.status = "loading";

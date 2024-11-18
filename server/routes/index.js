@@ -36,12 +36,12 @@ const interactionRouter = require("./client/interaction/interation.routes");
 const orderdetails = require("./client/orders/OrderDetail");
 const OrderAd = require("./admin/order/orderAd");
 const momoRouter = require("./client/momo/momo");
-const orderAucIteraction = require('./client/iterationOrderAuct/iterationOrderAuc.routes')
+const orderAucIteraction = require("./client/iterationOrderAuct/iterationOrderAuc.routes");
 
 const commentAdminRouter = require("./admin/comment");
 const commentClientRouter = require("./client/comment");
-
-const statistical = require('./admin/statistical');
+const bankRouter = require("./client/bank");
+const statistical = require("./admin/statistical");
 const routes = (app) => {
   app.use("/api/admin/statistical", statistical);
 
@@ -57,7 +57,7 @@ const routes = (app) => {
   app.use("/api/admin/attributes", adminAttributes);
   app.use("/api/client/product", clientProduct);
   app.use("/api/client/product-detail", clientProductDetail);
-  
+
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/attributes", attributesRouter);
   app.use("/api/client/sidebar/product", clientSidebarProduct);
@@ -84,6 +84,7 @@ const routes = (app) => {
   app.use("/api/admin/comment", commentAdminRouter);
   app.use("/api/client/comment", commentClientRouter);
   app.use("/api/client/iteracOder", orderAucIteraction);
+  app.use("/api/bank", bankRouter);
 };
 
 module.exports = routes;

@@ -188,7 +188,6 @@ const ProductSection: React.FC = () => {
                       fcdsf Quick look
                       <div className="tooltip-arrow" data-popper-arrow="" />
                     </div>
-                
 
                     <button
                       type="button"

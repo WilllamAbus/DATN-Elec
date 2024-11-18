@@ -1,6 +1,68 @@
 const OrderDetail = require("../../../model/orders/orderCart/OrderDetails");
 const Order = require("../../../model/orders/orderCart/orders");
 const OrderController = {
+  // getOrderById: async (req, res) => {
+  //   try {
+  //     const { orderId } = req.params;
+  //     const order = await OrderDetail.findOne({ order: orderId }).populate({
+  //       path: "order",
+  //       populate: [
+  //         { path: "payment", model: "payment" },
+  //         { path: "shipping", model: "shipping" },
+  //         {
+  //           path: "cartDetails",
+  //           model: "OrderDetail",
+  //           populate: [
+  //             {
+  //               path: "items.product",
+  //               model: "product_v2",
+  //             },
+  //             {
+  //               path: "items.productVariant",
+  //               model: "productVariant",
+  //               populate: [
+  //                 { path: "image", model: "ImageVariant" },
+  //                 { path: "battery", model: "Battery" },
+  //                 { path: "color", model: "Color" },
+  //                 { path: "cpu", model: "Cpu" },
+  //                 { path: "operatingSystem", model: "OperatingSystem" },
+  //                 { path: "ram", model: "Ram" },
+  //                 { path: "screen", model: "Screen" },
+  //                 { path: "storage", model: "Storage" },
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
+
+  //     if (!order) return res.status(404).json({ message: "Order not found" });
+
+  //     const itemsWithDeletedProducts = order.items.filter(
+  //       (item) => !item.product
+  //     );
+
+  //     if (itemsWithDeletedProducts.length > 0) {
+  //       console.log("Deleted Products:", itemsWithDeletedProducts);
+
+  //       order.items = order.items.filter((item) => item.product);
+
+  //       return res.status(200).json({
+  //         ...order.toObject(),
+  //         message: "Some products have been deleted",
+  //         deletedProducts: itemsWithDeletedProducts.map((item) => ({
+  //           quantity: item.quantity,
+  //           price: item.price,
+  //         })),
+  //       });
+  //     }
+
+  //     res.status(200).json(order);
+  //   } catch (error) {
+  //     console.error("Error fetching order details:", error);
+  //     res.status(500).json({ message: "Error fetching order", error });
+  //   }
+  // },
   getOrderById: async (req, res) => {
     try {
       const { orderId } = req.params;
@@ -12,9 +74,28 @@ const OrderController = {
             { path: "shipping", model: "shipping" },
           ],
         })
-        .populate({ path: "items.product", model: "product_v2" });
+        .populate({
+          path: "items.product",
+          model: "product_v2",
+        })
+        .populate({
+          path: "items.productVariant",
+          model: "productVariant",
+          populate: [
+            { path: "image", model: "ImageVariant" },
+            { path: "battery", model: "Battery" },
+            { path: "color", model: "Color" },
+            { path: "cpu", model: "Cpu" },
+            { path: "operatingSystem", model: "OperatingSystem" },
+            { path: "ram", model: "Ram" },
+            { path: "screen", model: "Screen" },
+            { path: "storage", model: "Storage" },
+          ],
+        });
 
-      if (!order) return res.status(404).json({ message: "Order not found" });
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
 
       // Kiểm tra sản phẩm bị xóa
       const itemsWithDeletedProducts = order.items.filter(

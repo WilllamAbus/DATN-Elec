@@ -245,7 +245,7 @@ import {
 } from "@nextui-org/react";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Address } from "../../../../../types/user";
@@ -462,10 +462,33 @@ const ListAddress: React.FC = () => {
               )}
             </ul>
 
-            <div className="mt-8 flex justify-center w-full">
+            {/* <div className="mt-8 flex justify-center w-full">
               <Button
                 onClick={handleAddAddress}
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 transition-all duration-200"
+              >
+                Thêm địa chỉ
+              </Button>
+            
+            </div> */}
+            <div className="mt-8 flex justify-center w-full">
+              <Button
+                onClick={() => {
+                  if (addresses.length >= 10) {
+                    toast.dismiss();
+                    toast.error(
+                      "Bạn không thể thêm quá 5 tài khoản ngân hàng."
+                    );
+                    return;
+                  }
+                  handleAddAddress();
+                }}
+                className={`px-6 py-3 ${
+                  addresses.length >= 10
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                } text-white rounded-lg shadow focus:ring-4 focus:ring-blue-300 transition-all duration-200`}
+                disabled={addresses.length >= 10}
               >
                 Thêm địa chỉ
               </Button>
@@ -473,8 +496,6 @@ const ListAddress: React.FC = () => {
           </>
         )}
       </>
-
-      <ToastContainer />
     </div>
   );
 };

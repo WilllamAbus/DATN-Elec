@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { HeartIcon, StarIcon } from "../listPage/svg";
 import { truncateText } from "../listPage/truncate/truncateText";
-import currencyFormatter from "currency-formatter";
+// import currencyFormatter from "currency-formatter";
 import { products } from "../../../../services/clientcate/client/types/getProuctbyCategory";
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
-}
+// function formatCurrency(value: number) {
+//   return currencyFormatter.format(value, { code: "VND", symbol: "" });
+// }
 export interface ProductItemProps {
   product: products;
   index: number;
@@ -29,13 +29,13 @@ export default function ProductItem({ product, index }: ProductItemProps) {
       </div>
       <div className="pt-1 mb-10">
         <div className="mb-4 px-2 flex items-center justify-between gap-4">
-          {product.product_discount.discountPercent > 0 ? (
+          {/* {product.product_discount.discountPercent > 0 ? (
             <span className=" rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
               Giảm giá {product.product_discount.discountPercent}%
             </span>
           ) : (
             <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
-          )}
+          )} */}
           <div className="flex items-center justify-end gap-1">
             <button
               type="button"
@@ -70,7 +70,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
           </div>
         </div>
         <div className="mt-2 px-2 flex items-center gap-2">
-          {product.product_discount.discountPercent > 1 ? (
+          {/* {product.product_discount.discountPercent > 1 ? (
             <div className="flex w-full">
               <p className="text-xs font-medium text-rose-700 flex-grow">
                 {formatCurrency(
@@ -87,7 +87,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
             <p className="text-xs font-medium text-rose-700">
               {formatCurrency(product.product_price)} đ
             </p>
-          )}
+          )} */}
         </div>
       </div>
     </div>

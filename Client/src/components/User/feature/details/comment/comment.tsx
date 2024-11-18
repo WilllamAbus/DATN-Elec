@@ -30,7 +30,7 @@ interface User {
   name?: string;
   avatar?: string;
 }
-const Comment = () => {
+const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: string) => void }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -85,6 +85,10 @@ const Comment = () => {
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
+  const calculateAverageRating = (comments: CommentType[]) => {
+    const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
+    return comments.length > 0 ? (totalRatings / comments.length).toFixed(1) : " ";
+  };
   const fetchComments = async () => {
     if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
@@ -95,6 +99,9 @@ const Comment = () => {
       const productComments: CommentType[] = await getCommentProduct(slug);
       setComments(productComments);
       setFilteredComments(productComments);
+           // Tính lại average rating và gửi lên component cha
+           const avgRating = calculateAverageRating(productComments);
+           onUpdateAverageRating(avgRating); // Truyền average rating lên component cha
       const userIds = Array.from(
         new Set(productComments.map((comment) => comment.id_user.toString()))
       );

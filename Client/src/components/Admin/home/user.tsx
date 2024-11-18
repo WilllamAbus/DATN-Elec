@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { topViewProduct,totalProductsSold } from "../../../services/statistical/statistical.service";
+import {
+  topViewProduct,
+  totalProductsSold,
+} from "../../../services/statistical/statistical.service";
 // import currencyFormatter from "currency-formatter";
 import { Link } from "react-router-dom";
 
@@ -26,15 +29,15 @@ const UserStatistics = () => {
       console.error("Error fetching products:", error);
     }
   };
-  const totalProductSold = async ()=>{
-    try{
+  const totalProductSold = async () => {
+    try {
       const response = await totalProductsSold();
-      setProductSold(response.totalProductsSold)
+      setProductSold(response.totalProductsSold);
       return response.totalProductsSold;
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -156,23 +159,25 @@ const UserStatistics = () => {
       <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
         <div className="w-full">
           <div className="flex space-x-2 items-center mb-4">
-          <h3 className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
-            Top sản phẩm có lượt xem cao nhất
-          </h3>
-          <select value={numberOfProducts} onChange={handleNumberChange} className="rounded-lg ">
-            <option value={1}>1</option>
-            <option value={3}>3</option>
-            <option value={5}>5</option>
-          </select>
+            <h3 className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
+              Top sản phẩm có lượt xem cao nhất
+            </h3>
+            <select
+              value={numberOfProducts}
+              onChange={handleNumberChange}
+              className="rounded-lg "
+            >
+              <option value={1}>1</option>
+              <option value={3}>3</option>
+              <option value={5}>5</option>
+            </select>
           </div>
-          
+
           <div>
             <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
               <div className="mb-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-             
                 {products.slice(0, numberOfProducts).map((product, index) => (
-                
-                 <div
+                  <div
                     key={index}
                     className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                   >
@@ -190,7 +195,6 @@ const UserStatistics = () => {
                       </Link>
                     </div>
                     <div className="pt-6">
-                    
                       <a
                         href="#"
                         className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
@@ -264,8 +268,6 @@ const UserStatistics = () => {
                           </div>
                         </p>
                       </div>
-                      
-                  
                     </div>
                   </div>
                 ))}

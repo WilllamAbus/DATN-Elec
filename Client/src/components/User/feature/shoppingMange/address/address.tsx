@@ -294,7 +294,6 @@ import { useForm, Controller } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
-
 interface AddressSelectorProps {
   address: string | null;
   onBack: () => void;
@@ -381,7 +380,7 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
       const response = await dispatch(addAddressThunk(addressData)).unwrap();
       await dispatch(fetchAddressListThunk());
       toast.dismiss();
-      const successMessage = response?.message || "Đăng ký thành công!";
+      const successMessage = response?.message || "Thêm địa chỉ thành công!";
       toast.success(successMessage);
     } catch (error) {
       console.error("error", error);
