@@ -10,6 +10,7 @@ import { notifyUpdate } from "../../../../ultils/success";
 import { Category } from "../../../../types/Categories.d";
 import { Supplier } from "../../../../types/Suppliers.d";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { notifyError } from "../productV2/toast/msgtoast";
 
 
 
@@ -127,10 +128,10 @@ const EditBrand: React.FC = () => {
         setTimeout(() => {
           navigate("/admin/listBrands");
         }, 2000);
-      } catch (error) {
-        console.error("Lỗi cập nhật thương hiệu:", error);
-        setError("Lỗi khi cập nhật thương hiệu");
-      }
+      } catch (error: any) {
+        console.error("Error:", error);
+        notifyError(error.message);
+    }
     }
   };
 
