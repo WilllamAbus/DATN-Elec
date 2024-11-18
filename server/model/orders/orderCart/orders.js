@@ -30,6 +30,7 @@ const orderSchema = new Schema(
         "Đang vận chuyển",
         "Hoàn tất",
         "Hủy đơn hàng",
+        "Đã hoàn tiền",
       ],
       required: true,
     },

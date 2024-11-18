@@ -239,6 +239,7 @@
 import {
   deleteBankThunk,
   listBankThunk,
+  setDefaultBankThunk,
 } from "../../../../../redux/auth/bank/bankThunk";
 import {
   Dropdown,
@@ -298,7 +299,21 @@ const ListBank: React.FC = () => {
       }
     });
   };
-
+  const handleSetDefaultBank = async (_id: string) => {
+    // setIsLoading(true);
+    try {
+      const response = await dispatch(setDefaultBankThunk(_id)).unwrap();
+      await dispatch(listBankThunk());
+      toast.dismiss();
+      const successMessage =
+        response?.message || "Đặt làm địa chỉ mặc định thành công!";
+      toast.success(successMessage);
+    } catch (error) {
+      const errorMessage = (error as string) || "Không thể khóa.";
+      toast.dismiss();
+      toast.error(errorMessage);
+    }
+  };
   const handleAction = (action: string, bank: Bank) => {
     if (!bank._id) {
       toast.error("Ngân hàng không hợp lệ.");
@@ -308,15 +323,22 @@ const ListBank: React.FC = () => {
     const isDefaultBank = bank.isDefault;
 
     switch (action) {
-      case "edit":
-        setEditBank(bank);
-        break;
+      // case "edit":
+      //   setEditBank(bank);
+      //   break;
       case "delete":
         if (isDefaultBank) {
           toast.error("Không thể xóa ngân hàng mặc định.");
           return;
         }
         handleDelete(bank._id);
+        break;
+      case "setDefault":
+        if (isDefaultBank) {
+          toast.error("Địa chỉ này đã là địa chỉ mặc định.");
+          return;
+        }
+        handleSetDefaultBank(bank._id);
         break;
       default:
         break;
@@ -374,7 +396,7 @@ const ListBank: React.FC = () => {
                       </DropdownTrigger>
 
                       <DropdownMenu variant="faded" aria-label="Menu hành động">
-                        <DropdownItem
+                        {/* <DropdownItem
                           key="edit"
                           onClick={() => handleAction("edit", bank)}
                           startContent={
@@ -382,7 +404,7 @@ const ListBank: React.FC = () => {
                           }
                         >
                           Chỉnh sửa
-                        </DropdownItem>
+                        </DropdownItem> */}
                         <DropdownItem
                           key="delete"
                           color="danger"
@@ -394,6 +416,16 @@ const ListBank: React.FC = () => {
                         >
                           Xóa
                         </DropdownItem>
+                        <DropdownItem
+                          key="setDefault"
+                          onClick={() => handleAction("setDefault", bank)}
+                          startContent={
+                            <i className="iconify mdi--check-circle-outline w-5 h-5 text-green-500 mr-2" />
+                          }
+                          isDisabled={bank?.isDefault}
+                        >
+                          Đặt làm mặc định
+                        </DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
                   </li>
@@ -403,10 +435,31 @@ const ListBank: React.FC = () => {
               )}
             </ul>
 
-            <div className="mt-8 flex justify-center w-full">
+            {/* <div className="mt-8 flex justify-center w-full">
               <Button
                 onClick={handleAddBank}
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 transition-all duration-200"
+              >
+                Thêm Ngân hàng
+              </Button>
+            </div> */}
+            <div className="mt-8 flex justify-center w-full">
+              <Button
+                onClick={() => {
+                  if (banks.length >= 5) {
+                    toast.error(
+                      "Bạn không thể thêm quá 5 tài khoản ngân hàng."
+                    );
+                    return;
+                  }
+                  handleAddBank();
+                }}
+                className={`px-6 py-3 ${
+                  banks.length >= 5
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                } text-white rounded-lg shadow focus:ring-4 focus:ring-blue-300 transition-all duration-200`}
+                disabled={banks.length >= 5}
               >
                 Thêm Ngân hàng
               </Button>

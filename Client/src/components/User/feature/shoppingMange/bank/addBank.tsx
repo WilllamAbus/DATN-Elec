@@ -1,131 +1,14 @@
-// import React, { useState, useEffect } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   getBanks,
-//   addBankThunk,
-// } from "../../../../../redux/auth/bank/bankThunk";
-// import { RootState, AppDispatch } from "../../../../../redux/store";
-// import { Bank } from "../../../../../types/user";
-// import { toast, ToastContainer } from "react-toastify";
-
-// const BankSelectComponent = () => {
-//   const dispatch = useDispatch<AppDispatch>();
-//   const { banks, loading } = useSelector((state: RootState) => state.Bank);
-
-//   const [newBank, setNewBank] = useState<Bank>({
-//     name: "",
-//     fullName: "",
-//     code: "",
-//     bin: "",
-//     shortName: "",
-//     logo: "",
-//     transferSupported: 1,
-//     lookupSupported: 1,
-//     support: 0,
-//     isTransfer: false,
-//     swift_code: "",
-//   });
-
-//   const [selectedBank, setSelectedBank] = useState<number | null>(null);
-//   if (!banks || banks.length === 0) {
-//     console.error("Banks list is empty or undefined:", banks);
-//   }
-//   console.log("Banks:", banks);
-
-//   useEffect(() => {
-//     dispatch(getBanks());
-//   }, [dispatch]);
-
-//   const handleBankSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-//     const bankId = Number(e.target.value);
-//     setSelectedBank(bankId);
-
-//     const selectedBankData = banks.find((bank) => bank.id === bankId);
-//     if (selectedBankData) {
-//       setNewBank({
-//         ...newBank,
-//         name: selectedBankData.name,
-//         code: selectedBankData.code,
-//         bin: selectedBankData.bin,
-//         shortName: selectedBankData.shortName,
-//         logo: selectedBankData.logo,
-//         transferSupported: selectedBankData.transferSupported,
-//         lookupSupported: selectedBankData.lookupSupported,
-//         support: selectedBankData.support,
-//         isTransfer: selectedBankData.isTransfer,
-//         swift_code: selectedBankData.swift_code,
-//       });
-//     }
-//   };
-
-//   const handleAddBank = async () => {
-//     try {
-//       const response = await dispatch(addBankThunk(newBank)).unwrap();
-
-//       toast.dismiss();
-//       const successMessage = response?.message || "Ngân hàng đã được thêm";
-//       toast.success(successMessage);
-
-//       dispatch(getBanks());
-//     } catch (error) {
-//       console.error("Lỗi đăng ký:", error);
-//       const errorMessage =
-//         (error as Error).message || "Registration failed. Please try again.";
-//       toast.dismiss();
-//       toast.error(errorMessage);
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h2>Chọn Ngân Hàng</h2>
-//       <select value={selectedBank || ""} onChange={handleBankSelect}>
-//         <option value="" disabled>
-//           Chọn ngân hàng
-//         </option>
-//         {banks
-//           .filter((bank) => bank && bank.id) // Chỉ render các ngân hàng hợp lệ
-//           .map((bank) => (
-//             <option key={bank.id} value={bank.id}>
-//               {bank.name}
-//             </option>
-//           ))}
-//       </select>
-
-//       <h2>Thêm Ngân Hàng Mới</h2>
-//       <form
-//         onSubmit={(e) => {
-//           e.preventDefault();
-//           handleAddBank();
-//         }}
-//       >
-//         <input
-//           type="text"
-//           value={newBank.fullName}
-//           onChange={(e) => setNewBank({ ...newBank, fullName: e.target.value })}
-//           placeholder="Họ tên đầy đủ"
-//         />
-
-//         <button type="submit" disabled={loading}>
-//           {loading ? "Đang thêm..." : "Thêm Ngân Hàng"}
-//         </button>
-//       </form>
-//       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-//     </div>
-//   );
-// };
-
-// export default BankSelectComponent;
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBanks,
   addBankThunk,
+  listBankThunk,
 } from "../../../../../redux/auth/bank/bankThunk";
 // import { getBank } from "../../../../../services/authentication/bank";
 import { RootState, AppDispatch } from "../../../../../redux/store";
 import { Bank } from "../../../../../types/user";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { Select, SelectItem, Avatar, Button } from "@nextui-org/react";
 import "react-toastify/dist/ReactToastify.css";
 interface BankSelectorProps {
@@ -140,9 +23,7 @@ interface BankSelectorProps {
 
 const BankSelectComponent: React.FC<BankSelectorProps> = ({ onBack }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { banks, loading, data } = useSelector(
-    (state: RootState) => state.Bank
-  );
+  const { loading, data } = useSelector((state: RootState) => state.Bank);
 
   const [newBank, setNewBank] = useState<Bank>({
     name: "",
@@ -169,7 +50,7 @@ const BankSelectComponent: React.FC<BankSelectorProps> = ({ onBack }) => {
     const bankId = Number(e.target.value);
     setSelectedBank(bankId);
 
-    const selectedBankData = banks.find((bank) => bank.id === bankId);
+    const selectedBankData = data.find((bank) => bank.id === bankId);
     if (selectedBankData) {
       setNewBank({
         ...newBank,
@@ -190,11 +71,13 @@ const BankSelectComponent: React.FC<BankSelectorProps> = ({ onBack }) => {
   const handleAddBank = async () => {
     try {
       const response = await dispatch(addBankThunk(newBank)).unwrap();
-
+      await dispatch(listBankThunk());
       toast.dismiss();
       const successMessage = response?.message || "Ngân hàng đã được thêm";
       toast.success(successMessage);
-
+      setTimeout(() => {
+        onBack();
+      }, 1000);
       dispatch(getBanks());
     } catch (error) {
       console.error("Lỗi đăng ký:", error);
@@ -233,9 +116,6 @@ const BankSelectComponent: React.FC<BankSelectorProps> = ({ onBack }) => {
           ))}
       </Select>
 
-      {/* <h2 className="text-3xl font-semibold text-gray-800 mb-4">
-        Thêm Ngân Hàng Mới
-      </h2> */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -276,7 +156,6 @@ const BankSelectComponent: React.FC<BankSelectorProps> = ({ onBack }) => {
       <button className="mt-6" color="gray" onClick={onBack}>
         Quay lại danh sách địa chỉ
       </button>
-      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </div>
   );
 };

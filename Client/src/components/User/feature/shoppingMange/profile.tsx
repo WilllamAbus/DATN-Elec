@@ -343,6 +343,7 @@ import Cookies from "js-cookie";
 import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
 import { Transition } from "@headlessui/react";
 import { User } from "@nextui-org/react";
+import { ToastContainer } from "react-toastify";
 const ProfileUse: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -633,6 +634,7 @@ const ProfileUse: React.FC = () => {
           </aside>
         </Transition>
       </div>
+      <ToastContainer />
     </>
   );
 };

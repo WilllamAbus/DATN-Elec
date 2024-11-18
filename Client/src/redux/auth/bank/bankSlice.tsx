@@ -6,6 +6,7 @@ import {
   deleteBankThunk,
   getBanks,
   listBankThunk,
+  // setDefaultBankThunk,
 } from "./bankThunk";
 interface BankState {
   banks: Bank[];
@@ -76,6 +77,24 @@ const bankSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
+    // .addCase(setDefaultBankThunk.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+
+    // .addCase(setDefaultBankThunk.fulfilled, (state, action) => {
+    //   const setDefaultBank = action.meta.arg;
+
+    //   state.banks = state.banks.map((bank) => ({
+    //     ...bank,
+    //     isDefault: bank._id === setDefaultBank,
+    //   }));
+    // })
+
+    // .addCase(setDefaultBankThunk.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload as string;
+    // });
   },
 });
 

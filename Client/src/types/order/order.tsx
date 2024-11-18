@@ -109,4 +109,5 @@ export interface ApplyVoucherResponse {
 export interface OrderItem {
   product: Product;
   productVariant: ProductVariant;
+  quantity?: number;
 }

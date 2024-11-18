@@ -380,7 +380,7 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
       const response = await dispatch(addAddressThunk(addressData)).unwrap();
       await dispatch(fetchAddressListThunk());
       toast.dismiss();
-      const successMessage = response?.message || "Đăng ký thành công!";
+      const successMessage = response?.message || "Thêm địa chỉ thành công!";
       toast.success(successMessage);
     } catch (error) {
       console.error("error", error);

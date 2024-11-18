@@ -36,3 +36,12 @@ export const deleteBanks = async (_id: string) => {
     throw error;
   }
 };
+//PUT: set mặc định
+export const setDefaultBank = async (id: string) => {
+  try {
+    const response = await instance.put(`${API_URL}/bank/default/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

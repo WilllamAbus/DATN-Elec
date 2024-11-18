@@ -4,6 +4,7 @@ import {
   deleteBanks,
   getBank,
   listBank,
+  setDefaultBank,
 } from "../../../services/authentication/bank";
 import { Bank, BankResponse } from "../../../types/user";
 
@@ -46,6 +47,18 @@ export const deleteBankThunk = createAsyncThunk(
   async (_id: string, { rejectWithValue }) => {
     try {
       const response = await deleteBanks(_id);
+      return response;
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+export const setDefaultBankThunk = createAsyncThunk(
+  "bank/setDefaultBank",
+  async (_id: string, { rejectWithValue }) => {
+    try {
+      const response = await setDefaultBank(_id);
       return response;
     } catch (error) {
       console.error("Error fetching cart:", error);

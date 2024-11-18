@@ -18,5 +18,9 @@ router.delete(
   authMiddleware.verifyToken,
   BankController.deleteBank
 );
-
+router.put(
+  "/default/:bankId",
+  authMiddleware.verifyToken,
+  BankController.setDefaultBank
+);
 module.exports = router;
