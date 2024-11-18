@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
-import RelatedProduct from "./relatedProduct/relatedProduct";
+// import RelatedProduct from "./relatedProduct/relatedProduct";
 import Comment from "../../../../User/feature/details/comment/comment";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
@@ -111,6 +111,7 @@ const DetailPage: React.FC = () => {
 
   return (
     <>
+     <ReusableBreadcrumbClient items={breadcrumbItemClient.productlist} />
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
         {firstVariant && (
@@ -170,11 +171,24 @@ const DetailPage: React.FC = () => {
       </div>
       <ToastContainer />
     </section>
+    <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
+        <div className="col-span-full xl:col-auto"> 
+        <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800"> 
+        <Blog post={productDetail.posts} />
+        </div>
+           </div>
+        <div className="col-span-full xl:col-auto">
+          <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <ProductsInTheSameSegment />
+          </div>
+
+        </div>
+      </div>
     <section>
     <Comment onUpdateAverageRating={handleUpdateAverageRating} />
     </section>
     <section>
-        <RelatedProduct/>
+        {/* <RelatedProduct/> */}
     </section>
     </>
   );
