@@ -12,7 +12,6 @@ const OrderService = {
               order_number: { $regex: search, $options: "i" },
             }
           : { isDeleted: false };
-
         const orders = await Order.find(searchQuery)
           .skip(offset)
           .limit(limit)
@@ -23,7 +22,32 @@ const OrderService = {
             path: "voucherIds",
             model: "Voucher",
           })
+          .populate({
+            path: "cartDetails",
+            populate: {
+              path: "items.product",
+              model: "product_v2",
+            },
+          })
+          .populate({
+            path: "cartDetails",
+            populate: {
+              path: "items.productVariant",
+              model: "productVariant",
+            },
+          })
           .lean();
+        // const orders = await Order.find(searchQuery)
+        //   .skip(offset)
+        //   .limit(limit)
+        //   .populate("cartDetails")
+        //   .populate("payment")
+        //   .populate("shipping")
+        //   .populate({
+        //     path: "voucherIds",
+        //     model: "Voucher",
+        //   })
+        //   .lean();
 
         const total = await Order.countDocuments(searchQuery);
 

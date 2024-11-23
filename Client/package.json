@@ -54,6 +54,7 @@
     "@mui/styles": "^6.1.0",
     "@mui/system": "^6.1.0",
     "@nextui-org/react": "^2.4.8",
+    "@react-pdf/renderer": "^4.1.4",
     "@reduxjs/toolkit": "^2.2.6",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@syncfusion/ej2-react-dropdowns": "^26.2.13",
