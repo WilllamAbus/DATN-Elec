@@ -65,15 +65,15 @@ const OrderListConfirmedStatus: React.FC = () => {
   };
 
   const handleDeleteClick = (orderId: OrderDataAllConfirmed) => {
-
-    
+    setIsModalOpen(true);
+   
     setSelectedOrderId(orderId);
    
-    
+  
     setOrders((prevOrders) =>
       prevOrders.filter((o) => o.orderId !== orderId.orderId) // Assuming orderId is a property of order
     );
-    setIsModalOpen(true);
+ 
  
  
   };

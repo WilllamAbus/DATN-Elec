@@ -7,18 +7,18 @@ import { updateOrderStatusThunk } from "../../../../redux/orderAucAdmin/updateSt
 import { Card, ListGroup } from "flowbite-react";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import withReactContent from "sweetalert2-react-content";
-import Swal from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+// import Swal from "sweetalert2";
 import { Button, Progress } from "@nextui-org/react";
-const MySwal = withReactContent(Swal);
+// const MySwal = withReactContent(Swal);
 const OrderDetails: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
   const orders = useSelector((state: RootState) => state.orderAucAdmin);
-  console.log('orders', orders);
+
   
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-console.log('selectedStatus', selectedStatus);
+  // const [selectedStatus, setSelectedStatus] = useState<string>("");
+
 
   const [progressValue, setProgressValue] = useState<number>(0);
   const navigate = useNavigate();
@@ -71,24 +71,13 @@ console.log('selectedStatus', selectedStatus);
   const handleBackToList = () => {
     navigate("/admin/listOrderAuction");
   };
-  const handleUpdateStatus = async() => {
+  const handleUpdateStatus = async(newStatus: string) => {
 
     if (selectedOrder ) {
  
-     MySwal.fire({
-        title: "Xác nhận cập nhật trạng thái?",
-        text: `Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng thành "${selectedStatus}" không?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Có",
-        cancelButtonText: "Hủy",
-      });
-
       await dispatch(updateOrderStatusThunk({  
         orderId: selectedOrder.orderid as string,
-        stateOrder: selectedStatus  })).unwrap()
+        stateOrder: newStatus  })).unwrap()
         toast.success(
     "Cập nhật thành công!"
         );
@@ -96,6 +85,8 @@ console.log('selectedStatus', selectedStatus);
         await dispatch(
           getOrderAuctionDetailsAdmin(selectedOrder?.orderid as string)
         ).unwrap();
+
+ 
      }
 
   };
@@ -106,8 +97,8 @@ console.log('selectedStatus', selectedStatus);
         return (
           <Button
             onClick={() => {
-              setSelectedStatus("Chờ xử lý");
-              handleUpdateStatus();
+              // setSelectedStatus("Chờ xử lý");
+              handleUpdateStatus("Chờ xử lý");
             }}
             className="mt-4 bg-green-500 text-white"
           >
@@ -118,8 +109,8 @@ console.log('selectedStatus', selectedStatus);
         return (
           <Button
             onClick={() => {
-              setSelectedStatus("Đã xác nhận");
-              handleUpdateStatus();
+              // setSelectedStatus();
+              handleUpdateStatus("Đã xác nhận");
             }}
             className="mt-4 bg-green-500 text-white"
           >
@@ -130,8 +121,8 @@ console.log('selectedStatus', selectedStatus);
         return (
           <Button
             onClick={() => {
-              setSelectedStatus("Vận chuyển");
-              handleUpdateStatus();
+              // setSelectedStatus();
+              handleUpdateStatus("Vận chuyển");
             }}
             className="mt-4 bg-yellow-500 text-white"
           >
@@ -143,8 +134,8 @@ console.log('selectedStatus', selectedStatus);
           <>
             <Button
               onClick={() => {
-                setSelectedStatus("Nhận hàng");
-                handleUpdateStatus();
+                // setSelectedStatus();
+                handleUpdateStatus("Nhận hàng");
               }}
               className="mt-4 bg-blue-500 text-white"
             >
@@ -158,8 +149,8 @@ console.log('selectedStatus', selectedStatus);
           <>
             <Button
               onClick={() => {
-                setSelectedStatus("Hoàn tất");
-                handleUpdateStatus();
+                // setSelectedStatus();
+                handleUpdateStatus("Hoàn tất");
               }}
               className="mt-4 bg-blue-500 text-white"
             >

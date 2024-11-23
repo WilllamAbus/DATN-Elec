@@ -679,7 +679,7 @@ const iteractionOrderAucService = {
               { new: true, runValidators: true }
             );
         
-            console.log('updated order:', updatedOrder);
+  
             return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
           } else {
             console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);
