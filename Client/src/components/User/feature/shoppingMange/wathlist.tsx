@@ -182,9 +182,12 @@ const Watchlist: React.FC<WatchlistProps> = () => {
     }
   }, [dispatch, userId]);
 
-  const handleDeleteFromWatchlist = async (productId: string) => {
+  const handleDeleteFromWatchlist = async (
+    productId: string,
+    variantId?: string
+  ) => {
     try {
-      await dispatch(deleteWatchlistThunk(productId)).unwrap();
+      await dispatch(deleteWatchlistThunk({ productId, variantId })).unwrap();
       setWatchlist(
         watchlist.filter(
           (item) => item.product && item.product._id !== productId

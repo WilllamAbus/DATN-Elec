@@ -193,7 +193,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({}) => {
     try {
       if (isFavorite) {
         const response = await dispatch(
-          deleteWatchlistThunk(productId)
+          deleteWatchlistThunk({ productId, variantId })
         ).unwrap();
         setIsFavorite(false);
         toast.dismiss();

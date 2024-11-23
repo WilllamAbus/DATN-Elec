@@ -254,11 +254,34 @@ export const getWatchlist = async () => {
   }
 };
 
-export const DeleteWatchlist = async (productId: string) => {
+// export const DeleteWatchlist = async (productId: string) => {
+//   try {
+//     const response = await instance.delete(
+//       `${API_URL}/wathlist/delete/${productId}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error(
+//         "Error deleting from watchlist: An unknown error occurred"
+//       );
+//     }
+//   }
+// };
+export const DeleteWatchlist = async (
+  productId: string,
+  variantId?: string
+) => {
   try {
-    const response = await instance.delete(
-      `${API_URL}/wathlist/delete/${productId}`
-    );
+    const endpoint = variantId
+      ? `${API_URL}/wathlist/delete/${productId}/${variantId}`
+      : `${API_URL}/wathlist/delete/${productId}`;
+
+    const response = await instance.delete(endpoint);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
