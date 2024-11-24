@@ -198,7 +198,7 @@ const WathListController = {
         console.log(`Python Output: ${data.toString()}`);
       });
 
-      pythonProcess.stderr.on('data', (data) => {
+      pythonProcess.stderr.on("data", (data) => {
         console.error(`Python Error: ${data.toString()}`);
       });
 
@@ -319,17 +319,25 @@ const WathListController = {
   // DeleteWatchlist: async (req, res) => {
   //   try {
   //     const userId = req.user.id;
-  //     const { id } = req.params;
-  //     if (!userId || !id) {
+  //     const { productId } = req.params; // `id` sẽ là `product._id`
+
+  //     if (!userId || !productId) {
   //       return res.status(400).json({
   //         success: false,
-  //         message:
-  //           "ID người dùng và ID mục trong danh sách yêu thích là bắt buộc",
+  //         message: "ID người dùng và ID sản phẩm là bắt buộc",
   //       });
   //     }
 
-  //     const watchlistItem = await WathList.findOne({
-  //       _id: id,
+  //     if (!mongoose.Types.ObjectId.isValid(productId)) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "ID sản phẩm không hợp lệ",
+  //       });
+  //     }
+
+  //     // Tìm và xóa mục trong danh sách yêu thích dựa trên `product._id` và `userId`
+  //     const watchlistItem = await WathList.findOneAndDelete({
+  //       product: productId,
   //       user: userId,
   //     });
 
@@ -339,8 +347,6 @@ const WathListController = {
   //         message: "Mục trong danh sách yêu thích không tồn tại",
   //       });
   //     }
-
-  //     await watchlistItem.remove();
 
   //     return res.status(200).json({
   //       success: true,
@@ -357,7 +363,7 @@ const WathListController = {
   DeleteWatchlist: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { productId } = req.params; // `id` sẽ là `product._id`
+      const { productId, variantId } = req.params;
 
       if (!userId || !productId) {
         return res.status(400).json({
@@ -373,11 +379,13 @@ const WathListController = {
         });
       }
 
-      // Tìm và xóa mục trong danh sách yêu thích dựa trên `product._id` và `userId`
-      const watchlistItem = await WathList.findOneAndDelete({
-        product: productId,
+      const query = {
         user: userId,
-      });
+        product: productId,
+        productVariant: variantId || null,
+      };
+
+      const watchlistItem = await WathList.findOneAndDelete(query);
 
       if (!watchlistItem) {
         return res.status(404).json({
@@ -386,6 +394,13 @@ const WathListController = {
         });
       }
 
+      await Interaction.deleteMany({
+        user: userId,
+        productID: productId,
+        productVariant: variantId || null,
+        type: "add wishlist",
+      });
+
       return res.status(200).json({
         success: true,
         message: "Sản phẩm đã được xóa khỏi danh sách yêu thích",
@@ -393,6 +408,7 @@ const WathListController = {
     } catch (error) {
       console.error("Error removing from watchlist:", error);
       return res.status(500).json({
+        success: false,
         message: "Có lỗi xảy ra",
         error: error.message,
       });

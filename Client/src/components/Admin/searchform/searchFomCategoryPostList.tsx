@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAppDispatch } from "../../../redux/store"; 
 import { getCategoryPostListThunk } from "../../../redux/post/thunk";
 
@@ -8,7 +8,7 @@ interface Props {
 
 const SearchFomCategoryPostList: React.FC<Props> = ({ onSearchChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [timer,] = useState<NodeJS.Timeout | null>(null);
+  // const [timer,] = useState<NodeJS.Timeout | null>(null);
   const dispatch = useAppDispatch();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -23,13 +23,13 @@ const SearchFomCategoryPostList: React.FC<Props> = ({ onSearchChange }) => {
   };
 
 
-  useEffect(() => {
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [timer]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer);
+  //     }
+  //   };
+  // }, [timer]);
 
   return (
     <div className="w-full md:w-1/2">

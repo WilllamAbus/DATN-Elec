@@ -36,17 +36,13 @@ export const loginUserThunk = createAsyncThunk<
   UserProfile,
   { email: string; password: string },
   { rejectValue: string }
->("auth/login", async (user, { rejectWithValue }) => {
+>("auth/login", async (user) => {
   try {
     const response = await loginUserService(user);
     console.log("API Response:", response);
     return response as UserProfile;
   } catch (error: any) {
-    // Xử lý lỗi từ API
-    if (error.response?.data?.message) {
-      return rejectWithValue(error.response.data.message);
-    }
-    return rejectWithValue(error.message || "Đã xảy ra lỗi khi đăng nhập.");
+    throw new Error(error.response?.data?.message || "Lỗi khi thêmm");
   }
 });
 
@@ -182,12 +178,12 @@ export const forgotPasswordThunk = createAsyncThunk(
 //yêu cầu lại email
 export const resendEmailThunk = createAsyncThunk(
   "auth/resendEmail",
-  async (email: string, { rejectWithValue }) => {
+  async (email: string) => {
     try {
       const response = await resendEmail(email);
       return response;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Lỗi khi thêmm");
     }
   }
 );
