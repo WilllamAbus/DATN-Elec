@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
-// import RelatedProduct from "./relatedProduct/relatedProduct";
+import RelatedProduct from "./relatedProduct/relatedProduct";
 import Comment from "../../../../User/feature/details/comment/comment";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
@@ -188,7 +188,7 @@ const DetailPage: React.FC = () => {
     <Comment onUpdateAverageRating={handleUpdateAverageRating} />
     </section>
     <section>
-        {/* <RelatedProduct/> */}
+        <RelatedProduct/>
     </section>
     </>
   );
