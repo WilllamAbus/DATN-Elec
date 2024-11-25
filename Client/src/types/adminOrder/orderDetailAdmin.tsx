@@ -5,6 +5,13 @@ export interface ShippingInfo {
     address: string;
     email: string;
   }
+
+  export interface RefundBank {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+
+  }
   
   export interface OrderAuctionDetailsAdmin {
     shippingInfo?: ShippingInfo;  // Thay đổi từ shippingInfo bắt buộc sang tùy chọn
@@ -13,7 +20,8 @@ export interface ShippingInfo {
     paymetMethod: string , 
     totalPrice: String
     orderid: string,
-    dateOrder:string
+    dateOrder:string,
+    refundBank?: RefundBank;
   }
   
   // Ví dụ về Product

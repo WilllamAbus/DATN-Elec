@@ -51,7 +51,7 @@ const RelatedProduct: React.FC = () => {
 
     return (
         <div className="container pb-16">
-            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
+            <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6 mt-4">
                 Sản phẩm liên quan
             </h2>
             {loading ? (

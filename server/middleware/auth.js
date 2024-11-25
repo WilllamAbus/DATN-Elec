@@ -66,7 +66,37 @@ getHeader:async (req, res, next) => {
       req.user = null; 
       next();
     }
-  }
+  },
+
+
+  verifyTokenUserAuth: async (req, res, next) => {
+    await middlewareController.verifyToken(req, res, async () => {
+  
+      const userRoles = req.user.roles;
+   
+      
+      
+      const adminRole = await Role.findOne({ name: "user" });
+ 
+      
+      if (adminRole) {
+        const adminRoleId = adminRole._id.toString();
+        const hasAdminRole = userRoles.some(
+          (role) => role._id.toString() === adminRoleId
+        );
+
+        if (hasAdminRole) {
+          next();
+        } else {
+          res
+            .status(403)
+            .json("Access denied: Only admins can access this route");
+        }
+      } else {
+        res.status(403).json("Access denied: Admin role not found");
+      }
+    });
+  },
   
   
 };

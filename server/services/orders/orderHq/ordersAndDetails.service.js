@@ -243,7 +243,7 @@ const orderAndDetailService = {
         })
       );
 
-      console.log('Order Details', productDetails);
+   
 
 
       // Extract the user and address information from the shippingAddress
@@ -275,6 +275,7 @@ const orderAndDetailService = {
         .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
 
+      
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order
@@ -282,14 +283,20 @@ const orderAndDetailService = {
         order: orderId,
       }).lean();
 
+    
       const payment = orderDetails[0].payment_method;
       const totalPriceWithShipping = orderDetails[0].totalPriceWithShipping;
       const date = orderDetails[0].payment_date;
       // Fetch product details for each order detail
       const productDetails = await Promise.all(
         orderDetails.map(async (detail) => {
-          const product = await Product_v2.findById(detail.productID).lean();
-
+     
+          const product = await Product_v2.findOne({ 
+            _id: detail.productID,
+            status: 'disable' // Điều kiện lọc, chỉ lấy sản phẩm không có trạng thái "disable"
+          }).lean();
+      
+          
           return {
             name: product.product_name,
             price: detail.totalAmount,
@@ -533,9 +540,12 @@ const orderAndDetailService = {
     try {
       // Tính toán skip và limit dựa trên số trang và giới hạn (limit)
       const orders = await OrderAuction.find({ status: "disable" })
-        .select("_id shippingAddress stateOrder  status")
+        .select("_id shippingAddress stateOrder status refundBank")
 
         .lean();
+
+        console.log('orders', orders);
+        
       const orderMatch = orders.map(orders => {
         // Lấy thông tin sản phẩm từ productMap
 

@@ -182,9 +182,12 @@ const Watchlist: React.FC<WatchlistProps> = () => {
     }
   }, [dispatch, userId]);
 
-  const handleDeleteFromWatchlist = async (productId: string) => {
+  const handleDeleteFromWatchlist = async (
+    productId: string,
+    variantId?: string
+  ) => {
     try {
-      await dispatch(deleteWatchlistThunk(productId)).unwrap();
+      await dispatch(deleteWatchlistThunk({ productId, variantId })).unwrap();
       setWatchlist(
         watchlist.filter(
           (item) => item.product && item.product._id !== productId
@@ -230,13 +233,13 @@ const Watchlist: React.FC<WatchlistProps> = () => {
               </div>
               <div className="p-2">
                 <div className="mb-2 flex justify-between">
-                  {product.product_discount.discountPercent > 0 ? (
+                  {/* {product.product_discount.discountPercent > 0 ? (
                     <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
                       Giảm giá {product.product_discount.discountPercent}%
                     </span>
                   ) : (
                     <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
-                  )}
+                  )} */}
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => handleDeleteFromWatchlist(product._id)}
@@ -276,7 +279,7 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                   </div>
                 </div>
                 <div className="mt-2 px-2 flex items-center gap-2">
-                  {product.product_discount.discountPercent > 1 ? (
+                  {/* {product.product_discount.discountPercent > 1 ? (
                     <div className="flex w-full">
                       <p className="text-xs font-medium text-rose-700 flex-grow">
                         {formatCurrency(
@@ -293,7 +296,10 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                     <p className="text-xs font-medium text-rose-700">
                       {formatCurrency(product.product_price)} đ
                     </p>
-                  )}
+                  )} */}
+                  <p className="text-xs font-medium text-rose-700">
+                    {formatCurrency(variant.variant_price)} đ
+                  </p>
                 </div>
               </div>
               <div className="flex justify-center pt-4 py-2 mb-2">

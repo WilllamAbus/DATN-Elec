@@ -65,15 +65,15 @@ const OrderListConfirmedStatus: React.FC = () => {
   };
 
   const handleDeleteClick = (orderId: OrderDataAllConfirmed) => {
-
-    
+    setIsModalOpen(true);
+   
     setSelectedOrderId(orderId);
    
-    
+  
     setOrders((prevOrders) =>
       prevOrders.filter((o) => o.orderId !== orderId.orderId) // Assuming orderId is a property of order
     );
-    setIsModalOpen(true);
+ 
  
  
   };
@@ -102,7 +102,7 @@ const OrderListConfirmedStatus: React.FC = () => {
   return (
     <div className="mt-6 border border-gray-300 pt-7 rounded-lg shadow-md bg-white">
       {orders
-        .filter((order: OrderDataAllConfirmed) => order.stateOrder === "Vận chuyển") // Filter orders with 'Vận chuyển' state
+        .filter((order: OrderDataAllConfirmed) => order.stateOrder === "Đã xác nhận") // Filter orders with 'Vận chuyển' state
         .map((order: OrderDataAllConfirmed, index: number) => (
           <div key={index} className="order-item mb-6 px-4 md:px-11">
             <div className="flex flex-col md:flex-row items-center justify-between mb-6">
