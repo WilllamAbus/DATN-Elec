@@ -64,7 +64,7 @@ const OrderListPendingStatus: React.FC = () => {
     navigate("/auction");
   };
   const handleDeleteClick = (orderId: OrderDataAllPendding) => {
-    setIsModalOpen(true);
+  
     
     setSelectedOrderId(orderId);
 
@@ -72,7 +72,7 @@ const OrderListPendingStatus: React.FC = () => {
     setOrders((prevOrders) =>
       prevOrders.filter((o) => o.orderId !== orderId.orderId) // Assuming orderId is a property of order
     );
-  
+    setIsModalOpen(true);
  
  
   };

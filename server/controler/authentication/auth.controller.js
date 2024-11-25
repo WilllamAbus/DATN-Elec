@@ -137,39 +137,6 @@ const authController = {
   },
 
   //Xác minh lại Email
-  // resendEmail: async (req, res) => {
-  //   try {
-  //     const { email } = req.body;
-  //     const user = await User.findOne({ email });
-
-  //     if (!user) {
-  //       return res.status(400).json({ message: "Email không tồn tại" });
-  //     }
-
-  //     if (user.VerifiedEmail) {
-  //       return res
-  //         .status(400)
-  //         .json({ message: "Email đã được xác minh trước đó" });
-  //     }
-
-  //     const token = crypto.randomBytes(20).toString("hex");
-  //     user.emailVerificationToken = crypto
-  //       .createHash("sha256")
-  //       .update(token)
-  //       .digest("hex");
-  //     user.emailVerificationExpires = Date.now() + 3600000;
-  //     await user.save();
-
-  //     await sendVerificationEmail(email, token);
-
-  //     res.status(200).json({
-  //       message:
-  //         "Mã xác minh đã được gửi lại. Vui lòng kiểm tra email của bạn.",
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({ message: "Lỗi server", error: err.message });
-  //   }
-  // },
   resendEmail: async (req, res) => {
     try {
       const { email } = req.body;
@@ -185,30 +152,14 @@ const authController = {
           .json({ message: "Email đã được xác minh trước đó" });
       }
 
-      const currentTime = Date.now();
-      const lastVerificationTime = user.emailVerificationExpires || 0;
-
-      // Nếu yêu cầu trước đó cách hiện tại chưa đủ 5 phút (300000 ms)
-      if (currentTime - lastVerificationTime < 300000) {
-        const remainingMinutes = Math.ceil(
-          (300000 - (currentTime - lastVerificationTime)) / 60000
-        );
-        return res.status(400).json({
-          message: `Vui lòng chờ thêm ${remainingMinutes} phút trước khi yêu cầu gửi lại mã xác minh.`,
-        });
-      }
-
-      // Tạo mã xác minh mới
       const token = crypto.randomBytes(20).toString("hex");
       user.emailVerificationToken = crypto
         .createHash("sha256")
         .update(token)
         .digest("hex");
-      user.emailVerificationExpires = Date.now() + 3600000; // Mã xác minh có hiệu lực trong 1 giờ
-
+      user.emailVerificationExpires = Date.now() + 3600000;
       await user.save();
 
-      // Gửi email xác minh
       await sendVerificationEmail(email, token);
 
       res.status(200).json({
@@ -219,7 +170,6 @@ const authController = {
       res.status(500).json({ message: "Lỗi server", error: err.message });
     }
   },
-
   generateToken: (user) => {
     const payload = {
       id: user.id,

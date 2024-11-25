@@ -129,9 +129,9 @@ export interface Permission {
 
 export interface Role {
   _id: string;
-  // roleId: string;
+  roleId: string;
   name: string;
-  // permissions: Permission[];
+  permissions: Permission[];
 }
 export interface LoginResponse {
   status: number;

@@ -2,7 +2,7 @@ const OrderAuction = require("../../../model/orders/auctionsOrders/aucOrders.mod
 const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrderDetail.model");
 
 const Product_v2 = require("../../../model/productAuction/productAuction");
-const User = require("../../../model/users.model");
+
 const Inventory = require("../../../model/inventory/inventory.model");
 const iteractionOrderAucService = {
   getOrderByUser: async (userId) => {
@@ -536,118 +536,92 @@ const iteractionOrderAucService = {
         }
       },
 
-      softDeleteReceivedOrdersByUser: async (orderId) => {
+      softDeleteReceivedOrdersByUser: async (orderId, userId) => {
         try {
           const nowUtc = new Date();
           const offset = 7 * 60 * 60 * 1000; // Chuyển đổi thời gian UTC sang múi giờ Việt Nam (UTC + 7)
           const now = new Date(nowUtc.getTime() + offset);
-      
+    
           // Tìm và xóa mềm các đơn hàng có stateOrder là "Nhận hàng"
           const orderToUpdate = await OrderAuction.findOne({
-            _id: orderId,
+           _id: orderId,
+       
+         
             status: { $ne: "disable" },
           }).exec();
        
-      
           if (!orderToUpdate) {
             return "Không tìm thấy đơn hàng";
           }
-          const userId = orderToUpdate.shippingAddress?.userID
     
-          
-          const orderIds = orderToUpdate._id;
-       
-      
-          const orderDetailST = await OrderDetailAuction.find({ order: orderIds }).lean();
-    
-      
-          const orderPayment = orderDetailST[0].payment_method;
-   
-      
           if (
             orderToUpdate.stateOrder !== "Chờ xử lý" &&
             orderToUpdate.stateOrder !== "Đã xác nhận"
           ) {
-            return "Đơn hàng không thể hủy. Chỉ các đơn hàng có trạng thái 'Chờ xử lý' hoặc 'Xác nhận đơn hàng' mới có thể hủy.";
+            return   "Đơn hàng không thể hủy. Chỉ các đơn hàng có trạng thái 'Chờ xử lý' hoặc 'Xác nhận đơn hàng' mới có thể hủy.."
           }
+          
+          const orderIds = orderToUpdate._id
+  
+    
+          
+        
+        await OrderAuction.updateOne(
+            { _id: orderIds }, // Query by the unique _id of the document
+            { 
+              $set: { 
+                status: "disable", 
+                disabledAt: now, 
+                stateOrder: "Hủy đơn hàng" 
+              } 
+            },
+            { new: true } // Optionally, return the updated document
+          ).exec();
        
           
-          // Xử lý xóa mềm bất kể phương thức thanh toán
-          const user = await User.findOne({_id: userId}).populate("banks");
-   
-          
-          if (!user) {
-            return "Không tìm thấy người dùng ";
-          }
+            const orderDetail = await OrderDetailAuction.find({order:orderIds}).lean()
+            const inven  = orderDetail[0].productID
+            const inventories =  await Inventory.findOne({
+              productAuction: inven}).lean();
       
-          const defaultBank =
-            user.banks.find((bank) => bank.isDefault) || user.banks[0];
+            const invenSheld = inventories.quantityShelf + 1
 
-      
-          const banksInfo = defaultBank
-            ? {
-                bankName: defaultBank.name,
-                accountNumber: defaultBank.accountNumber,
-                accountName: defaultBank.fullName,
-              }
-            : null;
-
-      
-          await OrderAuction.findOneAndUpdate(
-            { _id: orderIds },
-            {
-              $set: {
-                status: "disable",
-                disabledAt: now,
-                stateOrder: "Hủy đơn hàng",
-           
-                ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
-              },
-            },
-            { new: true }
-          ).exec();
-      
-          const orderDetail = await OrderDetailAuction.find({ order: orderIds }).lean();
-     
-      
-          const inven = orderDetail[0].productID;
-          const inventories = await Inventory.findOne({
-            productAuction: inven,
-          }).lean();
-      
-          const invenSheld = inventories.quantityShelf + 1;
-      
           await Inventory.findOneAndUpdate(
-            {
-              productAuction: inven,
+              {
+                
+                productAuction:inven
             },
-            {
-              $set: {
-                quantityShelf: invenSheld,
-              },
-            }
-          ).exec();
+           {$set:{
+         
+            quantityShelf: invenSheld,
       
+        
+            
+
+           }}
+          ).exec()
+          
           const orders = await OrderAuction.findOne({
             _id: orderIds,
             status: "disable",
             stateOrder: "Hủy đơn hàng",
           })
             .populate("shippingAddress.userID")
+          
+         
             .exec();
-        
-      
-          return { updateOrder: orders };
+
+    
+          return {updateOrder : orders}
         } catch (error) {
           console.error("Error:", error);
           throw new Error(`Lỗi khi xóa mềm đơn hàng: ${error.message}`);
         }
       },
-      
 
       updateOrderStatus : async (orderId, stateOrder) => {
         try {
-          const statusOrderFlow = ["Chờ giao hàng", "Chờ xử lý", "Đã xác nhận", "Vận chuyển", "Nhận hàng", "Hoàn tất"];
+          const statusOrderFlow = ["Chờ giao hàng","Chờ xử lý", "Đã xác nhận", "Vận chuyển", "Nhận hàng", "Hoàn tất"];
         
           // Tìm đơn hàng
           const order = await OrderAuction.findById(orderId);
@@ -679,7 +653,7 @@ const iteractionOrderAucService = {
               { new: true, runValidators: true }
             );
         
-  
+            console.log('updated order:', updatedOrder);
             return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
           } else {
             console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);

@@ -232,15 +232,13 @@ const ProductDetail: React.FC = () => {
   //     console.log("chưa login");
   //   }
   // };
-  const handleAddToWatchlist = async (variantId?: string) => {
+  const handleAddToWatchlist = async () => {
     if (userId && id) {
       try {
         let resultAction;
 
         if (isFavorite) {
-          resultAction = await dispatch(
-            deleteWatchlistThunk({ productId: id, variantId })
-          ).unwrap();
+          resultAction = await dispatch(deleteWatchlistThunk(id)).unwrap();
           console.log("Delete result action:", resultAction);
 
           if (

@@ -30,7 +30,7 @@ const orderUpdateStatus = createSlice({
         state.loading = true;
       })
       .addCase(updateOrderStatusThunk.fulfilled, (state, action) => {
-
+        console.log('action', action.payload);
         
         state.confirmOrder = action.payload; // Update the order with the new status
         state.loading = false;

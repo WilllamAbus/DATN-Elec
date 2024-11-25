@@ -60,7 +60,7 @@ const DeleteOrderModal: React.FC<DeleteBidModalProps> = ({
 
 
     dispatch(deleteOrderThunk(deleteRequest));
-    toast.success("Mail được gửi thành công");
+    toast.success("Xóa đơn hàng thành công");
   // Call onDelete instead of onConfirm
     onClose(); // Close the modal after submitting
   };

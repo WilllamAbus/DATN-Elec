@@ -1,5 +1,5 @@
 
-const {homeAllProduct,getID,auction,upView,shopping,search,recommendations} = require('./home');
+const {homeAllProduct,getID,auction,upView,shopping,search} = require('./home');
 const {getLimitProductClient, relatedProduct} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
@@ -47,7 +47,6 @@ module.exports = {
   relatedProduct,
   getProductDetail,
   getAllStorageBySlugUrl,
-  getAllProductVariantsByVariantPrice,
-  recommendations
+  getAllProductVariantsByVariantPrice
 };
 

@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { createBidThunk } from "../../redux/bidding/biddingThunk";
@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { NumericFormat } from "react-number-format";
 import socketService from "../../services/socket/socketService";
-import UserAuctDetails from '../User/feature/details/auctions/auctionsDetail'
+
 const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [bidAmount, setBidAmount] = useState<number | undefined>(undefined);
@@ -18,32 +18,7 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   const { bid } = useSelector((state: RootState) => state.randBidPrice);
   const bidStatus = useSelector((state: RootState) => state.bidding.status);
-  const isLoggedIn = useSelector(
-    (state: RootState) => state.auth.login.isLoggedIn
-  );
 
-  const error = useSelector((state: RootState) => state.auth.login.error);
-  const roles = useSelector((state: RootState) => state.auth.login.roles);
-  useEffect(() => {
-    if (isLoggedIn) {
-      if (roles && roles.length > 0) {
-        const isUeer = roles.some((role) => role.name === "user");
-   
-        
-        if (isUeer) {
-          <UserAuctDetails productId={productId} />
-        } 
-      } else {
-        toast.success("Bạn là Admin - Tài khoản không được tiến hành đấu giá !!");
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
-        // navigate("/login-error");
-      }
-    } else if (error) {
-      navigate("/login-error");
-    }
-  }, [isLoggedIn, roles, error, navigate]);
   const toggleModal = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
@@ -65,13 +40,13 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const handleBidAmountChange = (values: any) => setBidAmount(values.floatValue);
 
   const handleSubmit = (amount?: number) => {
-  
-    
+    const finalBidAmount = amount ?? bidAmount;
+
     if (!userId) {
       toast.error("Bạn chưa đăng nhập");
       return;
     }
-    const finalBidAmount = amount ?? bidAmount;
+
     if (finalBidAmount === undefined) {
       toast.error("Giá thầu là bắt buộc");
       return;
@@ -83,18 +58,14 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
 
     const isValidBid = finalBidAmount >= minBid && finalBidAmount <= maxAllowedBid;
 
-    if (isValidBid && userId ) {
-     
+    if (isValidBid && userId) {
+      console.log({ productId, userId, bidInput: finalBidAmount });
 
       dispatch(createBidThunk({ productId, userId, bidAmount: finalBidAmount }))
         .then(() => {
           socketService.emitCreateBidding(productId, { userId, bidAmount: finalBidAmount });
-          toast.success("Đặt thầu thành công!", {
-            onClose: () => {
-              navigate("/viewBids"); // Điều hướng sau khi toast hiển thị xong
-            },
-          });
-     
+          toast.success("Đấu giá thành công!");
+          navigate("/viewBids");
         })
         .catch((error) => {
           toast.error(`Error: ${error.message}`);

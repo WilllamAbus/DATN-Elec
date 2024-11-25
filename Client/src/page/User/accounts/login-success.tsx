@@ -52,8 +52,6 @@ const LoginSuccess = () => {
     }
   }, [isLoggedIn, roles, error, navigate]);
 
-
-
   return (
     <div className="container mx-auto px-4">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden my-20">

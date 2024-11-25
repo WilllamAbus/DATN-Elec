@@ -10,7 +10,7 @@ const User = require("../../../model/users.model");
 const Vnpay = require("../../../model/orders/vnpay.model");
 const productVariant = require("../../../model/product_v2/productVariant");
 const OrderService = require("../../../services/orders/orderSp");
-const { spawn } = require("child_process");
+const { spawn } = require('child_process');
 const {
   sendOrderConfirmationEmail,
 } = require("../../../services/email.service");
@@ -218,22 +218,19 @@ const authController = {
       await newInteraction.save();
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn("python", [
-        "recommendation_service.py",
-        userId.toString(),
-      ]);
+      const pythonProcess = spawn('python', ['recommendation_service.py', userId.toString()]);
 
       // Lắng nghe kết quả từ script Python
-      pythonProcess.stdout.on("data", (data) => {
+      pythonProcess.stdout.on('data', (data) => {
         console.log(`Python Output: ${data.toString()}`);
         // Xử lý kết quả từ Python nếu cần
       });
 
-      pythonProcess.stderr.on("data", (data) => {
+      pythonProcess.stderr.on('data', (data) => {
         console.error(`Python Error: ${data.toString()}`);
       });
 
-      pythonProcess.on("close", (code) => {
+      pythonProcess.on('close', (code) => {
         console.log(`Python script finished with code ${code}`);
       });
 
@@ -1065,7 +1062,7 @@ const authController = {
       const { orderId } = req.params;
       const { stateOrder } = req.body;
 
-      // Tìm đơn hàng và lấy chi tiết giỏ hàng
+      // Tìm đơn hàng và lấy chi tiết giỏ hàng, bao gồm cả tồn kho
       const order = await Order.findById(orderId).populate({
         path: "cartDetails",
         populate: [
@@ -1117,20 +1114,14 @@ const authController = {
       }
 
       if (order.stateOrder === "Hủy đơn hàng") {
-        if (
-          stateOrder === "Hoàn tiền" &&
-          order.payment?.payment_method === "Thanh toán khi nhận hàng"
-        ) {
-          return res.status(400).json({
-            message:
-              "Không thể cập nhật trạng thái 'Hoàn tiền' cho đơn hàng đã bị hủy và thanh toán bằng phương thức 'Thanh toán khi nhận hàng'.",
-          });
-        }
+        return res.status(400).json({
+          message: "Đơn hàng đã bị hủy và không thể cập nhật trạng thái khác.",
+        });
       }
 
       if (
         order.stateOrder === "Đang vận chuyển" &&
-        ["Chờ xử lý", "Đã xác nhận"].includes(stateOrder)
+        (stateOrder === "Chờ xử lý" || stateOrder === "Đã xác nhận")
       ) {
         return res.status(400).json({
           message:
@@ -1138,38 +1129,7 @@ const authController = {
         });
       }
 
-      // Nếu trạng thái hiện tại là "Đang vận chuyển"
-      if (order.stateOrder === "Đang vận chuyển") {
-        if (
-          stateOrder === "Đã hoàn tiền" &&
-          order.payment?.payment_method === "Thanh toán khi nhận hàng"
-        ) {
-          return res.status(400).json({
-            message:
-              "Không thể cập nhật trạng thái 'Đã hoàn tiền' cho đơn hàng thanh toán bằng 'Thanh toán khi nhận hàng'.",
-          });
-        }
-
-        if (stateOrder === "Giao hàng không thành công") {
-          // Hoàn lại số lượng tồn kho
-          for (const detail of order.cartDetails) {
-            for (const item of detail.items) {
-              const inventory = item.inventory;
-              if (!inventory) {
-                return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                    item.product?.name || "không xác định"
-                  }.`,
-                });
-              }
-              inventory.quantityShelf += item.quantity;
-              await inventory.save();
-            }
-          }
-        }
-      }
-
-      // Quản lý kho cho các trạng thái chuyển đổi khác
+      // Quản lý kho
       const handleInventoryUpdate = async (items, isRestocking) => {
         for (const item of items) {
           const inventory = item.inventory;

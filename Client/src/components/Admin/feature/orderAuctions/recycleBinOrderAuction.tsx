@@ -17,7 +17,6 @@ const ListOrdersDelete: React.FC = () => {
   ) ; // Default to an empty array if undefined
 
 
-
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, ] = useState("");
@@ -89,7 +88,6 @@ const ListOrdersDelete: React.FC = () => {
             <th scope="col" className="p-4">NGƯỜI DÙNG</th>
             <th scope="col" className="text-center">ĐỊA CHỈ</th>
             <th scope="col" className="p-4">SỐ ĐIỆN THOẠI</th>
-            <th scope="col" className="p-4">NGẦN HÀNG THANH TOÁN</th>
             <th scope="col" className="p-4">TRẠNG THÁI</th>
             <th scope="col" className="p-4">CHỨC NĂNG</th>
           </tr>
@@ -108,7 +106,6 @@ const ListOrdersDelete: React.FC = () => {
               </th>
               <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.address}</td>
               <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.phoneNumber}</td>
-              <td className="py-4 px-6 border-b border-grey-light">{order.refundBank?.bankName || ''}</td>
               <td className="py-4 px-6 border-b mt-1.5 inline-flex items-center rounded text-xs font-medium border-grey-light g-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
                 <svg className="me-1 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />

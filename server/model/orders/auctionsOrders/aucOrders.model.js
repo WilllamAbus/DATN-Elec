@@ -17,15 +17,7 @@ const orderAuctionSchema = new Schema(
       enum: ["Chờ giao hàng","Chờ xử lý", 
         "Đã xác nhận",  "Vận chuyển",
           "Nhận hàng", "Hoàn tất", 
-          "Hủy đơn hàng", 
-
-          "Đơn hàng không thành công"], // Order status
-    },
-
-    refundBank: {
-      bankName: { type: String, required: false }, // Tên ngân hàng
-      accountNumber: { type: String, required: false }, // Số tài khoản
-      accountName: { type: String, required: false }, // Tên chủ tài khoản
+          "Hủy đơn hàng", "Từ chối nhận hàng"], // Order status
     },
     order_date: { type: Date, default: Date.now }, // Order date
     createdAt: { type: Date, default: Date.now },

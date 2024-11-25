@@ -36,7 +36,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails , custome
     const mailOptions = {
       from: "haotri335@gmail.com",
       to: userEmail,
-      subject: "E-COM",
+      subject: "XÁC NHẬN HỦY DỊCH VỤ",
       html:   `  
 
       <head>

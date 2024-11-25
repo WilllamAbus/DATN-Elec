@@ -190,10 +190,7 @@ import authGoogleService from "../../../services/authentication/authGoogle.servi
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
-import {
-  loginUserThunk,
-  resendEmailThunk,
-} from "../../../redux/auth/authThunk";
+import { loginUserThunk } from "../../../redux/auth/authThunk";
 
 import Cookies from "js-cookie";
 import { logout } from "../../../redux/auth/authSlice";
@@ -210,12 +207,11 @@ const Login: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
   } = useForm<IFormInput>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
-  const [showResend, setShowResend] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const token = Cookies.get("token");
 
@@ -233,73 +229,30 @@ const Login: React.FC = () => {
     }
   }, [status, error]);
 
-  const handleResendEmail = async (email: string) => {
-    try {
-      const response = await dispatch(resendEmailThunk(email)).unwrap();
-      toast.success(response.message || "Mã xác thực đã được gửi lại!");
-      setShowResend(false);
-    } catch (error) {
-      toast.error((error as Error).message || "Gửi lại mã xác thực thất bại.");
-    }
-  };
-  // const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-  //   setLoading(true);
-  //   toast.dismiss(); // Xóa thông báo trước đó
-  //   try {
-  //     const response = await dispatch(loginUserThunk(data)).unwrap();
-
-  //     if (response) {
-  //       toast.success(response.message);
-
-  //       if (response.redirectTo) {
-  //         navigate(response.redirectTo);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     const errorMessage =
-  //       (error as Error).message || "login failed. Please try again.";
-  //     errorMessage === "Email chưa được xác thực";
-  //     setShowResend(true);
-  //     console.log("Nút resend sẽ hiển thị:", showResend);
-
-  //     toast.dismiss();
-
-  //     toast.error(errorMessage);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
-    toast.dismiss();
+    toast.dismiss(); // Xóa thông báo trước đó
     try {
-      const response = await dispatch(loginUserThunk(data)).unwrap();
+      const resultAction = await dispatch(loginUserThunk(data)).unwrap();
+      console.log(resultAction);
 
-      if (response) {
-        toast.success(response.message);
+      if (resultAction) {
+        toast.success(resultAction.message);
 
-        if (response.redirectTo) {
-          navigate(response.redirectTo);
+        if (resultAction.redirectTo) {
+          navigate(resultAction.redirectTo);
         }
       }
-    } catch (error) {
-      const errorMessage =
-        (error as Error).message || "login failed. Please try again.";
-
-      if (errorMessage === "Email chưa được xác minh") {
-        setShowResend(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message || "Đã xảy ra lỗi khi đăng nhập.");
+      } else {
+        toast.error("Đã xảy ra lỗi khi đăng nhập.");
       }
-
-      toast.dismiss();
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log("Nút resend sẽ hiển thị:", showResend);
-  }, [showResend]);
 
   return (
     <>
@@ -364,15 +317,7 @@ const Login: React.FC = () => {
                   Quên mật khẩu?
                 </Link>
               </div>
-              {showResend && (
-                <button
-                  type="button"
-                  onClick={() => handleResendEmail(getValues("email"))}
-                  className="w-full py-2 mt-4 text-center bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  {loading ? "Đang gửi mã..." : "  Gửi lại mã xác thực"}
-                </button>
-              )}
+
               <button
                 type="submit"
                 disabled={loading}

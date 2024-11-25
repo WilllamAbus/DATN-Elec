@@ -338,6 +338,7 @@ export default AdminEditUser;
 // import {
 //   fetchUserById,
 //   updateUserThunk,
+//   getlistRoleThunk,
 // } from "../../../../redux/auth/authThunk";
 // import { AppDispatch } from "../../../../redux/store";
 // import moment from "moment";
@@ -362,20 +363,23 @@ export default AdminEditUser;
 //   const navigate = useNavigate();
 //   const queryParams = new URLSearchParams(location.search);
 //   const userId = queryParams.get("userId");
-//   const rolesData: Role[] = [
-//     {
-//       _id: "668e4b302713c5112934b0b7", // Cần có roleId
-//       name: "Admin",
-//       // permissions: ["read", "write", "delete"], // Cần có permissions
-//     },
-//     {
-//       _id: "668e4b302713c5112934b0b8",
-//       name: "User",
-//       // permissions: ["read"], // Ví dụ quyền hạn cho User
-//     },
-//   ];
+//   const [roles, setRoles] = useState<Role[]>([]);
 
-//   const [roles, setRoles] = useState<Role[]>(rolesData);
+//   useEffect(() => {
+//     const fetchRoles = async () => {
+//       try {
+//         const rolesData = await dispatch(getlistRoleThunk()).unwrap();
+//         setRoles(rolesData);
+//       } catch (error) {
+//         console.error("Error fetching roles:", error);
+//         const errorMessage = (error as Error).message || "Error fetching roles";
+//         toast.dismiss();
+//         toast.error(errorMessage);
+//       }
+//     };
+
+//     fetchRoles();
+//   }, [dispatch]);
 
 //   const {
 //     register,
@@ -396,13 +400,13 @@ export default AdminEditUser;
 
 //           // Gán các giá trị khác
 //           setValue("name", profile.name);
-
+//           setValue("address", profile.address);
 //           setValue("gender", profile.gender);
 //           setValue("phone", profile.phone);
 //           setValue("birthday", moment(profile.birthday).format("YYYY-MM-DD"));
 
 //           // Gán vai trò nếu có
-
+//           // Gán vai trò nếu có
 //           if (profile.roles && profile.roles.length > 0) {
 //             setValue("roles", [profile.roles[0]._id]); // Gán mảng chứa ID của vai trò đầu tiên
 //           }
@@ -440,7 +444,7 @@ export default AdminEditUser;
 //       if (localProfile) {
 //         setLocalProfile({
 //           ...localProfile,
-//           roles: [value], // Chỉ cho phép chọn một vai trò
+//           [name]: value,
 //         });
 //       }
 //     }
@@ -454,19 +458,20 @@ export default AdminEditUser;
 //     try {
 //       const formData = new FormData();
 //       formData.append("name", data.name || "");
+//       formData.append("address", data.address || "");
 //       formData.append("gender", data.gender || "");
 //       formData.append("phone", data.phone || "");
 //       formData.append("birthday", data.birthday || "");
 
-//       // Cập nhật role chính xác
-//       // Cập nhật role chính xác
 //       if (data.roles && data.roles.length > 0) {
 //         const roleId = data.roles[0];
-//         formData.append("roles", roleId); // Gửi ID vai trò đầu tiên
-//       } else {
-//         toast.error("Vui lòng chọn một vai trò hợp lệ!");
-//         setLoading(false);
-//         return;
+//         if (roleId) {
+//           formData.append("role", roleId[0]);
+//         } else {
+//           console.log();
+//           ("Invalid role ID");
+//           return;
+//         }
 //       }
 
 //       if (selectedImage) {
@@ -476,9 +481,7 @@ export default AdminEditUser;
 //       const updatedProfile = await dispatch(
 //         updateUserThunk({ userId, formData })
 //       ).unwrap();
-
 //       setLocalProfile(updatedProfile);
-
 //       const successMessage =
 //         updatedProfile?.message || "Cập nhật hồ sơ thành công!";
 //       toast.success(successMessage);
@@ -493,9 +496,20 @@ export default AdminEditUser;
 //       setLoading(false);
 //     }
 //   };
-
 //   return (
 //     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+//       {/* {message && (
+//         <p
+//           className={`text-xs italic ${
+//             message.startsWith("Lỗi") ? "text-red-500" : "text-green-500"
+//           }`}
+//         >
+//           {message}
+//         </p>
+//       )}
+//       {loading && (
+//         <p className="text-gray-500 text-xs italic">Đang cập nhật...</p>
+//       )} */}
 //       <ToastContainer />
 //       <ReusableBreadcrumb items={breadcrumbItems.editUser} />
 //       <div className="mb-4 ml-4 col-span-full xl:mb-2">
@@ -608,7 +622,26 @@ export default AdminEditUser;
 //                 <p className="text-red-500 text-sm">{errors.phone.message}</p>
 //               )}
 //             </div>
-
+//             <div className="mb-4">
+//               <label
+//                 htmlFor="address"
+//                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+//               >
+//                 Địa chỉ
+//               </label>
+//               <input
+//                 type="text"
+//                 id="address"
+//                 {...register("address", { required: "Địa chỉ là bắt buộc" })}
+//                 onChange={handleChange}
+//                 className={`bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 ${
+//                   errors.address ? "border-red-500" : ""
+//                 }`}
+//               />
+//               {errors.address && (
+//                 <p className="text-red-500 text-sm">{errors.address.message}</p>
+//               )}
+//             </div>
 //             <div className="mb-4">
 //               <label
 //                 htmlFor="birthday"
@@ -639,20 +672,22 @@ export default AdminEditUser;
 //                 Chọn vai trò
 //               </label>
 //               <select
-//                 {...register("roles", { required: true })}
-//                 name="roles"
-//                 value={localProfile?.roles?.[0] || ""}
-//                 onChange={handleChange}
-//                 className="form-select"
+//                 id="roles"
+//                 {...register("roles", { required: "Vai trò là bắt buộc" })} // Đăng ký trường này
+//                 className="border rounded p-2 w-full"
 //               >
+//                 <option value="">Chọn vai trò</option>{" "}
+//                 {/* Mặc định khi không có lựa chọn */}
 //                 {roles.map((role) => (
 //                   <option key={role._id} value={role._id}>
-//                     {role.name}
+//                     {" "}
+//                     {/* ID của role làm giá trị */}
+//                     {role.name} {/* Tên role để hiển thị */}
 //                   </option>
 //                 ))}
 //               </select>
-//               {errors.roles && (
-//                 <p className="text-red-500 text-sm">{errors.roles.message}</p>
+//               {errors.roles && ( // Kiểm tra xem có lỗi không
+//                 <p className="text-red-500 text-sm">{errors.roles.message}</p> // Hiển thị thông báo lỗi
 //               )}
 //             </div>
 
@@ -683,7 +718,7 @@ export default AdminEditUser;
 //           </div>
 //         </div>
 //       </div>
-//       {/* <ToastContainer /> */}
+//       <ToastContainer />
 //     </form>
 //   );
 // };
