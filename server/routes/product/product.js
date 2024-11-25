@@ -7,10 +7,10 @@ const {
   getWatchlist,
 } = require("../../controler/product/wathlist");
 router.delete(
-  "/delete/:productId",
+  "/delete/:productId/:variantId?",
   middlewareController.verifyToken,
   DeleteWatchlist
 );
 router.post("/add/:productId", middlewareController.verifyToken, addWatchlist);
 router.get("/", middlewareController.verifyToken, getWatchlist);
-module.exports = router; 
+module.exports = router;
