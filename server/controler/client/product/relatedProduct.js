@@ -6,36 +6,44 @@ const relatedProduct = async (req, res) => {
         const productSlug = req.params.slug;
 
         // Tìm sản phẩm chính theo slug
-        const currentProduct = await Product.findOne({ slug: productSlug })
-            .populate({
-                path: 'product_discount.discountId', // Populate trường discountId từ bảng discounts
-                model: 'discounts',
-                select: 'discountPercent code isActive status disabledAt' // Chỉ lấy các trường cần thiết
-            });
-        
+        const currentProduct = await Product.findOne({ slug: productSlug });
+
         if (!currentProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Tìm các biến thể liên quan và lấy thông tin cần thiết từ `Product`
+        // Tìm các biến thể liên quan và lấy thông tin cần thiết từ `ProductVariant`
         const relatedVariants = await ProductVariant.find({
             product: currentProduct._id,
             status: 'active'
         })
-        .populate({
-            path: 'image', 
-            model: 'ImageVariant',
-            select: 'image color slug',
-            populate: { path: 'color', model: 'Color', select: 'name' }
-        })
+        .populate([
+            {
+                path: 'image',
+                model: 'ImageVariant',
+                select: 'image color slug',
+                populate: { path: 'color', model: 'Color', select: 'name' }
+            },
+            {
+                path: 'product_discount', // Populate discountId từ ProductVariant
+                model: 'discounts',
+                select: 'discountPercent' // Chỉ lấy trường discountPercent
+            }
+        ])
         .limit(10)
-        .lean();
+        .lean(); // Lấy kết quả dưới dạng đối tượng thuần túy
 
-        // Thêm thông tin product_discount, product_ratingAvg và weight_g vào từng biến thể liên quan
+        // Kiểm tra và log discountPercent
+        relatedVariants.forEach(variant => {
+            if (variant.product_discount && variant.product_discount.discountPercent) {
+                console.log("Discount Percent: ", variant.product_discount.discountPercent);
+            }
+        });
+
+        // Thêm thông tin product_ratingAvg và weight_g vào từng biến thể liên quan
         relatedVariants.forEach(variant => {
             variant.product_ratingAvg = currentProduct.product_ratingAvg;
             variant.weight_g = currentProduct.weight_g;
-            variant.product_discount = currentProduct.product_discount; // Thêm product_discount từ Product
         });
 
         // Gửi phản hồi JSON
@@ -48,4 +56,4 @@ const relatedProduct = async (req, res) => {
     }
 }
 
-module.exports = {relatedProduct}; 
+module.exports = { relatedProduct };

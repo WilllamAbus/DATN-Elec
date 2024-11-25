@@ -560,7 +560,7 @@ import {
 } from "../../../../redux/order/Admin/orderAdmin";
 // import { listOrderThunk } from "../../../../redux/order/orderThunks";
 import "../../../../assets/css/admin.style.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -568,6 +568,14 @@ import { Order } from "../../../../types/order/order";
 import withReactContent from "sweetalert2-react-content";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import { fetchPaginatedOrder } from "../../../../redux/order/pagiOrder/pagination";
+import handleExportPDF from "../../../../hooks/ExportInvoice";
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/react";
 const MySwal = withReactContent(Swal);
 
 const ListOrders: React.FC = () => {
@@ -650,7 +658,6 @@ const ListOrders: React.FC = () => {
           );
           toast.success("Đơn hàng đã được xóa.");
         } catch (error) {
-          // Kiểm tra nội dung lỗi và hiển thị thông báo tương ứng
           console.error("Error deleting order:", error);
           toast.error("Đã xảy ra sự cố khi xóa đơn hàng.");
         }
@@ -667,6 +674,39 @@ const ListOrders: React.FC = () => {
     console.error("filteredOrders is not an array:", filteredOrders);
     return null;
   }
+  const navigate = useNavigate();
+  const handleAction = (action: string, order: Order) => {
+    switch (action) {
+      case "cancel":
+        if (
+          order.stateOrder !== "Chờ xử lý" &&
+          order.stateOrder !== "Đã xác nhận"
+        ) {
+          toast.error("Không thể hủy đơn ở trạng thái này.");
+          return;
+        }
+        handleCancelOrder(order._id!);
+        break;
+      case "delete":
+        if (
+          order.stateOrder !== "Hủy đơn hàng" &&
+          order.stateOrder !== "Hoàn tất"
+        ) {
+          toast.error("Chỉ có thể xóa đơn đã bị hủy hoặc hoàn tất.");
+          return;
+        }
+        handleDeleteOrder(order._id!);
+        break;
+      case "viewDetails":
+        navigate(`/admin/listDetailOrder/${order._id}`);
+        break;
+      case "export":
+        handleExportPDF(order);
+        break;
+      default:
+        break;
+    }
+  };
 
   const totalAmount = filteredOrders.reduce(
     (sum, order) => sum + order.totalAmount,
@@ -674,7 +714,7 @@ const ListOrders: React.FC = () => {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg ">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="flex-1 flex items-center space-x-2">
           <h5>
@@ -964,6 +1004,7 @@ const ListOrders: React.FC = () => {
                         />
                       </svg>
                     )}
+
                     {order.stateOrder}
                   </span>
                 </td>
@@ -973,7 +1014,7 @@ const ListOrders: React.FC = () => {
                     currency: "VND",
                   })}
                 </td>
-                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                {/* <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
                     <button
                       className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center ${
@@ -1022,6 +1063,92 @@ const ListOrders: React.FC = () => {
                     >
                       Xem chi tiết
                     </Link>
+                  </div>
+                  <td className="py-4 px-6 border-b border-grey-light">
+                    <button
+                      onClick={() => handleExportPDF(order)}
+                      className="text-white bg-green-500 hover:bg-green-700 font-medium rounded-lg text-sm px-4 py-2"
+                    >
+                      Xuất hóa đơn
+                    </button>
+                  </td>
+                </td> */}
+                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div className="flex items-center space-x-4">
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button
+                          variant="bordered"
+                          className="flex items-center justify-between px-4 py-2 text-gray-800 bg-white border border-gray-300 rounded-lg shadow-md hover:bg-gray-100 hover:border-gray-400 transition duration-200"
+                        >
+                          <span className="flex items-center">
+                            <i className="iconify mdi--dots-vertical w-5 h-5 mr-2 text-gray-600" />
+                            Hành động
+                          </span>
+                          <i className="iconify mdi--chevron-down w-4 h-4 text-gray-600" />
+                        </Button>
+                      </DropdownTrigger>
+
+                      <DropdownMenu
+                        variant="faded"
+                        aria-label="Menu hành động đơn hàng"
+                      >
+                        <DropdownItem
+                          key="cancel"
+                          onClick={() => handleAction("cancel", order)}
+                          startContent={
+                            <i className="iconify mdi--cancel w-5 h-5 text-yellow-500 mr-2" />
+                          }
+                          isDisabled={
+                            !(
+                              order.stateOrder === "Chờ xử lý" ||
+                              order.stateOrder === "Đã xác nhận"
+                            )
+                          }
+                        >
+                          Hủy đơn
+                        </DropdownItem>
+
+                        <DropdownItem
+                          key="delete"
+                          color="danger"
+                          onClick={() => handleAction("delete", order)}
+                          startContent={
+                            <i className="iconify mdi--delete w-5 h-5 text-red-500 mr-2" />
+                          }
+                          isDisabled={
+                            !(
+                              order.stateOrder === "Hủy đơn hàng" ||
+                              order.stateOrder === "Hoàn tất"
+                            )
+                          }
+                        >
+                          Xóa đơn
+                        </DropdownItem>
+
+                        <DropdownItem
+                          key="viewDetails"
+                          onClick={() =>
+                            navigate(`/admin/listDetailOrder/${order._id}`)
+                          }
+                          startContent={
+                            <i className="iconify mdi--eye w-5 h-5 text-blue-500 mr-2" />
+                          }
+                        >
+                          Xem chi tiết
+                        </DropdownItem>
+
+                        <DropdownItem
+                          key="export"
+                          onClick={() => handleExportPDF(order)}
+                          startContent={
+                            <i className="iconify mdi--file-pdf-box w-5 h-5 text-green-500 mr-2" />
+                          }
+                        >
+                          Xuất hóa đơn
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
                   </div>
                 </td>
               </tr>
