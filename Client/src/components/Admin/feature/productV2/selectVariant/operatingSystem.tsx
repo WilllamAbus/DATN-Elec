@@ -47,7 +47,7 @@ interface OsSelectProps {
 const OsSelect: React.FC<OsSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { operatingSystems, isLoading } = useSelector(
-    (state: RootState) => state.attributes.getAllOperatingSystem 
+    (state: RootState) => state.getAttributes.getAllOperatingSystem 
   );
 
   useEffect(() => {

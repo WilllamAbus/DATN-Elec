@@ -94,11 +94,13 @@ const DetailPage: React.FC = () => {
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters((prevFilters) => {
       if (newFilters.storage && newFilters.storage !== prevFilters.storage) {
+        // Reset color filter khi thay đổi storage
         return { ...newFilters, color: "" };
       }
       return { ...prevFilters, ...newFilters };
     });
   }, []);
+  
 
   const firstVariant = productDetail?.variants?.length
     ? productDetail.variants[0]
@@ -146,7 +148,7 @@ const DetailPage: React.FC = () => {
                           href="#"
                           className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white"
                         >
-                          {productDetail?.product_view} Lượt xem
+                           {productDetail?.variants?.[0]?.viewCount} Lượt xem
                         </a>
                       </div>
                     </div>

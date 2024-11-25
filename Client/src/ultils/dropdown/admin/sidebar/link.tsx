@@ -17,6 +17,11 @@ export const links: Record<string, Link[]> = {
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
   ],
+  attribute: [
+    { label: "Màn hình", to: "/admin/list-screen" },
+    { label: "Ram", to: "/admin/list-ram" },
+
+  ],
   post: [
     { label: "Bài viết", to: "/admin/list-post" },
   ],

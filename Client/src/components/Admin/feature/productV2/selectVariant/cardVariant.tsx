@@ -50,7 +50,7 @@ interface CardSelectProps {
 const CardSelect: React.FC<CardSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>(); 
   const { graphicsCards, isLoading } = useSelector(
-    (state: RootState) => state.attributes.getAllGraphicsCard
+    (state: RootState) => state.getAttributes.getAllGraphicsCard
   );
 
   useEffect(() => {

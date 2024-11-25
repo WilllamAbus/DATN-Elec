@@ -62,7 +62,7 @@ interface ColorSelectProps {
 
 const ColorSelect: React.FC<ColorSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>(); 
-  const { colors, isLoading } = useSelector((state: RootState) => state.attributes.getAllColor);
+  const { colors, isLoading } = useSelector((state: RootState) => state.getAttributes.getAllColor);
 
   useEffect(() => {
     dispatch(getAllColorThunk());

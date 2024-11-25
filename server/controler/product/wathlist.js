@@ -176,7 +176,6 @@ const WathListController = {
       const newInteraction = new Interaction({
         user: userId,
         Watchlist: newWatchlist._id,
-        productID: productId,
         productVariant: variantId || null,
         type: "add wishlist",
         score: 1,
