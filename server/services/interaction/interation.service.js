@@ -196,11 +196,11 @@ const interactionService = {
     try {
       const { user, orderAuction, productVariant, item, orderCart, productID, watchlist, type, score } = additionalData;
       // Kiểm tra nếu tương tác cùng user, productID và type là "comment" đã tồn tại
-      const interactionExists = await Interaction.findOne({ user, productID, type: "comment" });
-      // Nếu tương tác đã tồn tại, trả về một thông báo mà không cần ném lỗi
-      if (interactionExists) {
-        return { message: 'Interaction already exists', interaction: interactionExists };
-      }
+      // const interactionExists = await Interaction.findOne({ user, productID, type: "comment" });
+      // // Nếu tương tác đã tồn tại, trả về một thông báo mà không cần ném lỗi
+      // if (interactionExists) {
+      //   return { message: 'Interaction already exists', interaction: interactionExists };
+      // }
       // Nếu tương tác không tồn tại, tiến hành tạo mới
       const interactions = await Interaction.create({
         user,

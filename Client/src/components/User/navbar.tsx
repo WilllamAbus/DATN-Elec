@@ -60,13 +60,13 @@ const Navbar: React.FC = () => {
       <nav className="fixed z-30 w-full bg-primary_flowbite-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
         <div className="flex justify-between items-center max-w-screen-2xl mx-auto">
           <div className="flex justify-start items-center">
-            <a href="/" className="flex mr-14">
+            <a href="/" className="flex">
               <img src={logoNav} className="mr-3 h-8" />
               <span className="self-center hidden sm:flex text-2xl font-semibold whitespace-nowrap dark:text-white">
                 E-Com
               </span>
             </a>
-            <div className="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1">
+            <div className="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1 ml-14">
               <ul className="flex flex-col mt-4 space-x-6 text-sm font-medium lg:flex-row xl:space-x-8 lg:mt-0">
                 <span className="hidden sm:flex">
                   <Dropdown buttonText="Danh mục" items={dropdownItems} />
@@ -91,13 +91,13 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <form className="hidden lg:block lg:pl-3.5" onSubmit={handleSubmit}>
+          <form className="" onSubmit={handleSubmit}>
             <label htmlFor="topbar-search" className="sr-only">
               Search
             </label>
             <div className="relative mt-1 lg:w-[32rem]">
-              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
-                <button type="submit">
+              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none ">
+                <button type="submit" >
                   <svg
                     className="w-5 h-5 text-gray-500 dark:text-gray-400"
                     fill="currentColor"
@@ -115,8 +115,8 @@ const Navbar: React.FC = () => {
               <input
                 type="text"
                 id="topbar-search"
-                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Nhập từ khóa tìm kiếm"
+                className="bg-gray-50 border sm:w-[100px]  border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Tìm kiếm sản phẩm"
                 value={keyword}
                 onChange={handleSearch}
               />
@@ -124,7 +124,7 @@ const Navbar: React.FC = () => {
 
             {/* Render filtered products */}
             {filteredProducts.length > 0 ? (
-              <div className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
+              <div className="bg-gray-50 border border-gray-300 text-gray-900 md:w-[510px] w-[210px] sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
                 {filteredProducts.map((result) => (
                   <div
                     key={result.id}
