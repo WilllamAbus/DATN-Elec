@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AppDispatch,
-  RootState
-
-} from "../../../../../redux/store";
+import { AppDispatch, RootState } from "../../../../../redux/store";
 import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
@@ -17,7 +13,7 @@ import {
   ProductResponse,
 } from "../../../../../types/timeTrackProduct/timeTrackProduct";
 import currencyFormatter from "currency-formatter";
-import "../../../../../assets/css/user.style.css";
+// import "../../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 // import Comment from "../../../../User/feature/details/comment/comment";
 import ModalPopUp from "../../../MoalButton";
@@ -106,14 +102,14 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   //   }));
   // };
 
-  const handleAddToWatchlist = async () => {
+  const handleAddToWatchlist = async (variantId?: string) => {
     if (userId && productId) {
       try {
         let resultAction;
 
         if (isFavorite) {
           resultAction = await dispatch(
-            deleteWatchlistThunk(productId)
+            deleteWatchlistThunk({ productId, variantId })
           ).unwrap();
           if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
             setIsFavorite(false);
@@ -376,7 +372,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
             {productId && <ModalPopUp productId={productId} />}
 
             <button
-              onClick={handleAddToWatchlist}
+              onClick={() => handleAddToWatchlist()}
               className="flex items-center space-x-2 bg-gray-200
                text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >

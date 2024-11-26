@@ -25,7 +25,7 @@ export const registerUser = async (user: {
 export const loginUser = async (user: {
   email: string;
   password: string;
-}): Promise<UserProfile | { status: number; message: string }> => {
+}): Promise<UserProfile> => {
   try {
     const response = await instance.post(
       `${import.meta.env.VITE_API_URL}/auth/login`,
@@ -43,23 +43,9 @@ export const loginUser = async (user: {
       sameSite: "strict",
     });
 
-    return {
-      ...userProfile,
-      status: response.status,
-      message: userProfile.message || "Đăng nhập thành công!",
-    };
-  } catch (error: any) {
-    console.error("Login error:", error); // Ghi lại thông tin lỗi
-
-    // Đảm bảo lấy thông điệp từ đúng nơi
-    const errorMessage =
-      error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập.";
-    const status = error.response?.status || 500;
-
-    return {
-      status,
-      message: errorMessage, // Trả về thông điệp chính xác từ API
-    };
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -161,18 +147,10 @@ export const verifyEmail = async (token: string) => {
 
 export const resendEmail = async (email: string) => {
   try {
-    const response = await axios.post(`${API_URL}/resendEmail`, { email });
-    return {
-      status: response.status,
-      message: response.data.message,
-      data: response.data,
-    };
-  } catch (error: any) {
-    return {
-      status: error.response?.status || 500,
-      message:
-        error.response?.data?.message || "Đã xảy ra lỗi khi yêu cầu xác lại.",
-    };
+    const response = await axios.post(`${API_URL}/auth/resendEmail`, { email });
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };
 // yêu cầu mail reset
@@ -276,11 +254,34 @@ export const getWatchlist = async () => {
   }
 };
 
-export const DeleteWatchlist = async (productId: string) => {
+// export const DeleteWatchlist = async (productId: string) => {
+//   try {
+//     const response = await instance.delete(
+//       `${API_URL}/wathlist/delete/${productId}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error(
+//         "Error deleting from watchlist: An unknown error occurred"
+//       );
+//     }
+//   }
+// };
+export const DeleteWatchlist = async (
+  productId: string,
+  variantId?: string
+) => {
   try {
-    const response = await instance.delete(
-      `${API_URL}/wathlist/delete/${productId}`
-    );
+    const endpoint = variantId
+      ? `${API_URL}/wathlist/delete/${productId}/${variantId}`
+      : `${API_URL}/wathlist/delete/${productId}`;
+
+    const response = await instance.delete(endpoint);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

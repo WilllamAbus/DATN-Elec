@@ -21,7 +21,7 @@ interface Option {
 
 const FilterByStorage: React.FC<FilterByStorageProps> = ({ onchange, filters }) => {
   const dispatch: AppDispatch = useDispatch();
-  const storages = useSelector((state: RootState) => state.attributes.getAllStorage.storages || []);
+  const storages = useSelector((state: RootState) => state.getAttributes.getAllStorage.storages || []);
   const [selectedStorages, setSelectedStorages] = useState<STORAGE[]>([]);
 
   useEffect(() => {

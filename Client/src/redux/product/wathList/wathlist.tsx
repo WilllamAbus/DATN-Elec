@@ -46,14 +46,30 @@ export const getWatchlistThunk = createAsyncThunk<
   }
 });
 
+// export const deleteWatchlistThunk = createAsyncThunk<
+//   any,
+//   string,
+//   { rejectValue: string }
+// >("watchlist/deleteWatchlist", async (productId, thunkAPI) => {
+//   try {
+//     const response = await DeleteWatchlist(productId);
+//     return response.data;
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       return thunkAPI.rejectWithValue(error.message);
+//     } else {
+//       return thunkAPI.rejectWithValue("An unknown error occurred");
+//     }
+//   }
+// });
 export const deleteWatchlistThunk = createAsyncThunk<
-  any,
-  string,
-  { rejectValue: string }
->("watchlist/deleteWatchlist", async (productId, thunkAPI) => {
+  any, // Kiểu dữ liệu trả về
+  { productId: string; variantId?: string }, // Payload nhận vào
+  { rejectValue: string } // Kiểu dữ liệu lỗi
+>("watchlist/deleteWatchlist", async ({ productId, variantId }, thunkAPI) => {
   try {
-    const response = await DeleteWatchlist(productId);
-    return response.data;
+    const response = await DeleteWatchlist(productId, variantId);
+    return response;
   } catch (error) {
     if (error instanceof Error) {
       return thunkAPI.rejectWithValue(error.message);

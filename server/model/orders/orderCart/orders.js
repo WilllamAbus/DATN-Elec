@@ -31,6 +31,7 @@ const orderSchema = new Schema(
         "Hoàn tất",
         "Hủy đơn hàng",
         "Đã hoàn tiền",
+        "Giao hàng không thành công",
       ],
       required: true,
     },

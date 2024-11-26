@@ -6,9 +6,10 @@ import { RootState } from "../../../../../../redux/store";
 interface ColorSelectorProps {
   filters: FilterState;
   onChange?: (selectedColor: COLOR | null) => void;
+  isStorageSelected: boolean; // New prop to control whether storage is selected
 }
 
-const ColorSelector: React.FC<ColorSelectorProps> = ({ filters, onChange = () => { } }) => {
+const ColorSelector: React.FC<ColorSelectorProps> = ({ filters, onChange = () => {}, isStorageSelected }) => {
   const { productDetail } = useSelector((state: RootState) => state.productClient.getProductDetail);
 
   const colors: COLOR[] = (productDetail?.variants || [])
@@ -17,19 +18,17 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ filters, onChange = () =>
 
   const initialActiveIndex = Array.isArray(filters.color) && filters.color.length > 0 ? 0 : -1;
   const [activeIndex, setActiveIndex] = useState<number>(initialActiveIndex);
-console.log(activeIndex);
 
-useEffect(() => {
-  if (Array.isArray(filters.color) && filters.color.length > 0) {
-    setActiveIndex(0);
-  }
-}, [filters]);
+  useEffect(() => {
+    if (Array.isArray(filters.color) && filters.color.length > 0) {
+      setActiveIndex(0);
+    }
+  }, [filters]);
 
-
-const handleColorClick = (index: number) => {
-  setActiveIndex(index);
-  onChange(colors[index]); 
-};
+  const handleColorClick = (index: number) => {
+    setActiveIndex(index);
+    onChange(colors[index]);
+  };
 
   return (
     <div>
@@ -39,8 +38,8 @@ const handleColorClick = (index: number) => {
           colors.map((color, index) => (
             <label
               key={color._id}
-              className="flex items-center cursor-pointer"
-              onClick={() => handleColorClick(index)}
+              className={`flex items-center cursor-pointer ${isStorageSelected ? '' : 'opacity-50 pointer-events-none'}`}
+              onClick={() => isStorageSelected && handleColorClick(index)}
             >
               <input
                 type="radio"
@@ -52,15 +51,10 @@ const handleColorClick = (index: number) => {
                 readOnly
               />
               <div className={`flex items-center justify-center w-auto h-auto p-1 text-sm border-[0.2px] rounded-2xl ${activeIndex === index ? 'border-blue-400 text-primary-700 bg-veryPaleBlue' : 'border-gray-300 text-gray-600'}`}>
-               
-                <p
-                  className="flex items-center justify-center w-3 h-3 border rounded-full "
-                  style={{ backgroundColor: color.code }}
-                ></p>
+                <p className="flex items-center justify-center w-3 h-3 border rounded-full" style={{ backgroundColor: color.code }}></p>
                 <p className="font-medium">{color.name}</p>
               </div>
             </label>
-
           ))
         ) : (
           <p className="text-gray-600 dark:text-gray-300">Không có màu sắc nào</p>
@@ -69,5 +63,6 @@ const handleColorClick = (index: number) => {
     </div>
   );
 };
+
 
 export default ColorSelector;

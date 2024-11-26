@@ -2,10 +2,16 @@ const { Schema, model } = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 const screenSchema = new Schema({
   name: { type: String, required: true },
-  status: { type: String, default: 'active' },
+  status: { 
+    type: String, 
+    enum: ['active', 'disabled',], 
+    default: 'active' 
+  },
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },
   slug: { type: String, unique: true },
+  description: { type: String },
+  deletedAt: { type: Date, default: null },
 }, {
   collection: "screens",
   timestamps: true,

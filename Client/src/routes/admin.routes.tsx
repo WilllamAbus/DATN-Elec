@@ -68,6 +68,20 @@ const AdminEditProductV2 = React.lazy(
 const AdminFetEditProductAuction = React.lazy(
   () => import("../page/Admin/product/edit/editAuction")
 );
+//attribute
+const AdminAddScreen = React.lazy(
+  () => import("../page/Admin/attribute/add/addScreen")
+);
+const AdminListScreen = React.lazy(
+  () => import("../page/Admin/attribute/list/getListScreen")
+);
+const AdminEditScreen = React.lazy(
+  () => import("../page/Admin/attribute/edit/editScreen")
+);
+
+const AdminListRam = React.lazy(
+  () => import("../page/Admin/attribute/list/getListRam")
+);
 /**Brands */
 const AdminAddBrands = React.lazy(
   () => import("../page/Admin/brands/addBrands")
@@ -271,6 +285,10 @@ const AdminRoutes: RouteObject[] = [
       { path: "list-image-and-color/:variantId", element: <AdminFetImageByVariantId /> },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
       { path: "edit-product-auction/:id", element: <AdminFetEditProductAuction /> },
+      { path: "add-screen", element: <AdminAddScreen /> },
+      { path: "edit-screen/:screenId", element: <AdminEditScreen /> },
+      { path: "list-screen", element: <AdminListScreen /> },
+      { path: "list-ram", element: <AdminListRam /> },
       { path: "addBrands", element: <AdminAddBrands /> },
       { path: "editBrands/:id", element: <AdminEditBrands /> },
       { path: "listBrands", element: <AdminListBrands /> },

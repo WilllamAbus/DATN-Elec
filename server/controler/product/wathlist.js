@@ -5,6 +5,7 @@ const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
 const { spawn } = require('child_process');
+const path = require('path');
 
 const WathListController = {
   // addWatchlist: async (req, res) => {
@@ -176,29 +177,40 @@ const WathListController = {
       const newInteraction = new Interaction({
         user: userId,
         Watchlist: newWatchlist._id,
-        productID: productId,
         productVariant: variantId || null,
         type: "add wishlist",
         score: 1,
       });
-
+      console.log(newInteraction);
       await newInteraction.save();
+      console.log(`Saved interaction for user: ${userId}`);
+      console.log(`Saved interaction: ${JSON.stringify(newInteraction)}`);
+
+      // Đường dẫn tới file Python
+      const pythonScriptPath = path.resolve(__dirname, '../../../Python Client Server/recommendation_service.py');
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn('python', ['recommendation_service.py', userId.toString()]);
+      const pythonProcess = spawn('python', [pythonScriptPath, userId.toString()]);
 
-      // Lắng nghe kết quả từ script Python
+      // Xử lý kết quả từ script Python
       pythonProcess.stdout.on('data', (data) => {
         console.log(`Python Output: ${data.toString()}`);
-        // Xử lý kết quả từ Python nếu cần
       });
 
-      pythonProcess.stderr.on('data', (data) => {
+      pythonProcess.stderr.on("data", (data) => {
         console.error(`Python Error: ${data.toString()}`);
       });
 
+      pythonProcess.on('error', (error) => {
+        console.error(`Failed to start Python process: ${error.message}`);
+      });
+
       pythonProcess.on('close', (code) => {
-        console.log(`Python script finished with code ${code}`);
+        if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+        } else {
+          console.log(`Python script finished successfully.`);
+        }
       });
 
       return res.status(200).json({
@@ -306,17 +318,25 @@ const WathListController = {
   // DeleteWatchlist: async (req, res) => {
   //   try {
   //     const userId = req.user.id;
-  //     const { id } = req.params;
-  //     if (!userId || !id) {
+  //     const { productId } = req.params; // `id` sẽ là `product._id`
+
+  //     if (!userId || !productId) {
   //       return res.status(400).json({
   //         success: false,
-  //         message:
-  //           "ID người dùng và ID mục trong danh sách yêu thích là bắt buộc",
+  //         message: "ID người dùng và ID sản phẩm là bắt buộc",
   //       });
   //     }
 
-  //     const watchlistItem = await WathList.findOne({
-  //       _id: id,
+  //     if (!mongoose.Types.ObjectId.isValid(productId)) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "ID sản phẩm không hợp lệ",
+  //       });
+  //     }
+
+  //     // Tìm và xóa mục trong danh sách yêu thích dựa trên `product._id` và `userId`
+  //     const watchlistItem = await WathList.findOneAndDelete({
+  //       product: productId,
   //       user: userId,
   //     });
 
@@ -326,8 +346,6 @@ const WathListController = {
   //         message: "Mục trong danh sách yêu thích không tồn tại",
   //       });
   //     }
-
-  //     await watchlistItem.remove();
 
   //     return res.status(200).json({
   //       success: true,
@@ -344,7 +362,7 @@ const WathListController = {
   DeleteWatchlist: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { productId } = req.params; // `id` sẽ là `product._id`
+      const { productId, variantId } = req.params;
 
       if (!userId || !productId) {
         return res.status(400).json({
@@ -360,11 +378,13 @@ const WathListController = {
         });
       }
 
-      // Tìm và xóa mục trong danh sách yêu thích dựa trên `product._id` và `userId`
-      const watchlistItem = await WathList.findOneAndDelete({
-        product: productId,
+      const query = {
         user: userId,
-      });
+        product: productId,
+        productVariant: variantId || null,
+      };
+
+      const watchlistItem = await WathList.findOneAndDelete(query);
 
       if (!watchlistItem) {
         return res.status(404).json({
@@ -373,6 +393,13 @@ const WathListController = {
         });
       }
 
+      await Interaction.deleteMany({
+        user: userId,
+        productID: productId,
+        productVariant: variantId || null,
+        type: "add wishlist",
+      });
+
       return res.status(200).json({
         success: true,
         message: "Sản phẩm đã được xóa khỏi danh sách yêu thích",
@@ -380,6 +407,7 @@ const WathListController = {
     } catch (error) {
       console.error("Error removing from watchlist:", error);
       return res.status(500).json({
+        success: false,
         message: "Có lỗi xảy ra",
         error: error.message,
       });

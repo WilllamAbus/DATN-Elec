@@ -75,14 +75,12 @@ const OrderDetails: React.FC = () => {
               stateOrder: selectedStatus,
             })
           ).unwrap();
+          await dispatch(getOrderDetailByIdThunk(selectedOrder?._id as string));
           toast.success(
             response.stateOrder
               ? `Trạng thái đơn hàng đã được cập nhật thành "${response.stateOrder}"!`
               : "Cập nhật thành công!"
           );
-          await dispatch(
-            getOrderDetailByIdThunk(selectedOrder?._id as string)
-          ).unwrap();
         } catch (error) {
           let errorMessage = "Đã xảy ra lỗi khi cập nhật trạng thái đơn hàng.";
           if (error instanceof Error) {
@@ -132,7 +130,15 @@ const OrderDetails: React.FC = () => {
             >
               Hoàn tất
             </Button>
-            {/* Nút Hoàn tiền */}
+            <Button
+              onClick={() => {
+                setSelectedStatus("Giao hàng không thành công");
+                handleUpdateStatus();
+              }}
+              className="mt-4 bg-red-500 text-white"
+            >
+              Giao hàng không thành công
+            </Button>
             {selectedOrder?.payment.payment_method !==
               "Thanh toán khi nhận hàng" && (
               <Button
@@ -140,7 +146,7 @@ const OrderDetails: React.FC = () => {
                   setSelectedStatus("Đã hoàn tiền");
                   handleUpdateStatus();
                 }}
-                className="mt-4 bg-red-500 text-white"
+                className="mt-4 bg-purple-500 text-white"
               >
                 Hoàn tiền
               </Button>
@@ -159,7 +165,7 @@ const OrderDetails: React.FC = () => {
                   setSelectedStatus("Đã hoàn tiền");
                   handleUpdateStatus();
                 }}
-                className="mt-4 bg-red-500 text-white"
+                className="mt-4 bg-purple-500 text-white"
               >
                 Hoàn tiền
               </Button>

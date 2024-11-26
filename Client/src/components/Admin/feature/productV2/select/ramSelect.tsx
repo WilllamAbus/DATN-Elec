@@ -49,7 +49,7 @@ interface RamSelectProps {
 const RamSelect: React.FC<RamSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>(); 
   const { rams, isLoading } = useSelector(
-    (state: RootState) => state.attributes.getAllRam 
+    (state: RootState) => state.getAttributes.getAllRam 
   );
 
   useEffect(() => {

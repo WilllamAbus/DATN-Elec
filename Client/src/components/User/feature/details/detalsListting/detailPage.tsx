@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
-// import RelatedProduct from "./relatedProduct/relatedProduct";
+import RelatedProduct from "./relatedProduct/relatedProduct";
 import Comment from "../../../../User/feature/details/comment/comment";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
@@ -94,11 +94,13 @@ const DetailPage: React.FC = () => {
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters((prevFilters) => {
       if (newFilters.storage && newFilters.storage !== prevFilters.storage) {
+        // Reset color filter khi thay đổi storage
         return { ...newFilters, color: "" };
       }
       return { ...prevFilters, ...newFilters };
     });
   }, []);
+  
 
   const firstVariant = productDetail?.variants?.length
     ? productDetail.variants[0]
@@ -146,7 +148,7 @@ const DetailPage: React.FC = () => {
                           href="#"
                           className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white"
                         >
-                          {productDetail?.product_view} Lượt xem
+                           {productDetail?.variants?.[0]?.viewCount} Lượt xem
                         </a>
                       </div>
                     </div>
@@ -188,7 +190,7 @@ const DetailPage: React.FC = () => {
     <Comment onUpdateAverageRating={handleUpdateAverageRating} />
     </section>
     <section>
-        {/* <RelatedProduct/> */}
+        <RelatedProduct/>
     </section>
     </>
   );

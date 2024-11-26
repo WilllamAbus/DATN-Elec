@@ -18,7 +18,8 @@ export interface OrderDeleted {
   order_date: string;
   createdAt: string;
   updatedAt: string;
-  shippingAddress: ShippingAddressDeleted
+  shippingAddress: ShippingAddressDeleted,
+  refundBank: RefundBankDeleted
 }
 
 export interface ShippingAddressDeleted {
@@ -28,4 +29,11 @@ export interface ShippingAddressDeleted {
     address: string;
     email: string;
     addressID: string;
+}
+
+export interface RefundBankDeleted {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+
 }
