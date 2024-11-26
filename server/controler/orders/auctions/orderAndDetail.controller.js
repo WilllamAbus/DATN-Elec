@@ -11,9 +11,57 @@ const { sendMail } = require("./mailer/mailerForPDF");
 const { sendMailExecl } = require("./mailer/mailerForExecl");
 const Product_v2 = require("../../../model/productAuction/productAuction");
 const orderAndDetailControler = {
+  verifyPayment : async (payment, auctionDetails) => {
+    try {
+      // Cấu hình URL cho từng cổng thanh toán
+      const paymentGateways = {
+        MoMo: "https://test-payment.momo.vn/v2/gateway/api/verify", // URL kiểm tra MoMo
+        VnPay: "https://sandbox.vnpayment.vn/paymentv2/verify", // URL kiểm tra VNPay
+      };
+  
+      // Kiểm tra phương thức thanh toán có hợp lệ hay không
+      if (!paymentGateways[payment]) {
+        return {
+          success: false,
+          message: "Phương thức thanh toán không hợp lệ.",
+        };
+      }
+  
+      // Gửi yêu cầu xác minh tới API của cổng thanh toán
+      const response = await axios.post(paymentGateways[payment], {
+        auctionDetails, // Gửi thông tin chi tiết phiên đấu giá
+      });
+  
+      // Kiểm tra trạng thái phản hồi từ API
+      if (response.data && response.data.status === "success") {
+        return {
+          success: true,
+          message: "Thanh toán đã được xác minh thành công.",
+        };
+      }
+  
+      return {
+        success: false,
+        message: response.data.message || "Xác minh thanh toán không thành công.",
+      };
+    } catch (error) {
+      console.error("Lỗi khi xác minh thanh toán:", error.message);
+      return {
+        success: false,
+        message: "Đã xảy ra lỗi khi xác minh thanh toán.",
+      };
+    }
+  },
   createOrder: async (req, res) => {
     try {
       const { userId, auctionDetails, payment } = req.body;
+      if (!["MoMo", "VnPay", "Cash"].includes(payment)) {
+        return res.status(400).json({
+            success: false,
+            status: 400,
+            message: "Phương thức thanh toán không hợp lệ.",
+        });
+    }
       const orderData = {
         userId,
         auctionDetails, // Rename to auctionID

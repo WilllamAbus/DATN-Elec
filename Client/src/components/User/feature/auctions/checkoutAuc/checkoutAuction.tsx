@@ -21,12 +21,13 @@ const CheckoutPage: React.FC = () => {
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
 
   
-  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); ;
+  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); 
   console.log('Bids: ', bids);
   
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
 
+console.log('auctionData', auctionData);
 
   
      // Access order data from `orderAuction`
