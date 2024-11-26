@@ -1,14 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import ListDetailComment from "../../../components/Admin/feature/comment/listDetailComment";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
-import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 const ListComments: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  
   return (
     <div>
       <ReusableBreadcrumb items={breadcrumbItems.listComments} />
@@ -26,11 +21,7 @@ const ListComments: React.FC = () => {
             </div>
             <div className="overflow-x-auto">
               <ListDetailComment />
-              <PaginationComponent
-                currentPage={currentPage}
-                totalPages={5}
-                onPageChange={handlePageChange}
-              />
+            
             </div>
           </div>
         </div>

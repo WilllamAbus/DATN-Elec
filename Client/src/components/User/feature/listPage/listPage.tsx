@@ -19,7 +19,6 @@ import {
   getAllStorageThunk
 } from "../../../../redux/product/client/Thunk";
 
-import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import ProductSkeletonList from "../../skeleton/product/productSkeleton";
 import ProductList from "./productList";
 import styles from "./css/section.module.css";
@@ -30,6 +29,7 @@ import NoProductsMessage from "./noProduct";
 import { useLocation, useParams } from "react-router-dom";
 import queryString from "query-string";
 import useProductFilters from "./produtFiltersHook";
+import { Pagination } from "@nextui-org/react";
 
 
 
@@ -217,11 +217,19 @@ export default function ListPage() {
                           <ProductList products={products} />
                         )}
                       </div>
-                      <PaginationComponent
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                      />
+                      {totalPages > 1 && (
+        <div className="flex justify-center my-4">
+          <Pagination
+            isCompact
+            loop
+            showControls
+            color="primary"
+            total={totalPages}
+            initialPage={currentPage}
+            onChange={(page) => handlePageChange(page)}
+          />
+        </div>
+      )}
                     </section>
                   </div>
                 </div>

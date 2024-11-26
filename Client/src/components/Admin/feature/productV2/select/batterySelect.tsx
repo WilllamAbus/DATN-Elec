@@ -49,7 +49,7 @@ interface BatterySelectProps {
 
 const BatterySelect: React.FC<BatterySelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { batteries, isLoading } = useSelector((state: RootState) => state.attributes.getAllBattery);
+  const { batteries, isLoading } = useSelector((state: RootState) => state.getAttributes.getAllBattery);
 
   useEffect(() => {
     dispatch(getAllBatteryThunk());

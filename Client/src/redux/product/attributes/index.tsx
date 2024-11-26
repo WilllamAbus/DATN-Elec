@@ -9,7 +9,7 @@ import {
   getAllScreenSlice,
   getAllStorageSlice
 } from "./Slicle";
-const attributesReducer = combineReducers({
+const getAttributesReducer = combineReducers({
   getAllRam: getAllRamSlice,
   getAllBattery:getAllBatterySlice,
   getAllColor:getAllColorSlice,
@@ -20,4 +20,4 @@ const attributesReducer = combineReducers({
   getAllStorage:getAllStorageSlice
 });
 
-export default attributesReducer;
+export default getAttributesReducer;

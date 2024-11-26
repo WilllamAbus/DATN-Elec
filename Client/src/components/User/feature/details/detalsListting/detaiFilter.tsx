@@ -28,7 +28,11 @@ const DetailFilters: React.FC<DetailFiltersProps> = ({ filters, onChange = () =>
   return (
     <div className="flex justify-between space-x-4"> {/* Sử dụng Flexbox và tạo khoảng cách */}
     <FilterStorage filters={filters} onChange={handleStorageChange} />
-    <FilterColor filters={filters} onChange={handleColorChange} />
+    <FilterColor 
+        filters={filters} 
+        onChange={handleColorChange} 
+        isStorageSelected={!!filters.storage} // Pass this prop to indicate storage selection
+      />
   </div>
   );
 };

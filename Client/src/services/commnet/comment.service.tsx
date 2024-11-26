@@ -9,6 +9,7 @@ export interface Comment {
   content: string;
   rating: number;
   id_user:string;
+  likes:string[];
 }
 // import { HomeAllProductResponse} from "../product_v2/client/types/homeAllProduct";
 
@@ -84,9 +85,17 @@ export const getCommentProduct = async (slug: string) => {
     throw error;
   }
 };
-export const getCommentAdmin = async () => {
+export const getCommentProducAdmin = async (slug: string,page:number,limit:number) => {
   try {
-    const response = await instance.get(`${API_URL_ADMIN}/getCommentAdmin`);
+    const response = await instance.get(`${API_URL_ADMIN}/listDetailComment/${slug}?page=${page}&limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getCommentAdmin = async (page:number,limit:number) => {
+  try {
+    const response = await instance.get(`${API_URL_ADMIN}/getCommentAdmin?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     return error; 
@@ -127,12 +136,34 @@ export const restoreComment = async (id: string) => {
     throw error; 
   }
 };
-export const getCommentDelete = async () => {
+export const getCommentDelete = async (page:number,limit:number) => {
   try {
-    const response = await instance.get(`${API_URL_ADMIN}/getCommentDelete`);
+    const response = await instance.get(`${API_URL_ADMIN}/getCommentDelete?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+export const addLike = async (slug:string,commentData: { userId: string,commentId:string }) => {
+  try {
+    const response = await instance.put(`${API_URL_CLIENT}/addLike/${slug}`,commentData);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    throw error; 
+  }
+};
+export const editComment = async (slug: string, commentData: { content: string; id_user: string; rating: number }) => {
+  try {
+    const response = await instance.put(`${API_URL_CLIENT}/editCommnet/${slug}`, commentData, {
+      headers: {
+        'Content-Type': 'application/json', 
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log('Error adding comment:', error);
     throw error; 
   }
 };

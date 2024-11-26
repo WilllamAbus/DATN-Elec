@@ -3,8 +3,9 @@ const modelProduct = require(`../model/product_v2/index`);
 const modelRepComment = require("../model/repComment.model");
 const modelUser = require("../model/users.model");
 const modelComment = require("../model/comment.model");
+// const modelProductVariants = require ('../model/recommendation/interaction.model')
 const mongoose = require("mongoose");
-const interactionService = require('../services/interaction/interation.service');
+const interactionService = require("../services/interaction/interation.service");
 const commentController = {
   userID: async (req, res) => {
     try {
@@ -138,12 +139,11 @@ const commentController = {
       res.status(500).json({ message: "Failed to search comments" });
     }
   },
+
   getCommentProduct: async (req, res) => {
     try {
       const { slug } = req.params;
-      // Lấy giá trị số sao từ query, nếu không có sẽ mặc định là null (không lọc theo rating)
       const rating = req.query.rating ? parseInt(req.query.rating) : null;
-  
       const product = await modelProduct.findOne({ slug: slug }).populate({
         path: "comments", // Đường dẫn tới mảng comments
         model: "Comment", // Model tương ứng
@@ -151,33 +151,49 @@ const commentController = {
           status: "active", // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
           ...(rating !== null && { rating: rating }), // Nếu có rating thì lọc theo rating
         },
-        select: "content rating id_user id_product createdAt", // Chỉ lấy các trường cần thiết
+        select: "content rating id_user id_product createdAt likes", // Chỉ lấy các trường cần thiết
         options: { sort: { createdAt: -1 } }, // Sắp xếp từ mới nhất đến cũ nhất
       });
   
-      // Kiểm tra xem sản phẩm có tồn tại và có bình luận không
       if (!product || product.comments.length === 0) {
+      }
+      if (!product) {
+        return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+      }
+
+      if (product.comments.length === 0) {
         return res
           .status(404)
           .json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
       }
-  
-      // Trả về các bình luận đã lọc
+
       res.status(200).json(product.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
-      res.status(500).json({ message: "Lỗi server" });
+       res.status(500).json({Message: 'Lỗi '});
     }
   },
-  
-  
-  
 
   getCommentAdmin: async (req, res) => {
     try {
+      // Lấy giá trị limit và page từ query parameters
+      const limit = parseInt(req.query.limit) || 2;
+      const page = parseInt(req.query.page) || 1;
+      const skip = (page - 1) * limit;
 
+      // Đếm tổng số lượng sản phẩm có bình luận
+      const totalItems = await modelProduct.countDocuments({
+        "comments.0": { $exists: true },
+      });
+
+      // Tính tổng số trang dựa trên tổng số lượng sản phẩm và limit
+      const totalPages = Math.ceil(totalItems / limit);
+
+      // Lấy dữ liệu sản phẩm với bình luận theo phân trang
       const productsWithComments = await modelProduct
         .find({ "comments.0": { $exists: true } })
+        .skip(skip)
+        .limit(limit)
         .populate({
           path: "comments", // Đường dẫn tới mảng comments
           model: "Comment", // Model tương ứng
@@ -192,20 +208,27 @@ const commentController = {
           .json({ message: "Không tìm thấy sản phẩm nào có bình luận" });
       }
 
-      res.status(200).json(productsWithComments);
+      // Trả về dữ liệu với thông tin phân trang
+      res.status(200).json({
+        success: true,
+        data: productsWithComments,
+        page: page,
+        limit: limit,
+        totalPages: totalPages, // Thêm tổng số trang vào kết quả trả về
+        totalItems: totalItems, // Thêm tổng số lượng sản phẩm có bình luận
+      });
     } catch (error) {
       console.error("Error fetching products with comments:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          err: 3,
-          msg: "Lỗi hệ thống",
-          status: 500,
-          error: error.message,
-        });
+      res.status(500).json({
+        success: false,
+        err: 3,
+        msg: "Lỗi hệ thống",
+        status: 500,
+        error: error.message,
+      });
     }
   },
+
   deleteComment: async (req, res) => {
     try {
       const { idComment, idProduct } = req.params;
@@ -275,139 +298,188 @@ const commentController = {
 
   addCommentProduct: async (req, res) => {
     try {
-      const slug = req.params.slug;
-      const commentData = req.body;
-  
-      // Tìm sản phẩm bằng slug để lấy productId
-      const product = await modelProduct.findOne({ slug: slug });
-      if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-  
-      const productId = product._id; // Lấy productId từ sản phẩm tìm thấy
-  
-      // Kiểm tra nếu không có id_user trong commentData
-      if (!commentData.id_user) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-  
-      commentData.id_product = productId;
-  
-      // Tạo comment mới
-      const newComment = await modelComment.Comment.create(commentData);
-  
-      if (!newComment) {
-        return res.status(404).json({ error: "Comment could not be added" });
-      }
-  
-      // Cập nhật trường comments trong bảng product_v2
-      const updatedProduct = await modelProduct.findByIdAndUpdate(
-        productId,
-        { $push: { comments: newComment._id } },
-        { new: true }
-      );
-  
-      if (!updatedProduct) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-      const interactionData = {
-        user: commentData.id_user,
-        orderAuctions: null,
-        OrderCart: null,
-        productID: productId,
-        Watchlist: null,
-        type: "comment",
-        score: 3,
-      };
+        const slug = req.params.slug;
+        const commentData = req.body;
 
-      const interactionResult = await interactionService.postInteractions(interactionData);
+        // Tìm sản phẩm bằng slug để lấy productId
+        const product = await modelProduct.findOne({ slug: slug });
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
 
-      return res.status(200).json({
-        message: "Comment added successfully",
-        product: updatedProduct,
-        interaction: interactionResult
-      });
+        const productId = product._id; // Lấy productId từ sản phẩm tìm thấy
+
+        // Lấy idProductVariant từ product
+        let idProductVariant;
+        if (Array.isArray(product.variants) && product.variants.length > 0) {
+            idProductVariant = product.variants[0]._id; // Lấy _id từ variant đầu tiên
+        } else {
+            console.log("Product Variants is not an array or is empty:", product.variants);
+            return res.status(404).json({ error: "Product variant not found" });
+        }
+
+        // Kiểm tra nếu không có id_user trong commentData
+        if (!commentData.id_user) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        commentData.id_product = productId;
+        commentData.likes = []; // Khởi tạo mảng likes rỗng cho comment mới
+
+        // Tạo comment mới
+        const newComment = await modelComment.Comment.create(commentData);
+
+        if (!newComment) {
+            return res.status(404).json({ error: "Comment could not be added" });
+        }
+
+        // Cập nhật trường comments trong bảng product_v2
+        const updatedProduct = await modelProduct.findByIdAndUpdate(
+            productId,
+            { $push: { comments: newComment._id } },
+            { new: true }
+        );
+
+        if (!updatedProduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Tạo interaction
+        const interactionData = {
+            user: commentData.id_user,
+            orderAuctions: null,
+            OrderCart: null,
+            productVariant: idProductVariant,
+            Watchlist: null,
+            type: "comment",
+            score: 3,
+        };
+
+        const interactionResult = await interactionService.postInteractions(interactionData);
+
+        return res.status(200).json({
+            message: "Comment added successfully",
+            product: updatedProduct,
+            interaction: interactionResult,
+        });
     } catch (error) {
-      console.error("Error adding comment:", error);
-      return res.status(500).json({ error: error.message });
+        console.error("Error adding comment:", error);
+        return res.status(500).json({ error: error.message });
     }
-  },
-  
+},
+
 
   listDetailComment: async (req, res) => {
     try {
-      const { id } = req.params;
+      const { slug } = req.params;
+      // Lấy giá trị số sao từ query, nếu không có sẽ mặc định là null (không lọc theo rating)
+      const rating = req.query.rating ? parseInt(req.query.rating) : null;
 
-      // Validate that the ID is valid (optional)
-      if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-          success: false,
-          err: 1,
-          msg: "Invalid product ID",
-          status: 400,
-        });
-      }
+      // Lấy số lượng bình luận mỗi trang và trang hiện tại từ query parameters
+      const limit = parseInt(req.query.limit) || 10; // Mặc định là 10 bình luận mỗi trang
+      const page = parseInt(req.query.page) || 1; // Mặc định là trang 1
+      const skip = (page - 1) * limit; // Tính toán số bình luận bỏ qua dựa trên trang hiện tại
 
-      // Find the product by ID and populate comments with user data
-      const product = await modelProduct.findById(id).populate({
-        path: "comments",
-        populate: {
-          path: "user",
-          select: "name avatar", // Select specific user fields if needed
+      // Tìm sản phẩm dựa trên slug và phân trang bình luận của sản phẩm
+      const product = await modelProduct.findOne({ slug: slug }).populate({
+        path: "comments", // Đường dẫn tới mảng comments
+        model: "Comment", // Model tương ứng
+        match: {
+          status: "active", // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
+          ...(rating !== null && { rating: rating }), // Nếu có rating thì lọc theo rating
+        },
+        select: "content rating id_user id_product createdAt", // Chỉ lấy các trường cần thiết
+        options: {
+          sort: { createdAt: -1 }, // Sắp xếp bình luận từ mới nhất đến cũ nhất
+          skip: skip, // Bỏ qua số lượng bình luận cần thiết
+          limit: limit, // Giới hạn số lượng bình luận trên mỗi trang
         },
       });
 
-      // Check if product was found
+      // Kiểm tra xem sản phẩm có tồn tại không
       if (!product) {
-        return res.status(404).json({
+        return res.status(404).json({ message: "Sản phẩm không tìm thấy" });
+      }
+
+      // Đếm tổng số bình luận của sản phẩm với các điều kiện lọc (nếu có rating)
+      const totalComments = await modelComment.Comment.countDocuments({
+        id_product: product._id,
+        status: "active",
+        ...(rating !== null && { rating: rating }), // Nếu có rating thì lọc theo rating
+      });
+
+      // Tính toán tổng số trang
+      const totalPages = Math.ceil(totalComments / limit); // Tính tổng số trang
+
+      // Trả về các bình luận và thông tin phân trang
+      res.status(200).json({
+        success: true,
+        data: product.comments, // Trả về bình luận
+        page: page,
+        limit: limit,
+        totalPages: totalPages,
+        totalComments: totalComments,
+      });
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ message: "Lỗi server" });
+    }
+  },
+
+  getCommentDelete: async (req, res) => {
+    try {
+      // Lấy giá trị 'limit' và 'page' từ query parameters
+      const limit = parseInt(req.query.limit) || 10; // Mặc định limit là 10 nếu không có giá trị
+      const page = parseInt(req.query.page) || 1; // Mặc định page là 1 nếu không có giá trị
+      const skip = (page - 1) * limit;
+
+      // Kiểm tra nếu limit và page là các số hợp lệ
+      if (isNaN(limit) || isNaN(page) || limit <= 0 || page <= 0) {
+        return res.status(400).json({
           success: false,
-          err: 1,
-          msg: "Product not found",
-          status: 404,
+          message: "Limit và Page phải là các số hợp lệ và lớn hơn 0.",
         });
       }
 
-      return res.status(200).json({
-        success: true,
-        err: 0,
-        msg: "OK",
-        status: 200,
-        comments: product.comments,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        err: 1,
-        msg: "System error",
-        status: 500,
-        error: error.message,
-      });
-    }
-  },
-  getCommentDelete: async (req, res) => {
-    try {
-      const disabledComments = await modelComment.Comment.find({
+      // Đếm tổng số bình luận có trạng thái "disable"
+      const totalItems = await modelComment.Comment.countDocuments({
         status: "disable",
       });
+
+      // Tìm bình luận với phân trang
+      const disabledComments = await modelComment.Comment.find({
+        status: "disable",
+      })
+        .skip(skip) // Bỏ qua các tài liệu không thuộc trang hiện tại
+        .limit(limit); // Giới hạn số tài liệu trả về
+
+      const totalPages = Math.ceil(totalItems / limit); // Tính tổng số trang
+
+      // Kiểm tra nếu không có bình luận nào
       if (!disabledComments || disabledComments.length === 0) {
-        return res
-          .status(404)
-          .json({
-            message: "Không tìm thấy bình luận nào có trạng thái 'disable'",
-          });
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy bình luận nào có trạng thái 'disable'",
+        });
       }
-      res.status(200).json(disabledComments);
+
+      // Phản hồi thông tin
+      res.status(200).json({
+        success: true,
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: totalItems,
+        comments: disabledComments,
+      });
     } catch (error) {
       console.error("Error fetching disabled comments:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          err: 3,
-          msg: "Lỗi hệ thống",
-          status: 500,
-          error: error.message,
-        });
+      res.status(500).json({
+        success: false,
+        error: 3,
+        message: "Lỗi hệ thống",
+        status: 500,
+        details: error.message,
+      });
     }
   },
 
@@ -453,6 +525,77 @@ const commentController = {
       });
     }
   },
-};
+  addLikeComment: async (req, res) => { 
+    try {
+      const { commentId, userId } = req.body;
+  
+      // Tìm bình luận cần cập nhật
+      const comment = await modelComment.Comment.findById(commentId);
+  
+      if (!comment) {
+        return res.status(404).json({ message: 'Comment not found' });
+      }
+  
+      // Kiểm tra xem người dùng đã like chưa
+      if (comment.likes.includes(userId)) {
+        // Nếu đã like, bỏ like
+        comment.likes = comment.likes.filter(id => id.toString() !== userId);
+      } else {
+        // Nếu chưa like, thêm user vào mảng likes
+        comment.likes.push(userId);
+      }
+  
+      // Lưu lại thay đổi
+      await comment.save();
+  
+      return res.json({ message: 'Like updated successfully', likes: comment.likes });
+    } catch (error) {
+      console.error('Error updating like:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+},
+updateCommentProduct: async (req, res) => {
+  try {
+      const slug = req.params.slug; 
+      const commentData = req.body; 
+      const commentId = commentData.commentId;
+      // Tìm sản phẩm bằng slug để lấy productId
+      const product = await modelProduct.findOne({ slug: slug });
+      if (!product) {
+          return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Kiểm tra nếu không có id_user trong commentData
+      if (!commentData.id_user) {
+          return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // Tìm và cập nhật comment theo ID
+      const updatedComment = await modelComment.Comment.findByIdAndUpdate(
+          commentId,
+          commentData, // Dữ liệu comment mới cần cập nhật
+          { new: true } // Trả về comment mới sau khi cập nhật
+      );
+
+      if (!updatedComment) {
+          return res.status(404).json({ error: "Comment not found" });
+      }
+
+      // Nếu cần, bạn có thể cập nhật lại product để đảm bảo tính toàn vẹn dữ liệu
+      const updatedProduct = await modelProduct.findById(product._id);
+
+      return res.status(200).json({
+          message: "Comment updated successfully",
+          product: updatedProduct,
+          updatedComment: updatedComment,
+      });
+  } catch (error) {
+      console.error("Error updating comment:", error);
+      return res.status(500).json({ error: error.message });
+  }
+},
+
+
+}
 
 module.exports = commentController;

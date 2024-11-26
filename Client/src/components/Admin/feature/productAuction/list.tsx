@@ -13,7 +13,7 @@ import NoProductsMessage from "../productV2/noProduct";
 
 const ProductListAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [searchTerm] = useState("");
+  const [searchTerm,] = useState("");
   const currentPage = useSelector(
     (state: RootState) => state.products.LimitProductAuction.pagination?.currentPage || 1
   );
@@ -102,10 +102,8 @@ const ProductListAuction: React.FC = () => {
         <AddProductButton type="addProductAuction" />
       </div>
 
-      {products.length === 0 && searchTerm ? (
-        <SearchMessage /> 
-      ) : products.length === 0 ? (
-        <NoProductsMessage /> 
+      {products.length === 0 ? (
+        searchTerm.length > 0 ? <SearchMessage /> : <NoProductsMessage />  
       ) : (
         <Table
           aria-label="Product List Auction Table"

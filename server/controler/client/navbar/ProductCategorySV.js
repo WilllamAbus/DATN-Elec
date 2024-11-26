@@ -3,7 +3,7 @@ const ProductType = require('../../../model/catgories.model');
 const mongoose = require('mongoose');
 const ProductVariant = require('../../../model/product_v2/productVariant');
 const ProductCategoryService = {
-  getProductsByCategory: (categoryId, page = 1, limit = 12, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, variantPrices) => new Promise(async (resolve, reject) => {
+  getProductsByCategory: (categoryId, page = 1, limit = 8, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, variantPrices) => new Promise(async (resolve, reject) => {
     try {
       page = parseInt(page, 10) || 1;
       limit = parseInt(limit, 10) || 12;
@@ -31,25 +31,29 @@ const ProductCategoryService = {
         ? { product_brand: { $in: brand.map(brand => mongoose.Types.ObjectId(brand)) } }
         : {};
 
-        const ramVariantIds = ram && ram.length > 0
+      const ramVariantIds = ram && ram.length > 0
         ? await ProductVariant.find({
           ram: { $in: ram.filter(ramId => mongoose.Types.ObjectId.isValid(ramId)) }
-        }).distinct('_id') // Lấy danh sách unique _id
+        }).distinct('_id')
         : [];
-        console.log('Danh sách ramVariantIds:', ramVariantIds);
+      console.log('Danh sách ramVariantIds:', ramVariantIds);
+
+
       const storageVariantIds = storage && storage.length > 0
-      ? await ProductVariant.find({
-        storage: { $in: storage.filter(storageId => mongoose.Types.ObjectId.isValid(storageId)) }
-      }).distinct('_id')
-      : [];
+        ? await ProductVariant.find({
+          storage: { $in: storage.filter(storageId => mongoose.Types.ObjectId.isValid(storageId)) }
+        }).distinct('_id')
+        : [];
       console.log('Danh sách storageVariantIds:', storageVariantIds);
+
+      
       const ramFilter = ramVariantIds.length > 0
-      ? { variants: { $in: ramVariantIds } }
-      : {};
+        ? { variants: { $in: ramVariantIds } }
+        : {};
 
       const storageFilter = storageVariantIds.length > 0
-    ? { variants: { $in: storageVariantIds } }
-    : {};
+        ? { variants: { $in: storageVariantIds } }
+        : {};
 
       const conditionShoppingFilter = conditionShopping && conditionShopping.length > 0
         ? { product_condition: { $in: conditionShopping.map(condition => mongoose.Types.ObjectId(condition)) } }
@@ -57,21 +61,30 @@ const ProductCategoryService = {
 
       const priceFilter = {};
       if (minPrice !== undefined || maxPrice !== undefined) {
-        const variantPriceFilter = {};
-        if (minPrice !== undefined) {
-          variantPriceFilter['variant_price'] = { $gte: parseFloat(minPrice) };
-        }
-        if (maxPrice !== undefined) {
-          variantPriceFilter['variant_price'] = { $lte: parseFloat(maxPrice) };
+        const variantPriceConditions = [];
+
+        // Thêm điều kiện giá tối thiểu
+        if (minPrice !== undefined && !isNaN(parseFloat(minPrice))) {
+          variantPriceConditions.push({ variant_price: { $gte: parseFloat(minPrice) } });
         }
 
-        // Kiểm tra xem có variant nào có variant_price không
-        const variantsWithPrice = await ProductVariant.find({
-          ...variantPriceFilter
-        }).select('_id');
+        // Thêm điều kiện giá tối đa
+        if (maxPrice !== undefined && !isNaN(parseFloat(maxPrice))) {
+          variantPriceConditions.push({ variant_price: { $lte: parseFloat(maxPrice) } });
+        }
 
-        if (variantsWithPrice.length > 0) {
-          priceFilter['variants'] = { $in: variantsWithPrice.map(variant => variant._id) };
+        if (variantPriceConditions.length > 0) {
+          // Tìm tất cả các `variant` khớp điều kiện
+          const variantsWithPrice = await ProductVariant.find({
+            $and: variantPriceConditions,
+          }).select('_id');
+
+          if (variantsWithPrice.length > 0) {
+            priceFilter['variants'] = { $in: variantsWithPrice.map(variant => variant._id) };
+          } else {
+            // Nếu không có variant nào khớp, trả về filter không khớp
+            priceFilter['variants'] = { $in: [] };
+          }
         }
       }
 
@@ -110,9 +123,19 @@ const ProductCategoryService = {
         .populate('product_supplier')
         .populate({
           path: 'variants',
-          populate: {
-            path: 'product_discount'
-          }
+          populate: [
+            {
+              path: 'storage', 
+              select: 'name', 
+            },
+            {
+              path: 'ram', 
+              select: 'name', 
+            },
+            {
+              path: 'product_discount', 
+            },
+          ],
         })
         .select('product_name image product_description slug product_discount product_brand variants product_condition product_supplier product_quantity product_ratingAvg product_view weight_g isActive status disabledAt comments')
         .lean();

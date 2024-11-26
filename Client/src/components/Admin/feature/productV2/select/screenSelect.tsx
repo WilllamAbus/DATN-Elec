@@ -52,7 +52,7 @@ interface ScreenSelectProps {
 const ScreenSelect: React.FC<ScreenSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { screens, isLoading } = useSelector(
-    (state: RootState) => state.attributes.getAllScreen
+    (state: RootState) => state.getAttributes.getAllScreen
   );
 
   useEffect(() => {
