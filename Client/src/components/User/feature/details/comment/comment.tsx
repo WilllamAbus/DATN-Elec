@@ -58,12 +58,9 @@ const Comment = ({
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset, formState, setValue } =
     useForm<FormValues>();
-  // Form chỉnh sửa đánh giá
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEditForm,
-    // formState: formStateEdit,
-    // reset: resetEdit,
   } = useForm<FormValues>();
   const { slug } = useParams<{ slug: string }>();
   const [visibleCount, setVisibleCount] = useState(5);
