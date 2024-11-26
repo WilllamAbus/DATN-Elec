@@ -194,7 +194,7 @@ const interactionService = {
   },
   postInteractions: async (additionalData) => {
     try {
-      const { user, orderAuction, item, orderCart, productID, watchlist, type, score } = additionalData;
+      const { user, orderAuction, productVariant, item, orderCart, productID, watchlist, type, score } = additionalData;
       // Kiểm tra nếu tương tác cùng user, productID và type là "comment" đã tồn tại
       const interactionExists = await Interaction.findOne({ user, productID, type: "comment" });
       // Nếu tương tác đã tồn tại, trả về một thông báo mà không cần ném lỗi
@@ -205,6 +205,7 @@ const interactionService = {
       const interactions = await Interaction.create({
         user,
         orderAuction,
+        productVariant,
         item,
         orderCart,
         productID,

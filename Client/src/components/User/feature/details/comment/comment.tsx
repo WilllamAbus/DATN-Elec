@@ -12,6 +12,8 @@ import {
   getCommentProduct,
   softDeleteComment,
   getUserComment,
+  addLike,
+  editComment,
   Comment as CommentType,
 } from "../../../../../services/commnet/comment.service";
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
@@ -20,6 +22,15 @@ import withReactContent from "sweetalert2-react-content";
 import RepComment from "./repComment";
 import RatingStats from "./ratingStats";
 import Select from "react-select";
+import { FaThumbsUp, FaTrash, FaEllipsisV, FaEdit } from "react-icons/fa";
+import { differenceInHours } from "date-fns";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem
+} from "@nextui-org/react";
+
 const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
@@ -30,7 +41,16 @@ interface User {
   name?: string;
   avatar?: string;
 }
-const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: string) => void }) => {
+interface EditComment {
+  _id: string;
+  content: string;
+  rating: number;
+}
+const Comment = ({
+  onUpdateAverageRating,
+}: {
+  onUpdateAverageRating: (average: string) => void;
+}) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -38,8 +58,15 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset, formState, setValue } =
     useForm<FormValues>();
+  // Form chỉnh sửa đánh giá
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEditForm,
+    // formState: formStateEdit,
+    // reset: resetEdit,
+  } = useForm<FormValues>();
   const { slug } = useParams<{ slug: string }>();
-  const [visibleCount, setVisibleCount] = useState(2);
+  const [visibleCount, setVisibleCount] = useState(5);
   const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
   const dispatch = useAppDispatch();
   const profile = useAppSelector(
@@ -48,17 +75,32 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
   const isLoggedIn = !!profile?._id;
   const [numberOfProducts, setNumberOfProducts] = useState("all");
   const [filteredComments, setFilteredComments] = useState<any[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [editingComment, setEditingComment] = useState<EditComment | null>(
+    null
+  );
+  const [commentContent, setCommentContent] = useState("");
+  const [commentRating, setCommentRating] = useState(0);
   const handleShowMore = () => {
     setVisibleCount(comments.length);
+    setIsExpanded(true);
   };
-
+  const handleShowLess = () => {
+    setVisibleCount(5); // Thu gọn về 5 bình luận
+    setIsExpanded(false); // Đặt trạng thái là "thu gọn"
+  };
+  const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const options = [
     { value: "all", label: "Tất cả" },
     ...[...Array(5)].map((_, index) => ({
-      value: 5 - index ,
+      value: 5 - index,
       label: (
         <span className="flex items-center ">
-          {5 - index }
+          {5 - index}
           <svg
             className="h-4 w-4 text-yellow-300 "
             aria-hidden="true"
@@ -74,7 +116,7 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
   ];
   const handleChange = (selectedOption: any) => {
     const selectedRating = selectedOption.value;
-    setNumberOfProducts(selectedRating); 
+    setNumberOfProducts(selectedRating);
 
     if (selectedRating === "all") {
       setFilteredComments(comments); // Hiển thị tất cả bình luận
@@ -86,8 +128,13 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
     }
   };
   const calculateAverageRating = (comments: CommentType[]) => {
-    const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
-    return comments.length > 0 ? (totalRatings / comments.length).toFixed(1) : " ";
+    const totalRatings = comments.reduce(
+      (sum, comment) => sum + comment.rating,
+      0
+    );
+    return comments.length > 0
+      ? (totalRatings / comments.length).toFixed(1)
+      : " ";
   };
   const fetchComments = async () => {
     if (!slug) {
@@ -99,9 +146,9 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
       const productComments: CommentType[] = await getCommentProduct(slug);
       setComments(productComments);
       setFilteredComments(productComments);
-           // Tính lại average rating và gửi lên component cha
-           const avgRating = calculateAverageRating(productComments);
-           onUpdateAverageRating(avgRating); // Truyền average rating lên component cha
+      // Tính lại average rating và gửi lên component cha
+      const avgRating = calculateAverageRating(productComments);
+      onUpdateAverageRating(avgRating); // Truyền average rating lên component cha
       const userIds = Array.from(
         new Set(productComments.map((comment) => comment.id_user.toString()))
       );
@@ -146,21 +193,11 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
       return;
     }
 
-    // const interactionData = {
-    //   user: profile._id,
-    //   orderAuctions: null,
-    //   item: slug,
-    //   OrderCart: null,
-    //   productID: slug,
-    //   Watchlist: null,
-    //   type: "comment",
-    //   score: 3,
-    // };
-
     const commentData = {
       content: data.content,
       rating: rating,
       id_user: profile?._id,
+      likes: 0,
     };
 
     try {
@@ -195,6 +232,62 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
       setSuccessMessage(null);
     }
   };
+  const handleSubmitEdit: SubmitHandler<FormValues> = async (commentData) => {
+    if (!isLoggedIn) {
+      setErrorMessage("You need to be logged in to submit a comment.");
+      return;
+    }
+    if (!slug) {
+      setErrorMessage("Product ID is missing.");
+      return;
+    }
+    if (!profile?._id) {
+      setErrorMessage("User profile is not available.");
+      return;
+    }
+
+    const idComment = editingComment?._id;
+
+    if (!idComment) {
+      setErrorMessage("Comment ID is missing.");
+      return;
+    }
+
+    const updatedCommentData = {
+      commentId: idComment,
+      content: commentData.content,
+      rating: commentRating,
+      id_user: profile?._id,
+    };
+
+    try {
+      const commentResponse = await editComment(slug, updatedCommentData);
+
+      const updatedComment = {
+        ...commentResponse.data,
+        id_user: profile.name,
+      };
+
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === updatedComment._id ? updatedComment : comment
+        )
+      );
+
+      notify();
+      reset();
+      setCommentContent("");
+      setCommentRating(0);
+      setHover(0);
+      fetchComments();
+
+      setEditingComment(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      setErrorMessage("Failed to submit comment.");
+    }
+  };
 
   const deleteComment = async (commentId: string) => {
     if (!commentId) {
@@ -217,12 +310,14 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
           await softDeleteComment(commentId);
 
           // Cập nhật state để xoá comment ngay mà không cần reload
-          
 
           MySwal.fire({
             title: "Đã Xóa!",
             text: "Bình luận đã được xóa.",
             icon: "success",
+            confirmButtonText: "OK",
+            showConfirmButton: true,
+            confirmButtonColor: "#3085d6",
           });
           setComments((prevComments) =>
             prevComments.filter((comment) => comment._id !== commentId)
@@ -230,14 +325,13 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
           fetchComments();
         } catch (error) {
           console.error("Error deleting comment:", error);
-        
         }
       }
     } catch (error) {
       console.error("Error showing confirmation dialog:", error);
     }
   };
-  
+
   useEffect(() => {
     dispatch(getProfileThunk());
   }, [dispatch]);
@@ -245,6 +339,41 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
     fetchComments();
   }, [slug]);
 
+  const handleLikeCmt = async (commentId: string) => {
+    if (!slug) {
+      setErrorMessage("Product ID is missing.");
+      return;
+    }
+    if (!profile?._id) {
+      setErrorMessage("User profile is not available.");
+      return;
+    }
+    const commentData = {
+      commentId: commentId,
+      userId: profile?._id,
+    };
+    try {
+      setIsLiked(!isLiked);
+      await addLike(slug, commentData);
+      fetchComments();
+    } catch (error) {
+      console.log("Error while liking comment:", error);
+    }
+  };
+  const toggleDeleteButton = (commentId: string) => {
+    setSelectedCommentId(selectedCommentId === commentId ? null : commentId);
+  };
+  const handleEditComment = (comment: any) => {
+    setEditingComment(comment);
+    setCommentContent(comment.content);
+    setCommentRating(comment.rating);
+    setIsModalOpen(true);
+  };
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setRating(0);
+    setHover(0);
+  };
   return (
     <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
       <div className="container">
@@ -268,7 +397,7 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
         {comments?.length > 0 ? (
           <section className="bg-white py-4 dark:bg-gray-900">
             <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-              <div className="flex flex-col md:flex-row items-start justify-between">
+              <div className="flex flex-col md:flex-row items-start ">
                 {/* Phần đánh giá */}
                 <div className="md:w-2/3">
                   <RatingStats comments={comments} />
@@ -278,7 +407,7 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
                     <Select
                       value={options.find(
                         (option) => option.value === numberOfProducts
-                      )} 
+                      )}
                       options={options}
                       onChange={handleChange}
                       className="border border-black rounded md:w-1/6"
@@ -289,15 +418,22 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
                   </div>
                   {/* Nội dung bình luận */}
                   {filteredComments?.slice(0, visibleCount).map((comment) => {
+                    const createdAtDate = new Date(comment.createdAt);
+
+                    // Tính số giờ chênh lệch giữa `createdAtDate` và thời gian hiện tại
+                    const hoursDifference: number = differenceInHours(
+                      new Date(), // Thời gian hiện tại
+                      createdAtDate // Thời gian tạo bình luận
+                    );
                     return (
                       <div
                         key={comment?._id}
-                        className="mt-6 divide-y divide-gray-200 dark:divide-gray-700"
+                        className="mt-6 divide-y divide-gray-200 dark:divide-gray-700 flex"
                       >
-                        <div className="gap-3 pb-6 sm:flex sm:items-start">
-                          <div className="shrink-0 space-y-2 sm:w-48 md:w-72">
+                        <div className="gap-3 pb-6 sm:flex sm:items-start ">
+                          <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
                             <div className="space-y-0.5">
-                              <div className="flex items-start space-x-4">
+                              <div className="flex items-start space-x-4 ">
                                 {userNames[comment?.id_user]?.avatar ? (
                                   <img
                                     className="h-10 w-10 rounded-full"
@@ -312,13 +448,64 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
                                 )}
 
                                 <div>
-                                  <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
-                                    <p>
-                                      {userNames[comment?.id_user]?.name ||
-                                        "Loading..."}
+                                  <div className="flex">
+                                    <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
+                                      <p>
+                                        {userNames[comment?.id_user]?.name ||
+                                          "Loading..."}
+                                      </p>
                                     </p>
-                                  </p>
-                                  <div className="flex items-center gap-1 mt-1">
+                                    {/* Chỉ hiển thị nút FaEllipsisV nếu người dùng là chủ sở hữu của cmt và hiện trong 24h kể từ khi cmt */}
+                                    {comment?.id_user === profile?._id &&
+                                      hoursDifference <= 24 && (
+                                        <div className="flex items-center ml-6">
+                                          <Dropdown>
+                                            <DropdownTrigger>
+                                              <button
+                                                className="flex items-center justify-center h-8 w-8"
+                                                onClick={() =>
+                                                  toggleDeleteButton(
+                                                    comment?._id
+                                                  )
+                                                }
+                                              >
+                                                <FaEllipsisV />
+                                              </button>
+                                            </DropdownTrigger>
+                                            <DropdownMenu>
+                                              <DropdownItem
+                                                key="new"
+                                                className="flex justify-center"
+                                              >
+                                                <button
+                                                  onClick={() =>
+                                                    deleteComment(comment?._id)
+                                                  }
+                                                  className="flex items-center justify-center h-4 w-full text-red-700 bg-transparent"
+                                                >
+                                                  <FaTrash /> <p className="ml-2">Xóa</p>
+                                                </button>
+                                              </DropdownItem>
+                                              <DropdownItem
+                                                key="copy"
+                                                className="flex justify-center"
+                                              >
+                                                <button
+                                                  onClick={() =>
+                                                    handleEditComment(comment)
+                                                  }
+                                                  className="flex items-center justify-center h-4  w-full bg-transparent"
+                                                >
+                                                  <FaEdit /> <p className="ml-2">Chỉnh sửa</p>
+                                                </button>
+                                              </DropdownItem>
+                                            </DropdownMenu>
+                                          </Dropdown>
+                                        </div>
+                                      )}
+                                  </div>
+
+                                  <div className="flex items-center gap-1 mt-2">
                                     {[...Array(5)].map((_, index) => (
                                       <svg
                                         key={index}
@@ -336,26 +523,35 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
                                       </svg>
                                     ))}
                                   </div>
-                                  <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                  <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-2">
                                     {comment?.createdAt?.slice(0, 10)}
                                   </p>
                                   <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
-                                    <p className="text-base font-normal text-gray-500 dark:text-gray-400">
+                                    <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
                                       {comment?.content}
                                     </p>
-                                    {comment?.id_user === profile?._id ? (
-                                      <div className="space-x-3">
+                                    <div className="flex items-center space-x-4">
+                                      {/* Like cmt */}
+                                      <div className="flex items-center space-x-2">
                                         <button
+                                          className={`bg-transparent ${
+                                            comment?.likes?.includes(
+                                              profile?._id
+                                            )
+                                              ? "text-yellow-400"
+                                              : "text-gray-400"
+                                          }`}
                                           onClick={() =>
-                                            deleteComment(comment?._id)
+                                            handleLikeCmt(comment?._id)
                                           }
                                         >
-                                          Xoá
+                                          <FaThumbsUp />
                                         </button>
+                                        <p>
+                                          Hữu ích ({comment?.likes?.length})
+                                        </p>
                                       </div>
-                                    ) : (
-                                      <div className="h-4"></div>
-                                    )}
+                                    </div>
 
                                     <div className="flex items-center gap-4">
                                       {/* RepComment */}
@@ -373,20 +569,87 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
                 </div>
               </div>
             </div>
-            {visibleCount < comments?.length && (
+            {visibleCount < filteredComments.length &&
+            filteredComments.length > 5 ? (
               <div className="w-full text-center">
                 <button
-                  type="button"
-                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
                   onClick={handleShowMore}
+                  className="rounded-lg bg-blue-500 text-white px-5 py-2"
                 >
                   Xem thêm
                 </button>
               </div>
+            ) : (
+              isExpanded && (
+                <div className="w-full text-center">
+                  <button
+                    onClick={handleShowLess}
+                    className="rounded-lg bg-blue-500 text-white px-5 py-2"
+                  >
+                    Thu gọn
+                  </button>
+                </div>
+              )
             )}
           </section>
         ) : (
           <p>Chưa có bình luận</p>
+        )}
+        {/* chỉnh sửa */}
+        {isModalOpen && (
+          <div className="fixed inset-0 backdrop-filter backdrop-blur-md flex items-center justify-center z-50 min-h-screen">
+            <div className="bg-white p-6 rounded-lg w-96 max-w-full sm:w-11/12 md:w-96 shadow-lg">
+              <h3 className="text-lg font-semibold mb-4">Chỉnh sửa đánh giá</h3>
+              <form onSubmit={handleSubmitEditForm(handleSubmitEdit)}>
+                <textarea
+                  value={commentContent}
+                  className="block w-full h-32 p-3 text-sm border border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 resize-none"
+                  placeholder={commentContent}
+                  {...registerEdit("content", {
+                    required: "Nội dung chỉnh sửa không được bỏ trống",
+                    onChange: (e) => setCommentContent(e.target.value),
+                  })}
+                />
+
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="flex gap-2 mb-4">
+                    {[...Array(5)].map((_, index) => {
+                      index += 1;
+                      return (
+                        <p
+                          key={index}
+                          className={`fa fa-star cursor-pointer ${
+                            index <= (hover || commentRating)
+                              ? "text-yellow-400"
+                              : "text-gray-400"
+                          }`}
+                          onClick={() => setCommentRating(index)}
+                          onMouseEnter={() => setHover(index)}
+                          onMouseLeave={() => setHover(commentRating)}
+                        ></p>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mb-4">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                  >
+                    Cập nhật
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleModalClose()}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md"
+                  >
+                    Bỏ qua
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
 
         {isLoggedIn ? (
@@ -397,7 +660,7 @@ const Comment = ({ onUpdateAverageRating }: { onUpdateAverageRating: (average: s
             <form onSubmit={handleSubmit(submitComment)}>
               <div className="space-y-4 max-w-full">
                 <textarea
-                  className="block w-full h-32 p-3 text-sm border border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  className="block w-full h-32 p-3 text-sm border border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 resize-none"
                   placeholder="Viết bình luận của bạn..."
                   {...register("content", {
                     required: "Đánh giá chưa nó nội dung",
