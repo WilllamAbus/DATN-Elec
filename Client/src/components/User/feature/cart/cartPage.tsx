@@ -21,7 +21,10 @@ const CartPage: React.FC = () => {
   const cartStatus = useSelector((state: RootState) => state.cart.status);
   const cartError = useSelector((state: RootState) => state.cart.error);
   const [loading, setLoading] = useState(false);
-  console.log(carts);
+  const userRole = useSelector(
+    (state: RootState) => state.auth.profile?.roles || []
+  );
+  console.log(userRole);
 
   const [itemQuantities, setItemQuantities] = useState<{
     [key: string]: number;
@@ -70,43 +73,6 @@ const CartPage: React.FC = () => {
     setTotalCartPrice(total);
   }, [carts, itemQuantities]);
 
-  // const handleSelectCart = async (productId: string, item: CartItem) => {
-  //   const updatedItem = {
-  //     productId: item.product._id,
-  //     isSelected: !item.isSelected,
-  //   };
-
-  //   toast.dismiss();
-  //   setLoading(true);
-  //   try {
-  //     await dispatch(SelectCart({ productId, items: [updatedItem] })).unwrap();
-
-  //     // Lấy lại danh sách giỏ hàng sau khi cập nhật
-  //     await dispatch(fetchCartList()); // Đảm bảo dispatch để lấy lại giỏ hàng
-  //   } catch (error) {
-  //     console.error("Lỗi khi chọn giỏ hàng:", error);
-  //     toast.error("Lỗi khi cập nhật giỏ hàng.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleSelectAll = async (isSelected: boolean) => {
-  //   setLoading(true);
-  //   try {
-  //     for (const cart of carts) {
-  //       for (const item of cart.items) {
-  //         if (item.isSelected !== isSelected) {
-  //           await handleSelectCart(cart._id, item);
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     toast.error("Lỗi khi chọn tất cả sản phẩm.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleSelectCart = async (productId: string, cart: CartType) => {
     const updatedItems = cart.items.map((cartItem) => ({
       productId: cartItem.product._id,
@@ -118,8 +84,7 @@ const CartPage: React.FC = () => {
     try {
       await dispatch(SelectCart({ productId, items: updatedItems })).unwrap();
 
-      // Lấy lại danh sách giỏ hàng sau khi cập nhật
-      await dispatch(fetchCartList()); // Đảm bảo dispatch để lấy lại giỏ hàng
+      await dispatch(fetchCartList());
     } catch (error) {
       console.error("Lỗi khi chọn giỏ hàng:", error);
       toast.error("Lỗi khi cập nhật giỏ hàng.");
@@ -199,16 +164,6 @@ const CartPage: React.FC = () => {
       toast.error("Cập nhật số lượng thất bại.");
     }
   };
-
-  // const handleBlur = async (
-  //   cartId: string,
-  //   itemId: string,
-  //   currentQuantity: string
-  // ) => {
-  //   const newQuantity =
-  //     currentQuantity === "" ? 1 : Math.max(1, Number(currentQuantity));
-  //   await handleQuantityChange(cartId, itemId, newQuantity);
-  // };
 
   const handleDecreaseQuantity = (
     cartId: string,
@@ -573,6 +528,7 @@ const CartPage: React.FC = () => {
               onClick={handleCheckout}
               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
               disabled={
+                userRole.includes("admin") ||
                 !groupedCarts.some((cart) =>
                   cart.items.some((item) => item.isSelected)
                 )
