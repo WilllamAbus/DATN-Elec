@@ -70,4 +70,9 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.orderCart,
     label: labels.orderCart,
   },
+  attribute: {
+    icon: icons.attribute,
+    links: links.attribute,
+    label: labels.attribute,
+  },
 };

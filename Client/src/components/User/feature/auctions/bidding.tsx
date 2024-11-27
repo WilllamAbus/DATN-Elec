@@ -31,7 +31,7 @@ const ViewBidPage: React.FC = () => {
   const [bidToDelete, setBidToDelete] = useState<Bid | null>(null);
   const [stats, setStats] = useState<{ [key: string]: { averageBid: number, totalBids: number, totalPayment: number } }>({});
   // const [completedAuctionAmount, setCompletedAuctionAmount] = useState<number | null>(null); // Add state for completed auction amount
-
+  const [completedAuctions, setCompletedAuctions] = useState<Set<string>>(new Set()); // Track completed auctions
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -134,38 +134,59 @@ const ViewBidPage: React.FC = () => {
 
     return Object.values(groupedBids);
   };
-
+  // const calculateTimeLeft = (endTime: string) => {
+  //   const currentTime = new Date().getTime();
+  //   const endTimeMs = new Date(endTime).getTime();
+  //   return endTimeMs - currentTime;
+  // };
   const bidGroups = groupBidsByProduct();
 
-  const handleCompleteAuction = async (productId: string, timeTrackID: string ) => {
-    // dispatch( resetState())
-    dispatch( completeAuction({ productId, timeTrackID }))
-      .then(() => {
-        // Calculate and display the total amount for the completed auction
-        // const averageAmount =  aucttionData?.auction_total 
-        // // console.log('auction', averageAmount);
-        
-        // if(averageAmount !== undefined){
-        //   const totalAmount = averageAmount * 1; // Adjust this calculation as needed
-     
-        
-        //   setCompletedAuctionAmount(totalAmount); // Use the state variable to store the amount
-      
-        //  // Show success toast
-      
-        // }
-        toast.success("Hoàn thành đấu giá", {
-          onClose: () => {
-            navigate("/checkoutAuc"); // Điều hướng sau khi toast hiển thị xong
-          },
-        });
-      })
-      .catch((error: any) => {
-        // Show error toast if something goes wrong
-        toast.error("Failed to complete auction.");
-        console.error("Complete auction error:", error);
+  const handleCompleteAuction = async (productId: string, timeTrackID: string) => {
+    if (!productId) {
+      toast.error("Đấu giá bị lỗi");
+      return; // Stop further execution if no productId is available
+    }
+
+    if (completedAuctions.has(productId)) {
+      return; // Skip if auction is already completed
+    }
+    if(!userId){
+      toast.error("Bạn chưa có tài khoản");
+      return
+    }
+    try {
+      // Call your dispatch action to complete the auction and update the winner
+      await dispatch(completeAuction({ productId, timeTrackID }));
+   
+      toast.success("Hoàn thành đấu giá", {
+        onClose: () => {
+          setCompletedAuctions((prev) => new Set(prev).add(productId));
+          navigate('/checkoutAuc');
+        },
       });
+  
+
+    } catch (error) {
+      toast.error("Failed to complete auction");
+      console.error("Complete auction error:", error);
+    }
   };
+  // useEffect(() => {
+  //   // Tạo một mảng mới chỉ chứa các auctions chưa hoàn thành
+  //   const incompleteAuctions = bidGroups.flat().filter(bid => {
+  //     const timeLeft = calculateTimeLeft(bid.bidEndTime.endTimeBid);
+  //     const productId = bid.product_bidding.productId._id;
+  //     // Kiểm tra thời gian còn lại và xem auction đã hoàn thành chưa
+  //     return timeLeft <= 0 && !completedAuctions.has(productId);
+  //   });
+  
+  //   if (incompleteAuctions.length > 0) {
+  //     incompleteAuctions.forEach((bid) => {
+  //       const productId = bid.product_bidding.productId._id;
+  //       handleCompleteAuction(productId, bid._id);
+  //     });
+  //   }
+  // }, [bidGroups, completedAuctions]); // Only re-run the effect when `bidGroups` or `completedAuctions` change
 
   return (
     <div className="container mx-auto px-4 lg:px-8 py-8">
@@ -193,6 +214,7 @@ const ViewBidPage: React.FC = () => {
                     canEdit={canEdit}
                     openEditModal={openEditModal}
                     openDeleteModal={openDeleteModal}
+                    
                     handleCompleteAuction={handleCompleteAuction}
                   />
                 ))

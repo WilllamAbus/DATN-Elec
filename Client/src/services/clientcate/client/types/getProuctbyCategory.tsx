@@ -112,7 +112,7 @@ export interface ProductVariant {
   operatingSystem: OPERATINGSYSTEM[];          
   ram: RAM[];                    
   screen: SCREEN[];                   
-  storage: STORAGE[];                    
+  storage: STORAGE;                    
   image?: FileList;                   
   sku: string;                         
   pid: string;                        

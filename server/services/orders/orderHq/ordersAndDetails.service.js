@@ -35,7 +35,7 @@ const orderAndDetailService = {
       const auction = await Auction.findById(auctionDetails)
         .populate("productId")
         .lean();
-      if (!auction || auction.status === "disable") throw new Error("Đấu giá không tồn tại");
+   
       const auctionID = auction._id;
       // Extract productID from auction details
       const productID = mongoose.Types.ObjectId(auction.productId._id);
@@ -66,6 +66,8 @@ const orderAndDetailService = {
       const shippingAddress = user.address;
 
       // Prepare hashLinkPayment
+   
+
 
       let hashLinkPayment;
       let paymentMethodText = ""; // Default payment method text
@@ -94,10 +96,13 @@ const orderAndDetailService = {
           .update(vnPayHash)
           .digest("hex");
         paymentMethodText = "Thanh toán VnPay";
-      } else {
+      } else  {
         throw new Error("Không xác thực phương thức thanh toán");
       }
 
+      if (!hashLinkPayment) {
+        throw new Error("Không thể tạo liên kết thanh toán");
+    }
       // Create order auction
       const orderAuction = new OrderAuction({
         shippingAddress: {
@@ -115,7 +120,6 @@ const orderAndDetailService = {
 
       await orderAuction.save();
 
-      // Create order detail auction
       const orderDetailAuction = new OrderDetailAuction({
         auction: auctionID,
         order: orderAuction._id,
@@ -132,6 +136,8 @@ const orderAndDetailService = {
 
 
       await orderDetailAuction.save();
+      // Create order detail auction
+
 
       // Update product quantity in Inventory
       const updatedProductQuantity = inven.quantityShelf - quantityDetails;
@@ -371,6 +377,8 @@ const orderAndDetailService = {
       const orderDetails = await OrderDetailAuction.find({
         order: orderId,
       }).lean();
+   
+      
       if (!orderDetails || orderDetails.length === 0) {
         throw new Error("No order details found for this order ID");
       }
@@ -406,6 +414,9 @@ const orderAndDetailService = {
 
       // Gọi script Python để tạo gợi ý sản phẩm
       const userID = order.shippingAddress.userID.toString(); // Lấy userID dưới dạng chuỗi
+      const productIDAuct =orderDetails[0].productID
+      console.log('product', productIDAuct);
+      
       const pythonProcess = spawn('python', ['recommendation_service.py', userID]); // Gọi script Python với đối số là userID
 
       // Lắng nghe kết quả từ script Python
@@ -421,6 +432,11 @@ const orderAndDetailService = {
       pythonProcess.on('close', (code) => {
         console.log(`Python script finished with code ${code}`);
       });
+
+      // await Auction.findOneAndUpdate({
+      //   productId:productIDAuct,
+        
+      // },      { $set: { status: "disable" } })
       return {
         message: "Thanh toán hoàn tất và thông báo đã được gửi",
         interactions, // Trả về dữ liệu tương tác đã tạo

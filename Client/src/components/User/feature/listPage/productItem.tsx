@@ -73,6 +73,29 @@ export default function ProductItem({ product, index }: ProductItemProps) {
           )}
         </div>
 
+        <div className="mt-2 px-2">
+          <div className="mt-2 flex flex-wrap gap-4">
+            {product.variants.map((variant, idx) => (
+              variant.storage ? (
+                <div
+                  key={idx}
+                  className={`flex items-center justify-center w-auto h-auto p-1 text-sm border border-gray-300 rounded-md 
+          ${idx === 0 ? 'border-primary-700 text-primary-700 bg-customGray' : 'text-gray-800'}`}
+                >
+                  <p className="font-medium">{variant.storage.name ? variant.storage.name : "N/A"}</p>
+                </div>
+              ) : null
+            ))}
+          </div>
+        </div>
+
+
+
+
+
+
+
+
 
 
       </div>

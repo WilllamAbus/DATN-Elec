@@ -21,7 +21,7 @@ interface Option {
 
 const FilterByRam: React.FC<FilterByRamProps> = ({ onchange, filters }) => {
   const dispatch: AppDispatch = useDispatch();
-  const rams = useSelector((state: RootState) => state.attributes.getAllRam.rams || []);
+  const rams = useSelector((state: RootState) => state.getAttributes.getAllRam.rams || []);
   const [selectedRams, setSelectedRams] = useState<RAM[]>([]);
 
   useEffect(() => {

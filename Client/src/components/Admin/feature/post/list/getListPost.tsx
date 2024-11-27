@@ -16,10 +16,11 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import SearchMessage from "../../productV2/searchMessage";
+import NoProductsMessage from "../../productV2/noProduct";
 
 const GetCategoryPostList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm] = useState(""); 
   const currentPage = useSelector(
     (state: RootState) => state.post.listPost.pagination?.currentPage || 1
   );
@@ -79,18 +80,17 @@ const GetCategoryPostList: React.FC = () => {
     { uid: "status", name: "Trạng thái" },
     { uid: "actions", name: "Chức năng" },
   ];
-  const handleSearchChange = (term: string) => {
-    setSearchTerm(term); 
-  };
-
+  
   return (
     <>
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
-        <SearchPostList onSearchChange={handleSearchChange} />
+        <SearchPostList/>
         <AddProductButton type="addPost" />
       </div>
-      {post.length === 0 ? (
-       <SearchMessage /> 
+      {post.length === 0 && searchTerm ? (
+        <SearchMessage /> 
+      ) : post.length === 0 ? (
+        <NoProductsMessage /> 
       ) : (
         <Table aria-label="Product Variants Table" className="p-4">
       <TableHeader columns={columns}>

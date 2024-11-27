@@ -65,6 +65,7 @@ export interface Product {
     productId?: string; 
     serviceRequestId: string;
     amount?: number
+    timeLeft: number;
   }
   
   export interface BidsState {

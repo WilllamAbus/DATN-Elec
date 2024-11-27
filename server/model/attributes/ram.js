@@ -3,10 +3,16 @@ const slugify = require('slugify');
 const { v4: uuidv4 } = require("uuid");
 const ramSchema = new Schema({
   name: { type: String, required: true },
-  status: { type: String, default: 'active' },
+  description: { type: String },
+  status: {
+    type: String,
+    enum: ['active', 'disabled'],
+    default: 'active'
+  },
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },
   slug: { type: String, unique: true },
+  deletedAt: { type: Date, default: null }
 }, {
   collection: "rams",
   timestamps: true,

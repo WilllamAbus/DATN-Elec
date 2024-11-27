@@ -11,7 +11,8 @@ import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
 import productClientReducer from "./product/client";
 import postReducer from "./post";
-import attributesReducer from "./product/attributes";
+import attributeReducer from "./attribute";
+import getAttributesReducer from "./product/attributes";
 import listCateNavReducer from "./clientcate/client";
 import watchlistReducer from "./product/wathList/wathlistSlice";
 import cartRenducer from "./cart/cartSlice";
@@ -67,8 +68,9 @@ const rootReducer = combineReducers({
   checkout: checkoutSlice,
   products: productAdminReducer,
   post:postReducer,
+  attribute:attributeReducer,
   productClient: productClientReducer,
-  attributes: attributesReducer,
+  getAttributes: getAttributesReducer,
   cateClients: listCateNavReducer,
   cart: cartRenducer,
   country: countryRenducer,

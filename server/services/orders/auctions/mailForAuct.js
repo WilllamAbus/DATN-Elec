@@ -39,7 +39,7 @@ const sendMail = async (userEmail, orderDetails) => {
     const mailOptions = {
       from: "haotri335@gmail.com",
       to: userEmail,
-      subject: "Đấu giá thành công",
+      subject: "Chiến thắng đấu giá",
       html: `<body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
 
 

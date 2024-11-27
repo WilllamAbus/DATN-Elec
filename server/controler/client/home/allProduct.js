@@ -185,7 +185,29 @@ const upView = async (req, res) => {
 const search = async (req, res) => {
   try {
       const { keyword } = req.params;
-      const result = await modelProduct.find({ product_name: { $regex: keyword, $options: 'i' } });
+      
+      // Sử dụng populate để lấy dữ liệu từ bảng variants
+      const result = await modelProduct.find({ 
+          product_name: { $regex: keyword, $options: 'i' } 
+      }).populate({
+        path: 'variants', 
+        select: 'variant_price product_discount variant_original_price',
+        populate:[
+          {
+            path:'storage',
+            select: 'name'
+          },
+          {
+            path:'ram',
+            select: 'name'
+          },
+          {
+            path:'product_discount',
+            select: 'discountPercent'
+          }
+        ]
+      });
+
       if (result.length > 0) {
           res.status(200).json({
               success: true,
@@ -207,6 +229,8 @@ const search = async (req, res) => {
       });
   }
 };
+
+
 const comment = async (req, res) => {
   try {
       let { content, id_product, id_user, rating, createdAt } = req.body;

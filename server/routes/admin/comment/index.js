@@ -4,7 +4,7 @@ const repComment = require(`../../../controler/repComment.controller`);
 const comment = require(`../../../controler/comment.controller`)
 router.get(`/getCommentAdmin`, comment.getCommentAdmin);  
 router.get(`/getCommentDelete`, comment.getCommentDelete);  
-router.get(`/listDetailComment/:id`,comment.listDetailComment);
+router.get(`/listDetailComment/:slug`,comment.listDetailComment);
 router.delete(`/repComment/:idRepComment`,repComment.deleteRepComment);
 router.post(`/repComment/:idComment`, repComment.createRepComment);
 router.get(`/repComment/:id`, repComment.getRepComment);
