@@ -4,7 +4,7 @@ const Category = require('../../../model/catgories.model');
 const getProductsByCategory = async (req, res) => {
   const { slug } = req.params;
   const { page, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
-  const limit = 12;
+  const limit = 8;
   const brands = brand ? brand.split(',').map(b => b.trim()).filter(b => b) : [];
   const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
   const rams = ram ? ram.split(',').map(r => r.trim()).filter(r => r) : [];

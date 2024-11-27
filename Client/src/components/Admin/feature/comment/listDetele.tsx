@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { getCommentDelete,restoreComment,deleteCommentAdmin} from "../../../../services/commnet/comment.service";
+import {
+  getCommentDelete,
+  restoreComment,
+  deleteCommentAdmin,
+} from "../../../../services/commnet/comment.service";
 import { getOneProduct } from "../../../../services/product_v2/admin/getone";
 import Swal, { SweetAlertResult } from "sweetalert2";
+import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 
 import withReactContent from "sweetalert2-react-content";
 import "react-toastify/dist/ReactToastify.css";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@nextui-org/react";
 const MySwal = withReactContent(Swal);
 interface Comment {
   _id: string;
@@ -21,9 +34,10 @@ const ListComment: React.FC = () => {
   const [products, setProducts] = useState<{
     [key: string]: { name: string; price: number; image: string[] };
   }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const navigatee = useNavigate();
 
-  // const navigatee = useNavigate();
-  
   const fetchProduct = async (id_product: string) => {
     try {
       const response = await getOneProduct(id_product);
@@ -45,27 +59,59 @@ const ListComment: React.FC = () => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (page:number) => {
     try {
-      const commentResponse = await getCommentDelete();
-      if (commentResponse && commentResponse.length > 0) {
-        setComments(commentResponse);
-        const productIds = commentResponse.map(
+      const commentResponse = await getCommentDelete(page, 5);
+  
+      // Kiểm tra cấu trúc dữ liệu trả về
+      if (!commentResponse || !commentResponse.comments) {
+        console.error("No comments data found in the response.");
+        setComments([]);
+        return;
+      }
+  
+      const commentsData = Array.isArray(commentResponse.comments)
+        ? commentResponse.comments
+        : [];
+      setComments(commentsData);
+  
+      // Cập nhật tổng số trang
+      if (commentResponse.totalPages) {
+        setTotalPages(commentResponse.totalPages);
+      } else {
+        console.warn("Total pages not found in the response.");
+      }
+  
+      // Nếu có dữ liệu bình luận, xử lý lấy sản phẩm liên quan
+      if (commentsData.length > 0) {
+        const productIds = commentsData.map(
           (comment: Comment) => comment.id_product
         );
-        await Promise.all(productIds.map((id: string) => fetchProduct(id)));
+  
+        // Gọi đồng thời tất cả các sản phẩm
+        await Promise.all(
+          productIds.map(async (id: string) => {
+            try {
+              await fetchProduct(id); // Gọi API lấy sản phẩm
+            } catch (err) {
+              console.error(`Error fetching product with id: ${id}`, err);
+            }
+          })
+        );
       } else {
-        console.error("No comments found in the response.");
+        console.warn("No comments found in the response.");
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   };
+  
+  
   const handleDelete = async (id_product: string, id_comment: string) => {
     MySwal.fire({
-      title: "Xóa comment?",
-      text: "Bạn có chắc muốn xóa comment này không!",
-      icon: "warning",
+      title: "Xóa vĩnh viễn",
+      text: "Bình luận này sẽ không được khôi phục  ",
+      icon: "warning",  
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -76,18 +122,23 @@ const ListComment: React.FC = () => {
         try {
           // Gọi hàm xóa bình luận
           await deleteCommentAdmin(id_product, id_comment);
-  
+
           // Cập nhật state của comments để bỏ bình luận đã xóa
-          setComments((prevComments) => 
-            prevComments.filter((comment) => comment._id !== id_comment) // Giữ lại các bình luận không bị xóa
+          setComments(
+            (prevComments) =>
+              prevComments.filter((comment) => comment._id !== id_comment) // Giữ lại các bình luận không bị xóa
           );
-  
+
           MySwal.fire({
             title: "Đã xóa!",
-            text: "Người dùng đã xóa bình luận.",
-            icon: "success",
+            text: "Bình luận đã được xóa",
+            icon: "success",  
+            confirmButtonText: "OK", 
+            showConfirmButton: true, 
+            confirmButtonColor: "#3085d6",
+
           });
-  
+         await fetchData(currentPage);
         } catch (error) {
           console.error("Error deleting comment:", error);
           MySwal.fire({
@@ -99,7 +150,7 @@ const ListComment: React.FC = () => {
       }
     });
   };
-  
+
   const handleRestore = async (id_comment: string) => {
     MySwal.fire({
       title: "Khôi phục comment?",
@@ -114,17 +165,22 @@ const ListComment: React.FC = () => {
       if (result.isConfirmed) {
         try {
           await restoreComment(id_comment);
-  
-          setComments((prevComments) => 
-            prevComments.filter((comment) => comment._id !== id_comment) // Giữ lại các bình luận không bị xóa
+
+          setComments(
+            (prevComments) =>
+              prevComments.filter((comment) => comment._id !== id_comment) // Giữ lại các bình luận không bị xóa
           );
-  
+
           MySwal.fire({
             title: "Đã khôi phục!",
-            text: "Người dùng đã khôi phục.",
+            text: "Đã khôi phục bình luận",
             icon: "success",
+            confirmButtonText: "OK", 
+            showConfirmButton: true, 
+            confirmButtonColor: "#3085d6",
           });
-  
+         await fetchData(currentPage);
+
         } catch (error) {
           console.error("Error restoring comment:", error);
           MySwal.fire({
@@ -136,91 +192,92 @@ const ListComment: React.FC = () => {
       }
     });
   };
-  
-  
-  
-  
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    navigatee(`?page=${page}`);
+  };
+
   useEffect(() => {
-    fetchData();
-  }, []);
+    const queryParams = new URLSearchParams(location.search);
+    const pageFromUrl = queryParams.get("page");
+    if (!pageFromUrl) {
+      navigatee(`?page=1`, { replace: true });
+    } else {
+      setCurrentPage(parseInt(pageFromUrl, 10));
+    }
+  }, [location.search, navigatee]);
+  useEffect(() => {
+    fetchData(currentPage);
+  }, [currentPage]);
 
   return (
     <>
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" className="p-4">
-              Stt
-            </th>
-            <th scope="col" className="p-4">
-              Tên Sản Phẩm
-            </th>
-            <th scope="col" className="p-4">
-              Giá
-            </th>
-            <th scope="col" className="p-4">
-              Hình Ảnh
-            </th>
-            <th scope="col" className="p-4">
-              Nội dung bình luận
-            </th>
-            <th scope="col" className="p-4">
-              Đánh giá
-            </th>
-            <th scope="col" className="p-4">
-              Chức Năng
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {comments.map((comment, index) => (
-            <tr
+      <Table aria-label="Example static collection table">
+        <TableHeader>
+          <TableColumn>STT</TableColumn>
+          <TableColumn>Tên sản phẩm</TableColumn>
+          <TableColumn>Hình ảnh</TableColumn>
+          <TableColumn>Nội dung bình luận</TableColumn>
+          <TableColumn> Đánh giá</TableColumn>
+          <TableColumn>#</TableColumn>
+        </TableHeader>
+        <TableBody>
+            {comments.map((comment, index) => (
+            <TableRow
               key={comment?._id}
               className="border-b text-left dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <td className="px-4 py-3">{index + 1}</td>
-              <td className="px-4 py-3">
+              <TableCell className="px-4 py-3">{index + 1}</TableCell>
+              <TableCell className="px-4 py-3">
                 {products[comment?.id_product]?.name || "Loading..."}
-              </td>
-              <td className="px-4 py-3">
-                {products[comment?.id_product]?.price || "Loading..."}
-              </td>
-              <td className="px-4 py-3">
+              </TableCell>
+              <TableCell className="px-4 py-3">
                 {/* Hiển thị hình ảnh nếu cần thiết */}
                 <img
                   src={products[comment?.id_product]?.image[0]} // sử dụng phần tử đầu tiên của mảng hình ảnh
                   width={100}
                   height={50}
                 />
-              </td>
-              <td className="px-4 py-3">{comment?.content}</td>
-              <td className="px-4 py-3 text-sm text-yellow-400">
+              </TableCell>
+              <TableCell className="px-4 py-3">{comment?.content}</TableCell>
+              <TableCell className="px-4 py-3 text-sm text-yellow-400">
                 {Array.from({ length: comment?.rating }, (_, i) => (
                   <span key={i}>
                     <i className="fa-solid fa-star"></i>
                   </span>
                 ))}
-              </td>
-              <td className="px-4 py-3 ">
+              </TableCell>
+              <TableCell className="px-4 py-3 ">
                 <div className="flex items-center space-x-4">
                   <button
                     type="button"
                     className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                    onClick = {()=>handleDelete(comment?.id_product,comment?._id)}
+                    onClick={() =>
+                      handleDelete(comment?.id_product, comment?._id)
+                    }
                   >
                     Xoá
                   </button>
-                  <button className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                  onClick = {()=>handleRestore(comment?._id)}
+                  <button
+                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    onClick={() => handleRestore(comment?._id)}
                   >
                     Khôi phục
                   </button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
+      {comments.length > 0 && (
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
     </>
   );
 };

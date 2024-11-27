@@ -1,6 +1,6 @@
-const { addRam } = require('./ram/add');
+const { addRam,getOneRam,getRam,editRam,softDeleteRam } = require('./ram');
 const { addColor } = require('./color/add');
-const { addScreen } = require('./screen/add');
+const { addScreen,getScreen,softDeleteScreen,getOneScreen,editScreen } = require('./screen');
 const { addStorage } = require('./storage/add');
 const { addOperatingSystem } = require('./operatingSystem/add');
 const { addCpu } = require('./cpu/add');
@@ -16,5 +16,10 @@ module.exports = {
   addCpu,
   addGraphicsCard,
   addBattery,
-  addKeyCap
+  addKeyCap,
+  getScreen,
+  softDeleteScreen,
+  getOneScreen,
+  editScreen,
+  getOneRam,getRam,editRam,softDeleteRam
 };

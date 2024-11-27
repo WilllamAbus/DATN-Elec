@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { IconLucideComponent } from "../../../../common/Icons/IconLucideComponent";
 
 export const icons: Record<string, ReactNode> = {
   account: (
@@ -196,6 +197,9 @@ export const icons: Record<string, ReactNode> = {
         clipRule="evenodd"
       />
     </svg>
+  ),
+  attribute: (
+   <IconLucideComponent/>
   ),
 
 };

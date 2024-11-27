@@ -50,7 +50,7 @@ interface StorageSelectProps {
 const StorageSelect: React.FC<StorageSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>(); 
   const { storages, isLoading } = useSelector(
-    (state: RootState) => state.attributes.getAllStorage
+    (state: RootState) => state.getAttributes.getAllStorage
   );
 
   useEffect(() => {

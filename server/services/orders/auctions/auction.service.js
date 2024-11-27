@@ -130,13 +130,15 @@ const auctionService = {
             auctionTime: currentTime,
             biddings: auctionTemp.biddings,
           },
-        }
-        // { new: true }
+        },
+        { new: true }
       ).lean();
 
       if (!updatedAuction) {
         throw new Error("Không thể cập nhật đấu giá.");
       }
+
+      console.log("Updated", updatedAuction);
 
       // Gửi mail đến người chiến thắng
       const winnerEmail = winnerBid.bidder;
@@ -165,7 +167,7 @@ const auctionService = {
         { $set: { status: "disable" } }
       );
       //      // Cập nhật trạng thái sản phẩm thành "disable"
-    
+
       await TimeTrack.findOneAndUpdate(
         { productId: productId },
         { $set: { status: "disable" } }
@@ -276,7 +278,6 @@ const auctionService = {
     try {
       const auction = await Auction.findOne({
         productId: productId,
-        status: "active",
       })
         .select(
           "auction_total auction_quantity auction_winner productId auctionTime auctionEndTime biddings stateAuction"

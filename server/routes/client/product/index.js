@@ -3,6 +3,11 @@ const express = require('express');
 const router = express.Router();
 const { homeAllProduct,listPageAuction,resetFilter, getID, getLimitProductClient,shopping,auction,upView,search} = require('../../../controler/client');
 const { getProductsByCategory,relatedProduct } = require('../../../controler/client');
+
+
+
+
+
 router.get('/homeAllProduct', homeAllProduct);
 router.get('/auction-product', listPageAuction);
 router.get('/reset-filter', resetFilter);

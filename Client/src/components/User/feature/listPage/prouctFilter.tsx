@@ -3,7 +3,6 @@ import FilterByBrand from "./filter/filterbybrand";
 import FilterByPrice from "./filter/filterbyPrice";
 import FilterByRam from "./filter/filterbyRam";
 import FilterByConditionShopping from "./filter/filterbyConditionShopping";
-import FilterByService from "./filter/filterbyService";
 import { FilterState,ProductCondition,ProductBrand,RAM, STORAGE } from "../../../../services/clientcate/client/types/getProuctbyCategory"; 
 import FilterByStorage from "./filter/filterbyStorage";
 interface ProductFiltersProps {
@@ -50,14 +49,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
     onChange(newFilters);
   };
 
-  const handleServiceChange = (minDiscountPercent: number | null, maxDiscountPercent: number | null) => {
-    const newFilters = {
-      ...filters,
-      minDiscountPercent: minDiscountPercent !== null ? minDiscountPercent : undefined,
-      maxDiscountPercent: maxDiscountPercent !== null ? maxDiscountPercent : undefined,
-    };
-    onChange(newFilters);
-  };
+
   return (
     <div>
       <FilterByPrice onchange={handlePriceChange} />
@@ -65,7 +57,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onChange = () 
       <FilterByRam filters={filters} onchange={handleRamChange} />
       <FilterByStorage filters={filters} onchange={handleStorageChange} />
       <FilterByConditionShopping filters={filters} onchange={handleConditionShoppingChange} />
-     <FilterByService filters={filters} onchange={handleServiceChange} />
     </div>
   );
 };

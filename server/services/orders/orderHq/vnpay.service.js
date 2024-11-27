@@ -45,7 +45,7 @@ exports.createPaymentUrl = async (totalPriceWithShipping, auctionID, orderInFo) 
 
         const finalParams = new URLSearchParams(vnp_Params);
         const paymentUrl = `${vnpUrl}?${finalParams.toString()}`;
-        console.log('paymentURl::', paymentUrl);
+
         
         return { url: paymentUrl };
     } catch (error) {
@@ -94,7 +94,7 @@ exports.vnpayIpn = (req, res) => {
     const signData = querystring.stringify(vnp_Params, { encode: false });
 
     // Debugging output
-    console.log('signData for IPN:', signData);
+
 
     const secretKey = process.env.VNP_HASH_SECRET;
     const hmac = crypto.createHmac("sha512", secretKey);
@@ -140,7 +140,7 @@ exports.queryDr = (req, res) => {
     ].join('|');
 
     // Debugging output
-    console.log('data for queryDr:', data);
+
 
     const hmac = crypto.createHmac("sha512", secretKey);
     const vnp_SecureHash = hmac.update(Buffer.from(data, "utf-8")).digest("hex");

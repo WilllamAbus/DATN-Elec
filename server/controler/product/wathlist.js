@@ -4,7 +4,8 @@ const productVariant = require("../../model/product_v2/productVariant");
 const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
-const { spawn } = require("child_process");
+const { spawn } = require('child_process');
+const path = require('path');
 
 const WathListController = {
   addWatchlist: async (req, res) => {
@@ -77,32 +78,40 @@ const WathListController = {
       const newInteraction = new Interaction({
         user: userId,
         Watchlist: newWatchlist._id,
-        productID: productId,
         productVariant: variantId || null,
         type: "add wishlist",
         score: 1,
       });
-
+      console.log(newInteraction);
       await newInteraction.save();
+      console.log(`Saved interaction for user: ${userId}`);
+      console.log(`Saved interaction: ${JSON.stringify(newInteraction)}`);
+
+      // Đường dẫn tới file Python
+      const pythonScriptPath = path.resolve(__dirname, '../../../Python Client Server/recommendation_service.py');
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn("python", [
-        "recommendation_service.py",
-        userId.toString(),
-      ]);
+      const pythonProcess = spawn('python', [pythonScriptPath, userId.toString()]);
 
-      // Lắng nghe kết quả từ script Python
-      pythonProcess.stdout.on("data", (data) => {
+      // Xử lý kết quả từ script Python
+      pythonProcess.stdout.on('data', (data) => {
         console.log(`Python Output: ${data.toString()}`);
-        // Xử lý kết quả từ Python nếu cần
       });
 
       pythonProcess.stderr.on("data", (data) => {
         console.error(`Python Error: ${data.toString()}`);
       });
 
-      pythonProcess.on("close", (code) => {
-        console.log(`Python script finished with code ${code}`);
+      pythonProcess.on('error', (error) => {
+        console.error(`Failed to start Python process: ${error.message}`);
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+        } else {
+          console.log(`Python script finished successfully.`);
+        }
       });
 
       return res.status(200).json({

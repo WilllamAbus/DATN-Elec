@@ -25,6 +25,7 @@ interface ProductDetailsProps {
   productId: string;
   // Dữ liệu người dùng
 }
+import ListRecommendation from "../../../recommendation";
 
 // const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 
@@ -253,8 +254,8 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
 
   const formattedEndTime = product.endTime
     ? format(parseISO(product.endTime), "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", {
-        locale: vi,
-      })
+      locale: vi,
+    })
     : "";
   const productPrice = product.product_price_unit ?? 0;
 
@@ -377,9 +378,8 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
                text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
-                className={`fas fa-heart ${
-                  isFavorite ? "text-red-500" : "text-gray-500"
-                }`}
+                className={`fas fa-heart ${isFavorite ? "text-red-500" : "text-gray-500"
+                  }`}
               ></i>
               <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>
@@ -421,34 +421,12 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
       {/* <Comment  /> */}
 
       {/* related-products */}
-      <div className="container pb-16">
-        <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
-          Sản phẩm
+      <div className="text-left">
+        <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-3xl xl:text-4xl uppercase py-10 px-10">
+          Sản phẩm dành cho bạn
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg overflow-hidden"
-            >
-              {/* <img
-                src={listTwo}
-                alt="related-product"
-                className="w-full h-48 object-cover"
-              /> */}
-              <div className="p-4">
-                <h3 className="text-gray-800 font-medium">
-                  Related Product Name
-                </h3>
-                <p className="text-gray-600">Related Product Price</p>
-                <button className="mt-4 bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition focus:outline-none">
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
+      <ListRecommendation />
     </>
   );
 };

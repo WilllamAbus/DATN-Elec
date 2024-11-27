@@ -49,7 +49,7 @@ interface CpuSelectProps {
 
 const CpuSelect: React.FC<CpuSelectProps> = ({ onChange, value, className }) => {
   const dispatch = useDispatch<AppDispatch>(); 
-  const { cpus, isLoading } = useSelector((state: RootState) => state.attributes.getAllCpu);
+  const { cpus, isLoading } = useSelector((state: RootState) => state.getAttributes.getAllCpu);
 
   useEffect(() => {
     dispatch(getAllCpuThunk());

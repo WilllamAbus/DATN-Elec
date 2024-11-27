@@ -123,16 +123,16 @@ const ListPriceRand: React.FC = () => {
                 {rand.product_randBib.product_name}
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.minBid.toLocaleString()} VND
+                {rand.minBid.toLocaleString()} VNĐ
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.midBid.toLocaleString()} VND
+                {rand.midBid.toLocaleString()} VNĐ
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.maxBid.toLocaleString()} VND
+                {rand.maxBid.toLocaleString()} VNĐ
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.bidInput.toLocaleString()} VND
+                {rand.bidInput.toLocaleString()} VNĐ
               </td>
               <td className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
                       rand.status === "active"
