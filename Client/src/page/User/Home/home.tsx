@@ -12,6 +12,11 @@ const UserHome: React.FC = () => {
       <UserBanner />
       <UserCategories />
       {/* <UserProdSection /> */}
+      <div className="text-center">
+        <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
+          Sản phẩm dành cho bạn
+        </h2>
+      </div>
       <GetRecommendation />
       <UserFeature />
       <UserArrivale />

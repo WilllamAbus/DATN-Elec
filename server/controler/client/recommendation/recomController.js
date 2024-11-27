@@ -49,7 +49,7 @@ const recommendations = {
       const sortedItems = filteredItems
         .filter(item => item.score > 0)  // Lọc các item có score > 0
         .sort((a, b) => b.score - a.score)  // Sắp xếp theo điểm số giảm dần
-        .slice(0, 8);  // Lấy 8 sản phẩm đầu tiên
+        .slice(0, 6);  // Lấy 8 sản phẩm đầu tiên
 
       // Lấy thông tin chi tiết từ productVariant hoặc productAuction
       const result = [];
