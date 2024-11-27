@@ -12,8 +12,9 @@ const connectDb = require("./config/connectDb");
 const http = require("http");
 const socketIo = require("socket.io");
 const SocketServices = require("./services/serviceSocket");
-const cron = require('node-cron');
-const { checkInventoryAndNotify } = require('./services/inventoryChecker'); 
+const cron = require("node-cron");
+const { checkInventoryAndNotify } = require("./services/inventoryChecker");
+require("./controler/cronJob.js");
 
 // Connect to database
 connectDb();
@@ -90,10 +91,14 @@ server.listen(PORT, () => {
 });
 
 // Thiết lập cron job để chạy hàng ngày lúc 00:00 (nửa đêm)
-cron.schedule('0 0 * * *', async () => {
-  console.log('Bắt đầu kiểm tra tồn kho hàng ngày...');
-  await checkInventoryAndNotify();
-  console.log('Kiểm tra tồn kho hoàn tất và thông báo đã gửi (nếu có).');
-}, {
-  timezone: "Asia/Ho_Chi_Minh" // Đặt múi giờ nếu cần, ví dụ: Việt Nam
-});
+cron.schedule(
+  "0 0 * * *",
+  async () => {
+    console.log("Bắt đầu kiểm tra tồn kho hàng ngày...");
+    await checkInventoryAndNotify();
+    console.log("Kiểm tra tồn kho hoàn tất và thông báo đã gửi (nếu có).");
+  },
+  {
+    timezone: "Asia/Ho_Chi_Minh", // Đặt múi giờ nếu cần, ví dụ: Việt Nam
+  }
+);
