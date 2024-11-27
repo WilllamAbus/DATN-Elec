@@ -272,7 +272,6 @@ const CartController = {
         const newInteraction = new Interaction({
           user: userId,
           Cart: cart._id,
-          productID: item.product,
           productVariant: item.variantId,
           type: "cart",
           score: 1,
