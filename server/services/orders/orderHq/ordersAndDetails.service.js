@@ -36,7 +36,7 @@ const orderAndDetailService = {
       const auction = await Auction.findById(auctionDetails)
         .populate("productId")
         .lean();
-
+  
       const auctionID = auction._id;
       // Extract productID from auction details
       const productID = mongoose.Types.ObjectId(auction.productId._id);
@@ -445,10 +445,10 @@ const orderAndDetailService = {
         }
       });
 
-      // await Auction.findOneAndUpdate({
-      //   productId:productIDAuct,
-
-      // },      { $set: { status: "disable" } })
+      await Auction.findOneAndUpdate({
+        productId:productIDAuct,
+        
+      },      { $set: { status: "disable" } })
       return {
         message: "Thanh toán hoàn tất và thông báo đã được gửi",
         interactions, // Trả về dữ liệu tương tác đã tạo

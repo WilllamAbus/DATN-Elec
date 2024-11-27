@@ -138,7 +138,7 @@ const auctionService = {
         throw new Error("Không thể cập nhật đấu giá.");
       }
 
-      console.log("Updated", updatedAuction);
+
 
       // Gửi mail đến người chiến thắng
       const winnerEmail = winnerBid.bidder;

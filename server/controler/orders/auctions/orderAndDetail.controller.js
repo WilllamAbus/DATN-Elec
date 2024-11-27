@@ -15,7 +15,7 @@ const orderAndDetailControler = {
     try {
       // Cấu hình URL cho từng cổng thanh toán
       const paymentGateways = {
-        MoMo: "https://test-payment.momo.vn/v2/gateway/api/verify", // URL kiểm tra MoMo
+       
         VnPay: "https://sandbox.vnpayment.vn/paymentv2/verify", // URL kiểm tra VNPay
       };
   
@@ -55,13 +55,17 @@ const orderAndDetailControler = {
   createOrder: async (req, res) => {
     try {
       const { userId, auctionDetails, payment } = req.body;
-      if (!["MoMo", "VnPay", "Cash"].includes(payment)) {
-        return res.status(400).json({
-            success: false,
-            status: 400,
-            message: "Phương thức thanh toán không hợp lệ.",
-        });
-    }
+    //   if (!["MoMo", "VnPay", "Cash"].includes(payment)) {
+    //     return res.status(400).json({
+    //         success: false,
+    //         status: 400,
+    //         message: "Phương thức thanh toán không hợp lệ.",
+    //     });
+    // }
+
+
+       // Xác minh thanh toán đối với MoMo hoặc VnPay
+  
       const orderData = {
         userId,
         auctionDetails, // Rename to auctionID
