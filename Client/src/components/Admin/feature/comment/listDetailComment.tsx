@@ -13,7 +13,6 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import "../../../../assets/css/admin.style.css";
-// import { notify } from "../../../../../ultils/success";
 import { notify } from "../../../../ultils/success";
 import { useForm } from "react-hook-form";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
@@ -163,6 +162,7 @@ const ListDetailComment: React.FC = () => {
           setComments((prevComments) =>
             prevComments.filter((comment) => comment._id !== commentId)
           );
+          fetchData(currentPage); 
   
           MySwal.fire({
             title: "Đã Xóa!",
@@ -174,11 +174,8 @@ const ListDetailComment: React.FC = () => {
           });
           
           // Gọi lại fetchData để làm mới danh sách bình luận
-          fetchData(currentPage); 
   
-          if (!id && !commentId) {
-            navigatee("/admin/listComments");
-          }
+          
         } catch (error) {
           console.error("Error deleting comment:", error);
           MySwal.fire({
@@ -215,12 +212,7 @@ const ListDetailComment: React.FC = () => {
         try {
           const response = await deleteRepComment(id_repComment);
 
-          if (response.success) {
-            await MySwal.fire({
-              title: "Đã Xóa!",
-              text: "Phản hồi bình luận đã được xóa.",
-              icon: "success",
-            });
+         
             setRepComments((prevRepComments) => {
               const updatedComments = { ...prevRepComments };
               updatedComments[commentId] = updatedComments[commentId].filter(
@@ -228,7 +220,15 @@ const ListDetailComment: React.FC = () => {
               );
               return updatedComments;
             });
-
+            if (response.success) {
+              await MySwal.fire({
+                title: "Đã Xóa!",
+                text: "Phản hồi bình luận đã được xóa.",
+                icon: "success",
+                confirmButtonText: "OK",
+                showConfirmButton: true,
+                confirmButtonColor: "#3085d6",
+              });
             fetchData(currentPage);
           } else {
             throw new Error("Xóa bình luận phản hồi không thành công");
@@ -272,6 +272,8 @@ const ListDetailComment: React.FC = () => {
       const response = await postRepComment(idComment, {
         content: replyContent,
       });
+      notify();
+      fetchRepComment(idComment);
       setComments((prevComments) =>
         prevComments.map((comment) =>
           comment._id === idComment
@@ -279,7 +281,6 @@ const ListDetailComment: React.FC = () => {
             : comment
         )
       );  
-      notify();
       reset();
       
       setContent((prevContent) => ({ ...prevContent, [idComment]: "" })); 
@@ -322,10 +323,10 @@ const ListDetailComment: React.FC = () => {
         <thead className="text-xs text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th className="p-4">Stt</th>
-            <th className="p-4">Tên người bình luận</th>
+            <th className="p-4">Tên người đánh giá</th>
             <th className="p-4">Đánh giá</th>
-            <th className="p-4">Nội dung bình luận</th>
-            <th className="p-4">Phản hồi bình luận</th>
+            <th className="p-4">Nội dung </th>
+            <th className="p-4">Phản hồi </th>
 
             <th className="p-4 text-center">Chức Năng</th>
           </tr>
@@ -432,7 +433,7 @@ const ListDetailComment: React.FC = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={5}>Không có comment....</td>
+              <td colSpan={5}>Không có đánh giá....</td>
             </tr>
           )}
         </tbody>

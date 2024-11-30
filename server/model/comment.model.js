@@ -14,12 +14,7 @@ const commentSchema = new Schema(
     },
     status: { type: String, default: "active" },
     likes: [{ type: Schema.Types.ObjectId, ref: "User"}],
-    replies: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Repcomment",
-      },
-    ],
+    replies: {  type: Schema.Types.ObjectId,  ref: "repcomments" },
   },
   {
     timestamps: true,

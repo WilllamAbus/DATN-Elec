@@ -85,35 +85,49 @@ const repCommentController = {
   deleteRepComment: async (req, res) => {
     try {
       const { idRepComment } = req.params;
-
-      // Kiểm tra ID có hợp lệ không
+  
+      // Kiểm tra ID hợp lệ
       if (!idRepComment || idRepComment.length !== 24) {
         return res.status(400).json({
           success: false,
           err: 1,
-          msg: "Invalid comment ID",
+          msg: "Invalid reply comment ID",
           status: 400,
         });
       }
-
-      // Tìm và xóa bình luận dựa trên ID
-      const deletedRepComment = await Repcomment.findByIdAndDelete(
-        idRepComment
-      );
-
+  
+      // Tìm `Comment` chứa `idRepComment` trong trường `replies`
+      const parentComment = await modelComment.Comment.findOne({ replies: idRepComment });
+  
+      if (!parentComment) {
+        return res.status(404).json({
+          success: false,
+          err: 1,
+          msg: "No parent comment found for this reply comment",
+          status: 404,
+        });
+      }
+  
+      // Xóa `idRepComment` khỏi trường `replies` của `Comment`
+      parentComment.replies = null; // Gán null vì `replies` không phải là mảng
+      await parentComment.save();
+  
+      // Xóa `RepComment` khỏi bảng `Repcomment`
+      const deletedRepComment = await Repcomment.findByIdAndDelete(idRepComment);
+  
       if (!deletedRepComment) {
         return res.status(404).json({
           success: false,
           err: 1,
-          msg: "No reply comment found with this ID",
+          msg: "Reply comment not found",
           status: 404,
         });
       }
-
-      console.log("Successfully deleted:", deletedRepComment);
+  
+      console.log("Successfully deleted reply comment:", deletedRepComment);
       return res.status(200).json({
         success: true,
-        msg: "Successfully deleted",
+        msg: "Successfully deleted reply comment and updated parent comment",
         data: deletedRepComment,
       });
     } catch (error) {
@@ -127,6 +141,9 @@ const repCommentController = {
       });
     }
   },
+  
+  
+
 };
 
 module.exports = repCommentController;

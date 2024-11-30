@@ -25,7 +25,6 @@ const RepComment: React.FC<RepCommentProps> = ({ id_comment }) => {
 
   return (
     <>
-      {repComments?.length > 0 ? (
         <div
           className={`comment-container ${
             repComments && repComments?.length > 0 ? "show-arrow" : ""
@@ -47,9 +46,7 @@ const RepComment: React.FC<RepCommentProps> = ({ id_comment }) => {
             ))}
           </div>
         </div>
-      ) : (
-        " "
-      )}
+      
     </>
   );
 };

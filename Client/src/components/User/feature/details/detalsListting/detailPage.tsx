@@ -24,7 +24,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
 import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSameSegment";
 
-
+import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify";
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -171,7 +171,7 @@ const DetailPage: React.FC = () => {
           </>
         )}
       </div>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </section>
     <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto"> 
@@ -192,6 +192,8 @@ const DetailPage: React.FC = () => {
     <section>
         <RelatedProduct/>
     </section>
+    <ToastContainer />
+
     </>
   );
 };

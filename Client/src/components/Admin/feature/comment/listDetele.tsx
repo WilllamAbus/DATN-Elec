@@ -20,6 +20,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
+
 const MySwal = withReactContent(Swal);
 interface Comment {
   _id: string;
@@ -153,8 +154,8 @@ const ListComment: React.FC = () => {
 
   const handleRestore = async (id_comment: string) => {
     MySwal.fire({
-      title: "Khôi phục comment?",
-      text: "Bạn có chắc muốn khôi phục comment này không!",
+      title: "Khôi phục bình luận?",
+      text: "Bạn có chắc muốn khôi phục bình luận này không!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
