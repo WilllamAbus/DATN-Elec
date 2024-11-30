@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const moment = require("moment-timezone");
 
 const orderSchema = new Schema(
   {
@@ -45,8 +44,6 @@ const orderSchema = new Schema(
       accountNumber: { type: String, required: false }, // Số tài khoản
       accountName: { type: String, required: false }, // Tên chủ tài khoản
     },
-    createdAt: { type: Date, default: moment.tz("Asia/Ho_Chi_Minh").toDate() },
-    updatedAt: { type: Date, default: moment.tz("Asia/Ho_Chi_Minh").toDate() },
   },
   {
     collection: "OrderCart",
@@ -55,11 +52,5 @@ const orderSchema = new Schema(
 );
 
 // Cập nhật thời gian khi lưu
-orderSchema.pre("save", function (next) {
-  const now = moment.tz("Asia/Ho_Chi_Minh").toDate();
-  this.updatedAt = now;
-  if (!this.createdAt) this.createdAt = now;
-  next();
-});
 
 module.exports = model("OrderCart", orderSchema);

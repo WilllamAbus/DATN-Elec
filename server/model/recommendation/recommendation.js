@@ -18,7 +18,7 @@ const recommendationSchema = new Schema(
         itemType: {
           type: String,
           required: true,
-          enum: ["productVariants", "productAuction"], 
+          enum: ["productvariants", "productAuction"], 
         },
         score: { 
           type: Number, 

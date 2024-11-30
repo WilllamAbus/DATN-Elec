@@ -429,90 +429,6 @@ const authController = {
     }
   },
 
-  // updateProfile: async (req, res) => {
-  //   try {
-  //     const id = req.user.id;
-  //     const { name, address, phone, gender, birthday, addressID } = req.body;
-  //     const avatar = req.file ? req.file : undefined;
-  //     let avatarURL;
-
-  //     const currentUser = await User.findById(id);
-
-  //     if (!currentUser) {
-  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
-  //     }
-
-  //     const updatedAddress = address || currentUser.address;
-  //     const updatedAddressID = addressID || currentUser.addressID;
-
-  //     if (avatar) {
-  //       const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
-  //       const file = bucket.file(`avatars/${filename}`);
-  //       const fileStream = file.createWriteStream({
-  //         metadata: {
-  //           contentType: avatar.mimetype,
-  //         },
-  //       });
-
-  //       fileStream.on("finish", async () => {
-  //         try {
-  //           console.log("User object:", req.user);
-  //           await file.makePublic();
-  //           const encodedFilename = encodeURIComponent(file.name);
-  //           avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
-
-  //           const updatedUser = await User.findByIdAndUpdate(
-  //             id,
-  //             {
-  //               name: name || currentUser.name,
-  //               address: updatedAddress,
-  //               phone: phone || currentUser.phone,
-  //               birthday: birthday || currentUser.birthday,
-  //               gender: gender || currentUser.gender,
-  //               avatar: avatarURL,
-  //               addressID: updatedAddressID,
-  //             },
-  //             { new: true }
-  //           );
-
-  //           return res
-  //             .status(200)
-  //             .json({ message: "Cập Nhật Thành Công", user: updatedUser });
-  //         } catch (err) {
-  //           console.error("Lỗi khi lấy URL của hình ảnh:", err);
-  //           return res
-  //             .status(500)
-  //             .json({ message: "Không thể lấy URL của hình ảnh" });
-  //         }
-  //       });
-
-  //       fileStream.end(avatar.buffer);
-  //     } else {
-  //       const updatedUser = await User.findByIdAndUpdate(
-  //         id,
-  //         {
-  //           name: name || currentUser.name,
-  //           address: updatedAddress,
-  //           phone: phone || currentUser.phone,
-  //           birthday: birthday || currentUser.birthday,
-  //           gender: gender || currentUser.gender,
-  //           addressID: updatedAddressID,
-  //         },
-  //         { new: true }
-  //       );
-
-  //       return res
-  //         .status(200)
-  //         .json({ message: "Cập Nhật Thành Công", user: updatedUser });
-  //     }
-  //   } catch (error) {
-  //     console.error("Server error updating user profile:", error);
-  //     return res.status(500).json({
-  //       message: "Server error updating user profile",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   updateProfile: async (req, res) => {
     try {
       const id = req.user.id;
@@ -588,50 +504,6 @@ const authController = {
     }
   },
 
-  // addAddress: async (req, res) => {
-  //   try {
-  //     const id = req.user.id;
-  //     const { fullName, address, addressID, phone } = req.body;
-
-  //     const currentUser = await User.findById(id);
-
-  //     if (!currentUser) {
-  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
-  //     }
-
-  //     let updatedAddresses = currentUser.addresses || [];
-
-  //     if (updatedAddresses.length >= 10) {
-  //       return res.status(400).json({
-  //         message: "Bạn chỉ có thể thêm tối đa 10 địa chỉ",
-  //       });
-  //     }
-
-  //     updatedAddresses.push({
-  //       fullName,
-  //       address,
-  //       addressID,
-  //       phone,
-  //     });
-
-  //     const updatedUser = await User.findByIdAndUpdate(
-  //       id,
-  //       { addresses: updatedAddresses },
-  //       { new: true }
-  //     );
-
-  //     return res.status(200).json({
-  //       message: "Địa chỉ đã được thêm thành công",
-  //       user: updatedUser,
-  //     });
-  //   } catch (error) {
-  //     console.error("Lỗi khi thêm địa chỉ:", error);
-  //     return res.status(500).json({
-  //       message: "Lỗi khi thêm địa chỉ",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   addAddress: async (req, res) => {
     try {
       const id = req.user.id;
@@ -730,42 +602,6 @@ const authController = {
     }
   },
 
-  // updateAddress: async (req, res) => {
-  //   try {
-  //     const id = req.user.id;
-  //     const { addressIndex, name, address, addressID, phone } = req.body;
-
-  //     const currentUser = await User.findById(id);
-
-  //     if (!currentUser) {
-  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
-  //     }
-
-  //     // Cập nhật địa chỉ theo chỉ số
-  //     if (currentUser.addresses && currentUser.addresses[addressIndex]) {
-  //       currentUser.addresses[addressIndex] = {
-  //         fullName: name || currentUser.addresses[addressIndex].fullName,
-  //         address: address || currentUser.addresses[addressIndex].address,
-  //         addressID: addressID || currentUser.addresses[addressIndex].addressID,
-  //         phone: phone || currentUser.addresses[addressIndex].phone,
-  //       };
-
-  //       const updatedUser = await currentUser.save();
-  //       return res.status(200).json({
-  //         message: "Địa chỉ đã được cập nhật thành công",
-  //         user: updatedUser,
-  //       });
-  //     } else {
-  //       return res.status(404).json({ message: "Địa chỉ không tồn tại" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi cập nhật địa chỉ:", error);
-  //     return res.status(500).json({
-  //       message: "Lỗi khi cập nhật địa chỉ",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   updateAddress: async (req, res) => {
     try {
       const userId = req.user.id; // Lấy ID của người dùng từ token
@@ -867,38 +703,6 @@ const authController = {
     }
   },
 
-  // getAddressList: async (req, res) => {
-  //   try {
-  //     // Kiểm tra xem req.user có tồn tại không
-  //     if (!req.user || !req.user.id) {
-  //       return res.status(401).json({ message: "Không được phép" });
-  //     }
-
-  //     const id = req.user.id;
-
-  //     // Tìm người dùng theo ID
-  //     const currentUser = await User.findById(id).catch((error) => {
-  //       throw new Error("Lỗi tìm người dùng: " + error.message);
-  //     });
-
-  //     // Kiểm tra xem người dùng có tồn tại không
-  //     if (!currentUser) {
-  //       return res.status(404).json({ message: "Người dùng không tìm thấy" });
-  //     }
-
-  //     // Trả về danh sách địa chỉ của người dùng
-  //     return res.status(200).json({
-  //       message: "Danh sách địa chỉ",
-  //       addresses: currentUser.addresses,
-  //     });
-  //   } catch (error) {
-  //     console.error("Lỗi khi lấy danh sách địa chỉ:", error);
-  //     return res.status(500).json({
-  //       message: "Lỗi khi lấy danh sách địa chỉ",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   getAddressList: async (req, res) => {
     try {
       if (!req.user || !req.user.id) {

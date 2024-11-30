@@ -344,7 +344,9 @@ import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
 import { Transition } from "@headlessui/react";
 import { User } from "@nextui-org/react";
 import { ToastContainer } from "react-toastify";
+import { useLocation } from "react-router-dom";
 const ProfileUse: React.FC = () => {
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -392,6 +394,14 @@ const ProfileUse: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (
+      location.state &&
+      (location.state as { view: string }).view === "watchlist"
+    ) {
+      setView("watchlist"); // Cập nhật trạng thái khi nhận state
+    }
+  }, [location.state]);
   const MenuItem = ({
     item,
   }: {

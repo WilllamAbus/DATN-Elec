@@ -41,6 +41,7 @@ export interface UserProfile {
   roles: string[];
   birthday: string;
   gender: string;
+  password?: string;
   phone: string;
   avatar: string;
   addresses: Address[];

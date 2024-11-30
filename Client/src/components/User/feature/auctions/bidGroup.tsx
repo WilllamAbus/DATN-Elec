@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "flowbite-react";
-import { format, parseISO, isValid, differenceInMilliseconds } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { Bid } from '~/types/bidding/bidding';
-import { Link } from 'react-router-dom';
+import { format, parseISO, isValid, differenceInMilliseconds } from "date-fns";
+import { vi } from "date-fns/locale";
+import { Bid } from "~/types/bidding/bidding";
+import { Link } from "react-router-dom";
 
 interface BidGroupProps {
   bidsGroup: Bid[];
@@ -27,61 +27,70 @@ const BidGroup: React.FC<BidGroupProps> = ({
     : null;
 
   const isValidEndTime = endTime ? isValid(endTime) : false;
-
-  // Get current time
   const currentTime = new Date();
+  const remainingTimeMs =
+    isValidEndTime && endTime
+      ? differenceInMilliseconds(endTime, currentTime)
+      : 0;
 
-  // Calculate remaining time in milliseconds
-  const remainingTimeMs = isValidEndTime && endTime
-    ? differenceInMilliseconds(endTime, currentTime)
-    : 0;
-
-  // Format current time
-  const formattedCurrentTime = format(currentTime, "dd/MM/yyyy HH:mm:ss", { locale: vi });
-
-  // Format end time
-  const formattedEndTime = isValidEndTime && endTime
-    ? format(endTime, "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", { locale: vi })
-    : "Không xác định";
-
-  // Calculate and format remaining time
   const formatRemainingTime = (ms: number) => {
     if (ms <= 0) return "Hết thời gian";
-    
+
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-    
-    // Calculate days, if necessary
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
-    
+
     return `${days} ngày ${remainingHours} giờ ${minutes} phút ${seconds} giây`;
   };
 
   const remainingTimeFormatted = formatRemainingTime(remainingTimeMs);
+  const productId = bidsGroup[0].product_bidding?.productId?._id;
+  const [isNotified, setIsNotified] = useState(false);
+  const [auctionCompleted, setAuctionCompleted] = useState(false);
 
-  const productId = bidsGroup[0].product_bidding?.productId; // Access productId from bid
-
-  // Check if this bid group should have a yellow border
-  const hasBlueBorder = bidsGroup.some((b: Bid) =>
-    b.product_bidding.productId === productId &&
-    b.bidEndTime.endTimeBid === bidsGroup[0].bidEndTime.endTimeBid
-  );
-
-  // Determine if the button should be enabled or disabled based on the remaining time
-  const disableCompleteAuctionButton = remainingTimeMs > FIFTEEN_MINUTES_MS;
+  useEffect(() => {
+    // Only call handleCompleteAuction if the auction hasn't been completed, time is up, and the auction is still active
+    if (
+      remainingTimeMs <= 0 &&
+      productId &&
+      !auctionCompleted &&
+      remainingTimeFormatted === "Hết thời gian"
+    ) {
+      setAuctionCompleted(true); 
+      if(!isNotified){
+     // Mark auction as completed to prevent multiple calls
+      handleCompleteAuction(productId, bidsGroup[0].bidEndTime._id);
+      setIsNotified(true);
+      }
+      
+    }
+  }, [
+    remainingTimeMs,
+    handleCompleteAuction,
+    productId,
+    bidsGroup,
+    auctionCompleted,
+    remainingTimeFormatted,
+  ]);
 
   return (
     <div
       key={bidsGroup[0]._id}
       className={`grid bg-white grid-cols-3 items-center gap-4 ${
-        hasBlueBorder ? "border-2 border-blue-600" : ""
+        bidsGroup.some(
+          (bid) =>
+            bid.product_bidding.productId._id === productId &&
+            bid.bidEndTime.endTimeBid === bidsGroup[0].bidEndTime.endTimeBid
+        )
+          ? "border-2 border-blue-600"
+          : ""
       }`}
     >
       <div className="col-span-2 flex items-center gap-4">
         <div className="w-15 h-24 m-4 shrink-0 border bg-white p-2 rounded-md">
-          <Link to={`/detailAuc/${productId._id}`}>
+          <Link to={`/detailAuc/${productId}`}>
             <img
               src={bidsGroup[0].product_bidding.productId.image[0]}
               className="w-full h-full object-contain"
@@ -94,12 +103,20 @@ const BidGroup: React.FC<BidGroupProps> = ({
             {bidsGroup[0].product_bidding.productId.product_name}
           </p>
           <p className="text-gray-600">
-            Thời gian hiện tại: {formattedCurrentTime}
+            Thời gian hiện tại:{" "}
+            {format(currentTime, "dd/MM/yyyy HH:mm:ss", { locale: vi })}
           </p>
           <p className="text-gray-600">
-            Thời gian kết thúc: {formattedEndTime}
+            Thời gian kết thúc:{" "}
+            {isValidEndTime && endTime
+              ? format(endTime, "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", {
+                  locale: vi,
+                })
+              : "Không xác định"}
           </p>
-          <p className="text-gray-800">Thời gian còn lại: {remainingTimeFormatted}</p>
+          <p className="text-gray-800">
+            Thời gian còn lại: {remainingTimeFormatted}
+          </p>
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -111,23 +128,28 @@ const BidGroup: React.FC<BidGroupProps> = ({
           const isValidBidEndTime = bidEndTime ? isValid(bidEndTime) : false;
 
           // Calculate time left for each bid and ensure it's a valid number
-          const timeLeftForBidMs = isValidBidEndTime && bidEndTime
-            ? differenceInMilliseconds(bidEndTime, currentTime)
-            : 0;
+          const timeLeftForBidMs =
+            isValidBidEndTime && bidEndTime
+              ? differenceInMilliseconds(bidEndTime, currentTime)
+              : 0;
           const disableBidButtons = timeLeftForBidMs < FIFTEEN_MINUTES_MS; // Disable buttons if time left is < 15 minutes
 
           return (
-           
             <div
               key={bid._id}
               className="bg-white p-5 m-1 rounded-md border border-yellow-500"
             >
-               <p className="font-bold text-gray-700">Thông tin đấu giá</p>
+              <p className="font-bold text-gray-700">Thông tin đấu giá</p>
               {/* <p className=" text-gray-600">Mã đơn: {bid._id}</p> */}
               <p className="text-gray-600">
-                Ngày đấu giá: {format(parseISO(bid.createdAt), "d/M/yy HH:mm:ss", { locale: vi })}
+                Ngày đấu giá:{" "}
+                {format(parseISO(bid.createdAt), "d/M/yy HH:mm:ss", {
+                  locale: vi,
+                })}
               </p>
-              <p className="text-gray-600">Giá đấu: {bid.bidAmount.toLocaleString()} đ</p>
+              <p className="text-gray-600">
+                Giá đấu: {bid.bidAmount.toLocaleString()} đ
+              </p>
               <div className="flex gap-2 mt-2">
                 {canEdit[bid._id] && (
                   <Button
@@ -150,15 +172,15 @@ const BidGroup: React.FC<BidGroupProps> = ({
           );
         })}
       </div>
-      {productId && bidsGroup.length > 0 && (
+      {/* {productId && bidsGroup.length > 0 && (
         <Button
           className="col-span-3 mt-4"
           onClick={() => handleCompleteAuction(productId._id, bidsGroup[0].bidEndTime._id)}
-          disabled={disableCompleteAuctionButton} // Disable button based on remaining time
+          disabled={disableCompleteAuctionButton} 
         >
           Hoàn thành đấu giá
         </Button>
-      )}
+      )} */}
     </div>
   );
 };
