@@ -34,11 +34,11 @@ const repCommentController = {
     try {
       const { id } = req.params;
       const comments = await repCommentService.findRepCommentsByCommentId(id);
-      if (comments.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy phản hồi cho bình luận này" });
-      }
+      // if (comments.length === 0) {
+      //   return res
+      //     .status(404)
+      //     .json({ message: "Không tìm thấy phản hồi cho bình luận này" });
+      // }
       res.status(200).json(comments);
     } catch (error) {
       console.error("Error fetching reply comments:", error);

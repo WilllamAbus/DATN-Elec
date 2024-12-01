@@ -87,7 +87,7 @@ const statisticalController = {
       });
     }
   },
-  //đơn hàng đã bán(lấy sl từ oderDetail)
+  //đơn hàng đã bán(lấy sl từ OrderDetail)
   totalProductsSold: async (req, res) => {
     try {
       const orderDetails = await OrderDetail.find();

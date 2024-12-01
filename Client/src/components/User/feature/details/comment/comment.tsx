@@ -11,7 +11,6 @@ import {
   addComment,
   getCommentProduct,
   softDeleteComment,
-  getUserComment,
   addLike,
   editComment,
   Comment as CommentType,
@@ -30,26 +29,22 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@nextui-org/react";
+import "react-toastify/dist/ReactToastify.css";
 const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
   rating: number;
 }
-interface User {
-  _id?: string;
-  name?: string;
-  avatar?: string;
-}
+
 interface EditComment {
   _id: string;
   content: string;
   rating: number;
 }
-const Comment = ({
-  onUpdateAverageRating,
-}: {
-  onUpdateAverageRating: (average: string) => void;
-}) => {
+const Comment = (
+  // { onUpdateAverageRating,}: {
+  // onUpdateAverageRating: (average: string) => void;}
+) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -61,7 +56,6 @@ const Comment = ({
     useForm<FormValues>();
   const { slug } = useParams<{ slug: string }>();
   const [visibleCount, setVisibleCount] = useState(5);
-  const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
   const dispatch = useAppDispatch();
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
@@ -132,15 +126,15 @@ useEffect(() => {
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
-  const calculateAverageRating = (comments: CommentType[]) => {
-    const totalRatings = comments.reduce(
-      (sum, comment) => sum + comment.rating,
-      0
-    );
-    return comments.length > 0
-      ? (totalRatings / comments.length).toFixed(1)
-      : " ";
-  };
+  // const calculateAverageRating = (comments: CommentType[]) => {
+  //   const totalRatings = comments.reduce(
+  //     (sum, comment) => sum + comment.rating,
+  //     0
+  //   );
+  //   return comments.length > 0
+  //     ? (totalRatings / comments.length).toFixed(1)
+  //     : " ";
+  // };
   const fetchComments = async () => {
     if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
@@ -152,30 +146,7 @@ useEffect(() => {
       setComments(productComments);
       setFilteredComments(productComments);
       // Tính lại average rating và gửi lên component cha
-      const avgRating = calculateAverageRating(productComments);
-      onUpdateAverageRating(avgRating); // Truyền average rating lên component cha
-      const userIds = Array.from(
-        new Set(productComments.map((comment) => comment.id_user.toString()))
-      );
-
-      const userNameResponses = await Promise.all(
-        userIds.map((userId) => getUserComment(userId))
-      );
-
-      const userNameMap = userNameResponses.reduce((map, response) => {
-        const user = response;
-        if (user?._id) {
-          map[user?._id] = {
-            name: user?.name,
-            avatar: user?.avatar,
-          };
-        }
-        return map;
-      }, {} as { [key: string]: User });
-
-      setUserNames(userNameMap);
-
-      // console.log("User Name Map:", userNameMap);
+      //  Truyền average rating lên component cha
     } catch (error) {
       console.error("Lỗi:", error);
     }
@@ -208,8 +179,9 @@ useEffect(() => {
 
     try {
       const commentResponse = await addComment(slug, commentData);
-        notify();
+        
         fetchComments();
+        notify();
       // console.log("Comment submitted:", commentResponse);
       reset();
       setRating(0);
@@ -251,7 +223,7 @@ useEffect(() => {
 
     try {
       const commentResponse = await editComment(slug, updatedCommentData);
-      console.log(commentResponse);
+      // console.log(commentResponse);
       
       notifyUpdate();
       reset();
@@ -262,6 +234,7 @@ useEffect(() => {
 
       setEditingComment(null);
       setIsModalOpen(false);
+      return commentResponse;
     } catch (error) {
       console.error("Error submitting comment:", error);
       setErrorMessage("Failed to submit comment.");
@@ -419,10 +392,10 @@ useEffect(() => {
                             <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
                               <div className="space-y-0.5">
                                 <div className="flex items-start space-x-4 ">
-                                  {userNames[comment?.id_user]?.avatar ? (
+                                  {comment?.id_user?.avatar ? (
                                     <img
                                       className="h-10 w-10 rounded-full"
-                                      src={userNames[comment?.id_user]?.avatar}
+                                      src={comment?.id_user?.avatar}
                                     />
                                   ) : (
                                     <img
@@ -435,11 +408,11 @@ useEffect(() => {
                                   <div>
                                     <div className="flex">
                                       <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
-                                        {userNames[comment?.id_user]?.name ||
+                                        {comment?.id_user?.name ||
                                           "Loading..."}
                                       </p>
                                       {/* Chỉ hiển thị nút FaEllipsisV nếu người dùng là chủ sở hữu của cmt và hiện trong 24h kể từ khi cmt */}
-                                      {comment?.id_user === profile?._id &&
+                                      {comment?.id_user._id === profile?._id &&
                                         hoursDifference <= 24 && (
                                           <div className="flex items-center ml-6">
                                             <Dropdown>

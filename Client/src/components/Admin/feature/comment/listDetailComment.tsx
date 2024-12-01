@@ -5,7 +5,8 @@ import {
   postRepComment,
   getRepComment,
   deleteRepComment,
-  getUserComment,
+  Comment as CommentType,
+
 } from "../../../../services/commnet/comment.service";
 // import { getOneUser } from "../../../../services/user/user.service";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -18,19 +19,6 @@ import { useForm } from "react-hook-form";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 
 const MySwal = withReactContent(Swal);
-
-interface Comment {
-  _id: string;
-  content: string;
-  rating: number;
-  id_user: string;
-  replies?: any[];
-}
-
-interface User {
-  _id?: string;
-  name: string;
-}
 interface FormValues {
   content: string;
 }
@@ -38,14 +26,13 @@ interface Content {
   [key: string]: string; // Định nghĩa content như một đối tượng với key là comment ID và value là nội dung
 }
 const ListDetailComment: React.FC = () => {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const { id } = useParams<{ id: string }>();
   const [openCommentId, setOpenCommentId] = useState<string | null>(null);
   const [content, setContent] = useState<Content>({});
-  const [repComments, setRepComments] = useState<{ [key: string]: Comment[] }>(
+  const [repComments, setRepComments] = useState<{ [key: string]: CommentType[] }>(
     {}
   );
-  const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
 
   const navigatee = useNavigate();
   const { reset } = useForm<FormValues>();
@@ -78,43 +65,9 @@ const ListDetailComment: React.FC = () => {
       const commentsData =productComments?.data && Array.isArray(productComments.data)? productComments.data
           : [];
       setTotalPages(productComments.totalPages);
+      setComments(commentsData);
 
-      if (Array.isArray(commentsData)) {
-        setComments(commentsData);
-        // Lấy danh sách các user từ comment
-        // Kiểm tra nếu productComments là mảng và có dữ liệu hợp lệ
-        const userIds = Array.from(
-          new Set(
-            commentsData
-              .filter((comment: Comment) => comment?.id_user) // Lọc những bình luận có id_user
-              .map((comment: Comment) => comment.id_user.toString()) // Chuyển id_user thành string
-          )
-        );
-
-        // Gọi API lấy thông tin người dùng song song
-        const userNameResponses = await Promise.all(
-          userIds.map((userId) => {
-            if (typeof userId === "string") {
-              return getUserComment(userId);
-            }
-            return Promise.reject("userId is not a string");
-          })
-        );
-
-        const userNameMap = userNameResponses.reduce((map, response) => {
-          if (response && response._id) {
-            map[response._id] = {
-              name: response.name, // Xác định rõ ràng các trường cần thiết
-            };
-          }
-          return map;
-        }, {} as { [key: string]: User });
-
-        // Set tên người dùng sau khi lấy xong
-        setUserNames(userNameMap);
-      } else {
-        console.error("Product comments are not an array");
-      }
+    
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -316,7 +269,6 @@ const ListDetailComment: React.FC = () => {
 
   return (
     <>
-      {/* Product */}
 
       {/* Comments */}
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -338,11 +290,7 @@ const ListDetailComment: React.FC = () => {
                 <tr className="border-b text-center dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <td className="px-4 py-3">{index + 1}</td>
                   <td className="px-4 py-3">
-                    {userNames[comment?.id_user]?.name ? (
-                      userNames[comment?.id_user]?.name
-                    ) : (
-                      <span className="text-gray-500">Loading...</span>
-                    )}
+                  {comment?.id_user?.name ||  "Loading..."}
                   </td>
 
                   <td className="px-4 py-3 text-sm text-yellow-400">
@@ -356,7 +304,6 @@ const ListDetailComment: React.FC = () => {
                   <td className="px-4 py-3">
                     {repComments[comment?._id]?.map((repComment) => (
                       <div key={repComment?._id} className="ml-4">
-                        <div className="font-bold">{repComment?.id_user}</div>
                         <div>{repComment?.content}</div>
                       </div>
                     ))}
