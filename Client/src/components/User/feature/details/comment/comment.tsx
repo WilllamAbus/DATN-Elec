@@ -41,6 +41,7 @@ interface EditComment {
   content: string;
   rating: number;
 }
+
 const Comment = (
   // { onUpdateAverageRating,}: {
   // onUpdateAverageRating: (average: string) => void;}
