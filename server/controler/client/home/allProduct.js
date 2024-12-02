@@ -184,51 +184,50 @@ const upView = async (req, res) => {
 
 const search = async (req, res) => {
   try {
-      const { keyword } = req.params;
-      
-      // Sử dụng populate để lấy dữ liệu từ bảng variants
-      const result = await modelProduct.find({ 
-          product_name: { $regex: keyword, $options: 'i' } 
-      }).populate({
-        path: 'variants', 
-        select: 'variant_price product_discount variant_original_price',
-        populate:[
-          {
-            path:'storage',
-            select: 'name'
-          },
-          {
-            path:'ram',
-            select: 'name'
-          },
-          {
-            path:'product_discount',
-            select: 'discountPercent'
-          }
-        ]
-      });
+    const keyword = req.params.keyword.trim(); 
 
-      if (result.length > 0) {
-          res.status(200).json({
-              success: true,
-              data: result
-          });
-      } else {
-          console.error("No results found for keyword:", keyword);
-          res.status(404).json({
-              success: false,
-              message: "No results found"
-          });
-      }
-  } catch (error) {
-      console.error('Error during search:', error);
-      res.status(500).json({
-          success: false,
-          message: 'Internal Server Error',
-          error: error.message
+    // Điều kiện không thực hiện tìm kiếm với từ khóa quá ngắn
+    if (keyword.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Keyword must be at least 3 characters long"
       });
+    }
+
+    // Truy vấn chỉ tìm kiếm các sản phẩm khớp với từ khóa
+    const result = await modelProduct.find({
+      product_name: { $regex: `${keyword}`, $options: 'i' } // Bắt đầu với từ khóa (case-insensitive)
+    }).populate({
+      path: 'variants',
+      select: 'variant_price product_discount variant_original_price',
+      populate: [
+        { path: 'storage', select: 'name' },
+        { path: 'ram', select: 'name' },
+        { path: 'product_discount', select: 'discountPercent' }
+      ]
+    });
+
+    if (result.length > 0) {
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No results found"
+      });
+    }
+  } catch (error) {
+    console.error('Error during search:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
   }
 };
+
 
 
 const comment = async (req, res) => {

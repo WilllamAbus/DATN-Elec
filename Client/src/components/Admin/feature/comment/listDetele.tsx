@@ -20,6 +20,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
+
 const MySwal = withReactContent(Swal);
 interface Comment {
   _id: string;
@@ -59,35 +60,35 @@ const ListComment: React.FC = () => {
     }
   };
 
-  const fetchData = async (page:number) => {
+  const fetchData = async (page: number) => {
     try {
       const commentResponse = await getCommentDelete(page, 5);
-  
+
       // Kiểm tra cấu trúc dữ liệu trả về
       if (!commentResponse || !commentResponse.comments) {
         console.error("No comments data found in the response.");
         setComments([]);
         return;
       }
-  
+
       const commentsData = Array.isArray(commentResponse.comments)
         ? commentResponse.comments
         : [];
       setComments(commentsData);
-  
+
       // Cập nhật tổng số trang
       if (commentResponse.totalPages) {
         setTotalPages(commentResponse.totalPages);
       } else {
         console.warn("Total pages not found in the response.");
       }
-  
+
       // Nếu có dữ liệu bình luận, xử lý lấy sản phẩm liên quan
       if (commentsData.length > 0) {
         const productIds = commentsData.map(
           (comment: Comment) => comment.id_product
         );
-  
+
         // Gọi đồng thời tất cả các sản phẩm
         await Promise.all(
           productIds.map(async (id: string) => {
@@ -105,13 +106,12 @@ const ListComment: React.FC = () => {
       console.error("Error fetching comments:", error);
     }
   };
-  
-  
+
   const handleDelete = async (id_product: string, id_comment: string) => {
     MySwal.fire({
       title: "Xóa vĩnh viễn",
       text: "Bình luận này sẽ không được khôi phục  ",
-      icon: "warning",  
+      icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -132,13 +132,12 @@ const ListComment: React.FC = () => {
           MySwal.fire({
             title: "Đã xóa!",
             text: "Bình luận đã được xóa",
-            icon: "success",  
-            confirmButtonText: "OK", 
-            showConfirmButton: true, 
+            icon: "success",
+            confirmButtonText: "OK",
+            showConfirmButton: true,
             confirmButtonColor: "#3085d6",
-
           });
-         await fetchData(currentPage);
+          await fetchData(currentPage);
         } catch (error) {
           console.error("Error deleting comment:", error);
           MySwal.fire({
@@ -153,8 +152,8 @@ const ListComment: React.FC = () => {
 
   const handleRestore = async (id_comment: string) => {
     MySwal.fire({
-      title: "Khôi phục comment?",
-      text: "Bạn có chắc muốn khôi phục comment này không!",
+      title: "Khôi phục bình luận?",
+      text: "Bạn có chắc muốn khôi phục bình luận này không!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -175,12 +174,11 @@ const ListComment: React.FC = () => {
             title: "Đã khôi phục!",
             text: "Đã khôi phục bình luận",
             icon: "success",
-            confirmButtonText: "OK", 
-            showConfirmButton: true, 
+            confirmButtonText: "OK",
+            showConfirmButton: true,
             confirmButtonColor: "#3085d6",
           });
-         await fetchData(currentPage);
-
+          await fetchData(currentPage);
         } catch (error) {
           console.error("Error restoring comment:", error);
           MySwal.fire({
@@ -211,10 +209,41 @@ const ListComment: React.FC = () => {
     fetchData(currentPage);
   }, [currentPage]);
 
+  const [selectedComments, setSelectedComments] = useState<string[]>([]);
+
+  // Hàm chọn hoặc bỏ chọn tất cả
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedComments(comments.map((comment: Comment) => comment._id)); // Chọn tất cả
+    } else {
+      setSelectedComments([]); // Bỏ chọn tất cả
+    }
+  };
+
+  // Hàm xử lý chọn từng comment
+  const toggleSelectComment = (id: string) => {
+    setSelectedComments((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const deleteAll = (idComment: string[]) => {
+    alert(`${idComment}`);
+  };
   return (
     <>
       <Table aria-label="Example static collection table">
         <TableHeader>
+          <TableColumn>
+            <input
+              type="checkbox"
+              onChange={(e) => toggleSelectAll(e.target.checked)}
+              checked={
+                selectedComments.length === comments.length &&
+                comments.length > 0
+              }
+            />
+          </TableColumn>
           <TableColumn>STT</TableColumn>
           <TableColumn>Tên sản phẩm</TableColumn>
           <TableColumn>Hình ảnh</TableColumn>
@@ -223,11 +252,19 @@ const ListComment: React.FC = () => {
           <TableColumn>#</TableColumn>
         </TableHeader>
         <TableBody>
-            {comments.map((comment, index) => (
+          {comments.map((comment, index) => (
             <TableRow
               key={comment?._id}
               className="border-b text-left dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
+              <TableCell className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  value={comment?._id}
+                  checked={selectedComments.includes(comment?._id)}
+                  onChange={() => toggleSelectComment(comment?._id)}
+                />
+              </TableCell>
               <TableCell className="px-4 py-3">{index + 1}</TableCell>
               <TableCell className="px-4 py-3">
                 {products[comment?.id_product]?.name || "Loading..."}
@@ -271,6 +308,16 @@ const ListComment: React.FC = () => {
           ))}
         </TableBody>
       </Table>
+      <div className="mt-4">
+        <button
+          className="bg-red-600 text-white py-2 px-4 rounded"
+          onClick={() => deleteAll(selectedComments)}
+          disabled={selectedComments.length === 0}
+        >
+          Xóa tất cả đã chọn
+        </button>
+      </div>
+
       {comments.length > 0 && (
         <PaginationComponent
           currentPage={currentPage}

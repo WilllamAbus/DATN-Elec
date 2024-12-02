@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -6,12 +6,11 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../redux/store";
-import { notify } from "../../../../../ultils/success";
+import { notify,notifyUpdate } from "../../../../../ultils/success";
 import {
   addComment,
   getCommentProduct,
   softDeleteComment,
-  getUserComment,
   addLike,
   editComment,
   Comment as CommentType,
@@ -28,29 +27,25 @@ import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from "@nextui-org/react";
-
+import "react-toastify/dist/ReactToastify.css";
 const MySwal = withReactContent(Swal);
 interface FormValues {
   content: string;
   rating: number;
 }
-interface User {
-  _id?: string;
-  name?: string;
-  avatar?: string;
-}
+
 interface EditComment {
   _id: string;
   content: string;
   rating: number;
 }
-const Comment = ({
-  onUpdateAverageRating,
-}: {
-  onUpdateAverageRating: (average: string) => void;
-}) => {
+
+const Comment = (
+  // { onUpdateAverageRating,}: {
+  // onUpdateAverageRating: (average: string) => void;}
+) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -58,13 +53,10 @@ const Comment = ({
   const [comments, setComments] = useState<CommentType[]>([]);
   const { register, handleSubmit, reset, formState, setValue } =
     useForm<FormValues>();
-  const {
-    register: registerEdit,
-    handleSubmit: handleSubmitEditForm,
-  } = useForm<FormValues>();
+  const { register: registerEdit, handleSubmit: handleSubmitEditForm } =
+    useForm<FormValues>();
   const { slug } = useParams<{ slug: string }>();
   const [visibleCount, setVisibleCount] = useState(5);
-  const [userNames, setUserNames] = useState<{ [key: string]: User }>({});
   const dispatch = useAppDispatch();
   const profile = useAppSelector(
     (state: RootState) => state.auth.profile.profile
@@ -83,10 +75,21 @@ const Comment = ({
     setVisibleCount(comments.length);
     setIsExpanded(true);
   };
+  const isMounted = useRef(true);
+
+useEffect(() => {
+  isMounted.current = true;
+  return () => {
+    isMounted.current = false;
+  };
+}, []);
+
+
   const handleShowLess = () => {
     setVisibleCount(5); // Thu gọn về 5 bình luận
     setIsExpanded(false); // Đặt trạng thái là "thu gọn"
   };
+  
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
     null
   );
@@ -124,15 +127,15 @@ const Comment = ({
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
-  const calculateAverageRating = (comments: CommentType[]) => {
-    const totalRatings = comments.reduce(
-      (sum, comment) => sum + comment.rating,
-      0
-    );
-    return comments.length > 0
-      ? (totalRatings / comments.length).toFixed(1)
-      : " ";
-  };
+  // const calculateAverageRating = (comments: CommentType[]) => {
+  //   const totalRatings = comments.reduce(
+  //     (sum, comment) => sum + comment.rating,
+  //     0
+  //   );
+  //   return comments.length > 0
+  //     ? (totalRatings / comments.length).toFixed(1)
+  //     : " ";
+  // };
   const fetchComments = async () => {
     if (!slug) {
       // console.log("ID sản phẩm không tồn tại");
@@ -144,30 +147,7 @@ const Comment = ({
       setComments(productComments);
       setFilteredComments(productComments);
       // Tính lại average rating và gửi lên component cha
-      const avgRating = calculateAverageRating(productComments);
-      onUpdateAverageRating(avgRating); // Truyền average rating lên component cha
-      const userIds = Array.from(
-        new Set(productComments.map((comment) => comment.id_user.toString()))
-      );
-
-      const userNameResponses = await Promise.all(
-        userIds.map((userId) => getUserComment(userId))
-      );
-
-      const userNameMap = userNameResponses.reduce((map, response) => {
-        const user = response;
-        if (user?._id) {
-          map[user?._id] = {
-            name: user?.name,
-            avatar: user?.avatar,
-          };
-        }
-        return map;
-      }, {} as { [key: string]: User });
-
-      setUserNames(userNameMap);
-
-      // console.log("User Name Map:", userNameMap);
+      //  Truyền average rating lên component cha
     } catch (error) {
       console.error("Lỗi:", error);
     }
@@ -195,34 +175,19 @@ const Comment = ({
       rating: rating,
       id_user: profile?._id,
       likes: 0,
+      replies:null,
     };
 
     try {
-      // Sử dụng Promise.all để gọi cả hai API cùng một lúc
-      const [commentResponse] = await Promise.all([
-        addComment(slug, commentData),
-        // addInteraction(interactionData),
-      ]);
-
-      console.log("Comment submitted:", commentResponse);
-      // console.log("Interaction submitted:", interactionResponse);
-
-      const newComment = {
-        ...commentResponse.data, // Đảm bảo sử dụng commentResponse
-        id_user: profile.name,
-      };
-
-      // Cập nhật danh sách comments
-      setComments((prevComments) =>
-        Array.isArray(prevComments)
-          ? [...prevComments, newComment]
-          : [newComment]
-      );
-      notify();
+      const commentResponse = await addComment(slug, commentData);
+        
+        fetchComments();
+        notify();
+      // console.log("Comment submitted:", commentResponse);
       reset();
       setRating(0);
       setHover(0);
-      fetchComments();
+      return commentResponse;
     } catch (error) {
       console.error("Error submitting comment:", error);
       setErrorMessage("Failed to submit comment.");
@@ -259,19 +224,9 @@ const Comment = ({
 
     try {
       const commentResponse = await editComment(slug, updatedCommentData);
-
-      const updatedComment = {
-        ...commentResponse.data,
-        id_user: profile.name,
-      };
-
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment._id === updatedComment._id ? updatedComment : comment
-        )
-      );
-
-      notify();
+      // console.log(commentResponse);
+      
+      notifyUpdate();
       reset();
       setCommentContent("");
       setCommentRating(0);
@@ -280,6 +235,7 @@ const Comment = ({
 
       setEditingComment(null);
       setIsModalOpen(false);
+      return commentResponse;
     } catch (error) {
       console.error("Error submitting comment:", error);
       setErrorMessage("Failed to submit comment.");
@@ -413,146 +369,157 @@ const Comment = ({
                       isSearchable={false}
                     />
                   </div>
-                  {/* Nội dung bình luận */}
-                  {filteredComments?.slice(0, visibleCount).map((comment) => {
-                    const createdAtDate = new Date(comment.createdAt);
 
-                    // Tính số giờ chênh lệch giữa `createdAtDate` và thời gian hiện tại
-                    const hoursDifference: number = differenceInHours(
-                      new Date(), // Thời gian hiện tại
-                      createdAtDate // Thời gian tạo bình luận
-                    );
-                    return (
-                      <div
-                        key={comment?._id}
-                        className="mt-6 divide-y divide-gray-200 dark:divide-gray-700 flex"
-                      >
-                        <div className="gap-3 pb-6 sm:flex sm:items-start ">
-                          <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
-                            <div className="space-y-0.5">
-                              <div className="flex items-start space-x-4 ">
-                                {userNames[comment?.id_user]?.avatar ? (
-                                  <img
-                                    className="h-10 w-10 rounded-full"
-                                    src={userNames[comment?.id_user]?.avatar}
-                                  />
-                                ) : (
-                                  <img
-                                    className="h-10 w-10 rounded-full"
-                                    src="/src/assets/images/cmt-Noavatar.png"
-                                    alt="No avatar"
-                                  />
-                                )}
+                  {filteredComments && filteredComments.length === 0 ? (
+                    <p className="text-left text-gray-500 dark:text-gray-400 mt-6">
+                      Không có đánh giá nào.
+                    </p>
+                  ) : (
+                    filteredComments?.slice(0, visibleCount).map((comment) => {
+                      const createdAtDate = new Date(comment.createdAt);
 
-                                <div>
-                                  <div className="flex">
-                                    <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
-                                      <p>
-                                        {userNames[comment?.id_user]?.name ||
+                      // Tính số giờ chênh lệch giữa `createdAtDate` và thời gian hiện tại
+                      const hoursDifference = differenceInHours(
+                        new Date(),
+                        createdAtDate
+                      );
+
+                      return (
+                        <div
+                          key={comment?._id}
+                          className="mt-6 divide-y divide-gray-200 dark:divide-gray-700 flex"
+                        >
+                          <div className="gap-3 pb-6 sm:flex sm:items-start ">
+                            <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
+                              <div className="space-y-0.5">
+                                <div className="flex items-start space-x-4 ">
+                                  {comment?.id_user?.avatar ? (
+                                    <img
+                                      className="h-10 w-10 rounded-full"
+                                      src={comment?.id_user?.avatar}
+                                    />
+                                  ) : (
+                                    <img
+                                      className="h-10 w-10 rounded-full"
+                                      src="/src/assets/images/cmt-Noavatar.png"
+                                      alt="No avatar"
+                                    />
+                                  )}
+
+                                  <div>
+                                    <div className="flex">
+                                      <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
+                                        {comment?.id_user?.name ||
                                           "Loading..."}
                                       </p>
-                                    </p>
-                                    {/* Chỉ hiển thị nút FaEllipsisV nếu người dùng là chủ sở hữu của cmt và hiện trong 24h kể từ khi cmt */}
-                                    {comment?.id_user === profile?._id &&
-                                      hoursDifference <= 24 && (
-                                        <div className="flex items-center ml-6">
-                                          <Dropdown>
-                                            <DropdownTrigger>
-                                              <button
-                                                className="flex items-center justify-center h-8 w-8"
-                                                onClick={() =>
-                                                  toggleDeleteButton(
-                                                    comment?._id
-                                                  )
-                                                }
-                                              >
-                                                <FaEllipsisV />
-                                              </button>
-                                            </DropdownTrigger>
-                                            <DropdownMenu>
-                                              <DropdownItem
-                                                key="new"
-                                                className="flex justify-center"
-                                              >
+                                      {/* Chỉ hiển thị nút FaEllipsisV nếu người dùng là chủ sở hữu của cmt và hiện trong 24h kể từ khi cmt */}
+                                      {comment?.id_user._id === profile?._id &&
+                                        hoursDifference <= 24 && (
+                                          <div className="flex items-center ml-6">
+                                            <Dropdown>
+                                              <DropdownTrigger>
                                                 <button
+                                                  className="flex items-center justify-center h-8 w-8"
                                                   onClick={() =>
-                                                    deleteComment(comment?._id)
+                                                    toggleDeleteButton(
+                                                      comment?._id
+                                                    )
                                                   }
-                                                  className="flex items-center justify-center h-4 w-full text-red-700 bg-transparent"
                                                 >
-                                                  <FaTrash /> <p className="ml-2">Xóa</p>
+                                                  <FaEllipsisV />
                                                 </button>
-                                              </DropdownItem>
-                                              <DropdownItem
-                                                key="copy"
-                                                className="flex justify-center"
-                                              >
-                                                <button
-                                                  onClick={() =>
-                                                    handleEditComment(comment)
-                                                  }
-                                                  className="flex items-center justify-center h-4  w-full bg-transparent"
+                                              </DropdownTrigger>
+                                              <DropdownMenu>
+                                                <DropdownItem
+                                                  key="new"
+                                                  className="flex justify-center"
                                                 >
-                                                  <FaEdit /> <p className="ml-2">Chỉnh sửa</p>
-                                                </button>
-                                              </DropdownItem>
-                                            </DropdownMenu>
-                                          </Dropdown>
-                                        </div>
-                                      )}
-                                  </div>
-
-                                  <div className="flex items-center gap-1 mt-2">
-                                    {[...Array(5)].map((_, index) => (
-                                      <svg
-                                        key={index}
-                                        className={`h-4 w-4 ${
-                                          index < comment?.rating
-                                            ? "text-yellow-300"
-                                            : "text-gray-400"
-                                        }`}
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
-                                      </svg>
-                                    ))}
-                                  </div>
-                                  <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-2">
-                                    {comment?.createdAt?.slice(0, 10)}
-                                  </p>
-                                  <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
-                                    <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
-                                      {comment?.content}
-                                    </p>
-                                    <div className="flex items-center space-x-4">
-                                      {/* Like cmt */}
-                                      <div className="flex items-center space-x-2">
-                                        <button
-                                          className={`bg-transparent ${
-                                            comment?.likes?.includes(
-                                              profile?._id
-                                            )
-                                              ? "text-yellow-400"
-                                              : "text-gray-400"
-                                          }`}
-                                          onClick={() =>
-                                            handleLikeCmt(comment?._id)
-                                          }
-                                        >
-                                          <FaThumbsUp />
-                                        </button>
-                                        <p>
-                                          Hữu ích ({comment?.likes?.length})
-                                        </p>
-                                      </div>
+                                                  <button
+                                                    onClick={() =>
+                                                      deleteComment(
+                                                        comment?._id
+                                                      )
+                                                    }
+                                                    className="flex items-center justify-center h-4 w-full text-red-700 bg-transparent"
+                                                  >
+                                                    <FaTrash />{" "}
+                                                    <p className="ml-2">Xóa</p>
+                                                  </button>
+                                                </DropdownItem>
+                                                <DropdownItem
+                                                  key="copy"
+                                                  className="flex justify-center"
+                                                >
+                                                  <button
+                                                    onClick={() =>
+                                                      handleEditComment(comment)
+                                                    }
+                                                    className="flex items-center justify-center h-4  w-full bg-transparent"
+                                                  >
+                                                    <FaEdit />{" "}
+                                                    <p className="ml-2">
+                                                      Chỉnh sửa
+                                                    </p>
+                                                  </button>
+                                                </DropdownItem>
+                                              </DropdownMenu>
+                                            </Dropdown>
+                                          </div>
+                                        )}
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                      {/* RepComment */}
-                                      <RepComment id_comment={comment?._id} />
+                                    <div className="flex items-center gap-1 mt-2">
+                                      {[...Array(5)].map((_, index) => (
+                                        <svg
+                                          key={index}
+                                          className={`h-4 w-4 ${
+                                            index < comment?.rating
+                                              ? "text-yellow-300"
+                                              : "text-gray-400"
+                                          }`}
+                                          aria-hidden="true"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          fill="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
+                                        </svg>
+                                      ))}
+                                    </div>
+                                    <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-2">
+                                      {comment?.createdAt?.slice(0, 10)}
+                                    </p>
+                                    <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
+                                      <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
+                                        {comment?.content}
+                                      </p>
+                                      <div className="flex items-center space-x-4">
+                                        {/* Like cmt */}
+                                        <div className="flex items-center space-x-2">
+                                          <button
+                                            className={`bg-transparent ${
+                                              comment?.likes?.includes(
+                                                profile?._id
+                                              )
+                                                ? "text-yellow-400"
+                                                : "text-gray-400"
+                                            }`}
+                                            onClick={() =>
+                                              handleLikeCmt(comment?._id)
+                                            }
+                                          >
+                                            <FaThumbsUp />
+                                          </button>
+                                          <p>
+                                            Hữu ích ({comment?.likes?.length})
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-4">
+                                        {/* RepComment */}
+                                        <RepComment id_comment={comment?._id} />
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -560,9 +527,9 @@ const Comment = ({
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
@@ -592,6 +559,7 @@ const Comment = ({
         ) : (
           <p>Chưa có bình luận</p>
         )}
+
         {/* chỉnh sửa */}
         {isModalOpen && (
           <div className="fixed inset-0 backdrop-filter backdrop-blur-md flex items-center justify-center z-50 min-h-screen">
@@ -713,7 +681,7 @@ const Comment = ({
           <div>
             <Link to="/login">
               <button className="bg-blue-600 border border-blue-600 text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-blue-600 transition">
-                Đăng nhập để bình luận
+                Đăng nhập để đánh giá
               </button>
             </Link>
           </div>
