@@ -163,7 +163,7 @@ const InboundList: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSearching}
-                className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 text-white bg-blue-500 border border-gray-300 rounded-r-md"
               >
                 <svg
                   className="h-5 w-5"
@@ -263,7 +263,7 @@ const InboundList: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">{inbound.productAuction.product_supplier.name}</td>
                     <td className="px-4 py-3">{inbound.inbound_quantity}</td>
-                    <td className="px-4 py-3">{inbound.inbound_price}</td>
+                    <td className="px-4 py-3">{inbound.inbound_price.toLocaleString()} VNĐ</td>
                     <td className="px-4 py-3">
                       {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",
@@ -275,7 +275,7 @@ const InboundList: React.FC = () => {
                       <div className="flex items-center space-x-4">
                       <button
                     className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                    onClick={() => handlesoftDeleteInbound(inbound._id)}
+                    onClick={() => handlesoftDeleteInbound(inbound._id)} 
                   >
                     Xoá
                   </button>

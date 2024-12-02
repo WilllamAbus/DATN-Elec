@@ -129,7 +129,7 @@ const InventoryList: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSearching}
-                className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex items-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md"
               >
                 <svg
                   className="h-5 w-5"
@@ -189,7 +189,7 @@ const InventoryList: React.FC = () => {
             <th scope="col" className="p-4">Tên sản phẩm</th>
             <th scope="col" className="p-4">Tên nhà cung cấp</th>
             <th scope="col" className="p-4">Số lượng kho</th>
-            <th scope="col" className="p-4">Số lượng kệ</th>
+            <th scope="col" className="p-4">Số lượng khả dụng</th>
             <th scope="col" className="p-4">Giá tiền</th>
             <th scope="col" className="p-4">Trạng thái kệ</th>
           </tr>
@@ -236,18 +236,18 @@ const InventoryList: React.FC = () => {
                     {productAuction.product_name}
                   </td>
                   <td className="px-4 py-3">{productAuction.product_supplier.name}</td>
-                  <td className="px-4 py-3">{quantityStock}
+                  <td className="px-4 py-3">{quantityStock.toLocaleString() } 
                     {quantityStockWarning && (
                       <p className="text-red-500 text-xs italic">{quantityStockWarning}</p>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {quantityShelf}
+                    {quantityShelf.toLocaleString()} 
                     {quantityWarning && (
                       <p className="text-red-500 text-xs italic">{quantityWarning}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3">{price}</td>
+                  <td className="px-4 py-3">{price.toLocaleString()} VNĐ</td>
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     <div className="flex items-center space-x-4">
                       {buttonDisabled ? (

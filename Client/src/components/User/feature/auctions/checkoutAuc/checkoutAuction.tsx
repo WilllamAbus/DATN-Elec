@@ -224,7 +224,7 @@ const onSubmit = async (data: FormData) => {
             <span>Vận chuyển:</span>
              
              <span>
-                31.000 đ
+                31,000 đ
              </span>
               <span>Tổng cộng:</span>
              

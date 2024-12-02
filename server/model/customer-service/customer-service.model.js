@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const customerServiceSchema = Schema(
   {
     bidding: { type: Schema.Types.ObjectId, ref: 'bidding', default:null },
-
+    order: { type: Schema.Types.ObjectId, ref: 'orderDetailAuction', default:null },
     serviceRequest: { type: Schema.Types.ObjectId, ref: 'services', required: true }, // Reference to the specific service
     reason: { type: String }, 
     status: { 

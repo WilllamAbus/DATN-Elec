@@ -3,6 +3,7 @@ const OrderDetailAuction = require("../../../../model/orders/auctionsOrders/aucO
 const Inventory = require("../../../../model/inventory/inventory.model");
 const getUserAndService = require("./findByIdSoftDel");
 const sendDeletionConfirmationEmail = require("./mailForOrderItarac");
+const Product_v2 = require("../../../../model/productAuction/productAuction");
 const CustomerService = require("../../../../model/customer-service/customer-service.model");
 const deleOrderIterationUser = {
   softDeleteOrdersByUser: async (orderId, userId) => {
@@ -100,7 +101,7 @@ const deleOrderIterationUser = {
 
   logServiceRequest: async (
     userId,
-   
+    orderId,
     serviceRequestId,
     reason,
     notes
@@ -108,6 +109,7 @@ const deleOrderIterationUser = {
     try {
       const log = new CustomerService({
         bidding: null,
+        order: orderId,
         serviceRequest: serviceRequestId, // Sử dụng trường mới này
         reason: reason,
         status: "Mở",
@@ -141,6 +143,7 @@ const deleOrderIterationUser = {
       // Ghi nhận yêu cầu dịch vụ
       await deleOrderIterationUser.logServiceRequest(
         userId,
+        orderId,
         serviceRequestId,
         reason,
         notes
@@ -152,15 +155,40 @@ const deleOrderIterationUser = {
         serviceRequestId
       ); // Dịch vụ có thể là đấu giá hoặc dịch vụ liên quan
       const customerRef = await CustomerService.findOne({
-        assignedAgent: userId,
+        order: orderId,
         status: { $ne: "disable" },
       }).lean();
-      const customerSelect = {
-        customerId: customerRef._id,
-        customerReson: customerRef.reason,
-        cutomerNotes: customerRef.notes,
-      };
+    
+      const serviceOrder = customerRef.order
 
+      const orderDetails = await OrderDetailAuction.findOne({
+        order: serviceOrder,
+      }).lean();
+
+      
+      if (!orderDetails) {
+        throw new Error("Order details not found");
+      }
+  
+      // Truy xuất thông tin sản phẩm từ product_v2
+      const product = await Product_v2.findOne({ _id: orderDetails.productID })
+        .select("product_name image")
+        .lean();
+  
+      if (!product) {
+        throw new Error("Product not found");
+      }
+  
+      const customerSelect = {
+        serviceOrder,
+        customerId: customerRef._id,
+        customerReason: customerRef.reason,
+        customerNotes: customerRef.notes,
+        productName: product.product_name,
+        productImage: product.image[0],
+      };
+  
+      
       
       // Gửi email xác nhận hủy dịch vụ
       await sendDeletionConfirmationEmail(

@@ -10,12 +10,10 @@ export const links: Record<string, Link[]> = {
   ],
   product: [
     { label: "Sản phẩm", to: "/admin/listproduct" },
-    { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
-    { label: "Khoảng định giá", to: "/admin/listPriceRand" },
+
     { label: "Mã giảm giá", to: "/admin/listVouchers" },
     { label: "Kho hàng", to: "/admin/listInventory" },
-    { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
-    { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
+  
   ],
   attribute: [
     { label: "Màn hình", to: "/admin/list-screen" },
@@ -27,7 +25,7 @@ export const links: Record<string, Link[]> = {
   ],
   orderCart: [
     { label: "Đơn hàng", to: "/admin/listOrders" },
-    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
+ 
   ],
 
   supplier: [{ label: "Nhà cung cấp", to: "/admin/listSuppliers" }],
@@ -53,7 +51,16 @@ export const links: Record<string, Link[]> = {
   homeAdmin: [{ label: "Trang chủ", to: "/admin" }],
   inbound: [
     { label: "Nhập hàng biến thể", to: "/admin/listInbound" },
-    { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" }
+  
   
   ],
+  auctions:[
+    { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
+    { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
+    { label: "Khoảng định giá", to: "/admin/listPriceRand" },
+    { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" },
+    { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
+ 
+    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" }
+  ]
 };

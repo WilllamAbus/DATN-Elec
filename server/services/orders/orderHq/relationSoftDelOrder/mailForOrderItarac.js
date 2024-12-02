@@ -40,8 +40,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
       html: 
       
       `  
-
-        <head>
+   <head>
     <title></title>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -76,10 +75,6 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
       .ExternalClass td,
       .ExternalClass div {
         line-height: 100%;
-      }
-      .gmail-mobile-forced-width {
-        display: none;
-        display: none !important;
       }
       body,
       a,
@@ -172,89 +167,113 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
     </style>
     <style type="text/css">
       @media (max-width: 480px) {
-        .t29,
-        .t32,
-        .t5,
-        .t9 {
-          width: 398px !important;
-        }
-        .t31,
-        .t34 {
+        .t70 {
           mso-line-height-alt: 0px !important;
           line-height: 0 !important;
           display: none !important;
         }
-        .t32 {
-          padding: 40px !important;
-          border-radius: 0 !important;
-        }
-        .t24 {
-          text-align: left !important;
-        }
-        .t17 {
-          display: revert !important;
-        }
-        .t19,
-        .t23 {
-          vertical-align: top !important;
-          width: auto !important;
-          max-width: 100% !important;
-        }
-      }
-    </style>
-    <style type="text/css">
-      @media (max-width: 480px) {
-        [class~="x_t31"] {
-          mso-line-height-alt: 0px !important;
-          line-height: 0px !important;
-          display: none !important;
-        }
-        [class~="x_t34"] {
-          mso-line-height-alt: 0px !important;
-          line-height: 0px !important;
-          display: none !important;
-        }
-        [class~="x_t32"] {
-          padding-left: 40px !important;
-          padding-top: 40px !important;
+        .t71 {
+          padding-left: 30px !important;
           padding-bottom: 40px !important;
-          padding-right: 40px !important;
-          border-top-left-radius: 0px !important;
-          border-top-right-radius: 0px !important;
-          border-bottom-right-radius: 0px !important;
-          border-bottom-left-radius: 0px !important;
-          width: 398px !important;
+          padding-right: 30px !important;
+          width: 420px !important;
         }
-        [class~="x_t5"] {
-          width: 398px !important;
+        .t68 {
+          width: 353px !important;
         }
-        [class~="x_t9"] {
-          width: 398px !important;
+        .t11,
+        .t110,
+        .t113,
+        .t119,
+        .t121,
+        .t14,
+        .t18,
+        .t21,
+        .t25,
+        .t28,
+        .t31,
+        .t34,
+        .t4,
+        .t64,
+        .t7,
+        .t74 {
+          width: 420px !important;
         }
-        [class~="x_t29"] {
-          width: 398px !important;
+        .t4 {
+          padding-bottom: 20px !important;
         }
-        [class~="x_t24"] {
-          text-align: left !important;
+        .t3 {
+          line-height: 28px !important;
+          font-size: 26px !important;
+          letter-spacing: -1.04px !important;
         }
-        [class~="x_t17"] {
+        .t121 {
+          padding: 40px 30px !important;
+        }
+        .t110 {
+          padding-bottom: 36px !important;
+        }
+        .t106 {
+          text-align: center !important;
+        }
+        .t101,
+        .t103,
+        .t38,
+        .t40,
+        .t44,
+        .t46,
+        .t51,
+        .t53,
+        .t77,
+        .t79,
+        .t83,
+        .t85,
+        .t89,
+        .t91,
+        .t95,
+        .t97 {
           display: revert !important;
         }
-        [class~="x_t19"] {
+        .t105,
+        .t81,
+        .t87,
+        .t93,
+        .t99 {
           vertical-align: top !important;
-          width: auto !important;
-          max-width: 100% !important;
+          width: 44px !important;
         }
-        [class~="x_t23"] {
-          vertical-align: top !important;
-          width: auto !important;
-          max-width: 100% !important;
+        .t42,
+        .t48,
+        .t55 {
+          vertical-align: middle !important;
+        }
+        .t1 {
+          padding-bottom: 50px !important;
+          width: 80px !important;
+        }
+        .t60 {
+          width: 380px !important;
+        }
+        .t56 {
+          text-align: left !important;
+        }
+        .t48 {
+          width: 620px !important;
+        }
+        .t45 {
+          padding-left: 0 !important;
+        }
+        .t55 {
+          width: 388px !important;
+        }
+        .t42 {
+          width: 221px !important;
         }
       }
     </style>
     <!--[if !mso]>-->
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&amp;family=Sofia+Sans:wght@700&amp;family=Open+Sans:wght@400;500;600&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;700;800&amp;display=swap"
       rel="stylesheet"
       type="text/css"
     />
@@ -268,17 +287,17 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
       </xml>
     <![endif]-->
   </head>
-          <body
+  <body
     id="body"
-    class="t37"
+    class="t125"
     style="
       min-width: 100%;
       margin: 0px;
       padding: 0px;
-      background-color: #ffffff;
+      background-color: #242424;
     "
   >
-    <div class="t36" style="background-color: #ffffff">
+    <div class="t124" style="background-color: #242424">
       <table
         role="presentation"
         width="100%"
@@ -289,12 +308,12 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
       >
         <tr>
           <td
-            class="t35"
+            class="t123"
             style="
               font-size: 0;
               line-height: 0;
               mso-line-height-rule: exactly;
-              background-color: #ffffff;
+              background-color: #242424;
             "
             valign="top"
             align="center"
@@ -305,7 +324,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                 fill="true"
                 stroke="false"
               >
-                <v:fill color="#FFFFFF" />
+                <v:fill color="#242424" />
               </v:background>
             <![endif]-->
             <table
@@ -320,11 +339,11 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
               <tr>
                 <td>
                   <div
-                    class="t31"
+                    class="t70"
                     style="
                       mso-line-height-rule: exactly;
-                      mso-line-height-alt: 50px;
-                      line-height: 50px;
+                      mso-line-height-alt: 45px;
+                      line-height: 45px;
                       font-size: 1px;
                       display: block;
                     "
@@ -336,7 +355,7 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
               <tr>
                 <td align="center">
                   <table
-                    class="t33"
+                    class="t72"
                     role="presentation"
                     cellpadding="0"
                     cellspacing="0"
@@ -344,18 +363,15 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                   >
                     <tr>
                       <!--[if mso]>
-<td width="600" class="t32" style="background-color:#FFFFFF;border:1px solid #EBEBEB;overflow:hidden;padding:44px 42px 32px 42px;border-radius:3px 3px 3px 3px;">
+<td width="600" class="t71" style="background-color:#F8F8F8;padding:0 50px 60px 50px;">
 <![endif]-->
                       <!--[if !mso]>-->
                       <td
-                        class="t32"
+                        class="t71"
                         style="
-                          background-color: #ffffff;
-                          border: 1px solid #ebebeb;
-                          overflow: hidden;
-                          width: 514px;
-                          padding: 44px 42px 32px 42px;
-                          border-radius: 3px 3px 3px 3px;
+                          background-color: #f8f8f8;
+                          width: 500px;
+                          padding: 0 50px 60px 50px;
                         "
                       >
                         <!--<![endif]-->
@@ -377,10 +393,13 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                               >
                                 <tr>
                                   <!--[if mso]>
-<td width="42" class="t1">
+<td width="130" class="t1" style="padding:0 0 60px 0;">
 <![endif]-->
                                   <!--[if !mso]>-->
-                                  <td class="t1" style="width: 42px">
+                                  <td
+                                    class="t1"
+                                    style="width: 130px; padding: 0 0 60px 0"
+                                  >
                                     <!--<![endif]-->
                                     <div style="font-size: 0px">
                                       <img
@@ -393,9 +412,9 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                                           margin: 0;
                                           max-width: 100%;
                                         "
-                                        width="102"
-                                        height="102"
-                                       src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogos.png?alt=media&token=078f5f5d-08f4-41e6-99c6-5f0a05afa74d"
+                                        width="130"
+                                        height="130"
+                                         src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogos2.png?alt=media&token=7ee844e9-8d47-46c6-a49a-db43773a5109"
                                             alt="Logo"
                                       />
                                     </div>
@@ -405,25 +424,9 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                             </td>
                           </tr>
                           <tr>
-                            <td>
-                              <div
-                                class="t3"
-                                style="
-                                  mso-line-height-rule: exactly;
-                                  mso-line-height-alt: 42px;
-                                  line-height: 42px;
-                                  font-size: 1px;
-                                  display: block;
-                                "
-                              >
-                                &nbsp;&nbsp;
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
                             <td align="center">
                               <table
-                                class="t6"
+                                class="t5"
                                 role="presentation"
                                 cellpadding="0"
                                 cellspacing="0"
@@ -431,41 +434,37 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                               >
                                 <tr>
                                   <!--[if mso]>
-<td width="514" class="t5" style="border-bottom:1px solid #EFF1F4;padding:0 0 18px 0;">
+<td width="500" class="t4" style="padding:0 0 15px 0;">
 <![endif]-->
                                   <!--[if !mso]>-->
                                   <td
-                                    class="t5"
-                                    style="
-                                      border-bottom: 1px solid #eff1f4;
-                                      width: 514px;
-                                      padding: 0 0 18px 0;
-                                    "
+                                    class="t4"
+                                    style="width: 500px; padding: 0 0 15px 0"
                                   >
                                     <!--<![endif]-->
                                     <h1
-                                      class="t4"
+                                      class="t3"
                                       style="
                                         margin: 0;
                                         margin: 0;
-                                        font-family: Montserrat,
+                                        font-family: Albert Sans,
                                           BlinkMacSystemFont, Segoe UI,
                                           Helvetica Neue, Arial, sans-serif;
-                                        line-height: 28px;
-                                        font-weight: 700;
+                                        line-height: 26px;
+                                        font-weight: 800;
                                         font-style: normal;
                                         font-size: 24px;
                                         text-decoration: none;
                                         text-transform: none;
-                                        letter-spacing: -1px;
+                                        letter-spacing: -1.56px;
                                         direction: ltr;
-                                        color: #141414;
+                                        color: #191919;
                                         text-align: left;
                                         mso-line-height-rule: exactly;
                                         mso-text-raise: 1px;
                                       "
                                     >
-                                   ${serviceDetails.service_name}
+                                       Dịch vụ  ${serviceDetails.service_name}
                                     </h1>
                                   </td>
                                 </tr>
@@ -473,25 +472,9 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                             </td>
                           </tr>
                           <tr>
-                            <td>
-                              <div
-                                class="t7"
-                                style="
-                                  mso-line-height-rule: exactly;
-                                  mso-line-height-alt: 18px;
-                                  line-height: 18px;
-                                  font-size: 1px;
-                                  display: block;
-                                "
-                              >
-                                &nbsp;&nbsp;
-                              </div>
-                            </td>
-                          </tr>
-                          <tr>
                             <td align="center">
                               <table
-                                class="t10"
+                                class="t8"
                                 role="presentation"
                                 cellpadding="0"
                                 cellspacing="0"
@@ -499,34 +482,370 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                               >
                                 <tr>
                                   <!--[if mso]>
-<td width="514" class="t9">
+<td width="500" class="t7" style="padding:0 0 22px 0;">
 <![endif]-->
                                   <!--[if !mso]>-->
-                                  <td class="t9" style="width: 514px">
+                                  <td
+                                    class="t7"
+                                    style="width: 500px; padding: 0 0 22px 0"
+                                  >
                                     <!--<![endif]-->
                                     <p
-                                      class="t8"
+                                      class="t6"
                                       style="
                                         margin: 0;
                                         margin: 0;
-                                        font-family: Open Sans,
+                                        font-family: Albert Sans,
                                           BlinkMacSystemFont, Segoe UI,
                                           Helvetica Neue, Arial, sans-serif;
-                                        line-height: 25px;
-                                        font-weight: 400;
+                                        line-height: 22px;
+                                        font-weight: 500;
                                         font-style: normal;
-                                        font-size: 15px;
+                                        font-size: 14px;
                                         text-decoration: none;
                                         text-transform: none;
-                                        letter-spacing: -0.1px;
+                                        letter-spacing: -0.56px;
                                         direction: ltr;
-                                        color: #141414;
+                                        color: #333333;
                                         text-align: left;
                                         mso-line-height-rule: exactly;
-                                        mso-text-raise: 3px;
+                                        mso-text-raise: 2px;
                                       "
                                     >
-                                 ${customerSelect.customerReson}
+                                  Chúng tôi nhận được yêu cầu hủy hóa đơn của bạn. Dịch vụ yêu cầu
+                                  sẽ được hoàn thành nhanh chóng .
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t12"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t11">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t11" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t10"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                      <span
+                                        class="t9"
+                                        style="
+                                          margin: 0;
+                                          margin: 0;
+                                          font-weight: bold;
+                                          mso-line-height-rule: exactly;
+                                        "
+                                        >Mã dịch vụ</span
+                                      >
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t15"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t14" style="padding:0 0 22px 0;">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td
+                                    class="t14"
+                                    style="width: 500px; padding: 0 0 22px 0"
+                                  >
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t13"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                    HD-${customerSelect.serviceOrder}
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t19"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t18">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t18" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t17"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                      <span
+                                        class="t16"
+                                        style="
+                                          margin: 0;
+                                          margin: 0;
+                                          font-weight: bold;
+                                          mso-line-height-rule: exactly;
+                                        "
+                                        >Mã dịch vụ yêu cầu</span
+                                      >
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t22"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t21" style="padding:0 0 22px 0;">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td
+                                    class="t21"
+                                    style="width: 500px; padding: 0 0 22px 0"
+                                  >
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t20"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                     ${customerSelect.customerId}
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t26"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t25">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                 
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t29"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t28">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t32"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t31">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t31" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t30"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                      
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t35"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t34">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t34" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t33"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                        Việt Nam
                                     </p>
                                   </td>
                                 </tr>
@@ -536,11 +855,11 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                           <tr>
                             <td>
                               <div
-                                class="t12"
+                                class="t36"
                                 style="
                                   mso-line-height-rule: exactly;
-                                  mso-line-height-alt: 24px;
-                                  line-height: 24px;
+                                  mso-line-height-alt: 30px;
+                                  line-height: 30px;
                                   font-size: 1px;
                                   display: block;
                                 "
@@ -550,58 +869,83 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                             </td>
                           </tr>
                           <tr>
-                            <td align="left">
+                            <td align="center">
                               <table
-                                class="t14"
+                                class="t61"
                                 role="presentation"
                                 cellpadding="0"
                                 cellspacing="0"
-                                style="margin-right: auto"
+                                style="margin-left: auto; margin-right: auto"
                               >
                                 <tr>
                                   <!--[if mso]>
-<td class="t13" style="background-color:#0666EB;overflow:hidden;text-align:center;line-height:34px;mso-line-height-rule:exactly;mso-text-raise:5px;padding:0 23px 0 23px;border-radius:40px 40px 40px 40px;">
+<td width="500" class="t60" style="background-color:#FFFFFF;padding:20px 20px 20px 20px;">
 <![endif]-->
                                   <!--[if !mso]>-->
                                   <td
-                                    class="t13"
+                                    class="t60"
                                     style="
-                                      background-color: #0666eb;
-                                      overflow: hidden;
-                                      width: auto;
-                                      text-align: center;
-                                      line-height: 34px;
-                                      mso-line-height-rule: exactly;
-                                      mso-text-raise: 5px;
-                                      padding: 0 23px 0 23px;
-                                      border-radius: 40px 40px 40px 40px;
+                                      background-color: #ffffff;
+                                      width: 460px;
+                                      padding: 20px 20px 20px 20px;
                                     "
                                   >
                                     <!--<![endif]-->
-                                    <span
-                                      class="t11"
-                                      style="
-                                        display: block;
-                                        margin: 0;
-                                        margin: 0;
-                                        font-family: Sofia Sans,
-                                          BlinkMacSystemFont, Segoe UI,
-                                          Helvetica Neue, Arial, sans-serif;
-                                        line-height: 34px;
-                                        font-weight: 700;
-                                        font-style: normal;
-                                        font-size: 16px;
-                                        text-decoration: none;
-                                        text-transform: none;
-                                        letter-spacing: -0.2px;
-                                        direction: ltr;
-                                        color: #ffffff;
-                                        text-align: center;
-                                        mso-line-height-rule: exactly;
-                                        mso-text-raise: 5px;
-                                      "
-                                      >Trở lại</span
-                                    >
+                                      <div style="width: 100%; text-align: left">
+    
+        <div class="t59" style="width: 100%; text-align: left">
+          <div class="t58" style="display: inline-block">
+            <table class="t57" role="presentation" cellpadding="0" cellspacing="0" align="left" valign="middle">
+              <tr class="t56">
+                <td></td>
+                <td class="t42" width="99.09324" valign="middle">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t41" style="width: 100%">
+                    <tr>
+                      <td class="t38" style="width: 10px" width="10"></td>
+                      <td class="t39">
+                        <div style="font-size: 0px">
+                          <img class="t37" style="display: block; border: 0; height: auto; width: 100%; margin: 0; max-width: 100%;" 
+                               width="79.09324208725407" height="105.859375" alt="${customerSelect.productName}" src="${customerSelect.productImage}" />
+                        </div>
+                      </td>
+                      <td class="t40" style="width: 10px" width="10"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td class="t48" width="256.09923" valign="middle">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t47" style="width: 100%">
+                    <tr>
+                      <td class="t44" style="width: 10px" width="10"></td>
+                      <td class="t45" style="padding: 0 0 0 24px">
+                        <h1 class="t43" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 16px; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #1a1a1a;">
+                          ${customerSelect.productName}
+                        </h1>
+                      </td>
+                      <td class="t46" style="width: 10px" width="10"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td class="t55" width="164.80753" valign="middle">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t54" style="width: 100%">
+                    <tr>
+                      <td class="t51" style="width: 10px" width="10"></td>
+                      <td class="t52">
+                        <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 500; font-size: 14px; text-transform: uppercase; color: #333333; text-align: right;">
+                          Số lượng: <span class="t49" style="font-weight: bold;">1</span>
+                        </p>
+                      </td>
+                      <td class="t53" style="width: 10px" width="10"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      
+        
+    </div>
                                   </td>
                                 </tr>
                               </table>
@@ -610,7 +954,68 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                           <tr>
                             <td>
                               <div
-                                class="t28"
+                                class="t62"
+                                style="
+                                  mso-line-height-rule: exactly;
+                                  mso-line-height-alt: 30px;
+                                  line-height: 30px;
+                                  font-size: 1px;
+                                  display: block;
+                                "
+                              >
+                                &nbsp;&nbsp;
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t65"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t64">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t64" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t63"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 14px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.56px;
+                                        direction: ltr;
+                                        color: #333333;
+                                        text-align: left;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 2px;
+                                      "
+                                    >
+                                     
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div
+                                class="t66"
                                 style="
                                   mso-line-height-rule: exactly;
                                   mso-line-height-alt: 40px;
@@ -624,9 +1029,104 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                             </td>
                           </tr>
                           <tr>
+                            <td align="left">
+                              <table
+                                class="t69"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="250" class="t68" style="background-color:#181818;overflow:hidden;text-align:center;line-height:44px;mso-line-height-rule:exactly;mso-text-raise:10px;border-radius:44px 44px 44px 44px;">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td
+                                    class="t68"
+                                    style="
+                                      background-color: #181818;
+                                      overflow: hidden;
+                                      width: 250px;
+                                      text-align: center;
+                                      line-height: 44px;
+                                      mso-line-height-rule: exactly;
+                                      mso-text-raise: 10px;
+                                      border-radius: 44px 44px 44px 44px;
+                                    "
+                                  >
+                                    <!--<![endif]-->
+                                    <a
+                                      class="t67"
+                                      href="http://localhost:3150/auction?_sort=product_price%3AASC&page=1"
+                                      style="
+                                        display: block;
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 44px;
+                                        font-weight: 800;
+                                        font-style: normal;
+                                        font-size: 12px;
+                                        text-decoration: none;
+                                        text-transform: uppercase;
+                                        letter-spacing: 2.4px;
+                                        direction: ltr;
+                                        color: #f8f8f8;
+                                        text-align: center;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 10px;
+                                      "
+                                      target="_blank"
+                                      >Tiếp tục mua sắm</a
+                                    >
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td align="center">
+                  <table
+                    class="t122"
+                    role="presentation"
+                    cellpadding="0"
+                    cellspacing="0"
+                    style="margin-left: auto; margin-right: auto"
+                  >
+                    <tr>
+                      <!--[if mso]>
+<td width="600" class="t121" style="background-color:#242424;padding:48px 50px 48px 50px;">
+<![endif]-->
+                      <!--[if !mso]>-->
+                      <td
+                        class="t121"
+                        style="
+                          background-color: #242424;
+                          width: 500px;
+                          padding: 48px 50px 48px 50px;
+                        "
+                      >
+                        <!--<![endif]-->
+                        <table
+                          role="presentation"
+                          width="100%"
+                          cellpadding="0"
+                          cellspacing="0"
+                          style="width: 100% !important"
+                        >
+                          <tr>
                             <td align="center">
                               <table
-                                class="t30"
+                                class="t75"
                                 role="presentation"
                                 cellpadding="0"
                                 cellspacing="0"
@@ -634,134 +1134,304 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                               >
                                 <tr>
                                   <!--[if mso]>
-<td width="514" class="t29" style="border-top:1px solid #DFE1E4;padding:24px 0 0 0;">
+<td width="500" class="t74">
 <![endif]-->
                                   <!--[if !mso]>-->
+                                  <td class="t74" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t73"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 800;
+                                        font-style: normal;
+                                        font-size: 18px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        letter-spacing: -0.9px;
+                                        direction: ltr;
+                                        color: #757575;
+                                        text-align: center;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 1px;
+                                      "
+                                    >
+                                     Hãy đăng nhập để mua sắm và nhận những thông tin về giá thành của sản phẩm
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t111"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+                                                            <td width="500" class="t110" style="padding:10px 0 44px 0;">
+                                                    <![endif]-->
+                                  <!--[if !mso]>-->
                                   <td
-                                    class="t29"
-                                    style="
-                                      border-top: 1px solid #dfe1e4;
-                                      width: 514px;
-                                      padding: 24px 0 0 0;
-                                    "
+                                    class="t110"
+                                    style="width: 500px; padding: 10px 0 44px 0"
                                   >
                                     <!--<![endif]-->
                                     <div
-                                      class="t27"
-                                      style="width: 100%; text-align: left"
+                                      class="t109"
+                                      style="width: 100%; text-align: center"
                                     >
                                       <div
-                                        class="t26"
+                                        class="t108"
                                         style="display: inline-block"
                                       >
                                         <table
-                                          class="t25"
+                                          class="t107"
                                           role="presentation"
                                           cellpadding="0"
                                           cellspacing="0"
-                                          align="left"
+                                          align="center"
                                           valign="top"
                                         >
-                                          <tr class="t24">
+                                          <tr class="t106">
                                             <td></td>
-                                            <td class="t19" valign="top">
+                                            <td
+                                              class="t81"
+                                              width="44"
+                                              valign="top"
+                                            >
                                               <table
                                                 role="presentation"
                                                 width="100%"
                                                 cellpadding="0"
                                                 cellspacing="0"
-                                                class="t18"
-                                                style="width: auto"
+                                                class="t80"
+                                                style="width: 100%"
                                               >
                                                 <tr>
                                                   <td
-                                                    class="t16"
-                                                    style="
-                                                      background-color: #ffffff;
-                                                      text-align: center;
-                                                      line-height: 20px;
-                                                      mso-line-height-rule: exactly;
-                                                      mso-text-raise: 2px;
-                                                    "
-                                                  >
-                                                    <span
-                                                      class="t15"
-                                                      style="
-                                                        display: block;
-                                                        margin: 0;
-                                                        margin: 0;
-                                                        font-family: Open Sans,
-                                                          BlinkMacSystemFont,
-                                                          Segoe UI,
-                                                          Helvetica Neue, Arial,
-                                                          sans-serif;
-                                                        line-height: 20px;
-                                                        font-weight: 600;
-                                                        font-style: normal;
-                                                        font-size: 14px;
-                                                        text-decoration: none;
-                                                        direction: ltr;
-                                                        color: #222222;
-                                                        text-align: center;
-                                                        mso-line-height-rule: exactly;
-                                                        mso-text-raise: 2px;
-                                                      "
-                                                      >E-com</span
-                                                    >
+                                                    class="t77"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                  <td class="t78">
+                                                    <div style="font-size: 0px">
+                                                      <img
+                                                        class="t76"
+                                                        style="
+                                                          display: block;
+                                                          border: 0;
+                                                          height: auto;
+                                                          width: 100%;
+                                                          margin: 0;
+                                                          max-width: 100%;
+                                                        "
+                                                        width="24"
+                                                        height="24"
+                                                        alt=""
+                                                        src="https://a1f898de-5c24-484f-82f0-a47a2ce1c407.b-cdn.net/e/2a2045dc-848b-4b42-82c9-19679c346752/8d668971-5312-4680-8eeb-e03b6a6b6940.png"
+                                                      />
+                                                    </div>
                                                   </td>
                                                   <td
-                                                    class="t17"
-                                                    style="width: 20px"
-                                                    width="20"
+                                                    class="t79"
+                                                    style="width: 10px"
+                                                    width="10"
                                                   ></td>
                                                 </tr>
                                               </table>
                                             </td>
-                                            <td class="t23" valign="top">
+                                            <td
+                                              class="t87"
+                                              width="44"
+                                              valign="top"
+                                            >
                                               <table
                                                 role="presentation"
                                                 width="100%"
                                                 cellpadding="0"
                                                 cellspacing="0"
-                                                class="t22"
-                                                style="width: auto"
+                                                class="t86"
+                                                style="width: 100%"
                                               >
                                                 <tr>
                                                   <td
-                                                    class="t21"
-                                                    style="
-                                                      background-color: #ffffff;
-                                                      text-align: center;
-                                                      line-height: 20px;
-                                                      mso-line-height-rule: exactly;
-                                                      mso-text-raise: 2px;
-                                                    "
-                                                  >
-                                                    <span
-                                                      class="t20"
-                                                      style="
-                                                        display: block;
-                                                        margin: 0;
-                                                        margin: 0;
-                                                        font-family: Open Sans,
-                                                          BlinkMacSystemFont,
-                                                          Segoe UI,
-                                                          Helvetica Neue, Arial,
-                                                          sans-serif;
-                                                        line-height: 20px;
-                                                        font-weight: 500;
-                                                        font-style: normal;
-                                                        font-size: 14px;
-                                                        text-decoration: none;
-                                                        direction: ltr;
-                                                        color: #b4becc;
-                                                        text-align: center;
-                                                        mso-line-height-rule: exactly;
-                                                        mso-text-raise: 2px;
-                                                      "
-                                                      ><a href="http://localhost:3150/auction">Tiếp tục mua sắm</a></span
-                                                    >
+                                                    class="t83"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                  <td class="t84">
+                                                    <div style="font-size: 0px">
+                                                      <img
+                                                        class="t82"
+                                                        style="
+                                                          display: block;
+                                                          border: 0;
+                                                          height: auto;
+                                                          width: 100%;
+                                                          margin: 0;
+                                                          max-width: 100%;
+                                                        "
+                                                        width="24"
+                                                        height="24"
+                                                        alt=""
+                                                        src="https://a1f898de-5c24-484f-82f0-a47a2ce1c407.b-cdn.net/e/2a2045dc-848b-4b42-82c9-19679c346752/619a4bc0-6689-4c36-bdea-d9a1f0071233.png"
+                                                      />
+                                                    </div>
                                                   </td>
+                                                  <td
+                                                    class="t85"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                </tr>
+                                              </table>
+                                            </td>
+                                            <td
+                                              class="t93"
+                                              width="44"
+                                              valign="top"
+                                            >
+                                              <table
+                                                role="presentation"
+                                                width="100%"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                class="t92"
+                                                style="width: 100%"
+                                              >
+                                                <tr>
+                                                  <td
+                                                    class="t89"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                  <td class="t90">
+                                                    <div style="font-size: 0px">
+                                                      <img
+                                                        class="t88"
+                                                        style="
+                                                          display: block;
+                                                          border: 0;
+                                                          height: auto;
+                                                          width: 100%;
+                                                          margin: 0;
+                                                          max-width: 100%;
+                                                        "
+                                                        width="24"
+                                                        height="24"
+                                                        alt=""
+                                                        src="https://a1f898de-5c24-484f-82f0-a47a2ce1c407.b-cdn.net/e/2a2045dc-848b-4b42-82c9-19679c346752/64248151-fa6a-40d1-ae6d-b5be6270db98.png"
+                                                      />
+                                                    </div>
+                                                  </td>
+                                                  <td
+                                                    class="t91"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                </tr>
+                                              </table>
+                                            </td>
+                                            <td
+                                              class="t99"
+                                              width="44"
+                                              valign="top"
+                                            >
+                                              <table
+                                                role="presentation"
+                                                width="100%"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                class="t98"
+                                                style="width: 100%"
+                                              >
+                                                <tr>
+                                                  <td
+                                                    class="t95"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                  <td class="t96">
+                                                    <div style="font-size: 0px">
+                                                      <img
+                                                        class="t94"
+                                                        style="
+                                                          display: block;
+                                                          border: 0;
+                                                          height: auto;
+                                                          width: 100%;
+                                                          margin: 0;
+                                                          max-width: 100%;
+                                                        "
+                                                        width="24"
+                                                        height="24"
+                                                        alt=""
+                                                        src="https://a1f898de-5c24-484f-82f0-a47a2ce1c407.b-cdn.net/e/2a2045dc-848b-4b42-82c9-19679c346752/622b291f-70e0-4782-91f9-9ef0e9b054b4.png"
+                                                      />
+                                                    </div>
+                                                  </td>
+                                                  <td
+                                                    class="t97"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                </tr>
+                                              </table>
+                                            </td>
+                                            <td
+                                              class="t105"
+                                              width="44"
+                                              valign="top"
+                                            >
+                                              <table
+                                                role="presentation"
+                                                width="100%"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                class="t104"
+                                                style="width: 100%"
+                                              >
+                                                <tr>
+                                                  <td
+                                                    class="t101"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
+                                                  <td class="t102">
+                                                    <div style="font-size: 0px">
+                                                      <img
+                                                        class="t100"
+                                                        style="
+                                                          display: block;
+                                                          border: 0;
+                                                          height: auto;
+                                                          width: 100%;
+                                                          margin: 0;
+                                                          max-width: 100%;
+                                                        "
+                                                        width="24"
+                                                        height="24"
+                                                        alt=""
+                                                        src="https://a1f898de-5c24-484f-82f0-a47a2ce1c407.b-cdn.net/e/2a2045dc-848b-4b42-82c9-19679c346752/986a7767-e9ee-4eb9-98b0-34dd3a0e1336.png"
+                                                      />
+                                                    </div>
+                                                  </td>
+                                                  <td
+                                                    class="t103"
+                                                    style="width: 10px"
+                                                    width="10"
+                                                  ></td>
                                                 </tr>
                                               </table>
                                             </td>
@@ -775,26 +1445,145 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
                               </table>
                             </td>
                           </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t114"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t113">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t113" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t112"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 12px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        direction: ltr;
+                                        color: #888888;
+                                        text-align: center;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 3px;
+                                      "
+                                    >
+                                    
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center">
+                              <table
+                                class="t120"
+                                role="presentation"
+                                cellpadding="0"
+                                cellspacing="0"
+                                style="margin-left: auto; margin-right: auto"
+                              >
+                                <tr>
+                                  <!--[if mso]>
+<td width="500" class="t119">
+<![endif]-->
+                                  <!--[if !mso]>-->
+                                  <td class="t119" style="width: 500px">
+                                    <!--<![endif]-->
+                                    <p
+                                      class="t118"
+                                      style="
+                                        margin: 0;
+                                        margin: 0;
+                                        font-family: Albert Sans,
+                                          BlinkMacSystemFont, Segoe UI,
+                                          Helvetica Neue, Arial, sans-serif;
+                                        line-height: 22px;
+                                        font-weight: 500;
+                                        font-style: normal;
+                                        font-size: 12px;
+                                        text-decoration: none;
+                                        text-transform: none;
+                                        direction: ltr;
+                                        color: #888888;
+                                        text-align: center;
+                                        mso-line-height-rule: exactly;
+                                        mso-text-raise: 3px;
+                                      "
+                                    >
+                                      <a
+                                        class="t115"
+                                        href="https://tabular.email"
+                                        style="
+                                          margin: 0;
+                                          margin: 0;
+                                          font-weight: 700;
+                                          font-style: normal;
+                                          text-decoration: none;
+                                          direction: ltr;
+                                          color: #888888;
+                                          mso-line-height-rule: exactly;
+                                        "
+                                        target="_blank"
+                                        >Unsubscribe</a
+                                      >&nbsp; •&nbsp;
+                                      <a
+                                        class="t116"
+                                        href=""
+                                        style="
+                                          margin: 0;
+                                          margin: 0;
+                                          font-weight: 700;
+                                          font-style: normal;
+                                          text-decoration: none;
+                                          direction: ltr;
+                                          color: #888888;
+                                          mso-line-height-rule: exactly;
+                                        "
+                                        target="_blank"
+                                        >Quyền riêng tư</a
+                                      >&nbsp; •&nbsp;
+                                      <a
+                                        class="t117"
+                                        href=""
+                                        style="
+                                          margin: 0;
+                                          margin: 0;
+                                          font-weight: 700;
+                                          font-style: normal;
+                                          text-decoration: none;
+                                          direction: ltr;
+                                          color: #878787;
+                                          mso-line-height-rule: exactly;
+                                        "
+                                        target="_blank"
+                                        >Liên hệ</a
+                                      >
+                                    </p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
                         </table>
                       </td>
                     </tr>
                   </table>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div
-                    class="t34"
-                    style="
-                      mso-line-height-rule: exactly;
-                      mso-line-height-alt: 50px;
-                      line-height: 50px;
-                      font-size: 1px;
-                      display: block;
-                    "
-                  >
-                    &nbsp;&nbsp;
-                  </div>
                 </td>
               </tr>
             </table>
@@ -803,8 +1592,13 @@ const sendDeletionConfirmationEmail = async (userEmail, serviceDetails, customer
       </table>
     </div>
     <div
-      class="gmail-mobile-forced-width"
-      style="white-space: nowrap; font: 15px courier; line-height: 0"
+      class="gmail-fix"
+      style="
+        display: none;
+        white-space: nowrap;
+        font: 15px courier;
+        line-height: 0;
+      "
     >
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;

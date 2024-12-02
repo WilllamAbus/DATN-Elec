@@ -13,16 +13,39 @@ const ConfirmOrderPage: React.FC = () => {
   const confirmOrder = useSelector(
     (state: RootState) => state.confirmOrder.confirmOrder
   );
-
-  
+  // const [, setOrderId] = useState<string | null>(null);
+  // const location = useLocation();
   const loading = useSelector((state: RootState) => state.confirmOrder.loading);
   const error = useSelector((state: RootState) => state.confirmOrder.error);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (orderId) {
-      dispatch(getOrderAuctionDetails(orderId));
-    }
-  }, [orderId, dispatch]);
+
+  const queryParams = new URLSearchParams(location.search);
+  const paymentDetails = Object.fromEntries(queryParams.entries());
+
+  const status = paymentDetails.vnp_TransactionStatus;
+  const vnpayAmou = paymentDetails.vnp_Amount
+ const vnpayOrderInfo = paymentDetails.vnp_OrderInfo
+ const vnpayResponCode = paymentDetails.vnp_ResponseCode
+ const vnpPayDate = paymentDetails.vnp_PayDate
+ const vnpayBankCode = paymentDetails.vnp_BankCode 
+ const vnpTransNo = paymentDetails.vnp_TransactionNo// Include this required field
+ useEffect(() => {
+  if (orderId && status) {
+    dispatch(getOrderAuctionDetails({ 
+      orderId, 
+      status, 
+      vnpayAmou, 
+      vnpayBankCode ,
+      vnpayOrderInfo, 
+      vnpayResponCode, 
+      vnpPayDate, 
+  
+      vnpTransNo// Include this required field
+    }));
+  }
+}, [orderId, status, dispatch]);
+
+
 
   if (loading) {
     return <div>Loading...</div>;

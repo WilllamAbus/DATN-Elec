@@ -5,12 +5,16 @@ import { OrderAuctionResponse, OrderCompleteResponse } from '../../types/auction
 
 export const getOrderAuctionDetails = createAsyncThunk(
   'orderAuction/getOrderDetails',
-  async (orderId: string, { rejectWithValue }) => {
+  async (payload: { orderId: string; status: string , vnpayAmou: string, vnpayBankCode: string,
+    vnpayOrderInfo: string, vnpPayDate: string, vnpayResponCode:string , vnpTransNo:string}, { rejectWithValue }) => {
     try {
-      const response: OrderAuctionResponse = await fetchAuctionData(orderId);
-  
-      
-      return response.data;
+      const { orderId, status, vnpayAmou,vnpayOrderInfo,
+        vnpayBankCode,vnpPayDate,vnpayResponCode , vnpTransNo} = payload;
+      const response: OrderAuctionResponse = await fetchAuctionData(orderId,
+         status,  vnpayAmou,vnpayOrderInfo,vnpayBankCode,
+         vnpPayDate,vnpayResponCode, vnpTransNo);
+
+      return response.data; // Return data if successful
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Something went wrong');
     }

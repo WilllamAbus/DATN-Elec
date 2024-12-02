@@ -76,3 +76,19 @@ export interface ShippingInfo {
     error: number;
     data: CompleteOrderDetail;
   }
+
+
+  export interface PaymentDetails  {
+    vnpAmount: string;
+    vnpBankCode: string;
+    vnpBankTranNo: string;
+    vnpCardType: string;
+    vnpOrderInfo: string;
+    vnpPayDate: string;
+    vnpResponseCode: string;
+    vnpTmnCode: string;
+    vnpTransactionNo: string;
+    vnpTransactionStatus: string;
+    vnpTxnRef: string;
+    vnpSecureHash: string;
+  }

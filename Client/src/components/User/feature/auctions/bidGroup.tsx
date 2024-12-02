@@ -84,7 +84,7 @@ const BidGroup: React.FC<BidGroupProps> = ({
             bid.product_bidding.productId._id === productId &&
             bid.bidEndTime.endTimeBid === bidsGroup[0].bidEndTime.endTimeBid
         )
-          ? "border-2 border-blue-600"
+          ? "border-2 border-[color:#E5E4E2] shadow-md"
           : ""
       }`}
     >
@@ -104,12 +104,12 @@ const BidGroup: React.FC<BidGroupProps> = ({
           </p>
           <p className="text-gray-600">
             Thời gian hiện tại:{" "}
-            {format(currentTime, "dd/MM/yyyy HH:mm:ss", { locale: vi })}
+            {format(currentTime, "HH:mm:ss, 'ngày' EEEE, d MMMM 'năm' yyyy ", { locale: vi })}
           </p>
           <p className="text-gray-600">
             Thời gian kết thúc:{" "}
             {isValidEndTime && endTime
-              ? format(endTime, "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", {
+              ? format(endTime, "HH:mm:ss,  'ngày' EEEE, d MMMM 'năm' yyyy", {
                   locale: vi,
                 })
               : "Không xác định"}
@@ -119,6 +119,7 @@ const BidGroup: React.FC<BidGroupProps> = ({
           </p>
         </div>
       </div>
+     
       <div className="flex flex-col gap-2">
         {bidsGroup.map((bid) => {
           const bidEndTime = bid.bidEndTime?.endTimeBid
@@ -137,10 +138,10 @@ const BidGroup: React.FC<BidGroupProps> = ({
           return (
             <div
               key={bid._id}
-              className="bg-white p-5 m-1 rounded-md border border-yellow-500"
+              className="bg-white p-3 m-1 rounded-md border border-[color:#DAA520] shadow-lg"
             >
               <p className="font-bold text-gray-700">Thông tin đấu giá</p>
-              {/* <p className=" text-gray-600">Mã đơn: {bid._id}</p> */}
+       
               <p className="text-gray-600">
                 Ngày đấu giá:{" "}
                 {format(parseISO(bid.createdAt), "d/M/yy HH:mm:ss", {

@@ -28,6 +28,7 @@ const CompletePage: React.FC = () => {
     const paymentResult = query.get("paymentResult");
     const orderIdFromQuery = query.get("orderId");
 
+
     if (paymentResult === "success" && orderIdFromQuery) {
       setOrderId(orderIdFromQuery);
       handleOrderCreation(orderIdFromQuery);
