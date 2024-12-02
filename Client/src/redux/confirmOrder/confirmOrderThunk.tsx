@@ -1,7 +1,7 @@
 // src/redux/thunks/orderAuctionThunk.ts
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchAuctionData, completeOrder } from '../../services/auction/confirmOrder';
-import { OrderAuctionResponse, OrderCompleteResponse } from '../../types/auctions/confirmOrder';
+import { fetchAuctionData, completeOrder, fetchAuctionDataDef } from '../../services/auction/confirmOrder';
+import { OrderAuctionResponse, OrderCompleteResponse, OrderAuctionResponseDefault } from '../../types/auctions/confirmOrder';
 
 export const getOrderAuctionDetails = createAsyncThunk(
   'orderAuction/getOrderDetails',
@@ -21,6 +21,20 @@ export const getOrderAuctionDetails = createAsyncThunk(
   }
 );
 
+export const getOrderAuctionDetailsDefault = createAsyncThunk(
+  'orderAuction/getOrderDetailsDefault',
+  async (payload: { orderIds: string; }, { rejectWithValue }) => {
+    try {
+      const { orderIds} = payload;
+      const response: OrderAuctionResponseDefault = await fetchAuctionDataDef (orderIds
+         );
+
+      return response.data; // Return data if successful
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Something went wrong');
+    }
+  }
+);
 
 
 export const completOrder = createAsyncThunk<OrderCompleteResponse, string>(

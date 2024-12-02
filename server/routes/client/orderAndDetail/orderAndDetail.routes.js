@@ -13,6 +13,7 @@ router.get('/deleted',middlewareController.verifyToken, orderController.getDelet
 router.get('/search',middlewareController.verifyTokenAdminAuth, orderController.searchOrdersByPhoneNumber);
 router.put('/product-details',middlewareController.verifyToken, orderController.getProductDetailsAuction)
 router.get('/orderDetailAuc',middlewareController.verifyToken, orderController.getOrderDetails)
+router.get('/orderDetailAucDefault',middlewareController.verifyToken, orderController.getOrderDetailsDefault)
 router.post('/complete',middlewareController.verifyToken, orderController.completeOrder)
 router.put('/received',middlewareController.verifyToken, orderController.updateAndGetReceivedOrdersByUser);
 router.patch('/received/soft-delete',middlewareController.verifyToken, orderController.softDeleteReceivedOrders);

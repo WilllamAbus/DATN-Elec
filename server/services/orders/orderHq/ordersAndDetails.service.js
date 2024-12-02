@@ -358,6 +358,77 @@ const orderAndDetailService = {
     }
   },
 
+  getOrderDetailDefaule: async (orderIds) => {
+    try {
+ 
+    
+      // Find the order and populate the userID in shippingAddress
+      const orderDefault = await OrderAuction.findById(orderIds)
+        .populate("shippingAddress.userID") // Populating userID inside shippingAddress
+        .exec();
+
+
+
+      
+      
+
+      if (!orderDefault) throw new Error("Đơn hàng không tồn tại");
+
+      // Find order details related to the order
+      const orderDetailsDefault = await OrderDetailAuction.find({
+        order: orderIds,
+      }).lean();
+
+
+   
+      const totlePricrDefaulr=  orderDetailsDefault[0].totalPriceWithShipping
+
+      
+      // Fetch product details for each order detail
+      const productDetails = await Promise.all(
+        orderDetailsDefault.map(async (detail) => {
+          const product = await Product_v2.findById(detail.productID).lean();
+
+
+          return {
+            name: product.product_name,
+            price: detail.totalAmount,
+            image: product.image,
+          };
+        })
+      );
+
+
+ 
+      
+      
+
+
+      // Extract the user and address information from the shippingAddress
+      const shippingInfo = {
+        userId: orderDefault.shippingAddress.userID._id,
+        recipientName: orderDefault.shippingAddress.recipientName,
+        phoneNumber: orderDefault.shippingAddress.phoneNumber,
+        address: orderDefault.shippingAddress.address,
+        email: orderDefault.shippingAddress.userID.email, // Assuming the user's email is stored here
+      };
+
+ 
+      
+      const orderIdResult = orderDefault._id;
+   
+  
+      // Return the consolidated order information
+      return {
+        orderIdResult,
+        shippingInfo, // Contains recipient, phone, address, and user email
+        totalPrice: totlePricrDefaulr,
+        products: productDetails,
+      };
+    } catch (error) {
+      throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
+    }
+  },
   getOrderDetailAdmin: async (orderId) => {
     try {
       // Find the order and populate the userID in shippingAddress

@@ -22,12 +22,12 @@ const CheckoutPage: React.FC = () => {
 
   
   const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); 
-  console.log('Bids: ', bids);
+
   
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
 
-console.log('auctionData', auctionData);
+
 
   
      // Access order data from `orderAuction`
@@ -89,7 +89,7 @@ const onSubmit = async (data: FormData) => {
     } else if (data.payment === 'Cash') {
       if(response.data){
         toast.success('Thanh toán khi nhận hàng');
-      navigate('/confimAuc');
+      navigate('/confimAucDefault');
       }
       // Handle Cash payment
        // Redirect after successful payment

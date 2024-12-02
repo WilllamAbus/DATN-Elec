@@ -208,6 +208,36 @@ const orderAndDetailControler = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  getOrderDetailsDefault: async (req, res) => {
+    try {
+
+      const { 
+        orderIds, 
+       
+    } = req.query ; 
+
+
+
+  
+      
+      const orderDetailsDefault = await orderService.getOrderDetailDefaule(
+        orderIds,
+      
+    );
+
+           
+        res
+          .status(200)
+          .json({ success: true, status: 200, error: -2, data: orderDetailsDefault });
+      
+      // Tạo chuỗi cần kiểm tra chữ ký
+ 
+
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   getOrderDetailsAdmin: async (req, res) => {
     try {
       const { orderId } = req.params; // Sử dụng req.body để lấy tham số từ request body

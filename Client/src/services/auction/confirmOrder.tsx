@@ -25,6 +25,20 @@ export const fetchAuctionData = async (
   return response.data;
 };
 
+
+export const fetchAuctionDataDef = async (
+  orderIds: string,
+ 
+): Promise<OrderAuctionResponse> => {
+  const response = await instance.get('client/orderAuc/orderDetailAucDefault', {
+    params: { 
+      orderIds: orderIds,
+      }, // Spread paymentDetails as query params
+  });
+
+
+  return response.data;
+};
 export const completeOrder = async (orderId: string): Promise<OrderCompleteResponse> => {
     const response = await instance.post('client/orderAuc/complete', { orderId });
   
