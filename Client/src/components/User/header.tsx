@@ -1,21 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Badge, Button } from "@nextui-org/react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { AppDispatch, RootState } from "../../redux/store";
+import { fetchCartList } from "../../redux/cart/cartThunk";
+import { getWatchlistThunk } from "../../redux/product/wathList/wathlist";
 
 const Header: React.FC = () => {
-  const [cartCount, setCartCount] = useState<number>(0);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const carts = useSelector((state: RootState) => state.cart.carts);
+  const wathlist = useSelector((state: RootState) => state.watchlist.items);
+  console.log(wathlist);
+  const totalProducts = carts
+    ? carts.reduce((productSet, cart) => {
+        if (cart.items && Array.isArray(cart.items)) {
+          cart.items.forEach((item) => productSet.add(item.product));
+        }
+        return productSet;
+      }, new Set()).size
+    : "";
+  useEffect(() => {
+    dispatch(getWatchlistThunk());
+  }, [dispatch]);
+  const totalWatchlistItems = wathlist
+    ? wathlist.filter((item) => item.product).length
+    : "";
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartCount(storedCart.length);
-    window.addEventListener("storage", updateCartCount);
-    return () => {
-      window.removeEventListener("storage", updateCartCount);
-    };
-  }, []);
+    dispatch(fetchCartList());
+  }, [dispatch]);
 
-  const updateCartCount = () => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartCount(storedCart.length);
+  const handleWatchlistView = () => {
+    navigate("/profile", { state: { view: "watchlist" } }); // Điều hướng kèm state
   };
 
   return (
@@ -26,7 +43,7 @@ const Header: React.FC = () => {
             <div className="flex items-center space-x-8">
               <ul className="hidden lg:flex items-center justify-start gap-6 md:gap-8 sm:justify-center">
                 <li>
-                <Link
+                  <Link
                     to="contact"
                     className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
                   >
@@ -54,106 +71,89 @@ const Header: React.FC = () => {
               </ul>
             </div>
             <div className="flex items-center lg:space-x-2">
-              <Link
-                to="/cart"
-                type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={24}
-                  height={24}
-                  fill="none"
-                  viewBox="0 0 24 24"
+              <Link to="/cart">
+                <Button
+                  type="button"
+                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
-                  />
-                </svg>
-                <span className="hidden sm:flex">Thông báo</span>
+                  <svg
+                    className="w-6 h-6 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
+                    />
+                  </svg>
+                  <span className="hidden sm:flex">Thông báo</span>
+                </Button>
               </Link>
-
-              <Link
-                to="/cart"
-                type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+              <Badge
+                color="danger"
+                content={totalProducts}
+                size="sm"
+                shape="circle"
               >
-                <svg
-                  className="w-5 h-5 lg:me-1"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={24}
-                  height={24}
-                  fill="none"
-                  viewBox="0 0 24 24"
+                <Link to="/cart">
+                  <Button
+                    type="button"
+                    className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                  >
+                    <i className="iconify mdi--cart-outline w-5 h-5 "></i>
+                    <span className="hidden sm:flex">Giỏ hàng</span>
+                  </Button>
+                </Link>
+              </Badge>
+              <Link to="/viewBids">
+                <Button
+                  type="button"
+                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                  />
-                </svg>
-                <span className="hidden sm:flex">Giỏ hàng</span>
-                <span className="cart-count ml-2"> {cartCount}</span>
+                  <svg
+                    className="w-6 h-6 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9.5 11H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h4.5M7 11V7a3 3 0 0 1 6 0v1.5m2.5 5.5v1.5l1 1m3.5-1a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
+                    />
+                  </svg>
+                  <span className="hidden sm:flex">Phiên đấu giá</span>
+                </Button>
               </Link>
-              <Link
-                to="/viewBids"
-                type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+              <Badge
+                color="danger"
+                content={totalWatchlistItems}
+                size="sm"
+                shape="circle"
               >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+                <Button
+                  onClick={handleWatchlistView}
+                  id="userDropdownButton1"
+                  data-dropdown-toggle="userDropdown1"
+                  type="button"
+                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9.5 11H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h4.5M7 11V7a3 3 0 0 1 6 0v1.5m2.5 5.5v1.5l1 1m3.5-1a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
-                  />
-                </svg>
-
-                <span className="hidden sm:flex">Phiên đấu giá</span>
-              </Link>
-              <button
-                id="userDropdownButton1"
-                data-dropdown-toggle="userDropdown1"
-                type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={24}
-                  height={24}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
-                  />
-                </svg>
-                Yêu thích
-              </button>
+                  <i className="iconify mdi--favourite-border w-5 h-5 "></i>
+                  Yêu thích
+                </Button>
+              </Badge>
               <div
                 id="userDropdown1"
                 className="hidden z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"

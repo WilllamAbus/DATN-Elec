@@ -1,140 +1,5 @@
-// import React, { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import {
-//   deleteWatchlistThunk,
-//   getWatchlistThunk,
-// } from "../../../../redux/product/wathList/wathlist";
-// import { AppDispatch, RootState } from "../../../../redux/store";
-// import "../../../../assets/css/admin.style.css";
-// import { UserProfile } from "../../../../types/user";
-
-// interface WatchlistProps {
-//   profiles?: UserProfile | null;
-// }
-
-// const Watchlist: React.FC<WatchlistProps> = () => {
-//   const dispatch = useDispatch<AppDispatch>();
-//   const userId = useSelector(
-//     (state: RootState) => state.auth.profile.profile?._id
-//   );
-//   const [watchlist, setWatchlist] = useState<any[]>([]);
-//   const [loading, setLoading] = useState<boolean>(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const fetchWatchlist = async () => {
-//       try {
-//         const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
-//         setWatchlist(watchlistResponse);
-//       } catch (error) {
-//         setError("Không có yêu thích");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (userId) {
-//       fetchWatchlist();
-//     }
-//   }, [dispatch, userId]);
-
-//   const handleDeleteFromWatchlist = async (productId: string) => {
-//     try {
-//       await dispatch(deleteWatchlistThunk(productId)).unwrap();
-//       setWatchlist(
-//         watchlist.filter(
-//           (item) => item.product && item.product._id !== productId
-//         )
-//       );
-//       toast.success("Sản phẩm đã bị xóa khỏi danh sách yêu thích.");
-//     } catch (error) {
-//       console.error("Error deleting item from watchlist:", error);
-//       toast.error("Đã xảy ra sự cố khi xóa sản phẩm khỏi danh sách yêu thích.");
-//     }
-//   };
-
-//   if (loading) return <p>Loading...</p>;
-//   if (error) return <p>{error}</p>;
-//   if (!Array.isArray(watchlist) || watchlist.length === 0) {
-//     return <p>Bạn chưa có sản phẩm nào trong danh sách yêu thích.</p>;
-//   }
-
-//   return (
-//     <div>
-//       <h1 className="text-2xl font-bold mb-4">Danh sách yêu thích</h1>
-//       <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
-//         {watchlist.map((item) => {
-//           const product = item.product;
-//           const variant = item.productVariant;
-//           if (!product) return null;
-
-//           return (
-//             <li key={item._id} className="py-3 sm:py-4">
-//               <div className="flex items-center justify-between space-x-4 rtl:space-x-reverse">
-//                 <div className="flex-shrink-0">
-//                   <img
-//                     className="w-12 h-12 rounded-full object-cover"
-//                     src={
-//                       variant?.image.image?.[0]
-//                         ? variant.image.image[0]
-//                         : product.image[0]
-//                     }
-//                     alt={product.product_name}
-//                   />
-//                 </div>
-//                 <div className="flex-1 min-w-0 text-center">
-//                   <p className="text-sm font-semibold text-gray-900 truncate dark:text-white">
-//                     {variant?.variant_name || product.product_name}
-//                   </p>
-//                   <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-//                     Bộ nhớ: {variant?.storage.name || "N/A"} | RAM:{" "}
-//                     {variant?.ram.name || "N/A"}
-//                   </p>
-//                   <p className="text-sm text-yellow-500 flex items-center justify-center dark:text-yellow-400">
-//                     {[...Array(Math.round(product.product_ratingAvg))].map(
-//                       (_, index) => (
-//                         <span key={index} className="mdi mdi-star"></span>
-//                       )
-//                     )}
-//                   </p>
-//                 </div>
-//                 <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-//                   {variant?.variant_price
-//                     ? variant.variant_price.toLocaleString("vi-VN", {
-//                         style: "currency",
-//                         currency: "VND",
-//                       })
-//                     : product.product_price_unit.toLocaleString("vi-VN", {
-//                         style: "currency",
-//                         currency: "VND",
-//                       })}
-//                 </div>
-//                 <div className="flex items-center space-x-2">
-//                   <button className="text-red-600 mdi mdi-heart hover:text-red-700"></button>
-//                   <button
-//                     className="bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-3 py-1 text-sm"
-//                     onClick={() => handleDeleteFromWatchlist(product._id)}
-//                   >
-//                     Xóa
-//                   </button>
-//                   <button className="text-blue-600 mdi mdi-cart hover:text-blue-700"></button>
-//                 </div>
-//               </div>
-//             </li>
-//           );
-//         })}
-//       </ul>
-//       <ToastContainer />
-//     </div>
-//   );
-// };
-
-// export default Watchlist;
-
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Button } from "@nextui-org/react";
@@ -142,7 +7,7 @@ import {
   deleteWatchlistThunk,
   getWatchlistThunk,
 } from "../../../../redux/product/wathList/wathlist";
-import { AppDispatch, RootState } from "../../../../redux/store";
+import { AppDispatch } from "../../../../redux/store";
 import { Link } from "react-router-dom";
 import { HeartIcon, StarIcon } from "../listPage/svg";
 
@@ -158,9 +23,9 @@ function formatCurrency(value: number) {
 
 const Watchlist: React.FC<WatchlistProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const userId = useSelector(
-    (state: RootState) => state.auth.profile.profile?._id
-  );
+  // const userId = useSelector(
+  //   (state: RootState) => state.auth.profile.profile?._id
+  // );
   const [watchlist, setWatchlist] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,10 +42,8 @@ const Watchlist: React.FC<WatchlistProps> = () => {
       }
     };
 
-    if (userId) {
-      fetchWatchlist();
-    }
-  }, [dispatch, userId]);
+    fetchWatchlist();
+  }, [dispatch]);
 
   const handleDeleteFromWatchlist = async (
     productId: string,

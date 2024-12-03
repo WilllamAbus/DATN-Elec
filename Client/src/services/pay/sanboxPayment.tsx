@@ -25,8 +25,8 @@ export class SanboxPayment {
     const requestId = this.generateUniqueId();
     const orderId = requestId;
     const orderInfo = `Thanh toán đấu giá ${auctionId}`;
-    const redirectUrl = "http://localhost:3150/confimAuc";
-    const ipnUrl = "http://localhost:3150/confimAuc";
+    const redirectUrl = "http://localhost:3150/confimAucDefault";
+    const ipnUrl = "http://localhost:3150/confimAucDefault";
     const extraData = "";
     const requestType = "captureWallet";
 

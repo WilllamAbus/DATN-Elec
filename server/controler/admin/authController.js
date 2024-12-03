@@ -210,10 +210,10 @@ exports.getOne = async (req, res) => {
 // exports.update = async (req, res) => {
 //   try {
 //     const { id } = req.params;
-
-//     const { name, address, phone, gender, birthday } = req.body;
+//     const { name, address, phone, gender, birthday, roles } = req.body;
 //     const avatar = req.file ? req.file : undefined;
 //     let avatarURL;
+
 //     if (avatar) {
 //       const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
 //       const file = bucket.file(`avatars/${filename}`);
@@ -229,9 +229,18 @@ exports.getOne = async (req, res) => {
 //           const encodedFilename = encodeURIComponent(file.name);
 //           avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
 
+//           // Cập nhật thông tin người dùng kèm theo avatar
 //           const updatedUser = await modelUser.findByIdAndUpdate(
 //             id,
-//             { name, address, phone, birthday, gender, avatar: avatarURL },
+//             {
+//               name,
+//               address,
+//               phone,
+//               birthday,
+//               gender,
+//               avatar: avatarURL,
+//               roles,
+//             },
 //             { new: true }
 //           );
 
@@ -252,17 +261,24 @@ exports.getOne = async (req, res) => {
 //         }
 //       });
 
+//       fileStream.on("error", (err) => {
+//         console.error("Lỗi khi tải lên hình ảnh:", err);
+//         return res.status(500).json({ message: "Không thể tải lên hình ảnh" });
+//       });
+
 //       fileStream.end(avatar.buffer);
 //     } else {
+//       // Cập nhật thông tin người dùng mà không có avatar
 //       const updatedUser = await modelUser.findByIdAndUpdate(
 //         id,
-//         { name, address, phone, gender, birthday },
+//         { name, address, phone, gender, birthday, roles },
 //         { new: true }
 //       );
 
 //       if (!updatedUser) {
 //         return res.status(404).json({ message: "Người dùng không tìm thấy" });
 //       }
+
 //       return res
 //         .status(200)
 //         .json({ message: "Cập Nhật Thành Công", user: updatedUser });
@@ -275,92 +291,41 @@ exports.getOne = async (req, res) => {
 //     });
 //   }
 // };
+
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, address, phone, gender, birthday, roles } = req.body;
-    const avatar = req.file ? req.file : undefined;
-    let avatarURL;
+    const { password } = req.body;
 
-    // Kiểm tra ID vai trò hợp lệ trước
-    // const roleExists = await modelRole.findById(roles);
-    // if (!roleExists) {
-    //   return res.status(400).json({ message: "Role không hợp lệ" });
-    // }
-
-    if (avatar) {
-      const filename = `${uuidv4()}-${Date.now()}-${avatar.originalname}`;
-      const file = bucket.file(`avatars/${filename}`);
-      const fileStream = file.createWriteStream({
-        metadata: {
-          contentType: avatar.mimetype,
-        },
-      });
-
-      fileStream.on("finish", async () => {
-        try {
-          await file.makePublic();
-          const encodedFilename = encodeURIComponent(file.name);
-          avatarURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedFilename}?alt=media`;
-
-          // Cập nhật thông tin người dùng kèm theo avatar
-          const updatedUser = await modelUser.findByIdAndUpdate(
-            id,
-            {
-              name,
-              address,
-              phone,
-              birthday,
-              gender,
-              avatar: avatarURL,
-              roles,
-            },
-            { new: true }
-          );
-
-          if (!updatedUser) {
-            return res
-              .status(404)
-              .json({ message: "Người dùng không tìm thấy" });
-          }
-
-          return res
-            .status(200)
-            .json({ message: "Cập Nhật Thành Công", user: updatedUser });
-        } catch (err) {
-          console.error("Lỗi khi lấy URL của hình ảnh:", err);
-          return res
-            .status(500)
-            .json({ message: "Không thể lấy URL của hình ảnh" });
-        }
-      });
-
-      fileStream.on("error", (err) => {
-        console.error("Lỗi khi tải lên hình ảnh:", err);
-        return res.status(500).json({ message: "Không thể tải lên hình ảnh" });
-      });
-
-      fileStream.end(avatar.buffer);
-    } else {
-      // Cập nhật thông tin người dùng mà không có avatar
-      const updatedUser = await modelUser.findByIdAndUpdate(
-        id,
-        { name, address, phone, gender, birthday, roles },
-        { new: true }
-      );
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: "Người dùng không tìm thấy" });
-      }
-
+    if (!password) {
       return res
-        .status(200)
-        .json({ message: "Cập Nhật Thành Công", user: updatedUser });
+        .status(400)
+        .json({ message: "Vui lòng cung cấp mật khẩu mới" });
     }
+
+    // Hash mật khẩu mới
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Cập nhật mật khẩu trong cơ sở dữ liệu
+    const updatedUser = await modelUser.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Người dùng không tìm thấy" });
+    }
+
+    return res.status(200).json({
+      message: "Cập nhật mật khẩu thành công",
+      user: updatedUser,
+    });
   } catch (error) {
-    console.error("Server error updating user profile:", error);
+    console.error("Server error updating password:", error);
     return res.status(500).json({
-      message: "Server error updating user profile",
+      message: "Server error updating password",
       error: error.message,
     });
   }

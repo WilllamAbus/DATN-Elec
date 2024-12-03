@@ -22,7 +22,11 @@ const Navbar: React.FC = () => {
   const dropdownItems = cateDropdownItems();
 
   const dataSearch = async (keyword: string) => {
+    if (keyword.length < 2) {
+      return;
+    }
     try {
+     
       if (!keyword.trim()) {
         setFilteredProducts([]);
         return;
@@ -47,6 +51,11 @@ const Navbar: React.FC = () => {
     const value = e.target.value;
     setKeyword(value);
     dataSearch(value);
+  };
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && keyword.length < 2) {
+      event.preventDefault(); 
+    }
   };
   const handleSubmit = () => {
     const trimmedKeyword = keyword.trim();
@@ -119,6 +128,7 @@ const Navbar: React.FC = () => {
                 placeholder="Tìm kiếm sản phẩm"
                 value={keyword}
                 onChange={handleSearch}
+                onKeyDown={handleKeyDown}
               />
             </div>
 

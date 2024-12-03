@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import {
@@ -11,32 +11,24 @@ import { Link } from "react-router-dom";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { Order } from "../../../../types/order/order";
+
 import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 
 const ListOrdersDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-
   const orders = useSelector(
     (state: RootState) => state.order.softDeletedOrders
   );
-  console.log(orders);
-  const [orderList, setOrderList] = useState<Order[]>(orders || []);
 
   useEffect(() => {
     dispatch(listSoftOrderThunk());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (orders) {
-      setOrderList(orders);
-    }
-  }, [orders]);
   const handlrestoreOrder = async (orderId: string) => {
     MySwal.fire({
-      title: "Xóa đơn hàng?",
+      title: "Khôi phục đơn hàng?",
       text: "Bạn có chắc muốn khôi phục đơn hàng này không?",
       icon: "warning",
       showCancelButton: true,
@@ -51,17 +43,15 @@ const ListOrdersDelete: React.FC = () => {
           dispatch(listSoftOrderThunk());
           toast.success("Đơn hàng đã được khôi phục.");
         } catch (error) {
-          console.error("Error deleting order:", error);
+          console.error("Lỗi khi khôi phục đơn hàng:", error);
           toast.error("Đã xảy ra sự cố khi khôi phục đơn hàng.");
         }
       }
     });
   };
 
-  const totalAmount = orderList.reduce(
-    (sum, order) => sum + order.totalAmount,
-    0
-  );
+  // Tính tổng số tiền của tất cả đơn hàng
+  const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
   return (
     <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -178,8 +168,8 @@ const ListOrdersDelete: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {orderList.length > 0 ? (
-            orderList.map((order, index) => (
+          {orders.length > 0 ? (
+            orders.map((order, index) => (
               <tr
                 key={order._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -207,17 +197,12 @@ const ListOrdersDelete: React.FC = () => {
                   {index + 1}
                 </th>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shipping.phoneNumber}
+                  {order.shipping?.phoneNumber || "Không có số điện thoại"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shipping.recipientName}
+                  {order.shipping?.recipientName || "Không có tên người nhận"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {/* <span
-                    className= "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
-                      order.stateOrder
-               
-                  > */}
                   <svg
                     className="me-1 h-3 w-3"
                     aria-hidden="true"
@@ -229,27 +214,27 @@ const ListOrdersDelete: React.FC = () => {
                   >
                     <path
                       stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M6 18 17.94 6M18 18 6.06 6"
                     />
                   </svg>
                   <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                    {order.stateOrder}
+                    {order.stateOrder || "Không xác định"}
                   </span>
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light text-primary-600">
-                  {order.totalAmount.toLocaleString("vi-VN", {
+                  {order.totalAmount?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  })}
+                  }) || "0 VND"}
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
                     <button
                       className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center text-blue-700 bg-blue-200 hover:text-white border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900`}
-                      onClick={() => handlrestoreOrder(order._id!)} // Thay đổi hàm xử lý nếu cần
+                      onClick={() => handlrestoreOrder(order._id!)}
                     >
                       Khôi phục
                     </button>
@@ -272,6 +257,7 @@ const ListOrdersDelete: React.FC = () => {
             </tr>
           )}
         </tbody>
+
         <ToastContainer />
       </table>
 

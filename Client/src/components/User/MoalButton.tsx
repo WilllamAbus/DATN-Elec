@@ -36,7 +36,7 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
       } else {
         toast.success("Bạn là Admin - Tài khoản không được tiến hành đấu giá !!");
         setTimeout(() => {
-          navigate("/");
+           <UserAuctDetails productId={productId} />
         }, 2000);
         // navigate("/login-error");
       }
@@ -141,9 +141,9 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
             <div className="relative p-5 text-center bg-white rounded-lg shadow dark:bg-gray-800 max-w-3xl mx-auto">
             <div className="flex justify-center items-center space-x-8">
   {[
-    { label: "Giá thấp đ ", value: bid?.minBid,  },
-    { label: "Giá trung bình đ", value: bid?.midBid },
-    { label: "Giá cao đ ", value: (bid?.minBid ?? 0) * 1.07 },
+    { label: "Giá thấp (đ) ", value: bid?.minBid,  },
+    { label: "Giá trung bình (đ)", value: bid?.midBid },
+    { label: "Giá cao (đ) ", value: (bid?.minBid ?? 0) * 1.07 },
   ].map((item, index) => (
     <div key={index} className="flex flex-col items-center w-1/3">
       <label className="text-sm text-gray-500 dark:text-gray-300 mb-1">{item.label}</label>

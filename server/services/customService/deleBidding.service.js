@@ -30,6 +30,7 @@ const deleBidingService = {
         try {
           const log = new CustomerService({
             bidding: biddingId,
+            order:null,
             serviceRequest: serviceRequestId, // Sử dụng trường mới này
             reason:  reason,
             status: 'Mở',

@@ -79,6 +79,10 @@ const UserCheckoutAuctPages = React.lazy(
 const UserConfirmAucPage = React.lazy(
   () => import("../page/User/shopping/auction/biddings/completAuctions")
 );
+
+const UserConfirmAucDefaultPage = React.lazy(
+  () => import("../page/User/shopping/auction/biddings/completAucDefault")
+);
 const LinkAccount = React.lazy(() => import("../page/User/accounts/link-account"));
 const LinkAccountSuccess = React.lazy(() => import("../page/User/accounts/link-account-success")); 
 const UserContact = React.lazy(() => import("../page/User/contact/contact"));
@@ -119,6 +123,7 @@ const UserRoutes: RouteObject[] = [
       { path: "viewBids", element: <UserViewBids /> },
       { path: "checkoutAuc", element: <UserCheckoutAuctPages /> },
       { path: "confimAuc", element: <UserConfirmAucPage /> },
+      { path: "confimAucDefault", element: <UserConfirmAucDefaultPage /> },
       { path: "contact", element: <UserContact /> },
     ],
   },

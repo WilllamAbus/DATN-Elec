@@ -17,23 +17,24 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    padding: 20,
+    padding: 10, // Giảm padding để vừa với khổ A6
     fontFamily: "Roboto",
   },
   section: {
-    marginBottom: 10,
+    marginBottom: 5,
+    fontSize: 12,
   },
   header: {
-    fontSize: 18,
+    fontSize: 14, // Giảm kích thước chữ cho tiêu đề
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   table: {
     display: "flex",
     flexDirection: "column",
     borderWidth: 1,
     borderColor: "#000",
-    marginTop: 20,
+    marginTop: 10,
   },
   tableHeader: {
     flexDirection: "row",
@@ -48,14 +49,14 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    padding: 5,
-    fontSize: 10,
+    padding: 3, // Giảm padding để fit khổ A6
+    fontSize: 8, // Giảm kích thước chữ để vừa với khổ A6
     textAlign: "center",
   },
   total: {
     textAlign: "right",
     marginTop: 10,
-    fontSize: 14,
+    fontSize: 12, // Giảm kích thước chữ cho tổng tiền
     fontWeight: "bold",
   },
 });
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
 const handleExportPDF = (order: Order) => {
   const MyDocument = () => (
     <Document>
-      <Page style={styles.page}>
+      <Page size="A6" style={styles.page}>
         {/* Tiêu đề */}
         <Text style={styles.header}>Hóa Đơn Bán Hàng</Text>
 

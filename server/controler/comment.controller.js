@@ -143,36 +143,41 @@ const commentController = {
   getCommentProduct: async (req, res) => {
     try {
       const { slug } = req.params;
-      const rating = req.query.rating ? parseInt(req.query.rating) : null;
-      const product = await modelProduct.findOne({ slug: slug }).populate({
-        path: "comments", // Đường dẫn tới mảng comments
-        model: "Comment", // Model tương ứng
+      const rating = req.query.rating ? parseInt(req.query.rating, 10) : null;
+  
+      // Tìm sản phẩm theo slug và populate thông tin
+      const product = await modelProduct.findOne({ slug }).populate({
+        path: "comments",
+        model: "Comment",
         match: {
-          status: "active", // Điều kiện lọc chỉ lấy bình luận có trạng thái 'active'
-          ...(rating !== null && { rating: rating }), // Nếu có rating thì lọc theo rating
+          status: "active",
+          ...(rating !== null && { rating }), // Lọc theo rating nếu có
         },
-        select: "content rating id_user id_product createdAt likes", // Chỉ lấy các trường cần thiết
-        options: { sort: { createdAt: -1 } }, // Sắp xếp từ mới nhất đến cũ nhất
+        select: "content rating id_user id_product createdAt likes", // Lấy các trường cần thiết
+        options: { sort: { createdAt: -1 } }, // Sắp xếp từ mới nhất
+        populate: {
+          path: "id_user", // Liên kết tới bảng User qua id_user
+          model: "users",
+          select: "name avatar", // Chỉ lấy name và avatar từ User
+        },
       });
   
-      if (!product || product.comments.length === 0) {
-      }
+      // Kiểm tra nếu không tìm thấy sản phẩm hoặc không có bình luận nào
       if (!product) {
         return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
       }
-
-      if (product.comments.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
+      if (!product.comments || product.comments.length === 0) {
+        return res.status(404).json({ message: "Không tìm thấy bình luận cho sản phẩm này" });
       }
-
+  
+      // Trả về danh sách bình luận
       res.status(200).json(product.comments);
     } catch (error) {
-      console.error("Error fetching comments:", error);
-       res.status(500).json({Message: 'Lỗi '});
+      console.error("Lỗi khi lấy bình luận sản phẩm:", error.message);
+      res.status(500).json({ message: "Đã xảy ra lỗi khi xử lý yêu cầu" });
     }
   },
+  
 
   getCommentAdmin: async (req, res) => {
     try {
@@ -393,6 +398,11 @@ const commentController = {
           sort: { createdAt: -1 }, // Sắp xếp bình luận từ mới nhất đến cũ nhất
           skip: skip, // Bỏ qua số lượng bình luận cần thiết
           limit: limit, // Giới hạn số lượng bình luận trên mỗi trang
+        },
+        populate: {
+          path: "id_user", // Liên kết tới bảng User qua id_user
+          model: "users",
+          select: "name avatar", // Chỉ lấy name và avatar từ User
         },
       });
 

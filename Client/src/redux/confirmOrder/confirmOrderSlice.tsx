@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'; // Import PayloadAction
-import { getOrderAuctionDetails, completOrder } from './confirmOrderThunk';
-import { OrderAuctionDetail, OrderCompleteResponse } from '../../types/auctions/confirmOrder';
+import { getOrderAuctionDetails, completOrder, getOrderAuctionDetailsDefault } from './confirmOrderThunk';
+import { OrderAuctionDetail, OrderCompleteResponse, OrderAuctionDetailDefaut } from '../../types/auctions/confirmOrder';
 
 interface OrderAuctionState {
+
   confirmOrder: OrderAuctionDetail | null;
+  confirmOrderDefaut: OrderAuctionDetailDefaut | null;
   completeOrder: OrderCompleteResponse | null;
   loading: boolean;
   error: string | null;
@@ -11,6 +13,7 @@ interface OrderAuctionState {
 
 const initialState: OrderAuctionState = {
   confirmOrder: null,
+  confirmOrderDefaut:null,
   completeOrder: null,
   loading: false,
   error: null,
@@ -31,6 +34,19 @@ const orderAuctionSlice = createSlice({
         state.confirmOrder = action.payload as OrderAuctionDetail;  // Ensure payload is of type OrderAuctionDetail
       })
       .addCase(getOrderAuctionDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(getOrderAuctionDetailsDefault.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrderAuctionDetailsDefault.fulfilled, (state, action) => {
+        state.loading = false;
+        state.confirmOrderDefaut = action.payload as OrderAuctionDetailDefaut;  // Ensure payload is of type OrderAuctionDetail
+      })
+      .addCase(getOrderAuctionDetailsDefault.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

@@ -24,7 +24,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
 import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSameSegment";
 
-
+import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify";
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -33,12 +33,9 @@ const DetailPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
  
-  const [averageRating, setAverageRating] = useState("5");
 
   // Hàm để cập nhật average rating
-  const handleUpdateAverageRating = (avgRating: string) => {
-    setAverageRating(avgRating);
-  }
+  
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail
   );
@@ -142,7 +139,7 @@ const DetailPage: React.FC = () => {
                           <Star />
                         </div>
                         <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                          {averageRating} trên 5
+                          {productDetail.product_ratingAvg} trên 5
                         </p>
                         <a
                           href="#"
@@ -171,7 +168,7 @@ const DetailPage: React.FC = () => {
           </>
         )}
       </div>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </section>
     <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto"> 
@@ -187,11 +184,14 @@ const DetailPage: React.FC = () => {
         </div>
       </div>
     <section>
-    <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+    {/* <Comment onUpdateAverageRating={handleUpdateAverageRating} /> */}
+    <Comment  />
     </section>
     <section>
         <RelatedProduct/>
     </section>
+    <ToastContainer />
+
     </>
   );
 };

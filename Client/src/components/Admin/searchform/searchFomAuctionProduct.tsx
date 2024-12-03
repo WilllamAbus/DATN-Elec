@@ -28,7 +28,7 @@ const SearchFomAuctionProduct: React.FC = () => {
           />
           <button
             type="submit"
-            className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+            className="absolute inset-y-0 right-0 flex items-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md"
           >
             <svg
               className="h-5 w-5"
