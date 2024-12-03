@@ -69,7 +69,7 @@ const recommendations = {
             .populate('product_discount')
             .populate({ 
               path: 'product', // Truy xuất thông tin sản phẩm từ trường product
-              select: 'weight_g product_ratingAvg' // Chỉ lấy các trường cần thiết
+              select: 'weight_g product_ratingAvg slug' // Chỉ lấy các trường cần thiết
             })
             .exec();
         } else if (item.itemType === "productAuction") {

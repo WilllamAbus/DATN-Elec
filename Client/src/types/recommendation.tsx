@@ -82,6 +82,7 @@ export interface Image {
 export interface ProductDetails {
     product_ratingAvg?: number; // Điểm đánh giá trung bình
     weight_g?: number; // Trọng lượng
+    slug?: string;
 }
 
 export interface Discount {

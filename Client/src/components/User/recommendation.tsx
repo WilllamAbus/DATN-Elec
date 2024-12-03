@@ -71,7 +71,7 @@ const ListRecommendation: React.FC = () => {
                                             className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                                         >
                                             <div className="h-56 w-auto">
-                                                <Link to={`/detailProd/${product.itemId}`}>
+                                            <Link to={`/product/${(product.itemDetails as ItemDetails).product?.slug}`}>
                                                     <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
                                                         <a href="#">
                                                             <img
