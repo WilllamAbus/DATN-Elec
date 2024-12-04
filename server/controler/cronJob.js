@@ -9,8 +9,8 @@ cron.schedule("* * * * *", async () => {
 
     const now = new Date();
     const thresholdDate = new Date();
-    // thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
-    thresholdDate.setTime(now.getTime() - 30 * 1000); //30s để test
+    thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
+    // thresholdDate.setTime(now.getTime() - 30 * 1000); //30s để test
 
     // 1. Xóa tài khoản bị disable hơn 30 ngày
     const usersToDelete = await modelUser.find({

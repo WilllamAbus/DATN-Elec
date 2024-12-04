@@ -381,6 +381,7 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
       await dispatch(fetchAddressListThunk());
       toast.dismiss();
       const successMessage = response?.message || "Thêm địa chỉ thành công!";
+      onBack();
       toast.success(successMessage);
     } catch (error) {
       console.error("error", error);

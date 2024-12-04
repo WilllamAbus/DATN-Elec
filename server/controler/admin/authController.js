@@ -306,8 +306,6 @@ exports.update = async (req, res) => {
     // Hash mật khẩu mới
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Cập nhật mật khẩu trong cơ sở dữ liệu
     const updatedUser = await modelUser.findByIdAndUpdate(
       id,
       { password: hashedPassword },

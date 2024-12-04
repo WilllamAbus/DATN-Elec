@@ -9,9 +9,10 @@ import {
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { CartType } from "../../../../types/cart/carts";
 import { useNavigate } from "react-router-dom";
-import { Button } from "flowbite-react";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Button } from "@nextui-org/react";
 
 const CartPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,9 +32,9 @@ const CartPage: React.FC = () => {
   }>({});
   const [totalCartPrice, setTotalCartPrice] = useState(0);
 
-  useEffect(() => {
-    dispatch(fetchCartList());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchCartList());
+  // }, [dispatch]);
 
   useEffect(() => {
     const updatedItemQuantities: { [key: string]: number } = {};
@@ -259,220 +260,179 @@ const CartPage: React.FC = () => {
         <div className="md:col-span-2 p-4 rounded-md">
           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />
-          <th scope="col" className="p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-all-orders"
-                type="checkbox"
-                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
-                checked={carts.every((cart) =>
-                  cart.items.every((item) => item.isSelected)
-                )}
-              />
-              <label htmlFor="checkbox-all-orders" className="ml-2">
-                Chọn tất cả
-              </label>
-            </div>
-          </th>
 
-          <div className="space-y-4">
+          <div className="flex items-center">
+            <input
+              id="checkbox-all-orders"
+              type="checkbox"
+              className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
+              checked={carts.every((cart) =>
+                cart.items.every((item) => item.isSelected)
+              )}
+            />
+            <label htmlFor="checkbox-all-orders" className="ml-2">
+              Chọn tất cả
+            </label>
+          </div>
+
+          <div className="space-y-4 mt-4">
             {groupedCarts.map((cart) => (
               <div
                 key={`${cart._id}-${cart.items[0].product._id}`}
-                className="grid bg-white grid-cols-3 items-center gap-4"
+                className="bg-white p-4 rounded-md shadow-sm"
               >
-                <div className="col-span-2 flex items-center gap-4">
-                  <th scope="col" className="p-4">
-                    {/* <div className="flex items-center">
-                      <input
-                        id={`checkbox-${cart._id}`}
-                        type="checkbox"
-                        checked={cart.items.every((item) => item.isSelected)}
-                        onChange={() => {
-                          cart.items.forEach((item) => {
-                            handleSelectCart(cart._id, item);
-                          });
-                        }}
-                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor={`checkbox-${cart._id}`}
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                      
-                    </div> */}
-                    <div className="flex items-center">
-                      <input
-                        id={`checkbox-${cart._id}`}
-                        type="checkbox"
-                        checked={cart.items.every((item) => item.isSelected)}
-                        onChange={() => {
-                          handleSelectCart(cart._id, cart); // Truyền toàn bộ đối tượng cart
-                        }}
-                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor={`checkbox-${cart._id}`}
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </th>
-
-                  <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
-                    <img
-                      src={
-                        cart.items[0]?.productVariant?.image?.[0]?.image?.[0] ||
-                        "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
-                      }
-                      alt={`product ${
-                        cart.items[0]?.productVariant?.variant_name || "Unknown"
-                      }`}
-                      className="w-full h-full object-contain"
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-4 w-full md:w-3/4">
+                    <input
+                      id={`checkbox-${cart._id}`}
+                      type="checkbox"
+                      checked={cart.items.every((item) => item.isSelected)}
+                      onChange={() => {
+                        handleSelectCart(cart._id, cart); // Truyền toàn bộ đối tượng cart
+                      }}
+                      className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     />
+                    <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
+                      <img
+                        src={
+                          cart.items[0]?.productVariant?.image?.[0]
+                            ?.image?.[0] ||
+                          "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
+                        }
+                        alt={`product ${
+                          cart.items[0]?.productVariant?.variant_name ||
+                          "Unknown"
+                        }`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
 
-                    {/* {cart.items.map((item, index) => (
-                      <div key={index}>
-                        {item.productVariant?.image?.[0]?.image?.[0] ? (
-                          <img
-                            src={item.productVariant.image[0].image[0]}
-                            alt="Product"
-                          />
-                        ) : (
-                          <p>Không có hình ảnh</p>
-                        )}
-                      </div>
-                    ))} */}
-                  </div>
-
-                  <div>
-                    <h3 className="text-base font-bold text-gray-800">
-                      {cart.items[0].productVariant.variant_name}
-                    </h3>
-                    <h6
-                      onClick={() =>
-                        handleDeleteProduct(cart._id, cart.items[0].product._id)
-                      }
-                      className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
-                        loading ? "opacity-50" : ""
-                      }`}
-                    >
-                      Xóa
-                    </h6>
-
-                    <div className="flex gap-4 mt-4">
-                      <button
-                        type="button"
-                        className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                    <div className="flex flex-col gap-2 w-full">
+                      <h3 className="text-base font-bold text-gray-800">
+                        {cart.items[0].productVariant.variant_name}
+                      </h3>
+                      <h6
+                        onClick={() =>
+                          handleDeleteProduct(
+                            cart._id,
+                            cart.items[0].product._id
+                          )
+                        }
+                        className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
+                          loading ? "opacity-50" : ""
+                        }`}
                       >
-                        <h5 className="text-gray-800 font-semibold">
-                          {cart.items[0].productVariant.screen?.name}
-                        </h5>
-                      </button>
+                        Xóa
+                      </h6>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap gap-4 mt-4">
                         <button
                           type="button"
-                          className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
-                          onClick={() =>
-                            handleDecreaseQuantity(
-                              cart._id,
-                              cart.items[0].product._id,
-                              itemQuantities[cart.items[0].product._id] ||
-                                cart.items[0].quantity
-                            )
-                          }
+                          className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-3 fill-current"
-                            viewBox="0 0 124 124"
-                          >
-                            <path d="M112 50H12c-6.6 0-10.8-1.8-10.8-6.5S5.4 37 12 37h100c6.6 0 10.8 1.8 10.8 6.5S118.6 50 112 50z" />
-                          </svg>
+                          <h5 className="text-gray-800 font-semibold">
+                            {cart.items[0].productVariant.ram?.name}
+                          </h5>
                         </button>
 
-                        <input
-                          type="text"
-                          className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
-                          value={
-                            itemQuantities[cart.items[0].product._id] ||
-                            cart.items[0].quantity
-                          }
-                          onChange={(e) => {
-                            const newQuantity = Number(e.target.value);
-
-                            if (
-                              !isNaN(newQuantity) &&
-                              newQuantity >= 1 &&
-                              newQuantity <= 99
-                            ) {
-                              setItemQuantities((prev) => ({
-                                ...prev,
-                                [cart.items[0].product._id]: newQuantity,
-                              }));
-                            } else if (newQuantity > 99) {
-                              toast.dismiss();
-                              toast.error("Số lượng không được vượt quá 99.");
-
-                              setItemQuantities((prev) => ({
-                                ...prev,
-                                [cart.items[0].product._id]: 99,
-                              }));
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                            onClick={() =>
+                              handleDecreaseQuantity(
+                                cart._id,
+                                cart.items[0].product._id,
+                                itemQuantities[cart.items[0].product._id] ||
+                                  cart.items[0].quantity
+                              )
                             }
-                          }}
-                          onBlur={(e) =>
-                            handleQuantityChange(
-                              cart._id,
-                              cart.items[0].product._id,
-                              Number(e.target.value) // Kiểm tra và cập nhật khi người dùng rời khỏi input
-                            )
-                          }
-                        />
-
-                        <button
-                          type="button"
-                          className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
-                          onClick={() =>
-                            handleIncreaseQuantity(
-                              cart._id,
-                              cart.items[0].product._id,
-                              itemQuantities[cart.items[0].product._id] ||
-                                cart.items[0].quantity
-                            )
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-3 fill-current"
-                            viewBox="0 0 42 42"
                           >
-                            <path d="M37.059 16H26V4.941C26 2.224 23.718 0 21 0s-5 2.224-5 4.941V16H4.941C2.224 16 0 18.282 0 21s2.224 5 4.941 5H16v11.059C16 39.776 18.282 42 21 42s5-2.224 5-4.941V26h11.059C39.776 26 42 23.718 42 21s-2.224-5-4.941-5z" />
-                          </svg>
-                        </button>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-3 fill-current"
+                              viewBox="0 0 124 124"
+                            >
+                              <path d="M112 50H12c-6.6 0-10.8-1.8-10.8-6.5S5.4 37 12 37h100c6.6 0 10.8 1.8 10.8 6.5S118.6 50 112 50z" />
+                            </svg>
+                          </button>
+
+                          <input
+                            type="text"
+                            className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
+                            value={
+                              itemQuantities[cart.items[0].product._id] ||
+                              cart.items[0].quantity
+                            }
+                            onChange={(e) => {
+                              const newQuantity = Number(e.target.value);
+                              if (
+                                !isNaN(newQuantity) &&
+                                newQuantity >= 1 &&
+                                newQuantity <= 99
+                              ) {
+                                setItemQuantities((prev) => ({
+                                  ...prev,
+                                  [cart.items[0].product._id]: newQuantity,
+                                }));
+                              } else if (newQuantity > 99) {
+                                toast.dismiss();
+                                toast.error("Số lượng không được vượt quá 99.");
+                                setItemQuantities((prev) => ({
+                                  ...prev,
+                                  [cart.items[0].product._id]: 99,
+                                }));
+                              }
+                            }}
+                            onBlur={(e) =>
+                              handleQuantityChange(
+                                cart._id,
+                                cart.items[0].product._id,
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <button
+                            type="button"
+                            className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                            onClick={() =>
+                              handleIncreaseQuantity(
+                                cart._id,
+                                cart.items[0].product._id,
+                                itemQuantities[cart.items[0].product._id] ||
+                                  cart.items[0].quantity
+                              )
+                            }
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-3 fill-current"
+                              viewBox="0 0 42 42"
+                            >
+                              <path d="M37.059 16H26V4.941C26 2.224 23.718 0 21 0s-5 2.224-5 4.941V16H4.941C2.224 16 0 18.282 0 21s2.224 5 4.941 5H16v11.059C16 39.776 18.282 42 21 42s5-2.224 5-4.941V26h11.059C39.776 26 42 23.718 42 21s-2.224-5-4.941-5z" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="ml-auto">
-                  <h4 className="text-base font-bold text-gray-800">
-                    {cart.items.length > 0 &&
-                    cart.items[0].productVariant &&
-                    cart.items[0].productVariant.variant_price
-                      ? cart.items[0].productVariant.variant_price.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : "Giá chưa được cập nhật"}
-                  </h4>
+                  <div className="ml-auto mt-4 md:mt-0">
+                    <h4 className="text-base font-bold text-gray-800">
+                      {cart.items.length > 0 &&
+                      cart.items[0].productVariant?.variant_price
+                        ? cart.items[0].productVariant.variant_price.toLocaleString(
+                            "vi-VN",
+                            {
+                              style: "currency",
+                              currency: "VND",
+                            }
+                          )
+                        : "Giá chưa được cập nhật"}
+                    </h4>
+                  </div>
                 </div>
               </div>
             ))}
@@ -527,7 +487,7 @@ const CartPage: React.FC = () => {
             <Button
               onClick={handleCheckout}
               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-              disabled={
+              isDisabled={
                 userRole.includes("admin") ||
                 !groupedCarts.some((cart) =>
                   cart.items.some((item) => item.isSelected)

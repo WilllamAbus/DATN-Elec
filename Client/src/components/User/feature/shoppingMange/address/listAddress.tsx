@@ -359,7 +359,7 @@ const ListAddress: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 shadow-md rounded-lg transition-shadow duration-200">
+    <div className="p-4 sm:p-6 bg-gray-50 shadow-md rounded-lg transition-shadow duration-200">
       <>
         {addressAdd ? (
           <CountrySelector
@@ -370,7 +370,7 @@ const ListAddress: React.FC = () => {
           />
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
               Danh sách địa chỉ
             </h1>
             <ul className="space-y-4">
@@ -378,9 +378,9 @@ const ListAddress: React.FC = () => {
                 addresses.map((address) => (
                   <li
                     key={address?.addressID}
-                    className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-200"
+                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-200"
                   >
-                    <div className="text-base">
+                    <div className="text-base flex-1">
                       <p className="font-bold text-gray-900 text-lg">
                         {address?.fullName || "Không có tên"}
                         {address?.isDefault && (
@@ -389,13 +389,14 @@ const ListAddress: React.FC = () => {
                           </span>
                         )}
                       </p>
-                      <p className="flex items-center text-gray-700 mt-1">
+                      <p className="flex items-start sm:items-center text-gray-700 mt-2 sm:mt-1">
                         <span className="font-medium text-gray-800 mr-2">
                           Địa chỉ:
                         </span>
+
                         {address?.address || "Không có địa chỉ"}
                       </p>
-                      <p className="flex items-center text-gray-700 mt-1">
+                      <p className="flex items-start sm:items-center text-gray-700 mt-2 sm:mt-1">
                         <span className="font-medium text-gray-800 mr-2">
                           Số điện thoại:
                         </span>
@@ -403,75 +404,68 @@ const ListAddress: React.FC = () => {
                       </p>
                     </div>
 
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button
-                          variant="bordered"
-                          className="flex items-center justify-between px-4 py-2 text-gray-800 bg-white border border-gray-300 rounded-lg shadow-md hover:bg-gray-100 hover:border-gray-400 transition duration-200"
-                        >
-                          <span className="flex items-center">
-                            <i className="iconify mdi--dots-vertical w-5 h-5 mr-2 text-gray-600" />
-                            Hành động
-                          </span>
-                          <i className="iconify mdi--chevron-down w-4 h-4 text-gray-600" />
-                        </Button>
-                      </DropdownTrigger>
+                    <div className="mt-4 sm:mt-0 sm:ml-4">
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Button
+                            variant="bordered"
+                            className="w-full sm:w-auto flex items-center justify-between px-4 py-2 text-gray-800 bg-white border border-gray-300 rounded-lg shadow-md hover:bg-gray-100 hover:border-gray-400 transition duration-200"
+                          >
+                            <span className="flex items-center">
+                              <i className="iconify mdi--dots-vertical w-5 h-5 mr-2 text-gray-600" />
+                              Hành động
+                            </span>
+                            <i className="iconify mdi--chevron-down w-4 h-4 text-gray-600" />
+                          </Button>
+                        </DropdownTrigger>
 
-                      <DropdownMenu
-                        variant="faded"
-                        aria-label="Menu hành động địa chỉ"
-                      >
-                        <DropdownItem
-                          key="setDefault"
-                          onClick={() => handleAction("setDefault", address)}
-                          startContent={
-                            <i className="iconify mdi--check-circle-outline w-5 h-5 text-green-500 mr-2" />
-                          }
-                          isDisabled={address?.isDefault}
+                        <DropdownMenu
+                          variant="faded"
+                          aria-label="Menu hành động địa chỉ"
                         >
-                          Đặt làm mặc định
-                        </DropdownItem>
-                        <DropdownItem
-                          key="edit"
-                          onClick={() => handleAction("edit", address)}
-                          startContent={
-                            <i className="iconify mdi--edit w-5 h-5 text-blue-500 mr-2" />
-                          }
-                        >
-                          Chỉnh sửa
-                        </DropdownItem>
-                        <DropdownItem
-                          key="delete"
-                          color="danger"
-                          onClick={() => handleAction("delete", address)}
-                          startContent={
-                            <i className="iconify mdi--delete w-5 h-5 text-red-500 mr-2" />
-                          }
-                          isDisabled={address?.isDefault}
-                        >
-                          Xóa
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
+                          <DropdownItem
+                            key="setDefault"
+                            onClick={() => handleAction("setDefault", address)}
+                            startContent={
+                              <i className="iconify mdi--check-circle-outline w-5 h-5 text-green-500 mr-2" />
+                            }
+                            isDisabled={address?.isDefault}
+                          >
+                            Đặt làm mặc định
+                          </DropdownItem>
+                          <DropdownItem
+                            key="edit"
+                            onClick={() => handleAction("edit", address)}
+                            startContent={
+                              <i className="iconify mdi--edit w-5 h-5 text-blue-500 mr-2" />
+                            }
+                          >
+                            Chỉnh sửa
+                          </DropdownItem>
+                          <DropdownItem
+                            key="delete"
+                            color="danger"
+                            onClick={() => handleAction("delete", address)}
+                            startContent={
+                              <i className="iconify mdi--delete w-5 h-5 text-red-500 mr-2" />
+                            }
+                            isDisabled={address?.isDefault}
+                          >
+                            Xóa
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
+                    </div>
                   </li>
                 ))
               ) : (
-                <li className="text-gray-500">
+                <li className="text-gray-500 text-center">
                   Không có địa chỉ nào để hiển thị.
                 </li>
               )}
             </ul>
 
-            {/* <div className="mt-8 flex justify-center w-full">
-              <Button
-                onClick={handleAddAddress}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 transition-all duration-200"
-              >
-                Thêm địa chỉ
-              </Button>
-            
-            </div> */}
-            <div className="mt-8 flex justify-center w-full">
+            <div className="mt-6 sm:mt-8 flex justify-center w-full">
               <Button
                 onClick={() => {
                   if (addresses.length >= 10) {
@@ -483,7 +477,7 @@ const ListAddress: React.FC = () => {
                   }
                   handleAddAddress();
                 }}
-                className={`px-6 py-3 ${
+                className={`w-full sm:w-auto px-6 py-3 ${
                   addresses.length >= 10
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600"
