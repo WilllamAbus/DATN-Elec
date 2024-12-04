@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const connectDb = require("./config/connectDb");
 const http = require("http");
-const redisClient = require("./services/redis.js");
+// const redisClient = require("./services/redis.js");
 const socketIo = require("socket.io");
 const SocketServices = require("./services/serviceSocket");
 const cron = require("node-cron");
@@ -30,11 +30,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 //Redis
-app.get("/", async (req, res) => {
-  await redisClient.set("key", "Hello Redis");
-  const value = await redisClient.get("key");
-  res.send(`Redis value: ${value}`);
-});
+// app.get("/", async (req, res) => {
+//   await redisClient.set("key", "Hello Redis");
+//   const value = await redisClient.get("key");
+//   res.send(`Redis value: ${value}`);
+// });
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
