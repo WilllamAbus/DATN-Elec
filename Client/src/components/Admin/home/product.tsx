@@ -59,7 +59,6 @@ const ProductStatistics = () => {
     fetchData();
     fetchtoTalCate()
   }, []);
-
   return (
     <>
       {/* sản phẩm */}
