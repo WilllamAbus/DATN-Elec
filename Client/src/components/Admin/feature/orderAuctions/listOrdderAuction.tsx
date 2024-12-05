@@ -97,7 +97,7 @@ const ListOrderAuction: React.FC = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" className="p-4">
-              <input type="checkbox" className="w-4 h-4" />
+              {/* <input type="checkbox" className="w-4 h-4" /> */}
             </th>
             <th scope="col" className="p-4">
               NGƯỜI DÙNG
@@ -124,7 +124,7 @@ const ListOrderAuction: React.FC = () => {
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <td className="p-4">
-                  <input type="checkbox" className="w-4 h-4" />
+                  {/* <input type="checkbox" className="w-4 h-4" /> */}
                 </td>
                 <th scope="row" className="px-4 py-3 font-medium text-gray-900">
                   {order.shippingAddress.recipientName}

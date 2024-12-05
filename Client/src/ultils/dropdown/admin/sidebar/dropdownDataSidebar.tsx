@@ -75,4 +75,9 @@ export const dropdownData: Record<string, DropdownData> = {
     links: links.attribute,
     label: labels.attribute,
   },
+  auctions: {
+    icon: icons.auctions,
+    links: links.auctions,
+    label: labels.auctions,
+  },
 };

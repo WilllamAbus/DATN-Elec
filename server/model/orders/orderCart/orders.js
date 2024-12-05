@@ -8,19 +8,15 @@ const orderSchema = new Schema(
     shipping: { type: Schema.Types.ObjectId, ref: "shipping", required: true },
     voucherIds: [{ type: Schema.Types.ObjectId, ref: "voucher" }],
 
-    // Loại giao hàng (Tiêu chuẩn, Nhanh)
     formatShipping: {
       type: String,
       enum: ["Tiêu chuẩn", "Nhanh"],
       required: true,
     },
 
-    // Tổng tiền và phí giao hàng
     totalAmount: { type: Number, required: true },
     shippingFee: { type: Number, default: 31000 },
     totalPriceWithShipping: { type: Number, required: true },
-
-    // Trạng thái đơn hàng
     stateOrder: {
       type: String,
       enum: [
@@ -40,9 +36,9 @@ const orderSchema = new Schema(
     cancelReason: { type: String, default: null },
 
     refundBank: {
-      bankName: { type: String, required: false }, // Tên ngân hàng
-      accountNumber: { type: String, required: false }, // Số tài khoản
-      accountName: { type: String, required: false }, // Tên chủ tài khoản
+      bankName: { type: String, required: false },
+      accountNumber: { type: String, required: false },
+      accountName: { type: String, required: false },
     },
   },
   {
@@ -50,7 +46,5 @@ const orderSchema = new Schema(
     timestamps: true,
   }
 );
-
-// Cập nhật thời gian khi lưu
 
 module.exports = model("OrderCart", orderSchema);

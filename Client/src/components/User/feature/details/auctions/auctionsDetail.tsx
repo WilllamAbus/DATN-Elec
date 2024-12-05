@@ -190,7 +190,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
 
       const updateTimes = () => {
         const now = new Date();
-        setCurrentTime(format(now, "d/M/yy T HH:mm:ss", { locale: vi }));
+        setCurrentTime(format(now, "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy  ", { locale: vi }));
         setTimeLeft(calculateTimeLeft(endTime));
       };
 
@@ -253,7 +253,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   }
 
   const formattedEndTime = product.endTime
-    ? format(parseISO(product.endTime), "HH:mm:ss 'Ngày' EEEE, d MMMM yyyy", {
+    ? format(parseISO(product.endTime), "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy", {
       locale: vi,
     })
     : "";

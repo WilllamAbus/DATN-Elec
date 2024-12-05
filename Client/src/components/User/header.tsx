@@ -11,7 +11,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const carts = useSelector((state: RootState) => state.cart.carts);
   const wathlist = useSelector((state: RootState) => state.watchlist.items);
-  console.log(wathlist);
+
   const totalProducts = carts
     ? carts.reduce((productSet, cart) => {
         if (cart.items && Array.isArray(cart.items)) {
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
+    <header className="sticky pt-2 top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
       <nav className="bg-primary-901 dark:bg-gray-800 antialiased px-0">
         <div className="max-w-screen-2xl px-8 mx-auto 2xl:px-0">
           <div className="flex items-center justify-between">

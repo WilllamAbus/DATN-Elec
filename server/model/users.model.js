@@ -104,11 +104,12 @@ const bankSchema = new Schema({
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
-    password: { type: String },
+    password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     addresses: { type: [addressSchema], default: [] },
     birthday: { type: Date, require: true },
     gender: { type: String, enum: ["Nam", "Nữ"] },
+    phone: { type: String, require: true },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },

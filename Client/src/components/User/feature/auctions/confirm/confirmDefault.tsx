@@ -1,17 +1,20 @@
 import { Button } from "flowbite-react";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrderAuctionDetails, completOrder } from "../../../../../redux/confirmOrder/confirmOrderThunk";
+import { getOrderAuctionDetailsDefault, completOrder } from "../../../../../redux/confirmOrder/confirmOrderThunk";
+
 import { RootState, AppDispatch } from "../../../../../redux/store";
 // import { Product, ShippingInfo } from "../../../../../types/auctions/confirmOrder";
 import { useNavigate } from "react-router-dom";
-const ConfirmOrderPage: React.FC = () => {
+const ConfirmOrderPageDefault: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const orderId = useSelector(
+  const orderIds = useSelector(
     (state: RootState) => state.orderAuction.orderData?.orderAuctionID
   );
-  const confirmOrder = useSelector(
-    (state: RootState) => state.confirmOrder.confirmOrder
+  console.log('orderAuction', orderIds);
+  
+  const confirmOrderDefault = useSelector(
+    (state: RootState) => state.confirmOrder.confirmOrderDefaut
   );
   // const [, setOrderId] = useState<string | null>(null);
   // const location = useLocation();
@@ -19,31 +22,14 @@ const ConfirmOrderPage: React.FC = () => {
   const error = useSelector((state: RootState) => state.confirmOrder.error);
   const navigate = useNavigate();
 
-  const queryParams = new URLSearchParams(location.search);
-  const paymentDetails = Object.fromEntries(queryParams.entries());
 
-  const status = paymentDetails.vnp_TransactionStatus;
-  const vnpayAmou = paymentDetails.vnp_Amount
- const vnpayOrderInfo = paymentDetails.vnp_OrderInfo
- const vnpayResponCode = paymentDetails.vnp_ResponseCode
- const vnpPayDate = paymentDetails.vnp_PayDate
- const vnpayBankCode = paymentDetails.vnp_BankCode 
- const vnpTransNo = paymentDetails.vnp_TransactionNo// Include this required field
- useEffect(() => {
-  if (orderId && status) {
-    dispatch(getOrderAuctionDetails({ 
-      orderId, 
-      status, 
-      vnpayAmou, 
-      vnpayBankCode ,
-      vnpayOrderInfo, 
-      vnpayResponCode, 
-      vnpPayDate, 
-  
-      vnpTransNo// Include this required field
-    }));
-  }
-}, [orderId, status, dispatch]);
+
+  useEffect(() => {
+    if (orderIds) {
+      // Ensure dispatch is used properly
+      dispatch(getOrderAuctionDetailsDefault({orderIds}));
+    }
+  }, [orderIds, dispatch]);
 
 
 
@@ -55,8 +41,8 @@ const ConfirmOrderPage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
   const handleCompleteOrder = () => {
-    if (orderId) {
-      dispatch(completOrder(orderId)).then(() => {
+    if (orderIds) {
+      dispatch(completOrder(orderIds)).then(() => {
         // Navigate after completing the order
         navigate("/auction");
       });
@@ -66,8 +52,8 @@ const ConfirmOrderPage: React.FC = () => {
   const goBack = () => {
     navigate("/auction");
   };
-  const shippingInfo = confirmOrder?.shippingInfo;
-  const products = confirmOrder?.products;
+  const shippingInfo = confirmOrderDefault?.shippingInfo;
+  const products = confirmOrderDefault?.products;
 
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -81,7 +67,7 @@ const ConfirmOrderPage: React.FC = () => {
             href="#"
             className="font-medium text-gray-900 dark:text-white hover:underline"
           >
-            #{orderId}
+            #{orderIds}
           </a>{" "}
           sẽ được xử lý trong vòng 24 giờ trong ngày làm việc. Chúng tôi sẽ
           thông báo cho bạn qua email khi đơn hàng của bạn đã được chuyển đi.
@@ -170,4 +156,4 @@ const ConfirmOrderPage: React.FC = () => {
   );
 };
 
-export default ConfirmOrderPage;
+export default ConfirmOrderPageDefault;

@@ -10,6 +10,7 @@ const path = require("path");
 const { sendMail } = require("./mailer/mailerForPDF");
 const { sendMailExecl } = require("./mailer/mailerForExecl");
 const Product_v2 = require("../../../model/productAuction/productAuction");
+const crypto = require('crypto');
 const orderAndDetailControler = {
   verifyPayment : async (payment, auctionDetails) => {
     try {
@@ -169,13 +170,70 @@ const orderAndDetailControler = {
   },
   getOrderDetails: async (req, res) => {
     try {
-      const { orderId } = req.query; // Sử dụng req.body để lấy tham số từ request body
-      console.log("getOrderDetails", orderId);
 
-      const orderDetails = await orderService.getOrderDetails(orderId);
-      res
-        .status(200)
-        .json({ success: true, status: 200, error: -2, data: orderDetails });
+      const { 
+        orderId, 
+        status, 
+        vnpayAmou, 
+        vnpayBankCode, 
+        vnpayOrderInfo, 
+        vnpPayDate, 
+        vnpayResponCode, 
+        vnpTransNo 
+    } = req.query ;// Include this required field } = req.query; // Sử dụng req.body để lấy tham số từ request body
+
+
+  
+      
+      const orderDetails = await orderService.getOrderDetails(
+        orderId,
+        status,
+        vnpayAmou,
+        vnpayBankCode,
+        vnpayOrderInfo,
+        vnpPayDate,
+        vnpayResponCode,
+        vnpTransNo
+    );
+
+           
+        res
+          .status(200)
+          .json({ success: true, status: 200, error: -2, data: orderDetails });
+      
+      // Tạo chuỗi cần kiểm tra chữ ký
+ 
+
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getOrderDetailsDefault: async (req, res) => {
+    try {
+
+      const { 
+        orderIds, 
+       
+    } = req.query ; 
+
+
+
+  
+      
+      const orderDetailsDefault = await orderService.getOrderDetailDefaule(
+        orderIds,
+      
+    );
+
+           
+        res
+          .status(200)
+          .json({ success: true, status: 200, error: -2, data: orderDetailsDefault });
+      
+      // Tạo chuỗi cần kiểm tra chữ ký
+ 
+
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -194,10 +252,26 @@ const orderAndDetailControler = {
       res.status(500).json({ error: error.message });
     }
   },
-
+ verifyVnpaySignature : (queryParams) => {
+    const vnp_SecureHash = queryParams.vnp_SecureHash;
+    delete queryParams.vnp_SecureHash;
+    delete queryParams.vnp_SecureHashType;
+   
+    const sortedParams = Object.keys(queryParams).sort().reduce((acc, key) => {
+        acc[key] = queryParams[key];
+        return acc;
+    }, {});
+   
+    const hashData = Object.entries(sortedParams).map(([key, value]) => `${key}=${value}`).join('&');
+    const hmac = crypto.createHmac('sha512', process.env.VNP_HASH_SECRET);
+    const signed = hmac.update(Buffer.from(hashData, 'utf-8')).digest('hex');
+   
+    return signed === vnp_SecureHash;
+   },
   completeOrder: async (req, res) => {
     try {
-      const { orderId } = req.body; // Sử dụng req.body để lấy tham số từ request body
+   
+      const { orderId } = req.body; 
       if (!orderId) {
         return res.status(400).json({ error: "orderId là bắt buộc" });
       }

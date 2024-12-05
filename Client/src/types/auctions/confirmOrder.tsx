@@ -15,6 +15,11 @@ export interface ShippingInfo {
     orderIds: string // Ví dụ về một thuộc tính khác
   }
   
+  export interface OrderAuctionDetailDefaut {
+    shippingInfo?: ShippingInfo;  // Thay đổi từ shippingInfo bắt buộc sang tùy chọn
+    products: Product[];
+    orderIds: string // Ví dụ về một thuộc tính khác
+  }
   // Ví dụ về Product
   export interface Product {
     name: string;
@@ -69,10 +74,31 @@ export interface ShippingInfo {
     data: OrderAuctionDetail;
   }
   
-
+  export interface OrderAuctionResponseDefault {
+    success: boolean;
+    status: number;
+    error: number;
+    data: OrderAuctionDetailDefaut;
+  }
   export interface OrderCompleteResponse {
     success: boolean;
     status: number;
     error: number;
     data: CompleteOrderDetail;
+  }
+
+
+  export interface PaymentDetails  {
+    vnpAmount: string;
+    vnpBankCode: string;
+    vnpBankTranNo: string;
+    vnpCardType: string;
+    vnpOrderInfo: string;
+    vnpPayDate: string;
+    vnpResponseCode: string;
+    vnpTmnCode: string;
+    vnpTransactionNo: string;
+    vnpTransactionStatus: string;
+    vnpTxnRef: string;
+    vnpSecureHash: string;
   }
