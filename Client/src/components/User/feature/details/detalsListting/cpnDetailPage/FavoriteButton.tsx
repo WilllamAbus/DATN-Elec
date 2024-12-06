@@ -21,7 +21,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({}) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false); // Trạng thái loading để ngăn spam
+  const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail

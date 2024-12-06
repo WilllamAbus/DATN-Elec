@@ -4,8 +4,8 @@ const productVariant = require("../../model/product_v2/productVariant");
 const User = require("../../model/users.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const mongoose = require("mongoose");
-const { spawn } = require('child_process');
-const path = require('path');
+const { spawn } = require("child_process");
+const path = require("path");
 
 const WathListController = {
   addWatchlist: async (req, res) => {
@@ -88,13 +88,19 @@ const WathListController = {
       console.log(`Saved interaction: ${JSON.stringify(newInteraction)}`);
 
       // Đường dẫn tới file Python
-      const pythonScriptPath = path.resolve(__dirname, '../../../Python Client Server/recommendation_service.py');
+      const pythonScriptPath = path.resolve(
+        __dirname,
+        "../../../Python Client Server/recommendation_service.py"
+      );
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn('python', [pythonScriptPath, userId.toString()]);
+      const pythonProcess = spawn("python", [
+        pythonScriptPath,
+        userId.toString(),
+      ]);
 
       // Xử lý kết quả từ script Python
-      pythonProcess.stdout.on('data', (data) => {
+      pythonProcess.stdout.on("data", (data) => {
         console.log(`Python Output: ${data.toString()}`);
       });
 
@@ -102,11 +108,11 @@ const WathListController = {
         console.error(`Python Error: ${data.toString()}`);
       });
 
-      pythonProcess.on('error', (error) => {
+      pythonProcess.on("error", (error) => {
         console.error(`Failed to start Python process: ${error.message}`);
       });
 
-      pythonProcess.on('close', (code) => {
+      pythonProcess.on("close", (code) => {
         if (code !== 0) {
           console.error(`Python script exited with code ${code}`);
         } else {

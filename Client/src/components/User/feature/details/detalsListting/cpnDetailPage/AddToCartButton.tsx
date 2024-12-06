@@ -34,13 +34,15 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({}) => {
           addProductToCart({ productId, quantity: 1, variantId })
         ).unwrap();
         toast.dismiss();
-        const successMessage = response?.message || "Đăng ký thành công!";
+        const successMessage = response?.message || "thêm thành công!";
         toast.success(successMessage);
 
         dispatch(fetchCartList());
-        console.log("Thêm thành công");
-      } catch (err) {
-        console.error("Lỗi thêm giỏ hàng", err);
+      } catch (error) {
+        toast.dismiss();
+
+        const errorMessage = (error as Error).message || "lỗi ";
+        toast.error(errorMessage);
       }
     } else {
       console.error("Không tìm thấy biến thể sản phẩm hoặc ID sản phẩm.");

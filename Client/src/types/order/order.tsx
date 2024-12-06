@@ -72,6 +72,10 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
 }
+export interface CreateOrderResponse {
+  order: Order;
+  message?: string; // Thêm message nếu có trong phản hồi
+}
 
 export interface Pagination {
   currentPage: number;

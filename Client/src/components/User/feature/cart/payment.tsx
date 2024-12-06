@@ -424,10 +424,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { createOrderThunk } from "../../../../redux/order/orderThunks";
-import {
-  fetchCartById,
-  // CheckVoucherThunk,
-} from "../../../../redux/cart/cartThunk";
+import { fetchCartById } from "../../../../redux/cart/cartThunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { Order } from "../../../../types/order/order";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -459,7 +456,7 @@ const CheckoutPage: React.FC = () => {
   const carts = useSelector((state: RootState) => state.cart.carts);
   const { createPaymentUrl } = useVNPay();
 
-  const [cart, setCart] = useState<any>(null); // Lưu trữ thông tin giỏ hàng
+  const [cart, setCart] = useState<any>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const { handleSubmit } = useForm<FormData>();
   const [selectedPayment, setSelectedPayment] = useState("");
@@ -467,7 +464,7 @@ const CheckoutPage: React.FC = () => {
     if (id) {
       dispatch(fetchCartById(id)).then((result) => {
         if (result.payload) {
-          setCart(result.payload); // Lưu giỏ hàng vào state
+          setCart(result.payload);
         }
       });
     }
@@ -569,14 +566,17 @@ const CheckoutPage: React.FC = () => {
     const orderData = generateOrderData("vnPay", orderId);
 
     try {
-      await dispatch(createOrderThunk(orderData)).unwrap();
-      toast.success("Đặt hàng thành công");
+      const response = await dispatch(createOrderThunk(orderData)).unwrap();
+      toast.dismiss();
+      const successMessage = response?.message || "Tạo đơn thành công!";
+      toast.success(successMessage);
+
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error) {
       console.error("Failed to create order:", error);
-      toast.error("Tạo đơn hàng thất bại.");
+      toast.error(error as string);
     }
   };
 
@@ -650,16 +650,19 @@ const CheckoutPage: React.FC = () => {
           window.location.href = paymentUrl;
         }
       } else {
-        await dispatch(createOrderThunk(orderData)).unwrap();
+        const response = await dispatch(createOrderThunk(orderData)).unwrap();
         setOrderId(orderId);
-        toast.success("Đặt hàng thành công");
+        toast.dismiss();
+        const successMessage = response?.message || "Tạo đơn thành công!";
+        toast.success(successMessage);
+
         setTimeout(() => {
           navigate("/");
         }, 2000);
       }
     } catch (error) {
       console.error("Failed to create order:", error);
-      toast.error("Thanh toán thất bại.");
+      toast.error(error as string);
     }
   };
 

@@ -12,7 +12,6 @@ const upLoadImgBucket = {
     }
   },
 
-
   getCategoryById: async (id) => {
     return await _Category.findById(id);
   },
@@ -24,9 +23,9 @@ const upLoadImgBucket = {
     // }
     const category = new _Category({
       name: categoryData.name, // Ensure 'name' is a string
-      pid: categoryData.pid,   // Ensure 'pid' is a string
+      pid: categoryData.pid, // Ensure 'pid' is a string
       path: categoryData.path, // Ensure 'path' is a string
-      imgURL: categoryData.imgURL // Ensure 'imgURL' is a string
+      imgURL: categoryData.imgURL, // Ensure 'imgURL' is a string
     });
     await category.save();
     return category;
@@ -39,39 +38,37 @@ const upLoadImgBucket = {
     return await _Category.findByIdAndDelete(id);
   },
   getAllCategories: async () => {
-    return await _Category.find({ status: { $ne: 'disable' } });
+    return await _Category.find({ status: { $ne: "disable" } });
   },
   softDeleteCategory: async (id) => {
-
     try {
-      return await _Category.findByIdAndUpdate(id, { status: 'disable' }, { new: true });
-
+      return await _Category.findByIdAndUpdate(
+        id,
+        { status: "disable" },
+        { new: true }
+      );
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-
   },
   deletedList: async (req, res) => {
     try {
-      return await _Category.find({ status: 'disable' });
+      return await _Category.find({ status: "disable" });
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-
-
   },
   restore: async (id) => {
     try {
-      return await _Category.findByIdAndUpdate(id, { status: 'active' }, { new: true });
-
+      return await _Category.findByIdAndUpdate(
+        id,
+        { status: "active" },
+        { new: true }
+      );
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-
-
   },
+};
 
-}
-
-
-module.exports = upLoadImgBucket
+module.exports = upLoadImgBucket;

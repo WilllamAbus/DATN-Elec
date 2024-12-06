@@ -10,15 +10,15 @@ import {
 import { ApplyVoucherResponse, Order } from "../../types/order/order";
 
 export const createOrderThunk = createAsyncThunk<
-  { order: Order },
+  { order: Order; message: string }, // Cập nhật kiểu dữ liệu trả về
   Order,
   { rejectValue: string }
 >("order/createOrder", async (orderData: Order, { rejectWithValue }) => {
   try {
-    const { data } = await createOrder(orderData);
-    return { order: data };
+    const response = await createOrder(orderData);
+    return response;
   } catch (error) {
-    return rejectWithValue((error as Error).message);
+    return rejectWithValue((error as Error).message); // Trả về lỗi nếu thất bại
   }
 });
 
