@@ -59,7 +59,6 @@ const ProductStatistics = () => {
     fetchData();
     fetchtoTalCate()
   }, []);
-
   return (
     <>
       {/* sản phẩm */}
@@ -98,8 +97,8 @@ const ProductStatistics = () => {
         {/* Card Footer */}
         <div className="flex items-center justify-between pt-3 mt-4 border-t border-gray-200 sm:pt-6 dark:border-gray-700">
           <div className="flex-shrink-0">
-            <a
-              href="#"
+            <button
+              onClick={() => navigates("/admin/listproduct")}
               className="inline-flex items-center p-2 text-xs font-medium uppercase rounded-lg text-primary-700 sm:text-sm hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700"
             >
               Chi tiết
@@ -117,7 +116,7 @@ const ProductStatistics = () => {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -214,8 +213,8 @@ const ProductStatistics = () => {
         {/* Card Footer */}
         <div className="flex items-center justify-between pt-3 mt-4 border-t border-gray-200 sm:pt-6 dark:border-gray-700">
           <div className="flex-shrink-0">
-            <a
-              href="#"
+            <button
+              onClick={() => navigates("/admin/listCategories")}
               className="inline-flex items-center p-2 text-xs font-medium uppercase rounded-lg text-primary-700 sm:text-sm hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700"
             >
               Chi tiết
@@ -233,7 +232,7 @@ const ProductStatistics = () => {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>

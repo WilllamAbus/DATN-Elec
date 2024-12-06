@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import {
   topViewProduct,
   totalProductsSold,
+  totalUser
 } from "../../../services/statistical/statistical.service";
-// import currencyFormatter from "currency-formatter";
+import currencyFormatter from "currency-formatter";
 import { Link } from "react-router-dom";
 
-// function formatCurrency(value: number) {
-//   return currencyFormatter.format(value, { code: "VND", symbol: "" });
-// }
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value, { code: "VND", symbol: "" });
+}
 const UserStatistics = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const [user, setUser] = useState<any[]>([]);
   const [numberOfProducts, setNumberOfProducts] = useState(3);
   const [productSold, setProductSold] = useState<number | null>(null);
 
@@ -38,10 +40,20 @@ const UserStatistics = () => {
       console.log(error);
     }
   };
-
+  const fetchUser = async()=>{
+  try{
+    const respone = await totalUser();
+    setUser(respone.data);
+    
+  }catch(error){
+    console.log(error);
+  }
+  
+  }
   useEffect(() => {
     fetchProducts();
     totalProductSold();
+    fetchUser();
   }, []);
   const handleNumberChange = (event: any) => {
     setNumberOfProducts(Number(event.target.value));
@@ -65,59 +77,14 @@ const UserStatistics = () => {
       <div className="items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:flex dark:border-gray-700 sm:p-6 dark:bg-gray-800">
         <div className="w-full">
           <h3 className="text-base font-normal text-gray-500 dark:text-gray-400">
-            Tài Khoản
+            Số lượng tài khoản trên hệ thống
           </h3>
           <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
-            45 tài khoản
+          {user.length} tài khoản
           </span>
           
         </div>
         <div className="w-full" id="week-signups-chart" />
-      </div>
-      {/* top 5 sản phẩm có lượt bán nhiều nhất  */}
-      <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-        <div className="w-full">
-          <h3 className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
-            Top 5 sản phẩm có lượt bán nhiều nhất
-          </h3>
-          <div className="flex items-center mb-2">
-            <div className="w-16 text-sm font-medium dark:text-white">50+</div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-              <div
-                className="bg-primary-600 h-2.5 rounded-full dark:bg-primary-500"
-                style={{ width: "18%" }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center mb-2">
-            <div className="w-16 text-sm font-medium dark:text-white">40+</div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-              <div
-                className="bg-primary-600 h-2.5 rounded-full dark:bg-primary-500"
-                style={{ width: "15%" }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center mb-2">
-            <div className="w-16 text-sm font-medium dark:text-white">30+</div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-              <div
-                className="bg-primary-600 h-2.5 rounded-full dark:bg-primary-500"
-                style={{ width: "60%" }}
-              />
-            </div>
-          </div>
-          <div className="flex items-center mb-2">
-            <div className="w-16 text-sm font-medium dark:text-white">20+</div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-              <div
-                className="bg-primary-600 h-2.5 rounded-full dark:bg-primary-500"
-                style={{ width: "30%" }}
-              />
-            </div>
-          </div>
-        </div>
-        <div id="traffic-channels-chart" className="w-full" />
       </div>
       {/* top 5 sản phẩm có lượt xem cao nhất  */}
       <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -173,9 +140,9 @@ const UserStatistics = () => {
                             data-tooltip-target="tooltip-quick-look"
                             className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                           >
-                            {product.product_view > 0 ? (
+                            {product.totalViewCount > 0 ? (
                               <span className="mr-2">
-                                ({product.product_view})
+                                ({product.totalViewCount})
                               </span>
                             ) : (
                               ""
@@ -235,7 +202,7 @@ const UserStatistics = () => {
                         href="#"
                         className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
                       >
-                        {product.product_name}
+                        {product.productName}
                       </a>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex items-center">
@@ -286,7 +253,7 @@ const UserStatistics = () => {
                           </svg>
                         </div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          5.0
+                         4.5
                         </p>
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                           {" "}
@@ -296,11 +263,6 @@ const UserStatistics = () => {
                                 <i className="fa-solid fa-star"></i>
                               </span>
                             ))}
-                          </div>
-                          <div className="text-xs text-gray-500 items-center m-3">
-                            {product.product_quantity > 0
-                              ? `(Còn ${product.product_quantity} sản phẩm)`
-                              : " "}
                           </div>
                         </p>
                       </div>
@@ -324,9 +286,12 @@ const UserStatistics = () => {
                             </div>
                           ) : (
                             <p className="text-xs font-medium text-rose-700">
-                              {formatCurrency(product.product_price)}đ
+                              {formatCurrency(product.productPrice)}đ
                             </p>
                           )} */}
+                          <p className="text-xs font-medium text-rose-700">
+                              {formatCurrency(product.productPrice)}đ
+                            </p>
                         </p>
                       </div>
                     </div>
