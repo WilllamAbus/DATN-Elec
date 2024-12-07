@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ListDetailComment from "../../../components/Admin/feature/comment/listDetailComment";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 const ListComments: React.FC = () => {

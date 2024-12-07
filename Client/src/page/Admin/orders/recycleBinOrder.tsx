@@ -3,7 +3,7 @@ import AdminRecyBinOrder from "../../../components/Admin/feature/orders/softDele
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../ultils/breadcrumb";
+} from "../../../ultils/breadcrumb/admin";
 
 const listOrders: React.FC = () => {
   return (

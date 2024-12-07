@@ -3,7 +3,7 @@ import AdminListPriceRand from "../../../components/Admin/feature/priceRand/list
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../ultils/breadcrumb";
+} from "../../../ultils/breadcrumb/admin";
 
 const listProducTimePage: React.FC = () => {
   return (

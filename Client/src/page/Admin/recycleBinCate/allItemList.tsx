@@ -1,5 +1,5 @@
 import React from "react";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 import AdminRecycleCate from '../../../components/Admin/feature/categories/softDeleteCate'
 const recycleBinCate: React.FC = () => {
   return (   

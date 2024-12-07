@@ -18,15 +18,16 @@ export default function ProductItem({ product, index }: ProductItemProps) {
     >
       <div className="backdrop-blur-sm bg-white/30">
         <Link to={`/product/${product.slug}`}>
-          <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
+          <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer">
             <img
-              className="absolute inset-0 w-full h-full object-cover rounded-lg p-8"
+              className="absolute inset-0 w-full h-full object-contain rounded-lg p-8"
               src={product.image[0]}
               alt={`product ${index + 1}`}
             />
           </figure>
         </Link>
       </div>
+
       <div className="pt-1 mb-10">
         <div className="mb-4 px-2 flex items-center justify-between gap-4">
           {product.variants.length > 0 && product.variants[0].product_discount.isActive && (

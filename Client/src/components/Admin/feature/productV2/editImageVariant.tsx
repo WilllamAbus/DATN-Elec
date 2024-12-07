@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getOneImageVariantThunk,editImageVariantThunk } from "../../../../redux/product/admin/Thunk";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import { ImageVariant } from "../../../../services/product_v2/admin/types/imageVariant";
 import { Color } from "../../../../services/product_v2/types/attributes/getAllColor";
 import { useImageUpload } from "../../../../hooks/useImageUpload";

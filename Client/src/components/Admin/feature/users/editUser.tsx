@@ -13,7 +13,7 @@ import { UserProfile } from "../../../../types/user";
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../../ultils/breadcrumb";
+} from "../../../../ultils/breadcrumb/admin";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

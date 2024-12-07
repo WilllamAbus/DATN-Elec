@@ -46,7 +46,7 @@ const ProductCategoryService = {
         : [];
       console.log('Danh sách storageVariantIds:', storageVariantIds);
 
-      
+
       const ramFilter = ramVariantIds.length > 0
         ? { variants: { $in: ramVariantIds } }
         : {};
@@ -125,27 +125,27 @@ const ProductCategoryService = {
           path: 'variants',
           populate: [
             {
-              path: 'storage', 
-              select: 'name', 
+              path: 'storage',
+              select: 'name',
             },
             {
-              path: 'ram', 
-              select: 'name', 
+              path: 'ram',
+              select: 'name',
             },
             {
-              path: 'product_discount', 
+              path: 'product_discount',
             },
           ],
         })
         .select('product_name image product_description slug product_discount product_brand variants product_condition product_supplier product_quantity product_ratingAvg product_view weight_g isActive status disabledAt comments')
         .lean();
-      // Log giá trị các variant_price để kiểm tra
-      console.log('Trước khi sắp xếp:', products.map(product => ({
-        product_name: product.product_name,
-        variant_price: product.variants.map(v => v.variant_price),
-      })));
+        const filteredProducts = products.filter(product =>
+          product.variants.some(variant => variant.image && variant.image.length > 0)
+        );
+        
 
-      // Sắp xếp trong JavaScript dựa trên variant_price
+ 
+
       if (_sort) {
         const [sortField, sortDirection] = _sort.split(":");
         if (sortField === "variant_price") {
@@ -157,23 +157,9 @@ const ProductCategoryService = {
         }
       }
 
-      // Log lại kết quả sau khi sắp xếp
-      console.log('Sau khi sắp xếp:', products.map(product => ({
-        product_name: product.product_name,
-        variant_price: product.variants.map(v => v.variant_price),
-      })));
+  
 
-      const total = await Product.countDocuments({
-        product_type: categoryId,
-        status: { $ne: 'disable' },
-        variants: { $exists: true, $ne: [] },
-        ...brandFilter,
-        ...conditionShoppingFilter,
-        ...priceFilter,
-        ...discountFilter,
-        ...ramFilter,
-        ...storageFilter,
-      });
+      const total = filteredProducts.length;
 
       const categoryInfo = await ProductType.findById(categoryId).select('name');
       if (!categoryInfo) {
@@ -193,7 +179,7 @@ const ProductCategoryService = {
         response: {
           total,
           category: categoryInfo.name,
-          products,
+          products: filteredProducts,
         },
       });
 

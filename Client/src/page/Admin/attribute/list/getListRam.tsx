@@ -1,6 +1,6 @@
 import React from "react";
 import AdminListRam from "../../../../components/Admin/feature/attribute/ram/getListRam";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import GetListRam from "../../../../components/Admin/summary/getListRam";
 const getListRam: React.FC = () => {
 

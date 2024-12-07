@@ -3,7 +3,7 @@ import AdminSoftListVoucher from "../../../components/Admin/feature/vouchers/sof
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../ultils/breadcrumb";
+} from "../../../ultils/breadcrumb/admin";
 import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import ProductSummary from "../../../components/Admin/summary/ProductSummary";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";

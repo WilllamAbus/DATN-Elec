@@ -41,7 +41,7 @@ const ProductService = {
             },
           ],
         })
-        .select('product_name image product_description product_slug product_discount product_brand product_format product_condition product_supplier product_quantity product_ratingAvg product_view product_price product_price_unit product_attributes weight_g isActive status disabledAt comments')
+        .select('product_name image product_description hasVariants  product_brand product_format product_condition product_supplier  product_ratingAvg product_view  weight_g isActive status disabledAt comments')
         .lean();
         const productsWithVariantCount = products.map((product) => ({
           ...product,
