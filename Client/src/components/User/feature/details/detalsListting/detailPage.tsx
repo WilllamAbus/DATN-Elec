@@ -18,7 +18,7 @@ import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getProductDetailThunk } from "../../../../../redux/product/client/Thunk";
 import NotFoundProduct from "../../../../../error/404/NotFoundProduct";
 import RelatedProduct from "./relatedProduct/relatedProduct";
-import Comment from "../../../../User/feature/details/comment/comment";
+// import Comment from "../../../../User/feature/details/comment/comment";
   import "@fortawesome/fontawesome-free/css/all.min.css";
 import Blog from "./blog";
 import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSameSegment";
@@ -34,7 +34,7 @@ const DetailPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
 
-  const [averageRating, setAverageRating] = useState("5");
+  // const [averageRating, setAverageRating] = useState("5");
 
   // Hàm để cập nhật average rating
 
@@ -140,7 +140,7 @@ const DetailPage: React.FC = () => {
                             <Star />
                           </div>
                           <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                            {averageRating} trên 5
+                            {/* {averageRating} trên 5 */}
                           </p>
                           <a
                             href="#"
@@ -214,7 +214,7 @@ const DetailPage: React.FC = () => {
         </div>
       </div>
       <section>
-        <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+        {/* <Comment onUpdateAverageRating={handleUpdateAverageRating} /> */}
       </section>
       <section>
         <RelatedProduct />

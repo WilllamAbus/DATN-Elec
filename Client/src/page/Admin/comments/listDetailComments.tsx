@@ -1,7 +1,6 @@
 import React from "react";
 import ListDetailComment from "../../../components/Admin/feature/comment/listDetailComment";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
-import PaginationComponent from "../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify";
