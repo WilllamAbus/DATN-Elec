@@ -78,10 +78,10 @@ const deletedPriceRand: React.FC = () => {
         <tr>
           <th scope="col" className="p-4">Hình ảnh</th>
           <th scope="col" className="p-4">Tên sản phẩm</th>
-          <th scope="col" className="p-4">Giá thấp nhất</th>
-          <th scope="col" className="p-4">Giá trung bình</th>
-          <th scope="col" className="p-4">Giá cao nhất</th>
-          <th scope="col" className="p-4">Trạng thái</th>
+          <th scope="col" className="p-4">Giá thấp nhất (VNĐ)</th>
+          <th scope="col" className="p-4">Giá trung bình (VNĐ)</th>
+          <th scope="col" className="p-4">Giá cao nhất (VNĐ)</th>
+          <th scope="col" className="p-4">Trạng thái </th>
           <th scope="col" className="p-4">Chức năng</th>
         </tr>
       </thead>
@@ -101,13 +101,13 @@ const deletedPriceRand: React.FC = () => {
                 {rand.product_randBib.product_name}
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.minBid.toLocaleString()} VND
+                {rand.minBid.toLocaleString()}
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.midBid.toLocaleString()} VND
+                {rand.midBid.toLocaleString()} 
               </td>
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {rand.maxBid.toLocaleString()} VND
+                {rand.maxBid.toLocaleString()} 
               </td>
               <td className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
                       rand.status === "active"
