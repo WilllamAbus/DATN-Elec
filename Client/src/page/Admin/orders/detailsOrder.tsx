@@ -20,7 +20,7 @@ import AdminDetailOrder from "../../../components/Admin/feature/orders/detailOrd
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../ultils/breadcrumb";
+} from "../../../ultils/breadcrumb/admin";
 
 const listOrdersDetails: React.FC = () => {
   return (

@@ -13,7 +13,7 @@ const updateSlice = createSlice({
       })
       .addCase(update.fulfilled, (state, action: PayloadAction<reponseProduct>) => { 
         state.status = "success";
-        const updatedProduct = action.payload.pproduct; 
+        const updatedProduct = action.payload.product; 
         if (updatedProduct) {
           state.products = state.products.map(product =>
             product._id === updatedProduct._id ? updatedProduct : product

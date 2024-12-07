@@ -10,7 +10,6 @@ const productV2Schema = new Schema({
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-  hasVariants: { type: String, default: "false" },
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
@@ -20,21 +19,14 @@ const productV2Schema = new Schema({
     min: [1, 'Rating must be above 1'],
     max: [5, 'Rating must be below 5']
   },
-
   product_view: { type: Number, default: 0 },
-  product_color: { type: String, },
   weight_g: { type: Number, required: true },
-  isActive: { type: Boolean, default: true },
   status: { type: String, default: 'disable' },
   disabledAt: { type: Date, default: null },
   variants: [{ type: Schema.Types.ObjectId, ref: 'productVariant' }],
+  hasVariants: { type: Boolean, required: true },
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   posts: { type: Schema.Types.ObjectId, ref: 'Post' },
-  product_attributes: [{
-    k: { type: String, required: true },
-    v: { type: Schema.Types.Mixed, required: true },
-    u: { type: String }
-  }],
   slug: { type: String, unique: true, sparse: true },
 }, {
   collection: "product_v2",

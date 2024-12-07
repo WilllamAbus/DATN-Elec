@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import { Product} from "../../../../services/product_v2/admin/types/add-product";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
 import { useDispatch, useSelector } from "react-redux";

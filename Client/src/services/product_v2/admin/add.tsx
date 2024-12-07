@@ -14,6 +14,13 @@ export const addProduct = async (product: Product): Promise<reponseProduct> => {
     formData.append("product_brand", product.product_brand);
     formData.append("product_condition", product.product_condition);
     formData.append("weight_g", product.weight_g.toString());
+    formData.append("hasVariants", (product.hasVariants ?? false).toString());
+
+
+
+
+
+
     for (let pair of formData.entries()) {
       console.log(pair[0] + ', ' + pair[1]);
     }

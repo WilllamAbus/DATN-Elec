@@ -80,24 +80,38 @@ const ProductList: React.FC = () => {
         </Chip>
 
         );
-      case "status":
-        return (
-          <Chip
-          startContent={<CheckIcon size={18} />}
-          variant="faded"
-          color={product.variants && product.variants.length > 0 ? "success" : "warning"} 
-        >
-          {product.variants && product.variants.length > 0
-            ? (product.status === "active" ? "Hiển thị" : "Chưa có biến thể")
-            : "Chưa có biến thể"
-          }
-        </Chip>
-        );
+        case "status":
+          return (
+            <Chip
+              startContent={<CheckIcon size={18} />}
+              variant="faded"
+              color={
+                // Chọn màu cảnh báo khi không có thuộc tính sản phẩm hoặc không có biến thể
+                product.hasVariants === false && (!product.variants || product.variants.length === 0)
+                  ? "warning" // Không có thuộc tính sản phẩm
+                  : product.hasVariants === true && (!product.variants || product.variants.length === 0)
+                  ? "warning" // Không có biến thể
+                  : "success"  // Hiển thị nếu có biến thể và có trạng thái active
+              }
+            >
+              {
+                // Điều kiện hiển thị văn bản phù hợp
+                product.hasVariants === false && (!product.variants || product.variants.length === 0)
+                  ? "Chưa có thuộc tính sản phẩm" // Không có thuộc tính sản phẩm
+                  : product.hasVariants === true && (!product.variants || product.variants.length === 0)
+                  ? "Chưa có biến thể" // Không có biến thể
+                  : product.status === "active"
+                  ? "Hiển thị" // Hiển thị nếu trạng thái là active
+                  : "Chưa có biến thể" // Nếu có biến thể nhưng không có trạng thái active
+              }
+            </Chip>
+          );
+        
       case "variant":
         return <DropdownVariant variants={product.variants} productId={product._id} />;
       case "actions":
         return (
-          <DropdownCRUD productId={product._id} currentPage={currentPage} searchTerm={searchTerm} />
+          <DropdownCRUD productId={product._id} currentPage={currentPage} searchTerm={searchTerm} hasVariants={product.hasVariants}variants={product.variants} />
         );
       default:
          return null;

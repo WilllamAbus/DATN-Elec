@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
-import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
-import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
+import ReusableBreadcrumb from "../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
+import { breadcrumbItems } from "../../../../ultils/breadcrumb/admin/breadcrumbData";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
 import { Product } from "../../../../services/product_v2/admin/types/add-product";
 import { ApiResponse } from "../../../../services/product_v2/admin/types/apiResponse";
@@ -18,6 +18,7 @@ import FormInput from "./Form/forminput";
 import FormSelect from "./Form/formselect";
 import ImageUpload from "./Form/imageUpload";
 import { useFetchData } from "./hook/selectFetchData";
+import ProductVariantSelector from "./Form/checkboxForm";
 
 
 const AddProduct: React.FC = () => {
@@ -49,7 +50,9 @@ const AddProduct: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  const handleVariantChange = (hasVariants: boolean) => {
+    setValue("hasVariants", hasVariants);
+  };
 
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
@@ -106,7 +109,14 @@ const AddProduct: React.FC = () => {
               />
             </div>
           </div>
-
+          <ProductVariantSelector
+            label="Loại sản phẩm"
+            id="hasVariants"
+            onVariantChange={handleVariantChange}
+            register={register}
+            validation={{ required: "Vui lòng chọn loại sản phẩm" }}
+            errorMessage={errors.hasVariants?.message}
+          />
 
 
         </div>
@@ -121,7 +131,6 @@ const AddProduct: React.FC = () => {
               <FormInput
                 id="product_name"
                 label="Tên sản phẩm"
-                placeholder="Bonnie"
                 register={register}
                 control={control}
                 error={errors.product_name}
@@ -136,7 +145,7 @@ const AddProduct: React.FC = () => {
 
               <FormInput
                 id="weight_g"
-                label="Trọng lượng (kg)"
+                label="Trọng lượng (g)"
                 format
                 suffix=" g"
                 register={register}

@@ -3,7 +3,7 @@ export interface reponseProduct {
   err: number;
   msg: string;
   status: number;
-  pproduct?: Product;
+  product?: Product;
   error?: string;
 }
 
@@ -13,7 +13,6 @@ export interface Product {
   product_description: string;
   product_type: string;
   product_discount: number;
-  hasVariants: boolean;
   product_brand: string;
   product_format: string;
   product_condition: string;
@@ -27,6 +26,7 @@ export interface Product {
   status: 'active' | 'inactive';
   disabledAt?: Date | null;
   variants: ProductVariant[];
+  hasVariants: boolean;
   comments: Comment[];
   createdAt: string;
   updatedAt: string;

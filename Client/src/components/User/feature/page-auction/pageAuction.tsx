@@ -6,7 +6,7 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FunnelIcon } from "@heroicons/react/20/solid";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb/admin";
 import ProductFilters from "./prouctAuctionFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
