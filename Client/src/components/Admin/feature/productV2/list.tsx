@@ -84,7 +84,7 @@ const ProductList: React.FC = () => {
           return (
             <Chip
               startContent={<CheckIcon size={18} />}
-              variant="faded"
+              variant="shadow"
               color={
                 // Chọn màu cảnh báo khi không có thuộc tính sản phẩm hoặc không có biến thể
                 product.hasVariants === false && (!product.variants || product.variants.length === 0)
