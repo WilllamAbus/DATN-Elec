@@ -25,7 +25,8 @@ const SearchFormProduct: React.FC<{ onSearch: (searchTerm: string) => void }> = 
           />
           <button
             type="submit"
-            className="absolute inset-y-0 right-0 flex items-center justify-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md h-10" // Thay đổi màu kính lúp và giảm chiều cao
+            className="absolute inset-y-0 right-0 flex items-center justify-center 
+            p-2 text-white bg-blue-500 border border-gray-300 rounded-r-sm h-10" // Thay đổi màu kính lúp và giảm chiều cao
           >
             <svg
               className="h-4 w-4"

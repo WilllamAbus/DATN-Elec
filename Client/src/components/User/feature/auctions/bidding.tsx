@@ -189,7 +189,7 @@ const ViewBidPage: React.FC = () => {
   // }, [bidGroups, completedAuctions]); // Only re-run the effect when `bidGroups` or `completedAuctions` change
 
   return (
-    <div className="container mx-auto px-4 lg:px-8 py-8">
+    <div className="min-h-[calc(71vh-10rem)] container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
           <div className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16">

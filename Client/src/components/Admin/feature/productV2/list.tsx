@@ -6,7 +6,7 @@ import SearchFormProduct from "../../../../components/Admin/searchform/searchFom
 import AddProductButton from "../../../../components/Admin/buttonAdd";
 import DropdownCRUD from "./dropdown";
 import { Avatar, Chip, Pagination, Tooltip } from "@nextui-org/react";
-import { CheckIcon} from "../../../../common/Icons";
+import { IconMdiStickerAlert,CheckIcon,IconMdiBellAlertOutline} from "../../../../common/Icons";
 import DropdownVariant from "./dropdownVariant";
 import { Product,} from "../../../../services/product_v2/admin/types/pagination";
 import {
@@ -17,6 +17,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/react";
+import CustomChip from "../../../../common/customs/CustomChip";
 
 
 const ProductList: React.FC = () => {
@@ -61,7 +62,7 @@ const ProductList: React.FC = () => {
       case "category":
         return (
           <Chip
-          variant="flat"
+          variant="bordered"
           color="primary"
           classNames={{
             base: "bg-primary-500 from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
@@ -82,30 +83,43 @@ const ProductList: React.FC = () => {
         );
         case "status":
           return (
-            <Chip
-              startContent={<CheckIcon size={18} />}
-              variant="shadow"
-              color={
-                // Chọn màu cảnh báo khi không có thuộc tính sản phẩm hoặc không có biến thể
-                product.hasVariants === false && (!product.variants || product.variants.length === 0)
-                  ? "warning" // Không có thuộc tính sản phẩm
-                  : product.hasVariants === true && (!product.variants || product.variants.length === 0)
-                  ? "warning" // Không có biến thể
-                  : "success"  // Hiển thị nếu có biến thể và có trạng thái active
-              }
-            >
-              {
-                // Điều kiện hiển thị văn bản phù hợp
-                product.hasVariants === false && (!product.variants || product.variants.length === 0)
-                  ? "Chưa có thuộc tính sản phẩm" // Không có thuộc tính sản phẩm
-                  : product.hasVariants === true && (!product.variants || product.variants.length === 0)
-                  ? "Chưa có biến thể" // Không có biến thể
-                  : product.status === "active"
-                  ? "Hiển thị" // Hiển thị nếu trạng thái là active
-                  : "Chưa có biến thể" // Nếu có biến thể nhưng không có trạng thái active
-              }
-            </Chip>
+            <CustomChip
+            startContent={
+              // Hiển thị biểu tượng thích hợp dựa trên trạng thái của sản phẩm
+              product.hasVariants === false && (!product.variants || product.variants.length === 0) ? (
+                <IconMdiStickerAlert size={18} /> // Không có thuộc tính sản phẩm
+              ) : product.hasVariants === true && product.variants.length === 0 ? (
+                <IconMdiBellAlertOutline size={18} /> // Không có biến thể nhưng có thuộc tính sản phẩm
+              ) : (
+                <CheckIcon size={18} /> // Biểu tượng kiểm tra nếu có biến thể
+              )
+            }
+            variant="solid"
+            color={
+              // Chọn màu cảnh báo khi không có thuộc tính sản phẩm hoặc không có biến thể
+              product.hasVariants === false && (!product.variants || product.variants.length === 0)
+                ? "orange" // Không có thuộc tính sản phẩm
+                : product.hasVariants === true && product.variants.length === 0
+                ? "orange" // Không có biến thể
+                : "springGreen" // Hiển thị nếu có biến thể và có trạng thái active
+            }
+            classNames={{
+              content: "drop-shadow shadow-black text-white",
+            }}
+          >
+            {
+              product.hasVariants === false && (!product.variants || product.variants.length === 0)
+                ? "Chưa có thuộc tính sản phẩm" // Không có thuộc tính sản phẩm
+                : product.hasVariants === true && product.variants.length === 0
+                ? "Chưa có biến thể" // Không có biến thể
+                : product.status === "active"
+                ? "Hiển thị" // Hiển thị nếu trạng thái là active
+                : "Chưa có biến thể" // Nếu có biến thể nhưng không có trạng thái active
+            }
+          </CustomChip>
+          
           );
+        
         
       case "variant":
         return <DropdownVariant variants={product.variants} productId={product._id} />;
