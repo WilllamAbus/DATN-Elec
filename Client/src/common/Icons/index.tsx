@@ -5,3 +5,7 @@ export * from './EditDocumentIcon';
 export * from './EditIcon';
 export * from './HeartIcon';
 export * from './RestoreIcon';
+export * from './IconLucideDot';
+export * from './IconRadixIconsDotFilled';
+export * from './IconMdiStickerAlert';
+export * from './IconMdiBellAlertOutline';

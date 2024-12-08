@@ -32,7 +32,7 @@ const SearchFormProduct: React.FC = () => {
           >
             <svg
               className="h-5 w-5"
-              fill="currentColor"
+              fill="#ffffff"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >

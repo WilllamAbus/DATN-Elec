@@ -72,6 +72,21 @@ export default {
         customPink: "#f21260",
         veryPaleBlue: "#eef9ff",
         pastelGreen: "#a0de86",
+        springGreen: {
+          50: "#e1fce4",
+          100: "#d2f8c7",
+          200: "#a6ec9d",
+          300: "#81e172",
+          400: "#60d954",
+          500: "#3dbf38",
+          600: "#319734",
+          700: "#2b7c2d",
+          800: "#256f27",
+          900: "#1bc24e", 
+        },
+         springGreenLight: "#0fc64a",
+         success:"#12a150"
+
       },
       fontFamily: {
         sans: [
