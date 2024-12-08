@@ -7,9 +7,12 @@ import { handleSoftDeleteProduct } from "../productAuction/handlers/softDelete";
 import SearchFomAuctionProduct from "../../../../components/Admin/searchform/searchFomAuctionProduct";
 import AddProductButton from "../../../../components/Admin/buttonAdd";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Pagination } from "@nextui-org/react";
-import { DeleteIcon, EditIcon } from "../../../../common/Icons";
+import { CheckIcon, DeleteIcon, EditDocumentIcon } from "../../../../common/Icons";
 import SearchMessage from "../productV2/searchMessage";
 import NoProductsMessage from "../productV2/noProduct";
+import { MyButton, CustomMyButton } from "../../../../common/customs/MyButton";
+import CustomChip from "../../../../common/customs/CustomChip";
+
 
 const ProductListAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -38,7 +41,7 @@ const ProductListAuction: React.FC = () => {
             <img
               src={product.image[0]}
               alt={product.product_name}
-             className="w-16 md:w-32 max-w-full max-h-full sm:w-24 sm:min-w-[96px] sm:min-h-[96px] mr-2 rounded-xl"
+              className="w-16 md:w-32 max-w-full max-h-full sm:w-24 sm:min-w-[96px] sm:min-h-[96px] mr-2 rounded-xl"
             />
           </div>
         );
@@ -64,32 +67,41 @@ const ProductListAuction: React.FC = () => {
         }).format(product.product_price);
       case "status":
         return (
-          <Chip color={product.status === "active" ? "success" : "danger"}>
+          <CustomChip color={product.status === "active" ? "springGreen" : "danger"}    startContent={<CheckIcon size={18} /> }>
             {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
-          </Chip>
+          </CustomChip>
         );
       case "actions":
         return (
           <div className="flex items-center space-x-2">
-            <Tooltip content="Soft Delete">
-              <button
-                type="button"
+            <Tooltip content="Xóa mềm">
+              <MyButton
+                variant="shadow"
+                size="sm"
+                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
                 onClick={() => handleSoftDeleteProduct(product._id, dispatch, currentPage, searchTerm)}
-                className="text-red-700 hover:text-red-800"
               >
-                <DeleteIcon />
-              </button>
+                <DeleteIcon /> Xóa
+              </MyButton>
             </Tooltip>
-            <Tooltip content="Edit">
-              <Link
-                to={`/admin/edit-product-auction/${product._id}`}
-                className="text-lime-600 hover:text-lime-500"
-              >
-                <EditIcon />
-              </Link>
+
+            <Tooltip content="Cập nhật">
+              <div>
+                <CustomMyButton
+                  as={Link} // Link component từ react-router-dom
+                  to={`/admin/edit-product-auction/${product._id}`} // Đường dẫn
+                  variant="shadow"
+                  size="sm"
+                  className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
+                >
+                  <EditDocumentIcon /> Cập nhật
+                </CustomMyButton>
+              </div>
             </Tooltip>
+
           </div>
         );
+
       default:
         return null;
     }
@@ -103,7 +115,7 @@ const ProductListAuction: React.FC = () => {
       </div>
 
       {products.length === 0 ? (
-        searchTerm.length > 0 ? <SearchMessage /> : <NoProductsMessage />  
+        searchTerm.length > 0 ? <SearchMessage /> : <NoProductsMessage />
       ) : (
         <Table
           aria-label="Product List Auction Table"
@@ -130,7 +142,7 @@ const ProductListAuction: React.FC = () => {
           </TableBody>
         </Table>
       )}
-    {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center my-4">
           <Pagination
             isCompact
