@@ -60,6 +60,7 @@ export interface UserProfile {
 //   phone: string;
 // }
 export interface Address {
+  addressId?: string;
   _id?: string;
   fullName?: string; // fullName có thể không có (optional)
   address: string;

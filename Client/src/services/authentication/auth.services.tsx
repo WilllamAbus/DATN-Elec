@@ -312,12 +312,9 @@ export const addAddress = async (addressData: Address) => {
 };
 
 // UPDATE: Cập nhật địa chỉ
-export const updateAddress = async (id: string, addressData: Address) => {
+export const updateAddress = async (addressData: Address) => {
   try {
-    const response = await instance.put(
-      `${API_URL}/auth/update/${id}`,
-      addressData
-    );
+    const response = await instance.put(`${API_URL}/auth/update`, addressData);
 
     return response.data;
   } catch (error) {
@@ -330,28 +327,26 @@ export const updateAddress = async (id: string, addressData: Address) => {
     }
   }
 };
-// export const updateAddress = async (
-//   addressIndex: number,
-//   addressData: Address
-// ) => {
+
+// export const updateAddress = async (id: string, addressData: Address) => {
 //   try {
-//     const response = await instance.put(`${API_URL}/addresses/update`, {
-//       addressIndex,
-//       ...addressData,
-//     });
-//     return {
-//       status: response.status,
-//       message: response.data.message,
-//       user: response.data.user,
-//     };
-//   } catch (error: any) {
-//     return {
-//       status: error.response?.status || 500,
-//       message:
-//         error.response?.data?.message || "Đã xảy ra lỗi khi cập nhật địa chỉ.",
-//     };
+//     const response = await instance.put(
+//       `${API_URL}/auth/update/${id}`,
+//       addressData
+//     );
+
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error("Error updating address: An unknown error occurred");
+//     }
 //   }
 // };
+
 //GET: danh sách địa chỉ
 export const fetchAddressList = async (): Promise<AddressResponse> => {
   try {
@@ -389,7 +384,17 @@ export const deleteAddress = async (_id: string) => {
       },
     });
 
-    return response.data; // Chỉ định kiểu dữ liệu cho response
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const fetchAddressById = async (addressId: string) => {
+  try {
+    const response = await instance.get(
+      `${API_URL}/auth/listAddress/${addressId}`
+    );
+    return response.data;
   } catch (error) {
     throw error;
   }
