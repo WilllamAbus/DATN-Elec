@@ -232,14 +232,14 @@ const ProductDetail: React.FC = () => {
   //     console.log("chưa login");
   //   }
   // };
-  const handleAddToWatchlist = async (variantId?: string) => {
+  const handleAddToWatchlist = async (variantId: string) => {
     if (userId && id) {
       try {
         let resultAction;
 
         if (isFavorite) {
           resultAction = await dispatch(
-            deleteWatchlistThunk({ productId: id, variantId })
+            deleteWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Delete result action:", resultAction);
 
@@ -254,7 +254,7 @@ const ProductDetail: React.FC = () => {
           }
         } else {
           resultAction = await dispatch(
-            addToWatchlistThunk({ productId: id })
+            addToWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Add result action:", resultAction);
 
@@ -485,7 +485,7 @@ const ProductDetail: React.FC = () => {
             </a>
             {error && <p className="text-red-500">{error}</p>}
             <button
-              onClick={() => handleAddToWatchlist()}
+              onClick={() => handleAddToWatchlist(products._id)}
               className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i

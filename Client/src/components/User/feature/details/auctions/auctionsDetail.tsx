@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import {
-  addToWatchlistThunk,
-  deleteWatchlistThunk,
-} from "../../../../../redux/product/wathList/wathlist";
+// import {
+//   addToWatchlistThunk,
+//   deleteWatchlistThunk,
+// } from "../../../../../redux/product/wathList/wathlist";
 import { fetchProductByTimeTrack } from "../../../../../redux/timeTrackProduct/timeTrackProdThunk";
 import {
   ProductDetails,
@@ -80,9 +80,9 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   // const [, setSelectedValues] = useState<Record<string, string | null>>({});
   const { productId } = useParams<{ productId: string }>();
-  const userId = useSelector(
-    (state: RootState) => state.auth.profile.profile?._id
-  );
+  // const userId = useSelector(
+  //   (state: RootState) => state.auth.profile.profile?._id
+  // );
   const dispatch = useDispatch<AppDispatch>();
   const [product, setProduct] = useState<ProductDetails | null>(null); // Initialize with null or an appropriate type
   const { productTimeTrack, loading, error } = useSelector(
@@ -103,39 +103,39 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   //   }));
   // };
 
-  const handleAddToWatchlist = async (variantId?: string) => {
-    if (userId && productId) {
-      try {
-        let resultAction;
+  // const handleAddToWatchlist = async (variantId: string) => {
+  //   if (userId && productId) {
+  //     try {
+  //       let resultAction;
 
-        if (isFavorite) {
-          resultAction = await dispatch(
-            deleteWatchlistThunk({ productId, variantId })
-          ).unwrap();
-          if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
-            setIsFavorite(false);
-          } else {
-            console.log(resultAction);
-          }
-        } else {
-          resultAction = await dispatch(
-            addToWatchlistThunk({ productId })
-          ).unwrap();
-          if (addToWatchlistThunk.fulfilled.match(resultAction)) {
-            setIsFavorite(true);
-          } else {
-            console.log(resultAction);
-          }
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          console.log(err.message);
-        }
-      }
-    } else {
-      console.log("User ID or Product ID is missing");
-    }
-  };
+  //       if (isFavorite) {
+  //         resultAction = await dispatch(
+  //           deleteWatchlistThunk({ variantId })
+  //         ).unwrap();
+  //         if (deleteWatchlistThunk.fulfilled.match(resultAction)) {
+  //           setIsFavorite(false);
+  //         } else {
+  //           console.log(resultAction);
+  //         }
+  //       } else {
+  //         resultAction = await dispatch(
+  //           addToWatchlistThunk({ variantId })
+  //         ).unwrap();
+  //         if (addToWatchlistThunk.fulfilled.match(resultAction)) {
+  //           setIsFavorite(true);
+  //         } else {
+  //           console.log(resultAction);
+  //         }
+  //       }
+  //     } catch (err) {
+  //       if (err instanceof Error) {
+  //         console.log(err.message);
+  //       }
+  //     }
+  //   } else {
+  //     console.log("User ID or Product ID is missing");
+  //   }
+  // };
 
   const changeMainImage = (index: number) => {
     setCurrentIndex(index);
@@ -190,7 +190,11 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
 
       const updateTimes = () => {
         const now = new Date();
-        setCurrentTime(format(now, "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy  ", { locale: vi }));
+        setCurrentTime(
+          format(now, "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy  ", {
+            locale: vi,
+          })
+        );
         setTimeLeft(calculateTimeLeft(endTime));
       };
 
@@ -253,9 +257,13 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   }
 
   const formattedEndTime = product.endTime
-    ? format(parseISO(product.endTime), "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy", {
-      locale: vi,
-    })
+    ? format(
+        parseISO(product.endTime),
+        "HH:mm:ss 'Ngày' EEEE, d MMMM 'năm' yyyy",
+        {
+          locale: vi,
+        }
+      )
     : "";
   const productPrice = product.product_price_unit ?? 0;
 
@@ -373,13 +381,14 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
             {productId && <ModalPopUp productId={productId} />}
 
             <button
-              onClick={() => handleAddToWatchlist()}
+              //  onClick={() => handleAddToWatchlist(productId)}
               className="flex items-center space-x-2 bg-gray-200
                text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
-                className={`fas fa-heart ${isFavorite ? "text-red-500" : "text-gray-500"
-                  }`}
+                className={`fas fa-heart ${
+                  isFavorite ? "text-red-500" : "text-gray-500"
+                }`}
               ></i>
               <span className="ml-2 text-slate-950">Yêu thích</span>
             </button>

@@ -215,13 +215,10 @@ export const resetPassword = async (token: string, password: string) => {
     }
   }
 };
-export const addToWatchlist = async (productId: string, variantId?: string) => {
+export const addToWatchlist = async (variantId: string) => {
   try {
     const response = await instance.post(
-      `${API_URL}/wathlist/add/${productId}`,
-      {
-        variantId,
-      }
+      `${API_URL}/wathlist/add/${variantId}`
     );
     return response.data;
   } catch (error) {
@@ -272,16 +269,11 @@ export const getWatchlist = async () => {
 //     }
 //   }
 // };
-export const DeleteWatchlist = async (
-  productId: string,
-  variantId?: string
-) => {
+export const DeleteWatchlist = async (variantId: string) => {
   try {
-    const endpoint = variantId
-      ? `${API_URL}/wathlist/delete/${productId}/${variantId}`
-      : `${API_URL}/wathlist/delete/${productId}`;
-
-    const response = await instance.delete(endpoint);
+    const response = await instance.delete(
+      `${API_URL}/wathlist/delete/${variantId}`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

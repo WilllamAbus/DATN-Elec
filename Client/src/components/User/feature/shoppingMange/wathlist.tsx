@@ -45,15 +45,12 @@ const Watchlist: React.FC<WatchlistProps> = () => {
     fetchWatchlist();
   }, [dispatch]);
 
-  const handleDeleteFromWatchlist = async (
-    productId: string,
-    variantId?: string
-  ) => {
+  const handleDeleteFromWatchlist = async (variantId: string) => {
     try {
-      await dispatch(deleteWatchlistThunk({ productId, variantId })).unwrap();
+      await dispatch(deleteWatchlistThunk({ variantId })).unwrap();
       setWatchlist(
         watchlist.filter(
-          (item) => item.product && item.product._id !== productId
+          (item) => item.productVariant && item.productVariant._id !== variantId
         )
       );
       toast.success("Sản phẩm đã bị xóa khỏi danh sách yêu thích.");
@@ -105,9 +102,7 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                   )} */}
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      onClick={() =>
-                        handleDeleteFromWatchlist(product._id, variant._id)
-                      }
+                      onClick={() => handleDeleteFromWatchlist(variant._id)}
                       type="button"
                       className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
