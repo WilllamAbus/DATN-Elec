@@ -6,28 +6,26 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "../../productV2/toast/msgtoast";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../../ultils/breadcrumb/admin/breadcrumbData";
-import {Screen,ResponseScreen } from "../../../../../services/attribute/types/screen/editScreen";
+import { Ram, ResponseRam } from "../../../../../services/attribute/types/ram/editRam";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch,RootState } from "../../../../../redux/store";
-import { getOneScreenThunk, editScreenThunk} from "../../../../../redux/attribute/thunk";
+import { AppDispatch, RootState } from "../../../../../redux/store";
+import { getOneRamThunk, editRamThunk } from "../../../../../redux/attribute/thunk";
 import FormInput from "../form/formInput";
 import CKEditorComponent from "../customEditor/ckeditor";
 
 const editScreen: React.FC = () => {
 
-  const { screenId } = useParams<{ screenId: string }>();
-  const { register, handleSubmit, control,watch,setValue, formState: { errors } } = useForm<Screen>();
+  const { ramId } = useParams<{ ramId: string }>();
+  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<Partial<Ram>>();
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
-  const screens = useSelector((state: RootState) => state.attribute.getOneScreen.screen);
-  const fetchStatus = useSelector((state: RootState) => state.attribute.getOneScreen.status);
-  const fetchError = useSelector((state: RootState) => state.attribute.getOneScreen.error);
+  const rams = useSelector((state: RootState) => state.attribute.getOneRam.ram);
+  const fetchStatus = useSelector((state: RootState) => state.attribute.getOneRam.status);
+  const fetchError = useSelector((state: RootState) => state.attribute.getOneRam.error);
   const navigate = useNavigate();
-console.log(screens);
-
 
   useEffect(() => {
-    if (!screenId) {
+    if (!ramId) {
       setIsLoading(false);
       return;
     }
@@ -35,7 +33,7 @@ console.log(screens);
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        await dispatch(getOneScreenThunk(screenId)).unwrap();
+        await dispatch(getOneRamThunk(ramId)).unwrap();
       } catch (error) {
         notifyError(fetchError instanceof Error ? fetchError.message : "Lỗi hệ thống");
       } finally {
@@ -44,54 +42,49 @@ console.log(screens);
     };
 
     fetchData();
-  }, [screenId, dispatch, fetchError]);
-
+  }, [ramId, dispatch, fetchError]);
 
   useEffect(() => {
-    if (fetchStatus === "succeeded" && screens) {
-
-      setValue("name", screens.name);
-      setValue("description", screens.description);
-
+    if (fetchStatus === "succeeded" && rams) {
+      setValue("name", rams.name);
+      setValue("description", rams.description);
     }
-  }, [fetchStatus, screens, setValue]);
+  }, [fetchStatus, rams, setValue]);
 
-  const submitFormEdit: SubmitHandler<Screen> = async (data) => {
+  const submitFormEdit: SubmitHandler<Partial<Ram>> = async (data) => {
     setIsLoading(true);
     try {
-
-      const actionResult = await dispatch(
-        editScreenThunk({ screenId: screenId!, updates: data })
-      ).unwrap();
+      const actionResult = await dispatch(editRamThunk({ ramId: ramId!, updates: data })).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
-        navigate("/admin/list-screen");
+        navigate("/admin/list-ram");
       }, 2000);
     } catch (error) {
-      notifyError((error as ResponseScreen).msg);
+      notifyError((error as ResponseRam).msg);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <form onSubmit={handleSubmit(submitFormEdit)} encType="multipart/form-data">
       <ToastContainer />
-      <ReusableBreadcrumb items={breadcrumbItems.addVariant} />
+      <ReusableBreadcrumb items={breadcrumbItems.editRam} />
       <div className="flex items-center px-4 py-2">
-          <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Đang cập nhật màn hình {" "}
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+          Đang cập nhật ram {" "}
           <span className="text-blue-600">
-            {screens?.name || "Không có tên màn hình"}
+            {rams?.name || "Không có tên màn hình"}
           </span>
         </h1>
-          </div>
+      </div>
       <div className="grid grid-cols-1 px-4 pt-4 xl:grid-cols-2 xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
 
 
             <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-6 sm:col-span-6">
+              <div className="col-span-6 sm:col-span-6">
                 <FormInput
                   id="name"
                   label="Tên loại màn hình"
@@ -102,14 +95,14 @@ console.log(screens);
                   validation={{ required: "Tên loại màn hình là bắt buộc" }}
                 />
               </div>
-              
 
-         
+
+
 
               <div className="col-span-6 1sm:col-span-3 mb-4">
                 <CKEditorComponent
                   name="description"
-                  value={watch("description")} 
+                  value={watch("description") || ""}
                   onChange={(data) => setValue("description", data)}
                 />
 

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getListScreenThunk } from "../../../../../redux/attribute/thunk";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import SearchFormListScreen from "../../../../../components/Admin/searchform/searchFormListScreen";
 import AddProductButton from "../../../../../components/Admin/buttonAdd";
-import DropdownCRUD from "../dropdown/dropdownScreen";
-import { Chip, Pagination, Tooltip } from "@nextui-org/react";
+import { handlesoftDeleteScreen } from "../handlers/softDeleteScreen";
+import { Pagination, Tooltip } from "@nextui-org/react";
 import { Screen } from "../../../../../services/attribute/types/screen/listScreen";
+import { Link } from "react-router-dom";
 import {
   Table,
   TableHeader,
@@ -16,6 +17,9 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import NoDataMessage from "../noData/noData";
+import { CustomMyButton, MyButton } from "../../../../../common/customs/MyButton";
+import { CheckIcon, DeleteIcon, EditDocumentIcon } from "../../../../../common/Icons";
+import CustomChip from "../../../../../common/customs/CustomChip";
 
 const getListScreen: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -30,14 +34,14 @@ const getListScreen: React.FC = () => {
 
   useEffect(() => {
     dispatch(getListScreenThunk({ page: currentPage, search: searchTerm }));
-  }, [dispatch, currentPage, searchTerm]);
+  }, [dispatch, currentPage]); // Chỉ phụ thuộc vào `currentPage`
+
 
   const handlePageChange = (page: number) => {
     dispatch(getListScreenThunk({ page, search: searchTerm }));
   };
-  const renderCell = (screens: Screen, columnKey: string) => {
+  const renderCell = useCallback((screens: Screen, columnKey: string) => {
     switch (columnKey) {
-
       case "name":
         const screenName = screens.name;
         return (
@@ -47,25 +51,52 @@ const getListScreen: React.FC = () => {
             </span>
           </Tooltip>
         );
-
       case "status":
         return (
-          <Chip color={screens.status === "active" ? "success" : "danger"}>
+          <CustomChip
+            startContent={<CheckIcon size={18} />}
+            color={screens.status === "active" ? "springGreen" : "danger"}
+            className="drop-shadow shadow-black text-white"
+            variant="flat"
+          >
             {screens.status === "active" ? "Hiển thị" : "Đã ẩn"}
-          </Chip>
+          </CustomChip>
         );
-
-
       case "actions":
         return (
-          <DropdownCRUD screenId={screens._id} currentPage={currentPage} searchTerm={searchTerm} />
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Xóa">
+              <MyButton
+                variant="shadow"
+                size="sm"
+                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                onClick={() => handlesoftDeleteScreen(screens._id, dispatch, currentPage, searchTerm)}
+              >
+                <DeleteIcon /> Xóa
+              </MyButton>
+            </Tooltip>
+            <Tooltip content="Cập nhật">
+              <div>
+                <CustomMyButton
+                  as={Link}
+                  to={`/admin/edit-screen/${screens._id}`}
+                  variant="shadow"
+                  size="sm"
+                  className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                >
+                  <EditDocumentIcon /> Cập nhật
+                </CustomMyButton>
+              </div>
+            </Tooltip>
+          </div>
         );
       default:
         return null;
     }
-  };
+  }, [dispatch, currentPage, searchTerm]);
+
   const columns = [
-    { uid: "name", name: "tên màn hình" },
+    { uid: "name", name: "Tên màn hình" },
     { uid: "status", name: "Trạng thái" },
     { uid: "actions", name: "Chức năng" },
   ];
@@ -87,10 +118,10 @@ const getListScreen: React.FC = () => {
           }
         />
       ) : (
-        <Table aria-label="Product Variants Table" className="p-4">
+        <Table aria-label="Example table with custom cells" className="p-4">
           <TableHeader columns={columns}>
             {(column) => (
-              <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+              <TableColumn key={column.uid} style={{ minWidth: "200px" }}>
                 {column.name}
               </TableColumn>
             )}
@@ -104,9 +135,11 @@ const getListScreen: React.FC = () => {
               </TableRow>
             )}
           </TableBody>
+
         </Table>
+
       )}
-       {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center my-4">
           <Pagination
             isCompact
