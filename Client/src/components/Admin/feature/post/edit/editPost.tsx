@@ -91,7 +91,7 @@ const EditPost: React.FC = () => {
   return (
     <form onSubmit={handleSubmit(submitFormEdit)} encType="multipart/form-data">
       <ToastContainer />
-      <ReusableBreadcrumb items={breadcrumbItems.addVariant} />
+      <ReusableBreadcrumb items={breadcrumbItems.editPostProduct} />
       <div className="flex items-center px-4 py-2">
           <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
           Đang cập nhật bài viết cho {" "}

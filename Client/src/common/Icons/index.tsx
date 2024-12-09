@@ -9,3 +9,5 @@ export * from './IconLucideDot';
 export * from './IconRadixIconsDotFilled';
 export * from './IconMdiStickerAlert';
 export * from './IconMdiBellAlertOutline';
+export * from './IconLucideBookText';
+export * from './IconLucideComponent';

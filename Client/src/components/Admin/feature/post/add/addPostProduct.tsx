@@ -46,7 +46,7 @@ const addPostProduct: React.FC = () => {
   return (
     <form onSubmit={handleSubmit(submitFormAdd)} encType="multipart/form-data">
       <ToastContainer />
-      <ReusableBreadcrumb items={breadcrumbItems.addVariant} />
+      <ReusableBreadcrumb items={breadcrumbItems.addPostProduct} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
           Thêm bài viết cho sản phẩm
