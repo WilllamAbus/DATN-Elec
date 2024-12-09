@@ -1,8 +1,21 @@
 import React from "react";
-import { truncateText } from "../truncate/truncateText";
-import { hardDeleteProduct,restoreProduct } from "../handlers";
+import { hardDeleteProduct, restoreProduct } from "../handlers";
 import { AppDispatch } from "../../../../../redux/store";
-import { Product } from "../types/main_product"; 
+import { Product } from "../types/main_product";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+  Tooltip,
+  Avatar,
+} from "@nextui-org/react";
+import { CustomMyButton, MyButton } from "../../../../../common/customs/MyButton";
+import { DeleteIcon, RestoreIcon } from "../../../../../common/Icons";
+
 interface ProductTableProps {
   products: Product[];
   dispatch: AppDispatch;
@@ -11,78 +24,106 @@ interface ProductTableProps {
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({ products, dispatch, currentPage, searchTerm }) => {
-  return (
-    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <th scope="col" className="p-4">Tên sản phẩm</th>
-          <th scope="col" className="p-4">Danh mục</th>
-          <th scope="col" className="p-4">Giá gốc</th>
-          <th scope="col" className="p-4">Trạng thái</th>
-          <th scope="col" className="p-4">Chức năng</th>
-        </tr>
-      </thead>
-      <tbody>
-        {products.map((product) => (
-          <tr
-            key={product._id}
-            className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+  const renderCell = (product: Product, columnKey: string) => {
+    switch (columnKey) {
+      case "image":
+        return (
+          <div className="flex items-center">
+            <img
+              src={product.image[0]}
+              alt={product.product_name}
+              className="w-16 md:w-32 max-w-full max-h-full sm:w-24 sm:min-w-[96px] sm:min-h-[96px] mr-2 rounded-xl"
+            />
+          </div>
+        );
+
+        case "product_name":
+          const productName = product.product_name;
+          return (
+            <Tooltip content={productName} delay={0}>
+              <span>
+                {productName.length > 20 ? `${productName.substring(0, 20)}...` : productName}
+              </span>
+            </Tooltip>
+          );
+      case "product_type":
+        return (
+          <Chip
+            color="primary"
+            avatar={
+              <Avatar
+                name={product.product_type?.name || "N/A"}
+                size="sm"
+                getInitials={(name) => (name ? name.charAt(0) : "N")}
+              />
+            }
           >
-            <th
-              scope="row"
-              className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              <div className="flex items-center mr-3">
-                <img
-                  src={product.image[0]}
-                  className="h-8 w-auto mr-3"
-                  alt={product.product_name}
-                />
-                <span>{truncateText(product.product_name, 30)}</span>
-              </div>
-            </th>
-            <td className="px-4 py-3">
-              <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                {product.product_type?.name || "Chưa có loại"}
-              </span>
-            </td>
-            <td className="px-4 py-3">
-              {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
-                product.product_price
-              )}
-            </td>
-            <td className="py-4 px-6 border-b border-grey-light">
-              <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-current ${
-                  product.status === "active"
-                    ? "bg-green-50 text-green-700"
-                    : "bg-red-50 text-red-700"
-                }`}
+            {product.product_type?.name || "Chưa có loại"}
+          </Chip>
+        );
+      case "status":
+        return (
+          <Chip
+            color={product.status === "active" ? "success" : "danger"}
+            className="capitalize"
+          >
+            {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
+          </Chip>
+        );
+      case "actions":
+        return (
+          <div className="flex items-center space-x-4">
+            <Tooltip content="Xóa">
+              <MyButton
+                variant="shadow"
+                size="sm"
+                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
+                onClick={() => hardDeleteProduct(product._id, dispatch, currentPage, searchTerm)}
               >
-                {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
-              </span>
-            </td>
-            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                  onClick={() => hardDeleteProduct(product._id, dispatch, currentPage, searchTerm)}
-                >
-                  Xoá
-                </button>
-                <button
+                <DeleteIcon /> Xóa
+              </MyButton>
+            </Tooltip>
+            <Tooltip content="Khôi phục">
+              <div>
+                <CustomMyButton
+                  variant="shadow"
+                  size="sm"
                   onClick={() => restoreProduct(product._id, dispatch, currentPage, searchTerm)}
-                  className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
                 >
-                  Khôi phục
-                </button>
+                  <RestoreIcon /> Khôi phục
+                </CustomMyButton>
               </div>
-            </td>
-          </tr>
+            </Tooltip>
+
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Table aria-label="Product List" className="p-4">
+      <TableHeader>
+        <TableColumn>Hình ảnh</TableColumn>
+        <TableColumn>Tên sản phẩm</TableColumn>
+        <TableColumn>Danh mục</TableColumn>
+        <TableColumn>Trạng thái</TableColumn>
+        <TableColumn>Chức năng</TableColumn>
+      </TableHeader>
+      <TableBody>
+        {products.map((product) => (
+          <TableRow key={product._id}>
+            {["image", "product_name", "product_type", "status", "actions"].map(
+              (columnKey) => (
+                <TableCell key={columnKey}>{renderCell(product, columnKey)}</TableCell>
+              )
+            )}
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 };
 

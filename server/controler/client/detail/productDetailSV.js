@@ -102,13 +102,6 @@ const ProductDetailService = {
           matchedVariant = product.variants[0];
         }
         
-        if (!matchedVariant) {
-          console.warn("matchedVariant is undefined, cannot update view history.");
-          return; 
-        }
-        
-        console.log("userId:", userId);
-        console.log("matchedVariant ID:", matchedVariant._id);
         
         const now = new Date();
         const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); 
