@@ -27,7 +27,7 @@ const addScreen: React.FC = () => {
       ).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
-        navigate("/admin/listproduct");
+        navigate("/admin/list-screen");
       }, 2000);
     } catch (error) {
       notifyError((error as ResponseScreen).msg);

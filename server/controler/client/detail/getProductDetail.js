@@ -6,12 +6,7 @@ const ProductDetailService = require('./productDetailSV');
 const getProductDetail = async (req, res) => {
   const { slug } = req.params; 
   const { storage,color } = req.query; 
-  console.log('Request Headers:', req.headers); 
-    console.log('User Info:', req.user); 
-    
     const userId = req.user ? req.user.id : null; 
-    console.log('userId:', userId); 
-    
   
   try {
     const product = await Product.findOne({ slug });

@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteListProductThunk } from "../../../../redux/product/admin/Thunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
-
-import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFomDeletelistProduct from "../../../../components/Admin/searchform/searchFomDeletelistProduct";
 import ProductTable from "./productTable/deletetListProduct";
 import SearchMessage from "./searchMessage"; 
 import NoProductsMessage from "./noProduct"; 
+import { Pagination } from "@nextui-org/react";
 
 const DeletetListProduct: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -52,11 +51,19 @@ const DeletetListProduct: React.FC = () => {
           searchTerm={searchTerm}
         />
       )}
-      <PaginationComponent
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      {totalPages > 1 && (
+        <div className="flex justify-center my-4">
+          <Pagination
+            isCompact
+            loop
+            showControls
+            color="primary"
+            total={totalPages}
+            initialPage={currentPage}
+            onChange={(page) => handlePageChange(page)}
+          />
+        </div>
+      )}
     </>
   );
 };

@@ -2,7 +2,7 @@ const ProductService = require('./getDeletedListSV');
 
 const deletedList = async (req, res) => {
   const { page, search } = req.query;
-  const limit = 2; 
+  const limit = 5; 
 
   try {
     const response = await ProductService.getDeletedListService(page, search, limit);
