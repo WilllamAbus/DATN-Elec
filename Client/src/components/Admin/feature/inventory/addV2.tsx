@@ -7,8 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductAuction } from "../../../../services/product_v2/admin/types/add-product-auction";
-
 import { Inventory } from "../../../../types/Inventories";
+import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption } from '@headlessui/react';
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
+import clsx from 'clsx';
 
 interface IFormInput {
     productAuction: string;
@@ -20,6 +22,8 @@ const AddInventory: React.FC = () => {
     const {
         register,
         handleSubmit,
+        setValue,
+
         formState: { errors },
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
@@ -29,6 +33,9 @@ const AddInventory: React.FC = () => {
     const [products, setProducts] = useState<ProductAuction[]>([]);
     const [selectedProductInventory, setSelectedProductInventory] = useState<Inventory | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [query, setQuery] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState<ProductAuction | null>(null);
+
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
@@ -40,16 +47,21 @@ const AddInventory: React.FC = () => {
             e.preventDefault();
         }
     };
-    const handleProductChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const productId = e.target.value;
-
-        if (productId) {
+    const filteredProducts =
+        query === ''
+            ? products
+            : products.filter((product) =>
+                product.product_name.toLowerCase().includes(query.toLowerCase())
+            );
+    const handleProductChange = async (product: ProductAuction | null) => {
+        if (product) {
             try {
-                const inventoryItem = await getOneInventoryItemV2(productId);
+                // Replace `getOneInventoryItem` with your actual API call
+                const inventoryItem = await getOneInventoryItemV2(product._id);
                 setSelectedProductInventory(inventoryItem);
             } catch (error: unknown) {
                 const typedError = error as Error;
-                setError(typedError.message);
+                console.error(typedError.message);
             }
         } else {
             setSelectedProductInventory(null);
@@ -123,23 +135,70 @@ const AddInventory: React.FC = () => {
                                 >
                                     Tên sản phẩm
                                 </label>
-                                <select
-                                    id="productAuction"
-                                    className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    {...register("productAuction", { required: "Sản phẩm không được bỏ trống" })}
-                                    onChange={handleProductChange}
-                                >
-                                    <option value="">Chọn sản phẩm</option>
-                                    {products.length > 0 ? (
-                                        products.map((product, index) => (
-                                            <option key={product._id || index} value={product._id}>
-                                                {product.product_name}
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option disabled>Không có sản phẩm nào</option>
-                                    )}
-                                </select>
+                                <Combobox value={selectedProduct} onChange={(product) => {
+                                    setSelectedProduct(product);
+                                    handleProductChange(product);
+                                    setValue("productAuction", product?._id || "");
+                                }}>
+                                    <div className="relative">
+                                        <ComboboxInput
+                                            id="product_variant"
+                                            className={clsx(
+                                                'w-full bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5',
+                                                'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                                            )}
+                                            onChange={(event) => setQuery(event.target.value)}
+                                            displayValue={(product: ProductAuction | null) => product?.product_name || ''}
+                                            placeholder="Nhập tên sản phẩm để tìm kiếm..."
+                                        />
+                                        <ComboboxButton className="absolute inset-y-0 right-0 px-2 flex items-center">
+                                            <ChevronDownIcon className="w-5 h-5 text-gray-500 dark:text-white" />
+                                        </ComboboxButton>
+                                    </div>
+                                    <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        {filteredProducts.length > 0 ? (
+                                            filteredProducts.map((product) => (
+                                                <ComboboxOption
+                                                    key={product._id}
+                                                    value={product}
+                                                    className={({ active }) =>
+                                                        clsx(
+                                                            'cursor-pointer select-none relative py-2 pl-3 pr-9',
+                                                            active ? 'bg-primary-600 text-white' : 'text-gray-900'
+                                                        )
+                                                    }
+                                                >
+                                                    {({ selected, active }) => (
+                                                        <>
+                                                            <span
+                                                                className={clsx(
+                                                                    'block truncate',
+                                                                    selected ? 'font-medium' : 'font-normal'
+                                                                )}
+                                                            >
+                                                                {product.product_name}
+                                                            </span>
+                                                            {selected ? (
+                                                                <span
+                                                                    className={clsx(
+                                                                        'absolute inset-y-0 right-0 flex items-center pr-4',
+                                                                        active ? 'text-white' : 'text-primary-600'
+                                                                    )}
+                                                                >
+                                                                    <CheckIcon className="w-5 h-5" />
+                                                                </span>
+                                                            ) : null}
+                                                        </>
+                                                    )}
+                                                </ComboboxOption>
+                                            ))
+                                        ) : (
+                                            <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
+                                                Không có sản phẩm nào phù hợp
+                                            </div>
+                                        )}
+                                    </ComboboxOptions>
+                                </Combobox>
                                 {errors.productAuction && (
                                     <span className="text-red-500 text-xs italic">
                                         {errors.productAuction.message?.toString()}
@@ -151,7 +210,7 @@ const AddInventory: React.FC = () => {
                                     htmlFor="quantity"
                                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                                 >
-                                    Số lượng kệ
+                                    Số lượng khả dụng
                                 </label>
                                 <input
                                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -185,7 +244,7 @@ const AddInventory: React.FC = () => {
 
                                                 // Kiểm tra nếu số lượng nhập vào lớn hơn số lượng tồn kho khả dụng
                                                 if (value > availableStock) {
-                                                    return `Số lượng nhập lên kệ vượt quá số lượng tồn kho. Tối đa có thể thêm: ${availableStock}`;
+                                                    return `Số lượng khả dụng vượt quá số lượng tồn kho. Tối đa có thể thêm: ${availableStock}`;
                                                 }
 
                                                 // Kiểm tra nếu số lượng là số âm hoặc 0

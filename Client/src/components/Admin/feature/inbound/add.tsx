@@ -7,7 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify } from "../../../../ultils/success";
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
 import { ProductVariant } from "../../../../types/ProductV2";
-
+import FormInput from "./forminput";
+import { Combobox } from '@headlessui/react';
 interface IFormInput {
     product_variant_id: string;
     inbound_description: string;
@@ -23,6 +24,7 @@ const AddInbound: React.FC = () => {
         handleSubmit,
         formState: { errors },
         setValue,
+        control,
         watch
     } = useForm<IFormInput>();
     const [] = useState<File | null>(null);
@@ -31,19 +33,21 @@ const AddInbound: React.FC = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState<ProductVariant[]>([]);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [query, setQuery] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState<ProductVariant | null>(null);
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
-    
-    
-       
+
+
+
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
         const pastedData = e.clipboardData.getData('Text');
         if (!/^\d+$/.test(pastedData)) {
             e.preventDefault();
-        
+
         }
     };
 
@@ -60,6 +64,14 @@ const AddInbound: React.FC = () => {
         fetchProducts();
     }, []);
 
+
+    const filteredProducts =
+        query === ''
+            ? products
+            : products.filter((product) =>
+                product.variant_name.toLowerCase().includes(query.toLowerCase())
+            );
+
     // Tính toán giá tổng lô hàng
     const calculateTotalPrice = (quantity: number, price: number) => {
         return quantity * price;
@@ -69,7 +81,11 @@ const AddInbound: React.FC = () => {
     useEffect(() => {
         const subscription = watch((value) => {
             const totalPrice = calculateTotalPrice(value.inbound_quantity || 0, value.inbound_price || 0);
-            setValue("totalPriceInbound", totalPrice); // Cập nhật giá tổng lô hàng
+
+            // So sánh với giá trị hiện tại từ watch
+            if ((value.totalPriceInbound || 0) !== totalPrice) {
+                setValue("totalPriceInbound", totalPrice); // Cập nhật giá tổng lô hàng
+            }
         });
 
         return () => subscription.unsubscribe(); // Dọn dẹp subscription khi component unmount
@@ -117,38 +133,106 @@ const AddInbound: React.FC = () => {
                         <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
                             <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan lô hàng</h3>
 
-                            <div className="grid grid-cols-6 gap-6">
-                                <div className="col-span-6 sm:col-span-6">
-                                    <label
-                                        htmlFor="first-name"
-                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Tên sản phẩm
-                                    </label>
-                                    <select
-                                        id="product_variant_id"
-                                        className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        {...register("product_variant_id", { required: "Sản phẩm không được bỏ trống" })}
-                                    >
-                                        <option value="">Chọn sản phẩm</option>
-                                        {products.length > 0 ? (
-                                            products.map((product, index) => (
-                                                <option key={product._id || index} value={product._id}>
-                                                    {product.variant_name}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option disabled>Không có sản phẩm nào</option>
-                                        )}
-                                    </select>
-                                    {errors.product_variant_id && (
-                                        <span className="text-red-500 text-xs italic">
-                                            {errors.product_variant_id.message?.toString()}
-                                        </span>
-                                    )}
-                                </div>
-
-
+                            <div className="col-span-6 sm:col-span-6 relative">
+                                <label
+                                    htmlFor="product_variant_id"
+                                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                                >
+                                    Tên sản phẩm
+                                </label>
+                                <Combobox
+                                    value={selectedProduct}
+                                    onChange={(value) => {
+                                        setSelectedProduct(value);
+                                        setValue("product_variant_id", value?._id || ""); // Cập nhật giá trị vào form
+                                    }}
+                                >
+                                    <div className="relative">
+                                        {/* Input with dropdown toggle */}
+                                        <div className="relative w-full">
+                                            <Combobox.Input
+                                                id="product_variant_id"
+                                                className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pr-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                                placeholder="Nhập tên sản phẩm để tìm kiếm..."
+                                                onChange={(event) => setQuery(event.target.value)} // Update search query
+                                                displayValue={(product: ProductVariant) =>
+                                                    product?.variant_name || ""
+                                                }
+                                            />
+                                            {/* Dropdown toggle icon */}
+                                            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth={2}
+                                                    stroke="currentColor"
+                                                    className="w-5 h-5 text-gray-500 dark:text-white"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M8.25 15l3.75-3.75 3.75 3.75"
+                                                    />
+                                                </svg>
+                                            </Combobox.Button>
+                                        </div>
+                                        {/* Dropdown list */}
+                                        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                            {filteredProducts.length > 0 ? (
+                                                filteredProducts.map((product) => (
+                                                    <Combobox.Option
+                                                        key={product._id}
+                                                        value={product}
+                                                        className={({ active }) =>
+                                                            `cursor-pointer select-none relative py-2 pl-3 pr-9 ${active ? "bg-primary-600 text-white" : "text-gray-900"
+                                                            }`
+                                                        }
+                                                    >
+                                                        {({ selected }) => (
+                                                            <>
+                                                                <span
+                                                                    className={`block truncate ${selected ? "font-medium" : "font-normal"
+                                                                        }`}
+                                                                >
+                                                                    {product.variant_name}
+                                                                </span>
+                                                                {selected ? (
+                                                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-white">
+                                                                        <svg
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            fill="none"
+                                                                            viewBox="0 0 24 24"
+                                                                            strokeWidth={2}
+                                                                            stroke="currentColor"
+                                                                            className="w-5 h-5"
+                                                                        >
+                                                                            <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                d="M5 13l4 4L19 7"
+                                                                            />
+                                                                        </svg>
+                                                                    </span>
+                                                                ) : null}
+                                                            </>
+                                                        )}
+                                                    </Combobox.Option>
+                                                ))
+                                            ) : (
+                                                <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
+                                                    Không có sản phẩm nào phù hợp
+                                                </div>
+                                            )}
+                                        </Combobox.Options>
+                                    </div>
+                                </Combobox>
+                                {/* Error message */}
+                                {errors.product_variant_id && (
+                                    <span className="text-red-500 text-xs italic">
+                                        {errors.product_variant_id.message?.toString()}
+                                    </span>
+                                )}
                             </div>
                             <div className="grid grid-cols-3 gap-6 mt-3 sm:grid-cols-1">
                                 <div className="sm:col-span-1">
@@ -178,56 +262,58 @@ const AddInbound: React.FC = () => {
                                     )}
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="quantity"
-                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Giá tiền
-                                    </label>
-                                    <input
-                                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    <FormInput
                                         id="inbound_price"
-                                     
-                                        type="number"
-                                        {...register("inbound_price",
-                                            {
-                                                required: "Giá tiền không được bỏ trống",
-                                                valueAsNumber: true,
-                                                validate: value => value > 0 || "Giá tiền phải lớn hơn 0"
-                                            })}
-                                        onInput={handleInput}
-                                        onPaste={handlePaste}
+                                        label="Giá gốc"
+                                        format
+                                        suffix=" đ"
+                                        register={register}
+                                        control={control}
+                                        error={errors.inbound_price}
+                                        validation={{
+                                            required: "Giá sản phẩm không được bỏ trống",
+                                            min: {
+                                                value: 1000,
+                                                message: "Giá sản phẩm không thể thấp hơn 1000",
+                                            },
+                                            max: {
+                                                value: 2000000000,
+                                                message: "Giá sản phẩm không thể vượt quá 2000000000",
+                                            },
+                                            valueAsNumber: true,
+                                        }}
+                                        onValueChange={(values) => {
+                                            const { floatValue } = values;
+                                            setValue("inbound_price", floatValue ?? 0);
+                                        }}
                                     />
-                                    {errors.inbound_price && (
-                                        <span className="text-red-500 text-xs italic">
-                                            {errors.inbound_price.message?.toString()}
-                                        </span>
-                                    )}
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <label
-                                        htmlFor="quantity"
-                                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                                    >
-                                        Giá tổng lô hàng
-                                    </label>
-                                    <input
-                                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    <FormInput
                                         id="totalPriceInbound"
-                                        type="number"
-                                        {...register("totalPriceInbound",
-                                            {
-                                                required: "Giá tổng  không được bỏ trống",
-                                                valueAsNumber: true,
-                                                validate: value => value > 0 || "Giá tổng phải lớn hơn 0"
-                                            })}
-                                        readOnly
+                                        label="Giá gốc"
+                                        format
+                                        suffix=" đ"
+                                        register={register}
+                                        control={control}
+                                        error={errors.totalPriceInbound}
+                                        validation={{
+                                            required: "Giá sản phẩm không được bỏ trống",
+                                            min: {
+                                                value: 1000,
+                                                message: "Giá sản phẩm không thể thấp hơn 1000",
+                                            },
+                                            max: {
+                                                value: 2000000000,
+                                                message: "Giá sản phẩm không thể vượt quá 2000000000",
+                                            },
+                                            valueAsNumber: true,
+                                        }}
+                                        onValueChange={(values) => {
+                                            const { floatValue } = values;
+                                            setValue("totalPriceInbound", floatValue ?? 0);
+                                        }}
                                     />
-                                    {errors.totalPriceInbound && (
-                                        <span className="text-red-500 text-xs italic">
-                                            {errors.totalPriceInbound.message?.toString()}
-                                        </span>
-                                    )}
                                 </div>
                             </div>
                             <div className="w-full mb-4 border mt-6 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">

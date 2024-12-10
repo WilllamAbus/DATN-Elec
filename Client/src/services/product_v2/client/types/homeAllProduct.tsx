@@ -36,26 +36,14 @@ export interface ProductResponse {
   error?: string;
 }
 export interface ProductRelated {
-  _id: string;
-  image: {
-    image: string[]; 
-    color: { _id: string; name: string };
-    slug: string;
-}[];
-  variant_name: string;
+  slug: string
+  variant_id: string; // ID của biến thể sản phẩm
+  variant_name: string; // Tên của biến thể sản phẩm
   variant_price: number;
-  product_ratingAvg: number;
-  weight_g: number; 
-  product_discount: {
-    discountId: string;
-    code: string; 
-    discountPercent: number; 
-    isActive: boolean; 
-    status: string; 
-    disabledAt: Date | null;
-  };
+  discount_percent: number; // Phần trăm giảm giá
+  images: string[]; // Mảng các URL hình ảnh
 }
 
 export interface RelatedProductsResponse {
-  relatedVariants: ProductRelated[]; 
+  "Sản phẩm gợi ý": ProductRelated[];
 }

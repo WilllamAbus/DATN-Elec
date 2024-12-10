@@ -3,12 +3,12 @@ import { useParams, Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { fetchRelatedProducts } from "../../../../../../services/detailProduct/relatedProducts";
-import { ProductRelated } from "../../../../../../services/product_v2/client/types/homeAllProduct"; // Updated import
+import { ProductRelated, RelatedProductsResponse } from "../../../../../../services/product_v2/client/types/homeAllProduct"; // Updated import
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Heart, Star } from "../svg";
+// import {  Star } from "../svg";
 import { ToastContainer, toast } from "react-toastify";
 import currencyFormatter from "currency-formatter";
 
@@ -31,21 +31,25 @@ const RelatedProduct: React.FC = () => {
             }
             try {
                 setLoading(true);
-                const relatedData = await fetchRelatedProducts(slug);
-                if (relatedData && Array.isArray(relatedData.relatedVariants)) {
-                    setRelatedVariants(relatedData.relatedVariants);
+                const relatedData: RelatedProductsResponse = await fetchRelatedProducts(slug);
+                console.log('Related Data:', relatedData); // Log dữ liệu phản hồi
+
+                // Sử dụng tên thuộc tính "Sản phẩm gợi ý"
+                if (relatedData && Array.isArray(relatedData["Sản phẩm gợi ý"])) {
+                    console.log('Sản phẩm gợi ý:', relatedData["Sản phẩm gợi ý"]);
+                    setRelatedVariants(relatedData["Sản phẩm gợi ý"]); // Cập nhật biến trạng thái với dữ liệu
                 } else {
                     setError("Không thể lấy sản phẩm liên quan.");
                     toast.error("Không thể lấy sản phẩm liên quan.");
                 }
             } catch (error) {
+                console.error('Error fetching related products:', error); // Log lỗi
                 setError("Không thể tải dữ liệu.");
                 toast.error("Không thể tải dữ liệu.");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [slug]);
 
@@ -75,15 +79,15 @@ const RelatedProduct: React.FC = () => {
                     }}
                 >
                     {relatedVariants.map((variant, index) => (
-                        <SwiperSlide key={variant._id || index}>
+                        <SwiperSlide key={variant.variant_id || index}>
                             <div className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
                                 <div className="backdrop-blur-sm bg-white/30">
-                                    <Link to={`/detailProd/${variant._id}`}>
+                                    <Link to={`/product/${variant.slug}`}>
                                         <figure className="relative w-full h-0 pb-[75%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
-                                            {variant.image && variant.image.length > 0 ? (
+                                            {variant.images && variant.images.length > 0 ? (
                                                 <img
                                                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                                                    src={variant.image[0].image[0]} // Show the first image
+                                                    src={variant.images[0]} // Show the first image
                                                     alt={`variant ${index + 1}`}
                                                 />
                                             ) : (
@@ -99,33 +103,34 @@ const RelatedProduct: React.FC = () => {
 
                                 <div className="pt-1 mb-10">
                                     <div className="mb-4 px-2 flex items-center justify-between gap-4">
-                                         {variant.product_discount.discountPercent > 0 && (
+                                        {variant.discount_percent > 0 && ( // Sử dụng đúng thuộc tính discount_percent
                                             <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                                                Giảm giá {variant.product_discount.discountPercent}%
+                                                Giảm giá {variant.discount_percent}%
                                             </span>
-                                        )} 
-                                        <div className="flex items-center justify-end gap-1">
+                                        )}
+                                        {/* <div className="flex items-center justify-end gap-1">
                                             <button
                                                 type="button"
                                                 className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                aria-label="Thêm vào danh sách yêu thích" // Thêm aria-label cho nút
                                             >
                                                 <Heart fill="red" size="1em" />
                                             </button>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
                                         <div className="mt-1 px-2 pb-1">
                                             <h5 className="text-sm tracking-tight text-slate-900 font-medium">
-                                                {variant.variant_name} 
+                                                {variant.variant_name}
                                             </h5>
                                         </div>
                                     </div>
 
-                                     <div className="px-2 flex items-center gap-2">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                    <div className="px-2 flex items-center gap-2">
+                                        {/* <p className="text-sm font-medium text-gray-900 dark:text-white">
                                             {variant.product_ratingAvg?.toFixed(1) || "N/A"}
-                                        </p>
-                                        <Star />
+                                        </p> */}
+                                        {/* <Star /> */}
                                         {/* <div className="text-xs text-gray-500 items-center">
                                             {variant.product_quantity > 0
                                                 ? `(Còn ${variant.product_quantity} sản phẩm)`
@@ -134,9 +139,9 @@ const RelatedProduct: React.FC = () => {
                                     </div>
                                     <div className="mt-2 px-2 flex items-center gap-2">
                                         <p className="text-xs font-medium text-rose-700">
-                                                {formatCurrency(variant.variant_price)} đ
-                                            </p>
-                                    </div> 
+                                            {formatCurrency(variant.variant_price)} đ
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </SwiperSlide>
