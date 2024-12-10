@@ -1,6 +1,6 @@
 import React from "react";
 import AdminListUser from "../../../components/Admin/feature/users/userList";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 import { Link } from "react-router-dom";
 const userList: React.FC = () => {
   return (

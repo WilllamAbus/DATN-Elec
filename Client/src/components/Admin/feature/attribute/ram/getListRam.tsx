@@ -1,11 +1,11 @@
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getListRamThunk } from "../../../../../redux/attribute/thunk";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import SearchFormListRam from "../../../../../components/Admin/searchform/searchFormListRam";
 import AddProductButton from "../../../../../components/Admin/buttonAdd";
-import DropdownCRUD from "../dropdown/dropdownRam";
-import { Chip, Pagination, Tooltip } from "@nextui-org/react";
+import { Pagination, Tooltip } from "@nextui-org/react";
 import { Ram } from "../../../../../services/attribute/types/ram/listRam";
 import {
   Table,
@@ -16,6 +16,11 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import NoDataMessage from "../noData/noData";
+import { CustomMyButton, MyButton } from "../../../../../common/customs/MyButton";
+import { CheckIcon, DeleteIcon, EditDocumentIcon } from "../../../../../common/Icons";
+import CustomChip from "../../../../../common/customs/CustomChip";
+import { handlesoftDeleteRam } from "../handlers/softDeleteRam";
+
 
 const getListScreen: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -47,18 +52,44 @@ const getListScreen: React.FC = () => {
             </span>
           </Tooltip>
         );
-
-      case "status":
-        return (
-          <Chip color={rams.status === "active" ? "success" : "danger"}>
-            {rams.status === "active" ? "Hiển thị" : "Đã ẩn"}
-          </Chip>
-        );
-
-
+        case "status":
+          return (
+            <CustomChip
+              startContent={<CheckIcon size={18} />}
+              color={rams.status === "active" ? "springGreen" : "danger"}
+              className="drop-shadow shadow-black text-white"
+              variant="flat"
+            >
+              {rams.status === "active" ? "Hiển thị" : "Đã ẩn"}
+            </CustomChip>
+          );
       case "actions":
         return (
-          <DropdownCRUD ramId={rams._id} currentPage={currentPage} searchTerm={searchTerm} />
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Xóa">
+              <MyButton
+                variant="shadow"
+                size="sm"
+                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                onClick={() => handlesoftDeleteRam(rams._id, dispatch, currentPage, searchTerm)}
+              >
+                <DeleteIcon /> Xóa
+              </MyButton>
+            </Tooltip>
+            <Tooltip content="Cập nhật">
+              <div>
+                <CustomMyButton
+                  as={Link}
+                  to={`/admin/edit-ram/${rams._id}`}
+                  variant="shadow"
+                  size="sm"
+                  className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                >
+                  <EditDocumentIcon /> Cập nhật
+                </CustomMyButton>
+              </div>
+            </Tooltip>
+          </div>
         );
       default:
         return null;
@@ -90,9 +121,9 @@ const getListScreen: React.FC = () => {
         <Table aria-label="Product Variants Table" className="p-4">
           <TableHeader columns={columns}>
             {(column) => (
-              <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
-                {column.name}
-              </TableColumn>
+            <TableColumn key={column.uid} style={{ minWidth: "200px" }}>
+            {column.name}
+          </TableColumn>
             )}
           </TableHeader>
           <TableBody items={rams}>
@@ -106,7 +137,7 @@ const getListScreen: React.FC = () => {
           </TableBody>
         </Table>
       )}
-     {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center my-4">
           <Pagination
             isCompact

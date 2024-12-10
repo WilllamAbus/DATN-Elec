@@ -9,7 +9,7 @@ import { notifyUpdate } from "../../../../ultils/success";
 
 import { Category } from "../../../../types/Categories.d";
 import { Supplier } from "../../../../types/Suppliers.d";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import { notifyError } from "../productV2/toast/msgtoast";
 
 

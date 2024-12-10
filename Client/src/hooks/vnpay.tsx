@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
 
+import { toast } from "react-toastify";
+import instance from "../services/axios";
 export const useVNPay = () => {
   const [loading, setLoading] = useState(false);
 
@@ -12,7 +12,7 @@ export const useVNPay = () => {
   ) => {
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await instance.post(
         "http://localhost:4000/api/vnpay/create_payment_url",
         {
           amount,

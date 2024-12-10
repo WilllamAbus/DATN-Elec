@@ -4,7 +4,7 @@ import { Ram, ResponseRam } from '../../../types/ram/addRam';
 
 export const addRam = async (ram: Ram): Promise<ResponseRam> => {
   try {
-    const response = await instance.post("/api/admin/attributes/add-ram", ram, {
+    const response = await instance.post("/admin/attributes/add-ram", ram, {
       headers: {
         "Content-Type": "application/json",
       },

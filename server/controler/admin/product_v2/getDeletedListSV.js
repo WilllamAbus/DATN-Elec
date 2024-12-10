@@ -1,7 +1,7 @@
 const Product = require('../../../model/product_v2');
 
 const ProductService = {
-  getDeletedListService: (page = 1, search, limit = 2) => new Promise(async (resolve, reject) => {
+  getDeletedListService: (page = 1, search, limit = 5) => new Promise(async (resolve, reject) => {
     try {
       const offset = (page - 1) * limit;
       const searchQuery = search

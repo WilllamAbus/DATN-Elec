@@ -1,3 +1,4 @@
+
 // import React, { useEffect, useState } from "react";
 // import { useDispatch } from "react-redux";
 // import { useLocation, useNavigate } from "react-router-dom";
@@ -347,7 +348,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../../ultils/breadcrumb";
+} from "../../../../ultils/breadcrumb/admin";
 import { Button, Image, Spinner } from "@nextui-org/react";
 
 const AdminEditUser = () => {
@@ -423,16 +424,19 @@ const AdminEditUser = () => {
       const formData = new FormData();
       formData.append("password", data.password);
 
-      await dispatch(updateUserThunk({ userId, formData })).unwrap();
+      const response = dispatch(updateUserThunk({ userId, formData })).unwrap();
+
       toast.dismiss();
-      toast.success("Cập nhật mật khẩu thành công!");
+      const successMessage = (await response).message;
+      toast.success(successMessage);
 
       setTimeout(() => {
         navigate("/admin/listUser");
       }, 3000);
     } catch (error) {
-      console.error("Error updating password:", error);
-      toast.error("Không thể cập nhật mật khẩu");
+      const errorMessage = (error as string) || "Không thể cập nhật mật khẩu";
+      toast.dismiss();
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -518,7 +522,8 @@ const AdminEditUser = () => {
                 className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 type="text"
                 id="name"
-                value={localProfile?.name}
+                value={localProfile?.name || "trống"}
+                readOnly
               />
             </div>
             <div className="mb-4">
@@ -532,43 +537,11 @@ const AdminEditUser = () => {
                 className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 type="text"
                 id="name"
-                value={localProfile?.phone}
+                value={localProfile?.phone || "trống"}
+                readOnly
               />
-              {/* <input
-                type="tel"
-                id="phone"
-                {...register("phone", {
-                  required: "Số điện thoại là bắt buộc",
-                })}
-                onChange={handleChange}
-                className={`bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 ${
-                  errors.phone ? "border-red-500" : ""
-                }`}
-              />
-              {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone.message}</p>
-              )} */}
             </div>
-            {/* <div className="mb-4">
-              <label
-                htmlFor="address"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Địa chỉ
-              </label>
-              <input
-                type="text"
-                id="address"
-                {...register("address", { required: "Địa chỉ là bắt buộc" })}
-                onChange={handleChange}
-                className={`bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 ${
-                  errors.address ? "border-red-500" : ""
-                }`}
-              />
-              {errors.address && (
-                <p className="text-red-500 text-sm">{errors.address.message}</p>
-              )}
-            </div> */}
+
             <div className="mb-4">
               <label
                 htmlFor="birthday"
@@ -580,7 +553,8 @@ const AdminEditUser = () => {
                 className="bg-gray-50 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 type="text"
                 id="name"
-                value={localProfile?.birthday}
+                value={localProfile?.birthday || "Trống"}
+                readOnly
               />
             </div>
             <Button

@@ -7,7 +7,7 @@ const SearchMessage = () => {
         className="w-32 h-32 mb-4"
       />
       <p className="text-gray-400">
-        Hix. Không có sản phẩm nào. Bạn thử tắt điều kiện lọc và tìm lại nhé?
+        Hix. Không có sản phẩm nào. Vui lòng xóa từ khóa?
       </p>
     </div>
   );

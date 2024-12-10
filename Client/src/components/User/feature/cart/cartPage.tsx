@@ -9,9 +9,10 @@ import {
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { CartType } from "../../../../types/cart/carts";
 import { useNavigate } from "react-router-dom";
-import { Button } from "flowbite-react";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Button, Checkbox } from "@nextui-org/react";
 
 const CartPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,21 +25,24 @@ const CartPage: React.FC = () => {
   const userRole = useSelector(
     (state: RootState) => state.auth.profile?.roles || []
   );
-  console.log(userRole);
-
+  const userProfile = useSelector(
+    (state: RootState) => state.auth.login.isLoggedIn
+  );
   const [itemQuantities, setItemQuantities] = useState<{
     [key: string]: number;
   }>({});
   const [totalCartPrice, setTotalCartPrice] = useState(0);
 
-  useEffect(() => {
-    dispatch(fetchCartList());
-  }, [dispatch]);
-
+  // useEffect(() => {
+  //   dispatch(fetchCartList());
+  // }, [dispatch]);
+  if (!userProfile) {
+    navigate("/login");
+    return null;
+  }
   useEffect(() => {
     const updatedItemQuantities: { [key: string]: number } = {};
 
-    // Kiểm tra nếu carts là một mảng
     if (Array.isArray(carts)) {
       carts.forEach((cart) => {
         if (Array.isArray(cart.items)) {
@@ -76,6 +80,7 @@ const CartPage: React.FC = () => {
   const handleSelectCart = async (productId: string, cart: CartType) => {
     const updatedItems = cart.items.map((cartItem) => ({
       productId: cartItem.product._id,
+      variantId: cartItem.productVariant._id,
       isSelected: !cartItem.isSelected,
     }));
 
@@ -93,19 +98,12 @@ const CartPage: React.FC = () => {
     }
   };
 
-  const handleSelectAll = async (isSelected: boolean) => {
+  const handleSelectAll = async (isSelected: boolean, cartId: string) => {
     setLoading(true);
     try {
-      for (const cart of carts) {
-        const updatedCart = {
-          ...cart,
-          items: cart.items.map((item) => ({
-            ...item,
-            isSelected,
-          })),
-        };
-        await handleSelectCart(cart._id, updatedCart);
-      }
+      await dispatch(SelectCart({ selectAll: isSelected, cartId })).unwrap();
+
+      await dispatch(fetchCartList());
     } catch (error) {
       toast.error("Lỗi khi chọn tất cả sản phẩm.");
     } finally {
@@ -186,10 +184,16 @@ const CartPage: React.FC = () => {
     navigate(`/checkout/${carts[0]._id}`, {});
   };
 
-  const handleDeleteProduct = async (cartId: string, productId: string) => {
+  const handleDeleteProduct = async (
+    cartId: string,
+    productId?: string,
+    productVariantId?: string
+  ) => {
     setLoading(true);
     try {
-      await dispatch(deleteCart({ cartId, productId })).unwrap();
+      await dispatch(
+        deleteCart({ cartId, productId, productVariantId })
+      ).unwrap();
       toast.success("Sản phẩm đã được xóa khỏi giỏ hàng.");
     } catch (error) {
       toast.error("Xóa sản phẩm thất bại.");
@@ -197,7 +201,6 @@ const CartPage: React.FC = () => {
       setLoading(false);
     }
   };
-
   if (cartStatus === "failed") {
     toast.error(`Error: ${cartError}`);
     return <p>Error: {cartError}</p>;
@@ -215,32 +218,36 @@ const CartPage: React.FC = () => {
 
   filteredCarts.forEach((cart) => {
     cart.items.forEach((item) => {
-      const key = item.product._id;
-      if (key) {
-        if (!groupedMap.has(key)) {
-          groupedMap.set(key, { ...cart, items: [item] });
+      const key = `${item.product._id}-${item.productVariant._id}`; // Nhóm theo cả productId và variantId
+
+      if (!groupedMap.has(key)) {
+        groupedMap.set(key, { ...cart, items: [item] });
+      } else {
+        const existingCart = groupedMap.get(key)!;
+        const updatedItems = [...existingCart.items];
+
+        const itemIndex = updatedItems.findIndex(
+          (i) =>
+            i.product._id === item.product._id &&
+            i.productVariant._id === item.productVariant._id
+        );
+
+        if (itemIndex !== -1) {
+          updatedItems[itemIndex] = {
+            ...updatedItems[itemIndex],
+            quantity: updatedItems[itemIndex].quantity + item.quantity,
+            totalItemPrice:
+              updatedItems[itemIndex].totalItemPrice +
+              item.productVariant.variant_price * item.quantity,
+          };
         } else {
-          const existingCart = groupedMap.get(key)!;
-          const updatedItems = [...existingCart.items];
-          const itemIndex = updatedItems.findIndex(
-            (i) => i.product._id === item.product._id
-          );
-          if (itemIndex !== -1) {
-            updatedItems[itemIndex] = {
-              ...updatedItems[itemIndex],
-              quantity: updatedItems[itemIndex].quantity + item.quantity,
-              totalItemPrice:
-                updatedItems[itemIndex].totalItemPrice +
-                item.productVariant.variant_price * item.quantity,
-            };
-          } else {
-            updatedItems.push({
-              ...item,
-              totalItemPrice: item.productVariant.variant_price * item.quantity,
-            });
-          }
-          existingCart.items = updatedItems;
+          updatedItems.push({
+            ...item,
+            totalItemPrice: item.productVariant.variant_price * item.quantity,
+          });
         }
+
+        existingCart.items = updatedItems;
       }
     });
   });
@@ -257,247 +264,285 @@ const CartPage: React.FC = () => {
     <div className="min-h-[calc(71vh-10rem)] container lg:col-span-8 border border-gray-200 p-4 rounded-lg shadow-sm bg-white mb-16 mt-16">
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 p-4 rounded-md">
-          <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
-          <hr className="border-gray-300 mt-4 mb-8" />
-          <th scope="col" className="p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-all-orders"
-                type="checkbox"
-                className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                onChange={(e) => handleSelectAll(e.target.checked)} // Xử lý chọn tất cả
-                checked={carts.every((cart) =>
-                  cart.items.every((item) => item.isSelected)
-                )}
-              />
-              <label htmlFor="checkbox-all-orders" className="ml-2">
-                Chọn tất cả
-              </label>
-            </div>
-          </th>
+          {/* <div className="flex items-center">
+            <Checkbox
+              id="checkbox-all-orders"
+              isSelected={carts.every((cart) =>
+                cart.items.every((item) => item.isSelected)
+              )}
+              onChange={(e) => handleSelectAll(e.target.checked, carts[0]._id)}
+              size="sm"
+              color="primary"
+              className="mr-2"
+            />
 
-          <div className="space-y-4">
-            {groupedCarts.map((cart) => (
-              <div
-                key={`${cart._id}-${cart.items[0].product._id}`}
-                className="grid bg-white grid-cols-3 items-center gap-4"
+            <label htmlFor="checkbox-all-orders" className="ml-2">
+              Chọn tất cả
+            </label>
+
+            <Button
+              onClick={() => handleDeleteProduct(carts[0]._id)}
+              disabled={loading}
+              className="btn btn-danger"
+            >
+              <i className="iconify mdi--delete w-5 h-5 text-red-600 transition duration-75 dark:text-red-400 group-hover:text-red-800 dark:group-hover:text-white "></i>
+              Xóa toàn bộ
+            </Button>
+          </div> */}
+          {groupedCarts.length === 0 ? (
+            <div className="text-center mt-10">
+              <div className="flex justify-center">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png"
+                  alt="Giỏ hàng trống"
+                  className="w-64 h-64 object-cover"
+                />
+              </div>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => navigate("/")}
               >
-                <div className="col-span-2 flex items-center gap-4">
-                  <th scope="col" className="p-4">
-                    {/* <div className="flex items-center">
-                      <input
-                        id={`checkbox-${cart._id}`}
-                        type="checkbox"
-                        checked={cart.items.every((item) => item.isSelected)}
-                        onChange={() => {
-                          cart.items.forEach((item) => {
-                            handleSelectCart(cart._id, item);
-                          });
-                        }}
-                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor={`checkbox-${cart._id}`}
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                      
-                    </div> */}
-                    <div className="flex items-center">
-                      <input
-                        id={`checkbox-${cart._id}`}
-                        type="checkbox"
-                        checked={cart.items.every((item) => item.isSelected)}
-                        onChange={() => {
-                          handleSelectCart(cart._id, cart); // Truyền toàn bộ đối tượng cart
-                        }}
-                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label
-                        htmlFor={`checkbox-${cart._id}`}
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </th>
-
-                  <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
-                    <img
-                      src={
-                        cart.items[0]?.productVariant?.image?.[0]?.image?.[0] ||
-                        "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
-                      }
-                      alt={`product ${
-                        cart.items[0]?.productVariant?.variant_name || "Unknown"
-                      }`}
-                      className="w-full h-full object-contain"
-                    />
-
-                    {/* {cart.items.map((item, index) => (
-                      <div key={index}>
-                        {item.productVariant?.image?.[0]?.image?.[0] ? (
-                          <img
-                            src={item.productVariant.image[0].image[0]}
-                            alt="Product"
-                          />
-                        ) : (
-                          <p>Không có hình ảnh</p>
-                        )}
-                      </div>
-                    ))} */}
-                  </div>
-
-                  <div>
-                    <h3 className="text-base font-bold text-gray-800">
-                      {cart.items[0].productVariant.variant_name}
-                    </h3>
-                    <h6
-                      onClick={() =>
-                        handleDeleteProduct(cart._id, cart.items[0].product._id)
-                      }
-                      className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
-                        loading ? "opacity-50" : ""
-                      }`}
-                    >
-                      Xóa
-                    </h6>
-
-                    <div className="flex gap-4 mt-4">
-                      <button
-                        type="button"
-                        className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
-                      >
-                        <h5 className="text-gray-800 font-semibold">
-                          {cart.items[0].productVariant.screen?.name}
-                        </h5>
-                      </button>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
-                          onClick={() =>
-                            handleDecreaseQuantity(
-                              cart._id,
-                              cart.items[0].product._id,
-                              itemQuantities[cart.items[0].product._id] ||
-                                cart.items[0].quantity
-                            )
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-3 fill-current"
-                            viewBox="0 0 124 124"
-                          >
-                            <path d="M112 50H12c-6.6 0-10.8-1.8-10.8-6.5S5.4 37 12 37h100c6.6 0 10.8 1.8 10.8 6.5S118.6 50 112 50z" />
-                          </svg>
-                        </button>
-
-                        <input
-                          type="text"
-                          className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
-                          value={
-                            itemQuantities[cart.items[0].product._id] ||
-                            cart.items[0].quantity
-                          }
-                          onChange={(e) => {
-                            const newQuantity = Number(e.target.value);
-
-                            if (
-                              !isNaN(newQuantity) &&
-                              newQuantity >= 1 &&
-                              newQuantity <= 99
-                            ) {
-                              setItemQuantities((prev) => ({
-                                ...prev,
-                                [cart.items[0].product._id]: newQuantity,
-                              }));
-                            } else if (newQuantity > 99) {
-                              toast.dismiss();
-                              toast.error("Số lượng không được vượt quá 99.");
-
-                              setItemQuantities((prev) => ({
-                                ...prev,
-                                [cart.items[0].product._id]: 99,
-                              }));
-                            }
-                          }}
-                          onBlur={(e) =>
-                            handleQuantityChange(
-                              cart._id,
-                              cart.items[0].product._id,
-                              Number(e.target.value) // Kiểm tra và cập nhật khi người dùng rời khỏi input
-                            )
-                          }
+                Tiếp tục mua sắm
+              </button>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
+              <hr className="border-gray-300 mt-4 mb-8" />
+              {groupedCarts.length > 0 && (
+                <div className="flex items-center">
+                  <Checkbox
+                    id="checkbox-all-orders"
+                    isSelected={carts.every((cart) =>
+                      cart.items.every((item) => item.isSelected)
+                    )}
+                    onChange={(e) =>
+                      handleSelectAll(e.target.checked, carts[0]._id)
+                    }
+                    size="sm"
+                    color="primary"
+                    className="mr-2"
+                  />
+                  <label htmlFor="checkbox-all-orders" className="ml-2">
+                    Chọn tất cả
+                  </label>
+                  <Button
+                    onClick={() => handleDeleteProduct(carts[0]._id)}
+                    disabled={loading}
+                    className="btn btn-danger"
+                  >
+                    <i className="iconify mdi--delete w-5 h-5 text-red-600 transition duration-75 dark:text-red-400 group-hover:text-red-800 dark:group-hover:text-white"></i>
+                    Xóa toàn bộ
+                  </Button>
+                </div>
+              )}
+              <div className="space-y-4 mt-4">
+                {groupedCarts.map((cart) => (
+                  <div
+                    key={`${cart._id}-${cart.items[0].product._id}`}
+                    className="bg-white p-4 rounded-md shadow-sm"
+                  >
+                    <div className="flex flex-wrap items-center gap-4">
+                      <div className="flex items-center gap-4 w-full md:w-3/4">
+                        <Checkbox
+                          id={`checkbox-${cart._id}`}
+                          isSelected={cart.items.every(
+                            (item) => item.isSelected
+                          )}
+                          onChange={() => handleSelectCart(cart._id, cart)}
+                          size="sm"
+                          color="primary"
+                          className="mr-2"
                         />
 
-                        <button
-                          type="button"
-                          className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
-                          onClick={() =>
-                            handleIncreaseQuantity(
-                              cart._id,
-                              cart.items[0].product._id,
-                              itemQuantities[cart.items[0].product._id] ||
-                                cart.items[0].quantity
-                            )
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-3 fill-current"
-                            viewBox="0 0 42 42"
+                        <div className="w-24 h-24 shrink-0 border bg-white p-2 rounded-md">
+                          <img
+                            src={
+                              cart.items[0]?.productVariant?.image?.[0]
+                                ?.image?.[0] ||
+                              "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
+                            }
+                            alt={`product ${
+                              cart.items[0]?.productVariant?.variant_name ||
+                              "Unknown"
+                            }`}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-2 w-full">
+                          <h3 className="text-base font-bold text-gray-800">
+                            {cart.items[0].productVariant.variant_name}
+                          </h3>
+                          <h6
+                            onClick={() =>
+                              handleDeleteProduct(
+                                cart._id,
+                                cart.items[0].product._id,
+                                cart.items[0].productVariant._id
+                              )
+                            }
+                            className={`text-xs text-red-500 cursor-pointer mt-0.5 ${
+                              loading ? "opacity-50" : ""
+                            }`}
                           >
-                            <path d="M37.059 16H26V4.941C26 2.224 23.718 0 21 0s-5 2.224-5 4.941V16H4.941C2.224 16 0 18.282 0 21s2.224 5 4.941 5H16v11.059C16 39.776 18.282 42 21 42s5-2.224 5-4.941V26h11.059C39.776 26 42 23.718 42 21s-2.224-5-4.941-5z" />
-                          </svg>
-                        </button>
+                            Xóa
+                          </h6>
+
+                          <div className="flex flex-wrap gap-4 mt-4">
+                            <button
+                              type="button"
+                              className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                            >
+                              <h5 className="text-gray-800 font-semibold">
+                                {cart.items[0].productVariant.ram?.name}
+                              </h5>
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                                onClick={() =>
+                                  handleDecreaseQuantity(
+                                    cart._id,
+                                    cart.items[0].product._id,
+                                    itemQuantities[cart.items[0].product._id] ||
+                                      cart.items[0].quantity
+                                  )
+                                }
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-3 fill-current"
+                                  viewBox="0 0 124 124"
+                                >
+                                  <path d="M112 50H12c-6.6 0-10.8-1.8-10.8-6.5S5.4 37 12 37h100c6.6 0 10.8 1.8 10.8 6.5S118.6 50 112 50z" />
+                                </svg>
+                              </button>
+
+                              <input
+                                type="text"
+                                className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
+                                value={
+                                  itemQuantities[cart.items[0].product._id] ||
+                                  cart.items[0].quantity
+                                }
+                                onChange={(e) => {
+                                  const newQuantity = Number(e.target.value);
+                                  if (
+                                    !isNaN(newQuantity) &&
+                                    newQuantity >= 1 &&
+                                    newQuantity <= 99
+                                  ) {
+                                    setItemQuantities((prev) => ({
+                                      ...prev,
+                                      [cart.items[0].product._id]: newQuantity,
+                                    }));
+                                  } else if (newQuantity > 99) {
+                                    toast.dismiss();
+                                    toast.error(
+                                      "Số lượng không được vượt quá 99."
+                                    );
+                                    setItemQuantities((prev) => ({
+                                      ...prev,
+                                      [cart.items[0].product._id]: 99,
+                                    }));
+                                  }
+                                }}
+                                onBlur={(e) =>
+                                  handleQuantityChange(
+                                    cart._id,
+                                    cart.items[0].product._id,
+                                    Number(e.target.value)
+                                  )
+                                }
+                              />
+
+                              <button
+                                type="button"
+                                className="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
+                                onClick={() =>
+                                  handleIncreaseQuantity(
+                                    cart._id,
+                                    cart.items[0].product._id,
+                                    itemQuantities[cart.items[0].product._id] ||
+                                      cart.items[0].quantity
+                                  )
+                                }
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-3 fill-current"
+                                  viewBox="0 0 42 42"
+                                >
+                                  <path d="M37.059 16H26V4.941C26 2.224 23.718 0 21 0s-5 2.224-5 4.941V16H4.941C2.224 16 0 18.282 0 21s2.224 5 4.941 5H16v11.059C16 39.776 18.282 42 21 42s5-2.224 5-4.941V26h11.059C39.776 26 42 23.718 42 21s-2.224-5-4.941-5z" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="ml-auto mt-4 md:mt-0">
+                        <h4 className="text-base font-bold text-gray-800">
+                          {cart.items.length > 0 &&
+                          cart.items[0].productVariant?.variant_price
+                            ? cart.items[0].productVariant.variant_price.toLocaleString(
+                                "vi-VN",
+                                {
+                                  style: "currency",
+                                  currency: "VND",
+                                }
+                              )
+                            : "Giá chưa được cập nhật"}
+                        </h4>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        {groupedCarts.length > 0 && (
+          <div className="p-4 rounded-md bg-gray-50">
+            <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
+            <hr className="border-gray-300 mt-4 mb-8" />
+            <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
 
-                <div className="ml-auto">
-                  <h4 className="text-base font-bold text-gray-800">
-                    {cart.items.length > 0 &&
-                    cart.items[0].productVariant &&
-                    cart.items[0].productVariant.variant_price
-                      ? cart.items[0].productVariant.variant_price.toLocaleString(
-                          "vi-VN",
-                          {
-                            style: "currency",
-                            currency: "VND",
-                          }
-                        )
-                      : "Giá chưa được cập nhật"}
-                  </h4>
-                </div>
+            {groupedCarts.map((cart) => (
+              <div key={cart._id} className="flex justify-between mt-2">
+                <span className="text-gray-800">
+                  {cart.items[0].product.product_name} x{" "}
+                  {itemQuantities[cart.items[0].product._id] ||
+                    cart.items[0].quantity}
+                </span>
               </div>
             ))}
-          </div>
-        </div>
 
-        <div className="p-4 rounded-md bg-gray-50">
-          <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
-          <hr className="border-gray-300 mt-4 mb-8" />
-          <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <p className="text-gray-800">Tạm tính:</p>
+                <p className="font-bold text-gray-800">
+                  {totalCartPrice.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </p>
+              </div>
 
-          {groupedCarts.map((cart) => (
-            <div key={cart._id} className="flex justify-between mt-2">
-              <span className="text-gray-800">
-                {cart.items[0].product.product_name} x{" "}
-                {itemQuantities[cart.items[0].product._id] ||
-                  cart.items[0].quantity}
-              </span>
+              <div className="flex justify-between items-center">
+                <p className="text-gray-800">Phí vận chuyển:</p>
+                <p className="font-bold text-gray-800">Miễn phí giao hàng</p>
+              </div>
             </div>
-          ))}
 
-          <div className="space-y-4">
+            <hr className="border-gray-300 mt-4 mb-8" />
+
             <div className="flex justify-between items-center">
-              <p className="text-gray-800">Tạm tính:</p>
-              <p className="font-bold text-gray-800">
+              <p className="text-lg font-bold text-gray-800">Tổng cộng:</p>
+              <p className="text-xl font-bold text-red-600">
                 {totalCartPrice.toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
@@ -505,43 +550,26 @@ const CartPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex justify-between items-center">
-              <p className="text-gray-800">Phí vận chuyển:</p>
-              <p className="font-bold text-gray-800">50.000₫</p>
+            <div className="mt-8 space-y-2">
+              <Button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
+                isDisabled={
+                  userRole.includes("admin") ||
+                  !groupedCarts.some((cart) =>
+                    cart.items.some((item) => item.isSelected)
+                  )
+                }
+              >
+                Thanh toán
+              </Button>
+
+              <Button className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light">
+                Tiếp tục mua sắm
+              </Button>
             </div>
           </div>
-
-          <hr className="border-gray-300 mt-4 mb-8" />
-
-          <div className="flex justify-between items-center">
-            <p className="text-lg font-bold text-gray-800">Tổng cộng:</p>
-            <p className="text-xl font-bold text-red-600">
-              {(totalCartPrice + 50000).toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              })}
-            </p>
-          </div>
-
-          <div className="mt-8 space-y-2">
-            <Button
-              onClick={handleCheckout}
-              className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-              disabled={
-                userRole.includes("admin") ||
-                !groupedCarts.some((cart) =>
-                  cart.items.some((item) => item.isSelected)
-                )
-              }
-            >
-              Thanh toán
-            </Button>
-
-            <Button className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light">
-              Tiếp tục mua sắm
-            </Button>
-          </div>
-        </div>
+        )}
       </div>
 
       <ToastContainer />

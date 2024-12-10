@@ -3,7 +3,7 @@ import AdminRecyBinPriceRand from "../../../components/Admin/feature/priceRand/d
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../ultils/breadcrumb";
+} from "../../../ultils/breadcrumb/admin";
 
 const listPriceRand: React.FC = () => {
   return (

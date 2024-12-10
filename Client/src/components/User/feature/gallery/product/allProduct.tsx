@@ -21,10 +21,10 @@ const AllProduct: React.FC = () => {
   const userId = useSelector(
     (state: RootState) => state.auth.profile.profile?._id
   );
-  const handleAddToWatchlist = async (productId: string) => {
+  const handleAddToWatchlist = async (variantId: string) => {
     if (userId) {
       try {
-        await dispatch(addToWatchlistThunk({ productId })).unwrap();
+        await dispatch(addToWatchlistThunk({ variantId })).unwrap();
       } catch (err) {
         console.error("Error adding product to watchlist", err);
       }

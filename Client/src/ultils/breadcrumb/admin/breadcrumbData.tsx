@@ -97,8 +97,23 @@ export const breadcrumbItems = {
   ],
   addScreen: [
     { href: "/admin", label: "Trang quản trị" },
-
     { href: "/admin/add-screen", label: "Thêm màn hình" },
+  ],
+  addRam: [
+    { href: "/admin", label: "Trang quản trị" },
+    { href: "/admin/add-ram", label: "Thêm ram" },
+  ],
+  editRam: [
+    { href: "/admin", label: "Trang quản trị" },
+    { href: "/admin/edit-ram", label: "Cập nhật ram" },
+  ],
+  addPostProduct: [
+    { href: "/admin", label: "Trang quản trị" },
+    { href: "/admin/add-post-product", label: "Thêm bài viết" },
+  ],
+  editPostProduct: [
+    { href: "/admin", label: "Trang quản trị" },
+    { href: "/admin/edit-post/:id", label: "Cập nhật bài viết" },
   ],
   listroductAuction: [
     { href: "/admin", label: "Trang quản trị" },

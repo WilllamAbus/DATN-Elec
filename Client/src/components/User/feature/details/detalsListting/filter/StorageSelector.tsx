@@ -43,11 +43,11 @@ const StorageSelector: React.FC<StorageSelectorProps> = ({ onChange = () => {} }
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bộ nhớ</h3>
-      <div className="mt-2 flex flex-wrap gap-4">
-        {allStorageOptions.length > 0 ? (
-          allStorageOptions.map((storage) => (
+    allStorageOptions.length > 0 && (  // Kiểm tra có tùy chọn dung lượng hay không
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bộ nhớ</h3>
+        <div className="mt-2 flex flex-wrap gap-4">
+          {allStorageOptions.map((storage) => (
             <label key={storage._id} className="flex items-center cursor-pointer">
               <input
                 type="radio"
@@ -62,12 +62,10 @@ const StorageSelector: React.FC<StorageSelectorProps> = ({ onChange = () => {} }
                 <p className="font-medium">{storage.name}</p>
               </div>
             </label>
-          ))
-        ) : (
-          <p className="text-gray-600 dark:text-gray-300">Không có tùy chọn dung lượng nào</p>
-        )}
+          ))}
+        </div>
       </div>
-    </div>
+    )
   );
 };
 

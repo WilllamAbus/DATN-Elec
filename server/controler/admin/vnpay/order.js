@@ -10,12 +10,18 @@ const {
   sendOrderConfirmationEmail,
 } = require("../../../services/email.service");
 const User = require("../../../model/users.model");
-
+const productVariant = require("../../../model/product_v2/productVariant");
+const Cart = require("../../../model/orders/cart.model");
 const Payment = require("../../../model/orders/payment.model");
 // Tạo URL thanh toán
 exports.createPaymentUrl = (req, res) => {
   try {
     process.env.TZ = "Asia/Ho_Chi_Minh";
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
+    }
 
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
@@ -70,90 +76,6 @@ exports.createPaymentUrl = (req, res) => {
     res.status(500).json({ message: "Error creating VNPay payment URL" });
   }
 };
-// exports.vnpayReturn = async (req, res) => {
-//   const vnp_Params = req.query;
-//   const secureHash = vnp_Params["vnp_SecureHash"];
-//   delete vnp_Params["vnp_SecureHash"];
-//   delete vnp_Params["vnp_SecureHashType"];
-
-//   const sortedParams = sortObject(vnp_Params);
-//   const signData = querystring.stringify(sortedParams, { encode: false });
-//   const hmac = crypto.createHmac("sha512", config.vnp_HashSecret);
-//   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
-
-//   if (secureHash === signed) {
-//     const responseCode = vnp_Params["vnp_ResponseCode"];
-//     const orderId = vnp_Params["vnp_TxnRef"];
-
-//     if (responseCode === "00") {
-//       const transactionNo = vnp_Params["vnp_TransactionNo"];
-//       const existingVnpay = await Vnpay.findOne({
-//         transaction: transactionNo,
-//       });
-
-//       if (existingVnpay) {
-//         return res.render("error", {
-//           code: "98",
-//           message: "Transaction already exists",
-//         });
-//       }
-
-//       const paymentData = {
-//         amount: parseInt(vnp_Params["vnp_Amount"]) / 100,
-//         transaction: transactionNo,
-//         bank_code: vnp_Params["vnp_BankCode"],
-//         card_type: vnp_Params["vnp_CardType"],
-//         order_info: vnp_Params["vnp_OrderInfo"],
-//         payment_date: vnp_Params["vnp_PayDate"],
-//         transaction_status: vnp_Params["vnp_TransactionStatus"],
-//         response_code: vnp_Params["vnp_ResponseCode"],
-//         payment_method: "vnPay", // Vì đây là VNPay
-//       };
-
-//       try {
-//         const newVnpay = new Vnpay(paymentData);
-//         await newVnpay.save();
-
-//         // Cập nhật trạng thái đơn hàng
-//         const order = await Order.findById(orderId);
-//         if (!order) {
-//           return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-//         }
-
-//         order.payment = newVnpay._id;
-//         order.stateOrder = "Đã thanh toán";
-//         await order.save();
-
-//         // Gửi email xác nhận đơn hàng
-//         const user = await User.findById(order.user);
-//         await sendOrderConfirmationEmail(user.email, {
-//           recipientName: order.shipping.recipientName,
-//           address: order.shipping.address,
-//           paymentMethod: "VNPay",
-//           items: order.cartDetails[0].items,
-//           totalPriceWithShipping: order.totalPriceWithShipping,
-//         });
-
-//         res.redirect(
-//           `http://localhost:3150/complete/${orderId}?paymentResult=success&orderId=${transactionNo}`
-//         );
-//       } catch (error) {
-//         console.error("Lưu thanh toán thất bại:", error);
-//         res.redirect(
-//           `http://localhost:3150/complete/${orderId}?paymentResult=failure`
-//         );
-//       }
-//     } else {
-//       res.redirect(
-//         `http://localhost:3150/complete/${orderId}?paymentResult=failure`
-//       );
-//     }
-//   } else {
-//     res.redirect(
-//       `http://localhost:3150/complete/${orderId}?paymentResult=invalid`
-//     );
-//   }
-// };
 
 exports.vnpayReturn = async (req, res) => {
   const vnp_Params = req.query;
@@ -221,90 +143,6 @@ exports.vnpayReturn = async (req, res) => {
     );
   }
 };
-// const vnpayReturn = async (req, res) => {
-//   const vnp_Params = req.query;
-//   const secureHash = vnp_Params["vnp_SecureHash"];
-//   delete vnp_Params["vnp_SecureHash"];
-//   delete vnp_Params["vnp_SecureHashType"];
-
-//   const sortedParams = sortObject(vnp_Params);
-//   const signData = querystring.stringify(sortedParams, { encode: false });
-//   const hmac = crypto.createHmac("sha512", config.vnp_HashSecret);
-//   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
-
-//   if (secureHash === signed) {
-//     const responseCode = vnp_Params["vnp_ResponseCode"];
-//     const orderId = vnp_Params["vnp_TxnRef"];
-
-//     if (responseCode === "00") {
-//       const transactionNo = vnp_Params["vnp_TransactionNo"];
-//       const existingVnpay = await Vnpay.findOne({
-//         transaction: transactionNo,
-//       });
-
-//       if (existingVnpay) {
-//         return res.render("error", {
-//           code: "98",
-//           message: "Transaction already exists",
-//         });
-//       }
-
-//       const paymentData = {
-//         amount: parseInt(vnp_Params["vnp_Amount"]) / 100,
-//         transaction: transactionNo,
-//         bank_code: vnp_Params["vnp_BankCode"],
-//         card_type: vnp_Params["vnp_CardType"],
-//         order_info: vnp_Params["vnp_OrderInfo"],
-//         payment_date: vnp_Params["vnp_PayDate"],
-//         transaction_status: vnp_Params["vnp_TransactionStatus"],
-//         response_code: vnp_Params["vnp_ResponseCode"],
-//         payment_method: "vnPay", // Vì đây là VNPay
-//       };
-
-//       try {
-//         const newVnpay = new Vnpay(paymentData);
-//         await newVnpay.save();
-
-//         // Cập nhật trạng thái đơn hàng
-//         const order = await Order.findById(orderId);
-//         if (!order) {
-//           return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-//         }
-
-//         order.payment = newVnpay._id;
-//         order.stateOrder = "Đã thanh toán";
-//         await order.save();
-
-//         // Gửi email xác nhận đơn hàng
-//         const user = await User.findById(order.user);
-//         await sendOrderConfirmationEmail(user.email, {
-//           recipientName: order.shipping.recipientName,
-//           address: order.shipping.address,
-//           paymentMethod: "VNPay",
-//           items: order.cartDetails[0].items,
-//           totalPriceWithShipping: order.totalPriceWithShipping,
-//         });
-
-//         res.redirect(
-//           `http://localhost:3150/complete/${orderId}?paymentResult=success&orderId=${transactionNo}`
-//         );
-//       } catch (error) {
-//         console.error("Lưu thanh toán thất bại:", error);
-//         res.redirect(
-//           `http://localhost:3150/complete/${orderId}?paymentResult=failure`
-//         );
-//       }
-//     } else {
-//       res.redirect(
-//         `http://localhost:3150/complete/${orderId}?paymentResult=failure`
-//       );
-//     }
-//   } else {
-//     res.redirect(
-//       `http://localhost:3150/complete/${orderId}?paymentResult=invalid`
-//     );
-//   }
-// };
 
 exports.vnpayIpn = (req, res) => {
   let vnp_Params = req.query;

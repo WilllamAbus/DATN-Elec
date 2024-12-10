@@ -395,13 +395,19 @@ const ProfileUse: React.FC = () => {
   };
 
   useEffect(() => {
-    if (
-      location.state &&
-      (location.state as { view: string }).view === "watchlist"
-    ) {
-      setView("watchlist"); // Cập nhật trạng thái khi nhận state
+    if (location.state) {
+      const { view } = location.state as { view: string };
+
+      if (view === "watchlist") {
+        setView("watchlist");
+      } else if (view === "address") {
+        setView("address");
+      } else if (view === "Bank") {
+        setView("Bank");
+      }
     }
   }, [location.state]);
+
   const MenuItem = ({
     item,
   }: {

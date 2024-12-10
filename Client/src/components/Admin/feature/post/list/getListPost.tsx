@@ -4,9 +4,10 @@ import { getListPostThunk } from "../../../../../redux/post/thunk";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import SearchPostList from "../../../../../components/Admin/searchform/searchFomPostList";
 import AddProductButton from "../../../../../components/Admin/buttonAdd";
-import DropdownCRUD from "../dropdown/dropdownPost";
-import { Chip, Pagination, Tooltip } from "@nextui-org/react";
+import { handlesoftDeletePost } from "../handlers/softDeletePost";
+import { Pagination, Tooltip } from "@nextui-org/react";
 import { Post} from "../../../../../services/post/admin/types/listPost";
+import { Link } from "react-router-dom";
 import {
   Table,
   TableHeader,
@@ -17,6 +18,9 @@ import {
 } from "@nextui-org/react";
 import SearchMessage from "../../productV2/searchMessage";
 import NoProductsMessage from "../../productV2/noProduct";
+import CustomChip from "../../../../../common/customs/CustomChip";
+import { CheckIcon, DeleteIcon, EditDocumentIcon } from "../../../../../common/Icons";
+import { CustomMyButton, MyButton } from "../../../../../common/customs/MyButton";
 
 const GetCategoryPostList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -59,17 +63,46 @@ const GetCategoryPostList: React.FC = () => {
         );
 
         case "status":
-        return (
-          <Chip color={post.status === "active" ? "success" : "danger"}>
-            {post.status === "active" ? "Hiển thị" : "Đã ẩn"}
-          </Chip>
-        );
+          return (
+            <CustomChip
+              startContent={<CheckIcon size={18} />}
+              color={post.status === "active" ? "springGreen" : "danger"}
+              className="drop-shadow shadow-black text-white"
+              variant="flat"
+            >
+              {post.status === "active" ? "Hiển thị" : "Đã ẩn"}
+            </CustomChip>
+          );
         
 
-      case "actions":
-        return (
-          <DropdownCRUD postId={post._id} currentPage={currentPage} searchTerm={searchTerm} />
-        );
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Xóa">
+                <MyButton
+                  variant="shadow"
+                  size="sm"
+                  className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                  onClick={() => handlesoftDeletePost(post._id, dispatch, currentPage, searchTerm)} 
+                >
+                  <DeleteIcon /> Xóa
+                </MyButton>
+              </Tooltip>
+              <Tooltip content="Cập nhật">
+                <div>
+                  <CustomMyButton
+                    as={Link}
+                    to={`/admin/edit-post/${post._id}`}
+                    variant="shadow"
+                    size="sm"
+                    className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black text-sm cursor-pointer active:opacity-50"
+                  >
+                    <EditDocumentIcon /> Cập nhật
+                  </CustomMyButton>
+                </div>
+              </Tooltip>
+            </div>
+          );
       default:
          return null;
     }
@@ -95,7 +128,7 @@ const GetCategoryPostList: React.FC = () => {
         <Table aria-label="Product Variants Table" className="p-4">
       <TableHeader columns={columns}>
         {(column) => (
-          <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+          <TableColumn key={column.uid} align={column.uid === "actions" ? "start" : "start"}>
             {column.name}
           </TableColumn>
         )}
@@ -111,18 +144,19 @@ const GetCategoryPostList: React.FC = () => {
       </TableBody>
     </Table>
       )}
-     <div className="flex justify-center my-4">
-        <Pagination
-
-          isCompact
-          loop
-          showControls
-          color="primary"
-          total={totalPages}
-          initialPage={currentPage}
-          onChange={(page) => handlePageChange(page)}
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center my-4">
+          <Pagination
+            isCompact
+            loop
+            showControls
+            color="primary"
+            total={totalPages}
+            initialPage={currentPage}
+            onChange={(page) => handlePageChange(page)}
+          />
+        </div>
+      )}
     </>
   );
 };

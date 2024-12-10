@@ -1,4 +1,3 @@
-// features/cart/cartThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getCartList,
@@ -27,7 +26,7 @@ export const fetchCartList = createAsyncThunk<FetchCartListResponse>(
       if (!response || !response.carts) {
         throw new Error("No data returned from the API.");
       }
-      return response; // Phải đảm bảo rằng response là một đối tượng chứa thuộc tính carts
+      return response;
     } catch (error) {
       console.error("Error fetching cart:", error);
       return rejectWithValue((error as Error).message);
@@ -52,24 +51,34 @@ export const fetchCartList = createAsyncThunk<FetchCartListResponse>(
 // );
 
 // Thêm sản phẩm vào giỏ hàng
+
 export const addProductToCart = createAsyncThunk(
   "cart/addProductToCart",
-  async ({
-    productId,
-    variantId, // Thêm variantId làm tham số
-    quantity = 1,
-  }: {
-    productId: string;
-    variantId: string; // Khai báo kiểu cho variantId
-    quantity?: number;
-  }) => {
+  async (
+    {
+      productId,
+      variantId,
+      quantity = 1,
+    }: { productId: string; variantId: string; quantity?: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await addToCart(productId, variantId, quantity); // Truyền variantId vào addToCart
+      if (isNaN(quantity) || quantity <= 0) {
+        return rejectWithValue("Số lượng sản phẩm không hợp lệ");
+      }
+
+      const response = await addToCart(productId, variantId, quantity);
       return response;
-    } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Lỗi khi thêm sản phẩm vào giỏ hàng"
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(
+          error.response.data.message || "Không thể thêm vào giỏ hàng."
+        );
+      } else if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("Đã xảy ra lỗi không xác định khi cập nhật giỏ hàng.");
+      }
     }
   }
 );
@@ -81,22 +90,22 @@ export const updateCartItem = createAsyncThunk(
       cartId,
       itemId,
       quantity,
-      variantId, // Thêm variantId vào tham số
+      variantId,
       isSelected = false,
     }: {
       cartId: string;
       itemId: string;
       quantity: number;
-      variantId: string; // Thêm kiểu dữ liệu cho variantId
+      variantId: string;
       isSelected?: boolean;
     },
-    { rejectWithValue } // Tham số `rejectWithValue` để trả về giá trị lỗi
+    { rejectWithValue }
   ) => {
     try {
       const response = await updateCart(cartId, [
         {
           product: itemId,
-          variantId, // Đảm bảo thêm variantId
+          variantId,
           quantity,
           isSelected,
         },
@@ -106,7 +115,7 @@ export const updateCartItem = createAsyncThunk(
         cartId,
         itemId,
         quantity,
-        variantId, // Trả về variantId
+        variantId,
         isSelected,
       };
     } catch (error) {
@@ -145,12 +154,23 @@ export const fetchCartById = createAsyncThunk(
 export const deleteCart = createAsyncThunk(
   "cart/deleteCart",
   async (
-    { cartId, productId }: { cartId: string; productId: string },
+    {
+      cartId,
+      productId,
+      productVariantId,
+    }: { cartId: string; productId?: string; productVariantId?: string },
     thunkAPI
   ) => {
     try {
-      await deleteCartService(cartId, productId);
-      return { cartId, productId }; // Trả về cartId và productId để cập nhật state
+      if (productId && productVariantId) {
+        await deleteCartService(cartId, productId, productVariantId);
+      } else if (productId) {
+        await deleteCartService(cartId, productId);
+      } else {
+        await deleteCartService(cartId);
+      }
+
+      return { cartId, productId, productVariantId };
     } catch (error) {
       if (error instanceof Error) {
         return thunkAPI.rejectWithValue(error.message);
@@ -160,21 +180,59 @@ export const deleteCart = createAsyncThunk(
     }
   }
 );
+// export const SelectCart = createAsyncThunk(
+//   "cart/selectCart",
+//   async (
+//     {
+//       productId,
+//       items,
+//     }: {
+//       productId: string;
+//       items: { productId: string }[];
+//     },
+//     { rejectWithValue }
+//   ) => {
+//     try {
+//       const response = await SelectCartService({ productId, items }); // Gọi service với một đối tượng
+//       return response; // Trả về response nếu chọn thành công
+//     } catch (error) {
+//       if (axios.isAxiosError(error) && error.response) {
+//         return rejectWithValue(
+//           error.response.data.message || "Chọn giỏ hàng thất bại."
+//         );
+//       } else {
+//         return rejectWithValue(
+//           (error as Error).message || "Chọn giỏ hàng thất bại."
+//         );
+//       }
+//     }
+//   }
+// );
 export const SelectCart = createAsyncThunk(
   "cart/selectCart",
   async (
     {
+      selectAll,
       productId,
       items,
+      cartId, // Thêm cartId vào tham số
     }: {
-      productId: string;
-      items: { productId: string }[];
+      selectAll?: boolean;
+      productId?: string;
+      items?: { productId: string; variantId: string; isSelected: boolean }[];
+      cartId?: string; // Đảm bảo cartId được cung cấp
     },
     { rejectWithValue }
   ) => {
     try {
-      const response = await SelectCartService({ productId, items }); // Gọi service với một đối tượng
-      return response; // Trả về response nếu chọn thành công
+      // Gọi SelectCartService và truyền cartId vào nếu cần
+      const response = await SelectCartService({
+        selectAll,
+        productId,
+        items,
+        cartId,
+      });
+      return response; // Trả về response khi chọn giỏ hàng thành công
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return rejectWithValue(
@@ -188,6 +246,7 @@ export const SelectCart = createAsyncThunk(
     }
   }
 );
+
 export const CheckVoucherThunk = createAsyncThunk(
   "cart/CheckVoucher",
   async (

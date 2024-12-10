@@ -112,6 +112,7 @@ export interface Product {
   status: string;
   variantCount: number; 
   variants: Variant[]; 
+  hasVariants:boolean;
 }
 
 export interface Pagination {

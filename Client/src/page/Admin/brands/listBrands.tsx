@@ -1,6 +1,6 @@
 import React from "react";
 import AdminFetListBrands from "../../../components/Admin/feature/brands/listBrands";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 const listBrands: React.FC = () => {
   return (
 

@@ -1,6 +1,6 @@
 import React from "react";
 import AdminFetsoftDeleteList from "../../../components/Admin/feature/brands/softDeleteList";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 const recycleBinBrand: React.FC = () => {
   return (
     <div>

@@ -14,7 +14,7 @@ import { ToastContainer } from "react-toastify";
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../../ultils/breadcrumb";
+} from "../../../../ultils/breadcrumb/admin";
 interface IFormInput {
   name: string;
   path: string;

@@ -11,17 +11,19 @@ interface InfoProps {
 
 const Info: React.FC<InfoProps> = ({ profiles }) => {
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     dispatch(getProfileThunk());
   }, [dispatch]);
+
   if (!profiles) return <p>No profile data available</p>;
 
   const formattedBirthday = profiles.birthday
-    ? moment(profiles.birthday).format("DD/MM/YYYY") // Định dạng ngày theo ý muốn
+    ? moment(profiles.birthday).format("DD/MM/YYYY")
     : "";
-  const defaultAddress = profiles.addresses.find(
-    (address) => address.isDefault
-  );
+
+  const defaultAddress =
+    profiles.addresses?.find((address) => address.isDefault) ?? null;
   return (
     <div className="col-span-9 shadow-lg rounded-lg px-6 pt-5 pb-7 bg-white">
       <h4 className="text-lg font-semibold text-gray-800 capitalize mb-4">

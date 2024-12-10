@@ -36,7 +36,7 @@ export const updateProductV2 = async (id: string, product: Product): Promise<rep
       err: 0,
       msg: response.data.msg,
       status: response.status,
-      pproduct: response.data.pproduct 
+      product: response.data.product 
     };
     
   } catch (error) {

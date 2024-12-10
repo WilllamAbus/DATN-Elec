@@ -21,16 +21,12 @@ const Search: React.FC = () => {
   let key: string;
   const dispatch = useDispatch<AppDispatch>();
   useSelector((state: RootState) => state.watchlist.items);
-  const userId = useSelector(
-    (state: RootState) => state.auth.profile.profile?._id
-  );
-  const handleAddToWatchlist = async (productId: string) => {
-    if (userId) {
-      try {
-        await dispatch(addToWatchlistThunk({ productId })).unwrap();
-      } catch (err) {
-        console.error("Error adding product to watchlist", err);
-      }
+
+  const handleAddToWatchlist = async (variantId: string) => {
+    try {
+      await dispatch(addToWatchlistThunk({ variantId })).unwrap();
+    } catch (err) {
+      console.error("Error adding product to watchlist", err);
     }
   };
   switch (price) {

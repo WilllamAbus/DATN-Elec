@@ -4,8 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
-import ReusableBreadcrumb from "../../../../ultils/breadcrumb/ReusableBreadcrumb";
-import { breadcrumbItems } from "../../../../ultils/breadcrumb/breadcrumbData";
+import ReusableBreadcrumb from "../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
+import { breadcrumbItems } from "../../../../ultils/breadcrumb/admin/breadcrumbData";
 import { ProductVariant, RAM, CPU, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
@@ -84,7 +84,7 @@ const AddVariant: React.FC = () => {
   const submitFormAdd: SubmitHandler<ProductVariant> = async (data) => {
     setIsLoading(true);
     
-    console.log("Submitted data:", data); // Kiểm tra dữ liệu
+
 
     try {
         const actionResult = await dispatch(
@@ -92,7 +92,7 @@ const AddVariant: React.FC = () => {
         ).unwrap();
         notify(actionResult.msg);
         setTimeout(() => {
-            navigate("/admin/listproduct");
+          navigate(`/admin/list-product-variant/${productId}`);
         }, 2000);
     } catch (error) {
         notifyError((error as ProductVariantResponse).msg);

@@ -16,6 +16,7 @@ import {
   deleteAddress,
   setDefaultAddress,
   updateAddress,
+  fetchAddressById,
   // addAddress,
   // updateAddress,
   // deleteAddress,
@@ -321,13 +322,21 @@ export const deleteAddressThunk = createAsyncThunk(
 
 export const editAddressThunk = createAsyncThunk(
   "address/edit",
-  async (
-    { id, addressData }: { id: string; addressData: Address }, // Định nghĩa kiểu đúng
-    { rejectWithValue }
-  ) => {
+  async ({ addressData }: { addressData: Address }, { rejectWithValue }) => {
     try {
-      const response = await updateAddress(id, addressData);
+      const response = await updateAddress(addressData);
       return response;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+export const fetchAddressByIdThunk = createAsyncThunk(
+  "address/fetchById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response: { address: Address } = await fetchAddressById(id);
+      return response.address;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

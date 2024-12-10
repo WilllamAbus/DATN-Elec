@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   totalCategories,
   productByCateActive,
-  productByCateDisable
 } from "../../../services/statistical/statistical.service";
 import { useNavigate } from "react-router-dom";
 interface TotalCategoriesResponse {
@@ -27,8 +26,6 @@ const CharCategories = () => {
   const navigates = useNavigate();
   const [xArray2, setXArray2] = useState<string[]>([]);
   const [yArray2, setYArray2] = useState<number[]>([]);
-  const [xArray3, setXArray3] = useState<string[]>([]);
-  const [yArray3, setYArray3] = useState<number[]>([]);
   const fetchTotalCate = async () => {
     try {
       const data: TotalCategoriesResponse = await totalCategories();
@@ -51,7 +48,7 @@ const CharCategories = () => {
   const fetchProductByCateActive = async () => {
     try {
       const response: Category[] = await productByCateActive(); // Gán kiểu cho response
-      console.log(response); // Xem cấu trúc dữ liệu trả về
+      // console.log(response); // Xem cấu trúc dữ liệu trả về
 
       // Lấy labels và values từ response
       const labels = response.map((item: Category) => item.name); // Xác định kiểu cho item
@@ -63,25 +60,10 @@ const CharCategories = () => {
       console.log(error);
     }
   };
-  const fetchProductByCateDisable= async () => {
-    try {
-      const response: Category[] = await   productByCateDisable(); // Gán kiểu cho response
-      console.log(response); // Xem cấu trúc dữ liệu trả về
 
-      // Lấy labels và values từ response
-      const labels = response.map((item: Category) => item.name); // Xác định kiểu cho item
-      const values = response.map((item: Category) => item.productCount); // Xác định kiểu cho item
-
-      setXArray3(labels); // Cập nhật xArray
-      setYArray3(values); // Cập nhật yArray
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   useEffect(() => {
     fetchProductByCateActive();
-    fetchProductByCateDisable();
     fetchTotalCate();
   }, []);
   return (
@@ -198,40 +180,12 @@ const CharCategories = () => {
               </div>
             </div>
           </div>
-          <div className="w-full mb-4 lg:mb-0">
-            <h3 className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
-              Số lượng sản phẩm có trong danh mục không hoạt động
-            </h3>
-            <div className="text-center">
-              <div className="w-full max-w-lg mx-auto text-center">
-                <Plot
-                  data={[
-                    {
-                      x: xArray3, // Sử dụng xArray cho labels
-                      y: yArray3, // Sử dụng yArray cho values
-                      type: "bar",
-                      showlegend: false,
-                    },
-                  ]}
-                  layout={{
-                    width: window.innerWidth < 768 ? 350 : 500,
-                    height: window.innerWidth < 768 ? 300 : 400,
-                  }}
-                  config={{
-                    scrollZoom: false,
-                    displayModeBar: false,
-                  }}
-                  className="w-full h-auto bg-transparent"
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="flex items-center justify-between pt-3 mt-4 border-t border-gray-200 sm:pt-6 dark:border-gray-700">
           <div className="flex-shrink-0">
             <button
-              onClick={() => navigates("/admin/listCategories")}
+              onClick={() => navigates("/admin/listproduct")}
               className="inline-flex items-center p-2 text-xs font-medium uppercase rounded-lg text-primary-700 sm:text-sm hover:bg-gray-100 dark:text-primary-500 dark:hover:bg-gray-700"
             >
               Chi tiết

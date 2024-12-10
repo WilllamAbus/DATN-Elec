@@ -5,9 +5,10 @@ interface ArticleProps {
 }
 
 import React from "react";
+import NoPostsMessage from "./noPostsMessage";
 const Article: React.FC<ArticleProps> = ({ post }) => {
   if (!post) {
-    return <p>Chưa có bài viết</p>; 
+    return <NoPostsMessage/>; 
   }
   return (
 <div>

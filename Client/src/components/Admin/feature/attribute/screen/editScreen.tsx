@@ -4,8 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "../../productV2/toast/msgtoast";
-import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/ReusableBreadcrumb";
-import { breadcrumbItems } from "../../../../../ultils/breadcrumb/breadcrumbData";
+import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
+import { breadcrumbItems } from "../../../../../ultils/breadcrumb/admin/breadcrumbData";
 import {Screen,ResponseScreen } from "../../../../../services/attribute/types/screen/editScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch,RootState } from "../../../../../redux/store";
@@ -88,7 +88,7 @@ console.log(screens);
       <div className="grid grid-cols-1 px-4 pt-4 xl:grid-cols-2 xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h3 className="mb-4 text-xl font-semibold dark:text-white">Tổng quan bài viết</h3>
+
 
             <div className="grid grid-cols-6 gap-6">
             <div className="col-span-6 sm:col-span-6">

@@ -8,7 +8,9 @@ router.get('/totalProduct',product.totalQuantityProduct);
 router.get('/pendingOder',product.pendingOrder);
 router.get('/totalCate',product.totalCategories);
 router.get('/productSold',product.totalProductsSold);
-router.get('/charProduct',product.productCate)
+router.get('/charProduct',product.productCate);
 router.get('/productInCateActive',product.productByCategoryActive);
 router.get('/productInCateDisable',product.productByCategoryDisable);
+router.get('/getTopComment',product.topComments);
+router.get('/accCountUser',product.totalUser)
 module.exports = router;

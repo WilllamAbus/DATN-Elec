@@ -30,17 +30,14 @@ const ProductSection: React.FC = () => {
     setVisibleCount(products.length); // Show all products
   };
 
-  const handleAddToWatchlist = async (
-    productId: string,
-    variantId?: string
-  ) => {
-    if (userId && productId) {
+  const handleAddToWatchlist = async (variantId: string) => {
+    if (userId) {
       try {
         let resultAction;
 
         if (isFavorite) {
           resultAction = await dispatch(
-            deleteWatchlistThunk({ productId, variantId })
+            deleteWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Delete result action:", resultAction);
 
@@ -55,7 +52,7 @@ const ProductSection: React.FC = () => {
           }
         } else {
           resultAction = await dispatch(
-            addToWatchlistThunk({ productId })
+            addToWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Add result action:", resultAction);
 
