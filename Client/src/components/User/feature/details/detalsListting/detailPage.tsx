@@ -213,7 +213,7 @@ const DetailPage: React.FC = () => {
       </section>
       <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
-          <div className="p-4 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+          <div className="p-1 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <Blog post={productDetail.posts} variants={productDetail.variants || []} />
           </div>
         </div>

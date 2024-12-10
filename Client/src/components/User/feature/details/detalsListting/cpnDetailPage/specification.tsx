@@ -21,7 +21,7 @@ const Specification: React.FC<SpecificationProps> = ({ variants }) => {
   
 
   return (
-    <Accordion variant="shadow" selectionMode="multiple" defaultExpandedKeys={["1"]}>
+    <Accordion selectionMode="multiple" defaultExpandedKeys={["1"]}>
       <AccordionItem key="1" aria-label="Accordion 1" title="Chi tiết cấu hình">
         <Table isStriped aria-label="Example static collection table">
           <TableHeader>
@@ -49,11 +49,11 @@ const Specification: React.FC<SpecificationProps> = ({ variants }) => {
               <TableCell>Dung lượng lưu trữ</TableCell>
               <TableCell>{getValue(firstVariant.storage)}</TableCell>
             </TableRow>
-            <TableRow key="6">
+            <TableRow key="7">
               <TableCell>Màn hình</TableCell>
               <TableCell>{getValue(firstVariant.screen)}</TableCell>
             </TableRow>
-            <TableRow key="6">
+            <TableRow key="8">
               <TableCell>Dung lượng pin</TableCell>
               <TableCell>{getValue(firstVariant.battery)}</TableCell>
             </TableRow>
