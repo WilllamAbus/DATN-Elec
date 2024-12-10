@@ -126,6 +126,7 @@ export default function ListPage() {
   });
   const breadcrumbPaths = getBreadcrumbPaths(category);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  
   return (
     <div>
        <ReusableBreadcrumb paths={breadcrumbPaths} />
@@ -211,7 +212,7 @@ export default function ListPage() {
                       <ProductAuctionSort currentSort={filters._sort} onChange={handleSortChange} />
                       <div className={styles.container}>
                         {isLoading ? (
-                          <ProductSkeletonList length={12} />
+                           <ProductSkeletonList length={total || 12}/>
                         ) : noProducts ? (
                           <NoProductsMessage />
                         ) : (

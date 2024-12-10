@@ -3,7 +3,6 @@ const slugify = require('slugify');
 const { v4: uuidv4 } = require("uuid");
 const osSchema = new Schema({
   name: { type: String, required: true },
-  version: { type: String, required: true },
   status: { type: String, default: 'active' },
   sku: { type: String, unique: true, required: true },
   pid: { type: String, required: true, default: uuidv4 },

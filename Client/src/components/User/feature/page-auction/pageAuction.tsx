@@ -11,12 +11,12 @@ import ProductFilters from "./prouctAuctionFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { 
+import {
   listPageAuctionProductThunk,
   getAllBrandPageAuctionThunk,
   getAllConditionShoppingThunk
- } from "../../../../redux/product/client/Thunk";
-import ProductSkeletonList from "../../skeleton/product/productSkeleton";
+} from "../../../../redux/product/client/Thunk";
+import ProductAuctionSkeleton from "../../skeleton/product/productAuctionSkeleton";
 import ProductList from "./productList";
 import styles from "./css/section.module.css";
 import ProductAuctionSort from "./productAuctionSort";
@@ -186,13 +186,14 @@ export default function AuctionSidebar() {
                       <ProductAuctionSort currentSort={filters._sort} onChange={handleSortChange} />
                       <div className={styles.container}>
                         {isLoading ? (
-                          <ProductSkeletonList length={12} />
+                          <ProductAuctionSkeleton length={total || 12} />
                         ) : noProducts ? (
                           <NoProductsMessage />
                         ) : (
                           <ProductList products={products} />
                         )}
                       </div>
+
                       {totalPages > 1 && (
                         <div className="flex justify-center my-4">
                           <Pagination

@@ -11,7 +11,6 @@ export const resetFilterThunk = createAsyncThunk<
   async (_, { rejectWithValue }) => {
     try {
       const response = await resetFilter();
-      console.log("API Response:", response);
       if (response.success) {
         return response;
       } else {

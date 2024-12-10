@@ -3,6 +3,7 @@ import { StarIcon } from "../listPage/svg";
 import { truncateText } from "../listPage/truncate/truncateText";
 import currencyFormatter from "currency-formatter";
 import { products } from "../../../../services/clientcate/client/types/getProuctbyCategory";
+import { motion } from "framer-motion";
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
@@ -16,7 +17,10 @@ export default function ProductItem({ product, index }: ProductItemProps) {
       key={index}
       className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
     >
-      <div className="backdrop-blur-sm bg-white/30">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.3 }}
+        className="backdrop-blur-sm bg-white/30">
         <Link to={`/product/${product.slug}`}>
           <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer">
             <img
@@ -26,7 +30,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
             />
           </figure>
         </Link>
-      </div>
+      </motion.div>
 
       <div className="pt-1 mb-10">
         <div className="mb-4 px-2 flex items-center justify-between gap-4">
