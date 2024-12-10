@@ -89,16 +89,6 @@ export default function ProductItem({ product, index }: ProductItemProps) {
             ))}
           </div>
         </div>
-
-
-
-
-
-
-
-
-
-
       </div>
     </div>
   );

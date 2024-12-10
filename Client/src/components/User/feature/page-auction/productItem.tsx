@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { HeartIcon, StarIcon } from "../listPage/svg";
 import { truncateText } from "../listPage/truncate/truncateText";
 import currencyFormatter from "currency-formatter";
 import { products } from "../../../../services/product_v2/client/types/listPageAuction";
@@ -16,11 +15,11 @@ export default function ProductItem({ product, index }: ProductItemProps) {
       key={index}
       className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
     >
-      <div className="backdrop-blur-sm bg-white/30">
+     <div className="backdrop-blur-sm bg-white/30">
         <Link to={`/detailAuc/${product._id}`}>
-          <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
+        <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer">
             <img
-              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+              className="absolute inset-0 w-full h-full object-contain rounded-lg p-8"
               src={product.image[0]}
               alt={`product ${index + 1}`}
             />
@@ -42,7 +41,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
               data-tooltip-target="tooltip-add-to-favorites"
               className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
-              <HeartIcon fill="red" size="1em" />
+        
             </button>
           </div>
         </div>
@@ -56,17 +55,7 @@ export default function ProductItem({ product, index }: ProductItemProps) {
           </div>
         </div>
 
-        <div className="px-2 flex items-center gap-2">
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
-            {product.product_ratingAvg ? product.product_ratingAvg.toFixed(1) : "N/A"}
-          </p>
-          <StarIcon />
-          <div className="text-xs text-gray-500 items-center">
-            {product.product_quantity > 0
-              ? `(Còn ${product.product_quantity} sản phẩm)`
-              : "Hết hàng"}
-          </div>
-        </div>
+
         <div className="mt-2 px-2 flex items-center gap-2">
           {product.product_discount.discountPercent > 1 ? (
             <div className="flex w-full">
