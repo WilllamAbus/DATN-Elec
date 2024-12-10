@@ -310,7 +310,7 @@ const CartPage: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
               <hr className="border-gray-300 mt-4 mb-8" />
               {groupedCarts.length > 0 && (
-                <div className="flex items-center">
+                <div className="flex ml-4 items-center">
                   <Checkbox
                     id="checkbox-all-orders"
                     isSelected={carts.every((cart) =>
@@ -322,10 +322,10 @@ const CartPage: React.FC = () => {
                     size="sm"
                     color="primary"
                     className="mr-2"
-                  />
-                  <label htmlFor="checkbox-all-orders" className="ml-2">
+                  >
                     Chọn tất cả
-                  </label>
+                  </Checkbox>
+
                   <Button
                     onClick={() => handleDeleteProduct(carts[0]._id)}
                     disabled={loading}
