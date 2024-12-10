@@ -14,7 +14,6 @@ const RepComment: React.FC<RepCommentProps> = ({ id_comment }) => {
       try {
         const commentList = await getRepComment(id_comment);
         setRepComments(commentList);
-        // console.log(commentList);
       } catch (error) {
         return error;
       }
@@ -25,28 +24,27 @@ const RepComment: React.FC<RepCommentProps> = ({ id_comment }) => {
 
   return (
     <>
-        <div
-          className={`comment-container ${
-            repComments && repComments?.length > 0 ? "show-arrow" : ""
+      <div
+        className={`comment-container ${repComments && repComments?.length > 0 ? "show-arrow" : ""
           }`}
-        >
-          <div className="ml-4 ">
-            {repComments && repComments?.length > 0 && (
-              <div className="horizontal-line"></div>
-            )}
-            {repComments?.map((comment) => (
-              <p key={comment?._id} className="text-gray-600">
-                <h1 className="font-medium text-gray-800">
-                  Phản hồi từ người bán
-                </h1>
-                <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-                  {comment?.content}
-                </p>
+      >
+        <div className="ml-4 ">
+          {repComments && repComments?.length > 0 && (
+            <div className="horizontal-line"></div>
+          )}
+          {repComments?.map((comment) => (
+            <p key={comment?._id} className="text-gray-600">
+              <h1 className="font-medium text-gray-800">
+                Phản hồi từ người bán
+              </h1>
+              <p className="text-base font-normal text-gray-500 dark:text-gray-400">
+                {comment?.content}
               </p>
-            ))}
-          </div>
+            </p>
+          ))}
         </div>
-      
+      </div>
+
     </>
   );
 };

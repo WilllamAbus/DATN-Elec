@@ -4,7 +4,6 @@ import { Star } from "./svg";
 import VariantImageGallery from "./cpnDetailPage/VariantImageGallery";
 import FavoriteButton from "./cpnDetailPage/FavoriteButton";
 import AddToCartButton from "./cpnDetailPage/AddToCartButton";
-
 import VariantName from "./cpnDetailPage/VariantName";
 import VariantPrice from "./cpnDetailPage/VariantPrice";
 import {
@@ -33,9 +32,8 @@ const DetailPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
- 
+
   const [averageRating, setAverageRating] = useState<string | null>(null);
-  // Hàm để cập nhật average rating
   const handleUpdateAverageRating = (avgRating: string) => {
     setAverageRating(avgRating);
   }
@@ -44,16 +42,13 @@ const DetailPage: React.FC = () => {
   );
   const variant_name = useSelector((state: RootState) => state.productClient.getProductDetail.productDetail?.product_name);
   const category = useSelector((state: RootState) => state.productClient.getProductsByCategory.category);
-
   const [filters, setFilters] = useState<FilterState>({
     storage: queryParams.storage ? String(queryParams.storage) : "",
     color: queryParams.color ? String(queryParams.color) : "",
   });
   const [selectedColor] = useState<string | null>(null);
-
   useEffect(() => {
     const hasFilters = Object.values(filters).some((value) => value !== "");
-
     if (!hasFilters) {
       navigate({ pathname: location.pathname });
     } else {
@@ -94,7 +89,6 @@ const DetailPage: React.FC = () => {
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters((prevFilters) => {
       if (newFilters.storage && newFilters.storage !== prevFilters.storage) {
-        // Reset color filter khi thay đổi storage
         return { ...newFilters, color: "" };
       }
       return { ...prevFilters, ...newFilters };
@@ -107,7 +101,6 @@ const DetailPage: React.FC = () => {
   if (!productDetail || productDetail.variants?.length === 0) {
     return <NotFoundProduct />;
   }
-
   const breadcrumbPaths = getBreadcrumbPaths(category, variant_name);
 
   return (
@@ -141,7 +134,6 @@ const DetailPage: React.FC = () => {
                             <Star />
                           </div>
                           <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                            {/* {averageRating} trên 5 */}
                           </p>
                           <a
                             href="#"
@@ -151,15 +143,9 @@ const DetailPage: React.FC = () => {
                           </a>
                         </div>
                         <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                          {/* {productDetail.product_ratingAvg} trên 5 */}
                           {averageRating} trên 5
                         </p>
-                        <a
-                          href="#"
-                          className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white"
-                        >
-                           {productDetail?.variants?.[0]?.viewCount} Lượt xem
-                        </a>
+                       
                       </div>
                       <div className="mt-4">
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -193,7 +179,6 @@ const DetailPage: React.FC = () => {
                       <div className="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
                         <FavoriteButton />
                         <AddToCartButton productId={productDetail?._id} />
-                        {/* <AddToCartButton /> */}
                       </div>
                       <hr className="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
                       <div className="grid grid-cols-1 gap-6 mt-6">
@@ -223,14 +208,13 @@ const DetailPage: React.FC = () => {
           </div>
         </div>
       </div>
-    <section>
-    <Comment onUpdateAverageRating={handleUpdateAverageRating} />
-    {/* <Comment  /> */}
-    </section>
-    <section>
-        <RelatedProduct/>
-    </section>
-    <ToastContainer />
+      <section>
+        <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+      </section>
+      <section>
+        <RelatedProduct />
+      </section>
+      <ToastContainer />
 
     </>
   );
