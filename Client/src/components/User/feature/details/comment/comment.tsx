@@ -41,11 +41,10 @@ interface EditComment {
   content: string;
   rating: number;
 }
-
-const Comment = (
-  // { onUpdateAverageRating,}: {
-  // onUpdateAverageRating: (average: string) => void;}
-) => {
+interface CommentProps {
+  onUpdateAverageRating: (avgRating: string) => void;
+}
+const Comment = ({ onUpdateAverageRating }: CommentProps) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -127,31 +126,35 @@ useEffect(() => {
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
-  // const calculateAverageRating = (comments: CommentType[]) => {
-  //   const totalRatings = comments.reduce(
-  //     (sum, comment) => sum + comment.rating,
-  //     0
-  //   );
-  //   return comments.length > 0
-  //     ? (totalRatings / comments.length).toFixed(1)
-  //     : " ";
-  // };
+  const calculateAverageRating = (comments: CommentType[]) => {
+    if (!comments || comments.length === 0) return "0.0";
+    const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
+    return (totalRatings / comments.length).toFixed(1); 
+  };
+  
   const fetchComments = async () => {
-    if (!slug) {
-      // console.log("ID sản phẩm không tồn tại");
-      return;
-    }
-
+    if (!slug) return; // Trả về sớm nếu slug không tồn tại
+  
     try {
-      const productComments: CommentType[] = await getCommentProduct(slug);
+      const productComments = await getCommentProduct(slug);
+  
       setComments(productComments);
       setFilteredComments(productComments);
-      // Tính lại average rating và gửi lên component cha
-      //  Truyền average rating lên component cha
+  
+      // Tính toán và truyền giá trị đánh giá trung bình lên component cha
+      const avgRating = calculateAverageRating(productComments);
+      
+      if (onUpdateAverageRating) {
+        onUpdateAverageRating(avgRating); 
+      } else {
+        console.error("onUpdateAverageRating is undefined");
+      }
     } catch (error) {
-      console.error("Lỗi:", error);
+      console.error("Lỗi khi lấy bình luận:", error);
     }
   };
+  
+  
   const handleRatingClick = (rate: number) => {
     setRating(rate);
     setValue("rating", rate);

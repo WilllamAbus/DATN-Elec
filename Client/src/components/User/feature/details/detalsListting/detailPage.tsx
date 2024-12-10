@@ -33,9 +33,11 @@ const DetailPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
  
-
+  const [averageRating, setAverageRating] = useState<string | null>(null);
   // Hàm để cập nhật average rating
-  
+  const handleUpdateAverageRating = (avgRating: string) => {
+    setAverageRating(avgRating);
+  }
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail
   );
@@ -139,7 +141,8 @@ const DetailPage: React.FC = () => {
                           <Star />
                         </div>
                         <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                          {productDetail.product_ratingAvg} trên 5
+                          {/* {productDetail.product_ratingAvg} trên 5 */}
+                          {averageRating} trên 5
                         </p>
                         <a
                           href="#"
@@ -184,8 +187,8 @@ const DetailPage: React.FC = () => {
         </div>
       </div>
     <section>
-    {/* <Comment onUpdateAverageRating={handleUpdateAverageRating} /> */}
-    <Comment  />
+    <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+    {/* <Comment  /> */}
     </section>
     <section>
         <RelatedProduct/>
