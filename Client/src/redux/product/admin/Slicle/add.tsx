@@ -15,9 +15,9 @@ const addSlice = createSlice({
       .addCase(add.fulfilled, (state, action: PayloadAction<reponseProduct>) => {
         state.status = "success";
         state.isLoading = false;
-        if (action.payload.pproduct) {
+        if (action.payload.product) {
           state.products.push({
-            ...action.payload.pproduct,
+            ...action.payload.product,
           });
         }
         state.error = null;

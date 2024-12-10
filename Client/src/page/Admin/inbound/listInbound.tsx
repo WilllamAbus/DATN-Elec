@@ -1,5 +1,5 @@
 import React from "react";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 
 import AdminFetListInbound from "../../../components/Admin/feature/inbound/list";
 

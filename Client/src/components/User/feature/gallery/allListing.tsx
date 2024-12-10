@@ -2,7 +2,7 @@
 import {
   breadcrumbItemClient,
   ReusableBreadcrumbClient,
-} from "../../../../ultils/breadcrumb";
+} from "../../../../ultils/breadcrumb/admin";
 import AllProduct from "./product/allProduct";
 import { ChangeEvent, useEffect, useState } from "react";
 import {

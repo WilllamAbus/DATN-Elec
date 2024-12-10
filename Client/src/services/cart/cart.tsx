@@ -87,7 +87,7 @@ export const addToCart = async (
     } else if (error instanceof Error) {
       throw new Error(error.message);
     } else {
-      throw new Error("An unknown error occurred while adding the cart.");
+      throw new Error("An unknown error occurred while updating the cart.");
     }
   }
 };
@@ -120,22 +120,78 @@ export const getCartById = async (cartId: string) => {
   return response.data;
 };
 
-export const deleteCart = (cartId: string, productId: string) => {
-  return instance.delete(`${API_URL}/cart/${cartId}/${productId}`);
+// export const deleteCart = (cartId: string, productId: string) => {
+//   return instance.delete(`${API_URL}/cart/${cartId}/${productId}`);
+// };
+export const deleteCart = (
+  cartId: string,
+  productId?: string,
+  productVariantId?: string
+) => {
+  // Xây dựng URL động dựa trên các tham số
+  let url = `${API_URL}/cart/${cartId}`;
+
+  // Thêm productId và productVariantId vào URL nếu có
+  if (productId) {
+    url += `/${productId}`;
+    if (productVariantId) {
+      url += `/${productVariantId}`;
+    }
+  }
+
+  return instance.delete(url);
 };
+
+// export const SelectCart = async ({
+//   productId,
+//   items,
+// }: {
+//   productId: string;
+//   items: { productId: string }[];
+// }) => {
+//   try {
+//     const response = await instance.put(
+//       `${API_URL}/cart/isSelect/${productId}`,
+//       { items }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       throw new Error(error.response.data.message || error.message);
+//     } else if (error instanceof Error) {
+//       throw new Error(error.message);
+//     } else {
+//       throw new Error("Đã xảy ra lỗi không xác định khi chọn giỏ hàng.");
+//     }
+//   }
+// };
 export const SelectCart = async ({
+  selectAll,
   productId,
   items,
+  cartId,
 }: {
-  productId: string;
-  items: { productId: string }[];
+  selectAll?: boolean;
+  productId?: string;
+  items?: { productId: string; variantId: string; isSelected: boolean }[];
+  cartId?: string;
 }) => {
   try {
-    const response = await instance.put(
-      `${API_URL}/cart/isSelect/${productId}`,
-      { items }
-    );
-    return response.data;
+    let response;
+    if (selectAll !== undefined) {
+      response = await instance.put(`${API_URL}/cart/isSelect/${cartId}`, {
+        selectAll,
+      });
+    } else if (productId) {
+      response = await instance.put(`${API_URL}/cart/isSelect/${productId}`, {
+        items,
+      });
+    }
+    if (response) {
+      return response.data;
+    } else {
+      throw new Error("Không nhận được phản hồi từ server.");
+    }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || error.message);
@@ -146,6 +202,7 @@ export const SelectCart = async ({
     }
   }
 };
+
 export const CheckVoucher = async ({
   cartId,
   voucherId,

@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { addCategoryPostThunk } from "../../../../../redux/post/thunk"
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../../ultils/breadcrumb/admin";
 import { Category } from "../../../../../services/post/admin/types/CategoryPost";
 import { Card, CardBody } from "@nextui-org/react";
 import { useImageUpload } from "../../../../../hooks/useImageUpload";

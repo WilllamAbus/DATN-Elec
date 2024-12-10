@@ -3,8 +3,8 @@ import React  from 'react';
 
 import AdminFetList from '../../../components/Admin/feature/categories/listCate'
 
-import ReusableBreadcrumb from '../../../ultils/breadcrumb/ReusableBreadcrumb';
-import { breadcrumbItems } from '../../../ultils/breadcrumb/breadcrumbData';
+import ReusableBreadcrumb from '../../../ultils/breadcrumb/admin/ReusableBreadcrumb';
+import { breadcrumbItems } from '../../../ultils/breadcrumb/admin/breadcrumbData';
 import { Link } from 'react-router-dom';
 
 

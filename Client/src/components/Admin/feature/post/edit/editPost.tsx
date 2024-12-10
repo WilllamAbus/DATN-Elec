@@ -4,8 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "../../productV2/toast/msgtoast";
-import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/ReusableBreadcrumb";
-import { breadcrumbItems } from "../../../../../ultils/breadcrumb/breadcrumbData";
+import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
+import { breadcrumbItems } from "../../../../../ultils/breadcrumb/admin/breadcrumbData";
 import { Post, responsePost } from "../../../../../services/post/admin/types/post";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch,RootState } from "../../../../../redux/store";
@@ -91,7 +91,7 @@ const EditPost: React.FC = () => {
   return (
     <form onSubmit={handleSubmit(submitFormEdit)} encType="multipart/form-data">
       <ToastContainer />
-      <ReusableBreadcrumb items={breadcrumbItems.addVariant} />
+      <ReusableBreadcrumb items={breadcrumbItems.editPostProduct} />
       <div className="flex items-center px-4 py-2">
           <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
           Đang cập nhật bài viết cho {" "}

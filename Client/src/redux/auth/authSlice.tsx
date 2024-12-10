@@ -32,6 +32,7 @@ import {
   addAddressThunk,
   setDefaultAddressThunk,
   editAddressThunk,
+  fetchAddressByIdThunk,
   // addAddressThunk,
   // updateAddressThunk,
   // deleteAddressThunk,
@@ -109,8 +110,9 @@ interface AuthState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 
-  addresses: Address[]; // Mảng các địa chỉ
-  loading: boolean; // Trạng thái loading
+  addresses: Address[];
+  selectedAddress: Address | null;
+  loading: boolean;
 
   // AddressState: {
   //   addresses: AddressResponse[];
@@ -195,6 +197,7 @@ const initialState: AuthState = {
   updateUserStatus: "idle",
   updateUserError: null,
   addresses: [],
+  selectedAddress: null,
   loading: false,
 
   // AddressState: {
@@ -635,7 +638,21 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string; // Lưu lỗi vào state
       })
-
+      .addCase(fetchAddressByIdThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        fetchAddressByIdThunk.fulfilled,
+        (state, action: PayloadAction<Address>) => {
+          state.status = "succeeded";
+          state.selectedAddress = action.payload;
+        }
+      )
+      .addCase(fetchAddressByIdThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string; // Ghi nhận lỗi
+      })
       .addCase(deleteAddressThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;

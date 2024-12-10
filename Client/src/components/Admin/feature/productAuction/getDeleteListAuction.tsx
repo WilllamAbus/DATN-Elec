@@ -4,12 +4,12 @@ import { getDeleteListAuctionThunk } from "../../../../redux/product/admin/Thunk
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { handleDeleteAuction } from "../productAuction/handlers/hardDeleteAuction";
 import SearchFomDeleteListAuction from "../../../../components/Admin/searchform/searchFomDeleteListAuction";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Pagination } from "@nextui-org/react";
-import { DeleteIcon, RestoreIcon } from "../../../../common/Icons";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Pagination, Avatar } from "@nextui-org/react";
+import { CheckIcon, DeleteIcon, RestoreIcon } from "../../../../common/Icons";
 import SearchMessage from "../productV2/searchMessage";
 import NoProductsMessage from "../productV2/noProduct";
 import { restoreAuction } from "./handlers/restoreAuction";
-
+import { MyButton, CustomMyButton } from "../../../../common/customs/MyButton";
 const ProductListAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [searchTerm] = useState("");
@@ -52,10 +52,20 @@ const ProductListAuction: React.FC = () => {
         );
       case "product_type":
         return (
-          <Chip color="primary">
+          <Chip
+            color="primary"
+            avatar={
+              <Avatar
+                name={productAuction.product_type?.name || "N/A"}
+                size="sm"
+                getInitials={(name) => name ? name.charAt(0) : "N"}
+              />
+            }
+          >
             {productAuction.product_type?.name || "Chưa có loại"}
           </Chip>
         );
+
       case "product_price":
         return new Intl.NumberFormat("vi-VN", {
           style: "currency",
@@ -63,33 +73,43 @@ const ProductListAuction: React.FC = () => {
         }).format(productAuction.product_price);
       case "status":
         return (
-          <Chip color={productAuction.status === "active" ? "success" : "danger"}>
+          <Chip color={productAuction.status === "active" ? "success" : "danger"} startContent={<CheckIcon size={18} />}>
             {productAuction.status === "active" ? "Hiển thị" : "Đã ẩn"}
           </Chip>
         );
       case "actions":
         return (
           <div className="flex items-center space-x-2">
-            <Tooltip content="xóa lun nha">
-              <button
-                type="button"
-                onClick={() => handleDeleteAuction(productAuction._id, dispatch, currentPage, searchTerm)}
-                className="text-red-700 hover:text-red-800"
+            <Tooltip content="Xóa">
+              <MyButton
+                variant="shadow"
+                size="sm"
+                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
+                onClick={() =>
+                  handleDeleteAuction(productAuction._id, dispatch, currentPage, searchTerm)
+                }
               >
-                <DeleteIcon />
-              </button>
+                <DeleteIcon /> Xóa
+              </MyButton>
             </Tooltip>
-            <Tooltip content="Khôi phục nha">
-              <button
-                type="button"
-                onClick={() => restoreAuction(productAuction._id, dispatch, currentPage, searchTerm)}
-                className="text-lime-600 hover:text-lime-500"
+            <Tooltip content="Khôi phục">
+            <div>
+              <CustomMyButton
+                variant="shadow"
+                size="sm"
+                onClick={() =>
+                  restoreAuction(productAuction._id, dispatch, currentPage, searchTerm)
+                }
+                className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
               >
-                <RestoreIcon />
-              </button>
+                <RestoreIcon /> Khôi phục
+              </CustomMyButton>
+              </div>
             </Tooltip>
+
           </div>
         );
+
       default:
         return null;
     }

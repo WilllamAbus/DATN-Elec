@@ -6,11 +6,11 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FunnelIcon } from "@heroicons/react/20/solid";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
 import ProductFilters from "./prouctFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
+import { getBreadcrumbPaths } from "../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import {
   getAllBrandPageAuctionThunk,
   getAllConditionShoppingThunk,
@@ -30,6 +30,7 @@ import { useLocation, useParams } from "react-router-dom";
 import queryString from "query-string";
 import useProductFilters from "./produtFiltersHook";
 import { Pagination } from "@nextui-org/react";
+import ReusableBreadcrumb from "../../../../ultils/breadcrumb/client/reusableBreadcrumb";
 
 
 
@@ -123,11 +124,12 @@ export default function ListPage() {
     if (value === undefined || value === null || value === '') return false;
     return true;
   });
-
+  const breadcrumbPaths = getBreadcrumbPaths(category);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  
   return (
     <div>
-      <ReusableBreadcrumbClient items={breadcrumbItemClient.productlist} />
+       <ReusableBreadcrumb paths={breadcrumbPaths} />
       <div className="w-full max-w-screen-2xl px-0 bg-white">
         <div>
           <Dialog
@@ -184,7 +186,7 @@ export default function ListPage() {
                         {category && category.trim() !== "" ? `${category} ` : "Sản phẩm"}
                         <span className="text-lg font-medium text-gray-500"> (có {total} sản phẩm)</span>
                       </h1>
-                    
+
                       <button
                         type="button"
                         onClick={() => setMobileFiltersOpen(true)}
@@ -210,7 +212,7 @@ export default function ListPage() {
                       <ProductAuctionSort currentSort={filters._sort} onChange={handleSortChange} />
                       <div className={styles.container}>
                         {isLoading ? (
-                          <ProductSkeletonList length={12} />
+                           <ProductSkeletonList length={total || 12}/>
                         ) : noProducts ? (
                           <NoProductsMessage />
                         ) : (
@@ -218,18 +220,18 @@ export default function ListPage() {
                         )}
                       </div>
                       {totalPages > 1 && (
-        <div className="flex justify-center my-4">
-          <Pagination
-            isCompact
-            loop
-            showControls
-            color="primary"
-            total={totalPages}
-            initialPage={currentPage}
-            onChange={(page) => handlePageChange(page)}
-          />
-        </div>
-      )}
+                        <div className="flex justify-center my-4">
+                          <Pagination
+                            isCompact
+                            loop
+                            showControls
+                            color="primary"
+                            total={totalPages}
+                            initialPage={currentPage}
+                            onChange={(page) => handlePageChange(page)}
+                          />
+                        </div>
+                      )}
                     </section>
                   </div>
                 </div>

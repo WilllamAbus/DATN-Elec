@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "../../productV2/toast/msgtoast";
-import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/ReusableBreadcrumb";
-import { breadcrumbItems } from "../../../../../ultils/breadcrumb/breadcrumbData";
+import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
+import { breadcrumbItems } from "../../../../../ultils/breadcrumb/admin/breadcrumbData";
 import { Screen, ResponseScreen } from "../../../../../services/attribute/types/screen/addScreen";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../../redux/store";
@@ -27,7 +27,7 @@ const addScreen: React.FC = () => {
       ).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
-        navigate("/admin/listproduct");
+        navigate("/admin/list-screen");
       }, 2000);
     } catch (error) {
       notifyError((error as ResponseScreen).msg);

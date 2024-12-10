@@ -1,6 +1,6 @@
 import React from "react";
 import AdminListScreen from "../../../../components/Admin/feature/attribute/screen/getListScreen";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import GetListScreen from "../../../../components/Admin/summary/getListScreen";
 const getListScreen: React.FC = () => {
 

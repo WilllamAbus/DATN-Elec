@@ -85,9 +85,9 @@ const ProductStatistics = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M9 10V6a3 3 0 0 1 3-3v0a3 3 0 0 1 3 3v4m3-2 .917 11.923A1 1 0 0 1 17.92 21H6.08a1 1 0 0 1-.997-1.077L6 8h12Z"
               ></path>
             </svg>
@@ -142,9 +142,9 @@ const ProductStatistics = () => {
               viewBox="0 0 24 24"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M4 4a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .979.796L7.939 6H19a1 1 0 0 1 .979 1.204l-1.25 6a1 1 0 0 1-.979.796H9.605l.208 1H17a3 3 0 1 1-2.83 2h-2.34a3 3 0 1 1-4.009-1.76L5.686 5H5a1 1 0 0 1-1-1Z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               ></path>
             </svg>
           </div>
@@ -201,9 +201,9 @@ const ProductStatistics = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M8 6h8M6 10h12M8 14h8M6 18h12"
               ></path>
             </svg>

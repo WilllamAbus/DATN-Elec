@@ -8,6 +8,7 @@ const {
 } = require('./validators');
 const add = async (req, res) => {
   try {
+    const hasVariants = req.body.hasVariants;
     const existingProduct = await checkProductNameExists(req.body.product_name);
     if (existingProduct) {
       return res.status(400).json({
@@ -50,6 +51,7 @@ const add = async (req, res) => {
       product_supplier: req.body.product_supplier,
       hasVariants: req.body.hasVariants,
       variants: [],
+      hasVariants: hasVariants, 
     });
     await newProduct.save();
     return res.status(201).json({

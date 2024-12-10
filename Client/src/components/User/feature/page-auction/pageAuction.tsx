@@ -6,18 +6,17 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FunnelIcon } from "@heroicons/react/20/solid";
-import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb";
+import { breadcrumbItemClient, ReusableBreadcrumbClient } from "../../../../ultils/breadcrumb/admin";
 import ProductFilters from "./prouctAuctionFilter";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { 
+import {
   listPageAuctionProductThunk,
   getAllBrandPageAuctionThunk,
   getAllConditionShoppingThunk
- } from "../../../../redux/product/client/Thunk";
-import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
-import ProductSkeletonList from "../../skeleton/product/productSkeleton";
+} from "../../../../redux/product/client/Thunk";
+import ProductAuctionSkeleton from "../../skeleton/product/productAuctionSkeleton";
 import ProductList from "./productList";
 import styles from "./css/section.module.css";
 import ProductAuctionSort from "./productAuctionSort";
@@ -27,6 +26,7 @@ import NoProductsMessage from "./noProduct";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import useAuctionFilters from "./useAuctionFiltersHook";
+import { Pagination } from "@nextui-org/react";
 export default function AuctionSidebar() {
   const dispatch: AppDispatch = useDispatch();
   const location = useLocation();
@@ -186,18 +186,27 @@ export default function AuctionSidebar() {
                       <ProductAuctionSort currentSort={filters._sort} onChange={handleSortChange} />
                       <div className={styles.container}>
                         {isLoading ? (
-                          <ProductSkeletonList length={12} />
+                          <ProductAuctionSkeleton length={total || 12} />
                         ) : noProducts ? (
                           <NoProductsMessage />
                         ) : (
                           <ProductList products={products} />
                         )}
                       </div>
-                      <PaginationComponent
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                      />
+
+                      {totalPages > 1 && (
+                        <div className="flex justify-center my-4">
+                          <Pagination
+                            isCompact
+                            loop
+                            showControls
+                            color="primary"
+                            total={totalPages}
+                            initialPage={currentPage}
+                            onChange={(page) => handlePageChange(page)}
+                          />
+                        </div>
+                      )}
                     </section>
                   </div>
                 </div>

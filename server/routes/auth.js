@@ -55,9 +55,15 @@ router.get(
   authController.getAddressList
 );
 router.put(
-  "/update/:id",
+  "/update",
   middlewareController.verifyToken,
   authController.updateAddress
+);
+
+router.get(
+  "/listAddress/:id",
+  middlewareController.verifyToken,
+  authController.fetchAddressById
 );
 router.delete(
   "/deleteAddress",

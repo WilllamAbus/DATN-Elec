@@ -1,6 +1,6 @@
 import React from "react";
 import AdminFetVariantsByProductId from "../../../../components/Admin/feature/productV2/getVariantsByProductId";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import GetVariantByProductId from "../../../../components/Admin/summary/getVariantByProductId";
 const GetVariantsByProductId: React.FC = () => {
 

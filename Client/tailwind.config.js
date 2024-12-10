@@ -1,6 +1,7 @@
 const { nextui } = require("@nextui-org/react");
 import flowbite from "flowbite-react/tailwind";
 import { addIconSelectors } from "@iconify/tailwind";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -66,11 +67,26 @@ export default {
         bgZincFoterCopyRight: "#a1a1a9",
         bgAmberBtbAdd: "#f49e0b",
         bgf3f4f6: "#f3f4f6",
-        btnDeletesweetalertOk: "##a0de86",
+        btnDeletesweetalertOk: "#a0de86",
         redCustom: "#e22920",
         customPink: "#f21260",
         veryPaleBlue: "#eef9ff",
         pastelGreen: "#a0de86",
+        springGreen: {
+          50: "#e1fce4",
+          100: "#d2f8c7",
+          200: "#a6ec9d",
+          300: "#81e172",
+          400: "#60d954",
+          500: "#3dbf38",
+          600: "#319734",
+          700: "#2b7c2d",
+          800: "#256f27",
+          900: "#1bc24e", 
+        },
+         springGreenLight: "#0fc64a",
+         success:"#12a150"
+
       },
       fontFamily: {
         sans: [
@@ -163,7 +179,7 @@ export default {
       },
       lineHeight: {
         normal: "1.5",
-        3.625: "3.625rem",
+        "3.625": "3.625rem",
         "8xl": "5rem",
         "80px": "80px",
         "26px": "1.625rem",
@@ -237,6 +253,31 @@ export default {
   plugins: [
     flowbite.plugin(),
     addIconSelectors(["mdi-light", "mdi", "solar"]),
-    nextui(),
+    nextui({
+      themes: {
+        light: {
+          colors: {
+            background: "#FFFFFF", 
+            foreground: "#11181C", 
+            primary: {
+              foreground: "#FFFFFF",
+              DEFAULT: "#006FEE",
+            },
+            customChipColor: "#FF5733"
+          },
+        },
+        dark: {
+          colors: {
+            background: "#000000",
+            foreground: "#ECEDEE",
+            primary: {
+              foreground: "#FFFFFF",
+              DEFAULT: "#006FEE",
+            },
+            customChipColor: "#FF5733"
+          },
+        },
+      },
+    }),
   ],
 };

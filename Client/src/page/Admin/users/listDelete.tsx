@@ -1,5 +1,5 @@
 import React from "react";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 import AdminlistDelete from "../../../components/Admin/feature/users/softDeleteList";
 import "../../../assets/css/admin.style.css";
 const userList: React.FC = () => {

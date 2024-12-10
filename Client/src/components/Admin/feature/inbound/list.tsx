@@ -163,7 +163,7 @@ const InboundList: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSearching}
-                className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex items-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md"
               >
                 <svg
                   className="h-5 w-5"
@@ -201,7 +201,7 @@ const InboundList: React.FC = () => {
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
               />
             </svg>
-            Thêm đơn hàng
+            Thêm đơn nhập hàng
           </Link>
         </div>
       </div>
@@ -263,7 +263,7 @@ const InboundList: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">{inbound.product_variant_id.product.product_supplier.name}</td>
                     <td className="px-4 py-3">{inbound.inbound_quantity}</td>
-                    <td className="px-4 py-3">{inbound.inbound_price}</td>
+                    <td className="px-4 py-3">{inbound.inbound_price.toLocaleString()} VNĐ</td>
                     <td className="px-4 py-3">
                       {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",

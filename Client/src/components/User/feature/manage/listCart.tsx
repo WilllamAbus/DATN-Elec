@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartItem, CartState } from "../../../../types/Voucher.d";
-import "../../../../assets/css/user.style.css";
+// import "../../../../assets/css/user.style.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { getUserData } from "../../../../middleware/getToken";
 

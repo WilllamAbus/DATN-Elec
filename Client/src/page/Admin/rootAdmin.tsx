@@ -12,27 +12,30 @@ const Admin: React.FC = () => {
   const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false);
 
   const roles = useSelector((state: RootState) => state.auth.profile?.roles);
-
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (roles) {
-        if (roles.includes("admin")) {
-          // User is admin, proceed with rendering the Admin component
-        } else {
-          console.log("User does not have admin role.");
-          navigate("/", { replace: true });
-        }
+    if (roles) {
+      if (roles.includes("admin")) {
+        setIsAuthorized(true);
       } else {
-        console.log("Roles are not available.");
         navigate("/", { replace: true });
+        setIsAuthorized(false);
       }
-    }, 500); // Delay in milliseconds
-
-    // Cleanup timeout if the component is unmounted before the timeout completes
-    return () => clearTimeout(timer);
+    } else {
+      navigate("/", { replace: true });
+      setIsAuthorized(false);
+    }
   }, [roles, navigate]);
+
+  if (isAuthorized === null) {
+    return <p>Đang kiểm tra quyền...</p>;
+  }
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   const handleSidebarClose = () => {
     setIsOpenSidebar(false);

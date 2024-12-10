@@ -17,7 +17,7 @@ import { Supplier } from "../../../../types/Suppliers.d";
 import {
   breadcrumbItems,
   ReusableBreadcrumb,
-} from "../../../../ultils/breadcrumb";
+} from "../../../../ultils/breadcrumb/admin";
 
 interface IFormInput {
   name: string;

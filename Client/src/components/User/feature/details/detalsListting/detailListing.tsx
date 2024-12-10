@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 //css carosel sản phẩm liên quan
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+//import { Swiper, SwiperSlide } from "swiper/react";
+//import { Navigation, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -33,11 +33,11 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 //   addProductToCart,
 //   fetchCartList,
 // } from "../../../../../redux/cart/cartThunk";
-import { ToastContainer } from "react-toastify";
+//import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { WatchlistItem } from "../../../../../types/cart/profile/wathlist";
-import { HeartIcon, StarIcon } from "../../page-auction/svg";
-import { fetchRelatedProducts } from "../../../../../services/detailProduct/relatedProducts";
+//import { HeartIcon, StarIcon } from "../../page-auction/svg";
+//import { fetchRelatedProducts } from "../../../../../services/detailProduct/relatedProducts";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 import { getProfileThunk } from "../../../../../redux/auth/authThunk";
 import { addInteractionView } from "../../../../../services/interaction/interaction.service";
@@ -53,7 +53,7 @@ export interface ProductRelatedList {
 const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [products, setProduct] = useState<any | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<ProductRelated[]>([]);
+  // const [relatedProducts, setRelatedProducts] = useState<ProductRelated[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | null>
@@ -178,18 +178,17 @@ const ProductDetail: React.FC = () => {
 
     try {
       console.log("Đang lấy thông tin sản phẩm với ID:", id);
-      const [productResponse, relatedData] = await Promise.all([
-        getProductByID(id),
-        fetchRelatedProducts(id),
+      const [productResponse] = await Promise.all([
+        getProductByID(id)
       ]);
 
       setProduct(productResponse.product);
 
-      if (relatedData && Array.isArray(relatedData.relatedVariants)) {
-        setRelatedProducts(relatedData.relatedVariants);
-      } else {
-        console.error("Lỗi: relatedData không phải là mảng", relatedData);
-      }
+      // if (relatedData && Array.isArray(relatedData.relatedVariants)) {
+      //   setRelatedProducts(relatedData.relatedVariants);
+      // } else {
+      //   console.error("Lỗi: relatedData không phải là mảng", relatedData);
+      // }
 
       await Promise.all([
         upViewProduct(id),
@@ -232,14 +231,14 @@ const ProductDetail: React.FC = () => {
   //     console.log("chưa login");
   //   }
   // };
-  const handleAddToWatchlist = async (variantId?: string) => {
+  const handleAddToWatchlist = async (variantId: string) => {
     if (userId && id) {
       try {
         let resultAction;
 
         if (isFavorite) {
           resultAction = await dispatch(
-            deleteWatchlistThunk({ productId: id, variantId })
+            deleteWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Delete result action:", resultAction);
 
@@ -254,7 +253,7 @@ const ProductDetail: React.FC = () => {
           }
         } else {
           resultAction = await dispatch(
-            addToWatchlistThunk({ productId: id })
+            addToWatchlistThunk({ variantId })
           ).unwrap();
           console.log("Add result action:", resultAction);
 
@@ -485,7 +484,7 @@ const ProductDetail: React.FC = () => {
             </a>
             {error && <p className="text-red-500">{error}</p>}
             <button
-              onClick={() => handleAddToWatchlist()}
+              onClick={() => handleAddToWatchlist(products._id)}
               className="flex items-center space-x-2 bg-gray-200 text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
             >
               <i
@@ -538,110 +537,6 @@ const ProductDetail: React.FC = () => {
 
       {/* <Comment /> */}
 
-      <div className="container pb-16">
-        <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">
-          Sản phẩm liên quan
-        </h2>
-        <Swiper
-          modules={[Navigation, Pagination]}
-          slidesPerView={1}
-          spaceBetween={10}
-          navigation // Kích hoạt navigation
-          pagination={{ clickable: true }} // Kích hoạt pagination
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-            },
-            1024: {
-              slidesPerView: 4,
-            },
-          }}
-        >
-          {relatedProducts.map((productRelated, index) => (
-            <SwiperSlide key={index}>
-              <div className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
-                <div className="backdrop-blur-sm bg-white/30">
-                  <Link to={`/detailProd/${productRelated._id}`}>
-                    <figure className="relative w-full h-0 pb-[75%] overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
-                      <img
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                        src={productRelated.image[0].image[0] || "null"}
-                        alt={`product ${index + 1}`}
-                      />
-                    </figure>
-                  </Link>
-                </div>
-
-                <div className="pt-1 mb-10">
-                  <div className="mb-4 px-2 flex items-center justify-between gap-4">
-                    {productRelated.product_discount.discountPercent > 0 ? (
-                      <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                        Giảm giá{" "}
-                        {productRelated.product_discount.discountPercent}%
-                      </span>
-                    ) : null}
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                      >
-                        <HeartIcon fill="red" size="1em" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
-                    <div className="mt-1 px-2 pb-1">
-                      <a href="#">
-                        <h5 className="text-sm tracking-tight text-slate-900 font-medium">
-                          {productRelated.variant_name}
-                        </h5>
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="px-2 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {productRelated.product_ratingAvg
-                        ? productRelated.product_ratingAvg.toFixed(1)
-                        : "N/A"}
-                    </p>
-                    <StarIcon />
-                    {/* <div className="text-xs text-gray-500 items-center">
-                      {productRelated.product_quantity > 0
-                        ? `(Còn ${productRelated.product_quantity} sản phẩm)`
-                        : "Hết hàng"}
-                    </div> */}
-                  </div>
-                  <div className="mt-2 px-2 flex items-center gap-2">
-                    {productRelated.product_discount.discountPercent > 0 ? (
-                      <div className="flex w-full">
-                        <p className="text-xs font-medium text-rose-700 flex-grow">
-                          {formatCurrency(
-                            productRelated.variant_price *
-                              (1 -
-                                productRelated.product_discount
-                                  .discountPercent /
-                                  100)
-                          )}{" "}
-                          đ
-                        </p>
-                        <p className="text-xs font-medium text-gray-400 line-through flex-shrink-0">
-                          {formatCurrency(productRelated.variant_price)} đ
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-xs font-medium text-rose-700">
-                        {formatCurrency(productRelated.variant_price)} đ
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-        <ToastContainer />
-      </div>
     </>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import ListComment from "../../../components/Admin/feature/comment/list";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 const ListComments: React.FC = () => {
  

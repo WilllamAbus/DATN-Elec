@@ -1,6 +1,6 @@
 import React from "react";
 import AdminFetListProductAuction from "../../../../components/Admin/feature/productAuction/list";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import GetListAuction from "../../../../components/Admin/summary/getListAuction";
 const listProd: React.FC = () => {
 

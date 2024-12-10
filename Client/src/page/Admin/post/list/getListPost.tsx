@@ -1,6 +1,6 @@
 import React from "react";
 import AdminFetPostList from "../../../../components/Admin/feature/post/list/getListPost";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import SummaryGetListPost from "../../../../components/Admin/summary/getListPost";
 const GetPostList: React.FC = () => {
 

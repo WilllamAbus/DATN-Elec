@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../../ultils/breadcrumb/admin";
 import { PriceRandService } from "../../../../services/adminPriceRand/adminPriceRand";
 import { Product , PriceRandData} from "../../../../types/adminPriceRand/addPriceRand";
 import { useForm } from "react-hook-form";

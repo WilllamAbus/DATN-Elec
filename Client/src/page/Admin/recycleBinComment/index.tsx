@@ -1,6 +1,6 @@
 import React from "react";
 import ListDeteleCommnet from "../../../components/Admin/feature/comment/listDetele";
-import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb";
+import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 // import ProductSummary from "../../../components/Admin/summary/ProductSummary";
 const recycleBinCommet: React.FC = () => {
   return (

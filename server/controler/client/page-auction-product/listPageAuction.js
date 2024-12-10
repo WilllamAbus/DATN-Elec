@@ -1,11 +1,12 @@
 const ProductAuctionService = require('./getAuctionProductSV');
 const listPageAuction = async (req, res) => {
   const { page, _sort, brand, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent } = req.query;
-  const limit = 2;
+  const limit = 12;
   const brands = brand ? brand.split(',').map(b => b.trim()).filter(b => b) : [];
   const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
   
   try {
+    await new Promise((resolve) => setTimeout(resolve, 3000)); 
     const response = await ProductAuctionService.getAuctionProducts(
       page, 
       limit, 
