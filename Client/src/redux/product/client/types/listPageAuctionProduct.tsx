@@ -14,7 +14,11 @@ export interface ProductCondition {
   _id: string;
   nameCondition: string;
 }
-
+export interface ProductSupplier {
+  _id: string;
+  name: string;
+  
+}
 
 export interface products {
   _id: string;
@@ -25,7 +29,7 @@ export interface products {
   product_discount: ProductDiscountClient;
   view: number;
   product_ratingAvg: number;
-  product_supplier: string;
+  product_supplier: ProductSupplier;
   product_brand: ProductBrand; 
   product_format: string;
   product_condition: ProductCondition;

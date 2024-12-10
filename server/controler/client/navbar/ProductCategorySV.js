@@ -157,8 +157,6 @@ const ProductCategoryService = {
         }
       }
 
-  
-
       const total = filteredProducts.length;
 
       const categoryInfo = await ProductType.findById(categoryId).select('name');

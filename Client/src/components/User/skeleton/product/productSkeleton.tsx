@@ -1,5 +1,5 @@
 import React from "react";
-import Skeleton from "@mui/material/Skeleton";
+import { Skeleton } from "@nextui-org/react";
 import styles from "../../feature/listPage/css/section.module.css";
 
 interface ProductSkeletonListProps {
@@ -14,50 +14,40 @@ const ProductSkeletonList: React.FC<ProductSkeletonListProps> = ({ length = 12 }
           key={index}
           className="relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md"
         >
-          <div className="relative w-full h-0 pb-[100%] overflow-hidden">
-            <Skeleton
-              variant="rectangular"
-              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-              height={150}
-            />
-          </div>
-          <div className="p-2">
+          {/* Skeleton cho hình ảnh sản phẩm */}
+          <Skeleton className="relative w-full h-0 pb-[100%] rounded-lg">
+            <div className="absolute inset-0 w-full h-full bg-gray-200" />
+          </Skeleton>
+          <div className="pt-1 mb-10">
+            {/* Skeleton cho giảm giá */}
             <div className="mb-4 px-2 flex items-center justify-between gap-4">
-              <Skeleton
-                variant="text"
-                width="30%"
-                height={20}
-                className="rounded bg-primary-100 text-xs font-medium text-primary-800"
-              />
-              <div className="flex items-center justify-end gap-1">
-                <Skeleton variant="circular" width={24} height={24} className="rounded-full" />
-              </div>
+              <Skeleton className="w-1/3 rounded-lg">
+                <div className="h-4 bg-gray-300" />
+              </Skeleton>
+              <Skeleton className="w-6 h-6 rounded-full">
+                <div className="h-6 w-6 bg-gray-300 rounded-full" />
+              </Skeleton>
             </div>
             {/* Skeleton cho tên sản phẩm */}
-            <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
-              <div className="mt-1 px-2 pb-1">
-                <a href="#">
-                  <h5 className="text-sm tracking-tight text-slate-900 font-medium">
-                    <Skeleton variant="text" width="80%" height={24} />
-                  </h5>
-                </a>
-              </div>
-            </div>
-            {/* Skeleton cho đánh giá */}
-            <div className="px-2 flex items-center gap-2">
-              <Skeleton variant="text" width="20%" height={20} />
-              <Skeleton variant="circular" width={20} height={20} className="rounded-full" />
-              <div className="text-xs text-gray-500 items-center flex-1">
-                <Skeleton variant="text" width="40%" height={20} />
-              </div>
+            <div className="px-2 text-md font-semibold leading-tight text-gray-900">
+              <Skeleton className="w-4/5 rounded-lg">
+                <div className="h-4 bg-gray-300" />
+              </Skeleton>
             </div>
             {/* Skeleton cho giá */}
-            <div className="mt-1 px-2 flex items-center gap-2 mb-11">
-              <Skeleton
-                variant="text"
-                width="60%" // Điều chỉnh chiều rộng phù hợp
-                height={24} // Điều chỉnh chiều cao nếu cần thiết
-              />
+            <div className="mt-2 px-2 flex items-center gap-2">
+              <Skeleton className="w-2/5 rounded-lg">
+                <div className="h-4 bg-gray-300" />
+              </Skeleton>
+              <Skeleton className="w-1/3 rounded-lg">
+                <div className="h-4 bg-gray-300" />
+              </Skeleton>
+            </div>
+            {/* Skeleton cho tình trạng */}
+            <div className="px-2 mt-2">
+              <Skeleton className="w-1/2 rounded-lg">
+                <div className="h-4 bg-gray-300" />
+              </Skeleton>
             </div>
           </div>
         </div>

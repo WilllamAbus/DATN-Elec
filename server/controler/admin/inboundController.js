@@ -39,9 +39,6 @@ const inboundController = {
                 product_variant_id: { $exists: true, $ne: null }
             };
 
-            // Đếm tổng số lô hàng dựa trên điều kiện đã tạo
-            const count = await modelInbound.countDocuments(query);
-            const totalPages = Math.ceil(count / limit);
 
             // Truy vấn dữ liệu các lô hàng với phân trang
             const inbounds = await modelInbound
@@ -59,15 +56,23 @@ const inboundController = {
                         }
                     }
                 })
-                .skip((page - 1) * limit) // Bỏ qua các kết quả trước đó
-                .limit(limit); // Giới hạn kết quả theo số lượng trang
-                const filteredInbounds = inbounds.filter(item => item.product_variant_id !== null);
+            // Lọc các bản ghi có productAuction không phải null
+            const filteredInbounds = inbounds.filter(item => item.product_variant_id !== null);
+
+            // Tính toán tổng số trang
+            const totalResults = filteredInbounds.length;
+            const totalPages = Math.ceil(totalResults / limit);
+
+            // Phân trang dữ liệu
+            const paginatedInbounds = filteredInbounds.slice((page - 1) * limit, page * limit);
             // Trả về kết quả
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: filteredInbounds,
+                data: paginatedInbounds,
                 totalPages: totalPages,
+                currentPage: page,
+                totalResults: totalResults
             });
         } catch (error) {
             console.error("Lỗi khi lấy danh sách lô hàng:", error);
@@ -82,13 +87,19 @@ const inboundController = {
 
     listInboundV2: async (req, res) => {
         try {
-            const page = parseInt(req.query.page, 10) || 1; // Sử dụng hệ thập phân, mặc định là 1 nếu không có giá trị
-            const limit = parseInt(req.query.limit, 5) || 5; // Sử dụng hệ thập phân, mặc định là 10 nếu không có giá trị
+            // Lấy thông tin phân trang từ query
+            const page = parseInt(req.query.page, 10) || 1;
+            const limit = parseInt(req.query.limit, 10) || 5;
 
-            const count = await modelInbound.countDocuments({ status: { $ne: "disable" }, productAuction: { $exists: true } });
-            const totalPages = Math.ceil(count / limit);
+            // Điều kiện truy vấn để lọc các lô hàng hợp lệ
+            const query = {
+                status: { $ne: "disable" },
+                productAuction: { $exists: true, $ne: null }  // Lọc các bản ghi có productAuction không phải null
+            };
+
+            // Truy vấn tất cả các lô hàng mà không phân trang
             const inbounds = await modelInbound
-                .find({ status: { $ne: "disable" }, productAuction: { $exists: true, $ne: null } })
+                .find(query)
                 .populate({
                     path: 'productAuction',
                     select: 'product_name',
@@ -97,15 +108,26 @@ const inboundController = {
                         model: 'Supplier',
                         select: '_id name'
                     }
-                })
-                .skip((page - 1) * limit)
-                .limit(limit);
-                const filteredInbounds = inbounds.filter(item => item.productAuction !== null);
+                });
+
+            // Lọc các bản ghi có productAuction không phải null
+            const filteredInbounds = inbounds.filter(item => item.productAuction !== null);
+
+            // Tính toán tổng số trang
+            const totalResults = filteredInbounds.length;
+            const totalPages = Math.ceil(totalResults / limit);
+
+            // Phân trang dữ liệu
+            const paginatedInbounds = filteredInbounds.slice((page - 1) * limit, page * limit);
+
+            // Trả về kết quả
             res.status(200).json({
                 success: true,
                 msg: "Lấy danh sách lô hàng thành công",
-                data: filteredInbounds,
+                data: paginatedInbounds,
                 totalPages: totalPages,
+                currentPage: page,
+                totalResults: totalResults
             });
         } catch (error) {
             console.error("Lỗi khi lấy danh sách lô hàng:", error);
@@ -116,6 +138,7 @@ const inboundController = {
             });
         }
     },
+
 
     addInbound: async (req, res) => {
         try {

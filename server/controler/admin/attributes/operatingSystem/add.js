@@ -17,7 +17,6 @@ const addOperatingSystem = async (req, res) => {
 
     const newOperatingSystem = new OperatingSystem({
       name: req.body.name,
-      version: req.body.version,
       status: req.body.status || 'active',
       sku: generateSKU(req.body.name),
       pid: req.body.pid || uuidv4(),

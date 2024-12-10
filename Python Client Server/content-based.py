@@ -5,18 +5,23 @@ from dotenv import load_dotenv
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+from bson import ObjectId 
 
 app = Flask(__name__)
 
 load_dotenv()
 MONGODB_URI = os.getenv('MONGODB_URI')
 client = MongoClient(MONGODB_URI)
+CORS(app)
 
 df_merged = None  # Khởi tạo df_merged là None để tránh lỗi
 
+# Kết nối với MongoDB và lấy dữ liệu
 try:
     db = client.get_database()
     collection_variants = db['productvariants']
+    collection_imagevariants = db['imagevariants']  # Kết nối với collection chứa ảnh
     data_variants = collection_variants.find()
     df_variants = pd.DataFrame(list(data_variants))
 
@@ -35,6 +40,7 @@ try:
 except Exception as e:
     print(f"Error: {e}")
 
+# Chỉ định tính năng sẽ dùng để tính độ tương đồng
 if df_merged is not None:
     features = ['variant_name', 'variant_price']
 
@@ -55,31 +61,79 @@ if df_merged is not None:
     @app.route('/recom/<slug>', methods=['GET'])
     def get_data(slug):
         result = []
-        
-        # Tìm slug có chứa chuỗi slug đã cho
-        matching_slugs = df_merged[df_merged['slug'].str.contains(slug, case=False)]
-        
-        if matching_slugs.empty:
-            # In ra các slug có trong df_merged để kiểm tra
-            available_slugs = df_merged['slug'].unique()
+
+        # Tìm kiếm product_v2 với slug đã cho
+        matching_products = df_products[df_products['slug'].str.contains(slug, case=False)]
+        if matching_products.empty:
+            available_slugs = df_products['slug'].unique()
             return jsonify({'Lỗi': 'slug không hợp lệ', 'Có sẵn slug': available_slugs.tolist()})
-        
-        indexProduct = matching_slugs.index[0]
-        
-        similarProduct = list(enumerate(similar[indexProduct]))
 
-        print(similarProduct)
+        # Lấy _id của product từ product_v2
+        product_id = matching_products.iloc[0]['_id']
 
+        # Lọc productvariants theo product_id
+        matching_variants = df_variants[df_variants['product'] == product_id]
+        if matching_variants.empty:
+            return jsonify({'Lỗi': 'Không tìm thấy biến thể nào cho sản phẩm này.'})
+
+        # Lấy index đầu tiên của biến thể làm trọng tâm
+        indexVariant = matching_variants.index[0]
+
+        similarProduct = list(enumerate(similar[indexVariant]))
         sortedSimilarProduct = sorted(similarProduct, key=lambda x: x[1], reverse=True)
 
         def get_name(index):
-            return df_merged[df_merged.index == index]['variant_name'].values[0]
+            return df_merged.iloc[index]['variant_name']
+
+        def get_price(index):
+            return df_merged.iloc[index]['variant_price']
+
+        def get_image(index):
+            # Lấy thông tin hình ảnh từ collection imagevariants
+            variant_id = df_merged.iloc[index]['_id']
+            image_data = collection_imagevariants.find_one({"productVariant": variant_id})
+            if image_data and 'image' in image_data:
+                return image_data['image']
+            return None
+
+        def get_discount_percent(discount_id):
+            # Lấy thông tin giảm giá từ collection discounts
+            discount_data = db['discounts'].find_one({"_id": ObjectId(discount_id)})
+            if discount_data and 'discountPercent' in discount_data:
+                return discount_data['discountPercent']
+            return None
+        
+        def get_product_slug(index):
+            # Lấy _id của product từ df_merged
+            product_id = df_merged.iloc[index]['product']  # Trường `product` tham chiếu tới _id của product_v2
+            # Lấy slug của product_v2 từ df_products
+            matching_product = df_products[df_products['_id'] == product_id]
+            if not matching_product.empty:
+                return matching_product.iloc[0]['slug']  # Trả về slug của product_v2
+            return None  # Nếu không tìm thấy, trả về None
 
         for i in range(1, number + 1):
-            print(get_name(sortedSimilarProduct[i][0]))
-            result.append(get_name(sortedSimilarProduct[i][0]))
-        
+            index = sortedSimilarProduct[i][0]
+            name = get_name(index)
+            price = get_price(index)
+            product_slug = get_product_slug(index)
+
+            image_urls = get_image(index)
+            variant_id = str(df_merged.iloc[index]['_id'])
+            discount_id = df_merged.iloc[index]['product_discount']
+            discount_percent = get_discount_percent(discount_id)
+
+            result.append({
+                'variant_name': name,
+                'variant_price': int(price),
+                'slug': product_slug,
+                'images': image_urls,
+                'variant_id': variant_id,
+                'discount_percent': discount_percent
+            })
+
         data = {'Sản phẩm gợi ý': result}
         return jsonify(data)
+
 if __name__ == "__main__":
     app.run(port=1111)
