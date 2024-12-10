@@ -58,7 +58,7 @@ const FilterByPrice: React.FC<FilterByPriceProps> = ({ onchange }) => {
 
   return (
     <Box sx={{ padding: theme.spacing(1) }}>
-      <span className="font-bold text-gray-900 text-sm">Lọc theo khoảng giá</span>
+      <span className="font-medium text-gray-900">Lọc theo khoảng giá</span>
       <Box
         sx={{
           display: "flex",
@@ -113,7 +113,7 @@ const FilterByPrice: React.FC<FilterByPriceProps> = ({ onchange }) => {
           color="primary"
           onClick={handleSubmit}
           size="small"
-          sx={{ fontFamily: "'Barlow', sans-serif" }}
+          sx={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}
         >
           Áp dụng
         </Button>
@@ -122,7 +122,7 @@ const FilterByPrice: React.FC<FilterByPriceProps> = ({ onchange }) => {
           color="success"
           onClick={handleReset}
           size="small"
-          sx={{ fontFamily: "'Barlow', sans-serif" }}
+          sx={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}
         >
           Xóa bộ lọc
         </Button>
