@@ -6,7 +6,7 @@ const listPageAuction = async (req, res) => {
   const conditions = conditionShopping ? conditionShopping.split(',').map(c => c.trim()).filter(c => c) : [];
   
   try {
-    await new Promise((resolve) => setTimeout(resolve, 3000)); 
+    await new Promise((resolve) => setTimeout(resolve, 2000)); 
     const response = await ProductAuctionService.getAuctionProducts(
       page, 
       limit, 

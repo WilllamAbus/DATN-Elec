@@ -36,16 +36,12 @@ const ProductCategoryService = {
           ram: { $in: ram.filter(ramId => mongoose.Types.ObjectId.isValid(ramId)) }
         }).distinct('_id')
         : [];
-      console.log('Danh sách ramVariantIds:', ramVariantIds);
-
 
       const storageVariantIds = storage && storage.length > 0
         ? await ProductVariant.find({
           storage: { $in: storage.filter(storageId => mongoose.Types.ObjectId.isValid(storageId)) }
         }).distinct('_id')
         : [];
-      console.log('Danh sách storageVariantIds:', storageVariantIds);
-
 
       const ramFilter = ramVariantIds.length > 0
         ? { variants: { $in: ramVariantIds } }
@@ -63,18 +59,15 @@ const ProductCategoryService = {
       if (minPrice !== undefined || maxPrice !== undefined) {
         const variantPriceConditions = [];
 
-        // Thêm điều kiện giá tối thiểu
         if (minPrice !== undefined && !isNaN(parseFloat(minPrice))) {
           variantPriceConditions.push({ variant_price: { $gte: parseFloat(minPrice) } });
         }
 
-        // Thêm điều kiện giá tối đa
         if (maxPrice !== undefined && !isNaN(parseFloat(maxPrice))) {
           variantPriceConditions.push({ variant_price: { $lte: parseFloat(maxPrice) } });
         }
 
         if (variantPriceConditions.length > 0) {
-          // Tìm tất cả các `variant` khớp điều kiện
           const variantsWithPrice = await ProductVariant.find({
             $and: variantPriceConditions,
           }).select('_id');
@@ -82,7 +75,6 @@ const ProductCategoryService = {
           if (variantsWithPrice.length > 0) {
             priceFilter['variants'] = { $in: variantsWithPrice.map(variant => variant._id) };
           } else {
-            // Nếu không có variant nào khớp, trả về filter không khớp
             priceFilter['variants'] = { $in: [] };
           }
         }
@@ -96,13 +88,7 @@ const ProductCategoryService = {
       if (maxDiscountPercent !== undefined) {
         discountFilter['product_discount.discountPercent'] = { ...discountFilter['product_discount.discountPercent'], $lte: parseFloat(maxDiscountPercent) };
       }
-
       const sortOptions = {};
-
-
-
-
-
       const products = await Product.find({
         product_type: categoryId,
         status: { $ne: 'disable' },
@@ -139,13 +125,23 @@ const ProductCategoryService = {
         })
         .select('product_name image product_description slug product_discount product_brand variants product_condition product_supplier product_quantity product_ratingAvg product_view weight_g isActive status disabledAt comments')
         .lean();
-        const filteredProducts = products.filter(product =>
-          product.variants.some(variant => variant.image && variant.image.length > 0)
-        );
+        const filteredProducts = products.filter(product => {
+          // Chỉ giữ lại sản phẩm có ít nhất một biến thể khớp với các tiêu chí
+          const validVariants = product.variants.filter(variant => {
+            const matchesRam = ram && ram.length > 0 ? ram.includes(variant.ram?._id.toString()) : true;
+            const matchesStorage = storage && storage.length > 0 ? storage.includes(variant.storage?._id.toString()) : true;
         
-
- 
-
+            return matchesRam && matchesStorage;
+          });
+        
+          // Cập nhật lại danh sách biến thể hợp lệ cho sản phẩm
+          product.variants = validVariants;
+        
+          // Chỉ giữ sản phẩm nếu có biến thể hợp lệ
+          return validVariants.length > 0;
+        });
+        
+        
       if (_sort) {
         const [sortField, sortDirection] = _sort.split(":");
         if (sortField === "variant_price") {
@@ -156,9 +152,7 @@ const ProductCategoryService = {
           });
         }
       }
-
       const total = filteredProducts.length;
-
       const categoryInfo = await ProductType.findById(categoryId).select('name');
       if (!categoryInfo) {
         return reject({
@@ -168,7 +162,6 @@ const ProductCategoryService = {
           status: 404
         });
       }
-
       resolve({
         success: true,
         err: 0,
