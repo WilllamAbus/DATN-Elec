@@ -11,7 +11,7 @@ const getProductsByCategory = async (req, res) => {
   const storages = storage ? storage.split(',').map(s => s.trim()).filter(s => s) : [];
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 3000)); 
+    await new Promise((resolve) => setTimeout(resolve, 1000)); 
     const category = await Category.findOne({ slug });
     if (!category) {
       return res.status(404).json({
