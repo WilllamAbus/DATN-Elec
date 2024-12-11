@@ -8,6 +8,8 @@ import logoNav from "../../assets/images/logoHeader/logo.svg";
 import { useAppDispatch } from "../../redux/rootReducer";
 import cateDropdownItems from "./listCateNav/path/hookspathnav";
 import { searchProduct } from "../../services/product_v2/client/homeAllProduct";
+import { Drawer, Sidebar } from "flowbite-react";
+
 
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -19,29 +21,23 @@ const Navbar: React.FC = () => {
     dispatch(listCateNavItemThunk());
   }, [dispatch]);
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleClose = () => setIsOpen(false);
   const dropdownItems = cateDropdownItems();
 
   const dataSearch = async (keyword: string) => {
     if (keyword.length < 2) {
+      setFilteredProducts([]);
       return;
     }
+
     try {
-     
-      if (!keyword.trim()) {
-        setFilteredProducts([]);
-        return;
-      }
-
       const result = await searchProduct(keyword);
-      const filteredProducts = result.data.filter((product: any) => {
-        return (
-          product &&
-          product.product_name &&
-          product.product_name.toLowerCase().includes(keyword.toLowerCase())
-        );
-      });
-
-      setFilteredProducts(filteredProducts);
+      const filtered = result.data.filter((product: any) =>
+        product.product_name.toLowerCase().includes(keyword.toLowerCase())
+      );
+      setFilteredProducts(filtered);
     } catch (error) {
       console.error("Error fetching search results:", error);
     }
@@ -52,11 +48,13 @@ const Navbar: React.FC = () => {
     setKeyword(value);
     dataSearch(value);
   };
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && keyword.length < 2) {
-      event.preventDefault(); 
+      event.preventDefault();
     }
   };
+
   const handleSubmit = () => {
     const trimmedKeyword = keyword.trim();
     const encodedKeyword = encodeURIComponent(trimmedKeyword);
@@ -64,9 +62,10 @@ const Navbar: React.FC = () => {
       navigate(`/search/${encodedKeyword}`);
     }
   };
+
   return (
     <header>
-      <nav className="fixed z-30 w-full bg-primary_flowbite-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
+      <nav className="fixed z-30 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
         <div className="flex justify-between items-center max-w-screen-2xl mx-auto">
           <div className="flex justify-start items-center">
             <a href="/" className="flex">
@@ -88,14 +87,6 @@ const Navbar: React.FC = () => {
                     Đấu giá
                   </Link>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    Dịch vụ
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -105,8 +96,8 @@ const Navbar: React.FC = () => {
               Search
             </label>
             <div className="relative mt-1 lg:w-[32rem]">
-              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none ">
-                <button type="submit" >
+              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
+                <button type="submit">
                   <svg
                     className="w-5 h-5 text-gray-500 dark:text-gray-400"
                     fill="currentColor"
@@ -124,7 +115,7 @@ const Navbar: React.FC = () => {
               <input
                 type="text"
                 id="topbar-search"
-                className="bg-gray-50 border sm:w-[100px]  border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                className="bg-gray-50 border sm:w-[100px] border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Tìm kiếm sản phẩm"
                 value={keyword}
                 onChange={handleSearch}
@@ -133,15 +124,15 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Render filtered products */}
-            {filteredProducts.length > 0 ? (
+            {filteredProducts.length > 0 && (
               <div className="bg-gray-50 border border-gray-300 text-gray-900 md:w-[510px] w-[210px] sm:text-sm rounded-lg shadow-lg pl-2 p-1 absolute mt-0">
                 {filteredProducts.map((result) => (
                   <div
                     key={result.id}
                     onClick={() =>
-                      (window.location.href = `/search/${encodeURIComponent(
-                        result.product_name
-                      )}`)
+                    (window.location.href = `/search/${encodeURIComponent(
+                      result.product_name
+                    )}`)
                     } // Điều hướng tới trang sản phẩm
                     className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
                   >
@@ -149,12 +140,13 @@ const Navbar: React.FC = () => {
                   </div>
                 ))}
               </div>
-            ) : null}
+            )}
           </form>
 
           <div className="flex justify-between items-center lg:order-2">
             <UserMenuDropdown />
             <button
+              onClick={() => setIsOpen(true)}
               type="button"
               id="toggleMobileMenuButton"
               data-collapse-toggle="toggleMobileMenu"
@@ -164,7 +156,7 @@ const Navbar: React.FC = () => {
               <svg
                 className="w-6 h-6"
                 aria-hidden="true"
-                fill="currentColor"
+                fill="#000000"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -176,41 +168,62 @@ const Navbar: React.FC = () => {
               </svg>
             </button>
           </div>
-        </div>
-      </nav>
 
-      <nav className="bg-white dark:bg-gray-900">
-        <ul
-          id="toggleMobileMenu"
-          className="hidden flex-col mt-0 pt-16 w-full text-sm font-medium lg:hidden"
-        >
-          {/* Mobile navigation menu */}
-          <li className="block border-b dark:border-gray-700">
-            <a
-              href="#"
-              className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-              aria-current="page"
-            >
-              Home
-            </a>
-          </li>
-          <li className="block border-b dark:border-gray-700">
-            <a
-              href="#"
-              className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-            >
-              Messages
-            </a>
-          </li>
-          <li className="block border-b dark:border-gray-700">
-            <a
-              href="#"
-              className="block py-3 px-4 text-gray-900 lg:py-0 dark:text-white lg:hover:underline lg:px-0"
-            >
-              Profile
-            </a>
-          </li>
-        </ul>
+          <Drawer open={isOpen} onClose={handleClose}>
+            <Drawer.Header title="MENU" titleIcon={() => <></>} />
+            <Drawer.Items>
+              <Sidebar
+                aria-label="Sidebar with multi-level dropdown example"
+                className="[&>div]:bg-transparent [&>div]:text-gray-900 [&>div]:dark:text-gray-200 [&>div]:text-sm [&>div]:space-y-1"
+              >
+                <Link
+                  to="/"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Trang chủ
+                </Link>
+
+                <Dropdown buttonText="Danh mục" items={dropdownItems} />
+
+                <Link
+                  to="/auction"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Đấu giá
+                </Link>
+
+                <Link
+                  to="/profile"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Tài khoản của tôi
+                </Link>
+                <Link
+                  to="/login"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Đăng nhập
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Đăng ký
+                </Link>
+
+                <Link
+                  to="/checkout"
+                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                >
+                  Giỏ hàng
+                </Link>
+
+
+              </Sidebar>
+            </Drawer.Items>
+          </Drawer>
+        </div>
       </nav>
     </header>
   );

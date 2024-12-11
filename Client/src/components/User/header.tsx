@@ -1,5 +1,5 @@
 import { Badge, Button } from "@nextui-org/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
@@ -32,12 +32,27 @@ const Header: React.FC = () => {
   }, [dispatch]);
 
   const handleWatchlistView = () => {
-    navigate("/profile", { state: { view: "watchlist" } }); // Điều hướng kèm state
+    navigate("/profile", { state: { view: "watchlist" } }); 
   };
+  const [isVisible, setIsVisible] = useState(true);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsVisible(window.innerWidth >= 1024); 
+    };
+
+    handleResize(); 
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  if (!isVisible) return null; // Không render Header nếu không cần
   return (
-    <header className="sticky pt-2 top-0 z-40 flex-none w-full mx-auto bg-white border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
-      <nav className="bg-primary-901 dark:bg-gray-800 antialiased px-0">
+    <header className="sticky  top-0 z-40 flex-none w-full mx-auto bg-primary-500 border-b border-gray-200 dark:border-gray-600 dark:bg-gray-800">
+      <nav className="bg-primary-400 dark:bg-gray-800 antialiased p-2">
         <div className="max-w-screen-2xl px-8 mx-auto 2xl:px-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
@@ -45,7 +60,7 @@ const Header: React.FC = () => {
                 <li>
                   <Link
                     to="contact"
-                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
+                    className="flex text-sm font-medium text-white hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
                   >
                     Liên hệ
                   </Link>
@@ -54,48 +69,15 @@ const Header: React.FC = () => {
                   <a
                     href="#"
                     title=""
-                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
+                    className="flex text-sm font-medium text-white hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
                   >
                     Tin công nghệ
-                  </a>
-                </li>
-                <li className="shrink-0">
-                  <a
-                    href="#"
-                    title=""
-                    className="flex text-sm font-medium text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-primary-500"
-                  >
-                    Khuyến mại
                   </a>
                 </li>
               </ul>
             </div>
             <div className="flex items-center lg:space-x-2">
-              <Link to="/cart">
-                <Button
-                  type="button"
-                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
-                >
-                  <svg
-                    className="w-6 h-6 text-gray-800 dark:text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
-                    />
-                  </svg>
-                  <span className="hidden sm:flex">Thông báo</span>
-                </Button>
-              </Link>
+    
               <Badge
                 color="danger"
                 content={totalProducts}
@@ -105,7 +87,7 @@ const Header: React.FC = () => {
                 <Link to="/cart">
                   <Button
                     type="button"
-                    className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                    className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                   >
                     <i className="iconify mdi--cart-outline w-5 h-5 "></i>
                     <span className="hidden sm:flex">Giỏ hàng</span>
@@ -115,10 +97,10 @@ const Header: React.FC = () => {
               <Link to="/viewBids">
                 <Button
                   type="button"
-                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                 >
                   <svg
-                    className="w-6 h-6 text-gray-800 dark:text-white"
+                    className="w-6 h-6 text-white dark:text-white"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -148,7 +130,7 @@ const Header: React.FC = () => {
                   id="userDropdownButton1"
                   data-dropdown-toggle="userDropdown1"
                   type="button"
-                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                  className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                 >
                   <i className="iconify mdi--favourite-border w-5 h-5 "></i>
                   Yêu thích
