@@ -84,6 +84,7 @@ const UserConfirmAucDefaultPage = React.lazy(
   () => import("../page/User/shopping/auction/biddings/completAucDefault")
 );
 const LinkAccount = React.lazy(() => import("../page/User/accounts/link-account"));
+const UserLoginError = React.lazy(() => import("../page/User/accounts/login_error"));
 const LinkAccountSuccess = React.lazy(() => import("../page/User/accounts/link-account-success")); 
 const UserContact = React.lazy(() => import("../page/User/contact/contact"));
 const UserRoutes: RouteObject[] = [
@@ -93,6 +94,7 @@ const UserRoutes: RouteObject[] = [
     children: [
       { index: true, element: <User /> },
       { path: "login", element: <UserLogin /> },
+      { path: "login-error", element: <UserLoginError /> },
       { path: "register", element: <UserRegister /> },
       { path: "verifyEmail", element: <VerifyEmail /> },
       { path: "regisOTP", element: <UserRegisOTP /> },
