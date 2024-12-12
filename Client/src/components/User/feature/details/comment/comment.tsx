@@ -41,11 +41,10 @@ interface EditComment {
   content: string;
   rating: number;
 }
-
-const Comment = (
-  // { onUpdateAverageRating,}: {
-  // onUpdateAverageRating: (average: string) => void;}
-) => {
+interface CommentProps {
+  onUpdateAverageRating: (avgRating: string) => void;
+}
+const Comment = ({ onUpdateAverageRating }: CommentProps) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -84,10 +83,9 @@ useEffect(() => {
   };
 }, []);
 
-
   const handleShowLess = () => {
-    setVisibleCount(5); // Thu gọn về 5 bình luận
-    setIsExpanded(false); // Đặt trạng thái là "thu gọn"
+    setVisibleCount(5); 
+    setIsExpanded(false); 
   };
   
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
@@ -127,73 +125,75 @@ useEffect(() => {
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
-  // const calculateAverageRating = (comments: CommentType[]) => {
-  //   const totalRatings = comments.reduce(
-  //     (sum, comment) => sum + comment.rating,
-  //     0
-  //   );
-  //   return comments.length > 0
-  //     ? (totalRatings / comments.length).toFixed(1)
-  //     : " ";
-  // };
+  const calculateAverageRating = (comments: CommentType[]) => {
+    if (!comments || comments.length === 0) return "0.0";
+    const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
+    return (totalRatings / comments.length).toFixed(1); 
+  };
+  
   const fetchComments = async () => {
-    if (!slug) {
-      // console.log("ID sản phẩm không tồn tại");
-      return;
-    }
-
+    if (!slug) return; 
+  
     try {
-      const productComments: CommentType[] = await getCommentProduct(slug);
+      const productComments = await getCommentProduct(slug);
+  
       setComments(productComments);
       setFilteredComments(productComments);
-      // Tính lại average rating và gửi lên component cha
-      //  Truyền average rating lên component cha
+  
+      const avgRating = calculateAverageRating(productComments);
+      
+      if (onUpdateAverageRating) {
+        onUpdateAverageRating(avgRating); 
+      } else {
+        console.error("onUpdateAverageRating is undefined");
+      }
     } catch (error) {
-      console.error("Lỗi:", error);
+      console.error("Lỗi khi lấy bình luận:", error);
     }
   };
+  
+  
   const handleRatingClick = (rate: number) => {
     setRating(rate);
     setValue("rating", rate);
   };
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
-      setErrorMessage("You need to be logged in to submit a comment.");
-      return;
+       setErrorMessage("You need to be logged in to submit a comment.");
+       return;
     }
     if (!slug) {
-      setErrorMessage("Product ID is missing.");
-      return;
+       setErrorMessage("Product ID is missing.");
+       return;
     }
     if (!profile?._id) {
-      setErrorMessage("User profile is not available.");
-      return;
+       setErrorMessage("User profile is not available.");
+       return;
     }
-
+ 
     const commentData = {
-      content: data.content,
-      rating: rating,
-      id_user: profile?._id,
-      likes: 0,
-      replies:null,
+       content: data.content,
+       rating: rating,
+       id_user: profile?._id,
+       likes: 0,
+       replies: null,
     };
-
+ 
     try {
-      const commentResponse = await addComment(slug, commentData);
-        
-        fetchComments();
-        notify();
-      // console.log("Comment submitted:", commentResponse);
-      reset();
-      setRating(0);
-      setHover(0);
-      return commentResponse;
+       const commentResponse = await addComment(slug, commentData);
+       notify();
+       setTimeout(fetchComments, 10000); 
+       reset();
+       setRating(0);
+       setHover(0);
+       return commentResponse;
     } catch (error) {
-      console.error("Error submitting comment:", error);
-      setErrorMessage("Failed to submit comment.");
-      setSuccessMessage(null);
+       console.error("Error submitting comment:", error);
+       setErrorMessage("Failed to submit comment.");
+       setSuccessMessage(null);
     }
-  };
+ };
+ 
   const handleSubmitEdit: SubmitHandler<FormValues> = async (commentData) => {
     if (!isLoggedIn) {
       setErrorMessage("You need to be logged in to submit a comment.");
@@ -224,8 +224,6 @@ useEffect(() => {
 
     try {
       const commentResponse = await editComment(slug, updatedCommentData);
-      // console.log(commentResponse);
-      
       notifyUpdate();
       reset();
       setCommentContent("");
@@ -241,7 +239,6 @@ useEffect(() => {
       setErrorMessage("Failed to submit comment.");
     }
   };
-
   const deleteComment = async (commentId: string) => {
     if (!commentId) {
       return console.log("No comment ID provided");
@@ -261,9 +258,6 @@ useEffect(() => {
       if (result.isConfirmed) {
         try {
           await softDeleteComment(commentId);
-
-          // Cập nhật state để xoá comment ngay mà không cần reload
-
           MySwal.fire({
             title: "Đã Xóa!",
             text: "Bình luận đã được xóa.",

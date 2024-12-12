@@ -18,32 +18,31 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   const { bid } = useSelector((state: RootState) => state.randBidPrice);
   const bidStatus = useSelector((state: RootState) => state.bidding.status);
-  const isLoggedIn = useSelector(
-    (state: RootState) => state.auth.login.isLoggedIn
+  // const isLoggedIn = useSelector(
+  //   (state: RootState) => state.auth.login.isLoggedIn
+  // );
+  const userRole = useSelector(
+    (state: RootState) => state.auth.profile?.roles || []
   );
-
   const error = useSelector((state: RootState) => state.auth.login.error);
-  const roles = useSelector((state: RootState) => state.auth.login.roles);
+  // const roles = useSelector((state: RootState) => state.auth.login.roles);
   useEffect(() => {
-    if (isLoggedIn) {
-      if (roles && roles.length > 0) {
-        const isUeer = roles.some((role) => role.name === "user");
-   
-        
-        if (isUeer) {
-          <UserAuctDetails productId={productId} />
-        } 
-      } else {
+    if (userRole && userRole.length > 0) {
+      const isUeer = userRole.includes("admin") ;
+ 
+
+      
+      if (isUeer) {
         toast.success("Bạn là Admin - Tài khoản không được tiến hành đấu giá !!");
         setTimeout(() => {
            <UserAuctDetails productId={productId} />
         }, 2000);
-        // navigate("/login-error");
-      }
-    } else if (error) {
-      navigate("/login-error");
+      } 
+    } else {
+  
+      <UserAuctDetails productId={productId} />
     }
-  }, [isLoggedIn, roles, error, navigate]);
+  }, [ userRole, error, navigate]);
   const toggleModal = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
