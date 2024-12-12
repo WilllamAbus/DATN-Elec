@@ -10,6 +10,7 @@ const {
   update,
   list,
   listRole,
+  getUseLimit,
 } = require("../../../controler/admin/authController");
 const middlewareController = require("../../../middleware/auth");
 const upload = require("../../../middleware/multer.middle");
@@ -25,6 +26,7 @@ router.get("/deleted", deletedList);
 router.get("/list", list);
 router.get("/listRole", middlewareController.verifyTokenAdminAuth, listRole);
 router.get("/get-one/:id", getOne);
+router.get("/limit/", middlewareController.verifyTokenAdminAuth, getUseLimit);
 router.put(
   "/edit/:id",
   middlewareController.verifyTokenAdminAuth,

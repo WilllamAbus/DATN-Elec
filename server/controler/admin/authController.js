@@ -6,7 +6,7 @@ const serviceAccount = require("../authentication/authFirebase.json");
 const admin = require("firebase-admin");
 const multer = require("multer");
 const STORE_BUCKET = process.env.STORE_BUCKET;
-
+const UserService = require("../../services/auth.service");
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -85,6 +85,49 @@ exports.list = async (req, res) => {
   }
 };
 
+exports.getUseLimit = async (req, res) => {
+  const { page, search } = req.query;
+
+  try {
+    const response = await UserService.getUseLimitService(page, search);
+    if (response.err) {
+      return res.status(400).json({
+        success: false,
+        err: response.err,
+        msg: response.msg || "Lỗi khi lấy đơn hàng",
+        status: 400,
+      });
+    }
+
+    const currentPage = page ? +page : 1;
+    const totalPages = Math.ceil(
+      response.response.total / (+process.env.LIMIT || 1)
+    );
+
+    return res.status(200).json({
+      success: true,
+      err: 0,
+      msg: "OK",
+      status: 200,
+      data: response.response,
+      pagination: {
+        currentPage,
+        totalPages,
+        hasNextPage: currentPage < totalPages,
+        hasPrevPage: currentPage > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      err: -1,
+      msg: "Lỗi: " + error.message,
+      status: 500,
+    });
+  }
+};
 // Xóa cứng danh mục
 exports.hardDelete = async (req, res) => {
   try {

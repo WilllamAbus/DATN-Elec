@@ -802,7 +802,11 @@ const ListOrders: React.FC = () => {
     }
   };
 
-  const totalAmount = Order.reduce((sum, order) => sum + order.totalAmount, 0);
+  // const totalAmount = Order.reduce((sum, order) => sum + order.totalAmount, 0);
+  const totalAmount = Order.filter(
+    (order) =>
+      order.stateOrder !== "Hủy đơn hàng" && order.stateOrder !== "Đã hoàn tiền"
+  ).reduce((sum, order) => sum + order.totalAmount, 0);
 
   return (
     <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg ">
@@ -836,6 +840,7 @@ const ListOrders: React.FC = () => {
                 <option value="Đang vận chuyển">Đang vận chuyển</option>
                 <option value="Hoàn tất">Hoàn tất</option>
                 <option value="Hủy đơn hàng">Hủy đơn hàng</option>
+                <option value="Đã hoàn tiền">Đã hoàn tiền</option>
               </select>
             </div>
             <div className="relative w-full">

@@ -1520,9 +1520,13 @@ const authController = {
   //   }
   // },
   getOrderLimit: async (req, res) => {
+    const userId = req.user.id;
     const { page, search, stateOrder } = req.query;
 
     try {
+      if (!userId) {
+        return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
+      }
       const response = await OrderService.getOrderLimitService(
         page,
         search,

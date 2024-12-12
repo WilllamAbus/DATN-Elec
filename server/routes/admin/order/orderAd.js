@@ -8,7 +8,11 @@ router.get(
   middlewareController.verifyTokenAdminAuth,
   orderController.getOrders
 );
-router.get("/limit", orderController.getOrderLimit);
+router.get(
+  "/limit",
+  middlewareController.verifyTokenAdminAuth,
+  orderController.getOrderLimit
+);
 router.get(
   "/getSoftOrder",
   middlewareController.verifyTokenAdminAuth,

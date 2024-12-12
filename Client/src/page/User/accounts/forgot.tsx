@@ -40,7 +40,7 @@ const Forgot: React.FC = () => {
     } catch (error) {
       toast.error("Đã xảy ra lỗi khi gửi email.");
     } finally {
-      setIsLoading(false); // Kết thúc quá trình loading
+      setIsLoading(false);
     }
   };
 
@@ -52,7 +52,10 @@ const Forgot: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Quên mật khẩu
             </h2>
-            <p className="text-gray-600 mb-8">Welcome back, customer</p>
+            <p className="text-gray-600 mb-8">
+              Vui lòng nhập email của bạn để nhận đường dẫn đặt lại mật khẩu.
+            </p>
+
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>

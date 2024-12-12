@@ -51,6 +51,32 @@ export interface UserProfile {
   currentUser: string;
   redirectTo: string;
 }
+export interface Userpagi {
+  profile?: string;
+  msg?: string;
+  token?: string;
+  _id: string;
+  id?: string;
+  name: string;
+  accessToken: string;
+  email: string;
+  VerifiedEmail: string;
+  status: string | null;
+  message: string | null;
+  refreshToken: string;
+  roles: Role[];
+  birthday: string;
+  gender: string;
+  password?: string;
+  phone: string;
+  avatar: string;
+  addresses: Address[];
+  banks: Bank[];
+  createdAt: string;
+  updatedAt?: string;
+  currentUser: string;
+  redirectTo: string;
+}
 
 // Định nghĩa interface Address cho cấu trúc địa chỉ
 // export interface Address {
@@ -153,4 +179,22 @@ export interface LinkAccountData {
   email: string;
   password: string;
   token: string;
+}
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface LimitCrudUserResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: {
+    total: number;
+    users: Userpagi[];
+  };
+  pagination: Pagination;
 }

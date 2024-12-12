@@ -17,6 +17,7 @@ import {
   setDefaultAddress,
   updateAddress,
   fetchAddressById,
+  pagiCrudUser,
   // addAddress,
   // updateAddress,
   // deleteAddress,
@@ -31,7 +32,13 @@ import {
   getUserById,
   listRole,
 } from "../../services/authentication/authAdmin";
-import { Address, AddressResponse, Role, UserProfile } from "../../types/user";
+import {
+  Address,
+  AddressResponse,
+  LimitCrudUserResponse,
+  Role,
+  UserProfile,
+} from "../../types/user";
 
 export const loginUserThunk = createAsyncThunk<
   UserProfile,
@@ -467,3 +474,19 @@ export const fetchUserById = createAsyncThunk(
     }
   }
 );
+export const fetchPaginatedUser = createAsyncThunk<
+  LimitCrudUserResponse,
+  { page: number; search?: string },
+  { rejectValue: string }
+>("users/fetchPaginated", async ({ page, search }, { rejectWithValue }) => {
+  try {
+    const response = await pagiCrudUser(page, search);
+    if (response.success) {
+      return response;
+    } else {
+      return rejectWithValue(response.msg);
+    }
+  } catch (error: any) {
+    return rejectWithValue(error.message || "Lỗi không xác định");
+  }
+});

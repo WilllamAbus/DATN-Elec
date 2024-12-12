@@ -1,7 +1,12 @@
 import axios from "axios";
 import instance from "../axios";
 import Cookies from "js-cookie";
-import { Address, AddressResponse, UserProfile } from "../../types/user";
+import {
+  Address,
+  AddressResponse,
+  LimitCrudUserResponse,
+  UserProfile,
+} from "../../types/user";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const registerUser = async (user: {
@@ -389,6 +394,28 @@ export const fetchAddressById = async (addressId: string) => {
     return response.data;
   } catch (error) {
     throw error;
+  }
+};
+
+export const pagiCrudUser = async (
+  page: number,
+  search?: string
+): Promise<LimitCrudUserResponse> => {
+  try {
+    const queryParams = new URLSearchParams({ page: page.toString() });
+
+    if (search) {
+      queryParams.append("search", search);
+    }
+
+    const response = await instance.get<LimitCrudUserResponse>(
+      `/admin/limit/?${queryParams.toString()}`
+    );
+    console.log("Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching User:", error);
+    throw new Error("Failed to fetch User");
   }
 };
 

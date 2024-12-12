@@ -6,6 +6,9 @@ import {
   ForgotState,
   Address,
   AddressResponse,
+  Pagination,
+  LimitCrudUserResponse,
+  Userpagi,
 
   // LoginResponse,
 } from "../../types/user";
@@ -33,6 +36,7 @@ import {
   setDefaultAddressThunk,
   editAddressThunk,
   fetchAddressByIdThunk,
+  fetchPaginatedUser,
   // addAddressThunk,
   // updateAddressThunk,
   // deleteAddressThunk,
@@ -90,6 +94,7 @@ interface AuthState {
   };
 
   users: UserProfile[];
+  userpagi: Userpagi[];
   userListStatus: "idle" | "loading" | "succeeded" | "failed";
   userListError: string | null;
 
@@ -119,6 +124,8 @@ interface AuthState {
   //   status: "idle" | "loading" | "succeeded" | "failed";
   //   error: string | null;
   // };
+
+  pagination: Pagination | null;
 }
 
 const initialState: AuthState = {
@@ -187,6 +194,7 @@ const initialState: AuthState = {
   error: null,
 
   users: [],
+  userpagi: [],
   deletedUsers: [],
   userListStatus: "idle",
   userListError: null,
@@ -205,6 +213,8 @@ const initialState: AuthState = {
   //   status: "idle",
   //   error: null,
   // },
+
+  pagination: null,
 };
 
 const authSlice = createSlice({
@@ -738,20 +748,39 @@ const authSlice = createSlice({
       .addCase(editAddressThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      // // Xóa địa chỉ
+      // .addCase(deleteAddressThunk.pending, (state) => {
+      //   state.AddressState.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(deleteAddressThunk.fulfilled, (state, action) => {
+      //   state.AddressState.loading = false;
+      //   state.AddressState.addresses = action.payload.addresses;
+      // })
+      // .addCase(deleteAddressThunk.rejected, (state, action) => {
+      //   state.AddressState.loading = false;
+      //   state.error = action.payload as string;
+      // });
+      .addCase(fetchPaginatedUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        fetchPaginatedUser.fulfilled,
+        (state, action: PayloadAction<LimitCrudUserResponse>) => {
+          state.status = "succeeded";
+          state.userpagi = action.payload.data.users;
+          state.pagination = action.payload.pagination;
+        }
+      )
+      .addCase(fetchPaginatedUser.rejected, (state, action) => {
+        console.error("Error payload:", action.payload);
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Lỗi không xác định";
       });
-    // // Xóa địa chỉ
-    // .addCase(deleteAddressThunk.pending, (state) => {
-    //   state.AddressState.loading = true;
-    //   state.error = null;
-    // })
-    // .addCase(deleteAddressThunk.fulfilled, (state, action) => {
-    //   state.AddressState.loading = false;
-    //   state.AddressState.addresses = action.payload.addresses;
-    // })
-    // .addCase(deleteAddressThunk.rejected, (state, action) => {
-    //   state.AddressState.loading = false;
-    //   state.error = action.payload as string;
-    // });
   },
 });
 
