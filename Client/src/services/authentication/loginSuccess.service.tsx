@@ -1,18 +1,13 @@
 import Cookies from "js-cookie";
 import instance from "../axios";
-
 const API_URL = import.meta.env.VITE_API_URL;
-
 export const apiLoginSuccessService = async (id: string, token: string) => {
   try {
     const response = await instance.post(`${API_URL}/auth/login-success`, {
       id,
       tokenLogin: token,
     });
-    console.log("API Response:", response.data);
-
     const { accessToken } = response.data;
-
     if (!accessToken) throw new Error("No access token received");
     Cookies.set("token", accessToken, {
       path: "/",
@@ -20,14 +15,6 @@ export const apiLoginSuccessService = async (id: string, token: string) => {
       secure: true,
       sameSite: "strict",
     });
-    // localStorage.setItem("token", accessToken);
-    // localStorage.setItem("roles", roles?.[0]?.name || "");
-    // localStorage.setItem("name", name || "");
-    // localStorage.setItem(
-    //   "userProfile",
-    //   JSON.stringify({ name, roles, email, avatar })
-    // );
-
     return response.data;
   } catch (error: any) {
     console.error("Error in apiLoginSuccessService:", error);
