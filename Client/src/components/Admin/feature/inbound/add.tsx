@@ -178,7 +178,7 @@ const AddInbound: React.FC = () => {
                                             </Combobox.Button>
                                         </div>
                                         {/* Dropdown list */}
-                                        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-1/2 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {filteredProducts.length > 0 ? (
                                                 filteredProducts.map((product) => (
                                                     <Combobox.Option
@@ -250,7 +250,8 @@ const AddInbound: React.FC = () => {
                                             {
                                                 required: "Số lượng không được bỏ trống",
                                                 valueAsNumber: true,
-                                                validate: value => value > 0 || "Số lượng phải lớn hơn 0"
+                                                validate: value => value > 0 || "Số lượng phải lớn hơn 0",
+                                                max: { value: 1000, message: "Số lượng không được vượt quá 1000" } 
                                             })}
                                         onInput={handleInput}
                                         onPaste={handlePaste}
@@ -278,7 +279,7 @@ const AddInbound: React.FC = () => {
                                             },
                                             max: {
                                                 value: 2000000000,
-                                                message: "Giá sản phẩm không thể vượt quá 2000000000",
+                                                message: "Giá sản phẩm không thể vượt quá 2.000.000.000",
                                             },
                                             valueAsNumber: true,
                                         }}
@@ -291,7 +292,7 @@ const AddInbound: React.FC = () => {
                                 <div className="sm:col-span-1">
                                     <FormInput
                                         id="totalPriceInbound"
-                                        label="Giá gốc"
+                                        label="Tổng giá lô hàng"
                                         format
                                         suffix=" đ"
                                         register={register}
@@ -305,7 +306,7 @@ const AddInbound: React.FC = () => {
                                             },
                                             max: {
                                                 value: 2000000000,
-                                                message: "Giá sản phẩm không thể vượt quá 2000000000",
+                                                message: "Giá sản phẩm không thể vượt quá 2.000.000.000",
                                             },
                                             valueAsNumber: true,
                                         }}

@@ -155,7 +155,7 @@ const AddInventory: React.FC = () => {
                                             <ChevronDownIcon className="w-5 h-5 text-gray-500 dark:text-white" />
                                         </ComboboxButton>
                                     </div>
-                                    <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-1/3 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         {filteredProducts.length > 0 ? (
                                             filteredProducts.map((product) => (
                                                 <ComboboxOption

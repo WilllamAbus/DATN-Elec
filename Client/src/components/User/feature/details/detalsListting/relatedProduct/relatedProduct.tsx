@@ -9,7 +9,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 // import {  Star } from "../svg";
-import { ToastContainer, toast } from "react-toastify";
+// import { ToastContainer, toast } from "react-toastify";
 import currencyFormatter from "currency-formatter";
 
 // Function to format currency values
@@ -40,12 +40,12 @@ const RelatedProduct: React.FC = () => {
                     setRelatedVariants(relatedData["Sản phẩm gợi ý"]); // Cập nhật biến trạng thái với dữ liệu
                 } else {
                     setError("Không thể lấy sản phẩm liên quan.");
-                    toast.error("Không thể lấy sản phẩm liên quan.");
+                    // toast.error("Không thể lấy sản phẩm liên quan.");
                 }
             } catch (error) {
                 console.error('Error fetching related products:', error); // Log lỗi
                 setError("Không thể tải dữ liệu.");
-                toast.error("Không thể tải dữ liệu.");
+                // toast.error("Không thể tải dữ liệu.");
             } finally {
                 setLoading(false);
             }
@@ -148,7 +148,7 @@ const RelatedProduct: React.FC = () => {
                     ))}
                 </Swiper>
             )}
-            <ToastContainer />
+            {/* <ToastContainer /> */}
         </div>
     );
 };
