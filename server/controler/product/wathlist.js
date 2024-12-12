@@ -193,7 +193,6 @@ const WathListController = {
       });
       await newInteraction.save();
 
-      // Gọi script Python (nếu cần)
       const pythonScriptPath = path.resolve(
         __dirname,
         "../../../Python Client Server/recommendation_service.py"

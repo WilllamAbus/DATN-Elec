@@ -39,14 +39,14 @@ const authController = {
     const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
 
     try {
-      const response = await axios.get(url);
-      const data = response.data;
-      if (
-        data.data.result === "undeliverable" ||
-        data.data.result === "risky"
-      ) {
-        return false;
-      }
+      await axios.get(url);
+      // const data = response.data;
+      // if (
+      //   data.data.result === "undeliverable" ||
+      //   data.data.result === "risky"
+      // ) {
+      //   return false;
+      // }
       return true;
     } catch (error) {
       console.error("Lỗi xác thực email với Hunter.io:", error);

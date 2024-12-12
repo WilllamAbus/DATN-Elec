@@ -3,13 +3,18 @@ import { LimitCrudOrderResponse } from "~/types/order/order";
 
 export const pagiCrudOrder = async (
   page: number,
-  search?: string
+  search?: string,
+  stateOrder?: string
 ): Promise<LimitCrudOrderResponse> => {
   try {
     const queryParams = new URLSearchParams({ page: page.toString() });
 
     if (search) {
       queryParams.append("search", search);
+    }
+
+    if (stateOrder) {
+      queryParams.append("stateOrder", stateOrder);
     }
 
     const response = await instance.get<LimitCrudOrderResponse>(

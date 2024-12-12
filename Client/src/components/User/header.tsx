@@ -32,16 +32,16 @@ const Header: React.FC = () => {
   }, [dispatch]);
 
   const handleWatchlistView = () => {
-    navigate("/profile", { state: { view: "watchlist" } }); 
+    navigate("/profile", { state: { view: "watchlist" } });
   };
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsVisible(window.innerWidth >= 1024); 
+      setIsVisible(window.innerWidth >= 1024);
     };
 
-    handleResize(); 
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -77,7 +77,6 @@ const Header: React.FC = () => {
               </ul>
             </div>
             <div className="flex items-center lg:space-x-2">
-    
               <Badge
                 color="danger"
                 content={totalProducts}
@@ -89,7 +88,7 @@ const Header: React.FC = () => {
                     type="button"
                     className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                   >
-                    <i className="iconify mdi--cart-outline w-5 h-5 "></i>
+                    <i className="iconify mdi--cart w-5 h-5 "></i>
                     <span className="hidden sm:flex">Giỏ hàng</span>
                   </Button>
                 </Link>
@@ -132,7 +131,7 @@ const Header: React.FC = () => {
                   type="button"
                   className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                 >
-                  <i className="iconify mdi--favourite-border w-5 h-5 "></i>
+                  <i className="iconify mdi--favourite w-5 h-5 "></i>
                   Yêu thích
                 </Button>
               </Badge>
