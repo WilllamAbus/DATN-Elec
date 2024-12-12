@@ -10,6 +10,7 @@ const User = require("../../../model/users.model");
 const Vnpay = require("../../../model/orders/vnpay.model");
 const productVariant = require("../../../model/product_v2/productVariant");
 const OrderService = require("../../../services/orders/orderSp");
+const path = require("path");
 const { spawn } = require("child_process");
 const {
   sendOrderConfirmationEmail,
@@ -217,16 +218,20 @@ const authController = {
       });
       await newInteraction.save();
 
-      // Gọi script Python để tạo gợi ý sản phẩm
+      const pythonScriptPath = path.resolve(
+        __dirname,
+        "../../../../Python Client Server/recommendation_service.py"
+      );
+
+      console.log("Python Script Path:", pythonScriptPath);
+
       const pythonProcess = spawn("python", [
-        "recommendation_service.py",
+        pythonScriptPath,
         userId.toString(),
       ]);
 
-      // Lắng nghe kết quả từ script Python
       pythonProcess.stdout.on("data", (data) => {
         console.log(`Python Output: ${data.toString()}`);
-        // Xử lý kết quả từ Python nếu cần
       });
 
       pythonProcess.stderr.on("data", (data) => {
@@ -234,7 +239,11 @@ const authController = {
       });
 
       pythonProcess.on("close", (code) => {
-        console.log(`Python script finished with code ${code}`);
+        if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+        } else {
+          console.log(`Python script finished successfully.`);
+        }
       });
 
       // Remove selected items from cart

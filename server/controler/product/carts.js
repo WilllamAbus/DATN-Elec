@@ -319,6 +319,35 @@ const CartController = {
         await newInteraction.save();
       }
 
+
+      const pythonScriptPath = path.resolve(
+        __dirname,
+        "../../../Python Client Server/recommendation_service.py"
+      );
+
+      console.log("Python Script Path:", pythonScriptPath);
+
+      const pythonProcess = spawn("python", [
+        pythonScriptPath,
+        userId.toString(),
+      ]);
+
+      pythonProcess.stdout.on("data", (data) => {
+        console.log(`Python Output: ${data.toString()}`);
+      });
+
+      pythonProcess.stderr.on("data", (data) => {
+        console.error(`Python Error: ${data.toString()}`);
+      });
+
+      pythonProcess.on("close", (code) => {
+        if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+        } else {
+          console.log(`Python script finished successfully.`);
+        }
+      });
+
       res.status(201).json({ message: "Thêm vào giỏ hàng thành công", cart });
     } catch (error) {
       console.error(error);

@@ -132,7 +132,7 @@ const brandList: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+      {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="flex-1 flex items-center space-x-2">
           <h5>
             <span className="text-gray-500">Tổng có: </span>
@@ -140,7 +140,7 @@ const brandList: React.FC = () => {
           </h5>
           <h5 className="text-gray-500 dark:text-gray-400 ml-1">Thương hiệu</h5>
         </div>
-      </div>
+      </div> */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
         <div className="w-full md:w-1/2">
           <form className="flex items-center" onSubmit={handleSearch}>
@@ -160,7 +160,7 @@ const brandList: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSearching}
-                className="absolute inset-y-0 right-0 flex items-center p-2 text-gray-700 bg-blue-500 border border-gray-300 rounded-r-md"
+                className="absolute inset-y-0 right-0 flex items-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md"
               >
                 <svg
                   className="h-5 w-5"
@@ -205,7 +205,7 @@ const brandList: React.FC = () => {
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" className="p-4">
+            {/* <th scope="col" className="p-4">
               <div className="flex items-center">
                 <input
                   id="checkbox-all"
@@ -216,7 +216,7 @@ const brandList: React.FC = () => {
                   checkbox
                 </label>
               </div>
-            </th>
+            </th> */}
             <th scope="col" className="p-4">
               Tên thương hiệu
             </th>
@@ -237,7 +237,7 @@ const brandList: React.FC = () => {
         <tbody>
           {brands.map((brand) => (
             <tr key={brand._id} className="hover:bg-grey-lighter">
-              <td className="p-4 w-4">
+              {/* <td className="p-4 w-4">
                 <div className="flex items-center">
                   <input
                     id="checkbox-table-search-1"
@@ -248,7 +248,7 @@ const brandList: React.FC = () => {
                     checkbox
                   </label>
                 </div>
-              </td>
+              </td> */}
               <th
                 scope="row"
                 className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -269,7 +269,7 @@ const brandList: React.FC = () => {
                 </span>
               </td>
               <td className="py-4 px-6">
-                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-current">
+                <span className="inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium text-[#ffffff] bg-[#1bc24e] ring-1 ring-current">
                   {brand.status === "active" ? "Hiển thị" : "Đã ẩn"}
                 </span>
               </td>
@@ -277,14 +277,14 @@ const brandList: React.FC = () => {
               <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <div className="flex items-center space-x-4">
                   <button
-                    className="flex items-center text-red-700 bg-red-200 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                    className="flex items-center text-[#C20E4D] bg-gray-100 hover:bg-gray-200 border border-red-700  focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                     onClick={() => handlesoftDeleteBrand(brand._id)}
                   >
                     Xoá
                   </button>
                   <Link
                     to={`/admin/editBrands/${brand._id}`}
-                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    className="py-2 px-3 flex items-center text-sm font-medium text-center text-success bg-gray-100 hover:bg-gray-200 rounded-lg  focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   >
                     Sửa
                   </Link>

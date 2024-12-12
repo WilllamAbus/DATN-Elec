@@ -101,7 +101,7 @@ const InventoryList: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+      {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="flex-1 flex items-center space-x-2">
           <h5>
             <span className="text-gray-500">Tổng có: </span>
@@ -109,7 +109,7 @@ const InventoryList: React.FC = () => {
           </h5>
           <h5 className="text-gray-500 dark:text-gray-400 ml-1">Đơn hàng</h5>
         </div>
-      </div>
+      </div> */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
         <div className="w-full md:w-1/2">
           <form className="flex items-center" onSubmit={handleSearch}>
@@ -174,7 +174,7 @@ const InventoryList: React.FC = () => {
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" className="p-4">
+            {/* <th scope="col" className="p-4">
               <div className="flex items-center">
                 <input
                   id="checkbox-all"
@@ -185,7 +185,7 @@ const InventoryList: React.FC = () => {
                   checkbox
                 </label>
               </div>
-            </th>
+            </th> */}
             <th scope="col" className="p-4">Tên sản phẩm</th>
             <th scope="col" className="p-4">Tên nhà cung cấp</th>
             <th scope="col" className="p-4">Số lượng kho</th>
@@ -220,7 +220,7 @@ const InventoryList: React.FC = () => {
 
               return (
                 <tr key={_id} className="hover:bg-grey-lighter">
-                  <td className="p-4 w-4">
+                  {/* <td className="p-4 w-4">
                     <div className="flex items-center">
                       <input
                         id={`checkbox-table-search-${_id}`}
@@ -231,7 +231,7 @@ const InventoryList: React.FC = () => {
                         checkbox
                       </label>
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {productAuction.product_name}
                   </td>
