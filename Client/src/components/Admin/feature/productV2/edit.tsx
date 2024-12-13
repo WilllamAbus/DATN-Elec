@@ -500,7 +500,7 @@ const EditProduct: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Cập nhật sản phẩm"
                 )}
               </button>
             </div>

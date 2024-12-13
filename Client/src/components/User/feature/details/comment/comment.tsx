@@ -322,7 +322,7 @@ useEffect(() => {
     setHover(0);
   };
   return (
-    <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
+    <div className="flex flex-col items-center p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div className="container">
         {successMessage && (
           <div
