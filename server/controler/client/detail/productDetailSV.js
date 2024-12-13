@@ -30,6 +30,7 @@ const ProductDetailService = {
             'operatingSystem',
             'ram',
             'screen',
+            'graphicsCard',
             {
               path: 'storage',
               select: 'slug name sku pid status',
