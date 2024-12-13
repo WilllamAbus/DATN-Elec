@@ -21,7 +21,9 @@ const colorMap = {
   'Màu Hồng': '#fde3e3',
   'Màu Xanh Rêu': '#747a6f',
   'Màu Xanh Mòng Két': '#aed6d3',
-  'Màu Xanh Dương': '#d9e8f7'
+  'Màu Xanh Dương': '#d9e8f7',
+  'Màu Titan Trắng': '#f2f1ec',
+  'Màu Xanh Lưu Ly': '#9badf7'
 };
 
 const getColorCode = (name) => {

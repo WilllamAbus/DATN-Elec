@@ -1,7 +1,9 @@
 const modelProduct = require("../../../model/product_v2");
 const ProductVariant = require('../../../model/product_v2/productVariant'); 
+const ImageVariant = require('../../../model/product_v2/imagevariant'); 
 const Role = require('../../../model/role.model');
 const { RESPONSE_MESSAGES_CRUD, STATUS_CODES } = require('./constants'); 
+
 const hardDelete = async (req, res) => {
     try {
         const adminRole = await Role.findOne({ name: 'admin' });
@@ -51,6 +53,7 @@ const hardDelete = async (req, res) => {
         if (productToDelete.variants && productToDelete.variants.length > 0) {
             const variantIds = productToDelete.variants.map(variantId => variantId.toString());
             await ProductVariant.deleteMany({ _id: { $in: variantIds } });
+            await ImageVariant.deleteMany({ productVariant: { $in: variantIds } });
         }
         const hardDeletedProduct = await modelProduct.findByIdAndDelete(id);
         if (!hardDeletedProduct) {

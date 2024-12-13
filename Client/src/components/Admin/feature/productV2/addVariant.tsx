@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { notify, notifyError } from "./toast/msgtoast";
 import ReusableBreadcrumb from "../../../../ultils/breadcrumb/admin/ReusableBreadcrumb";
 import { breadcrumbItems } from "../../../../ultils/breadcrumb/admin/breadcrumbData";
-import { ProductVariant, RAM, CPU, GRAPHICSCARD, SCREEN, BATTERY,OPERATINGSYSTEM,STORAGE,ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
+import { ProductVariant, RAM, CPU, GRAPHICSCARD, SCREEN, BATTERY, OPERATINGSYSTEM, STORAGE, ProductVariantResponse } from "../../../../services/product_v2/admin/types/addVariant";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store";
 import { addVariantThunk } from "../../../../redux/product/admin/Thunk";
@@ -30,7 +30,7 @@ import {
   handleOsChange,
   handleStorageChange
 } from "./handlersVariant";
-import { SingleValue} from "react-select";
+import { SingleValue } from "react-select";
 import Productdescription from "../productAuction/description/product_description";
 import FormInput from "./Form/forminput";
 import FormSelect from "./Form/formselect";
@@ -52,8 +52,8 @@ const AddVariant: React.FC = () => {
   const [selectedCPU, setSelectedCPU] = useState<SingleValue<CPU>>(null);
   const [selectedCard, setSelectedCard] = useState<SingleValue<GRAPHICSCARD>>(null);
   const [selectedBattery, setSelectedBattery] = useState<SingleValue<BATTERY>>(null);
-  const [selectedOS, setSelectedOs] = useState<SingleValue<OPERATINGSYSTEM>>(null); 
-  const [selectedStorage, setSelectedStorage] = useState<SingleValue<STORAGE>>(null); 
+  const [selectedOS, setSelectedOs] = useState<SingleValue<OPERATINGSYSTEM>>(null);
+  const [selectedStorage, setSelectedStorage] = useState<SingleValue<STORAGE>>(null);
   const onRamChange = (selectedOptions: SingleValue<RAM>) => {
     handleRamChange(selectedOptions, setSelectedRam, setValue);
   };
@@ -72,34 +72,34 @@ const AddVariant: React.FC = () => {
   const onBatteryChange = (selectedOptions: SingleValue<BATTERY>) => {
     handleBatteryChange(selectedOptions, setSelectedBattery, setValue);
   };
-  const onOsChange = (selectedOptions: SingleValue<OPERATINGSYSTEM>) => { 
+  const onOsChange = (selectedOptions: SingleValue<OPERATINGSYSTEM>) => {
     handleOsChange(selectedOptions, setSelectedOs, setValue);
   };
 
-  const onStorageChange = (selectedOptions: SingleValue<STORAGE>) => { 
+  const onStorageChange = (selectedOptions: SingleValue<STORAGE>) => {
     handleStorageChange(selectedOptions, setSelectedStorage, setValue);
   };
   const navigate = useNavigate();
   const { discounts } = useFetchData();
   const submitFormAdd: SubmitHandler<ProductVariant> = async (data) => {
     setIsLoading(true);
-    
+
 
 
     try {
-        const actionResult = await dispatch(
-            addVariantThunk({ productId: productIdString, variant: data })
-        ).unwrap();
-        notify(actionResult.msg);
-        setTimeout(() => {
-          navigate(`/admin/list-product-variant/${productId}`);
-        }, 2000);
+      const actionResult = await dispatch(
+        addVariantThunk({ productId: productIdString, variant: data })
+      ).unwrap();
+      notify(actionResult.msg);
+      setTimeout(() => {
+        navigate(`/admin/list-product-variant/${productId}`);
+      }, 2000);
     } catch (error) {
-        notifyError((error as ProductVariantResponse).msg);
+      notifyError((error as ProductVariantResponse).msg);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
 
   return (
@@ -143,7 +143,8 @@ const AddVariant: React.FC = () => {
                   </div>
                 )}
               </div>
-
+          
+            
               <FormInput
                 id="variant_original_price"
                 label="Giá gốc"
@@ -169,6 +170,19 @@ const AddVariant: React.FC = () => {
                   setValue("variant_price", floatValue ?? 0);
                 }}
               />
+         <div className="col-span-6 1sm:col-span-3">
+              <FormSelect
+                label="Giảm giá"
+                id="product_discount"
+                options={(discounts ?? []).map((discount) => ({
+                  _id: discount._id,
+                  name: discount.discountPercent,
+                }))}
+                register={register}
+                validation={{ required: "Giảm giá là bắt buộc" }}
+                errorMessage={errors.product_discount?.message}
+              />
+              </div>
               <div className="col-span-3 1sm:col-span-3">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Dung lượng RAM
@@ -193,7 +207,7 @@ const AddVariant: React.FC = () => {
               </div>
               <div className="col-span-3 1sm:col-span-3">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                 Hệ điều hành
+                  Hệ điều hành
                 </label>
                 <OsSelect value={selectedOS} onChange={onOsChange} />
                 {errors.operatingSystem && (
@@ -248,17 +262,7 @@ const AddVariant: React.FC = () => {
                 )}
               </div>
             </div>
-            <FormSelect
-                label="Giảm giá"
-                id="product_discount"
-                options={(discounts ?? []).map((discount) => ({
-                  _id: discount._id,
-                  name: discount.discountPercent,
-                }))}
-                register={register}
-                validation={{ required: "Giảm giá là bắt buộc" }}
-                errorMessage={errors.product_discount?.message}
-              />
+
             <Productdescription register={register} errors={errors} />
 
             <div className="col-span-6 sm:col-full">
@@ -293,7 +297,7 @@ const AddVariant: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Thêm sản phẩm biến thể"
                 )}
               </button>
             </div>

@@ -35,7 +35,6 @@ const deleteVariant = async (req, res) => {
         }
 
         const variantId = req.params.variantId;
-        console.log("variantId:", variantId); 
         if (!variantId) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
                 success: false,
