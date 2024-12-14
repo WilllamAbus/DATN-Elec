@@ -19,13 +19,14 @@ const orderAuctionSchema = new Schema(
           "Nhận hàng", "Hoàn tất", 
           "Hủy đơn hàng", 
 
-          "Đơn hàng không thành công"], // Order status
+          "Hoàn tiền", "Chờ xử lý hoàn tiền", "Xác nhận hoàn tiền", "Hoàn tiền thành công"], // Order status
     },
-
+ 
     refundBank: {
-      bankName: { type: String, required: false }, // Tên ngân hàng
-      accountNumber: { type: String, required: false }, // Số tài khoản
-      accountName: { type: String, required: false }, // Tên chủ tài khoản
+      bankCode: { type: String, required: false }, // Tên ngân hàng
+      orderInForVnPay: { type: String, required: false },
+      paymentDateVnPay: { type: String, required: false }, // Số tài khoản
+      transiTionAmout: { type: String, required: false }, // Tên chủ tài khoản
     },
     order_date: { type: Date, default: Date.now }, // Order date
     createdAt: { type: Date, default: Date.now },

@@ -7,9 +7,10 @@ export interface ShippingInfo {
   }
 
   export interface RefundBank {
-    bankName: string;
-    accountNumber: string;
-    accountName: string;
+    bankCode: string;
+    orderInForVnPay: string;
+    paymentDateVnPay: string;
+    transiTionAmout: string;
 
   }
   
@@ -21,7 +22,7 @@ export interface ShippingInfo {
     totalPrice: String
     orderid: string,
     dateOrder:string,
-    refundBank?: RefundBank;
+    refundPay?: RefundBank;
   }
   
   // Ví dụ về Product

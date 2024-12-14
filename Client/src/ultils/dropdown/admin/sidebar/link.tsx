@@ -61,6 +61,7 @@ export const links: Record<string, Link[]> = {
     { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" },
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
  
-    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" }
+    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
+    { label: "Đơn hàng hoàn trả", to: "/admin/recBinOrderAuction" },
   ]
 };

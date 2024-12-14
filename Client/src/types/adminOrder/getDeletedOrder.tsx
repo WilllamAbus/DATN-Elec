@@ -32,8 +32,8 @@ export interface ShippingAddressDeleted {
 }
 
 export interface RefundBankDeleted {
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-
+  bankCode: string;
+  orderInForVnPay: string;
+  paymentDateVnPay: string;
+  transiTionAmout: string;
 }

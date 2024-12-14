@@ -157,6 +157,7 @@ useEffect(() => {
     setRating(rate);
     setValue("rating", rate);
   };
+  
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
        setErrorMessage("You need to be logged in to submit a comment.");
@@ -182,7 +183,7 @@ useEffect(() => {
     try {
        const commentResponse = await addComment(slug, commentData);
        notify();
-       setTimeout(fetchComments, 10000); 
+       setTimeout(fetchComments, 1000); 
        reset();
        setRating(0);
        setHover(0);
@@ -322,7 +323,7 @@ useEffect(() => {
     setHover(0);
   };
   return (
-    <div className="flex flex-col items-center p-4 border gray-300 rounded-lg">
+    <div className="flex flex-col items-center p-4 bg-white border border-gray-100 rounded-lg shadow-sm">
       <div className="container">
         {successMessage && (
           <div
@@ -341,218 +342,201 @@ useEffect(() => {
           </div>
         )}
 
-        {comments?.length > 0 ? (
-          <section className="bg-white py-4 dark:bg-gray-900">
-            <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-              <div className="flex flex-col md:flex-row items-start ">
-                {/* Phần đánh giá */}
-                <div className="md:w-2/3">
-                  <RatingStats comments={comments} />
+{comments?.length > 0 ? (
+  <section className="bg-white py-4 dark:bg-gray-900">
+    <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+      <div className="flex flex-col md:flex-row items-start">
+        {/* Phần đánh giá */}
+        <div className="md:w-2/3">
+          <RatingStats comments={comments} />
 
-                  <div className="mt-4 flex items-center space-x-2">
-                    <h1>Lọc đánh giá</h1>
-                    <Select
-                      value={options.find(
-                        (option) => option.value === numberOfProducts
-                      )}
-                      options={options}
-                      onChange={handleChange}
-                      className="border border-black rounded md:w-1/6"
-                      classNamePrefix="react-select"
-                      defaultValue={options[0]}
-                      isSearchable={false}
-                    />
-                  </div>
+          <div className="mt-4 flex items-center space-x-2">
+            <h1>Lọc đánh giá</h1>
+            <Select
+              value={options.find(
+                (option) => option.value === numberOfProducts
+              )}
+              options={options}
+              onChange={handleChange}
+              className="border border-black rounded md:w-1/6"
+              classNamePrefix="react-select"
+              defaultValue={options[0]}
+              isSearchable={false}
+            />
+          </div>
 
-                  {filteredComments && filteredComments.length === 0 ? (
-                    <p className="text-left text-gray-500 dark:text-gray-400 mt-6">
-                      Không có đánh giá nào.
-                    </p>
-                  ) : (
-                    filteredComments?.slice(0, visibleCount).map((comment) => {
-                      const createdAtDate = new Date(comment.createdAt);
+          {filteredComments?.length === 0 ? (
+            <p className="text-left text-gray-500 dark:text-gray-400 mt-6">
+              Không có đánh giá nào.
+            </p>
+          ) : (
+            filteredComments?.slice(0, visibleCount).map((comment) => {
+              const createdAtDate = new Date(comment?.createdAt || "");
+              const hoursDifference = differenceInHours(new Date(), createdAtDate);
 
-                      // Tính số giờ chênh lệch giữa `createdAtDate` và thời gian hiện tại
-                      const hoursDifference = differenceInHours(
-                        new Date(),
-                        createdAtDate
-                      );
+              return (
+                <div
+                  key={comment?._id || Math.random()}
+                  className="mt-6 divide-y divide-gray-200 dark:divide-gray-700 flex"
+                >
+                  <div className="gap-3 pb-6 sm:flex sm:items-start">
+                    <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
+                      <div className="space-y-0.5">
+                        <div className="flex items-start space-x-4">
+                          {/* Avatar */}
+                          <img
+                            className="h-10 w-10 rounded-full"
+                            src={
+                              comment?.id_user?.avatar ||
+                              "/src/assets/images/cmt-Noavatar.png"
+                            }
+                            alt="Avatar"
+                          />
 
-                      return (
-                        <div
-                          key={comment?._id}
-                          className="mt-6 divide-y divide-gray-200 dark:divide-gray-700 flex"
-                        >
-                          <div className="gap-3 pb-6 sm:flex sm:items-start ">
-                            <div className="shrink-0 space-y-2 sm:w-48 md:w-72 w-full">
-                              <div className="space-y-0.5">
-                                <div className="flex items-start space-x-4 ">
-                                  {comment?.id_user?.avatar ? (
-                                    <img
-                                      className="h-10 w-10 rounded-full"
-                                      src={comment?.id_user?.avatar}
-                                    />
-                                  ) : (
-                                    <img
-                                      className="h-10 w-10 rounded-full"
-                                      src="/src/assets/images/cmt-Noavatar.png"
-                                      alt="No avatar"
-                                    />
-                                  )}
+                          <div>
+                            <div className="flex">
+                              <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
+                                {comment?.id_user?.name || "Ẩn danh"}
+                              </p>
 
-                                  <div>
-                                    <div className="flex">
-                                      <p className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center">
-                                        {comment?.id_user?.name ||
-                                          "Loading..."}
-                                      </p>
-                                      {/* Chỉ hiển thị nút FaEllipsisV nếu người dùng là chủ sở hữu của cmt và hiện trong 24h kể từ khi cmt */}
-                                      {comment?.id_user._id === profile?._id &&
-                                        hoursDifference <= 24 && (
-                                          <div className="flex items-center ml-6">
-                                            <Dropdown>
-                                              <DropdownTrigger>
-                                                <button
-                                                  className="flex items-center justify-center h-8 w-8"
-                                                  onClick={() =>
-                                                    toggleDeleteButton(
-                                                      comment?._id
-                                                    )
-                                                  }
-                                                >
-                                                  <FaEllipsisV />
-                                                </button>
-                                              </DropdownTrigger>
-                                              <DropdownMenu>
-                                                <DropdownItem
-                                                  key="new"
-                                                  className="flex justify-center"
-                                                >
-                                                  <button
-                                                    onClick={() =>
-                                                      deleteComment(
-                                                        comment?._id
-                                                      )
-                                                    }
-                                                    className="flex items-center justify-center h-4 w-full text-red-700 bg-transparent"
-                                                  >
-                                                    <FaTrash />{" "}
-                                                    <p className="ml-2">Xóa</p>
-                                                  </button>
-                                                </DropdownItem>
-                                                <DropdownItem
-                                                  key="copy"
-                                                  className="flex justify-center"
-                                                >
-                                                  <button
-                                                    onClick={() =>
-                                                      handleEditComment(comment)
-                                                    }
-                                                    className="flex items-center justify-center h-4  w-full bg-transparent"
-                                                  >
-                                                    <FaEdit />{" "}
-                                                    <p className="ml-2">
-                                                      Chỉnh sửa
-                                                    </p>
-                                                  </button>
-                                                </DropdownItem>
-                                              </DropdownMenu>
-                                            </Dropdown>
-                                          </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center gap-1 mt-2">
-                                      {[...Array(5)].map((_, index) => (
-                                        <svg
-                                          key={index}
-                                          className={`h-4 w-4 ${
-                                            index < comment?.rating
-                                              ? "text-yellow-300"
-                                              : "text-gray-400"
-                                          }`}
-                                          aria-hidden="true"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          fill="currentColor"
-                                          viewBox="0 0 24 24"
+                              {comment?.id_user?._id === profile?._id &&
+                                hoursDifference <= 24 && (
+                                  <div className="flex items-center ml-6">
+                                    <Dropdown>
+                                      <DropdownTrigger>
+                                        <button
+                                          className="flex items-center justify-center h-8 w-8"
+                                          onClick={() =>
+                                            toggleDeleteButton(comment?._id)
+                                          }
                                         >
-                                          <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
-                                        </svg>
-                                      ))}
-                                    </div>
-                                    <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-2">
-                                      {comment?.createdAt?.slice(0, 10)}
-                                    </p>
-                                    <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
-                                      <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
-                                        {comment?.content}
-                                      </p>
-                                      <div className="flex items-center space-x-4">
-                                        {/* Like cmt */}
-                                        <div className="flex items-center space-x-2">
+                                          <FaEllipsisV />
+                                        </button>
+                                      </DropdownTrigger>
+                                      <DropdownMenu>
+                                        <DropdownItem
+                                          key="new"
+                                          className="flex justify-center"
+                                        >
                                           <button
-                                            className={`bg-transparent ${
-                                              comment?.likes?.includes(
-                                                profile?._id
-                                              )
-                                                ? "text-yellow-400"
-                                                : "text-gray-400"
-                                            }`}
                                             onClick={() =>
-                                              handleLikeCmt(comment?._id)
+                                              deleteComment(comment?._id)
                                             }
+                                            className="flex items-center justify-center h-4 w-full text-red-700 bg-transparent"
                                           >
-                                            <FaThumbsUp />
+                                            <FaTrash />
+                                            <p className="ml-2">Xóa</p>
                                           </button>
-                                          <p>
-                                            Hữu ích ({comment?.likes?.length})
-                                          </p>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex items-center gap-4">
-                                        {/* RepComment */}
-                                        <RepComment id_comment={comment?._id} />
-                                      </div>
-                                    </div>
+                                        </DropdownItem>
+                                        <DropdownItem
+                                          key="copy"
+                                          className="flex justify-center"
+                                        >
+                                          <button
+                                            onClick={() =>
+                                              handleEditComment(comment)
+                                            }
+                                            className="flex items-center justify-center h-4  w-full bg-transparent"
+                                          >
+                                            <FaEdit />
+                                            <p className="ml-2">Chỉnh sửa</p>
+                                          </button>
+                                        </DropdownItem>
+                                      </DropdownMenu>
+                                    </Dropdown>
                                   </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-1 mt-2">
+                              {[...Array(5)].map((_, index) => (
+                                <svg
+                                  key={index}
+                                  className={`h-4 w-4 ${
+                                    index < comment?.rating
+                                      ? "text-yellow-300"
+                                      : "text-gray-400"
+                                  }`}
+                                  aria-hidden="true"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M12 17.27l-5.18 3.01c-.53.3-1.17-.14-1.17-.76v-6.05L1.7 9.04c-.76-.75-.36-2.04.71-2.21l6.62-.49 2.96-6.01c.39-.79 1.57-.79 1.96 0l2.96 6.01 6.62.49c1.07.08 1.47 1.46.71 2.21l-4.95 4.43v6.05c0 .62-.64 1.06-1.17.76L12 17.27z" />
+                                </svg>
+                              ))}
+                            </div>
+
+                            <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-2">
+                              {comment?.createdAt?.slice(0, 10)}
+                            </p>
+                            <div className="mt-4 min-w-0 flex-1 space-y-4 sm:mt-0">
+                              <p className="text-base font-normal text-gray-500 dark:text-gray-400 mt-2">
+                                {comment?.content || "Không có nội dung."}
+                              </p>
+                              <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    className={`bg-transparent ${
+                                      comment?.likes?.includes(profile?._id)
+                                        ? "text-yellow-400"
+                                        : "text-gray-400"
+                                    }`}
+                                    onClick={() =>
+                                      handleLikeCmt(comment?._id)
+                                    }
+                                  >
+                                    <FaThumbsUp />
+                                  </button>
+                                  <p>
+                                    Hữu ích ({comment?.likes?.length || 0})
+                                  </p>
                                 </div>
+                              </div>
+
+                              <div className="flex items-center gap-4">
+                                <RepComment id_comment={comment?._id} />
                               </div>
                             </div>
                           </div>
                         </div>
-                      );
-                    })
-                  )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {visibleCount < filteredComments.length &&
-            filteredComments.length > 5 ? (
-              <div className="w-full text-center">
-                <button
-                  onClick={handleShowMore}
-                  className="rounded-lg bg-blue-500 text-white px-5 py-2"
-                >
-                  Xem thêm
-                </button>
-              </div>
-            ) : (
-              isExpanded && (
-                <div className="w-full text-center">
-                  <button
-                    onClick={handleShowLess}
-                    className="rounded-lg bg-blue-500 text-white px-5 py-2"
-                  >
-                    Thu gọn
-                  </button>
-                </div>
-              )
-            )}
-          </section>
-        ) : (
-          <p>Chưa có bình luận</p>
-        )}
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+
+    {visibleCount < filteredComments?.length && filteredComments.length > 5 ? (
+      <div className="w-full text-center">
+        <button
+          onClick={handleShowMore}
+          className="rounded-lg bg-blue-500 text-white px-5 py-2"
+        >
+          Xem thêm
+        </button>
+      </div>
+    ) : (
+      isExpanded && (
+        <div className="w-full text-center">
+          <button
+            onClick={handleShowLess}
+            className="rounded-lg bg-blue-500 text-white px-5 py-2"
+          >
+            Thu gọn
+          </button>
+        </div>
+      )
+    )}
+  </section>
+) : (
+  <p>Chưa có bình luận</p>
+)}
+
 
         {/* chỉnh sửa */}
         {isModalOpen && (

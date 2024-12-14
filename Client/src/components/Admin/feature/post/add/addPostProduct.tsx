@@ -152,7 +152,7 @@ const addPostProduct: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Thêm bài viết"
                 )}
               </button>
             </div>

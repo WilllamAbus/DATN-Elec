@@ -2,13 +2,14 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "src/*": ["src/*"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+
 
     /* Bundler mode */
     "allowSyntheticDefaultImports": true,
@@ -31,7 +32,7 @@
 
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx","src/**/*.jsx", "src/redux/orderAucAdmin", "src/common/Icons/EditDocumentIcon.tsx", "src/components/Admin/feature/post/customEditor/ckeditor.jsx"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "lib"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

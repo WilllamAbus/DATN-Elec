@@ -301,26 +301,31 @@ const auctionService = {
         .lean();
 
       if (!product) {
-        console.warn(`Product not found for productId: ${biddings}`);
+   
         throw new Error("Không tìm thấy sản phẩm.");
       }
 
       const user = await User.findById(userId)
-        .select("address name phone")
+        .select("addresses name phone")
         .lean();
-
+     
+      
       if (!user) {
         throw new Error("Không thể tìm thấy người dùng.");
       }
       // If each bidding contains a productId, query for product details
+      const defaultAddress = user.addresses.find(address => address.isDefault);
 
+      const addressName =defaultAddress.address
+  
+      
       return {
         auctionId: auction._id,
         auctionTotal: auction.auction_total,
         auctionQuantity: auction.auction_quantity,
         productName: product.product_name,
         productImages: product.image,
-        userAddress: user.address,
+        userAddress:addressName,
         userName: user.name,
         userSdt: user.phone,
         auctionTime: auction.auctionTime,

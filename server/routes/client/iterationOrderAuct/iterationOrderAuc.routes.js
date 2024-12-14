@@ -16,4 +16,5 @@ router.get('/reciveStateOrderAuc', iteractionOrderAuController.getReciveOrderByU
 router.get('/completStateOrderAuc', iteractionOrderAuController.getCompleteOrderByUser);
 router.patch('/received/soft-delete/:orderId',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);
 router.put('/updateStatus/:orderId', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatus)
+router.put('/updateStatusCash/:orderIdCash', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatusForCash)
 module.exports = router;

@@ -1,5 +1,5 @@
 import instance from "../../axios";
-import { LimitCrudOrderResponse } from "~/types/order/order";
+import { LimitCrudOrderResponse } from "../../../types/order/order";
 
 export const pagiCrudOrder = async (
   page: number,

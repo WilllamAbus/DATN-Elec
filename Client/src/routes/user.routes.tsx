@@ -1,6 +1,7 @@
 import React from "react";
 import { RouteObject } from "react-router-dom";
 import User from "../page/User/Home/home";
+import Title from "../common/title/Title";
 const UserHome = React.lazy(() => import("../page/User/rootUser"));
 const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
 const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
@@ -87,10 +88,16 @@ const LinkAccount = React.lazy(() => import("../page/User/accounts/link-account"
 const UserLoginError = React.lazy(() => import("../page/User/accounts/login_error"));
 const LinkAccountSuccess = React.lazy(() => import("../page/User/accounts/link-account-success")); 
 const UserContact = React.lazy(() => import("../page/User/contact/contact"));
+
 const UserRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <UserHome />,
+    element: (
+      <>
+        <Title /> 
+        <UserHome />
+      </>
+    ),
     children: [
       { index: true, element: <User /> },
       { path: "login", element: <UserLogin /> },
@@ -131,16 +138,25 @@ const UserRoutes: RouteObject[] = [
   },
   {
     path: "/",
-    element: <ExternalPage />,
+    element: (
+      <>
+        <Title /> {/* Title component bên trong route */}
+        <ExternalPage />
+      </>
+    ),
     children: [
       { path: "link-account", element: <LinkAccount /> },
       { path: "link-account-success", element: <LinkAccountSuccess /> }
-
     ],
   },
   {
     path: "*",
-    element: <UserHome />,
+    element: (
+      <>
+        <Title /> {/* Title component bên trong route */}
+        <UserHome />
+      </>
+    ),
   },
 ];
 

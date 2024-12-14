@@ -15,7 +15,7 @@ export const fetchDeletedOrderAuc = async (page: number, pageSize: number, searc
         search,
       },
     });
-    console.log('response', response);
+
     
     return response.data;
   } catch (error: any) {

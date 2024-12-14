@@ -48,6 +48,12 @@ export const updateOrderStatus = async (orderId: string, stateOrder: string) => 
   return response.data; // Return the order data
 };
 
+export const updateOrderStatusCash = async (orderIdCash: string, stateOrderCash: string) => {
+  const response = await axios.put(`/client/iteracOder/updateStatusCash/${orderIdCash}`, { stateOrderCash });
+
+  
+  return response.data; // Return the order data
+};
 export const downloadInvoiceExcel = async (orderId: string) => {
   try {
     // Gọi API với `responseType: 'blob'` để nhận file dưới dạng blob

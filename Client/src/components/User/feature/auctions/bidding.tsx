@@ -200,10 +200,10 @@ const ViewBidPage: React.FC = () => {
            
             className="bg-indigo-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition duration-200"
           >
-         Lịch sử lệnh đấu giá
+              Tổng lượt đấu giá
           </Link>
         </div>
-            <hr className="border-gray-300 mt-4 mb-8" />
+         
 
             <div className="space-y-8">
               {bidGroups.length > 0 ? (

@@ -78,7 +78,7 @@ const Forgot: React.FC = () => {
               <div className="mt-6">
                 <button
                   type="submit"
-                  className={`flex items-center justify-center block w-full py-3 text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-transparent hover:text-orange-500 transition duration-200 ease-in-out font-semibold uppercase ${
+                  className={`items-center justify-center block w-full py-3 text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-transparent hover:text-orange-500 transition duration-200 ease-in-out font-semibold uppercase ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={isLoading} // Vô hiệu hóa nút khi loading

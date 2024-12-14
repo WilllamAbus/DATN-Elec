@@ -15,7 +15,6 @@ export const getOrderDeletedThunk = createAsyncThunk<OrdersDeletedResponse,Fetch
     const response = await fetchDeletedOrderAuc(page, pageSize, search);
 
 
-    console.log('Order deleted thunk', response);
     
     
     return response ;

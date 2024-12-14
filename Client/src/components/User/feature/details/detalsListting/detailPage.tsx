@@ -209,7 +209,9 @@ const DetailPage: React.FC = () => {
         </div>
       </div>
       <section>
+      <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
         <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+        </div>
       </section>
       <section>
         <RelatedProduct />

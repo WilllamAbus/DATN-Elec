@@ -145,9 +145,9 @@ const AddProduct: React.FC = () => {
 
               <FormInput
                 id="weight_g"
-                label="Trọng lượng (g)"
+                label="Trọng lượng"
                 format
-                suffix=" g"
+                suffix=" "
                 register={register}
                 control={control}
                 error={errors.weight_g}

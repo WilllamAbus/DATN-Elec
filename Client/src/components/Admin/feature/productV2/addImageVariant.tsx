@@ -149,7 +149,7 @@ const AddImageVariant: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Thêm ảnh cho biến thể"
                 )}
               </button>
               <Link

@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 // import Swal from "sweetalert2";
 import { Button, Progress } from "@nextui-org/react";
 // const MySwal = withReactContent(Swal);
-const OrderDetails: React.FC = () => {
+const OrderDetailsCash: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
   const orders = useSelector((state: RootState) => state.orderAucAdmin);
@@ -341,4 +341,4 @@ const OrderDetails: React.FC = () => {
   );
 };
 
-export default OrderDetails;
+export default OrderDetailsCash;
