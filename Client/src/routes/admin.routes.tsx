@@ -2,6 +2,7 @@ import React from "react";
 import { RouteObject } from "react-router-dom";
 import Admin from "../page/Admin/Home/home";
 const Dashboard = React.lazy(() => import("../page/Admin/rootAdmin"));
+import TitleAdmin from "../common/title/TitleAdmin";
 const AdminAddCategories = React.lazy(
   () => import("../page/Admin/categories/addCategories")
 );
@@ -269,8 +270,12 @@ const AdminDetailOrderAuctionFrCash = React.lazy(
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
-    
-    element: <Dashboard />,
+    element: (
+      <>
+        <TitleAdmin />
+        <Dashboard />
+      </>
+    ),
     children: [
       { index: true, element: <Admin /> },
       { path: "addCategories", element: <AdminAddCategories /> },

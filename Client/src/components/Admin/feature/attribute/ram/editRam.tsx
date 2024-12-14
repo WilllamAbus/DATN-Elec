@@ -143,7 +143,7 @@ const editScreen: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Cập nhật ram"
                 )}
               </button>
             </div>
