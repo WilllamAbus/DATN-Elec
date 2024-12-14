@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import UserRoutes from "./routes/user.routes";
 import AdminRoutes from "./routes/admin.routes";
+
 import { Spinner } from "flowbite-react";
 const routes: RouteObject[] = [
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter(routes);
 
 const App: React.FC = () => {
   return (
+
     <Suspense
       fallback={
         <div className="flex justify-center items-center h-screen">

@@ -18,8 +18,8 @@ export default defineConfig({
     port: 3150,
     open: true,
     watch: {
-      usePolling: true,
-    },
+      ignored: ["**/node_modules/**", "**/.git/**"],
+    },    
     proxy: {
       "/api": {
         target: "http://localhost:4000",

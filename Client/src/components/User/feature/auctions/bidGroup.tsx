@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "flowbite-react";
 import { format, parseISO, isValid, differenceInMilliseconds } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Bid } from "~/types/bidding/bidding";
+import { Bid } from "../../../../types/bidding/bidding";
 import { Link } from "react-router-dom";
 
 interface BidGroupProps {

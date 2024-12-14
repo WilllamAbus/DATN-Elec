@@ -266,6 +266,7 @@ const AdminDetailOrderAuction = React.lazy(
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
+    
     element: <Dashboard />,
     children: [
       { index: true, element: <Admin /> },
