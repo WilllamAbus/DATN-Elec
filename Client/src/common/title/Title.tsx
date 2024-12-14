@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 const Title = () => {
   const location = useLocation();
+
   const titles: { [key: string]: string } = {
     "/": "Trang chủ",
     "/login": "Đăng nhập",
@@ -29,39 +30,33 @@ const Title = () => {
     "/contact": "Liên hệ",
     "/link-account": "Liên kết tài khoản",
     "/link-account-success": "Liên kết tài khoản thành công",
-    "/search/:keyword": "Tìm kiếm sản phẩm",
-    "/filter/:price": "Lọc sản phẩm",
-    "/product/:slug": "Chi tiết sản phẩm",
-    "/category/:slug": "Danh mục sản phẩm",
-    "/detailProd/:id": "Chi tiết sản phẩm (ID)",
-    "/detailAuc/:productId": "Chi tiết đấu giá",
-    "/checkout/:id": "Thanh toán",
-    "/complete/:id": "Hoàn tất thanh toán",
   };
+
+  // Route động và tiêu đề tương ứng
+  const dynamicRoutes: { prefix: string; title: string }[] = [
+    { prefix: "/product/", title: "Chi tiết sản phẩm" },
+    { prefix: "/category/", title: "Danh mục sản phẩm" },
+    { prefix: "/search/", title: "Tìm kiếm sản phẩm" },
+    { prefix: "/filter/", title: "Lọc sản phẩm" },
+    { prefix: "/detailProd/", title: "Chi tiết sản phẩm (ID)" },
+    { prefix: "/detailAuc/", title: "Chi tiết đấu giá" },
+    { prefix: "/checkout/", title: "Thanh toán" },
+    { prefix: "/complete/", title: "Hoàn tất thanh toán" },
+  ];
 
   useEffect(() => {
     const path = location.pathname;
 
-    // Xử lý các route động (dynamic routes)
-    if (path.startsWith("/product/")) {
-      document.title = "Chi tiết sản phẩm";
-    } else if (path.startsWith("/category/")) {
-      document.title = "Danh mục sản phẩm";
-    } else if (path.startsWith("/search/")) {
-      document.title = "Tìm kiếm sản phẩm";
-    } else if (path.startsWith("/filter/")) {
-      document.title = "Lọc sản phẩm";
-    } else if (path.startsWith("/detailProd/")) {
-      document.title = "Chi tiết sản phẩm (ID)";
-    } else if (path.startsWith("/detailAuc/")) {
-      document.title = "Chi tiết đấu giá";
-    } else if (path.startsWith("/checkout/")) {
-      document.title = "Thanh toán";
-    } else if (path.startsWith("/complete/")) {
-      document.title = "Hoàn tất thanh toán";
-    } else {
-      document.title = titles[path] || "Trang không tồn tại";
+    // Kiểm tra route động trước
+    for (const route of dynamicRoutes) {
+      if (path.startsWith(route.prefix)) {
+        document.title = route.title;
+        return; // Thoát khi tìm thấy match
+      }
     }
+
+    // Nếu không phải route động, kiểm tra route tĩnh
+    document.title = titles[path] || "Trang không tồn tại";
   }, [location]);
 
   return null;

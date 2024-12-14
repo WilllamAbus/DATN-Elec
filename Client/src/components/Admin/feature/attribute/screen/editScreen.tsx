@@ -150,7 +150,7 @@ console.log(screens);
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Cập nhật màn hình"
                 )}
               </button>
             </div>
