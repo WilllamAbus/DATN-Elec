@@ -157,6 +157,7 @@ useEffect(() => {
     setRating(rate);
     setValue("rating", rate);
   };
+  
   const submitComment: SubmitHandler<FormValues> = async (data) => {
     if (!isLoggedIn) {
        setErrorMessage("You need to be logged in to submit a comment.");
