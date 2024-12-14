@@ -263,6 +263,9 @@ const AdminListRecybinOrderAuction = React.lazy(
 const AdminDetailOrderAuction = React.lazy(
   () => import("../page/Admin/orderAuction/detailsOrderAuction")
 );
+const AdminDetailOrderAuctionFrCash = React.lazy(
+  () => import("../page/Admin/orderAuction/detailOrderCash")
+);
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -343,11 +346,13 @@ const AdminRoutes: RouteObject[] = [
       { path: "recycleBinComment", element: <AdminRecycleComment /> },
       { path: "recycleBinProducTime", element: <AdminRecybinProductTime /> },
       { path: "recycleBinPriceRand", element: <AdminRecybinPriceRand /> },
+
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },
       { path: "listOrderAuction", element: <AdminListOrderAuction /> },
       { path: "detailOrderAuction/:id", element: <AdminDetailOrderAuction /> },
+      { path: "AdminDetailOrderAuctionFrCash/:id", element: <AdminDetailOrderAuctionFrCash /> },
       { path: "recBinOrderAuction", element: <AdminListRecybinOrderAuction /> },
       { path: "*", element: <Dashboard /> },
     ],

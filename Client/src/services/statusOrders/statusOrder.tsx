@@ -108,7 +108,7 @@ export const deleteOrderSoftMail = async ({
     reason,
     notes,
   });
-  console.log('response.data.result',response.data.result);
+
   return response.data.result as SoftDeleteOrderData;
  
    // Return typed result

@@ -34,7 +34,7 @@ export const getOrderAuctionDetailsAdmin = createAsyncThunk(
   async (orderId: string, { rejectWithValue }) => {
     try {
       const response: OrderDetailAdminResponse = await fetchOrderDetailAdminData(orderId);
-      console.log('responese', response);
+
       
       return response.data;
     } catch (error: any) {

@@ -27,7 +27,7 @@ const CheckoutPage: React.FC = () => {
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
 
-  console.log('auction', auctionData);
+
   
 
   

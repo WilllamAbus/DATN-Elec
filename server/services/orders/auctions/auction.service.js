@@ -301,7 +301,7 @@ const auctionService = {
         .lean();
 
       if (!product) {
-        console.warn(`Product not found for productId: ${biddings}`);
+   
         throw new Error("Không tìm thấy sản phẩm.");
       }
 
