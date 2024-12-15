@@ -5,8 +5,8 @@ const ProductVariant = require('../../../model/product_v2/productVariant');
 const ProductCategoryService = {
   getProductsByCategory: (categoryId, page = 1, limit = 8, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, variantPrices) => new Promise(async (resolve, reject) => {
     try {
-      page = parseInt(page, 10) || 1;
-      limit = parseInt(limit, 10) || 12;
+      page = parseInt(page, 8) || 1;
+      limit = parseInt(limit, 8) || 8;
       const offset = (page - 1) * limit;
 
       if (limit <= 0) {
@@ -152,7 +152,18 @@ const ProductCategoryService = {
           });
         }
       }
-      const total = filteredProducts.length;
+      const total = await Product.countDocuments({
+        product_type: categoryId,
+        status: { $ne: 'disable' },
+        variants: { $exists: true, $ne: [] },
+        ...brandFilter,
+        ...conditionShoppingFilter,
+        ...priceFilter,
+        ...discountFilter,
+        ...ramFilter,
+        ...storageFilter,
+      });
+      
       const categoryInfo = await ProductType.findById(categoryId).select('name');
       if (!categoryInfo) {
         return reject({

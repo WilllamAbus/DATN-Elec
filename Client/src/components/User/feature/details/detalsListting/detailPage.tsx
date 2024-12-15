@@ -124,29 +124,36 @@ const DetailPage: React.FC = () => {
                         product={productDetail || {}}
                       />
 
-                      <div className="mt-4 sm:items-center sm:gap-4 sm:flex">
-                        <VariantPrice
-                          variant={firstVariant}
-                          product={productDetail || {}}
-                        />
-                        <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                          <div className="flex items-center gap-1">
+                      <div className="mt-4 sm:flex sm:items-center sm:gap-2 flex-wrap sm:flex-nowrap">
+   
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <VariantPrice
+                            variant={firstVariant}
+                            product={productDetail || {}}
+                          />
+
+        
+                          <div className="flex items-center text-yellow-400">
+                            <span className="ml-1 text-sm font-medium">{averageRating || "0"}</span>
                             <Star />
                           </div>
-                          <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
+
+                          <p className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                            ({averageRating || "0"} trên 5)
                           </p>
-                          <a
-                            href="#"
-                            className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white"
+                          <p
+                            className="ml-2 text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
                           >
-                            {productDetail?.variants?.[0]?.viewCount} Lượt xem
-                          </a>
+                            {productDetail?.variants?.[0]?.viewCount || 0} Lượt xem
+                          </p>
                         </div>
-                        <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">
-                          {averageRating} trên 5
-                        </p>
-                       
                       </div>
+
+
+
+
+
+
                       <div className="mt-4">
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                           Mô tả sản phẩm
@@ -209,8 +216,8 @@ const DetailPage: React.FC = () => {
         </div>
       </div>
       <section>
-      <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
-        <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+        <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
+          <Comment onUpdateAverageRating={handleUpdateAverageRating} />
         </div>
       </section>
       <section>

@@ -305,7 +305,7 @@ useEffect(() => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Cập nhật biến thể"
                 )}
               </button>
             </div>
