@@ -2,8 +2,9 @@ const getAllProductsByVariantPriceService = require('../../../services/product/a
 
 const getAllProductVariantsByVariantPrice = async (req, res) => {
   const { slug } = req.params;
+  const { page = 1, limit = 2 } = req.query; 
   try {
-    const response = await getAllProductsByVariantPriceService.getAllProductsByVariantPrice(slug);
+    const response = await getAllProductsByVariantPriceService.getAllProductsByVariantPrice(slug, parseInt(page), parseInt(limit));
 
     if (!response.success) {
       return res.status(response.status).json({
@@ -20,6 +21,13 @@ const getAllProductVariantsByVariantPrice = async (req, res) => {
       msg: 'OK',
       status: 200,
       data: response.data,
+      pagination: {
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        totalItems: response.pagination.totalItems,
+        hasNextPage: response.pagination.currentPage < response.pagination.totalPages,
+        hasPrevPage: response.pagination.currentPage > 1,
+      },
     });
   } catch (error) {
     console.error('Error in getAllProductsByPrice:', error);

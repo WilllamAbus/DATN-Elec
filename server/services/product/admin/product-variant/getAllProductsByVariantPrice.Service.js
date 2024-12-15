@@ -2,7 +2,7 @@ const Product = require('../../../../model/product_v2/index');
 const ProductVariant = require('../../../../model/product_v2/productVariant');
 
 const getAllProductsByVariantPriceService = {
-  getAllProductsByVariantPrice: async (slug) => {
+  getAllProductsByVariantPrice: async (slug, page = 1, limit = 2) => {
     try {
       // 1. Tìm sản phẩm dựa trên slug
       const product = await Product.findOne({ slug }).populate('variants').lean();
@@ -40,8 +40,8 @@ const getAllProductsByVariantPriceService = {
       }
 
       // 4. Tính giá trung bình (hoặc lấy giá đầu tiên nếu chỉ có 1 variant)
-      const avgTargetPrice = targetPrices.length > 1 
-        ? targetPrices.reduce((sum, price) => sum + price, 0) / targetPrices.length 
+      const avgTargetPrice = targetPrices.length > 1
+        ? targetPrices.reduce((sum, price) => sum + price, 0) / targetPrices.length
         : targetPrices[0];
 
       // 5. Xác định khoảng giá +- 1 triệu
@@ -52,38 +52,53 @@ const getAllProductsByVariantPriceService = {
       console.log(`Mức giá mục tiêu: ${avgTargetPrice}, Khoảng giá từ: ${minPrice} - ${maxPrice}`);
 
       // 6. Tìm các variants trong khoảng giá của tất cả sản phẩm
-      const matchingVariants = await ProductVariant.find({
+      const matchingVariantsQuery = ProductVariant.find({
         variant_price: { $gte: minPrice, $lte: maxPrice },
-      }).populate({
-        path: 'product',
-        select: 'product_name slug product_type', // Lấy product_type của sản phẩm
       })
-      .populate({
-        path: 'image',
-        populate: {
-          path: 'color', // Populate thêm trường color từ bảng liên kết
-          select: 'name code', // Chọn các field mà bạn muốn lấy từ color
-        },
-        select: 'image color',
-      })
-      
-      .lean();
+        .populate({
+          path: 'product',
+          select: 'product_name slug product_type', // Lấy product_type của sản phẩm
+        })
+        .populate({
+          path: 'image',
+          populate: {
+            path: 'color', // Populate thêm trường color từ bảng liên kết
+            select: 'name code', // Chọn các field mà bạn muốn lấy từ color
+          },
+          select: 'image color',
+        })
+        .lean();
 
-      // 7. Lọc các variants có cùng product_type với sản phẩm ban đầu
+      // 7. Áp dụng phân trang
+      const totalItems = await ProductVariant.countDocuments({
+        variant_price: { $gte: minPrice, $lte: maxPrice },
+      });
+
+      const totalPages = Math.ceil(totalItems / limit);
+      const skip = (page - 1) * limit;
+
+      const matchingVariants = await matchingVariantsQuery.skip(skip).limit(limit);
+
+      // 8. Lọc các variants có cùng product_type với sản phẩm ban đầu
+      // 8. Lọc các variants có cùng product_type với sản phẩm ban đầu và không lấy chính nó
       const matchingProducts = matchingVariants
-      .filter((variant) => variant.product?.product_type?.equals(productType)) // Dùng equals để so sánh ObjectId
-      .map((variant) => ({
-        _id: variant._id,
-        product_name: variant.product?.product_name || 'Không có tên',
-        slug: variant.product?.slug || '',
-        variant_name: variant.variant_name,
-        variant_price: variant.variant_price,
-        image:variant.image
-      }));
-    
-        console.log(`Product Type: ${productType}`);
+        .filter((variant) =>
+          variant.product?.product_type?.equals(productType) && // Kiểm tra product_type
+          !variant.product?._id.equals(product._id) // Loại bỏ chính sản phẩm hiện tại
+        )
+        .map((variant) => ({
+          _id: variant._id,
+          product_name: variant.product?.product_name || 'Không có tên',
+          slug: variant.product?.slug || '',
+          variant_name: variant.variant_name,
+          variant_price: variant.variant_price,
+          image: variant.image,
+        }));
 
-      // 8. Kiểm tra dữ liệu trả về
+
+      console.log(`Product Type: ${productType}`);
+
+      // 9. Kiểm tra dữ liệu trả về
       if (matchingProducts.length === 0) {
         return {
           success: true,
@@ -91,6 +106,7 @@ const getAllProductsByVariantPriceService = {
           msg: 'Không tìm thấy sản phẩm nào tương tự trong cùng phân khúc giá',
           status: 200,
           data: [],
+          pagination: { totalItems, totalPages, currentPage: page },
         };
       }
 
@@ -100,6 +116,7 @@ const getAllProductsByVariantPriceService = {
         msg: 'OK',
         status: 200,
         data: matchingProducts,
+        pagination: { totalItems, totalPages, currentPage: page },
       };
 
     } catch (error) {
