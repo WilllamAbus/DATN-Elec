@@ -1,5 +1,6 @@
 const OrderDetail = require("../../../model/orders/orderCart/OrderDetails");
 const Order = require("../../../model/orders/orderCart/orders");
+const OrderService = require("../../../services/orders/orderSp");
 const OrderController = {
   // getOrderById: async (req, res) => {
   //   try {
@@ -234,38 +235,89 @@ const OrderController = {
       });
     }
   },
+  // getSoftdeleteOrder: async (req, res) => {
+  //   const userId = req.user.id;
+  //   try {
+  //     if (!userId) {
+  //       return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
+  //     }
+
+  //     const orders = await Order.find({ isDeleted: true })
+  //       .populate({
+  //         path: "cartDetails",
+  //         populate: {
+  //           path: "items.product",
+  //           model: "product_v2",
+  //         },
+  //       })
+  //       .populate("payment")
+  //       .populate("shipping")
+  //       .populate({
+  //         path: "voucherIds",
+  //         model: "Voucher",
+  //       });
+
+  //     if (!orders || orders.length === 0) {
+  //       return res.status(404).json({ message: "Không có đơn hàng nào" });
+  //     }
+
+  //     res.status(200).json({ orders });
+  //   } catch (error) {
+  //     console.error("Error fetching all orders:", error);
+  //     res.status(500).json({
+  //       message: "Lỗi khi lấy đơn hàng",
+  //       error: error.message || error,
+  //     });
+  //   }
+  // },
   getSoftdeleteOrder: async (req, res) => {
     const userId = req.user.id;
+    const { page, search, stateOrder } = req.query;
+
     try {
       if (!userId) {
         return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
       }
-
-      const orders = await Order.find({ isDeleted: true })
-        .populate({
-          path: "cartDetails",
-          populate: {
-            path: "items.product",
-            model: "product_v2",
-          },
-        })
-        .populate("payment")
-        .populate("shipping")
-        .populate({
-          path: "voucherIds",
-          model: "Voucher",
+      const response = await OrderService.getDeletedLimitService(
+        page,
+        search,
+        stateOrder
+      );
+      if (response.err) {
+        return res.status(400).json({
+          success: false,
+          err: response.err,
+          msg: response.msg || "Lỗi khi lấy đơn hàng",
+          status: 400,
         });
-
-      if (!orders || orders.length === 0) {
-        return res.status(404).json({ message: "Không có đơn hàng nào" });
       }
 
-      res.status(200).json({ orders });
+      const currentPage = page ? +page : 1;
+      const totalPages = Math.ceil(
+        response.response.total / (+process.env.LIMIT || 1)
+      );
+
+      return res.status(200).json({
+        success: true,
+        err: 0,
+        msg: "OK",
+        status: 200,
+        data: response.response,
+        pagination: {
+          currentPage,
+          totalPages,
+          hasNextPage: currentPage < totalPages,
+          hasPrevPage: currentPage > 1,
+        },
+      });
     } catch (error) {
-      console.error("Error fetching all orders:", error);
-      res.status(500).json({
-        message: "Lỗi khi lấy đơn hàng",
-        error: error.message || error,
+      console.error("Error:", error);
+
+      return res.status(500).json({
+        success: false,
+        err: -1,
+        msg: "Lỗi: " + error.message,
+        status: 500,
       });
     }
   },

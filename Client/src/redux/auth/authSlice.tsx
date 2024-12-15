@@ -97,7 +97,7 @@ interface AuthState {
   userpagi: Userpagi[];
   userListStatus: "idle" | "loading" | "succeeded" | "failed";
   userListError: string | null;
-
+  deleyedpagi: Userpagi[];
   deletedUsers: UserProfile[];
   deletedUsersStatus: "idle" | "loading" | "succeeded" | "failed";
   deletedUsersError: string | null;
@@ -195,6 +195,7 @@ const initialState: AuthState = {
 
   users: [],
   userpagi: [],
+  deleyedpagi: [],
   deletedUsers: [],
   userListStatus: "idle",
   userListError: null,
@@ -448,22 +449,41 @@ const authSlice = createSlice({
         state.activeUsersError = action.payload as string;
       })
 
+      // .addCase(getDeletedListThunk.pending, (state) => {
+      //   state.deletedUsersStatus = "loading";
+      //   state.deletedUsersError = null;
+      // })
+      // .addCase(
+      //   getDeletedListThunk.fulfilled,
+      //   (state, action: PayloadAction<any[]>) => {
+      //     state.deletedUsersStatus = "succeeded";
+      //     state.deletedUsers = action.payload;
+      //     state.deletedUsersError = null;
+      //   }
+      // )
+      // .addCase(getDeletedListThunk.rejected, (state, action) => {
+      //   state.deletedUsersStatus = "failed";
+      //   state.deletedUsersError =
+      //     (action.payload as string) || "An unknown error occurred";
+      // })
       .addCase(getDeletedListThunk.pending, (state) => {
-        state.deletedUsersStatus = "loading";
-        state.deletedUsersError = null;
+        state.status = "loading";
       })
       .addCase(
         getDeletedListThunk.fulfilled,
-        (state, action: PayloadAction<any[]>) => {
-          state.deletedUsersStatus = "succeeded";
-          state.deletedUsers = action.payload;
-          state.deletedUsersError = null;
+        (state, action: PayloadAction<LimitCrudUserResponse>) => {
+          state.status = "succeeded";
+          state.deleyedpagi = action.payload.data.users;
+          state.pagination = action.payload.pagination;
         }
       )
       .addCase(getDeletedListThunk.rejected, (state, action) => {
-        state.deletedUsersStatus = "failed";
-        state.deletedUsersError =
-          (action.payload as string) || "An unknown error occurred";
+        console.error("Error payload:", action.payload);
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Lỗi không xác định";
       })
       .addCase(forgotPasswordThunk.pending, (state) => {
         state.ForgotPassword.loading = true;

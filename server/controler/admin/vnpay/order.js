@@ -17,11 +17,6 @@ const Payment = require("../../../model/orders/payment.model");
 exports.createPaymentUrl = (req, res) => {
   try {
     process.env.TZ = "Asia/Ho_Chi_Minh";
-    const userId = req.user?.id;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
-    }
 
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");

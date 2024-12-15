@@ -1,4 +1,4 @@
-import { UserProfile } from "../../types/user";
+import { LimitCrudUserResponse, UserProfile } from "../../types/user";
 import instance from "../axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,12 +23,32 @@ export const restore = async (userId: string) => {
   }
 };
 //danh sách tài khoản xóa mềm
+export const listDeleted = async (
+  page: number,
+  search?: string
+): Promise<LimitCrudUserResponse> => {
+  try {
+    const queryParams = new URLSearchParams({ page: page.toString() });
 
-export const listDeleted = async () => {
-  const response = await instance.get(`${API_URL}/admin/deleted`);
+    if (search) {
+      queryParams.append("search", search);
+    }
 
-  return response.data;
+    const response = await instance.get<LimitCrudUserResponse>(
+      `/admin/disable/limit/?${queryParams.toString()}`
+    );
+    console.log("Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching User:", error);
+    throw new Error("Failed to fetch User");
+  }
 };
+// export const listDeleted = async () => {
+//   const response = await instance.get(`${API_URL}/admin/disable/limit`);
+
+//   return response.data;
+// };
 
 //list active tk
 export const listActive = async () => {

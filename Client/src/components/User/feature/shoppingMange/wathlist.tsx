@@ -191,22 +191,11 @@ import { Link } from "react-router-dom";
 import { HeartIcon, StarIcon } from "../listPage/svg";
 
 import { UserProfile } from "../../../../types/user";
-import currencyFormatter from "currency-formatter";
+
 import { truncateText } from "../listPage/truncate/truncateText";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Image,
-  Tooltip,
-} from "@nextui-org/react";
-import { Grid } from "@mui/system";
+
 interface WatchlistProps {
   profiles?: UserProfile | null;
-}
-function formatCurrency(value: number) {
-  return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
 
 const Watchlist: React.FC<WatchlistProps> = () => {
@@ -288,9 +277,11 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                 </button>
               </div>
               <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition">
-                  {truncateText(product.product_name, 30)}
-                </h2>
+                <Link to={`/product/${product.slug}`}>
+                  <h2 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition">
+                    {truncateText(product.product_name, 15)}
+                  </h2>
+                </Link>
                 <div className="text-sm text-gray-600 mt-1">
                   {variant?.storage.name || "N/A"} |{" "}
                   {variant?.ram.name || "N/A"}
@@ -302,15 +293,18 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                       : "N/A"}
                   </p>
                   <StarIcon />
-                  <span className="ml-2">
+                  {/* <span className="ml-2">
                     {product.product_quantity > 0
                       ? `(Còn ${product.product_quantity} sản phẩm)`
                       : "Hết hàng"}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="mt-3">
                   <p className="text-lg font-bold text-rose-600">
-                    {formatCurrency(variant.variant_price)} đ
+                    {variant.variant_price.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </p>
                 </div>
               </div>
