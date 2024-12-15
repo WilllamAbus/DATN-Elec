@@ -193,15 +193,7 @@ import { HeartIcon, StarIcon } from "../listPage/svg";
 import { UserProfile } from "../../../../types/user";
 import currencyFormatter from "currency-formatter";
 import { truncateText } from "../listPage/truncate/truncateText";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Image,
-  Tooltip,
-} from "@nextui-org/react";
-import { Grid } from "@mui/system";
+
 interface WatchlistProps {
   profiles?: UserProfile | null;
 }
