@@ -1,151 +1,155 @@
-import React, { useState } from "react";
+import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { ImageVariant } from "../../../../../services/product_v2/admin/types/imageVariant";
-import { Progress,Spinner,Tooltip} from "@nextui-org/react";
+import { Progress, Tooltip } from "@nextui-org/react";
 import { DeleteIcon } from "../../../../../common/Icons/DeleteIcon";
 
 interface ImageUploadProps {
-  imgPreview: string | null;
+  imgPreviews: { id: string; url: string; progress: number; status: string }[];
   register: UseFormRegister<ImageVariant>;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: string;
+  errors?: string;
   validation?: {
     required?: string;
   };
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
-  imgPreview,
+  imgPreviews,
   register,
   handleImageChange,
-  error,
+  errors,
   validation,
 }) => {
+  const [uploads, setUploads] = React.useState(
+    imgPreviews.map((img) => ({ ...img, progress: 0, status: "" }))
+  );
 
-  const [progress, setProgress] = useState<number>(0);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  const [showSpinner, setShowSpinner] = useState<boolean>(false);
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleRemoveImage = (id: string) => {
+    setUploads((prev) => prev.filter((upload) => upload.id !== id));
 
-    setIsUploading(true);
-    setUploadSuccess(false); 
-    const totalSize = file.size;
-    let uploadedSize = 0;
+    const fileInput = document.getElementById("image") as HTMLInputElement;
+    if (fileInput) {
+      const newFiles = Array.from(fileInput.files || []).filter(
+        (file) => file.name !== id
+      );
+      const dataTransfer = new DataTransfer();
+      newFiles.forEach((file) => dataTransfer.items.add(file));
+      fileInput.files = dataTransfer.files;
+    }
+  };
 
-    const interval = setInterval(() => {
-      uploadedSize += totalSize / 20;
-      const progressValue = Math.min((uploadedSize / totalSize) * 100, 100);
-      setProgress(progressValue);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-      if (progressValue === 100) {
-        clearInterval(interval);
-        setIsUploading(false);
-        setUploadSuccess(true); 
-      }
-    }, 100);
+    const newUploads = Array.from(files).filter(
+      (file) => !uploads.some((upload) => upload.id === file.name)
+    ).map((file) => ({
+      id: file.name,
+      url: URL.createObjectURL(file),
+      progress: 0,
+      status: "Uploading",
+    }));
+
+    setUploads((prev) => [...prev, ...newUploads]);
+
+    newUploads.forEach((file) => {
+      const totalSize = 100;
+      let uploadedSize = 0;
+
+      const interval = setInterval(() => {
+        uploadedSize += totalSize / 20;
+        const progressValue = Math.min((uploadedSize / totalSize) * 100, 100);
+
+        setUploads((prev) =>
+          prev.map((upload) =>
+            upload.id === file.id
+              ? {
+                  ...upload,
+                  progress: progressValue,
+                  status: progressValue === 100 ? "Uploaded" : "Uploading",
+                }
+              : upload
+          )
+        );
+
+        if (progressValue === 100) {
+          clearInterval(interval);
+        }
+      }, 100);
+    });
 
     handleImageChange(e);
   };
-
-  const handleDeleteImage = () => {
-    setShowSpinner(true);
-
-    setTimeout(() => {
-      setUploadSuccess(false);
-      setProgress(0);
-      handleImageChange({ target: { files: null } } as any);
-
-      const fileInput = document.getElementById("thumbnail") as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = "";
-      }
-      setShowSpinner(false);
-    }, 3000); 
-  };
-  
-
-
   return (
     <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
-      {imgPreview && (
-          <div className="flex items-center mb-4">
+      <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+        Hình ảnh
+      </h3>
+      <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+        {!errors && "JPG, GIF hoặc PNG. Max size là 800KB"}
+        {errors && <span className="text-red-600">{errors}</span>}
+      </div>
+
+      <div className="flex items-center space-x-4">
+        <input
+          type="file"
+          multiple
+          id="image"
+          {...register("image", validation)}
+          onChange={handleFileChange}
+          className="hiddenblock w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+        />
+      </div>
+
+      <div className="mt-4 space-y-4">
+        {uploads.map((upload) => (
+          <div
+            key={upload.id}
+            className="flex items-center p-2 bg-gray-100 rounded-lg shadow-sm dark:bg-gray-700"
+          >
             <div className="relative w-24 h-24 overflow-hidden rounded-lg">
               <img
-                src={imgPreview}
-                alt="Image Preview"
-                className="w-full h-full object-cover"
+                src={upload.url}
+                alt="Preview"
+                className="object-cover w-full h-full"
               />
             </div>
+
+            <div className="flex-1 ml-4">
+              {upload.status === "Uploading" && (
+                <Progress
+                  size="sm"
+                  radius="sm"
+                  value={upload.progress}
+                  classNames={{
+                    base: "max-w-md",
+                    track: "border",
+                    indicator: "bg-gradient-to-r from-blue-500 to-purple-500",
+                  }}
+                  label="Đang tải"
+                />
+              )}
+
+              {upload.status === "Uploaded" && (
+                <p className="text-[#53c277] font-semibold">
+                  Tải lên thành công
+                </p>
+              )}
+            </div>
+
             <Tooltip content="Xóa ảnh">
               <button
                 type="button"
-                className="ml-2 p-1 text-danger-600 rounded-full shadow-md hover:text-danger-500"
-                onClick={handleDeleteImage}
+                className="ml-2 text-danger-600 p-1 rounded-full shadow-md hover:text-danger-500"
+                onClick={() => handleRemoveImage(upload.id)}
               >
-                {showSpinner ? (
-                  <Spinner size="sm" color="danger" />
-                ) : (
-                  <DeleteIcon />
-                )}
+                <DeleteIcon />
               </button>
             </Tooltip>
           </div>
-        )}
-
-
-        <div>
-          <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
-            Hình ảnh
-          </h3>
-          <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-            {!error && "JPG, GIF hoặc PNG. Max size là 800KB"}
-            {error && <span className="text-red-600">{error}</span>}
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <input
-              type="file"
-              multiple
-              id="image"
-              {...register("image", validation)}
-              onChange={handleFileChange}
-              className="hiddenblock w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-            />
-          </div>
-
-          {/* Hiển thị progress bar với NextUI */}
-          {isUploading && (
-            <div className="mt-4">
-              <Progress
-                size="sm"
-                radius="sm"
-                value={progress}
-                showValueLabel={true}
-                classNames={{
-                  base: "max-w-md",
-                  track: "drop-shadow-md border border-default",
-                  indicator: "bg-gradient-to-r from-blue-500 to-purple-500",
-                  label: "tracking-wider font-medium text-default-600",
-                  value: "text-foreground/60",
-                }}
-                label="Uploading"
-              />
-            </div>
-          )}
-
-          {/* Hiển thị thông báo thành công */}
-          {uploadSuccess && (
-            <p className="text-pastelGreen font-semibold mt-2">
-              Tệp được tải lên thành công
-            </p>
-          )}
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getImageByVariantIdThunk } from "../../../../redux/product/admin/Thunk";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { Image } from "../../../../services/product_v2/admin/types/getImageByVariantId";
-import SearchFormProduct from "../../../../components/Admin/searchform/searchFomProduct";
-import AddProductButton from "../../../../components/Admin/buttonAdd";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Modal, ModalBody,ModalProps, ModalHeader, Button, useDisclosure, ModalFooter, ModalContent, } from "@nextui-org/react";
 import { Link, useParams } from "react-router-dom";
 
@@ -126,10 +124,7 @@ const GetImageByVariantIdThunk: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
-        <SearchFormProduct />
-        <AddProductButton type="addProduct" />
-      </div>
+
 
       <Table aria-label="Product Variants Table" className="p-4">
         <TableHeader>

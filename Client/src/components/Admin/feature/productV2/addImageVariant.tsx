@@ -32,7 +32,8 @@ const AddImageVariant: React.FC = () => {
   const productVariantIdString = product_variant_id ?? "";
   const dispatch: AppDispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const { imgPreview, handleImageChange, error } = useImageUpload();
+  const { imgPreviews, handleImageChange, error } = useImageUpload();
+  
   const [selectedColor, setSelectedColor] = useState<SingleValue<Color> | null>(null);
   const onColorChange = (selectedOption: SingleValue<Color> | null) => {
     handleColorImageVariantChange(selectedOption, setSelectedColor, setValue);
@@ -66,14 +67,14 @@ const AddImageVariant: React.FC = () => {
         <CardBody>
           <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
             <div className="col-span-full xl:col-auto">
-            <div className="col-span-6 sm:col-span-6">
+              <div className="col-span-6 sm:col-span-6">
               <ImageUpload
-                imgPreview={imgPreview}
-                register={register}
-                handleImageChange={handleImageChange}
-                error={error || errors.image?.message}
-                validation={{ required: "vui lòng chọn ảnh" }}
-              />
+                  imgPreviews={imgPreviews}
+                  handleImageChange={handleImageChange}
+                  register={register}
+                  errors={(errors.image?.message as string) || error.join(", ")}
+                  validation={{ required: "vui lòng chọn ảnh" }}
+                />
               </div>
 
             </div>
