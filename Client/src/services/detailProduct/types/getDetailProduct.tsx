@@ -262,7 +262,7 @@ export interface FilterState {
 
 
   
-export interface QueryParamAuction {
+export interface QueryParamProduct {
   [key: string]: string | number | undefined; 
   storage?: string; 
   color?: string;
