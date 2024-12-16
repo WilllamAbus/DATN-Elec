@@ -340,7 +340,7 @@ import OrderAuct from "./orderAuctStatus";
 import ListBid from "./listBidding";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
-import { fetchUserOrdersThunk } from "../../../../redux/order/orderThunks";
+
 import { Transition } from "@headlessui/react";
 import { User } from "@nextui-org/react";
 import { ToastContainer } from "react-toastify";
@@ -372,10 +372,6 @@ const ProfileUse: React.FC = () => {
   const profileError = useAppSelector(
     (state: RootState) => state.auth.profile.error
   );
-
-  useEffect(() => {
-    dispatch(fetchUserOrdersThunk());
-  }, [dispatch]);
 
   useAuth();
 

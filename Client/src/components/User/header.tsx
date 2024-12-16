@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import { fetchCartList } from "../../redux/cart/cartThunk";
-import { getWatchlistThunk } from "../../redux/product/wathList/wathlist";
+import { CheckWatchlistThunk } from "../../redux/product/wathList/wathlist";
 
 const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +21,7 @@ const Header: React.FC = () => {
       }, new Set()).size
     : "";
   useEffect(() => {
-    dispatch(getWatchlistThunk());
+    dispatch(CheckWatchlistThunk());
   }, [dispatch]);
   const totalWatchlistItems = wathlist
     ? wathlist.filter((item) => item.product).length

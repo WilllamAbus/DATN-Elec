@@ -134,20 +134,39 @@ const orderSlice = createSlice({
       })
       .addCase(fetchUserOrdersThunk.pending, (state) => {
         state.status = "loading";
-        state.error = null;
       })
       .addCase(
         fetchUserOrdersThunk.fulfilled,
-        (state, action: PayloadAction<{ orders: Order[] }>) => {
+        (state, action: PayloadAction<LimitCrudOrderResponse>) => {
           state.status = "succeeded";
-          state.orders = action.payload.orders;
-          state.error = null;
+          state.orders = action.payload.data.orders;
+          state.pagination = action.payload.pagination;
         }
       )
       .addCase(fetchUserOrdersThunk.rejected, (state, action) => {
+        console.error("Error payload:", action.payload);
         state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Lỗi không xác định";
       })
+      // .addCase(fetchUserOrdersThunk.pending, (state) => {
+      //   state.status = "loading";
+      //   state.error = null;
+      // })
+      // .addCase(
+      //   fetchUserOrdersThunk.fulfilled,
+      //   (state, action: PayloadAction<{ orders: Order[] }>) => {
+      //     state.status = "succeeded";
+      //     state.orders = action.payload.orders;
+      //     state.error = null;
+      //   }
+      // )
+      // .addCase(fetchUserOrdersThunk.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = (action.payload as string) || "An error occurred";
+      // })
 
       // Xử lý cho cancelOrderThunk
       .addCase(cancelOrderThunk.pending, (state) => {
