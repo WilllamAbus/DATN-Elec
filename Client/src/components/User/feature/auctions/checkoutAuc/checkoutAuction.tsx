@@ -20,15 +20,27 @@ const CheckoutPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
 
+
+  const userNameProfile = useSelector((state: RootState) => state.auth.profile.profile?.name);
+
+
   
-  const bids = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); 
+  const productId = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); 
+
 
   
 
   const auctionData = useSelector((state: RootState) => state.auctCheckout.auctionData) as AuctionData | null;
 
+  const address = useSelector((state: RootState) => state.auth.profile);
+  const defaultAddress = address?.profile?.addresses.find(
+    (address) => address.isDefault === true
+  );
+  // const productIds = useSelector((state: RootState) => state.bidding.bidData?.data.product_bidding.productId); 
 
   
+  // const aucttionDataProduct = useSelector((state: RootState) => state.auction.auction?.productId);
+
 
   
      // Access order data from `orderAuction`
@@ -39,10 +51,10 @@ const CheckoutPage: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
-    if (userId && bids) {
-      dispatch(fetchAuction(bids));
+    if (userId && productId) {
+      dispatch(fetchAuction({userId, productId}));
     }
-  }, [dispatch, bids]);
+  }, [dispatch, userId, productId]);
 
   useEffect(() => {
     if (auctionData) {
@@ -53,14 +65,12 @@ const CheckoutPage: React.FC = () => {
     }
   }, [auctionData]);
 const auctionDetails= auctionData?.auctionId
+// const auctionNamePay = defaultAddress?.fullName
+const auctionNamePays = auctionData?.userName
 
 
 const onSubmit = async (data: FormData) => {
-  if (!auctionData?.userAddress || !auctionData?.userName || !auctionData?.userSdt) {
-    navigate('/profile'); // Redirect to profile page
-    toast.error('Bạn cần cập nhật thông tin cá nhân và địa chỉ');
-    return;
-  }
+
   // Check for missing form fields
   if (!auctionDetails || !userId || !data.payment) {
     toast.error('Vui lòng điền đầy đủ thông tin và chọn phương thức thanh toán');
@@ -83,14 +93,27 @@ const onSubmit = async (data: FormData) => {
 
     if (data.payment === 'MoMo') {
       // Process MoMo payment
-      await paymentService.processMoMoPaymentWithRetry(amount, auctionData.auctionId);
-      toast.success('Thanh toán thành công');
+      if(auctionNamePays === userNameProfile){
+        await paymentService.processMoMoPaymentWithRetry(amount, auctionData.auctionId);
+        toast.success('Thanh toán thành công');
+      }else {
+        navigate('/auction');
+        toast.success('Bạn không thanh toán được cho sản phẩm này');
+      }
+   
   
 
     } else if (data.payment === 'Cash') {
       if(response.data){
-        toast.success('Thanh toán khi nhận hàng');
-      navigate('/confimAucDefault');
+    
+        if(auctionNamePays === userNameProfile){
+          toast.success('Thanh toán khi nhận hàng');
+          navigate('/confimAucDefault');
+        }else {
+          navigate('/auction');
+          toast.success('Bạn không thanh toán được cho sản phẩm này');
+        }
+   
       }
       // Handle Cash payment
        // Redirect after successful payment
@@ -98,9 +121,15 @@ const onSubmit = async (data: FormData) => {
     } else if (data.payment === 'VnPay') {
       // Handle VNPay payment
       if (response.data && response.data.hashLinkPayment) {
+        if(auctionNamePays === userNameProfile){
+          toast.success('Thanh toán thành công');
+          window.location.href = response.data.hashLinkPayment;
+        }else {
+          navigate('/auction');
+          toast.success('Bạn không thanh toán được cho sản phẩm này');
+        }
         // Redirect user to VNPay payment page
-        toast.success('Thanh toán thành công');
-        window.location.href = response.data.hashLinkPayment;
+    
       } else {
         throw new Error('VNPay payment URL is missing in the response');
       }
@@ -147,7 +176,7 @@ const onSubmit = async (data: FormData) => {
                 <input
                   type="text"
                   id="name"
-                  value={auctionData?.userName || ''}
+                  value={defaultAddress?.fullName || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -158,7 +187,7 @@ const onSubmit = async (data: FormData) => {
                 <input
                   type="text"
                   id="address"
-                  value={auctionData?.userAddress || ''}
+                  value={defaultAddress?.address || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -169,7 +198,7 @@ const onSubmit = async (data: FormData) => {
                 <input
                   type="text"
                   id="phone"
-                  value={auctionData?.userSdt || ''}
+                  value={defaultAddress?.phone || ''}
                   readOnly
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />

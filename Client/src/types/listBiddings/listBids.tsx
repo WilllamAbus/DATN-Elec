@@ -43,3 +43,13 @@ export interface BiddingResponse {
     currentPage: number;
   };
 }
+
+
+export interface BiddingResponseActive {
+  success: boolean;
+  data: {
+    biddingActive: Bidding[];
+    totalPages: number;
+    currentPage: number;
+  };
+}

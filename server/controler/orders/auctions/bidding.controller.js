@@ -100,7 +100,36 @@ const BiddingController = {
       });
     }
   },
+  getAllBidsActive: async (req, res) => {
+    try {
+      const pageActive = parseInt(req.query.page) || 1;
+      const pageSizeActive = parseInt(req.query.pageSize) || 10;
 
+
+   
+
+      const { biddingActive, totalPagesActive, currentPageActive }  = await biddingService.getAllBidsActive(
+        pageActive,
+        pageSizeActive,
+ 
+      
+      );
+      return res.status(200).json({
+        success: true,
+        data: {
+          biddingActive,
+          totalPagesActive,
+          currentPageActive
+        },
+      });
+    } catch (error) {
+      console.error("Error in getAllBids controller:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: `Không thể lấy danh sách lượt đấu giá: ${error.message}`,
+      });
+    }
+  },
   getBidById: async (req, res) => {
     try {
       const { bidId } = req.params;

@@ -9,20 +9,42 @@ import { useAppDispatch } from "../../redux/rootReducer";
 import cateDropdownItems from "./listCateNav/path/hookspathnav";
 import { searchProduct } from "../../services/product_v2/client/homeAllProduct";
 import { Drawer, Sidebar } from "flowbite-react";
+// import algoliasearch from "algoliasearch/lite";
 
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
 
+interface SpeechRecognitionResultList {
+  0: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  0: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+// const searchClient = algoliasearch("HCQHU7GEB1", "415bf6e3084b190a88deebe9791858c7");
+// const index = searchClient.initIndex('products'); // Make sure this matches your Algolia index name
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const [keyword, setKeyword] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const navigate = useNavigate();
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     dispatch(listCateNavItemThunk());
   }, [dispatch]);
 
   const [isOpen, setIsOpen] = useState(false);
-
   const handleClose = () => setIsOpen(false);
   const dropdownItems = cateDropdownItems();
 
@@ -31,7 +53,6 @@ const Navbar: React.FC = () => {
       setFilteredProducts([]);
       return;
     }
-
     try {
       const result = await searchProduct(keyword);
       const filtered = result.data.filter((product: any) =>
@@ -39,22 +60,25 @@ const Navbar: React.FC = () => {
       );
       setFilteredProducts(filtered);
     } catch (error) {
-      console.error("Error fetching search results:", error);
+      console.error("Lỗi tìm kiếm:", error);
     }
   };
 
+  // Xử lý nhập liệu tìm kiếm
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setKeyword(value);
     dataSearch(value);
   };
 
+  // Tìm kiếm khi nhấn Enter
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && keyword.length < 2) {
-      event.preventDefault();
+    if (event.key === "Enter" && keyword.trim().length > 1) {
+      handleSubmit();
     }
   };
 
+  // Xử lý gửi tìm kiếm
   const handleSubmit = () => {
     const trimmedKeyword = keyword.trim();
     const encodedKeyword = encodeURIComponent(trimmedKeyword);
@@ -62,6 +86,62 @@ const Navbar: React.FC = () => {
       navigate(`/search/${encodedKeyword}`);
     }
   };
+
+  // Hàm tìm kiếm bằng giọng nói
+  const handleVoiceSearch = () => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  
+    if (!SpeechRecognition) {
+      alert("Trình duyệt không hỗ trợ tìm kiếm bằng giọng nói.");
+      return;
+    }
+  
+    const recognition = new SpeechRecognition();
+    recognition.lang = "vi-VN"; // Đặt ngôn ngữ là tiếng Việt
+    recognition.start();
+    setIsListening(true); // Bật trạng thái lắng nghe
+  
+    recognition.onresult = async (event: SpeechRecognitionEvent) => {
+      const keyword = event.results[0][0].transcript.trim(); // Lấy kết quả nhận diện
+      setKeyword(keyword);
+  
+      // Gọi tìm kiếm ngay sau khi nhận diện giọng nói
+      if (keyword.length >= 2) { // Chỉ tìm kiếm khi từ khóa dài hơn 2 ký tự
+        try {
+          const result = await searchProduct(keyword);
+          if (result.data.length > 0) {
+            setFilteredProducts(result.data); // Cập nhật kết quả tìm kiếm
+            // Chuyển hướng đến trang tìm kiếm
+            navigate(`/search/${encodeURIComponent(keyword)}`);
+          } else {
+            // Nếu không tìm thấy sản phẩm, gọi lại hàm tìm kiếm thường
+            dataSearch(keyword);
+          }
+        } catch (error) {
+          console.error("Lỗi khi tìm kiếm:", error);
+          setFilteredProducts([]); // Xóa kết quả nếu có lỗi
+        }
+      } else {
+        setFilteredProducts([]); // Xóa kết quả nếu từ khóa ngắn hơn 2 ký tự
+      }
+  
+      setIsListening(false); // Tắt trạng thái lắng nghe
+    };
+  
+    recognition.onerror = (event: Event) => {
+      console.error("Lỗi nhận diện giọng nói:", event);
+      setIsListening(false); // Tắt trạng thái lắng nghe nếu có lỗi
+    };
+  
+    recognition.onend = () => {
+      setIsListening(false); // Kết thúc lắng nghe
+    };
+  };
+
+
+
+
 
   return (
     <header>
@@ -91,36 +171,55 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          <form className="" onSubmit={handleSubmit}>
-            <label htmlFor="topbar-search" className="sr-only">
-              Search
-            </label>
-            <div className="relative mt-1 lg:w-[32rem]">
-              <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
-                <button type="submit">
-                  <svg
-                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
+          <form className="relative mt-1 lg:w-[32rem]" onSubmit={handleSubmit}>
+            <label htmlFor="topbar-search" className="sr-only">Search</label>
+            <div className="flex items-center">
+              {/* Input tìm kiếm */}
+              <div className="relative flex items-center flex-grow">
+                <input
+                  type="text"
+                  id="topbar-search"
+                  className="bg-gray-50 border sm:w-[100px] border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Tìm kiếm sản phẩm"
+                  value={keyword}
+                  onChange={handleSearch}
+                  onKeyDown={handleKeyDown}
+                />
+                {/* Biểu tượng tìm kiếm */}
+                <div className="absolute inset-y-0 right-2 flex items-center pl-3 pointer-events-none">
+                  <button type="submit">
+                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <input
-                type="text"
-                id="topbar-search"
-                className="bg-gray-50 border sm:w-[100px] border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-2 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Tìm kiếm sản phẩm"
-                value={keyword}
-                onChange={handleSearch}
-                onKeyDown={handleKeyDown}
-              />
+
+              {/* Nút tìm kiếm bằng giọng nói */}
+              <button
+                type="button"
+                onClick={handleVoiceSearch}
+                className={`relative bg-transparent p-1 m-2 rounded-full border-2 ${isListening ? "border-red-500 bg-red-500 text-white" : "border-gray-300 text-gray-500"} flex items-center justify-center`}
+              >
+                <svg
+                  className={`w-5 h-5 ${isListening ? "animate-pulse" : ""}`}
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill="#444"
+                    d="M8 10v0c-1.7 0-3-1.3-3-3v-4c0-1.6 1.3-3 3-3v0c1.6 0 3 1.3 3 3v4c0 1.6-1.4 3-3 3z"
+                  ></path>
+                  <path
+                    fill="#444"
+                    d="M12 5v2.5c0 1.9-1.8 3.5-3.8 3.5h-0.4c-2 0-3.8-1.6-3.8-3.5v-2.5c-0.6 0-1 0.4-1 1v1.5c0 2.2 1.8 4.1 4 4.4v2.1c-3 0-2.5 2-2.5 2h7c0 0 0.5-2-2.5-2v-2.1c2.2-0.4 4-2.2 4-4.4v-1.5c0-0.6-0.4-1-1-1z"
+                  ></path>
+                </svg>
+              </button>
+
+
+
             </div>
 
             {/* Render filtered products */}
@@ -129,11 +228,7 @@ const Navbar: React.FC = () => {
                 {filteredProducts.map((result) => (
                   <div
                     key={result.id}
-                    onClick={() =>
-                    (window.location.href = `/search/${encodeURIComponent(
-                      result.product_name
-                    )}`)
-                    } // Điều hướng tới trang sản phẩm
+                    onClick={() => (window.location.href = `/search/${encodeURIComponent(result.product_name)}`)}
                     className="border border-gray-300 rounded w-full pl-2 p-1 mb-1 text-gray-900 dark:text-white cursor-pointer"
                   >
                     {result.product_name}
@@ -142,6 +237,8 @@ const Navbar: React.FC = () => {
               </div>
             )}
           </form>
+
+
 
           <div className="flex justify-between items-center lg:order-2">
             <UserMenuDropdown />

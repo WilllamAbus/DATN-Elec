@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { listBiidings } from '../../services/listBiddinggs/llistbidding';
 import {BiddingResponse} from '../../types/listBiddings/listBids';
+
 interface FetchListBidsParams {
   page: number;
   pageSize: number;
@@ -18,3 +19,4 @@ export const fetchListBid = createAsyncThunk<BiddingResponse, FetchListBidsParam
     }
   }
 );
+

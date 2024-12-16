@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams,  useNavigate} from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import { getOrderAuctionDetailsAdmin } from "../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
-import { updateOrderStatusThunk } from "../../../../redux/orderAucAdmin/updateStatusAdmin/updateStatusAdminThunk";
+import { updateOrderStatusThunkCash } from "../../../../redux/orderAucAdmin/updateStatusAdmin/updateStatusAdminThunk";
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -29,6 +29,7 @@ const OrderDetailsCash: React.FC = () => {
   }, [dispatch, id]);
 
   const selectedOrder = orders.confirmOrder;
+console.log('selectedOrder', selectedOrder);
 
   
   // const selectedOrderStatus = Array.isArray(orders.orders)
@@ -43,21 +44,17 @@ const OrderDetailsCash: React.FC = () => {
   // }, [selectedOrderStatus]);
   useEffect(() => {
     switch (selectedOrder?.state) {
-      case "Chờ xử lý":
-        setProgressValue(15);
+      case "Chờ xử lý hoàn tiền":
+        setProgressValue(45);
         break;
-      case "Đã xác nhận":
-        setProgressValue(25);
+      case "Đã xác nhận hoàn tiền":
+        setProgressValue(85);
         break;
-      case "Vận chuyển":
-        setProgressValue(55);
-        break;
-        case "Nhận hàng":
-        setProgressValue(75);
-        break;
-      case "Hoàn tất":
+      case "Hoàn tiền thành công":
         setProgressValue(100);
         break;
+     
+  
       default:
         setProgressValue(0);
     }
@@ -69,15 +66,15 @@ const OrderDetailsCash: React.FC = () => {
   
   // };
   const handleBackToList = () => {
-    navigate("/admin/listOrderAuction");
+    navigate("/admin/recBinOrderAuction");
   };
   const handleUpdateStatus = async(newStatus: string) => {
 
     if (selectedOrder ) {
  
-      await dispatch(updateOrderStatusThunk({  
-        orderId: selectedOrder.orderid as string,
-        stateOrder: newStatus  })).unwrap()
+      await dispatch(updateOrderStatusThunkCash({  
+        orderIdCash: selectedOrder.orderid as string,
+        stateOrderCash: newStatus  })).unwrap()
         toast.success(
     "Cập nhật thành công!"
         );
@@ -93,84 +90,44 @@ const OrderDetailsCash: React.FC = () => {
 
   const renderStatusButton = () => {
     switch (selectedOrder?.state) {
-      case "Chờ giao hàng":
+      case "Hoàn tiền":
         return (
           <Button
             onClick={() => {
               // setSelectedStatus("Chờ xử lý");
-              handleUpdateStatus("Chờ xử lý");
+              handleUpdateStatus("Chờ xử lý hoàn tiền");
             }}
             className="mt-4 bg-green-500 text-white"
           >
-             Chờ xử lý
+            Chờ xử lý hoàn tiền
           </Button>
         );
-      case "Chờ xử lý":
+      case "Chờ xử lý hoàn tiền":
         return (
           <Button
             onClick={() => {
               // setSelectedStatus();
-              handleUpdateStatus("Đã xác nhận");
+              handleUpdateStatus("Đã xác nhận hoàn tiền");
             }}
             className="mt-4 bg-green-500 text-white"
           >
-            Đã xác nhận
+           Đã xác nhận hoàn tiền
           </Button>
         );
-      case "Đã xác nhận":
+      case "Đã xác nhận hoàn tiền":
         return (
           <Button
             onClick={() => {
               // setSelectedStatus();
-              handleUpdateStatus("Vận chuyển");
+              handleUpdateStatus("Hoàn tiền thành công");
             }}
             className="mt-4 bg-yellow-500 text-white"
           >
-            Đang vận chuyển
+       Hoàn tiền thành công
           </Button>
         );
-      case "Vận chuyển":
-        return (
-          <>
-            <Button
-              onClick={() => {
-                // setSelectedStatus();
-                handleUpdateStatus("Nhận hàng");
-              }}
-              className="mt-4 bg-blue-500 text-white"
-            >
-              Nhận hàng
-            </Button>
-           
-          </>
-        );
-      case "Nhận hàng":
-        return (
-          <>
-            <Button
-              onClick={() => {
-                // setSelectedStatus();
-                handleUpdateStatus("Hoàn tất");
-              }}
-              className="mt-4 bg-blue-500 text-white"
-            >
-              Hoàn tất
-            </Button>
-            {/* Nút Hoàn tiền */}
-            {/* {selectedOrder?.payment.payment_method !==
-              "Thanh toán khi nhận hàng" && (
-              <Button
-                onClick={() => {
-                  setSelectedStatus("Đã hoàn tiền");
-                  handleUpdateStatus();
-                }}
-                className="mt-4 bg-red-500 text-white"
-              >
-                Hoàn tiền
-              </Button>
-            )} */}
-          </>
-        );
+
+     
       
       // case "Hủy đơn hàng":
       //   return (
@@ -193,6 +150,25 @@ const OrderDetailsCash: React.FC = () => {
         return null;
     }
   };
+
+  const formatDate = (dateString: any) => {
+    if (dateString && dateString.length === 14) {
+      // Tách chuỗi theo từng phần (yyyy, MM, dd, HH, mm, ss)
+      const year = dateString.slice(0, 4);
+      const month = dateString.slice(4, 6);
+      const day = dateString.slice(6, 8);
+      const hours = dateString.slice(8, 10);
+      const minutes = dateString.slice(10, 12);
+      const seconds = dateString.slice(12, 14);
+  
+      // Tạo đối tượng Date từ chuỗi đã tách
+      return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+    }
+    return null; // Trả về null nếu chuỗi không hợp lệ
+  };
+  
+  const formattedDate = formatDate(selectedOrder?.refundPay?.paymentDateVnPay);
+  
   return (
     <main className="w-full flex-grow p-6 bg-gray-50">
       <div className="max-w-4xl mx-auto">
@@ -204,17 +180,17 @@ const OrderDetailsCash: React.FC = () => {
                 <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                   <div className="space-y-2">
                   <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium ">Mã đơn hàng:</span> #
+                <span className="font-medium ">Mã đơn hàng:</span> {" "}
                 {selectedOrder.orderid}
               </p>
               <p className="text-lg mb-2 text-blue-700">
-                <span className="font-medium ">Trạng thái đơn hiện tại:</span> 
-                {selectedOrder.state}
+                <span className="font-medium ">Trạng thái đơn hiện tại:</span> {" "}
+                 {selectedOrder.state}
               </p>
 
               <p className="text-lg mb-2">
                 <span className="font-medium">Ngày mua sắm:</span>{" "}
-                {new Date(selectedOrder.dateOrder).toLocaleDateString()} VNĐ
+                {new Date(selectedOrder.dateOrder).toLocaleDateString('vi-VN')}
               </p>
               <p className="text-lg text-red-600 mb-2">
                 <span className="font-medium">Tổng tiền:</span>{" "}
@@ -224,7 +200,7 @@ const OrderDetailsCash: React.FC = () => {
               {renderStatusButton()}
       
 
-           <div className="mt-4">
+           <div className="mt-4"   style={{ display:selectedOrder.state === "Hủy đơn hàng" ? 'none' : 'block' }}>
             <label className="text-lg font-medium mb-2 block">
               Tiến trình giao hàng:
             </label>
@@ -273,12 +249,14 @@ const OrderDetailsCash: React.FC = () => {
                 {selectedOrder?.refundPay?.bankCode || ""}
               </p>
               <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium">Họ tên:</span>{" "}
-                {selectedOrder?.refundPay?.paymentDateVnPay || ""}
+                <span className="font-medium">Ngày thanh toán:</span>{" "}
+                {formattedDate ? formattedDate.toLocaleDateString('vi-VN') : ""}
               </p>
               <p className="text-lg text-gray-700">
-                <span className="font-medium">Số tài khoản:</span>{" "}
-                {selectedOrder?.refundPay?.transiTionAmout || ""}
+                <span className="font-medium">Giá tiền thanh toán:</span>{" "}
+                {selectedOrder?.refundPay?.transiTionAmout 
+    ? Number(selectedOrder.refundPay.transiTionAmout).toLocaleString() 
+    : ""} VNĐ
               </p>
             </div>
           </section>

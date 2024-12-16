@@ -2,7 +2,7 @@ import { Carousel } from "flowbite-react";
 
 export function UserBanner() {
   return (
-    <div className="h-56 sm:h-64 xl:h-80 2xl:h-96 px-4 bg-bgf3f4f6">
+    <div className="h-56 sm:h-64 xl:h-80 2xl:h-96 px-4 bg-white">
       <Carousel slide={false}>
         <img
           src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/banner%2Fbn-7.svg?alt=media&token=53fdddd8-1c89-4811-b91d-697b720e1eae"

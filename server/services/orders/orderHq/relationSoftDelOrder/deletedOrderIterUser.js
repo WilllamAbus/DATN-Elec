@@ -40,25 +40,36 @@ const deleOrderIterationUser = {
       const vnPay = await Vnpay.find({transaction_status: '00'})
 
       .lean()
+     
           
       if (!vnPay) {
         return "Không tìm thấy ngân hàng ";
       }
   
+      const filteredVnPay = vnPay.filter(payment => {
+        return !payment.order_info.includes("Thanh toan");
+      });
+      
+    
+   
+      const lastIndex = filteredVnPay.length - 1;
+      const lastElement = filteredVnPay[lastIndex];
+  
+      const OrderInForPayment = lastElement.order_info
+  
+      
+      const transOrderId = orderIds.toString();
+      let inforBank
+      let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+        bankCode: lastElement.bank_code,
+        orderInForVnPay: orderIds,
+        paymentDateVnPay: lastElement.payment_date,
+        transiTionAmout: lastElement.amount,
+      } : null
  
-
-  
-      const banksInfo = {
     
-       bankCode : vnPay[0].bank_code,
-       orderInForVnPay : orderIds,
-       paymentDateVnPay : vnPay[0].payment_date,
-       transiTionAmout : vnPay[0].amount,
   
-      } 
-
-
-    
+       
 
      await OrderAuction.findOneAndUpdate(
         { _id: orderIds }, // Query by the unique _id of the document

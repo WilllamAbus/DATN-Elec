@@ -8,7 +8,12 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import withReactContent from "sweetalert2-react-content";
-
+import {
+  downloadInvoiceExcelCash,
+  getInvoicePDFCash,
+} from "../../../../services/orderAuction/getOrderAdmin";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const MySwal = withReactContent(Swal);
 
 const ListOrdersDelete: React.FC = () => {
@@ -71,6 +76,26 @@ const ListOrdersDelete: React.FC = () => {
       }
     });
   };
+
+  const handleDownloadInvoice = async (orderId: string) => {
+    try {
+      await downloadInvoiceExcelCash(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
+
+  const handleDownloadInvoicePDF = async (orderId: string) => {
+    try {
+      await getInvoicePDFCash(orderId);
+      toast.success("Tải về thành công!");
+    } catch (error) {
+      toast.error("Failed to download the invoice.");
+      console.error("Error downloading invoice:", error);
+    }
+  };
   return (
     <>
       {/* Uncomment this to display loading state if needed */}
@@ -84,7 +109,7 @@ const ListOrdersDelete: React.FC = () => {
             <th scope="col" className="p-4">NGƯỜI DÙNG</th>
             <th scope="col" className="text-center">ĐỊA CHỈ</th>
             <th scope="col" className="p-4">SỐ ĐIỆN THOẠI</th>
-            <th scope="col" className="p-4">NGÂN HÀNG THANH TOÁN</th>
+        
             <th scope="col" className="p-4">TRẠNG THÁI</th>
             <th scope="col" className="p-4">CHỨC NĂNG</th>
           </tr>
@@ -93,13 +118,15 @@ const ListOrdersDelete: React.FC = () => {
           {Array.isArray(deltedOrder) && deltedOrder.length > 0  ? (
            deltedOrder?.map((order) => (
             <tr key={order._id} className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-          
-              <th scope="row" className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                <td className="p-4">
+                  {/* <input type="checkbox" className="w-4 h-4" /> */}
+                </td>
+              <td scope="row"  className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                 {order.shippingAddress.recipientName}
-              </th>
+              </td>
               <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.address}</td>
               <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.phoneNumber}</td>
-              <td className="py-4 px-6 border-b border-grey-light text-center">{order.refundBank?.bankCode || ''}</td>
+           
               <td className="py-4 px-6 border-b border-grey-light">
                   <span
                     className={`mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
@@ -230,6 +257,7 @@ const ListOrdersDelete: React.FC = () => {
                           order._id && handleRestoreDeleteOrder(order._id)
                         }
                       }}
+                   
                       disabled={
                         !(
                          
@@ -238,10 +266,11 @@ const ListOrdersDelete: React.FC = () => {
                           
                         )
                       }
+                      style={{ display: order.stateOrder === "Hủy đơn hàng" ? ' inline-flex ' : 'none' }} // Hide button if stateOrder is 'Hoàn tiền'
                     >
                       Khôi phục
                     </button>
-                    <Link to={`/admin/detailOrderAuction/${order._id}`}>
+                    <Link to={`/admin/detailOrderAuctionFrCash/${order._id}`}>
                       {/* SVG Icon embedded directly */}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -264,12 +293,58 @@ const ListOrdersDelete: React.FC = () => {
                           d="M12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"
                         />
                       </svg>
-                      {/* Xem chi tiết */}
+             
                     </Link>
-                  <button   onClick={() => order._id && handleRestoreDeleteOrder(order._id)}
-                   className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-600-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                    Khôi phục
-                  </button>
+                    {order.stateOrder === "Hoàn tiền thành công" && (
+                      <div
+                        onClick={() => handleDownloadInvoice(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#27AE60" />
+                          <path d="M20 20H44V44H20z" fill="#FFF" />
+                          <path
+                            d="M24 24L40 40M40 24L24 40"
+                            stroke="#27AE60"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-white">Đơn hàng Excel</span> */}
+                      </div>
+                    )}
+
+                    {order.stateOrder === "Hoàn tiền" && (
+                      <div
+                        onClick={() => handleDownloadInvoicePDF(order._id)}
+                        className="flex items-center cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="32"
+                          height="32"
+                          viewBox="0 0 64 64"
+                          className="mr-2"
+                        >
+                          <rect width="64" height="64" rx="8" fill="#E74C3C" />
+                          <path
+                            d="M32 12V52M22 22H42M22 32H42M22 42H32"
+                            stroke="#FFF"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        {/* <span className="text-sm font-medium text-black">Đơn hàng PDF</span> */}
+                      </div>
+                    )}
                 </div>
               </td>
             </tr>
@@ -277,7 +352,7 @@ const ListOrdersDelete: React.FC = () => {
           ) : (
             <tr>
             <td colSpan={5} className="text-center py-4">
-              No products found
+            Không có đơn hàng
             </td>
           </tr>
           )}
@@ -290,6 +365,7 @@ const ListOrdersDelete: React.FC = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
+       <ToastContainer />
     </>
   );
 };

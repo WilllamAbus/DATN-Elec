@@ -10,7 +10,7 @@ const middlewareController = require("../../../middleware/auth");
 router.post('/createBiding',middlewareController.verifyTokenUserAuth, biddingController.createBid);
 
 router.get('/bidAlls', biddingController.getAllBids);
-
+router.get('/bidAllActive', biddingController.getAllBidsActive);
 
 router.get('/getBidID/:bidId', biddingController.getBidById);
 
