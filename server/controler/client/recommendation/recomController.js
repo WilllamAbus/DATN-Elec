@@ -49,7 +49,7 @@ const recommendations = {
       const sortedItems = filteredItems
         .filter(item => item.score > 0)  // Lọc các item có score > 0
         .sort((a, b) => b.score - a.score)  // Sắp xếp theo điểm số giảm dần
-        .slice(0, 6);  // Lấy 8 sản phẩm đầu tiên
+        .slice(0, 10);  
 
       // Lấy thông tin chi tiết từ productVariant hoặc productAuction
       const result = [];
@@ -67,7 +67,7 @@ const recommendations = {
           itemDetails = await ProductVariant.findById(item.item)
             .populate('image')  // Populating hình ảnh từ imageVariant
             .populate('product_discount')
-            .populate({ 
+            .populate({
               path: 'product', // Truy xuất thông tin sản phẩm từ trường product
               select: 'weight_g product_ratingAvg slug' // Chỉ lấy các trường cần thiết
             })
@@ -79,12 +79,10 @@ const recommendations = {
 
         if (itemDetails) {
           // Kiểm tra nếu _id của itemDetails đã xuất hiện trong Set, nếu có thì bỏ qua
-          if (uniqueItemDetails.has(itemDetails._id.toString())) {
-            continue;  // Bỏ qua sản phẩm trùng lặp
+          if (uniqueItemDetails.has(itemDetails._id.toString() + item.itemType)) {
+            continue; // Bỏ qua sản phẩm trùng lặp hoàn toàn
           }
-
-          // Thêm _id của itemDetails vào Set để theo dõi
-          uniqueItemDetails.add(itemDetails._id.toString());
+          uniqueItemDetails.add(itemDetails._id.toString() + item.itemType);
 
           result.push({
             itemId: item.item,
