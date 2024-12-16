@@ -5,6 +5,7 @@ const auctionSchema = Schema(
   {
     productId: { type: Schema.Types.ObjectId, ref: 'productAuction'},
     auction_winner: { type: String, default: 'A' }, // Tên của người chiến thắng
+    auctionUser: { type: Schema.Types.ObjectId, ref: 'users' }, // Tên của người chiến thắng
     auction_total: { type: Number, default: 0 }, // Tổng giá trị đấu giá
     auction_quantity: { type: Number, default: 1 }, // Số lượng đấu giá
     // Khoảnh giá của phiên đấu giá

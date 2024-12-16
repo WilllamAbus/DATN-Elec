@@ -3,10 +3,15 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchAuctionData } from '../../services/auction/auctCheckout';
 import {AuctionData } from '../../types/auctions/auctCheckout';
 
-export const fetchAuction = createAsyncThunk<AuctionData, string>(
+interface FetchAuctionArgs {
+  userId: string;
+  productId: string;
+}
+
+export const fetchAuction = createAsyncThunk<AuctionData, FetchAuctionArgs>(
   'auction/fetchAuctionData',
-  async (productId: string) => {
-    const data = await fetchAuctionData(productId);
+  async ({ userId, productId }) => {
+    const data = await fetchAuctionData(userId, productId);
     console.log('auction', data);
     
     return data;

@@ -11,7 +11,7 @@ const listOrders: React.FC = () => {
       <ReusableBreadcrumb items={breadcrumbItems.recycleBinOrder} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Danh sách xóa mềm
+        Đơn hàng đấu giá hoàn trả
         </h1>
       </div>
 

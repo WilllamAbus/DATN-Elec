@@ -28,6 +28,10 @@ const bidSlice = createSlice({
   name: 'bids',
   initialState,
   reducers: {/**Test gan mot65 cai restState */
+    setBids(state, action: PayloadAction<Bid[]>) {
+      state.bids = action.payload;
+      state.totalBids = action.payload.length;
+    },
     resetStateBidding: (state) => {
       state.updatedBid = null;
       state.bidData = null;
@@ -36,8 +40,14 @@ const bidSlice = createSlice({
       state.bids = [];
       state.error = null;
  
+    },
+    clearCompletedAuction(state, action: PayloadAction<string>) {
+      const productId = action.payload;
+      state.bids = state.bids.filter(
+        (bid) => bid.product_bidding.productId._id !== productId // Truy cập `_id` của Product
+      );
+      state.totalBids = state.bids.length;
     }
-
 
   },
   extraReducers: (builder) => {
@@ -72,5 +82,5 @@ const bidSlice = createSlice({
     });
   },
 });
-export const { resetStateBidding } = bidSlice.actions;
+export const { resetStateBidding,setBids,clearCompletedAuction } = bidSlice.actions;
 export default bidSlice.reducer;

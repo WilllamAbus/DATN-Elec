@@ -24,6 +24,8 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   const userRole = useSelector(
     (state: RootState) => state.auth.profile?.roles || []
   );
+
+  
   const error = useSelector((state: RootState) => state.auth.login.error);
   // const roles = useSelector((state: RootState) => state.auth.login.roles);
   useEffect(() => {

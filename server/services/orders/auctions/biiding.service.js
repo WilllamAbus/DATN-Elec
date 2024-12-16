@@ -231,15 +231,13 @@ const biddingService = {
         }
       },
 
-     setupCronJob : () => {
-     
-      },
+ 
       getAllBids: async (page = 1, pageSize = 10) => {
         try {
         
        
           // Bước 1: Tìm tất cả TimeTrack có status là 'active'
-          const Biddings = await Bidding.find({ status: "disable" })
+          const Biddings = await Bidding.find({status:'disable' })
             .select("_id product_bidding bidder bidAmount bidTime bidEndTime priceRange status") 
             .populate("product_bidding" ,"product_name", "productId") // Chỉ lấy các trường cần thiết từ TimeTrack
             .lean();
@@ -381,7 +379,153 @@ const biddingService = {
           throw new Error(`Error retrieving : ${error.message}`);
         }
     },
+    getAllBidsActive: async (page = 1, pageSize = 10) => {
+      try {
+      
+     
+        // Bước 1: Tìm tất cả TimeTrack có status là 'active'
+        const Biddings = await Bidding.find({status:'active' })
+          .select("_id product_bidding bidder bidAmount bidTime bidEndTime priceRange status") 
+          .populate("product_bidding" ,"product_name", "productId") // Chỉ lấy các trường cần thiết từ TimeTrack
+          .lean();
+  
+        
+          
+        // Bước 2: Lấy danh sách productId từ timeTracks
+        const productIds = Biddings.map((bis) => bis.product_bidding.productId);
+        const priceRandBids = Biddings.map((bidRand) =>bidRand.priceRange)
+        const bidders = Biddings.map((bidUser) =>bidUser.bidder)
+        const timeBiddings = Biddings.map((timeBiddings) => timeBiddings.bidEndTime)
+        // Bước 3: Tìm các sản phẩm có _id nằm trong danh sách productIds
+        const products = await Product_v2.find({
+          _id: { $in: productIds },
+        })
+          .select("_id product_name image ")
+        
+          .lean();
 
+          const priceRand = await PriceRangeBid.find({
+            _id: { $in: priceRandBids },
+          })
+            .select("minBid midBid maxBid")
+          
+            .lean();
+
+
+            const priceRandUSer = await User.find({
+              _id: { $in: bidders },
+            })
+              .select("name")
+            
+              .lean();
+
+
+              const biddingTime = await User.find({
+                _id: { $in: timeBiddings },
+              })
+                .select("endTimeBid")
+              
+                .lean();
+
+             
+  
+
+        const productMap = {};
+        const priceRandMap = {};
+        const priceRandUserMap = {};
+        const timeRandMap = {};
+        products.forEach((product) => {
+          productMap[product._id] = product;
+        });
+
+        priceRand.forEach((rand) => {
+          priceRandMap[rand._id] = rand;
+        });
+
+        priceRandUSer.forEach((randUser) => {
+          priceRandUserMap[randUser._id] = randUser;
+        });
+
+        biddingTime.forEach((randUserTime) => {
+          timeRandMap[randUserTime._id] = randUserTime;
+        });
+  
+        // Bước 5: Thêm thông tin sản phẩm vào timeTracks
+        const matchedBidding = Biddings.map(ciddings => {
+          const productIdStr = ciddings.product_bidding?.productId?.toString(); // Chuyển ObjectId thành chuỗi
+          const product = productMap[productIdStr]; // Lấy thông tin sản phẩm từ productMap
+          
+          const randPrice = ciddings.priceRange.toString(); //
+          const randPriceObj = priceRandMap[randPrice];
+          
+          
+          const bidingUser = ciddings.bidder.toString()
+          const biddingUserObj = priceRandUserMap[bidingUser]
+
+          const bidngTime =  ciddings.bidEndTime.toString()
+          const bidngTimeObj = timeRandMap[bidngTime]
+          // Lấy thông tin giá trị đấu giá từ priceRandMap
+          // Nếu sản phẩm tồn tại, kết hợp thông tin từ timeTrack và product
+          if (product) {
+            return {
+              ...ciddings, // Thêm thông tin timeTrack
+              product,
+              randPriceObj,
+              biddingUserObj,
+              bidngTimeObj // Thêm thông tin sản phẩm
+            };
+          }
+          return null; // Trả về null nếu không tìm thấy sản phẩm
+        }).filter(track => track !== null); // Lọc các phần tử null
+  
+        // In ra kết quả
+    
+    
+        
+        // Lấy danh sách hình ảnh từ matchedTimeTracks
+        const allBiddingActive = matchedBidding.map(track => ({
+          timeTrackId: track._id,
+          productId: track.product._id,
+          productName: track.product.product_name,
+          image: track.product.image, // Lấy hình ảnh từ sản phẩm
+          minBib: track.randPriceObj.minBib,
+          midBid: track.randPriceObj.midBid,
+          maxBid: track.randPriceObj.maxBid,
+    
+          biddingUserObj: track.biddingUserObj.name,
+          // Lấy thông tin giá trị đấu giá từ priceRandMap
+        }));
+      
+        
+        // In ra danh sách hình ảnh
+  
+  
+        // Bước 6: Áp dụng tìm kiếm (nếu có)
+        const searchResults =  matchedBidding.filter((priceRange) => {
+          const productName = priceRange.product_bidding.product_name.toLowerCase();
+          return productName
+        })
+  
+        // Bước 7: Phân trang
+        const totalItems = searchResults.length; // Tổng số mục sau khi lọc
+        const totalBuckets = Math.ceil(totalItems / pageSize); // Tổng số bucket
+        const bucket = Math.min(totalBuckets, page); // Chỉ số bucket hiện tại
+        const paginatedResults = searchResults.slice((bucket - 1) * pageSize, bucket * pageSize); // Lấy dữ liệu của bucket
+    
+        // Bước 8: Tính toán tổng số trang
+        const totalPages = totalBuckets;
+  
+        return {
+          biddingActive: paginatedResults,
+          totalPageActive: totalPages,
+        currentPageActive: bucket,
+        allBiddingActive, // Trả về danh sách hình ảnh
+        };
+      } catch (error) {
+        console.error(error);
+        throw new Error(`Error retrieving : ${error.message}`);
+      }
+  },
     getBidById: async (bidId) => {
         try {
             const bid = await Bidding.findById(bidId)
