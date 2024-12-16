@@ -48,13 +48,13 @@ export function UserFooter() {
           </div>
         </div>
         <div className="w-full bg-bgZincFoterCopyRight px-4 py-6 sm:flex sm:items-center sm:justify-between ">
-          <FooterCopyright href="#" className="text-black" by="E-Com" year={2024} />
+          <FooterCopyright href="#"  by="E-Com" year={2024} />
           <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
-            <FooterIcon href="#" className="text-black" icon={BsFacebook} />
-            <FooterIcon href="#" className="text-black" icon={BsInstagram} />
-            <FooterIcon href="#" className="text-black" icon={BsTwitter} />
-            <FooterIcon href="#" className="text-black" icon={BsGithub} />
-            <FooterIcon href="#"  className="text-black"icon={BsDribbble} />
+            <FooterIcon href="#"  icon={BsFacebook} />
+            <FooterIcon href="#"  icon={BsInstagram} />
+            <FooterIcon href="#"  icon={BsTwitter} />
+            <FooterIcon href="#"  icon={BsGithub} />
+            <FooterIcon href="#"  icon={BsDribbble} />
           </div>
         </div>
       </div>

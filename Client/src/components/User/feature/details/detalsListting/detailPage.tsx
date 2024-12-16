@@ -8,7 +8,7 @@ import VariantName from "./cpnDetailPage/VariantName";
 import VariantPrice from "./cpnDetailPage/VariantPrice";
 import {
   FilterState,
-  QueryParamAuction,
+  QueryParamProduct,
 } from "../../../../../services/detailProduct/types/getDetailProduct";
 import DetailFilters from "./detaiFilter";
 import queryString from "query-string";
@@ -60,7 +60,7 @@ const DetailPage: React.FC = () => {
   }, [navigate, filters, location.pathname]);
 
   useEffect(() => {
-    const newQueryParams: QueryParamAuction = {};
+    const newQueryParams: QueryParamProduct = {};
     if (filters.storage?.length) {
       newQueryParams.storage = filters.storage;
     }
@@ -88,12 +88,18 @@ const DetailPage: React.FC = () => {
 
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters((prevFilters) => {
-      if (newFilters.storage && newFilters.storage !== prevFilters.storage) {
-        return { ...newFilters, color: "" };
+      const hasStorage = !!productDetail?.variants?.some(
+        (variant) => variant.storage // Kiểm tra xem sản phẩm có `storage`
+      );
+  
+      if (hasStorage && newFilters.storage && newFilters.storage !== prevFilters.storage) {
+        return { ...newFilters, color: "" }; // Reset color nếu storage thay đổi
       }
-      return { ...prevFilters, ...newFilters };
+  
+      return { ...prevFilters, ...newFilters }; // Nếu không có storage, chỉ cập nhật bình thường
     });
-  }, []);
+  }, [productDetail]);
+  
 
   const firstVariant = productDetail?.variants?.length
     ? productDetail.variants[0]
@@ -125,19 +131,16 @@ const DetailPage: React.FC = () => {
                       />
 
                       <div className="mt-4 sm:flex sm:items-center sm:gap-2 flex-wrap sm:flex-nowrap">
-   
+
                         <div className="flex items-center gap-3 flex-wrap">
                           <VariantPrice
                             variant={firstVariant}
                             product={productDetail || {}}
                           />
-
-        
                           <div className="flex items-center text-yellow-400">
                             <span className="ml-1 text-sm font-medium">{averageRating || "0"}</span>
                             <Star />
                           </div>
-
                           <p className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                             ({averageRating || "0"} trên 5)
                           </p>

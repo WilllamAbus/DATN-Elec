@@ -1,7 +1,7 @@
 import React from "react";
 const Categories: React.FC = () => {
   return (
-    <section className="bg-bgf3f4f6 py-8 antialiased dark:bg-gray-900 md:py-16">
+    <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <div className="mb-4 flex items-center justify-between gap-4 md:mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
