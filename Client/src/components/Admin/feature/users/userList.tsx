@@ -166,7 +166,7 @@ const MySwal = withReactContent(Swal);
 
 const UserList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  // const users = useSelector((state: RootState) => state.auth.activeUsers);
+
   const users = useSelector((state: RootState) => state.auth.userpagi || []);
   const [searchTerm, setSearchTerm] = useState<string>("");
   console.log(users);
@@ -177,9 +177,6 @@ const UserList: React.FC = () => {
   const totalPages = useSelector(
     (state: RootState) => state.auth.pagination?.totalPages || 1
   );
-  // useEffect(() => {
-  //   dispatch(getActiveListThunk());
-  // }, [dispatch]);
 
   useEffect(() => {
     dispatch(
@@ -245,7 +242,8 @@ const UserList: React.FC = () => {
   // }
 
   return (
-    <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg ">
+    <>
+      {/* <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg "> */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
         <div className="w-full md:w-1/2">
           <form className="flex items-center">
@@ -325,7 +323,9 @@ const UserList: React.FC = () => {
                     ) : (
                       <AvatarFallback name={user.name} className="mr-3" />
                     )}
-                    {user.name}
+                    {user.name.length > 20
+                      ? `${user.name.slice(0, 20)}...`
+                      : user.name}
                   </div>
                 </th>
                 <td className="py-4 px-6 border-b border-grey-light">
@@ -378,7 +378,8 @@ const UserList: React.FC = () => {
           onChange={(page) => handlePageChange(page)}
         />
       </div>
-    </div>
+      {/* </div> */}
+    </>
   );
 };
 

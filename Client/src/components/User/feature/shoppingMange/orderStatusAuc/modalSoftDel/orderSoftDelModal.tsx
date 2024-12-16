@@ -211,7 +211,7 @@ const DeleteOrderModal: React.FC<DeleteBidModalProps> = ({
                 className="text-white bg-red-600 hover:bg-red-700 rounded-lg 
                 text-sm px-5 py-2.5 dark:bg-red-500 dark:hover:bg-red-600"
               >
-                Xóa
+                Trả hàng
               </button>
             </div>
           </form>

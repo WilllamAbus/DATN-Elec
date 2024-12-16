@@ -485,7 +485,7 @@ const ProfileUse: React.FC = () => {
         {item === "listBid" && (
           <>
             <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
-            <span className="ms-3"> Lịch sử lệnh đấu giá</span>
+            <span className="ms-3"> Tổng lượt đấu giá</span>
           </>
         )}
       </button>

@@ -4,6 +4,7 @@ const OrderDetailAuction = require("../../../model/orders/auctionsOrders/aucOrde
 const Product_v2 = require("../../../model/productAuction/productAuction");
 const User = require("../../../model/users.model");
 const Inventory = require("../../../model/inventory/inventory.model");
+const Vnpay = require("../../../model/orders/vnpay.model");
 const iteractionOrderAucService = {
   getOrderByUser: async (userId) => {
     try {
@@ -552,7 +553,7 @@ const iteractionOrderAucService = {
           if (!orderToUpdate) {
             return "Không tìm thấy đơn hàng";
           }
-          const userId = orderToUpdate.shippingAddress?.userID
+       
     
           
           const orderIds = orderToUpdate._id;
@@ -573,24 +574,26 @@ const iteractionOrderAucService = {
        
           
           // Xử lý xóa mềm bất kể phương thức thanh toán
-          const user = await User.findOne({_id: userId}).populate("banks");
-   
-          
-          if (!user) {
-            return "Không tìm thấy người dùng ";
+          const vnPay = await Vnpay.find({transaction_status: '00'})
+       
+          .lean()
+      
+              
+          if (!vnPay) {
+            return "Không tìm thấy ngân hàng ";
           }
       
-          const defaultBank =
-            user.banks.find((bank) => bank.isDefault) || user.banks[0];
-
+     
+    
       
-          const banksInfo = defaultBank
-            ? {
-                bankName: defaultBank.name,
-                accountNumber: defaultBank.accountNumber,
-                accountName: defaultBank.fullName,
-              }
-            : null;
+          const banksInfo = {
+        
+           bankCode : vnPay[0].bank_code,
+           orderInForVnPay : orderIds,
+           paymentDateVnPay : vnPay[0].payment_date,
+           transiTionAmout : vnPay[0].amount,
+      
+          } 
 
       
           await OrderAuction.findOneAndUpdate(
@@ -653,8 +656,8 @@ const iteractionOrderAucService = {
           const order = await OrderAuction.findById(orderId);
 
         
-          if (!order || order.status === 'disable') {
-            throw new Error("Đơn hàng không tồn tại hoặc đã bị vô hiệu hóa");
+          if (!order ) {
+            throw new Error("Đơn hàng không tồn tại ");
           }
         
           // Kiểm tra trạng thái hiện tại
@@ -683,6 +686,59 @@ const iteractionOrderAucService = {
             return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
           } else {
             console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);
+            throw new Error("Không thể chuyển về trạng thái trước đó hoặc nhảy qua trạng thái.");
+          }
+        } catch (error) {
+          console.error("Error updating order status:", error.message || "Lỗi cập nhật trạng thái đơn hàng.");
+          throw new Error(error.message || "Lỗi cập nhật trạng thái đơn hàng.");
+        }
+        
+
+
+      
+
+      },
+
+
+
+      updateOrderStatusRefunCash : async (orderIdCash, stateOrderCash) => {
+        try {
+          const statusOrderFlowCash = [  "Hoàn tiền", "Chờ xử lý hoàn tiền", "Đã xác nhận hoàn tiền", "Hoàn tiền thành công"];
+        
+          // Tìm đơn hàng
+          const orderCash = await OrderAuction.findById(orderIdCash);
+
+        
+          if (!orderCash ) {
+            throw new Error("Đơn hàng không tồn tại ");
+          }
+        
+          // Kiểm tra trạng thái hiện tại
+          const currentIndexCash = statusOrderFlowCash.indexOf(orderCash.stateOrder);
+          const newIndexCash = statusOrderFlowCash.indexOf(stateOrderCash);
+        
+          // Nếu trạng thái hiện tại hoặc trạng thái mới không hợp lệ
+          if (currentIndexCash === -1 || newIndexCash === -1) {
+            throw new Error("Trạng thái hiện tại hoặc trạng thái mới không hợp lệ.");
+          }
+        
+          // Ngăn cản cập nhật khi đơn hàng đã "Hoàn tất"
+          if (orderCash.stateOrder === "Hoàn tiền thành công") {
+            return { message: "Đơn hàng đã 'Hoàn tiền thành công' và không thể chuyển sang trạng thái khác." };
+          }
+        
+          // Ràng buộc chỉ có thể chuyển tới trạng thái tiếp theo
+          if (newIndexCash > currentIndexCash && newIndexCash === currentIndexCash + 1) {
+            const updatedOrderCash = await OrderAuction.findOneAndUpdate(
+              { _id: orderIdCash },
+              { $set: { stateOrder: stateOrderCash } },
+              { new: true, runValidators: true }
+            );
+        
+  
+            return { orderCash: updatedOrderCash, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrderCash}` };
+          } else {
+            console.error("Trạng thái không hợp lệ. Current status:", orderCash.stateOrder, "New status:", stateOrderCash);
             throw new Error("Không thể chuyển về trạng thái trước đó hoặc nhảy qua trạng thái.");
           }
         } catch (error) {

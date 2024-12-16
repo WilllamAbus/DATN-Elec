@@ -5,8 +5,10 @@ const getUserAndService = require("./findByIdSoftDel");
 const sendDeletionConfirmationEmail = require("./mailForOrderItarac");
 const Product_v2 = require("../../../../model/productAuction/productAuction");
 const CustomerService = require("../../../../model/customer-service/customer-service.model");
+const User = require("../../../../model/users.model");
+const Vnpay = require("../../../../model/orders/vnpay.model");
 const deleOrderIterationUser = {
-  softDeleteOrdersByUser: async (orderId, userId) => {
+  softDeleteOrdersByUser: async (orderId) => {
     try {
       const nowUtc = new Date();
       const offset = 7 * 60 * 60 * 1000; // Chuyển đổi thời gian UTC sang múi giờ Việt Nam (UTC + 7)
@@ -19,11 +21,15 @@ const deleOrderIterationUser = {
         status: { $ne: "disable" },
       }).exec();
 
-      
+      const orderIds = orderToUpdate._id;
       if (!orderToUpdate) {
         return "Không tìm thấy đơn hàng";
       }
-
+      const orderDetail = await OrderDetailAuction.findOne({
+        order: orderIds,
+        status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
+      }).lean();
+      const orderPayment = orderDetail.payment_method;
       if (
         orderToUpdate.stateOrder !== "Chờ xử lý" &&
         orderToUpdate.stateOrder !== "Đã xác nhận"
@@ -31,24 +37,44 @@ const deleOrderIterationUser = {
         return "Đơn hàng không thể hủy. Chỉ các đơn hàng có trạng thái 'Chờ xử lý' hoặc 'Xác nhận đơn hàng' mới có thể hủy..";
       }
 
-      const orderIds = orderToUpdate._id;
+      const vnPay = await Vnpay.find({transaction_status: '00'})
 
-     await OrderAuction.updateOne(
+      .lean()
+          
+      if (!vnPay) {
+        return "Không tìm thấy ngân hàng ";
+      }
+  
+ 
+
+  
+      const banksInfo = {
+    
+       bankCode : vnPay[0].bank_code,
+       orderInForVnPay : orderIds,
+       paymentDateVnPay : vnPay[0].payment_date,
+       transiTionAmout : vnPay[0].amount,
+  
+      } 
+
+
+    
+
+     await OrderAuction.findOneAndUpdate(
         { _id: orderIds }, // Query by the unique _id of the document
         {
           $set: {
             status: "disable",
             disabledAt: now,
-            stateOrder: "Hủy đơn hàng",
+            stateOrder: "Hoàn tiền",
+            ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
           },
         },
+    
         { new: true } // Optionally, return the updated document
       ).exec();
 
-      const orderDetail = await OrderDetailAuction.findOne({
-        order: orderIds,
-        status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
-      }).lean();
+ 
 
       
       const inven = orderDetail.productID;

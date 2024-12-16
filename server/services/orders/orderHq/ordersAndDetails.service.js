@@ -65,10 +65,13 @@ const orderAndDetailService = {
       // Extract user details
       const recipientName = user.name || "Chưa nhập tên";
       const phoneNumber = user.phone || "Chưa nhập số điện thoại";
-      const shippingAddress = user.address;
+   
+      const defaultAddress = user.addresses.find(address => address.isDefault);
 
+      
+  
       // Prepare hashLinkPayment
-
+      const shippingAddress = defaultAddress.address;
 
 
       let hashLinkPayment;
@@ -280,11 +283,14 @@ const orderAndDetailService = {
  
       
       const orderIds = order._id;
-   
+  
+      
       if(status === '02'){
      
      
         const inven = await Inventory.findOne({ productAuction: productIds, status: "active" }).lean();
+
+        
         if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
 
   
@@ -315,7 +321,7 @@ const orderAndDetailService = {
           }
         );
 
-  
+ 
         
         return {
           orderIds,
@@ -328,9 +334,9 @@ const orderAndDetailService = {
         const paymentData = {
           amount: vnpayAmou,
           transaction: vnpTransNo,
-          bank_code: vnpayBankCode,
+          bank_code:  vnpayOrderInfo,
           card_type: 'ATM',
-          order_info: vnpayOrderInfo,
+          order_info: vnpayBankCode,
           payment_date: vnpPayDate,
           transaction_status: status,
           response_code: vnpayResponCode,
@@ -347,12 +353,12 @@ const orderAndDetailService = {
         };
       }
       // Return the consolidated order information
-      return {
-        orderIds,
-        shippingInfo, // Contains recipient, phone, address, and user email
-        totalPrice: totlePricr,
-        products: productDetails,
-      };
+      // return {
+      //   orderIds,
+      //   shippingInfo, // Contains recipient, phone, address, and user email
+      //   totalPrice: totlePricr,
+      //   products: productDetails,
+      // };
     } catch (error) {
       throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
     }
@@ -433,10 +439,11 @@ const orderAndDetailService = {
     try {
       // Find the order and populate the userID in shippingAddress
       const order = await OrderAuction.findById(orderId)
-        .populate("shippingAddress.userID") // Populating userID inside shippingAddress
+        .populate("shippingAddress.userID refundBank") // Populating userID inside shippingAddress
         .exec();
 
-
+      console.log('ordersss', order);
+      
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order
@@ -475,6 +482,12 @@ const orderAndDetailService = {
         email: order.shippingAddress.userID.email, // Assuming the user's email is stored here
       };
 
+      const refundPay = {
+        bank: order.bankCode,
+        paymentDateVnPay: order.paymentDateVnPay,
+        transiTionAmout: order.transiTionAmout,
+      }
+
       // Return the consolidated order information
       return {
         shippingInfo, // Contains recipient, phone, address, and user email
@@ -484,6 +497,7 @@ const orderAndDetailService = {
         paymetMethod: payment,
         orderid: order._id,
         dateOrder: date,
+        refundPay
       };
     } catch (error) {
       throw new Error(`Lỗi khi lấy thông tin đơn hàng: ${error.message}`);
@@ -729,7 +743,7 @@ const orderAndDetailService = {
 
         .lean();
 
-      console.log('orders', orders);
+
 
       const orderMatch = orders.map(orders => {
         // Lấy thông tin sản phẩm từ productMap

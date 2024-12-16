@@ -158,7 +158,7 @@ const OrderListPendingStatus: React.FC = () => {
                       onClick={() => handleDeleteClick(order)} // Truy cập _id từ đối tượng order
                         className="flex items-center justify-center whitespace-nowrap rounded-full px-4 py-3 bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 transition duration-200 ease-in-out"
                       >
-                        Hủy đơn hàng
+                        Trả hàng
                       </button>
                       <button
                         onClick={() => goBack()}

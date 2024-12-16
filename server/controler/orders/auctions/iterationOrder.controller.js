@@ -154,12 +154,30 @@ getConfirmedOrderByUser : async(req,res)=>{
         const { stateOrder } = req.body; // Get newStatus from the request body
     
         const updateOrderStatus = iteractionOrderAucService.updateOrderStatus(orderId, stateOrder)
-        console.log('update', updateOrderStatus);
+  
         
         res.status(200).json({success:true ,
            status: 200,
             data: (await updateOrderStatus).order,
              msg: (await updateOrderStatus).message})
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+  
+    },
+
+    updateorderStatusForCash: async(req, res)=>{
+      try {
+        const { orderIdCash } = req.params; // Get orderId from URL parameters
+        const { stateOrderCash } = req.body; // Get newStatus from the request body
+    
+        const updateOrderStatusCash = iteractionOrderAucService.updateOrderStatusRefunCash(orderIdCash, stateOrderCash)
+  
+        
+        res.status(200).json({success:true ,
+           status: 200,
+            data: (await updateOrderStatusCash).orderCash,
+             msg: (await updateOrderStatusCash).message})
       } catch (error) {
         res.status(500).json({ error: error.message });
       }

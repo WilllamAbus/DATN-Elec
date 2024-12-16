@@ -335,7 +335,8 @@ const biddingService = {
     
           // In ra kết quả
       
-    
+      
+          
           // Lấy danh sách hình ảnh từ matchedTimeTracks
           const allBidding = matchedBidding.map(track => ({
             timeTrackId: track._id,
@@ -349,7 +350,8 @@ const biddingService = {
             biddingUserObj: track.biddingUserObj.name,
             // Lấy thông tin giá trị đấu giá từ priceRandMap
           }));
-    
+        
+          
           // In ra danh sách hình ảnh
     
     

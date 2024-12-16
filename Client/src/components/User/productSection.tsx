@@ -8,7 +8,7 @@ import {
   addToWatchlistThunk,
   deleteWatchlistThunk,
 } from "../../redux/product/wathList/wathlist";
-import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+import { ProductAttribute } from "../../services/product_v2/client/types/homeAllProduct";
 // import { addProductToCart, fetchCartList } from "../../redux/cart/cartThunk";
 const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
 

@@ -1,9 +1,9 @@
-import instance from "../../axios"; 
-import { ImageVariant, ImageVariantResponse } from "./types/imageVariant"; 
+import instance from "../../axios";
+import { ImageVariant, ImageVariantResponse } from "./types/imageVariant";
 import { AxiosError } from "axios";
 
 export const addImageVariant = async (
-  product_variant_id: string, 
+  product_variant_id: string,
   imageVariant: ImageVariant
 ): Promise<ImageVariantResponse> => {
   try {
@@ -14,13 +14,16 @@ export const addImageVariant = async (
     }
 
 
-
     if (imageVariant.image && imageVariant.image.length > 0) {
-      for (let i = 0; i < imageVariant.image.length; i++) {
-        formData.append("image", imageVariant.image[i]);
-      }
+      Array.from(imageVariant.image).forEach((img) => {
+        if (img instanceof File) {
+          formData.append("image", img);
+        } else {
+          console.warn("Skipping invalid image", img);
+        }
+      });
     } else {
-      console.warn("ko có ảnh");
+      console.warn("Không có ảnh để thêm");
     }
 
     const response = await instance.post(`/admin/product/${product_variant_id}/add-image-variant`, formData, {
@@ -28,7 +31,6 @@ export const addImageVariant = async (
         "Content-Type": "multipart/form-data",
       },
     });
-    
 
     return response.data;
   } catch (error) {

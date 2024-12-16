@@ -405,18 +405,34 @@ export const restoreUserThunk = createAsyncThunk(
   }
 );
 // Thunk để lấy danh sách người dùng đã bị xóa mềm
-export const getDeletedListThunk = createAsyncThunk(
-  "auth/getDeletedList",
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await listDeleted();
-      console.log(result);
-      return result;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
+// export const getDeletedListThunk = createAsyncThunk(
+//   "auth/getDeletedList",
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const result = await listDeleted();
+//       console.log(result);
+//       return result;
+//     } catch (error) {
+//       return rejectWithValue((error as Error).message);
+//     }
+//   }
+// );
+export const getDeletedListThunk = createAsyncThunk<
+  LimitCrudUserResponse,
+  { page: number; search?: string },
+  { rejectValue: string }
+>("users/DeletedList", async ({ page, search }, { rejectWithValue }) => {
+  try {
+    const response = await listDeleted(page, search);
+    if (response.success) {
+      return response;
+    } else {
+      return rejectWithValue(response.msg);
     }
+  } catch (error: any) {
+    return rejectWithValue(error.message || "Lỗi không xác định");
   }
-);
+});
 
 //Lấy danh sách tk là active
 

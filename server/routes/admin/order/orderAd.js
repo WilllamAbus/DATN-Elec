@@ -14,7 +14,7 @@ router.get(
   orderController.getOrderLimit
 );
 router.get(
-  "/getSoftOrder",
+  "/getSoftOrder/limit",
   middlewareController.verifyTokenAdminAuth,
   orderDetail.getSoftdeleteOrder
 );

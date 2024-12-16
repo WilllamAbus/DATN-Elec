@@ -6,7 +6,7 @@ import {
   updateStatusById,
   getSoftOrder,
 } from "../../../services/order/OrderAdmin/orderAdmin";
-import { Order } from "../../../types/order/order";
+import { LimitDeletedListResponse, Order } from "../../../types/order/order";
 
 export const cancelOrderAdminThunk = createAsyncThunk<
   Order,
@@ -63,15 +63,34 @@ export const deleteOrderAdminThunk = createAsyncThunk<
   }
 });
 
+// export const listSoftOrderThunk = createAsyncThunk<
+//   Order[],
+//   void,
+//   { rejectValue: string }
+// >("order/listSoftOrder", async (_, { rejectWithValue }) => {
+//   try {
+//     const response = await getSoftOrder();
+//     return response.orders;
+//   } catch (error) {
+//     return rejectWithValue((error as Error).message);
+//   }
+// });
 export const listSoftOrderThunk = createAsyncThunk<
-  Order[],
-  void,
+  LimitDeletedListResponse,
+  { page: number; search?: string; stateOrder?: string },
   { rejectValue: string }
->("order/listSoftOrder", async (_, { rejectWithValue }) => {
-  try {
-    const response = await getSoftOrder();
-    return response.orders;
-  } catch (error) {
-    return rejectWithValue((error as Error).message);
+>(
+  "order/getSoftOrder",
+  async ({ page, search, stateOrder }, { rejectWithValue }) => {
+    try {
+      const response = await getSoftOrder(page, search, stateOrder);
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.msg);
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Lỗi không xác định");
+    }
   }
-});
+);

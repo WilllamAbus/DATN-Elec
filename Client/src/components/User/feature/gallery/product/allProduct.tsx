@@ -3,7 +3,7 @@ import { getProductShopping } from "../../../../../services/product_v2/client/ho
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
 import Sidebar from "../sidebar";
-import { ProductAttribute } from "~/services/product_v2/client/types/homeAllProduct";
+import { ProductAttribute } from "../../../../../services/product_v2/client/types/homeAllProduct";
 import { addToWatchlistThunk } from "../../../../../redux/product/wathList/wathlist";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/rootReducer";

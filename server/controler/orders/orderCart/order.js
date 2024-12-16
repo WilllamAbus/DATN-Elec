@@ -1426,11 +1426,12 @@ const authController = {
       // Kiểm tra trạng thái đơn hàng
       if (
         order.stateOrder !== "Hủy đơn hàng" &&
-        order.stateOrder !== "Hoàn tất"
+        order.stateOrder !== "Hoàn tất" &&
+        order.stateOrder !== "Đã hoàn tiền" &&
+        order.stateOrder !== "Giao hàng không thành công"
       ) {
         return res.status(403).json({
-          message:
-            "Đơn hàng không thể bị xóa vì trạng thái chưa hủy hoặc hoàn tất",
+          message: "Đơn hàng không thể bị xóa",
         });
       }
       const now = new Date();

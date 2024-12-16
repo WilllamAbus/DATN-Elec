@@ -1,3 +1,5 @@
+
+"use client"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 import { Link } from 'react-router-dom'; // Import Link
 
@@ -24,11 +26,12 @@ export default function DropdownVariant({ variants, productId }: DropdownVariant
       <DropdownMenu aria-label="Static Actions">
         {variantCount > 0 ? (
           <DropdownItem
-          textValue="Danh sách sản phẩm biến thể" >
+            key="variant-list" // Thêm thuộc tính key
+            textValue="Danh sách sản phẩm biến thể" >
             <Link to={`/admin/list-product-variant/${productId}`}>Danh sách sản phẩm biến thể</Link>
           </DropdownItem>
         ) : (
-          <DropdownItem isDisabled>No variants available</DropdownItem> 
+          <DropdownItem key="no-variants" isDisabled>No variants available</DropdownItem> 
         )}
       </DropdownMenu>
     </Dropdown>

@@ -431,7 +431,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useVNPay } from "../../../../hooks/vnpay";
 import { CartItem } from "../../../../types/cart/carts";
 import { Card } from "flowbite-react";
-import { Button, Radio, RadioGroup } from "@nextui-org/react";
+import { Radio, RadioGroup } from "@nextui-org/react";
 import Swal from "sweetalert2";
 
 type FormData = {
@@ -833,23 +833,20 @@ const CheckoutPage: React.FC = () => {
                       aria-label="Thanh toán khi nhận hàng"
                     >
                       <div className="flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                        <img
+                          src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Fcash.png?alt=media&token=ecd7d9a0-342a-4dd9-b712-dffdab256441"
+                          alt="VnPay"
                           width="50"
                           height="50"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M4.308 18.616q-.667 0-1.141-.475q-.475-.475-.475-1.141V8.692q0-.212.144-.356t.357-.144t.356.144t.143.356V17q0 .23.192.423q.193.193.424.193h13.538q.213 0 .356.143q.144.144.144.357t-.144.356t-.356.144zm3-3q-.667 0-1.141-.475q-.475-.475-.475-1.141V6.846q0-.666.475-1.14t1.14-.475h12.385q.667 0 1.141.474t.475 1.141V14q0 .666-.475 1.14q-.474.476-1.14.476zm1-1q0-.672-.475-1.144Q7.36 13 6.693 13v1q0 .25.182.433t.433.183zm10.384 0h1q.25 0 .433-.183t.183-.433v-1q-.672 0-1.144.475q-.472.474-.472 1.14M13.5 12.424q.846 0 1.423-.577t.577-1.423T14.923 9T13.5 8.423T12.077 9t-.577 1.423t.577 1.423t1.423.577M6.692 7.846q.672 0 1.144-.474q.472-.475.472-1.141h-1q-.25 0-.433.183t-.183.432zm13.616 0v-1q0-.25-.183-.432t-.433-.183h-1q0 .671.475 1.143q.474.472 1.14.472"
-                          />
-                        </svg>
+                          className="object-contain"
+                        />
                         <div className="ml-5">
                           <span className="font-semibold">
                             Thanh toán khi nhận hàng
                           </span>
                           <p className="text-slate-500 text-sm leading-6">
-                            Delivery: 2-4 Days
+                            Giao hàng: Dự kiến trong 2-4 ngày làm việc, tùy
+                            thuộc vào địa chỉ của bạn.
                           </p>
                         </div>
                       </div>
@@ -857,29 +854,21 @@ const CheckoutPage: React.FC = () => {
 
                     <Radio value="vnPay" aria-label="vnPay">
                       <div className="flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
+                        <img
+                          src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Fvnpay.png?alt=media&token=d894f968-8e29-4897-a2ac-c80bba0e00f1"
+                          alt="VnPay"
                           width="50"
                           height="50"
-                          viewBox="0 0 24 24"
-                        >
-                          <rect width="24" height="24" fill="none" />
-                          <g fill="none">
-                            <g clipPath="url(#grommetIconsSamsungPay0)">
-                              <path
-                                fill="#110404"
-                                fillRule="evenodd"
-                                d="M21.33 2.688c1.395 1.48 2.192 3.502 2.477 5.723c.284 2.135.17 3.587.17 3.587s.086 1.452-.199 3.587c-.284 2.22-1.082 4.243-2.477 5.723c-1.48 1.395-3.502 2.192-5.722 2.477c-2.136.256-3.588.2-3.588.2s-1.451.084-3.587-.2c-2.22-.285-4.242-1.082-5.722-2.477c-1.395-1.48-2.193-3.502-2.477-5.723c-.257-2.135-.2-3.587-.2-3.587s-.057-1.452.228-3.587C.518 6.19 1.315 4.169 2.71 2.688C4.19 1.293 6.212.496 8.433.211C10.568-.045 12.02.012 12.02.012s1.452-.085 3.587.2c2.22.284 4.242 1.081 5.723 2.476M6.582 8.496H4.447v6.292h1.167v-1.793h.968c.342 0 .655-.058.911-.172s.513-.284.712-.483a2.1 2.1 0 0 0 .484-.712c.114-.285.17-.57.17-.883a2.3 2.3 0 0 0-.17-.882a2.1 2.1 0 0 0-.484-.712a2.1 2.1 0 0 0-.712-.484a2.4 2.4 0 0 0-.91-.17Zm-.996 3.388V9.55h.91c.172 0 .342.028.485.085a1.1 1.1 0 0 1 .37.256c.085.114.17.228.228.37c.057.143.085.285.085.456c0 .17-.028.313-.085.456a1.08 1.08 0 0 1-.598.626a1.3 1.3 0 0 1-.484.085zm5.067 2.733c.314.114.598.171.912.171c.341 0 .626-.057.91-.171c.285-.142.542-.313.712-.541v.712h1.168V9.72h-1.168v.655c-.199-.2-.427-.37-.711-.484a2.3 2.3 0 0 0-.912-.17c-.341 0-.626.056-.939.17c-.285.114-.57.256-.797.484a2.7 2.7 0 0 0-.57.797c-.142.313-.199.684-.199 1.082c0 .399.086.769.228 1.082s.342.57.57.797c.227.2.512.37.796.484m1.709-.996c-.171.085-.37.114-.598.114a1.9 1.9 0 0 1-.598-.114l-.004-.002c-.17-.085-.339-.17-.48-.311a3 3 0 0 1-.313-.484a1.3 1.3 0 0 1-.114-.57c0-.199.028-.398.114-.569c.057-.17.17-.313.313-.456a1.4 1.4 0 0 1 .484-.313c.2-.085.399-.114.598-.114c.2 0 .398.029.598.143c.199.085.341.17.484.313c.142.114.227.285.313.456c.085.17.114.37.114.569s-.029.398-.114.57a1.6 1.6 0 0 1-.313.455c-.143.142-.313.228-.484.313m5.039-.427l-1.424-3.445h-1.224l2.05 4.812l-1.053 2.533h1.195l2.99-7.345H18.71z"
-                              />
-                            </g>
-                          </g>
-                        </svg>
+                          className="object-contain"
+                        />
+
                         <div className="ml-5">
                           <span className="font-semibold">
                             Thanh Toán VnPay
                           </span>
                           <p className="text-slate-500 text-sm leading-6">
-                            Payment via VnPay
+                            Giao hàng: Dự kiến trong 2-4 ngày làm việc, tùy
+                            thuộc vào địa chỉ của bạn.
                           </p>
                         </div>
                       </div>
@@ -946,7 +935,7 @@ const CheckoutPage: React.FC = () => {
                   readOnly
                 />
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {/* <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label
                       htmlFor="expiry_date"
@@ -969,7 +958,7 @@ const CheckoutPage: React.FC = () => {
                       </Button>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
               <button className="mt-8 w-full rounded-md bg-blue-500 py-3 text-white font-medium transition duration-200 hover:bg-blue-600">
                 Thanh toán

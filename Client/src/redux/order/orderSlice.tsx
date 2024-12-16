@@ -22,7 +22,12 @@ import {
   updateStatusByIdThunk,
   listSoftOrderThunk,
 } from "./Admin/orderAdmin";
-import { Order, OrderItem } from "../../types/order/order";
+import {
+  LimitCrudOrderResponse,
+  Order,
+  OrderItem,
+  Pagination,
+} from "../../types/order/order";
 
 interface OrderState {
   selectedOrder: Order | null;
@@ -32,6 +37,7 @@ interface OrderState {
 
   items: OrderItem[];
 
+  pagination: Pagination | null;
   softDeletedOrders: Order[];
 
   status: "idle" | "loading" | "succeeded" | "failed";
@@ -43,7 +49,7 @@ const initialState: OrderState = {
   items: [],
   orders: [],
   order: null,
-
+  pagination: null,
   softDeletedOrders: [],
 
   status: "idle",
@@ -93,21 +99,39 @@ const orderSlice = createSlice({
         state.error = action.error.message ?? "An error occurred";
       })
 
+      // .addCase(listSoftOrderThunk.pending, (state) => {
+      //   state.status = "loading";
+      // })
+      // .addCase(
+      //   listSoftOrderThunk.fulfilled,
+      //   (state, action: PayloadAction<Order[]>) => {
+      //     state.status = "succeeded";
+      //     state.softDeletedOrders = action.payload;
+      //   }
+      // )
+      // .addCase(listSoftOrderThunk.rejected, (state, action) => {
+      //   state.status = "failed";
+      //   state.error = (action.payload as string) || "An error occurred";
+      // })
       .addCase(listSoftOrderThunk.pending, (state) => {
         state.status = "loading";
       })
       .addCase(
         listSoftOrderThunk.fulfilled,
-        (state, action: PayloadAction<Order[]>) => {
+        (state, action: PayloadAction<LimitCrudOrderResponse>) => {
           state.status = "succeeded";
-          state.softDeletedOrders = action.payload;
+          state.softDeletedOrders = action.payload.data.orders;
+          state.pagination = action.payload.pagination;
         }
       )
       .addCase(listSoftOrderThunk.rejected, (state, action) => {
+        console.error("Error payload:", action.payload);
         state.status = "failed";
-        state.error = (action.payload as string) || "An error occurred";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Lỗi không xác định";
       })
-
       .addCase(fetchUserOrdersThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;

@@ -340,11 +340,11 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
                 <span className="text-red-600">Hết Hàng</span>
               )}
             </p> */}
-            <p className="text-gray-800 font-roboto font-bold">
+            <p className="text-red-600 font-roboto font-bold">
               <span>Thời gian hiện tại: {currentTime}</span>
             </p>
 
-            <p className="text-gray-800 font-roboto font-bold ">
+            <p className="text-red-600 font-roboto font-bold ">
               {/* <span>Thời gian kết thúc: </span>
               <span>{endTime.toLocaleString()}</span> */}
               <span>Thời gian kết thúc: {formattedEndTime}</span>

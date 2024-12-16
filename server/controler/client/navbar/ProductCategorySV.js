@@ -5,8 +5,8 @@ const ProductVariant = require('../../../model/product_v2/productVariant');
 const ProductCategoryService = {
   getProductsByCategory: (categoryId, page = 1, limit = 8, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, variantPrices) => new Promise(async (resolve, reject) => {
     try {
-      page = parseInt(page, 10) || 1;
-      limit = parseInt(limit, 10) || 12;
+      page = parseInt(page, 8) || 1;
+      limit = parseInt(limit, 8) || 8;
       const offset = (page - 1) * limit;
 
       if (limit <= 0) {
@@ -89,6 +89,17 @@ const ProductCategoryService = {
         discountFilter['product_discount.discountPercent'] = { ...discountFilter['product_discount.discountPercent'], $lte: parseFloat(maxDiscountPercent) };
       }
       const sortOptions = {};
+      if (_sort) {
+        const [sortField, sortDirection] = _sort.split(":");
+        const direction = sortDirection === "ASC" ? 1 : -1;
+
+        if (sortField === "variant_price") {
+          sortOptions['variants.variant_price'] = direction;
+        } else {
+          sortOptions[sortField] = direction;
+        }
+      }
+
       const products = await Product.find({
         product_type: categoryId,
         status: { $ne: 'disable' },
@@ -125,34 +136,49 @@ const ProductCategoryService = {
         })
         .select('product_name image product_description slug product_discount product_brand variants product_condition product_supplier product_quantity product_ratingAvg product_view weight_g isActive status disabledAt comments')
         .lean();
-        const filteredProducts = products.filter(product => {
-          // Chỉ giữ lại sản phẩm có ít nhất một biến thể khớp với các tiêu chí
-          const validVariants = product.variants.filter(variant => {
-            const matchesRam = ram && ram.length > 0 ? ram.includes(variant.ram?._id.toString()) : true;
-            const matchesStorage = storage && storage.length > 0 ? storage.includes(variant.storage?._id.toString()) : true;
-        
-            return matchesRam && matchesStorage;
-          });
-        
-          // Cập nhật lại danh sách biến thể hợp lệ cho sản phẩm
-          product.variants = validVariants;
-        
-          // Chỉ giữ sản phẩm nếu có biến thể hợp lệ
-          return validVariants.length > 0;
+      const filteredProducts = products.filter(product => {
+        // Chỉ giữ lại sản phẩm có ít nhất một biến thể khớp với các tiêu chí
+        const validVariants = product.variants.filter(variant => {
+          const matchesRam = ram && ram.length > 0 ? ram.includes(variant.ram?._id.toString()) : true;
+          const matchesStorage = storage && storage.length > 0 ? storage.includes(variant.storage?._id.toString()) : true;
+
+          return matchesRam && matchesStorage;
         });
-        
-        
+
+        // Cập nhật lại danh sách biến thể hợp lệ cho sản phẩm
+        product.variants = validVariants;
+
+        // Chỉ giữ sản phẩm nếu có biến thể hợp lệ
+        return validVariants.length > 0;
+      });
+
+
+
+      const total = await Product.countDocuments({
+        product_type: categoryId,
+        status: { $ne: 'disable' },
+        variants: { $exists: true, $ne: [] },
+        ...brandFilter,
+        ...conditionShoppingFilter,
+        ...priceFilter,
+        ...discountFilter,
+        ...ramFilter,
+        ...storageFilter,
+      });
       if (_sort) {
         const [sortField, sortDirection] = _sort.split(":");
+        const direction = sortDirection === "DESC" ? -1 : 1;
+
         if (sortField === "variant_price") {
-          products.sort((a, b) => {
-            const aPrice = a.variants[0]?.variant_price || 0;
-            const bPrice = b.variants[0]?.variant_price || 0;
-            return sortDirection === "ASC" ? aPrice - bPrice : bPrice - aPrice;
+          filteredProducts.sort((a, b) => (a.variants[0]?.variant_price || 0) - (b.variants[0]?.variant_price || 0) * direction);
+        } else {
+          filteredProducts.sort((a, b) => {
+            if (a[sortField] > b[sortField]) return direction;
+            if (a[sortField] < b[sortField]) return -direction;
+            return 0;
           });
         }
       }
-      const total = filteredProducts.length;
       const categoryInfo = await ProductType.findById(categoryId).select('name');
       if (!categoryInfo) {
         return reject({

@@ -257,7 +257,7 @@ export const breadcrumbItems = {
   ],
   recycleBinOrder: [
     { href: "/admin", label: "Trang quản trị" },
-    { href: "/admin/recycleBinOrder", label: "Danh sách xóa mềm" },
+    { href: "/admin/recycleBinOrder", label: "Danh sách đơn hàng hoàn trả" },
   ],
   listComments: [
     { href: "/admin", label: "Trang quản trị" },
