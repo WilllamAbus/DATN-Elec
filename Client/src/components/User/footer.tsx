@@ -10,7 +10,7 @@ import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-
 
 export function UserFooter() {
   return (
-    <Footer className="bg-bgZincFoter">
+    <Footer className="bg-white">
       <div className="w-full">
         <div className="grid w-full grid-cols-2 gap-8 px-6 py-8 md:grid-cols-4">
           <div>
@@ -47,7 +47,7 @@ export function UserFooter() {
             </FooterLinkGroup>
           </div>
         </div>
-        <div className="w-full bg-bgZincFoterCopyRight px-4 py-6 sm:flex sm:items-center sm:justify-between ">
+        <div className="w-full bg-[#f1f1f1] px-4 py-6 sm:flex sm:items-center sm:justify-between ">
           <FooterCopyright href="#"  by="E-Com" year={2024} />
           <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
             <FooterIcon href="#"  icon={BsFacebook} />

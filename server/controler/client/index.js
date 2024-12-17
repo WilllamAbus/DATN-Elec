@@ -1,5 +1,5 @@
 
-const {homeAllProduct,getID,auction,upView,shopping,search,recommendations} = require('./home');
+const {homeAllProduct,getID,auction,upView,shopping,search,recommendations,getPhoneByVariants,getLaptopByVariants} = require('./home');
 const {getLimitProductClient, relatedProduct} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
@@ -48,6 +48,8 @@ module.exports = {
   getProductDetail,
   getAllStorageBySlugUrl,
   getAllProductVariantsByVariantPrice,
-  recommendations
+  recommendations,
+  getPhoneByVariants,
+  getLaptopByVariants
 };
 

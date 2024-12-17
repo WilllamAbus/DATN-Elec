@@ -53,7 +53,6 @@ const ProductAuctionService = {
         .populate('product_supplier')
         .select('product_name image product_description slug product_discount product_brand product_condition product_supplier  product_quantity product_ratingAvg product_view product_price product_price_unit weight_g isActive status disabledAt comments')
         .lean();
-      console.log("Products:", products);
       const total = await Product.countDocuments({
         status: { $ne: 'disable' },
         ...brandFilter,

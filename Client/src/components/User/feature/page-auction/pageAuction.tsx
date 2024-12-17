@@ -105,7 +105,7 @@ export default function AuctionSidebar() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   return (
     <div>
-      <ReusableBreadcrumbClient items={breadcrumbItemClient.productlist} />
+      <ReusableBreadcrumbClient items={breadcrumbItemClient.auction} />
       <div className="w-full max-w-screen-2xl px-0 bg-white">
         <div>
           <Dialog

@@ -7,5 +7,9 @@ export const breadcrumbItemClient = {
     { href: "/", label: "Trang chủ" },
     { href: "/productlist", label: "Laptop" },
   ],
+  auction: [
+    { href: "/", label: "Trang chủ" },
+    { href: "/productlist", label: "Đấu giá" },
+  ],
 
 };

@@ -9,3 +9,5 @@ export { default as getAllStorageSlice } from "./getAllStorage";
 export { default as getProductDetailSlice } from "./getProductDetail";
 export { default as getAllStorageBySlugUrlSlice } from "./getAllStorageBySlugUrl";
 export { default as getAllProductVariantsByVariantPriceSlice } from "./getAllProductVariantsByVariantPrice";
+export { default as getPhoneByVariantsSlice } from "./getPhoneByVariants";
+export { default as getLaptopByVariantsSlice } from "./getLaptopByVariants";
