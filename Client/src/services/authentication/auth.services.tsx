@@ -7,6 +7,7 @@ import {
   LimitCrudUserResponse,
   UserProfile,
 } from "../../types/user";
+import { LimitCrudWathlistResponse } from "../../types/cart/profile/wathlist";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const registerUser = async (user: {
@@ -241,7 +242,7 @@ export const addToWatchlist = async (variantId: string) => {
   }
 };
 
-export const getWatchlist = async () => {
+export const CheckWatchlist = async () => {
   try {
     const response = await instance.get(`${API_URL}/wathlist/`);
     return response.data;
@@ -255,25 +256,28 @@ export const getWatchlist = async () => {
     }
   }
 };
+export const getWatchlist = async (
+  page: number,
+  search?: string
+): Promise<LimitCrudWathlistResponse> => {
+  try {
+    const queryParams = new URLSearchParams({ page: page.toString() });
 
-// export const DeleteWatchlist = async (productId: string) => {
-//   try {
-//     const response = await instance.delete(
-//       `${API_URL}/wathlist/delete/${productId}`
-//     );
-//     return response.data;
-//   } catch (error) {
-//     if (axios.isAxiosError(error) && error.response) {
-//       throw new Error(error.response.data.message || error.message);
-//     } else if (error instanceof Error) {
-//       throw new Error(error.message);
-//     } else {
-//       throw new Error(
-//         "Error deleting from watchlist: An unknown error occurred"
-//       );
-//     }
-//   }
-// };
+    if (search) {
+      queryParams.append("search", search);
+    }
+
+    const response = await instance.get<LimitCrudWathlistResponse>(
+      `${API_URL}/wathlist/limit/?${queryParams.toString()}`
+    );
+    console.log("Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Order:", error);
+    throw new Error("Failed to fetch Order");
+  }
+};
+
 export const DeleteWatchlist = async (variantId: string) => {
   try {
     const response = await instance.delete(

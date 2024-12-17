@@ -482,15 +482,25 @@ const CheckoutPage: React.FC = () => {
           _id: cart?._id,
           order: orderIdParam || "",
           items: cart?.items.map((item: CartItem) => ({
+            // product: {
+            //   ...item.product,
+            //   product_attributes: item.product.product_attributes.map(
+            //     (attr) => ({
+            //       k: attr.k,
+            //       v: attr.v,
+            //     })
+            //   ),
+            // },
             product: {
               ...item.product,
-              product_attributes: item.product.product_attributes.map(
-                (attr) => ({
-                  k: attr.k,
-                  v: attr.v,
-                })
-              ),
+              product_attributes: Array.isArray(item.product.product_attributes)
+                ? item.product.product_attributes.map((attr) => ({
+                    k: attr.k,
+                    v: attr.v,
+                  }))
+                : [],
             },
+
             quantity: item.quantity,
             price: item.product.product_price_unit,
             totalItemPrice: item.product.product_price_unit * item.quantity,

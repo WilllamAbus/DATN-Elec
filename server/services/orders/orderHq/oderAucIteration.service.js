@@ -586,14 +586,26 @@ const iteractionOrderAucService = {
      
     
       
-          const banksInfo = {
+          const filteredVnPay = vnPay.filter(payment => {
+            return !payment.order_info.includes("Thanh toan");
+          });
+          
         
-           bankCode : vnPay[0].bank_code,
-           orderInForVnPay : orderIds,
-           paymentDateVnPay : vnPay[0].payment_date,
-           transiTionAmout : vnPay[0].amount,
+       
+          const lastIndex = filteredVnPay.length - 1;
+          const lastElement = filteredVnPay[lastIndex];
       
-          } 
+          const OrderInForPayment = lastElement.order_info
+      
+          
+          const transOrderId = orderIds.toString();
+          let inforBank
+          let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+            bankCode: lastElement.bank_code,
+            orderInForVnPay: orderIds,
+            paymentDateVnPay: lastElement.payment_date,
+            transiTionAmout: lastElement.amount,
+          } : null
 
       
           await OrderAuction.findOneAndUpdate(

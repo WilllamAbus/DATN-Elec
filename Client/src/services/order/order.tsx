@@ -1,6 +1,6 @@
 import axios from "axios";
 import instance from "../axios";
-import { Order } from "../../types/order/order";
+import { LimitCrudOrderResponse, Order } from "../../types/order/order";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -50,24 +50,9 @@ export const listOrder = async (page = 1, limit = 10) => {
   }
 };
 
-export const fetchUserOrders = async () => {
-  try {
-    const response = await instance.get(`${API_URL}/order/UserOrders`);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw new Error(error.response.data.message || error.message);
-    } else if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error("Error fetching UserOrders: An unknown error occurred");
-    }
-  }
-};
-
-// export const cancelOrder = async (orderId: string) => {
+// export const fetchUserOrders = async () => {
 //   try {
-//     const response = await instance.put(`${API_URL}/order/cancel/${orderId}`);
+//     const response = await instance.get(`${API_URL}/order/limit`);
 //     return response.data;
 //   } catch (error) {
 //     if (axios.isAxiosError(error) && error.response) {
@@ -75,10 +60,37 @@ export const fetchUserOrders = async () => {
 //     } else if (error instanceof Error) {
 //       throw new Error(error.message);
 //     } else {
-//       throw new Error("Error canceling order: An unknown error occurred");
+//       throw new Error("Error fetching UserOrders: An unknown error occurred");
 //     }
 //   }
 // };
+export const fetchUserOrders = async (
+  page: number,
+  search?: string,
+  stateOrder?: string
+): Promise<LimitCrudOrderResponse> => {
+  try {
+    const queryParams = new URLSearchParams({ page: page.toString() });
+
+    if (search) {
+      queryParams.append("search", search);
+    }
+
+    if (stateOrder) {
+      queryParams.append("stateOrder", stateOrder);
+    }
+
+    const response = await instance.get<LimitCrudOrderResponse>(
+      `${API_URL}/order/limit/?${queryParams.toString()}`
+    );
+    console.log("Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Order:", error);
+    throw new Error("Failed to fetch Order");
+  }
+};
+
 export const cancelOrder = async (orderId: string, cancelReason: string) => {
   try {
     const response = await instance.put(`${API_URL}/order/cancel/${orderId}`, {

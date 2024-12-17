@@ -1,4 +1,5 @@
-import { ProductVariant } from "../../../types/ProductV2";
+import { ProductVariant } from "../carts";
+
 export interface WatchlistItem {
   _id: string;
   user: string;
@@ -19,8 +20,28 @@ export interface WatchlistItem {
     product_attributes: { k: string; v: string }[];
     weight_g: number;
     image: string[];
+    product_ratingAvg: number;
+    slug: string;
   };
   productVariant: ProductVariant[];
   createdAt: string;
   updatedAt: string;
+}
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface LimitCrudWathlistResponse {
+  success: boolean;
+  err: number;
+  msg: string;
+  status: number;
+  data: {
+    total: number;
+    data: WatchlistItem[];
+  };
+  pagination: Pagination;
 }

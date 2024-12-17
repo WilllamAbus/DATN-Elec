@@ -120,7 +120,7 @@ const ListProductTime: React.FC = () => {
           {timeTracks && timeTracks.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-4">
-                No products found
+                Không có dữ liệu
               </td>
             </tr>
           ) : (

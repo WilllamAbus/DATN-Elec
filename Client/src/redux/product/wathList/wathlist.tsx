@@ -4,7 +4,9 @@ import {
   addToWatchlist,
   getWatchlist,
   DeleteWatchlist,
+  CheckWatchlist,
 } from "../../../services/authentication/auth.services";
+import { LimitCrudWathlistResponse } from "src/types/cart/profile/wathlist";
 
 // interface WatchlistItem {
 //   userId: string;
@@ -27,13 +29,13 @@ export const addToWatchlistThunk = createAsyncThunk<
     }
   }
 });
-export const getWatchlistThunk = createAsyncThunk<
+export const CheckWatchlistThunk = createAsyncThunk<
   any[],
   void,
   { rejectValue: string }
->("watchlist/getWatchlist", async (_, thunkAPI) => {
+>("watchlist/CheckWatchlist", async (_, thunkAPI) => {
   try {
-    const response = await getWatchlist();
+    const response = await CheckWatchlist();
     console.log("danh sách wathlisst", response);
 
     return response.data;
@@ -43,6 +45,22 @@ export const getWatchlistThunk = createAsyncThunk<
     } else {
       return thunkAPI.rejectWithValue("An unknown error occurred");
     }
+  }
+});
+export const getWatchlistThunk = createAsyncThunk<
+  LimitCrudWathlistResponse,
+  { page: number; search?: string },
+  { rejectValue: string }
+>("watchlist/getWatchlist", async ({ page, search }, { rejectWithValue }) => {
+  try {
+    const response = await getWatchlist(page, search);
+    if (response.success) {
+      return response;
+    } else {
+      return rejectWithValue(response.msg);
+    }
+  } catch (error: any) {
+    return rejectWithValue(error.message || "Lỗi không xác định");
   }
 });
 

@@ -17,4 +17,6 @@ router.get('/completStateOrderAuc', iteractionOrderAuController.getCompleteOrder
 router.patch('/received/soft-delete/:orderId',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);
 router.put('/updateStatus/:orderId', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatus)
 router.put('/updateStatusCash/:orderIdCash', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatusForCash)
+router.get('/invoices/:orderId',middlewareController.verifyTokenAdminAuth,iteractionOrderAuController.exportInvoiceToPDF);
+router.get('/invoicesExecl/:orderId',middlewareController.verifyTokenAdminAuth,iteractionOrderAuController.exportInvoiceToExcel);
 module.exports = router;

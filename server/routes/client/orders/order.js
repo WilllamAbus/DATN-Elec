@@ -16,7 +16,7 @@ router.get(
   orderController.getOrders
 );
 router.get(
-  "/UserOrders",
+  "/limit",
   middlewareController.verifyToken,
   orderController.getUserOrders
 );

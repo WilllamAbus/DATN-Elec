@@ -11,7 +11,7 @@ const ConfirmOrderPageDefault: React.FC = () => {
   const orderIds = useSelector(
     (state: RootState) => state.orderAuction.orderData?.orderAuctionID
   );
-  console.log('orderAuction', orderIds);
+
   
   const confirmOrderDefault = useSelector(
     (state: RootState) => state.confirmOrder.confirmOrderDefaut

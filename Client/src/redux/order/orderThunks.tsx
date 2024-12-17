@@ -7,7 +7,11 @@ import {
   getOrderById,
   applyVoucher,
 } from "../../services/order/order";
-import { ApplyVoucherResponse, Order } from "../../types/order/order";
+import {
+  ApplyVoucherResponse,
+  LimitCrudOrderResponse,
+  Order,
+} from "../../types/order/order";
 
 export const createOrderThunk = createAsyncThunk<
   { order: Order; message: string }, // Cập nhật kiểu dữ liệu trả về
@@ -40,23 +44,42 @@ export const listOrderThunk = createAsyncThunk<
   }
 });
 
+// export const fetchUserOrdersThunk = createAsyncThunk<
+//   { orders: Order[] },
+//   void,
+//   { rejectValue: string }
+// >("order/UserOrders", async (_, { rejectWithValue }) => {
+//   try {
+//     const response = await fetchUserOrders();
+
+//     if (!response || !response.orders || !Array.isArray(response.orders)) {
+//       throw new Error("Invalid data format");
+//     }
+
+//     return { orders: response.orders };
+//   } catch (error) {
+//     return rejectWithValue((error as Error).message);
+//   }
+// });
 export const fetchUserOrdersThunk = createAsyncThunk<
-  { orders: Order[] },
-  void,
+  LimitCrudOrderResponse,
+  { page: number; search?: string; stateOrder?: string },
   { rejectValue: string }
->("order/UserOrders", async (_, { rejectWithValue }) => {
-  try {
-    const response = await fetchUserOrders();
-
-    if (!response || !response.orders || !Array.isArray(response.orders)) {
-      throw new Error("Invalid data format");
+>(
+  "products/UserOrders",
+  async ({ page, search, stateOrder }, { rejectWithValue }) => {
+    try {
+      const response = await fetchUserOrders(page, search, stateOrder);
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.msg);
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Lỗi không xác định");
     }
-
-    return { orders: response.orders };
-  } catch (error) {
-    return rejectWithValue((error as Error).message);
   }
-});
+);
 
 // export const cancelOrderThunk = createAsyncThunk<
 //   Order,

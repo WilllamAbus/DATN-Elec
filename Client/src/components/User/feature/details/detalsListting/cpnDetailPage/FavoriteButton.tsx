@@ -134,8 +134,8 @@ import { AppDispatch, RootState } from "../../../../../../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToWatchlistThunk,
+  CheckWatchlistThunk,
   deleteWatchlistThunk,
-  getWatchlistThunk,
 } from "../../../../../../redux/product/wathList/wathlist";
 import NotFoundProduct from "../../../../../../error/404/NotFoundProduct";
 import { getProfileThunk } from "../../../../../../redux/auth/authThunk";
@@ -183,7 +183,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({}) => {
 
   const fetchWatchlist = async () => {
     try {
-      await dispatch(getWatchlistThunk());
+      await dispatch(CheckWatchlistThunk());
     } catch (error) {
       console.error("Không thể lấy danh sách yêu thích:", error);
     }

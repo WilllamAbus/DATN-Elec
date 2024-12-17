@@ -22,16 +22,15 @@ const BidGroup: React.FC<BidGroupProps> = ({
   openDeleteModal,
   handleCompleteAuction,
 }) => {
-  const endTime = bidsGroup[0].bidEndTime.endTimeBid
+  const endTime = bidsGroup[0]?.bidEndTime?.endTimeBid
     ? parseISO(bidsGroup[0].bidEndTime.endTimeBid)
     : null;
 
   const isValidEndTime = endTime ? isValid(endTime) : false;
   const currentTime = new Date();
-  const remainingTimeMs =
-    isValidEndTime && endTime
-      ? differenceInMilliseconds(endTime, currentTime)
-      : 0;
+  const [remainingTimeMs, setRemainingTimeMs] = useState(() =>
+    isValidEndTime && endTime ? differenceInMilliseconds(endTime, new Date()) : 0
+  );
 
   const formatRemainingTime = (ms: number) => {
     if (ms <= 0) return "Hết thời gian";
@@ -47,33 +46,42 @@ const BidGroup: React.FC<BidGroupProps> = ({
 
   const remainingTimeFormatted = formatRemainingTime(remainingTimeMs);
   const productId = bidsGroup[0].product_bidding?.productId?._id;
-  const [isNotified, setIsNotified] = useState(false);
-  const [auctionCompleted, setAuctionCompleted] = useState(false);
-
+  const [isNotified, ] = useState(false);
+  const [isAuctionComplete, ] = useState(false); 
+  // Đảm bảo đấu giá được hoàn thành khi hết thời gian
   useEffect(() => {
-    // Only call handleCompleteAuction if the auction hasn't been completed, time is up, and the auction is still active
     if (
       remainingTimeMs <= 0 &&
       productId &&
-      !auctionCompleted &&
-      remainingTimeFormatted === "Hết thời gian"
+      bidsGroup &&
+      bidsGroup.length > 0 &&
+      bidsGroup[0]?.bidEndTime?._id &&
+      !isNotified&&!isAuctionComplete
     ) {
-      setAuctionCompleted(true); 
-      if(!isNotified){
-     // Mark auction as completed to prevent multiple calls
+      // Gọi hàm hoàn thành đấu giá
+      // setIsNotified(true);
+      // setIsAuctionComplete(true);
       handleCompleteAuction(productId, bidsGroup[0].bidEndTime._id);
-      setIsNotified(true);
-      }
-      
     }
   }, [
     remainingTimeMs,
-    handleCompleteAuction,
     productId,
     bidsGroup,
-    auctionCompleted,
-    remainingTimeFormatted,
+    handleCompleteAuction,
+    isAuctionComplete,
+    isNotified,
   ]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (isValidEndTime && endTime) {
+        const currentMs = differenceInMilliseconds(endTime, new Date());
+        setRemainingTimeMs(currentMs);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isValidEndTime, endTime]);
 
   return (
     <div
@@ -82,7 +90,7 @@ const BidGroup: React.FC<BidGroupProps> = ({
         bidsGroup.some(
           (bid) =>
             bid.product_bidding.productId._id === productId &&
-            bid.bidEndTime.endTimeBid === bidsGroup[0].bidEndTime.endTimeBid
+            bid.bidEndTime?.endTimeBid === bidsGroup[0]?.bidEndTime?.endTimeBid
         )
           ? "border-2 border-[color:#E5E4E2] shadow-md"
           : ""
@@ -119,7 +127,7 @@ const BidGroup: React.FC<BidGroupProps> = ({
           </p>
         </div>
       </div>
-     
+
       <div className="flex flex-col gap-2">
         {bidsGroup.map((bid) => {
           const bidEndTime = bid.bidEndTime?.endTimeBid
@@ -141,7 +149,7 @@ const BidGroup: React.FC<BidGroupProps> = ({
               className="bg-white p-3 m-1 rounded-md border border-[color:#DAA520] shadow-lg"
             >
               <p className="font-bold text-gray-700">Thông tin đấu giá</p>
-       
+
               <p className="text-gray-600">
                 Ngày đấu giá:{" "}
                 {format(parseISO(bid.createdAt), "d/M/yy HH:mm:ss", {
@@ -164,7 +172,6 @@ const BidGroup: React.FC<BidGroupProps> = ({
                 <Button
                   color="red"
                   onClick={() => openDeleteModal(bid)}
-                  disabled={disableBidButtons} // Disable the button based on time left
                 >
                   Xóa
                 </Button>
@@ -173,15 +180,6 @@ const BidGroup: React.FC<BidGroupProps> = ({
           );
         })}
       </div>
-      {/* {productId && bidsGroup.length > 0 && (
-        <Button
-          className="col-span-3 mt-4"
-          onClick={() => handleCompleteAuction(productId._id, bidsGroup[0].bidEndTime._id)}
-          disabled={disableCompleteAuctionButton} 
-        >
-          Hoàn thành đấu giá
-        </Button>
-      )} */}
     </div>
   );
 };

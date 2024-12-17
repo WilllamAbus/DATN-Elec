@@ -13,7 +13,7 @@ AuctionDataComplete, // Return type
   async ({ productId, timeTrackID,}, thunkAPI) => {
     try {
       const updatedAuction = await auctionService.completeAuction(productId, timeTrackID);
-   
+      
       
       return updatedAuction;
     } catch (error: any) {
