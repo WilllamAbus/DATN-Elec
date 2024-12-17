@@ -1,194 +1,101 @@
 const Product = require('../../../model/product_v2');
 const ProductType = require('../../../model/catgories.model');
-const mongoose = require('mongoose');
 const ProductVariant = require('../../../model/product_v2/productVariant');
+
 const getPhoneVariantsService = {
-  getPhoneVariants: (categoryId, page = 1, limit = 8, _sort, brand, ram, storage, conditionShopping, minPrice, maxPrice, minDiscountPercent, maxDiscountPercent, variantPrices) => new Promise(async (resolve, reject) => {
+  getPhoneVariants: async (page = 1, limit = 10) => {
     try {
-      page = parseInt(page, 8) || 1;
-      limit = parseInt(limit, 8) || 8;
+      page = parseInt(page, 10) || 1;
+      limit = parseInt(limit, 10) || 10;
       const offset = (page - 1) * limit;
 
       if (limit <= 0) {
-        return reject({
+        return {
           success: false,
           err: 1,
           msg: 'Giá trị limit không hợp lệ.',
           status: 400
-        });
+        };
       }
 
       if (page <= 0) {
-        return reject({
+        return {
           success: false,
           err: 1,
           msg: 'Giá trị page không hợp lệ.',
           status: 400
-        });
+        };
       }
 
-      const brandFilter = brand && brand.length > 0
-        ? { product_brand: { $in: brand.map(brand => mongoose.Types.ObjectId(brand)) } }
-        : {};
-
-      const ramVariantIds = ram && ram.length > 0
-        ? await ProductVariant.find({
-          ram: { $in: ram.filter(ramId => mongoose.Types.ObjectId.isValid(ramId)) }
-        }).distinct('_id')
-        : [];
-
-      const storageVariantIds = storage && storage.length > 0
-        ? await ProductVariant.find({
-          storage: { $in: storage.filter(storageId => mongoose.Types.ObjectId.isValid(storageId)) }
-        }).distinct('_id')
-        : [];
-
-      const ramFilter = ramVariantIds.length > 0
-        ? { variants: { $in: ramVariantIds } }
-        : {};
-
-      const storageFilter = storageVariantIds.length > 0
-        ? { variants: { $in: storageVariantIds } }
-        : {};
-
-      const conditionShoppingFilter = conditionShopping && conditionShopping.length > 0
-        ? { product_condition: { $in: conditionShopping.map(condition => mongoose.Types.ObjectId(condition)) } }
-        : {};
-
-      const priceFilter = {};
-      if (minPrice !== undefined || maxPrice !== undefined) {
-        const variantPriceConditions = [];
-
-        if (minPrice !== undefined && !isNaN(parseFloat(minPrice))) {
-          variantPriceConditions.push({ variant_price: { $gte: parseFloat(minPrice) } });
-        }
-
-        if (maxPrice !== undefined && !isNaN(parseFloat(maxPrice))) {
-          variantPriceConditions.push({ variant_price: { $lte: parseFloat(maxPrice) } });
-        }
-
-        if (variantPriceConditions.length > 0) {
-          const variantsWithPrice = await ProductVariant.find({
-            $and: variantPriceConditions,
-          }).select('_id');
-
-          if (variantsWithPrice.length > 0) {
-            priceFilter['variants'] = { $in: variantsWithPrice.map(variant => variant._id) };
-          } else {
-            priceFilter['variants'] = { $in: [] };
-          }
-        }
-      }
-
-
-      const discountFilter = {};
-      if (minDiscountPercent !== undefined) {
-        discountFilter['product_discount.discountPercent'] = { ...discountFilter['product_discount.discountPercent'], $gte: parseFloat(minDiscountPercent) };
-      }
-      if (maxDiscountPercent !== undefined) {
-        discountFilter['product_discount.discountPercent'] = { ...discountFilter['product_discount.discountPercent'], $lte: parseFloat(maxDiscountPercent) };
-      }
-      const sortOptions = {};
-      const products = await Product.find({
-        product_type: categoryId,
-        status: { $ne: 'disable' },
-        variants: { $exists: true, $ne: [] },
-        ...brandFilter,
-        ...conditionShoppingFilter,
-        ...priceFilter,
-        ...discountFilter,
-        ...ramFilter,
-        ...storageFilter,
-      })
-        .sort(sortOptions)
-        .skip(offset)
-        .limit(limit)
-        .populate('product_type')
-        .populate('product_brand')
-        .populate('product_condition')
-        .populate('product_supplier')
-        .populate({
-          path: 'variants',
-          populate: [
-            {
-              path: 'storage',
-              select: 'name',
-            },
-            {
-              path: 'ram',
-              select: 'name',
-            },
-            {
-              path: 'product_discount',
-            },
-          ],
-        })
-        .select('product_name image product_description slug product_discount product_brand variants product_condition product_supplier product_quantity product_ratingAvg product_view weight_g isActive status disabledAt comments')
-        .lean();
-        const filteredProducts = products.filter(product => {
-          // Chỉ giữ lại sản phẩm có ít nhất một biến thể khớp với các tiêu chí
-          const validVariants = product.variants.filter(variant => {
-            const matchesRam = ram && ram.length > 0 ? ram.includes(variant.ram?._id.toString()) : true;
-            const matchesStorage = storage && storage.length > 0 ? storage.includes(variant.storage?._id.toString()) : true;
-        
-            return matchesRam && matchesStorage;
-          });
-        
-          // Cập nhật lại danh sách biến thể hợp lệ cho sản phẩm
-          product.variants = validVariants;
-        
-          // Chỉ giữ sản phẩm nếu có biến thể hợp lệ
-          return validVariants.length > 0;
-        });
-        
-        
-      if (_sort) {
-        const [sortField, sortDirection] = _sort.split(":");
-        if (sortField === "variant_price") {
-          products.sort((a, b) => {
-            const aPrice = a.variants[0]?.variant_price || 0;
-            const bPrice = b.variants[0]?.variant_price || 0;
-            return sortDirection === "ASC" ? aPrice - bPrice : bPrice - aPrice;
-          });
-        }
-      }
-      const total = await Product.countDocuments({
-        product_type: categoryId,
-        status: { $ne: 'disable' },
-        variants: { $exists: true, $ne: [] },
-        ...brandFilter,
-        ...conditionShoppingFilter,
-        ...priceFilter,
-        ...discountFilter,
-        ...ramFilter,
-        ...storageFilter,
-      });
-      
-      const categoryInfo = await ProductType.findById(categoryId).select('name');
-      if (!categoryInfo) {
-        return reject({
+      const category = await ProductType.findOne({ slug: 'dien-thoai' }).lean();
+      if (!category) {
+        return {
           success: false,
           err: 1,
-          msg: 'Không tìm thấy danh mục.',
-          status: 404
-        });
+          msg: 'Không tìm thấy danh mục điện thoại.',
+          status: 404,
+        };
       }
-      resolve({
+
+      const products = await Product.find({
+        product_type: category._id,
+        status: { $ne: 'disable' },
+      })
+        .populate('product_type')
+        .populate('product_brand')
+        .lean();
+
+      if (products.length === 0) {
+        return {
+          success: false,
+          err: 1,
+          msg: 'Không thấy sản phẩm.',
+          status: 404,
+        };
+      }
+
+      // Lấy danh sách các biến thể với phân trang
+      const variantsPromises = products.map(product =>
+        ProductVariant.find({ product: product._id })
+          .populate('storage', 'name')
+          .populate('ram', 'name')
+          .populate('color', 'name')
+          .populate('image', 'image color')
+          .populate('operatingSystem', 'name')
+          .populate('screen', 'name')
+          .populate('product_discount', 'code discountPercent')
+          .populate('product', 'slug')
+          .lean()
+      );
+
+      const variants = await Promise.all(variantsPromises);
+      const flatVariants = variants.flat();
+
+      // Tính toán phân trang cho biến thể
+      const totalVariants = flatVariants.length;
+      const paginatedVariants = flatVariants.slice(offset, offset + limit);
+
+      return {
         success: true,
         err: 0,
-        msg: products.length ? 'OK' : 'Không thấy sản phẩm.',
+        msg: 'OK',
         status: 200,
         response: {
-          total,
-          category: categoryInfo.name,
-          products: filteredProducts,
+          total: totalVariants,
+          category: category.name,
+          variants: paginatedVariants,
         },
-      });
-
+      };
     } catch (error) {
-      reject({ success: false, err: 1, msg: 'LỗI không có sản phẩm: ' + error.message, status: 500 });
+      console.error('loi:', error.message);
+      return {
+        success: false,
+        err: 1,
+        msg: 'Lỗi khi lấy sản phẩm biến thể: ' + error.message,
+        status: 500,
+      };
     }
-  }),
+  },
 };
 
 module.exports = getPhoneVariantsService;

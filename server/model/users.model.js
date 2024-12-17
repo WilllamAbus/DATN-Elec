@@ -105,7 +105,7 @@ const userSchema = new Schema(
   {
     name: { type: String, required: true },
     password: { type: String, required: true },
-    email: { type: String},
+    password: { type: String }, 
     addresses: { type: [addressSchema], default: [] },
     birthday: { type: Date, require: true },
     gender: { type: String, enum: ["Nam", "Nữ"] },
