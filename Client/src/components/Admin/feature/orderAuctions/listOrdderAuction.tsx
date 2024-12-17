@@ -320,16 +320,10 @@ const ListOrderAuction: React.FC = () => {
                           handleSoftDelOrder(order._id);
                         }
                       }}
-                      disabled={
-                        !(
-                          order.stateOrder === "Chờ xử lý" ||
-                    
-                          order.stateOrder === "Hủy đơn hàng" 
-                          
-                        )
-                      }
+            
+                      style={{ display: order.stateOrder === "Chờ xử lý" ? ' inline-flex ' : 'none' }}
                     >
-                      {order.stateOrder}
+                      Hủy đơn hàng
                     </button>
                     <Link to={`/admin/detailOrderAuction/${order._id}`}>
                       {/* SVG Icon embedded directly */}
@@ -413,7 +407,7 @@ const ListOrderAuction: React.FC = () => {
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
-                No orders available.
+                Không có đơn hàng
               </td>
             </tr>
           )}

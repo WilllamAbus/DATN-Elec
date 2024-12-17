@@ -178,7 +178,7 @@
 
 // export default Watchlist;
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -186,63 +186,122 @@ import {
   deleteWatchlistThunk,
   getWatchlistThunk,
 } from "../../../../redux/product/wathList/wathlist";
-import { AppDispatch } from "../../../../redux/store";
+import { AppDispatch, RootState } from "../../../../redux/store";
 import { Link } from "react-router-dom";
 import { HeartIcon, StarIcon } from "../listPage/svg";
 
 import { UserProfile } from "../../../../types/user";
 
 import { truncateText } from "../listPage/truncate/truncateText";
+import { Pagination } from "@nextui-org/react";
 
 interface WatchlistProps {
   profiles?: UserProfile | null;
 }
 
+// const Watchlist: React.FC<WatchlistProps> = () => {
+//   const dispatch = useDispatch<AppDispatch>();
+
+//   const currentPage = useSelector(
+//     (state: RootState) => state.watchlist.pagination?.currentPage || 1
+//   );
+//   const [searchTerm] = useState<string>("");
+//   const totalPages = useSelector(
+//     (state: RootState) => state.watchlist.pagination?.totalPages || 1
+//   );
+
+//   const watchlist = useSelector(
+//     (state: RootState) => state.watchlist.items || []
+//   );
+//   console.log(watchlist);
+
+//   useEffect(() => {
+//     dispatch(
+//       getWatchlistThunk({
+//         page: currentPage,
+//         search: searchTerm,
+//       })
+//     );
+//   }, [dispatch, currentPage, searchTerm]);
+//   const handlePageChange = (page: number) => {
+//     dispatch(
+//       getWatchlistThunk({
+//         page,
+//         search: searchTerm,
+//       })
+//     );
+//   };
+//   const handleDeleteFromWatchlist = async (variantId: string) => {
+//     try {
+//       await dispatch(deleteWatchlistThunk({ variantId })).unwrap();
+//       dispatch(
+//         getWatchlistThunk({
+//           page: currentPage,
+//           search: searchTerm,
+//         })
+//       );
+
+//       toast.success("Sản phẩm đã bị xóa khỏi danh sách yêu thích.");
+//     } catch (error) {
+//       console.error("Error deleting item from watchlist:", error);
+//       toast.error("Đã xảy ra sự cố khi xóa sản phẩm khỏi danh sách yêu thích.");
+//     }
+//   };
 const Watchlist: React.FC<WatchlistProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
-  // const userId = useSelector(
-  //   (state: RootState) => state.auth.profile.profile?._id
-  // );
-  const [watchlist, setWatchlist] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const currentPage = useSelector(
+    (state: RootState) => state.watchlist.pagination?.currentPage || 1
+  );
+  const [searchTerm] = useState<string>("");
+  const totalPages = useSelector(
+    (state: RootState) => state.watchlist.pagination?.totalPages || 1
+  );
+
+  const watchlist = useSelector(
+    (state: RootState) => state.watchlist.items || []
+  );
+  console.log(watchlist);
 
   useEffect(() => {
-    const fetchWatchlist = async () => {
-      try {
-        const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
-        setWatchlist(watchlistResponse);
-      } catch (error) {
-        setError("Không có yêu thích");
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(
+      getWatchlistThunk({
+        page: currentPage,
+        search: searchTerm,
+      })
+    );
+  }, [dispatch, currentPage, searchTerm]);
 
-    fetchWatchlist();
-  }, [dispatch]);
+  const handlePageChange = (page: number) => {
+    dispatch(
+      getWatchlistThunk({
+        page,
+        search: searchTerm,
+      })
+    );
+  };
 
   const handleDeleteFromWatchlist = async (variantId: string) => {
     try {
       await dispatch(deleteWatchlistThunk({ variantId })).unwrap();
-      setWatchlist(
-        watchlist.filter(
-          (item) => item.productVariant && item.productVariant._id !== variantId
-        )
-      );
+
+      if (watchlist.length === 1 && currentPage > 1) {
+        handlePageChange(1);
+      } else {
+        dispatch(
+          getWatchlistThunk({
+            page: currentPage,
+            search: searchTerm,
+          })
+        );
+      }
+
       toast.success("Sản phẩm đã bị xóa khỏi danh sách yêu thích.");
     } catch (error) {
       console.error("Error deleting item from watchlist:", error);
       toast.error("Đã xảy ra sự cố khi xóa sản phẩm khỏi danh sách yêu thích.");
     }
   };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-  if (!Array.isArray(watchlist) || watchlist.length === 0) {
-    return <p>Bạn chưa có sản phẩm nào trong danh sách yêu thích.</p>;
-  }
-
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-3xl font-extrabold text-gray-800 mb-6">
@@ -251,7 +310,10 @@ const Watchlist: React.FC<WatchlistProps> = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {watchlist.map((item, index) => {
           const product = item.product;
-          const variant = item.productVariant;
+          const variant = Array.isArray(item.productVariant)
+            ? item.productVariant
+            : [item.productVariant];
+
           if (!product) return null;
 
           return (
@@ -270,7 +332,7 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                   </figure>
                 </Link>
                 <button
-                  onClick={() => handleDeleteFromWatchlist(variant._id)}
+                  onClick={() => handleDeleteFromWatchlist(variant[0]._id)}
                   className="absolute top-3 right-3 rounded-full p-2 bg-white shadow-md hover:bg-gray-100"
                 >
                   <HeartIcon fill="red" size="1.5em" />
@@ -283,8 +345,8 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                   </h2>
                 </Link>
                 <div className="text-sm text-gray-600 mt-1">
-                  {variant?.storage.name || "N/A"} |{" "}
-                  {variant?.ram.name || "N/A"}
+                  {variant?.[0]?.storage?.name || ""} |{" "}
+                  {variant?.[0]?.ram?.name || ""}
                 </div>
                 <div className="flex items-center text-sm text-gray-500 mt-2">
                   <p>
@@ -301,7 +363,7 @@ const Watchlist: React.FC<WatchlistProps> = () => {
                 </div>
                 <div className="mt-3">
                   <p className="text-lg font-bold text-rose-600">
-                    {variant.variant_price.toLocaleString("vi-VN", {
+                    {variant[0].variant_price.toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })}
@@ -313,6 +375,18 @@ const Watchlist: React.FC<WatchlistProps> = () => {
         })}
       </div>
       <ToastContainer />
+      <div className="flex justify-center my-4">
+        <Pagination
+          isCompact
+          loop
+          showControls
+          color="primary"
+          total={totalPages}
+          page={currentPage}
+          initialPage={1}
+          onChange={(page) => handlePageChange(page)}
+        />
+      </div>
     </div>
   );
 };

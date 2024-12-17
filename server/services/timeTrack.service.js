@@ -94,8 +94,9 @@ const timeTrackService = {
     try {
       // Fetch the time track for the product
       const currentTimeInHCM = moment().tz("Asia/Ho_Chi_Minh");
-      const timeTrack = await Time_Track.findOne({ productId }).lean();
-
+      const timeTrack = await Time_Track.findOne({productId: productId }).lean();
+      console.log('Time track', timeTrack);
+      
       if (!timeTrack) throw new Error("Time track không tồn tại");
 
       // Check if stateTime is "Thời gian kết thúc"
@@ -142,12 +143,7 @@ const timeTrackService = {
         alt: img.alt || "Product image", // Example: adding an alt text
       }));
 
-      // Extract and format product attributes
-      // const productAttributes = product.product_attributes.map((attribute) => ({
-      //   key: attribute.k, // 'k' for key
-      //   value: attribute.v, // 'v' for value
-      // }));
-
+   
       // Construct the product details object
       const productDetails = {
         _id: product._id,

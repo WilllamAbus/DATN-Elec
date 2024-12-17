@@ -18,7 +18,20 @@ const initialState: AuctionState = {
 const auctionSlice = createSlice({
   name: 'auction',
   initialState,
-  reducers: {},
+  reducers: {
+    clearAuctionData(state) {
+      state.auctionData = null;
+      state.error = null;
+      state.loading = false;
+    },
+    // clearCompletedAuctionCheckout(state, action: PayloadAction<string>) {
+    //   const productId = action.payload;
+    //   state.auctionData = state.auctionData.filter(
+    //     (bid) => bid.product_bidding.productId._id !== productId // Truy cập `_id` của Product
+    //   );
+    //   state.totalBids = state.bids.length;
+    // }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAuction.pending, (state) => {
@@ -35,5 +48,5 @@ const auctionSlice = createSlice({
       });
   },
 });
-
+export const { clearAuctionData } = auctionSlice.actions;
 export default auctionSlice.reducer;

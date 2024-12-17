@@ -320,9 +320,19 @@ const orderAndDetailService = {
             },
           }
         );
-
- 
+  
         
+        const disbaleOrder = await OrderAuction.findOneAndUpdate(
+          { _id: orderId },
+          {
+            $set: {
+              status: "disable",
+         
+              stateOrder: "Hủy đơn hàng",
+            },
+          }
+        );
+        console.log('softDel',disbaleOrder );
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -442,7 +452,8 @@ const orderAndDetailService = {
         .populate("shippingAddress.userID refundBank") // Populating userID inside shippingAddress
         .exec();
 
-      console.log('ordersss', order);
+      console.log('Order', order);
+      
       
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
@@ -483,11 +494,12 @@ const orderAndDetailService = {
       };
 
       const refundPay = {
-        bank: order.bankCode,
-        paymentDateVnPay: order.paymentDateVnPay,
-        transiTionAmout: order.transiTionAmout,
+        bankCode: order.refundBank?.bankCode,
+        paymentDateVnPay: order.refundBank?.paymentDateVnPay,
+        transiTionAmout: order.refundBank?.transiTionAmout,
       }
 
+      
       // Return the consolidated order information
       return {
         shippingInfo, // Contains recipient, phone, address, and user email
@@ -821,6 +833,45 @@ const orderAndDetailService = {
       if (!order) {
         throw new Error("Order not found");
       }
+      const orderDetails = await OrderDetailAuction.find({
+        order: id,
+      }).lean();
+
+
+      const quantiTyAucDetail = orderDetails[0].quantityDetails
+      const productIds = orderDetails[0].productID
+      const inven = await Inventory.findOne({ productAuction: productIds, status: "active" }).lean();
+
+        
+      if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
+
+
+      
+
+    
+
+      const numInventoriesShelf = inven.quantityShelf;
+      const numQuantityDetails = quantiTyAucDetail;
+      const remainingQuantityShelf = numInventoriesShelf - numQuantityDetails;
+
+  await Inventory.findOneAndUpdate(
+        { productAuction:productIds },
+
+        {
+          $set: {
+            productAuction: productIds,
+            quantityShelf: remainingQuantityShelf,
+            quantityStock: inven.quantityStock,
+            totalQuantity: inven.totalQuantity,
+            supplier: inven.supplier,
+            price: inven.price,
+            totalPrice: inven.totalPrice,
+            status: "active",
+            createdAt: Date.now(),
+            updateAt: Date.now(),
+          },
+        }
+      );
 
       return order;
     } catch (error) {

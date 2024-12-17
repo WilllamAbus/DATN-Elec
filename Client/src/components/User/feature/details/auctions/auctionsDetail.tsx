@@ -27,53 +27,12 @@ interface ProductDetailsProps {
 }
 import ListRecommendation from "../../../recommendation";
 
-// const attributesToShow = ["Ram", "Color", "Storage", "Screen", "CPU", "Pin"];
+
 
 function formatCurrency(value: number) {
   return currencyFormatter.format(value, { code: "VND", symbol: "" });
 }
-// Function to format date and time in Vietnamese
-// const formatDateTime = (date: Date) => {
-//     const dateFormatter = new Intl.DateTimeFormat('vi-VN', {
-//       weekday: 'long', // 'Thứ Hai', 'Thứ Ba', etc.
-//       year: 'numeric', // '2024'
-//       month: 'long', // 'Tháng Mười'
-//       day: 'numeric', // '05'
-//       hour: 'numeric', // '12'
-//       minute: 'numeric', // '30'
-//       second: 'numeric', // '00'
-//     });
 
-//     return dateFormatter.format(date);
-//   };
-
-// Function to format time only (watch style) in Vietnamese
-// Function to format time only (watch style) in Vietnamese (+7 timezone)
-// const formatTime = (date: Date) => {
-//     const timeFormatter = new Intl.DateTimeFormat('vi-VN', {
-//       hour: '2-digit', // 12 or 24 hour format
-//       minute: '2-digit', // Minutes
-//       second: '2-digit', // Seconds
-//       timeZone: 'Asia/Ho_Chi_Minh', // Vietnamese timezone
-//     });
-
-//     return timeFormatter.format(date);
-//   };
-//   const calculateTimeLeft = (endDate: Date) => {
-//     const now = new Date();
-//     const difference = endDate.getTime() - now.getTime();
-
-//     if (difference <= 0) {
-//       return "Hết thời gian";
-//     }
-
-//     const hours = Math.floor((difference % (1000 * 3600 * 24)) / (1000 * 3600));
-//     const minutes = Math.floor((difference % (1000 * 3600)) / (1000 * 60));
-//     const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-//     return `${hours} giờ ${minutes} phút ${seconds} giây`;
-//   };
-// Function to calculate time left
 
 const AuctDetail: React.FC<ProductDetailsProps> = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -141,34 +100,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
     setCurrentIndex(index);
   };
 
-  // useEffect(() => {
-  //   const handleInteraction = async () => {
-  //     if (!productId || !profile?._id) {
-  //       console.log("User profile or product ID is not available.");
-  //       return;
-  //     }
 
-  //     const interactionData = {
-  //       user: profile._id,
-  //       orderAuctions: null,
-  //       item: productId,
-  //       OrderCart: null,
-  //       productID: productId,
-  //       Watchlist: null,
-  //       type: "auctions",
-  //       score: 6,
-  //     };
-
-  //     try {
-  //       await addInteractionAuction(interactionData);
-  //       dispatch(getProfileThunk());
-  //     } catch (error) {
-  //       console.log("Error adding interaction:", error);
-  //     }
-  //   };
-
-  //   handleInteraction();
-  // }, [productId, profile?._id, dispatch]);
 
   useEffect(() => {
     if (productId) {

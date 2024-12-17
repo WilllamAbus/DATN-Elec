@@ -3,19 +3,26 @@ import {
   addToWatchlistThunk,
   getWatchlistThunk,
   deleteWatchlistThunk,
+  CheckWatchlistThunk,
 } from "./wathlist";
-import { WatchlistItem } from "../../../types/cart/profile/wathlist";
+import {
+  LimitCrudWathlistResponse,
+  WatchlistItem,
+  Pagination,
+} from "../../../types/cart/profile/wathlist";
 
 interface WatchlistState {
   items: WatchlistItem[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  pagination: Pagination | null;
 }
 
 const initialState: WatchlistState = {
   items: [],
   status: "idle",
   error: null,
+  pagination: null,
 };
 
 const watchlistSlice = createSlice({
@@ -24,24 +31,43 @@ const watchlistSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getWatchlistThunk.pending, (state) => {
+      .addCase(CheckWatchlistThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
       .addCase(
-        getWatchlistThunk.fulfilled,
+        CheckWatchlistThunk.fulfilled,
         (state, action: PayloadAction<WatchlistItem[]>) => {
           state.status = "succeeded";
           state.items = action.payload;
         }
       )
       .addCase(
-        getWatchlistThunk.rejected,
+        CheckWatchlistThunk.rejected,
         (state, action: PayloadAction<string | undefined>) => {
           state.status = "failed";
           state.error = action.payload || "Failed to fetch watchlist";
         }
       )
+      .addCase(getWatchlistThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(
+        getWatchlistThunk.fulfilled,
+        (state, action: PayloadAction<LimitCrudWathlistResponse>) => {
+          state.status = "succeeded";
+          state.items = action.payload.data.data;
+          state.pagination = action.payload.pagination;
+        }
+      )
+      .addCase(getWatchlistThunk.rejected, (state, action) => {
+        console.error("Error payload:", action.payload);
+        state.status = "failed";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Lỗi không xác định";
+      })
       .addCase(addToWatchlistThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;

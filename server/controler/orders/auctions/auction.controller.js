@@ -64,12 +64,12 @@ getAuctionDetails: async (req, res) => {
  
 
   try {
-    const {productId} = req.query;
+    const { userId , productId} = req.query;
   
 
     
 
-    const details = await autionService.getAuctionDetails(productId);
+    const details = await autionService.getAuctionDetails( userId, productId);
 
     
     res.status(200).json({

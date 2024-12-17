@@ -357,7 +357,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "editUser", element: <AdminEditUser /> },
       { path: "listOrderAuction", element: <AdminListOrderAuction /> },
       { path: "detailOrderAuction/:id", element: <AdminDetailOrderAuction /> },
-      { path: "AdminDetailOrderAuctionFrCash/:id", element: <AdminDetailOrderAuctionFrCash /> },
+      { path: "detailOrderAuctionFrCash/:id", element: <AdminDetailOrderAuctionFrCash /> },
       { path: "recBinOrderAuction", element: <AdminListRecybinOrderAuction /> },
       { path: "*", element: <Dashboard /> },
     ],

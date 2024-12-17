@@ -19,7 +19,7 @@ const orderAuctionSchema = new Schema(
           "Nhận hàng", "Hoàn tất", 
           "Hủy đơn hàng", 
 
-          "Hoàn tiền", "Chờ xử lý hoàn tiền", "Xác nhận hoàn tiền", "Hoàn tiền thành công"], // Order status
+          "Hoàn tiền", "Chờ xử lý hoàn tiền", "Đã xác nhận hoàn tiền", "Hoàn tiền thành công"], // Order status
     },
  
     refundBank: {

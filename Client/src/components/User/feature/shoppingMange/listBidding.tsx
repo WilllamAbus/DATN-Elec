@@ -4,7 +4,7 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import { fetchListBid } from "../../../../redux/listBiddings/listBidThunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 
-import "../../../../assets/css/admin.style.css";
+// import "../../../../assets/css/admin.style.css";
 
 // Hàm để định dạng thời gian theo giờ Việt Nam
 const formatDateVN = (dateString: string) => {
@@ -42,7 +42,7 @@ const ListProductTime: React.FC = () => {
     <>
       <div className="py-5 relative">
         <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className=" text-3xl leading-10 text-black mb-9">Lượt đấu giá</h2>
+          <h2 className=" text-3xl leading-10 text-black mb-9">Lịch sử lượt đấu giá</h2>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

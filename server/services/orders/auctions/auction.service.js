@@ -13,6 +13,8 @@ const { sendMail } = require("./mailForAuct");
 const scheduelAuction = require("./crons/cronScheduleAuc");
 const auctionService = {
   completeAuction: async (productId, timeTrackID) => {
+
+    
     // Xác minh sản phẩm và định dạng đấu giá
     const product = await Product_v2.findById({
       _id: productId,
@@ -21,6 +23,7 @@ const auctionService = {
       .select("product_name image")
 
       .lean();
+
 
     if (!product) {
       throw new Error(
@@ -72,6 +75,7 @@ const auctionService = {
         auction_quantity: 0,
         auction_total: 0,
         auctionTime: currentTime,
+    
         auctionEndTime: timeTrackID, // Set auctionEndTime to timeTrackID
         biddings: [],
       });
@@ -94,93 +98,245 @@ const auctionService = {
         bidEndTime: { $eq: bidEndTime },
         status: "active", // Chỉ xét các biddings trong khoảng thời gian này
       }).lean();
-
+      console.log('bdiing', biddings);
+      console.log('lengthBids', biddings.length);
+      
       if (biddings.length === 0) {
         throw new Error("Không có giá đấu nào cho phiên đấu giá này.");
       }
+      const highestBid = biddings.reduce((maxBid, currentBid) => {
+        return currentBid.bidAmount > maxBid.bidAmount ? currentBid : maxBid;
+      });
 
+    
+      const highestBidPrice = highestBid.bidAmount;
+      const winner = highestBid.bidder.toString();
+      const winnerRef = highestBid.bidder
+
+      
       // const highestBid = biddings[0];
+      const remainingBids = biddings.filter(bid => bid.bidder !== winner);
+      switch (true) {
+    
+        case biddings.length > 1:
+          const groupedBids = remainingBids.reduce((acc, bid) => {
+            acc[bid.bidAmount] = acc[bid.bidAmount] || [];
+            acc[bid.bidAmount].push(bid);
+            return acc;
+          }, {});
+   
+          
+        
+          // Tìm các nhóm bid có cùng giá trị
+          const commonBidGroups = Object.values(groupedBids).filter(group => group.length > 1);
 
-      let maxBidAmount = 0;
-      let winnerBid = null;
-
-      for (const bid of biddings) {
-        if (bid.bidAmount > maxBidAmount) {
-          maxBidAmount = bid.bidAmount;
-          winnerBid = bid; // Cập nhật người chiến thắng
-          console.log(
-            `Cập nhật người chiến thắng: ${winnerBid.bidder} với mức giá: ${maxBidAmount}`
+        
+          if (commonBidGroups.length > 0) {
+            // Xử lý trường hợp có nhiều người cùng giá bid
+            for (const group of commonBidGroups) {
+              const earliestBid = group.reduce((earliest, currentBid) => {
+                return new Date(currentBid.bidTime) < new Date(earliest.bidTime) ? currentBid : earliest;
+              });
+              
+     
+              
+              const newWinner = earliestBid.bidder.toString();
+              const newWinnerRef = earliestBid.bidder;
+              const winningPrice = earliestBid.bidAmount;
+        
+              console.log('Trường hợp cùng giá bid - Người thắng:', newWinner, 'Giá:', winningPrice);
+        
+              // Cập nhật cơ sở dữ liệu với winner mới
+              await Auction.findOneAndUpdate(
+                { productId, auctionEndTime: timeTrackID },
+                {
+                  $set: {
+                    auction_winner: newWinner,
+                    auctionUser: newWinnerRef,
+                    auction_total: winningPrice,
+                    stateAuction: "Xác nhận",
+                    isActive: true,
+                    auction_quantity: 1,
+                    auctionTime: currentTime,
+                    biddings: auctionTemp.biddings,
+                  },
+                },
+                { new: true }
+              );
+        
+              await Bidding.updateMany(
+                {
+                  "product_bidding.productId": productId,
+                  bidder: { $ne: newWinner },
+                  bidEndTime: { $eq: bidEndTime },
+                  status: "active",
+                },
+                {
+                  $set: {
+                    status: "disable",
+                    stateBidding: "Lần sau",
+                  },
+                }
+              );
+        
+              const userWinner = await User.findOne({
+                _id: newWinner,
+                status: "active",
+              }).select("email").lean();
+        
+              const mailWinner = userWinner.email;
+              const orderDetails = {
+                product_name: product.product_name,
+                product_image: product.image[0],
+                amount: winningPrice,
+                winningTime: currentTime,
+              };
+        
+              await sendMail(mailWinner, orderDetails);
+            }
+          } else {
+            // Xử lý trường hợp các giá bid khác nhau
+            const highestBid = remainingBids.reduce((highest, current) => {
+              return current.bidAmount > highest.bidAmount ? current : highest;
+            });
+            const newWinner = highestBid.bidder.toString();
+            const newWinnerRef = highestBid.bidder;
+            const winningPrice = highestBid.bidAmount;
+            console.log('Trường hợp giá bid khác nhau - Người thắng:', newWinner, 'Giá:', winningPrice);
+            await Auction.findOneAndUpdate(
+              { productId, auctionEndTime: timeTrackID },
+              {
+                $set: {
+                  auction_winner: newWinner,
+                  auctionUser: newWinnerRef,
+                  auction_total: winningPrice,
+                  stateAuction: "Xác nhận",
+                  isActive: true,
+                  auction_quantity: 1,
+                  auctionTime: currentTime,
+                  biddings: auctionTemp.biddings,
+                },
+              },
+              { new: true }
+            );
+        
+            await Bidding.updateMany(
+              {
+                "product_bidding.productId": productId,
+                bidder: { $ne: newWinner },
+                bidEndTime: { $eq: bidEndTime },
+                status: "active",
+              },
+              {
+                $set: {
+                  status: "disable",
+                  stateBidding: "Lần sau",
+                },
+              }
+            );
+        
+         
+      
+            const userWinner = await User.findOne({
+            _id: newWinner,
+            status: "active",
+           }).select("email").lean();
+            const mailWinner = userWinner.email;
+           
+            const orderDetails = {
+              product_name: product.product_name,
+              product_image: product.image[0],
+              amount: winningPrice,
+              winningTime: currentTime,
+            };
+        
+            await sendMail(mailWinner, orderDetails);
+            // Cập nhật cơ sở dữ liệu với winner mới
+      
+          }
+          break;
+        
+    
+        case biddings.length === 1:
+          // Nếu không có thay đổi, giữ nguyên người chiến thắng hiện tại
+          // Cập nhật trạng thái cho người chiến thắng và các bidding còn lại
+          await Auction.findOneAndUpdate(
+            { productId, auctionEndTime: timeTrackID },
+            {
+              $set: {
+                auction_winner: winner,
+                auctionUser: winnerRef,
+                auction_total: highestBidPrice,
+                stateAuction: "Xác nhận",
+                isActive: true,  // Đấu giá đã kết thúc
+                auctionTime: currentTime,
+                auction_quantity: 1,
+                biddings: auctionTemp.biddings, // Đấu giá đã kết thúc
+              },
+            },
+            { new: true }
           );
-        }
+          await Bidding.updateMany(
+            {
+              "product_bidding.productId": productId,
+              bidder: { $ne: winner }, // Những người không phải là người chiến thắng
+              bidEndTime: { $eq: bidEndTime },
+              status: "active",
+            },
+           { new: true }
+          );
+          const winnerEmailCase = winner;
+          const userWinnerCase = await User.findOne({
+            _id: winnerEmailCase,
+            status: "active",
+          })
+            .select("email")
+            .lean();
+    
+          const mailWinnerCase = userWinnerCase.email;
+          const orderDetailsCase = {
+            product_name: product.product_name,
+            product_image: product.image[0], // Thêm ảnh sản phẩm
+            amount: highestBidPrice,
+            winningTime: currentTime, // Thêm thời gian trúng đấu giá
+          };
+    
+          await sendMail(mailWinnerCase, orderDetailsCase);
+          // Gửi email thông báo cho người chiến thắng
+      
+    
+          // Cập nhật trạng thái các bidding không thắng
+         
+          break;
+       
+        default:
+          // Trường hợp mặc định nếu không có thay đổi nào
+          throw new Error("Có sự cố trong việc xử lý kết quả đấu giá.");
       }
-      // Kiểm tra xem có người chiến thắng không
-      if (!winnerBid) {
-        throw new Error("Không thể xác định người chiến thắng.");
-      }
-
-      const updatedAuction = await Auction.findOneAndUpdate(
-        { productId, auctionEndTime: timeTrackID },
-        {
-          $set: {
-            auction_winner: winnerBid.bidder,
-            auction_total: winnerBid.bidAmount,
-            auction_quantity: 1,
-            stateAuction: "Xác nhận",
-            isActive: true,
-            auctionTime: currentTime,
-            biddings: auctionTemp.biddings,
-          },
-        },
-        { new: true }
-      ).lean();
-
-      if (!updatedAuction) {
-        throw new Error("Không thể cập nhật đấu giá.");
-      }
-
-
-
-      // Gửi mail đến người chiến thắng
-      const winnerEmail = winnerBid.bidder;
-      const userWinner = await User.findOne({
-        _id: winnerEmail,
-        status: "active",
-      })
-        .select("email")
-        .lean();
-
-      const mailWinner = userWinner.email;
-      const orderDetails = {
-        product_name: product.product_name,
-        product_image: product.image[0], // Thêm ảnh sản phẩm
-        amount: maxBidAmount,
-        winningTime: currentTime, // Thêm thời gian trúng đấu giá
-      };
-
-      await sendMail(mailWinner, orderDetails);
-      /**
-       *
-       * @param {string} Sau khi có được một auction thì ẩn sp, time, randBid
-       */
-      await Bidding.updateMany(
-        { "product_bidding.productId": productId },
-        { $set: { status: "disable" } }
-      );
+      
       //      // Cập nhật trạng thái sản phẩm thành "disable"
-
-      await TimeTrack.findOneAndUpdate(
-        { productId: productId },
-        { $set: { status: "disable" } }
-      );
-      // // Cập nhật trạng thái của các bản ghi trong priceRandBid và timeTrack thành "disable"
-      await PriceRandBidder.findOneAndUpdate(
-        { "product_randBib.productId": productId },
-        { $set: { status: "disable" } }
-      );
-      await Product_v2.findOneAndUpdate(
-        { _id: productId },
-        { $set: { status: "disable" } }
-      );
+      await Promise.all([
+        Bidding.updateMany(
+          { "product_bidding.productId": productId },
+          { $set: { status: "disable" } }
+        ),
+        TimeTrack.findOneAndUpdate(
+          { productId: productId },
+          { $set: { status: "disable" } }
+        ),
+        PriceRandBidder.findOneAndUpdate(
+          { "product_randBib.productId": productId },
+          { $set: { status: "disable" } }
+        ),
+        Product_v2.findOneAndUpdate(
+          { _id: productId },
+          { $set: { status: "disable" } }
+        )
+      ]);
+      
+      const updatedAuction = await Auction.findOne({productId: productId, auctionEndTime: timeTrackID })
+      console.log('Updated', updatedAuction);
+      ;
       return updatedAuction;
     } else {
       throw new Error(
@@ -274,29 +430,32 @@ const auctionService = {
       );
     }
   },
-  getAuctionDetails: async (productId) => {
+  getAuctionDetails: async (userId, productId ) => {
     try {
-      const auction = await Auction.findOne({
-        productId: productId,
+      const objectId = mongoose.Types.ObjectId(userId);
+      const auctions = await Auction.find({
+        auctionUser: userId
       })
         .select(
-          "auction_total auction_quantity auction_winner productId auctionTime auctionEndTime biddings stateAuction"
+          "auction_total auction_quantity auction_winner productId auctionUser auctionTime auctionEndTime biddings stateAuction"
         )
         .lean();
+      
+        
+   
 
-      if (!auction) {
-        console.error(`No active auction found for productId: ${productId}`);
+      if (!auctions) {
         throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
       }
+     
+      const filteredAuctions = auctions.filter(auction => auction.productId.toString() === productId);
 
-      if (!auction) {
-        throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
+      
+      if (filteredAuctions.length === 0) {
+        throw new Error("Không thể tìm thấy đấu giá cho sản phẩm này.");
       }
 
-      const biddings = auction.productId;
-      const userId = auction.auction_winner;
-
-      const product = await Product_v2.findOne({ _id: biddings })
+      const product = await Product_v2.findOne({ _id: productId })
         .select("product_name image")
         .lean();
 
@@ -305,10 +464,16 @@ const auctionService = {
         throw new Error("Không tìm thấy sản phẩm.");
       }
 
-      const user = await User.findById(userId)
-        .select("addresses name phone")
-        .lean();
+      const user = await User.findOne({ _id: filteredAuctions[0].auctionUser })
+      .select("addresses name phone")
+      .lean();
+
+    if (!user) {
+      throw new Error("Không thể tìm thấy người dùng.");
+    }
+
      
+
       
       if (!user) {
         throw new Error("Không thể tìm thấy người dùng.");
@@ -320,18 +485,18 @@ const auctionService = {
   
       
       return {
-        auctionId: auction._id,
-        auctionTotal: auction.auction_total,
-        auctionQuantity: auction.auction_quantity,
+        auctionId: filteredAuctions[0]._id,
+        auctionTotal: filteredAuctions[0].auction_total,
+        auctionQuantity: filteredAuctions[0].auction_quantity,
         productName: product.product_name,
         productImages: product.image,
         userAddress:addressName,
         userName: user.name,
         userSdt: user.phone,
-        auctionTime: auction.auctionTime,
-        auctionEndTime: auction.auctionEndTime,
-        biddings: biddings,
-        stateAuction: auction.stateAuction,
+        auctionTime: filteredAuctions[0].auctionTime,
+        auctionEndTime: filteredAuctions[0].auctionEndTime,
+        biddings: filteredAuctions[0],
+        stateAuction: filteredAuctions[0].stateAuction,
       };
 
       // Retrieve the product details

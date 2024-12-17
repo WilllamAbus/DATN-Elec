@@ -193,6 +193,25 @@ const OrderDetails: React.FC = () => {
         return null;
     }
   };
+
+  const formatDate = (dateString: any) => {
+    if (dateString && dateString.length === 14) {
+      // Tách chuỗi theo từng phần (yyyy, MM, dd, HH, mm, ss)
+      const year = dateString.slice(0, 4);
+      const month = dateString.slice(4, 6);
+      const day = dateString.slice(6, 8);
+      const hours = dateString.slice(8, 10);
+      const minutes = dateString.slice(10, 12);
+      const seconds = dateString.slice(12, 14);
+  
+      // Tạo đối tượng Date từ chuỗi đã tách
+      return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+    }
+    return null; // Trả về null nếu chuỗi không hợp lệ
+  };
+  
+  const formattedDate = formatDate(selectedOrder?.refundPay?.paymentDateVnPay);
+
   return (
     <main className="w-full flex-grow p-6 bg-gray-50">
       <div className="max-w-4xl mx-auto">
@@ -204,17 +223,17 @@ const OrderDetails: React.FC = () => {
                 <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                   <div className="space-y-2">
                   <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium ">Mã đơn hàng:</span> #
+                <span className="font-medium ">Mã đơn hàng:</span> {" "}
                 {selectedOrder.orderid}
               </p>
               <p className="text-lg mb-2 text-blue-700">
-                <span className="font-medium ">Trạng thái đơn hiện tại:</span> 
-                {selectedOrder.state}
+                <span className="font-medium ">Trạng thái đơn hiện tại:</span>{" "}  
+                 {selectedOrder.state}
               </p>
 
               <p className="text-lg mb-2">
                 <span className="font-medium">Ngày mua sắm:</span>{" "}
-                {new Date(selectedOrder.dateOrder).toLocaleDateString()} VNĐ
+                {new Date(selectedOrder.dateOrder).toLocaleDateString('vi-VN')}
               </p>
               <p className="text-lg text-red-600 mb-2">
                 <span className="font-medium">Tổng tiền:</span>{" "}
@@ -273,12 +292,14 @@ const OrderDetails: React.FC = () => {
                 {selectedOrder?.refundPay?.bankCode || ""}
               </p>
               <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium">Họ tên:</span>{" "}
-                {selectedOrder?.refundPay?.paymentDateVnPay || ""}
+                <span className="font-medium">Ngày thanh toán:</span>{" "}
+                {formattedDate ? formattedDate.toLocaleDateString('vi-VN') : ""}
               </p>
               <p className="text-lg text-gray-700">
-                <span className="font-medium">Số tài khoản:</span>{" "}
-                {selectedOrder?.refundPay?.transiTionAmout || ""}
+                <span className="font-medium">Giá tiền thanh toán:</span>{" "}
+                {selectedOrder?.refundPay?.transiTionAmout 
+    ? Number(selectedOrder.refundPay.transiTionAmout).toLocaleString() 
+    : ""} VNĐ
               </p>
             </div>
           </section>

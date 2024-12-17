@@ -6,7 +6,7 @@ import {
 } from "../../../../services/commnet/comment.service";
 import { getOneProduct } from "../../../../services/product_v2/admin/getone";
 import Swal, { SweetAlertResult } from "sweetalert2";
-import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
+import { Pagination } from "@nextui-org/react";
 
 import withReactContent from "sweetalert2-react-content";
 import "react-toastify/dist/ReactToastify.css";
@@ -209,41 +209,11 @@ const ListComment: React.FC = () => {
     fetchData(currentPage);
   }, [currentPage]);
 
-  const [selectedComments, setSelectedComments] = useState<string[]>([]);
 
-  // Hàm chọn hoặc bỏ chọn tất cả
-  const toggleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedComments(comments.map((comment: Comment) => comment._id)); // Chọn tất cả
-    } else {
-      setSelectedComments([]); // Bỏ chọn tất cả
-    }
-  };
-
-  // Hàm xử lý chọn từng comment
-  const toggleSelectComment = (id: string) => {
-    setSelectedComments((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const deleteAll = (idComment: string[]) => {
-    alert(`${idComment}`);
-  };
   return (
     <>
       <Table aria-label="Example static collection table">
         <TableHeader>
-          <TableColumn>
-            <input
-              type="checkbox"
-              onChange={(e) => toggleSelectAll(e.target.checked)}
-              checked={
-                selectedComments.length === comments.length &&
-                comments.length > 0
-              }
-            />
-          </TableColumn>
           <TableColumn>STT</TableColumn>
           <TableColumn>Tên sản phẩm</TableColumn>
           <TableColumn>Hình ảnh</TableColumn>
@@ -257,14 +227,6 @@ const ListComment: React.FC = () => {
               key={comment?._id}
               className="border-b text-left dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <TableCell className="px-4 py-3">
-                <input
-                  type="checkbox"
-                  value={comment?._id}
-                  checked={selectedComments.includes(comment?._id)}
-                  onChange={() => toggleSelectComment(comment?._id)}
-                />
-              </TableCell>
               <TableCell className="px-4 py-3">{index + 1}</TableCell>
               <TableCell className="px-4 py-3">
                 {products[comment?.id_product]?.name || "Loading..."}
@@ -308,23 +270,23 @@ const ListComment: React.FC = () => {
           ))}
         </TableBody>
       </Table>
-      <div className="mt-4">
-        <button
-          className="bg-red-600 text-white py-2 px-4 rounded"
-          onClick={() => deleteAll(selectedComments)}
-          disabled={selectedComments.length === 0}
-        >
-          Xóa tất cả đã chọn
-        </button>
-      </div>
-
+      <div className="flex justify-center my-4">
       {comments.length > 0 && (
-        <PaginationComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
+          <Pagination
+          isCompact
+          loop
+          showControls
+          color="primary"
+          total={totalPages}
+          page={currentPage}
+          initialPage={1}
+          onChange={(page) => handlePageChange(page)}
         />
       )}
+      </div>
+
+      
+
     </>
   );
 };

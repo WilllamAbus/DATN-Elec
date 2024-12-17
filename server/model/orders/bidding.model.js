@@ -19,7 +19,7 @@ const biddingSchema = Schema(
         },
         stateBidding :{
           type:String,
-          enum:['Tiến hành thanh toán', 'Xử lý', 'Xác nhận'],
+          enum:['Tiến hành thanh toán', 'Xử lý', 'Xác nhận', 'Thắng', 'Lần sau'],
           // default:'Đang đấu giá'
         },
         isActive: { type: Boolean, default: false },
