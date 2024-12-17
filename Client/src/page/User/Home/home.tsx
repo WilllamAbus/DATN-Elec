@@ -2,8 +2,10 @@ import React from "react";
 import { UserBanner } from "../../../components/User/banner";
 import UserFeature from "../../../components/User/feeture";
 import UserCategories from "../../../components/User/categories";
-import UserArrivale from "../../../components/User/arrivale";
+// import UserArrivale from "../../../components/User/arrivale";
 import GetRecommendation from "../../../components/User/recommendation";
+import GetBestSell from "../../../components/User/best-sellings";
+
 
 const UserHome: React.FC = () => {
 
@@ -18,7 +20,8 @@ const UserHome: React.FC = () => {
       </div>
       <GetRecommendation />
       <UserFeature />
-      <UserArrivale />
+      {/* <UserArrivale /> */}
+      <GetBestSell />
     </div>
   );
 };

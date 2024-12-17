@@ -44,6 +44,9 @@ const commentClientRouter = require("./client/comment");
 const bankRouter = require("./client/bank");
 const statistical = require("./admin/statistical");
 const recommendationRoute = require("./client/recommendation/recommendation");
+const bestSellRoute = require("./client/best-selling/best-selling");
+
+
 const routes = (app) => {
   app.use("/api/admin/statistical", statistical);
 
@@ -89,6 +92,7 @@ const routes = (app) => {
   app.use("/api/client/iteracOder", orderAucIteraction);
   app.use("/api/bank", bankRouter);
   app.use("/api/client/recommendation", recommendationRoute);
+  app.use("/api/client/best-selling", bestSellRoute);
 };
 
 module.exports = routes;
