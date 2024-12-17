@@ -62,6 +62,7 @@ const getUseLimitService = (page, search) =>
       }
 
       const users = await User.find(searchQuery)
+        .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit)
         .populate({
@@ -116,6 +117,7 @@ const getdisableLimitService = (page, search) =>
       }
 
       const users = await User.find(searchQuery)
+        .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit)
         .populate({
@@ -171,6 +173,7 @@ const getWathlistLimitService = (userId, page, search) =>
       }
 
       const data = await WathList.find(searchQuery)
+        .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit)
         .populate({
