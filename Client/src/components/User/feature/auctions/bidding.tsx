@@ -16,7 +16,7 @@ import {  Link, useNavigate} from "react-router-dom";
 import { fetchListBidActive } from "../../../../redux/listBidActive/listbidActiveThunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import { clearProductBidding } from "../../../../redux/listBidActive/listBidActivveSlice";
-// import { clearAuctionData } from "../../../../redux/aucCheckout/auctCheckoutSlice";
+import { clearAuctionData } from "../../../../redux/aucCheckout/auctCheckoutSlice";
 export interface Auction {
   _id:string
     productId: string;
@@ -243,7 +243,7 @@ const completAuction = async (productId: string, timeTrackID: string) => {
         // console.log('others', otherBids);
     
         const productIdEra = bidsWithTimes[0].product_bidding.productId;
-        console.log('productIdEra', productIdEra);
+      
         // const groupBId =  otherBids.map((bid) => {
         //   return {
         //     productIdBis: bid.product_bidding.productId,
@@ -265,16 +265,19 @@ const completAuction = async (productId: string, timeTrackID: string) => {
                       dispatch(clearCompletedAuction(productIdEra));
                       dispatch(clearProductBidding(productIdEra));
                       navigate('/checkoutAuc')
+              }else {
+                navigate('/')
+                dispatch(clearAuctionData());
               }
     //     if(userGroupBid !== userId){
     // // toast.success("Hãy thử lại lần sau!", {
     //           //   onClose: () => 
     //           // });
-    //           navigate('/auction')
+    //          
     //           // If it's not the logged-in user, clear their bidding data
     //           dispatch(clearProductBidding(productGroupBId));
     //           dispatch(clearCompletedAuction(productGroupBId));
-    //           dispatch(clearAuctionData());
+    //         
     //     }
         // Clear dữ liệu của những user không thắng
    
@@ -295,18 +298,18 @@ const completAuction = async (productId: string, timeTrackID: string) => {
         const hidghBidsUserID = highestBid.biddingUserObj._id;
 
         
-        // const otherBidsElf = BiddingActive.filter(bid => bid.biddingUserObj._id !== highestBid.biddingUserObj._id);
-        // console.log('otherHiges', otherBidsElf);
-        // const endOfBids = otherBidsElf.map((bid) => {
-        //   return {
-        //     productIdBis: bid.product_bidding.productId,
-        //     userOtherBid: bid.biddingUserObj._id,
-        //   };
-        // });
-        // const userEndOFBid = endOfBids[0].userOtherBid;
+        const otherBidsElf = BiddingActive.filter(bid => bid.biddingUserObj._id !== highestBid.biddingUserObj._id);
+  
+        const endOfBids = otherBidsElf.map((bid) => {
+          return {
+            productIdBis: bid.product_bidding.productId,
+            userOtherBid: bid.biddingUserObj._id,
+          };
+        });
+    
  
         
-        // const productEndOfBid = endOfBids[0].productIdBis
+        const productEndOfBid = endOfBids[0].productIdBis
         // console.log('productEndOfBid', productEndOfBid);
         if (hidghBidsUserID === userId){
           // toast.success("Chúc mừng bạn!", {
@@ -316,6 +319,11 @@ const completAuction = async (productId: string, timeTrackID: string) => {
                dispatch(clearProductBidding(hidghBids));
                dispatch(clearCompletedAuction(hidghBids));
                navigate('/checkoutAuc')
+             }else {
+              navigate('/')
+              dispatch(clearAuctionData());
+                  dispatch(clearProductBidding(productEndOfBid));
+          dispatch(clearCompletedAuction(productEndOfBid));
              }
 
         // if (userEndOFBid !== userId) {

@@ -13,7 +13,7 @@ const { sendMail } = require("./mailForAuct");
 const scheduelAuction = require("./crons/cronScheduleAuc");
 const auctionService = {
   completeAuction: async (productId, timeTrackID) => {
-    console.log('Auction completess', productId, timeTrackID);
+
     
     // Xác minh sản phẩm và định dạng đấu giá
     const product = await Product_v2.findById({
@@ -23,7 +23,7 @@ const auctionService = {
       .select("product_name image")
 
       .lean();
-console.log('Auction completed', product);
+
 
     if (!product) {
       throw new Error(
@@ -199,14 +199,10 @@ console.log('Auction completed', product);
             const highestBid = remainingBids.reduce((highest, current) => {
               return current.bidAmount > highest.bidAmount ? current : highest;
             });
-        
             const newWinner = highestBid.bidder.toString();
             const newWinnerRef = highestBid.bidder;
             const winningPrice = highestBid.bidAmount;
-        
             console.log('Trường hợp giá bid khác nhau - Người thắng:', newWinner, 'Giá:', winningPrice);
-        
-            // Cập nhật cơ sở dữ liệu với winner mới
             await Auction.findOneAndUpdate(
               { productId, auctionEndTime: timeTrackID },
               {
@@ -239,12 +235,14 @@ console.log('Auction completed', product);
               }
             );
         
+         
+      
             const userWinner = await User.findOne({
-              _id: newWinner,
-              status: "active",
-            }).select("email").lean();
-        
+            _id: newWinner,
+            status: "active",
+           }).select("email").lean();
             const mailWinner = userWinner.email;
+           
             const orderDetails = {
               product_name: product.product_name,
               product_image: product.image[0],
@@ -253,6 +251,8 @@ console.log('Auction completed', product);
             };
         
             await sendMail(mailWinner, orderDetails);
+            // Cập nhật cơ sở dữ liệu với winner mới
+      
           }
           break;
         
