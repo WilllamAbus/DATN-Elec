@@ -5,6 +5,7 @@ const auction = require('./allProduct').auction ;
 const upView = require('./allProduct').upView;
 const  search = require('./allProduct').search;
 const  getPhoneByVariants = require('./phone').getPhoneByVariants;
+const  getLaptopByVariants = require('./laptop').getLaptopByVariants;
 module.exports = {
   homeAllProduct,
   getID,
@@ -12,5 +13,6 @@ module.exports = {
   auction,
   upView,
   search,
-  getPhoneByVariants
+  getPhoneByVariants,
+  getLaptopByVariants
 };

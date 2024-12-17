@@ -1,44 +1,44 @@
-import ProductListPhone from "./productList/phone";
+import ProductListLaptop from "./productList/laptop";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getPhoneByVariantsThunk } from "../../../../redux/product/client/Thunk";
+import { getLaptopByVariantsThunk } from "../../../../redux/product/client/Thunk";
 import { useState, useEffect } from "react";
 import ProductSkeletonList from "../../skeleton/product/productHomeSkeleton";
 import NoProductsMessage from "../listPage/noProduct";
 import { Tooltip } from "@nextui-org/react";
 import { MyButton } from "src/common/customs/MyButton";
 import { motion } from 'framer-motion';
-export default function ListPhone() {
+export default function ListLaptop() {
   const dispatch: AppDispatch = useDispatch();
   const products = useSelector((state: RootState) => {
-    const phoneVariants = state.productClient.getPhoneByVariants.phoneVariants;
+    const phoneVariants = state.productClient.getLaptopByVariants.laptopVariants;
     return phoneVariants ? phoneVariants.variants : [];
   });
   const currentPage = useSelector(
-    (state: RootState) => state.productClient.getPhoneByVariants.pagination?.currentPage || 1
+    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.currentPage || 1
   );
   const totalPages = useSelector(
-    (state: RootState) => state.productClient.getPhoneByVariants.pagination?.totalPages || 1
+    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.totalPages || 1
   );
   const hasNextPage = useSelector(
-    (state: RootState) => state.productClient.getPhoneByVariants.pagination?.hasNextPage || false
+    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.hasNextPage || false
   );
   const hasPrevPage = useSelector(
-    (state: RootState) => state.productClient.getPhoneByVariants.pagination?.hasPrevPage || false
+    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.hasPrevPage || false
   );
   const isLoading = useSelector(
-    (state: RootState) => state.productClient.getPhoneByVariants.isLoading
+    (state: RootState) => state.productClient.getLaptopByVariants.isLoading
   );
 
   const [action, setAction] = useState<"next" | "prev" | null>(null);
 
   useEffect(() => {
-    dispatch(getPhoneByVariantsThunk({ page: 1 }));
+    dispatch(getLaptopByVariantsThunk({ page: 1 }));
   }, [dispatch]);
 
   const handlePageChange = (page: number, actionType: "next" | "prev") => {
     setAction(actionType);
-    dispatch(getPhoneByVariantsThunk({ page }));
+    dispatch(getLaptopByVariantsThunk({ page }));
   };
   const noProducts = products.length === 0;
   return (
@@ -53,12 +53,12 @@ export default function ListPhone() {
             viewport={{ once: true, amount: 0.1 }}
           >
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/home_product%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(3).svg?alt=media&token=4e70e058-8c87-4b28-afbd-5c82e4eb40c5"
               alt="Icon"
               className="w-10 h-10"
             />
             <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
-              Điện thoại
+              Laptop
             </h1>
           </motion.div>
         </div>
@@ -106,22 +106,29 @@ export default function ListPhone() {
       ) : noProducts ? (
         <NoProductsMessage />
       ) : (
-        <motion.div
-          key={currentPage} 
-          initial={{
-            opacity: 0,
-            x: action === "next" ? -100 : action === "prev" ? 100 : 0,
-          }} 
-          animate={{ opacity: 1, x: 0 }}
-          exit={{
-            opacity: 0,
-            x: action === "next" ? 100 : action === "prev" ? -100 : 0,
-          }} 
-          transition={{ duration: 0.7, ease: "easeOut" }} 
-        >
-          <ProductListPhone productVariant={products} />
-        </motion.div>
+        <>
+          {action === "next" || action === "prev" ? (
+            <motion.div
+              initial={{ opacity: 0, x: action === "next" ? -100 : 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: action === "next" ? 100 : -100 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
+              <ProductListLaptop productVariant={products} />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              <ProductListLaptop productVariant={products} />
+            </motion.div>
+          )}
+        </>
       )}
+
 
     </div>
   );

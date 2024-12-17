@@ -10,3 +10,4 @@ export * from "./getProductDetail";
 export * from "./getAllStorageBySlugUrl";
 export * from "./getAllProductVariantsByVariantPrice";
 export * from "./getPhoneByVariants";
+export * from "./getLaptopByVariants";
