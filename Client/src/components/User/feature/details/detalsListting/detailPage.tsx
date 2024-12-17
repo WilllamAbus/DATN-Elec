@@ -146,12 +146,6 @@ const DetailPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-
-
-
-
-
-
                       <div className="mt-4">
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                           Mô tả sản phẩm
@@ -179,7 +173,6 @@ const DetailPage: React.FC = () => {
                           )}
                         </p>
                       </div>
-
 
                       <div className="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
                         <FavoriteButton />

@@ -1,4 +1,5 @@
 const User = require("../model/users.model");
+const WathList = require("../model/wathlist");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
@@ -149,8 +150,72 @@ const getdisableLimitService = (page, search) =>
       });
     }
   });
+
+const getWathlistLimitService = (userId, page, search) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const limit = parseInt(process.env.LIMITV2, 10) || 3;
+      const offset = !page || +page <= 1 ? 0 : (+page - 1) * limit;
+
+      let searchQuery = { user: userId };
+
+      if (search) {
+        searchQuery = {
+          ...searchQuery,
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { phone: { $regex: search, $options: "i" } },
+          ],
+        };
+      }
+
+      const data = await WathList.find(searchQuery)
+        .skip(offset)
+        .limit(limit)
+        .populate({
+          path: "product",
+        })
+        .populate({
+          path: "productVariant",
+          populate: [
+            {
+              path: "image",
+            },
+            {
+              path: "ram",
+            },
+            {
+              path: "storage",
+            },
+          ],
+        })
+        .lean();
+
+      const total = await WathList.countDocuments(searchQuery);
+
+      resolve({
+        success: true,
+        err: 0,
+        msg: data.length ? "OK" : "No users found.",
+        status: 200,
+        response: {
+          total,
+          data,
+        },
+      });
+    } catch (error) {
+      reject({
+        success: false,
+        err: 1,
+        msg: "Error retrieving users: " + error.message,
+        status: 500,
+      });
+    }
+  });
 module.exports = {
   loginSuccessService,
   getUseLimitService,
   getdisableLimitService,
+  getWathlistLimitService,
 };

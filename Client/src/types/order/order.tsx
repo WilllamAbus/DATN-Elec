@@ -18,6 +18,7 @@ export interface Product {
   product_price_unit: number;
   product_attributes: ProductAttribute[];
   weight_g: number;
+  slug: string;
 }
 
 export interface CartDetail {

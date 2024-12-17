@@ -76,7 +76,10 @@ const ProductDetail: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const watchlistItems = useSelector((state: RootState) => state.watchlist);
-
+  const currentPage = useSelector(
+    (state: RootState) => state.orderPagi.pagination?.currentPage || 1
+  );
+  const [searchTerm] = useState<string>("");
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -140,7 +143,9 @@ const ProductDetail: React.FC = () => {
   // }, [id, dispatch]); // Thêm profile vào dependency array
   const fetchWatchlist = async () => {
     try {
-      const watchlistResponse = await dispatch(getWatchlistThunk()).unwrap();
+      const watchlistResponse = await dispatch(
+        getWatchlistThunk({ page: currentPage, search: searchTerm })
+      );
 
       if (Array.isArray(watchlistResponse)) {
         const isFavoriteProduct = watchlistResponse.some(
@@ -178,9 +183,7 @@ const ProductDetail: React.FC = () => {
 
     try {
       console.log("Đang lấy thông tin sản phẩm với ID:", id);
-      const [productResponse] = await Promise.all([
-        getProductByID(id)
-      ]);
+      const [productResponse] = await Promise.all([getProductByID(id)]);
 
       setProduct(productResponse.product);
 
@@ -536,7 +539,6 @@ const ProductDetail: React.FC = () => {
       </div>
 
       {/* <Comment /> */}
-
     </>
   );
 };
