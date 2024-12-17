@@ -6,7 +6,6 @@ import {
   getRepComment,
   deleteRepComment,
   Comment as CommentType,
-
 } from "../../../../services/commnet/comment.service";
 // import { getOneUser } from "../../../../services/user/user.service";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -16,7 +15,7 @@ import withReactContent from "sweetalert2-react-content";
 import "../../../../assets/css/admin.style.css";
 import { notify } from "../../../../ultils/success";
 import { useForm } from "react-hook-form";
-import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
+import { Pagination } from "@nextui-org/react";
 
 const MySwal = withReactContent(Swal);
 interface FormValues {
@@ -30,9 +29,9 @@ const ListDetailComment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [openCommentId, setOpenCommentId] = useState<string | null>(null);
   const [content, setContent] = useState<Content>({});
-  const [repComments, setRepComments] = useState<{ [key: string]: CommentType[] }>(
-    {}
-  );
+  const [repComments, setRepComments] = useState<{
+    [key: string]: CommentType[];
+  }>({});
 
   const navigatee = useNavigate();
   const { reset } = useForm<FormValues>();
@@ -53,7 +52,7 @@ const ListDetailComment: React.FC = () => {
     setCurrentPage(page);
     navigatee(`?page=${page}`);
   };
-  const fetchData = async (page:number) => {
+  const fetchData = async (page: number) => {
     if (!id) {
       console.log("No product ID provided");
       return;
@@ -62,12 +61,12 @@ const ListDetailComment: React.FC = () => {
     try {
       const productComments = await getCommentProducAdmin(id, page, 5);
       // console.log("Product Comments:", productComments);
-      const commentsData =productComments?.data && Array.isArray(productComments.data)? productComments.data
+      const commentsData =
+        productComments?.data && Array.isArray(productComments.data)
+          ? productComments.data
           : [];
       setTotalPages(productComments.totalPages);
       setComments(commentsData);
-
-    
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -95,7 +94,7 @@ const ListDetailComment: React.FC = () => {
       navigatee("/admin/listComments");
       return;
     }
-  
+
     try {
       const result = await MySwal.fire({
         title: "Xóa bình luận?",
@@ -107,28 +106,26 @@ const ListDetailComment: React.FC = () => {
         confirmButtonText: "Xóa!",
         cancelButtonText: "Hủy",
       });
-  
+
       if (result.isConfirmed) {
         try {
-          await softDeleteComment(commentId); 
-  
+          await softDeleteComment(commentId);
+
           setComments((prevComments) =>
             prevComments.filter((comment) => comment._id !== commentId)
           );
-          fetchData(currentPage); 
-  
+          fetchData(currentPage);
+
           MySwal.fire({
             title: "Đã Xóa!",
             text: "Bình luận đã được xóa.",
             icon: "success",
-            confirmButtonText: "OK", 
-            showConfirmButton: true, 
+            confirmButtonText: "OK",
+            showConfirmButton: true,
             confirmButtonColor: "#3085d6",
           });
-          
+
           // Gọi lại fetchData để làm mới danh sách bình luận
-  
-          
         } catch (error) {
           console.error("Error deleting comment:", error);
           MySwal.fire({
@@ -142,7 +139,6 @@ const ListDetailComment: React.FC = () => {
       console.error("Error showing confirmation dialog:", error);
     }
   };
-  
 
   const deleteRep = async (id_repComment: string, commentId: string) => {
     if (!id_repComment) {
@@ -165,23 +161,22 @@ const ListDetailComment: React.FC = () => {
         try {
           const response = await deleteRepComment(id_repComment);
 
-         
-            setRepComments((prevRepComments) => {
-              const updatedComments = { ...prevRepComments };
-              updatedComments[commentId] = updatedComments[commentId].filter(
-                (repComment) => repComment._id !== id_repComment
-              );
-              return updatedComments;
+          setRepComments((prevRepComments) => {
+            const updatedComments = { ...prevRepComments };
+            updatedComments[commentId] = updatedComments[commentId].filter(
+              (repComment) => repComment._id !== id_repComment
+            );
+            return updatedComments;
+          });
+          if (response.success) {
+            await MySwal.fire({
+              title: "Đã Xóa!",
+              text: "Phản hồi bình luận đã được xóa.",
+              icon: "success",
+              confirmButtonText: "OK",
+              showConfirmButton: true,
+              confirmButtonColor: "#3085d6",
             });
-            if (response.success) {
-              await MySwal.fire({
-                title: "Đã Xóa!",
-                text: "Phản hồi bình luận đã được xóa.",
-                icon: "success",
-                confirmButtonText: "OK",
-                showConfirmButton: true,
-                confirmButtonColor: "#3085d6",
-              });
             fetchData(currentPage);
           } else {
             throw new Error("Xóa bình luận phản hồi không thành công");
@@ -233,10 +228,10 @@ const ListDetailComment: React.FC = () => {
             ? { ...comment, replies: [...(comment.replies || []), response] }
             : comment
         )
-      );  
+      );
       reset();
-      
-      setContent((prevContent) => ({ ...prevContent, [idComment]: "" })); 
+
+      setContent((prevContent) => ({ ...prevContent, [idComment]: "" }));
     } catch (error) {
       console.error("Error submitting reply comment:", error);
     } finally {
@@ -269,7 +264,6 @@ const ListDetailComment: React.FC = () => {
 
   return (
     <>
-
       {/* Comments */}
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -290,7 +284,7 @@ const ListDetailComment: React.FC = () => {
                 <tr className="border-b text-center dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <td className="px-4 py-3">{index + 1}</td>
                   <td className="px-4 py-3">
-                  {comment?.id_user?.name ||  "Loading..."}
+                    {comment?.id_user?.name || "Loading..."}
                   </td>
 
                   <td className="px-4 py-3 text-sm text-yellow-400">
@@ -311,15 +305,14 @@ const ListDetailComment: React.FC = () => {
                   <td className="px-4 py-3 text-center">
                     {!(repComments[comment?._id]?.length > 0) && (
                       <button
-                  className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-
+                        className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         onClick={() => openForm(comment?._id)}
                       >
                         Trả lời
                       </button>
                     )}
                     <button
-                    className="flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 mt-4"
+                      className="flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 mt-4"
                       onClick={() => deleteComment(comment?._id)}
                     >
                       Xóa bình luận
@@ -328,7 +321,6 @@ const ListDetailComment: React.FC = () => {
                       <button
                         key={repComment?._id}
                         className="flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 mt-4"
-
                         onClick={() => deleteRep(repComment?._id, comment?._id)}
                       >
                         Xóa phản hồi
@@ -385,13 +377,20 @@ const ListDetailComment: React.FC = () => {
           )}
         </tbody>
       </table>
-      {comments.length > 0 && (
-        <PaginationComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+      <div className="flex justify-center my-4">
+        {comments.length > 0 && (
+          <Pagination
+            isCompact
+            loop
+            showControls
+            color="primary"
+            total={totalPages}
+            page={currentPage}
+            initialPage={1}
+            onChange={(page) => handlePageChange(page)}
+          />
+        )}
+      </div>
     </>
   );
 };
