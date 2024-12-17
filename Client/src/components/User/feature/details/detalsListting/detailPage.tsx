@@ -24,7 +24,7 @@ import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSa
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
 
-import { ToastContainer } from "react-toastify";
+// import { ToastContainer } from "react-toastify";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -118,6 +118,7 @@ const DetailPage: React.FC = () => {
 
   return (
     <>
+      {/* <ToastContainer /> */}
       <ReusableBreadcrumb paths={breadcrumbPaths} />
       <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
         <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
@@ -204,7 +205,6 @@ const DetailPage: React.FC = () => {
             </>
           )}
         </div>
-        <ToastContainer />
       </section>
       <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
