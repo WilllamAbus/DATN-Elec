@@ -28,13 +28,13 @@ const Arrivale: React.FC = () => {
         return <p>Đang tải sản phẩm bán chạy...</p>;
       }
     return (
-        <section className="bg-gray-50 shadow hover:shadow-lg py-8 antialiased dark:bg-gray-900 md:py-12">
+        <section className="bg-gray-50 shadow hover:shadow-lg antialiased dark:bg-gray-900 md:py-12">
             <div className="text-center">
                 <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
                     Bán chạy
                 </h2>
             </div>
-            <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+            <div className="mx-auto max-w-screen-2xl px-4 2xl:px-0">
                 <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4">
                     {products.map((product, index) => (
                         <div

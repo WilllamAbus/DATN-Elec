@@ -40,11 +40,11 @@ export default function ProductItem({ product, index }: ProductItemProps) {
         </Link>
       </motion.div>
 
-      <div className="pt-1 mb-10">
+      <div className="pt-2 mb-10">
         <div className="mb-4 px-2 flex items-center justify-between gap-4">
           {product.variants.length > 0 &&
             product.variants[0].product_discount.isActive && (
-              <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+              <span className="rounded bg-red-700  px-2.5 py-0.5 text-xs font-medium text-white dark:bg-primary-900 dark:text-primary-300">
                 Giảm giá {product.variants[0].product_discount.discountPercent}%
               </span>
             )}
