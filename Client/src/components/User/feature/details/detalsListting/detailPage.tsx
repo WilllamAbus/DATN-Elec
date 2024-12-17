@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Star } from "./svg";
+// import { Star } from "./svg";
 import VariantImageGallery from "./cpnDetailPage/VariantImageGallery";
 import FavoriteButton from "./cpnDetailPage/FavoriteButton";
 import AddToCartButton from "./cpnDetailPage/AddToCartButton";
@@ -33,10 +33,7 @@ const DetailPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
 
-  const [averageRating, setAverageRating] = useState<string | null>(null);
-  const handleUpdateAverageRating = (avgRating: string) => {
-    setAverageRating(avgRating);
-  }
+  
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail
   );
@@ -137,13 +134,11 @@ const DetailPage: React.FC = () => {
                             variant={firstVariant}
                             product={productDetail || {}}
                           />
-                          <div className="flex items-center text-yellow-400">
+                          {/* <div className="flex items-center text-yellow-400">
                             <span className="ml-1 text-sm font-medium">{averageRating || "0"}</span>
                             <Star />
-                          </div>
-                          <p className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                            ({averageRating || "0"} trên 5)
-                          </p>
+                          </div> */}
+                          
                           <p
                             className="ml-2 text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
                           >
@@ -213,7 +208,7 @@ const DetailPage: React.FC = () => {
       </div>
       <section>
         <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
-          <Comment onUpdateAverageRating={handleUpdateAverageRating} />
+          <Comment  />
         </div>
       </section>
       <section>

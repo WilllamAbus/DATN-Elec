@@ -41,10 +41,8 @@ interface EditComment {
   content: string;
   rating: number;
 }
-interface CommentProps {
-  onUpdateAverageRating: (avgRating: string) => void;
-}
-const Comment = ({ onUpdateAverageRating }: CommentProps) => {
+
+const Comment = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -125,11 +123,7 @@ useEffect(() => {
       setFilteredComments(filtered); // Lọc bình luận theo rating
     }
   };
-  const calculateAverageRating = (comments: CommentType[]) => {
-    if (!comments || comments.length === 0) return "0.0";
-    const totalRatings = comments.reduce((sum, comment) => sum + comment.rating, 0);
-    return (totalRatings / comments.length).toFixed(1); 
-  };
+ 
   
   const fetchComments = async () => {
     if (!slug) return; 
@@ -140,13 +134,8 @@ useEffect(() => {
       setComments(productComments);
       setFilteredComments(productComments);
   
-      const avgRating = calculateAverageRating(productComments);
       
-      if (onUpdateAverageRating) {
-        onUpdateAverageRating(avgRating); 
-      } else {
-        console.error("onUpdateAverageRating is undefined");
-      }
+    
     } catch (error) {
       console.error("Lỗi khi lấy bình luận:", error);
     }
@@ -183,7 +172,7 @@ useEffect(() => {
     try {
        const commentResponse = await addComment(slug, commentData);
        notify();
-       setTimeout(fetchComments, 1000); 
+       fetchComments (); 
        reset();
        setRating(0);
        setHover(0);
