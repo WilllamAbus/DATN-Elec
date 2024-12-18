@@ -1,44 +1,45 @@
-import ProductListLaptop from "./productList/laptop";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getLaptopByVariantsThunk } from "../../../../redux/product/client/Thunk";
+import { getAccessoryByVariantsThunk } from "../../../../redux/product/client/Thunk";
 import { useState, useEffect } from "react";
 import ProductSkeletonList from "../../skeleton/product/productHomeSkeleton";
 import NoProductsMessage from "../listPage/noProduct";
 import { Tooltip } from "@nextui-org/react";
 import { MyButton } from "src/common/customs/MyButton";
 import { motion } from 'framer-motion';
-export default function ListLaptop() {
+import ProductListAccessory from "./productList/accessory";
+export default function ListAccessory() {
   const dispatch: AppDispatch = useDispatch();
   const products = useSelector((state: RootState) => {
-    const laptopVariants = state.productClient.getLaptopByVariants.laptopVariants;
-    return laptopVariants ? laptopVariants.variants : [];
+    const accessoryVariants = state.productClient.getAccessoryByVarians.accessoryVariants;
+    return accessoryVariants ? accessoryVariants.variants  : [];
   });
   const currentPage = useSelector(
-    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.currentPage || 1
+    (state: RootState) => state.productClient.getAccessoryByVarians.pagination?.currentPage || 1
   );
   const totalPages = useSelector(
-    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.totalPages || 1
+    (state: RootState) => state.productClient.getAccessoryByVarians.pagination?.totalPages || 1
   );
   const hasNextPage = useSelector(
-    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.hasNextPage || false
+    (state: RootState) => state.productClient.getAccessoryByVarians.pagination?.hasNextPage || false
   );
   const hasPrevPage = useSelector(
-    (state: RootState) => state.productClient.getLaptopByVariants.pagination?.hasPrevPage || false
+    (state: RootState) => state.productClient.getAccessoryByVarians.pagination?.hasPrevPage || false
   );
   const isLoading = useSelector(
-    (state: RootState) => state.productClient.getLaptopByVariants.isLoading
+    (state: RootState) => state.productClient.getAccessoryByVarians.isLoading
   );
 
   const [action, setAction] = useState<"next" | "prev" | null>(null);
 
   useEffect(() => {
-    dispatch(getLaptopByVariantsThunk({ page: 1 }));
+    dispatch(getAccessoryByVariantsThunk({ page: 1 }));
   }, [dispatch]);
 
   const handlePageChange = (page: number, actionType: "next" | "prev") => {
     setAction(actionType);
-    dispatch(getLaptopByVariantsThunk({ page }));
+    dispatch(getAccessoryByVariantsThunk({ page }));
   };
   const noProducts = products.length === 0;
   return (
@@ -53,12 +54,12 @@ export default function ListLaptop() {
             viewport={{ once: true, amount: 0.1 }}
           >
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(5).svg?alt=media&token=2506d2b5-60aa-4e05-9d0c-a55fb63548d5"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(4).svg?alt=media&token=497f2982-abe3-4ae9-ab7d-5ca2edb36544"
               alt="Icon"
               className="w-10 h-10"
             />
             <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
-              Laptop
+              Linh kiện
             </h1>
           </motion.div>
         </div>
@@ -102,33 +103,32 @@ export default function ListLaptop() {
         )}
       </div>
       {isLoading ? (
-  <ProductSkeletonList length={10} />
-) : noProducts ? (
-  <NoProductsMessage />
-) : (
-  <>
-    {action === "next" || action === "prev" ? (
-      <motion.div
-        initial={{ opacity: 0, x: action === "next" ? -100 : 100 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: action === "next" ? 100 : -100 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-      >
-        <ProductListLaptop productVariant={products.slice(0, 5)} />
-      </motion.div>
-    ) : (
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true, amount: 0.1 }}
-      >
-        <ProductListLaptop productVariant={products.length <= 5 ? products : products.slice(0, 5)} />
-      </motion.div>
-    )}
-  </>
-)}
-
+        <ProductSkeletonList length={10} />
+      ) : noProducts ? (
+        <NoProductsMessage />
+      ) : (
+        <>
+          {action === "next" || action === "prev" ? (
+            <motion.div
+              initial={{ opacity: 0, x: action === "next" ? -100 : 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: action === "next" ? 100 : -100 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
+              <ProductListAccessory productVariant={products} />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              <ProductListAccessory productVariant={products} />
+            </motion.div>
+          )}
+        </>
+      )}
 
 
     </div>
