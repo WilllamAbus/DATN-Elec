@@ -6,7 +6,7 @@ interface ProductSkeletonListProps {
   length?: number;
 }
 
-const ProductSkeletonList: React.FC<ProductSkeletonListProps> = ({ length = 8 }) => {
+const ProductSkeletonList: React.FC<ProductSkeletonListProps> = ({ length = 10 }) => {
   return (
     <div className={styles.gridContainer}>
       {[...Array(length)].map((_, index) => (

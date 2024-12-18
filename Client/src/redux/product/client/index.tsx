@@ -11,7 +11,9 @@ import {
   getProductDetailSlice,
   getAllStorageBySlugUrlSlice,
   getAllProductVariantsByVariantPriceSlice,
-  getPhoneByVariantsSlice
+  getPhoneByVariantsSlice,
+  getLaptopByVariantsSlice,
+  getAccessoryByVariantsSlice
 
 
 } from "./Slicle";
@@ -27,7 +29,9 @@ const productsReducer = combineReducers({
   getProductDetail:getProductDetailSlice,
   getAllStorageBySlugUrl:getAllStorageBySlugUrlSlice,
   getAllProductVariantsByVariantPrice:getAllProductVariantsByVariantPriceSlice,
-  getPhoneByVariants:getPhoneByVariantsSlice
+  getPhoneByVariants:getPhoneByVariantsSlice,
+  getLaptopByVariants:getLaptopByVariantsSlice,
+  getAccessoryByVarians:getAccessoryByVariantsSlice
 
 
 });

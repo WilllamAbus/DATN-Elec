@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import currencyFormatter from "currency-formatter";
-import { ProductVariant } from "../../../../../services/home/types/getLaptopByVariants";
+import { ProductVariant } from "../../../../../services/home/types/getAccessoryByVariants";
 import { motion } from "framer-motion";
 
 function formatCurrency(value: number) {

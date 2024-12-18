@@ -468,13 +468,10 @@ const authController = {
         return res.status(404).json({ message: "User information not found" });
       }
 
-      // Kiểm tra phương thức thanh toán
       if (order.payment.payment_method === "Thanh toán khi nhận hàng") {
-        // Nếu là "Thanh toán khi nhận hàng", không cần lấy thông tin ngân hàng
         order.stateOrder = "Hủy đơn hàng";
         order.cancelReason = cancelReason;
       } else {
-        // Nếu là phương thức thanh toán khác, lấy thông tin ngân hàng của người đặt đơn
         const user = await User.findById(order.user._id).populate("banks");
         if (!user) {
           return res.status(404).json({ message: "User not found" });
@@ -489,7 +486,6 @@ const authController = {
           });
         }
 
-        // Cập nhật thông tin ngân hàng vào đơn hàng
         order.stateOrder = "Hủy đơn hàng";
         order.cancelReason = cancelReason;
         order.refundBank = {
@@ -703,6 +699,44 @@ const authController = {
         }
       }
 
+      // Nếu trạng thái mới là "Hủy đơn hàng"
+      if (stateOrder === "Hủy đơn hàng") {
+        if (!order.user) {
+          return res
+            .status(404)
+            .json({ message: "Thông tin người dùng không tồn tại" });
+        }
+
+        // Kiểm tra phương thức thanh toán
+        if (order.payment?.payment_method !== "Thanh toán khi nhận hàng") {
+          const user = await User.findById(order.user).populate("banks");
+          if (!user) {
+            return res
+              .status(404)
+              .json({ message: "Người dùng không tồn tại" });
+          }
+
+          const defaultBank =
+            user.banks.find((bank) => bank.isDefault) || user.banks[0];
+
+          if (!defaultBank) {
+            return res.status(400).json({
+              message:
+                "Không tìm thấy thông tin ngân hàng mặc định của người dùng",
+            });
+          }
+
+          // Lưu thông tin ngân hàng hoàn tiền
+          order.refundBank = {
+            bankName: defaultBank.name,
+            accountNumber: defaultBank.accountNumber,
+            accountName: defaultBank.fullName,
+          };
+        }
+
+        // Lưu lý do hủy
+        // order.cancelReason = cancelReason || "Không có lý do cụ thể";
+      }
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();

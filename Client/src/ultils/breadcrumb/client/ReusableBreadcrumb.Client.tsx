@@ -31,7 +31,7 @@ const ReusableBreadcrumbClient = ({ items }: ReusableBreadcrumbProps) => {
   }, [lastScrollTop]);
 
   return (
-    <section className="w-full bg-gray-50 dark:bg-gray-900 p-0 sm:p-3 -mt-1.5  antialiased">
+    <section className="w-full bg-gray-50 dark:bg-gray-900 p-0 sm:p-3 mt-3 antialiased">
       <div
         className={`sticky top-0 z-60 transition-transform duration-300 ${
           isSticky ? "" : "-translate-y-full"

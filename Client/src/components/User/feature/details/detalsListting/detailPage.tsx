@@ -24,7 +24,7 @@ import ProductsInTheSameSegment from "./productsInTheSameSegment/productsInTheSa
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
 
-import { ToastContainer } from "react-toastify";
+// import { ToastContainer } from "react-toastify";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 const DetailPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -33,12 +33,16 @@ const DetailPage: React.FC = () => {
   const navigate = useNavigate();
   const queryParams = queryString.parse(location.search);
 
-  
   const { productDetail } = useSelector(
     (state: RootState) => state.productClient.getProductDetail
   );
-  const variant_name = useSelector((state: RootState) => state.productClient.getProductDetail.productDetail?.product_name);
-  const category = useSelector((state: RootState) => state.productClient.getProductsByCategory.category);
+  const variant_name = useSelector(
+    (state: RootState) =>
+      state.productClient.getProductDetail.productDetail?.product_name
+  );
+  const category = useSelector(
+    (state: RootState) => state.productClient.getProductsByCategory.category
+  );
   const [filters, setFilters] = useState<FilterState>({
     storage: queryParams.storage ? String(queryParams.storage) : "",
     color: queryParams.color ? String(queryParams.color) : "",
@@ -83,20 +87,26 @@ const DetailPage: React.FC = () => {
     }
   }, [slug, dispatch, filters.storage, filters.color]);
 
-  const handleFilterChange = useCallback((newFilters: FilterState) => {
-    setFilters((prevFilters) => {
-      const hasStorage = !!productDetail?.variants?.some(
-        (variant) => variant.storage // Kiểm tra xem sản phẩm có `storage`
-      );
-  
-      if (hasStorage && newFilters.storage && newFilters.storage !== prevFilters.storage) {
-        return { ...newFilters, color: "" }; // Reset color nếu storage thay đổi
-      }
-  
-      return { ...prevFilters, ...newFilters }; // Nếu không có storage, chỉ cập nhật bình thường
-    });
-  }, [productDetail]);
-  
+  const handleFilterChange = useCallback(
+    (newFilters: FilterState) => {
+      setFilters((prevFilters) => {
+        const hasStorage = !!productDetail?.variants?.some(
+          (variant) => variant.storage // Kiểm tra xem sản phẩm có `storage`
+        );
+
+        if (
+          hasStorage &&
+          newFilters.storage &&
+          newFilters.storage !== prevFilters.storage
+        ) {
+          return { ...newFilters, color: "" }; // Reset color nếu storage thay đổi
+        }
+
+        return { ...prevFilters, ...newFilters }; // Nếu không có storage, chỉ cập nhật bình thường
+      });
+    },
+    [productDetail]
+  );
 
   const firstVariant = productDetail?.variants?.length
     ? productDetail.variants[0]
@@ -108,6 +118,7 @@ const DetailPage: React.FC = () => {
 
   return (
     <>
+      {/* <ToastContainer /> */}
       <ReusableBreadcrumb paths={breadcrumbPaths} />
       <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
         <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
@@ -128,7 +139,6 @@ const DetailPage: React.FC = () => {
                       />
 
                       <div className="mt-4 sm:flex sm:items-center sm:gap-2 flex-wrap sm:flex-nowrap">
-
                         <div className="flex items-center gap-3 flex-wrap">
                           <VariantPrice
                             variant={firstVariant}
@@ -138,11 +148,10 @@ const DetailPage: React.FC = () => {
                             <span className="ml-1 text-sm font-medium">{averageRating || "0"}</span>
                             <Star />
                           </div> */}
-                          
-                          <p
-                            className="ml-2 text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
-                          >
-                            {productDetail?.variants?.[0]?.viewCount || 0} Lượt xem
+
+                          <p className="ml-2 text-sm font-medium text-gray-900 hover:no-underline dark:text-white">
+                            {productDetail?.variants?.[0]?.viewCount || 0} Lượt
+                            xem
                           </p>
                         </div>
                       </div>
@@ -155,8 +164,12 @@ const DetailPage: React.FC = () => {
                             <Popover placement="top" showArrow={true}>
                               <PopoverTrigger>
                                 <span className="cursor-pointer text-gray-900 dark:text-white">
-                                  {productDetail.product_description.length > 100
-                                    ? `${productDetail.product_description.substring(0, 100)}...`
+                                  {productDetail.product_description.length >
+                                  100
+                                    ? `${productDetail.product_description.substring(
+                                        0,
+                                        100
+                                      )}...`
                                     : productDetail.product_description}
                                 </span>
                               </PopoverTrigger>
@@ -192,12 +205,14 @@ const DetailPage: React.FC = () => {
             </>
           )}
         </div>
-        <ToastContainer />
       </section>
       <div className="grid grid-cols-[2fr_1fr] px-4 pt-4 xl:grid-cols-[2fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className="p-1 mb-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <Blog post={productDetail.posts} variants={productDetail.variants || []} />
+            <Blog
+              post={productDetail.posts}
+              variants={productDetail.variants || []}
+            />
           </div>
         </div>
         <div className="col-span-full xl:col-auto">
@@ -208,14 +223,13 @@ const DetailPage: React.FC = () => {
       </div>
       <section>
         <div className="grid grid-cols-1 px-4 pt-4 gap-4 dark:bg-gray-900">
-          <Comment  />
+          <Comment />
         </div>
       </section>
       <section>
         <RelatedProduct />
       </section>
-      <ToastContainer />
-
+      {/* <ToastContainer /> */}
     </>
   );
 };

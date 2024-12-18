@@ -18,6 +18,7 @@ const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const { order, items } = useSelector((state: RootState) => state.order);
+
   console.log("Order data:", order, items);
 
   const selectedOrder = Array.isArray(order)
@@ -92,19 +93,125 @@ const OrderDetails: React.FC = () => {
     }
   };
 
+  // const renderStatusButton = () => {
+  //   switch (selectedOrder?.stateOrder) {
+  //     case "Chờ xử lý":
+  //       return (
+  //         <>
+  //           <Button
+  //             onClick={() => {
+  //               setSelectedStatus("Đã xác nhận");
+  //               handleUpdateStatus();
+  //             }}
+  //             className="mt-4 bg-green-500 text-white"
+  //           >
+  //             Đã xác nhận
+  //           </Button>
+  //           <Button
+  //             onClick={() => {
+  //               setSelectedStatus("Hủy đơn hàng");
+  //               handleUpdateStatus();
+  //             }}
+  //             className="mt-4 bg-red-500 text-white"
+  //           >
+  //             Hủy đơn hàng
+  //           </Button>
+  //         </>
+  //       );
+  //     case "Đã xác nhận":
+  //       return (
+  //         <Button
+  //           onClick={() => {
+  //             setSelectedStatus("Đang vận chuyển");
+  //             handleUpdateStatus();
+  //           }}
+  //           className="mt-4 bg-yellow-500 text-white"
+  //         >
+  //           Đang vận chuyển
+  //         </Button>
+  //       );
+  //     case "Đang vận chuyển":
+  //       return (
+  //         <>
+  //           <Button
+  //             onClick={() => {
+  //               setSelectedStatus("Hoàn tất");
+  //               handleUpdateStatus();
+  //             }}
+  //             className="mt-4 bg-blue-500 text-white"
+  //           >
+  //             Hoàn tất
+  //           </Button>
+  //           <Button
+  //             onClick={() => {
+  //               setSelectedStatus("Giao hàng không thành công");
+  //               handleUpdateStatus();
+  //             }}
+  //             className="mt-4 bg-red-500 text-white"
+  //           >
+  //             Giao hàng không thành công
+  //           </Button>
+  //           {selectedOrder?.payment.payment_method !==
+  //             "Thanh toán khi nhận hàng" && (
+  //             <Button
+  //               onClick={() => {
+  //                 setSelectedStatus("Đã hoàn tiền");
+  //                 handleUpdateStatus();
+  //               }}
+  //               className="mt-4 bg-purple-500 text-white"
+  //             >
+  //               Hoàn tiền
+  //             </Button>
+  //           )}
+  //         </>
+  //       );
+  //     case "Hoàn tất":
+  //       return <p className="mt-4 text-gray-500">Đơn hàng đã hoàn tất</p>;
+  //     case "Hủy đơn hàng":
+  //       return (
+  //         <>
+  //           {selectedOrder?.payment.payment_method !==
+  //             "Thanh toán khi nhận hàng" && (
+  //             <Button
+  //               onClick={() => {
+  //                 setSelectedStatus("Đã hoàn tiền");
+  //                 handleUpdateStatus();
+  //               }}
+  //               className="mt-4 bg-purple-500 text-white"
+  //             >
+  //               Hoàn tiền
+  //             </Button>
+  //           )}
+  //         </>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
   const renderStatusButton = () => {
     switch (selectedOrder?.stateOrder) {
       case "Chờ xử lý":
         return (
-          <Button
-            onClick={() => {
-              setSelectedStatus("Đã xác nhận");
-              handleUpdateStatus();
-            }}
-            className="mt-4 bg-green-500 text-white"
-          >
-            Đã xác nhận
-          </Button>
+          <>
+            <Button
+              onClick={() => {
+                setSelectedStatus("Đã xác nhận");
+                handleUpdateStatus();
+              }}
+              className="mt-4 bg-green-500 text-white"
+            >
+              Đã xác nhận
+            </Button>
+            <Button
+              onClick={() => {
+                setSelectedStatus("Hủy đơn hàng");
+                handleUpdateStatus();
+              }}
+              className="mt-4 bg-red-500 text-white"
+            >
+              Hủy đơn hàng
+            </Button>
+          </>
         );
       case "Đã xác nhận":
         return (
@@ -139,18 +246,6 @@ const OrderDetails: React.FC = () => {
             >
               Giao hàng không thành công
             </Button>
-            {selectedOrder?.payment.payment_method !==
-              "Thanh toán khi nhận hàng" && (
-              <Button
-                onClick={() => {
-                  setSelectedStatus("Đã hoàn tiền");
-                  handleUpdateStatus();
-                }}
-                className="mt-4 bg-purple-500 text-white"
-              >
-                Hoàn tiền
-              </Button>
-            )}
           </>
         );
       case "Hoàn tất":
@@ -253,29 +348,37 @@ const OrderDetails: React.FC = () => {
           </div>
         </section>
 
+        {/* Phương thức thanh toán */}
+        <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4">
+            Phương thức thanh toán
+          </h3>
+          <p>{selectedOrder?.payment?.payment_method}</p>
+        </div>
         {/* Ngân Hàng Thanh Toán */}
         {selectedOrder?.payment?.payment_method !==
-          "Thanh toán khi nhận hàng" && (
-          <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">
-              Ngân Hàng Thanh Toán
-            </h2>
-            <div className="space-y-2">
-              <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium">Tên ngân hàng:</span>{" "}
-                {selectedOrder?.refundBank?.bankName || "N/A"}
-              </p>
-              <p className="text-lg mb-2 text-gray-700">
-                <span className="font-medium">Họ tên:</span>{" "}
-                {selectedOrder?.refundBank?.accountName || "N/A"}
-              </p>
-              <p className="text-lg text-gray-700">
-                <span className="font-medium">Số tài khoản:</span>{" "}
-                {selectedOrder?.refundBank?.accountNumber || "N/A"}
-              </p>
-            </div>
-          </section>
-        )}
+          "Thanh toán khi nhận hàng" &&
+          selectedOrder?.stateOrder === "Hủy đơn hàng" && (
+            <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">
+                Ngân Hàng Thanh Toán
+              </h2>
+              <div className="space-y-2">
+                <p className="text-lg mb-2 text-gray-700">
+                  <span className="font-medium">Tên ngân hàng:</span>{" "}
+                  {selectedOrder?.refundBank?.bankName || "N/A"}
+                </p>
+                <p className="text-lg mb-2 text-gray-700">
+                  <span className="font-medium">Họ tên:</span>{" "}
+                  {selectedOrder?.refundBank?.accountName || "N/A"}
+                </p>
+                <p className="text-lg text-gray-700">
+                  <span className="font-medium">Số tài khoản:</span>{" "}
+                  {selectedOrder?.refundBank?.accountNumber || "N/A"}
+                </p>
+              </div>
+            </section>
+          )}
 
         {/* Sản Phẩm */}
         <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">

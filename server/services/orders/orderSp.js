@@ -14,6 +14,7 @@ const OrderService = {
         }
 
         const orders = await Order.find(searchQuery)
+          .sort({ createdAt: -1 })
           .skip(offset)
           .limit(limit)
           .populate({
@@ -86,6 +87,7 @@ const OrderService = {
         }
 
         const orders = await Order.find(searchQuery)
+          .sort({ createdAt: -1 })
           .skip(offset)
           .limit(limit)
           .populate({
@@ -150,11 +152,10 @@ const OrderService = {
         if (!userId) {
           return res.status(401).json({ message: "Người dùng chưa đăng nhập" });
         }
-        // Define pagination parameters
+
         const limit = parseInt(process.env.LIMIT, 10) || 3;
         const offset = !page || +page <= 1 ? 0 : (+page - 1) * limit;
 
-        // Define base search query
         let searchQuery = { user: userId, isDeleted: false };
 
         if (stateOrder) {
@@ -162,6 +163,7 @@ const OrderService = {
         }
 
         const orders = await Order.find(searchQuery)
+          .sort({ createdAt: -1 })
           .skip(offset)
           .limit(limit)
           .populate({

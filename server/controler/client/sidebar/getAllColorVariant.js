@@ -7,7 +7,7 @@ const getAllColorVariant = async (req, res) => {
       'variant_attributes.k': 'Color' 
     }).select('variant_attributes'); 
 
-    console.log('Variants:', variants); 
+
 
     const colors = new Set();
     
