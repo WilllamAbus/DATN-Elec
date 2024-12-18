@@ -10,8 +10,8 @@ export const fetchProductByTimeTrack = createAsyncThunk<ProductResponse, string>
         const data = await getProductByTimeTrack(productId);
         return data; // This should match the ProductResponse type
       } catch (error) {
-        console.error('Error in thunk:', error);
-        return thunkAPI.rejectWithValue('Failed to fetch product details');
+ 
+        return thunkAPI.rejectWithValue('Không có dữ liệu');
       }
     }
   );

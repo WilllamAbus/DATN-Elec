@@ -51,7 +51,7 @@ const search: React.FC = () => {
                       </figure>
                     </Link>
                   </div>
-                  <div className="pt-1 mb-10">
+                  <div className="pt-1 mb-10 h-full">
                     <div className="mb-4 px-2 flex items-center justify-between gap-4">
                       {product.variants.length > 0 && product.variants[0].product_discount?.isActive && (
                         <span className="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">

@@ -452,9 +452,6 @@ const orderAndDetailService = {
         .populate("shippingAddress.userID refundBank") // Populating userID inside shippingAddress
         .exec();
 
-      console.log('Order', order);
-      
-      
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order

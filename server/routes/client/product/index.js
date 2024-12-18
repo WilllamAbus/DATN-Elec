@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { homeAllProduct,listPageAuction,resetFilter, getID, getLimitProductClient,shopping,auction,upView,search,getPhoneByVariants,getLaptopByVariants} = require('../../../controler/client');
+const { homeAllProduct,listPageAuction,resetFilter, getID, getLimitProductClient,shopping,auction,upView,search,getPhoneByVariants,getLaptopByVariants,getAccessoryByVariants} = require('../../../controler/client');
 const { getProductsByCategory,relatedProduct } = require('../../../controler/client');
 
 
@@ -20,6 +20,6 @@ router.put(`/upView/:id`,upView);
 router.get(`/search/:keyword`,search);
 router.get('/get-phone/:slug', getPhoneByVariants);
 router.get('/get-laptop/:slug', getLaptopByVariants);
- 
+router.get('/get-accessory/:slug', getAccessoryByVariants);
 
 module.exports = router;

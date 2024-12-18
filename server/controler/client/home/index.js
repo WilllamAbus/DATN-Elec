@@ -6,6 +6,7 @@ const upView = require('./allProduct').upView;
 const  search = require('./allProduct').search;
 const  getPhoneByVariants = require('./phone').getPhoneByVariants;
 const  getLaptopByVariants = require('./laptop').getLaptopByVariants;
+const  getAccessoryByVariants = require('./accessory').getAccessoryByVariants;
 module.exports = {
   homeAllProduct,
   getID,
@@ -14,5 +15,6 @@ module.exports = {
   upView,
   search,
   getPhoneByVariants,
-  getLaptopByVariants
+  getLaptopByVariants,
+  getAccessoryByVariants
 };

@@ -204,7 +204,7 @@ const Navbar: React.FC = () => {
                 <svg
                   className={`w-5 h-5 ${isListening ? "animate-pulse" : ""}`}
                   fill="currentColor"
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 16 18"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
