@@ -28,13 +28,20 @@ const Arrivale: React.FC = () => {
         return <p>Đang tải sản phẩm bán chạy...</p>;
       }
     return (
-        <section className="bg-gray-50 shadow hover:shadow-lg py-8 antialiased dark:bg-gray-900 md:py-12">
-            <div className="text-center">
-                <h2 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl xl:text-5xl uppercase py-10">
-                    Bán chạy
-                </h2>
-            </div>
-            <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <section className="p-1 mb-4 m-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
+              alt="Icon"
+              className="w-10 h-10"
+            />
+            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+               Sản phẩm bán chạy
+            </h1>
+          </div>
+        </div>
+            <div className="mx-auto max-w-screen-2xl px-4 2xl:px-0 mt-4">
                 <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4">
                     {products.map((product, index) => (
                         <div
@@ -242,7 +249,7 @@ const Arrivale: React.FC = () => {
                                     <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
                                         {product.discountPercent  > 1 ? (
                                             <div>
-                                                <p className="text-xs text-rose-700">
+                                                <p className="text-xs text-gray-400">
                                                     {formatCurrency(
                                                         product.totalOriginalPrice * (1 - product.discountPercent  / 100)
                                                     )}
@@ -253,7 +260,7 @@ const Arrivale: React.FC = () => {
                                                 </p>
                                             </div>
                                         ) : (
-                                            <p className="text-xs">
+                                            <p className="text-xs text-rose-700">
                                                 {formatCurrency(product.totalOriginalPrice)}đ
                                             </p>
                                         )}

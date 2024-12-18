@@ -44,7 +44,7 @@ const ListRecommendation: React.FC = () => {
 
 
     return (
-        <div className="mb-4 m-4 bg-white  rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div className="p-1 mb-4 m-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                     <img
@@ -82,14 +82,14 @@ const ListRecommendation: React.FC = () => {
                                         <SwiperSlide key={product.itemId || index}>
                                             <div
                                                 key={product.itemId}
-                                                className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                                                className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800 h-auto"
                                             >
                                                 <div className="h-56 w-auto">
                                                     <Link to={`/product/${(product.itemDetails as ItemDetails).product?.slug}`}>
                                                         <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
                                                             <a href="#">
                                                                 <img
-                                                                    className="rounded-lg"
+                                                                    className="rounded-lg object-contain "
                                                                     src={
                                                                         product.itemType === "productVariant"
                                                                             ? `${(product.itemDetails as ItemDetails).image?.[0].image[0]}`

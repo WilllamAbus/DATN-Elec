@@ -44,45 +44,45 @@ export default function ListPhone() {
   return (
     <div className="p-1 mb-4 m-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <div className="flex items-center justify-between gap-2 mb-4">
-      <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                    <img
-                        src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
-                        alt="Icon"
-                        className="w-10 h-10"
-                    />
-                    <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
-                        Điện thoại
-                    </h1>
-                </div>
-            </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
+              alt="Icon"
+              className="w-10 h-10"
+            />
+            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+              Điện thoại
+            </h1>
+          </div>
+        </div>
         {totalPages > 1 && (
-         <div className="flex justify-between my-4">
-         {hasPrevPage && (
-           <Tooltip className="capitalize" color="primary" content="Trở lại" showArrow={true}>
-             <MyButton
-               variant="flat"
-               size="sm"
-               onPress={() => handlePageChange(currentPage - 1)}
-               className="text-primary-500 bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black ml-2"
-             >
-               <span>Trở lại</span>
-             </MyButton>
-           </Tooltip>
-         )}
-         {hasNextPage && (
-           <Tooltip className="capitalize" color="primary" content="Xem tiếp" showArrow={true}>
-             <MyButton
-               size="sm"
-               variant="flat"
-               onPress={() => handlePageChange(currentPage + 1)}
-               className="text-primary-500 bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black ml-2"
-             >
-               <span>Xem tiếp</span>
-             </MyButton>
-           </Tooltip>
-         )}
-       </div>
+          <div className="flex justify-between my-4">
+            {hasPrevPage && (
+              <Tooltip className="capitalize" color="primary" content="Trở lại" showArrow={true}>
+                <MyButton
+                  variant="flat"
+                  size="sm"
+                  onPress={() => handlePageChange(currentPage - 1)}
+                  className="text-primary-500 bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black ml-2"
+                >
+                  <span>Trở lại</span>
+                </MyButton>
+              </Tooltip>
+            )}
+            {hasNextPage && (
+              <Tooltip className="capitalize" color="primary" content="Xem tiếp" showArrow={true}>
+                <MyButton
+                  size="sm"
+                  variant="flat"
+                  onPress={() => handlePageChange(currentPage + 1)}
+                  className="text-primary-500 bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black ml-2"
+                >
+                  <span>Xem tiếp</span>
+                </MyButton>
+              </Tooltip>
+            )}
+          </div>
         )}
       </div>
       {isLoading ? (
