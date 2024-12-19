@@ -237,6 +237,7 @@ const orderAndDetailService = {
 
 
 
+
       
 
       if (!order) throw new Error("Đơn hàng không tồn tại");
@@ -322,7 +323,7 @@ const orderAndDetailService = {
         );
   
         
-        const disbaleOrder = await OrderAuction.findOneAndUpdate(
+    await OrderAuction.findOneAndUpdate(
           { _id: orderId },
           {
             $set: {
@@ -332,7 +333,7 @@ const orderAndDetailService = {
             },
           }
         );
-        console.log('softDel',disbaleOrder );
+    
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -352,9 +353,67 @@ const orderAndDetailService = {
           response_code: vnpayResponCode,
           payment_method: "vnPay", // Vì đây là VNPay
         };
-
+      
+        
         const newVnpay = new Vnpay(paymentData);
         await newVnpay.save();
+         const orderDetail = await OrderDetailAuction.findOne({
+                order: orderIds,
+                status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
+              }).lean();
+              const orderPayment = orderDetail.payment_method;
+           const vnPay = await Vnpay.find({transaction_status: '00'})
+        
+              .lean()
+             
+            
+                  
+              if (!vnPay) {
+                return "Không tìm thấy ngân hàng ";
+              }
+          
+              const filteredVnPay = vnPay.filter(payment => {
+                return !payment.order_info.includes("Thanh toan");
+              });
+          
+              const lastIndex = filteredVnPay.length - 1;
+          
+              const lastElement = filteredVnPay[lastIndex];
+     
+              const OrderInForPayment = lastElement.order_info
+         
+              
+              const transOrderId = orderIds.toString();
+      
+              
+              let inforBank
+              let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+                bankCode: lastElement.bank_code,
+                orderInForVnPay: orderIds,
+                paymentDateVnPay: lastElement.payment_date,
+                transiTionAmout: lastElement.amount,
+              } : null
+         
+      
+            
+          
+               
+        
+           const fine =  await OrderAuction.findOneAndUpdate(
+                { _id: orderIds }, // Query by the unique _id of the document
+                {
+                  $set: {
+                
+            
+                 
+                    ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
+                  },
+                },
+            
+                { new: true } // Optionally, return the updated document
+              ).exec();
+              console.log('Updated', fine);
+              
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -475,7 +534,7 @@ const orderAndDetailService = {
 
           return {
             name: product.product_name,
-            price: detail.totalAmount,
+            price: detail.totalPriceWithShipping,
             image: product.image,
           };
         })
