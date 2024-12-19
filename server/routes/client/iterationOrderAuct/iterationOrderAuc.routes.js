@@ -6,15 +6,15 @@ const router = express.Router();
 const iteractionOrderAuController = require('../../../controler/orders/auctions/iterationOrder.controller')
 const middlewareController = require("../../../middleware/auth");
 // Route to create a payment link
-router.get('/allOrder', iteractionOrderAuController.getOrderByUser);
-router.get('/shippStateOrderAuc', iteractionOrderAuController.getShippingOrderByUser);
+router.get('/allOrder',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getOrderByUser);
+router.get('/shippStateOrderAuc',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getShippingOrderByUser);
 
-router.get('/pendingStateOrderAuc', iteractionOrderAuController.getPendingOrderByUser);
-router.get('/confirmStateOrderAuc', iteractionOrderAuController.getConfirmedOrderByUser);
+router.get('/pendingStateOrderAuc',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getPendingOrderByUser);
+router.get('/confirmStateOrderAuc',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getConfirmedOrderByUser);
 
-router.get('/reciveStateOrderAuc', iteractionOrderAuController.getReciveOrderByUser);
-router.get('/completStateOrderAuc', iteractionOrderAuController.getCompleteOrderByUser);
-router.patch('/received/soft-delete/:orderId',middlewareController.verifyToken, iteractionOrderAuController.softDeleteReceivedOrders);
+router.get('/reciveStateOrderAuc',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getReciveOrderByUser);
+router.get('/completStateOrderAuc',middlewareController.verifyTokenUserAuth, iteractionOrderAuController.getCompleteOrderByUser);
+router.patch('/received/soft-delete/:orderId',middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.softDeleteReceivedOrders);
 router.put('/updateStatus/:orderId', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatus)
 router.put('/updateStatusCash/:orderIdCash', middlewareController.verifyTokenAdminAuth, iteractionOrderAuController.updateorderStatusForCash)
 router.get('/invoices/:orderId',middlewareController.verifyTokenAdminAuth,iteractionOrderAuController.exportInvoiceToPDF);

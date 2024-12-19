@@ -213,6 +213,7 @@ const biddingService = {
                 totalBids: bids.length, // Use bids.length here
                 bids,
             };
+            
       } catch (error) {
           console.error('Error fetching bids by user:', error.message);
           throw new Error(`Không thể lấy danh sách lượt đấu giá của người dùng: ${error.message}`);

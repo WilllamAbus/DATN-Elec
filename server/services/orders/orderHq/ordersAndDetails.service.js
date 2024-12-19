@@ -235,11 +235,6 @@ const orderAndDetailService = {
         .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
 
-
-
-
-      
-
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order
@@ -295,10 +290,6 @@ const orderAndDetailService = {
         if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
 
   
-        
- 
-      
-  
         const numInventoriesShelf = inven.quantityShelf;
         const numQuantityDetails = quantiTyAucDetail;
         const remainingQuantityShelf = numInventoriesShelf + numQuantityDetails;
@@ -323,17 +314,72 @@ const orderAndDetailService = {
         );
   
         
-    await OrderAuction.findOneAndUpdate(
+   
+        const paymentDataDisable = {
+          amount: vnpayAmou,
+          transaction: vnpTransNo,
+          bank_code:  vnpayOrderInfo,
+          card_type: 'ATM',
+          order_info: vnpayBankCode,
+          payment_date: vnpPayDate,
+          transaction_status: status,
+          response_code: vnpayResponCode,
+          payment_method: "vnPay", // Vì đây là VNPay
+    
+        };
+      
+        
+        const newVnpay = new Vnpay(paymentDataDisable);
+        await newVnpay.save();
+        const orderDetail = await OrderDetailAuction.findOne({
+          order: orderIds,
+          status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
+        }).lean();
+        const orderPayment = orderDetail.payment_method;
+     const vnPay = await Vnpay.find({transaction_status: '02'})
+                .lean()
+  
+       
+        if (!vnPay) {
+          return "Không tìm thấy ngân hàng ";
+        }
+    
+        const filteredVnPay = vnPay.filter(payment => {
+          return !payment.order_info.includes("Thanh toan");
+        });
+    
+        const lastIndex = filteredVnPay.length - 1;
+    
+        const lastElement = filteredVnPay[lastIndex];
+
+        const OrderInForPayment = lastElement.order_info
+   
+        
+        const transOrderId = orderIds.toString();
+
+        
+        let inforBank
+        let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+          bankCode: lastElement.bank_code,
+          orderInForVnPay: orderIds,
+          paymentDateVnPay: lastElement.payment_date,
+          transiTionAmout: lastElement.amount,
+        } : null
+
+
+        await OrderAuction.findOneAndUpdate(
           { _id: orderId },
           {
             $set: {
               status: "disable",
          
               stateOrder: "Hủy đơn hàng",
+              ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
             },
           }
         );
-    
+
+        
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -363,11 +409,8 @@ const orderAndDetailService = {
               }).lean();
               const orderPayment = orderDetail.payment_method;
            const vnPay = await Vnpay.find({transaction_status: '00'})
-        
-              .lean()
+                      .lean()
              
-            
-                  
               if (!vnPay) {
                 return "Không tìm thấy ngân hàng ";
               }
@@ -399,7 +442,7 @@ const orderAndDetailService = {
           
                
         
-           const fine =  await OrderAuction.findOneAndUpdate(
+         await OrderAuction.findOneAndUpdate(
                 { _id: orderIds }, // Query by the unique _id of the document
                 {
                   $set: {
@@ -412,7 +455,7 @@ const orderAndDetailService = {
             
                 { new: true } // Optionally, return the updated document
               ).exec();
-              console.log('Updated', fine);
+          
               
         return {
           orderIds,
@@ -650,7 +693,7 @@ const orderAndDetailService = {
       });
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const userID = order.shippingAddress.userID.toString(); // Lấy userID dưới dạng chuỗi
+      // const userID = order.shippingAddress.userID.toString(); // Lấy userID dưới dạng chuỗi
       const productIDAuct = orderDetails[0].productID
 
 

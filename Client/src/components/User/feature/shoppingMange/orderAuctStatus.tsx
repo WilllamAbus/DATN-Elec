@@ -23,7 +23,7 @@ const Order: React.FC = () => {
   return (
     <div className="py-5 relative">
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
-        <h2 className=" text-3xl leading-10 text-black mb-9">Đơn hàng</h2>
+        <h2 className=" text-3xl leading-10 text-black mb-9">Đơn hàng đấu giá</h2>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between">
           <ul className="flex flex-wrap sm:flex-nowrap gap-x-5 gap-y-3 sm:gap-y-0">
             <li
