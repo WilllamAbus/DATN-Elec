@@ -185,6 +185,7 @@ const authController = {
 
         orderDetailItems.push({
           product: product._id,
+          variantName: selectedVariant.variant_name || "Mặc định", // Lấy tên biến thể
           productVariant: item.productVariant,
           quantity: item.quantity,
           price: item.price,
