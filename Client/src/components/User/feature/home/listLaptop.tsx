@@ -114,7 +114,7 @@ export default function ListLaptop() {
         exit={{ opacity: 0, x: action === "next" ? 100 : -100 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
       >
-        <ProductListLaptop productVariant={products.slice(0, 5)} />
+        <ProductListLaptop productVariant={products} />
       </motion.div>
     ) : (
       <motion.div
@@ -123,11 +123,15 @@ export default function ListLaptop() {
         transition={{ duration: 1 }}
         viewport={{ once: true, amount: 0.1 }}
       >
-        <ProductListLaptop productVariant={products.length <= 5 ? products : products.slice(0, 5)} />
+        <ProductListLaptop
+          productVariant={products.length >= 10 ? products : products.slice(0, 5)}
+          
+        />
       </motion.div>
     )}
   </>
 )}
+
 
 
 
