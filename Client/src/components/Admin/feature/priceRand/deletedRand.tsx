@@ -128,7 +128,7 @@ const deletedPriceRand: React.FC = () => {
           ))
         ) : (
           <tr>
-            <td colSpan={6} className="text-center py-4">Không có dữ liệu</td>
+            <td colSpan={8} className="text-center py-4">Không có dữ liệu</td>
           </tr>
         )}
       </tbody>
