@@ -351,8 +351,8 @@ const ListOrdersDelete: React.FC = () => {
           ))
           ) : (
             <tr>
-            <td colSpan={5} className="text-center py-4">
-            Không có đơn hàng
+            <td colSpan={6} className="text-center py-4">
+                 Không có đơn hàng
             </td>
           </tr>
           )}
