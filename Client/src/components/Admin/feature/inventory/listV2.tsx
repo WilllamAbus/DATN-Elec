@@ -247,7 +247,7 @@ const InventoryList: React.FC = () => {
                       <p className="text-red-500 text-xs italic">{quantityWarning}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3">{price.toLocaleString()} VNĐ</td>
+                  <td className="px-4 py-3">{price.toLocaleString()}đ</td>
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     <div className="flex items-center space-x-4">
                       {buttonDisabled ? (

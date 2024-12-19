@@ -263,7 +263,7 @@ const InboundList: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">{inbound.product_variant_id.product.product_supplier.name}</td>
                     <td className="px-4 py-3">{inbound.inbound_quantity}</td>
-                    <td className="px-4 py-3">{inbound.inbound_price.toLocaleString()} VNĐ</td>
+                    <td className="px-4 py-3">{inbound.inbound_price.toLocaleString()}đ</td>
                     <td className="px-4 py-3">
                       {new Date(inbound.createdAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",

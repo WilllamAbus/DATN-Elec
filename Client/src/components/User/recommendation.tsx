@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getRecommendations } from "../../services/recommendation/getRecommendation";
 import { Link, useParams } from "react-router-dom";
 import { Recommendation, ItemDetails } from "../../types/recommendation";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -12,7 +11,7 @@ import "swiper/css/pagination";
 
 const ListRecommendation: React.FC = () => {
 
-    const [products, setProducts] = useState<Recommendation[]>([]);
+    const [products, setProducts] = useState<Recommendation[]>([]); // Định nghĩa kiểu dữ liệu chính xác
     useParams<{ id: string }>();
     useEffect(() => {
         const fetchProducts = async () => {
@@ -147,7 +146,7 @@ const ListRecommendation: React.FC = () => {
                                                             >
                                                                 fcdsf Quick look
                                                                 <div className="tooltip-arrow" data-popper-arrow="" />
-                                                            </div>
+                                                            </div> 
                                                         </div>
                                                     </div>
                                                     <a
@@ -236,20 +235,20 @@ const ListRecommendation: React.FC = () => {
                                                             </p>
                                                         </li>
                                                     </ul>
-                                                    <div className="mt-4 flex items-center justify-between gap-6">
+                                                    <div className="mt-2 px-2 flex items-center gap-2">
                                                         <p className="text-xs leading-tight text-gray-900 dark:text-white">
                                                             {product.itemType === "productVariant" && 'product' in product.itemDetails ? (
                                                                 // Kiểm tra nếu có thông tin giảm giá
                                                                 product.itemDetails.product_discount?.discountPercent && product.itemDetails.product_discount.discountPercent > 0 ? (
-                                                                    <div>
-                                                                        <p className="text-xs font-medium text-rose-700">
+                                                                    <div className="flex w-full">
+                                                                        <p className="text-xs font-medium text-rose-700 flex-grow">
                                                                             {formatCurrency(
                                                                                 product.itemDetails.variant_price *
                                                                                 (1 - product.itemDetails.product_discount.discountPercent / 100)
                                                                             )}
                                                                             đ
                                                                         </p>
-                                                                        <p className="text-xs font-medium line-through text-gray-400">
+                                                                        <p className=" ms-4 text-xs font-medium line-through text-gray-400 flex-shrink-0">
                                                                             {formatCurrency(product.itemDetails.variant_original_price)} {/* Hiển thị giá gốc */}
                                                                         </p>
                                                                     </div>
@@ -278,7 +277,7 @@ const ListRecommendation: React.FC = () => {
                                                             </li>
                                                         </div>
                                                     </ul>
-
+                                                    
                                                 </div>
                                             </div>
                                         </SwiperSlide>

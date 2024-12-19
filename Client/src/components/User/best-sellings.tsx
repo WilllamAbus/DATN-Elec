@@ -26,21 +26,21 @@ const Arrivale: React.FC = () => {
 
     if (loading) {
         return <p>Đang tải sản phẩm bán chạy...</p>;
-      }
+    }
     return (
         <section className="p-1 mb-4 m-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <img
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(6).svg?alt=media&token=8b339c30-9226-465e-a6ba-59a96504f454"
-              alt="Icon"
-              className="w-10 h-10"
-            />
-            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
-               Sản phẩm bán chạy
-            </h1>
-          </div>
-        </div>
+                <div className="flex items-center gap-2">
+                    <img
+                        src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(6).svg?alt=media&token=8b339c30-9226-465e-a6ba-59a96504f454"
+                        alt="Icon"
+                        className="w-10 h-10"
+                    />
+                    <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+                        Sản phẩm bán chạy
+                    </h1>
+                </div>
+            </div>
             <div className="mx-auto max-w-screen-2xl px-4 2xl:px-0 mt-4">
                 <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4">
                     {products.map((product, index) => (
@@ -49,7 +49,7 @@ const Arrivale: React.FC = () => {
                             className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                         >
                             <div className="h-56 w-full">
-                               <Link to={`/product/${product.productDetails.slug}`} title={product.productDetails.product_name}>
+                                <Link to={`/product/${product.productDetails.slug}`} title={product.productDetails.product_name}>
                                     <img
                                         src={product.productDetails.image[0]}
                                         alt={product.productDetails.product_name}
@@ -59,8 +59,8 @@ const Arrivale: React.FC = () => {
                             </div>
                             <div className="pt-6">
                                 <div className="mb-4 flex items-center justify-between gap-4">
-                                    {product.discountPercent  > 0 ? <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                                        Giảm giá {product.discountPercent }%
+                                    {product.discountPercent > 0 ? <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                                        Giảm giá {product.discountPercent}%
                                     </span> : <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
                                     </span>}
                                     <div className="flex items-center justify-end gap-1">
@@ -235,21 +235,18 @@ const Arrivale: React.FC = () => {
                                 </ul>
                                 <div className="mt-4 flex items-center justify-between gap-6">
                                     <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
-                                        {product.discountPercent  > 1 ? (
-                                            <div>
-                                                <p className="text-xs text-gray-400">
-                                                    {formatCurrency(
-                                                        product.totalOriginalPrice * (1 - product.discountPercent  / 100)
-                                                    )}
-                                                    đ
+                                        {product.discountPercent > 1 ? (
+                                            <div className="flex w-full">
+                                                <p className="text-xs font-medium text-rose-700 flex-grow">
+                                                    {formatCurrency(product.variant_price)} đ
                                                 </p>
-                                                <p className="text-xs line-through text-gray-400">
+                                                <p className="text-xs line-through text-gray-400 font-medium flex-shrink-0">
                                                     {formatCurrency(product.totalOriginalPrice)}đ
                                                 </p>
                                             </div>
                                         ) : (
-                                            <p className="text-xs text-rose-700">
-                                                {formatCurrency(product.totalOriginalPrice)}đ
+                                            <p className="text-xs text-rose-700 font-medium">
+                                                {formatCurrency(product.variant_price)}đ
                                             </p>
                                         )}
                                     </p>
