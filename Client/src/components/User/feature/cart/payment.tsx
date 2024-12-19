@@ -514,8 +514,8 @@ const CheckoutPage: React.FC = () => {
         order_info: orderIdParam || "",
       },
       shipping: {
-        recipientName: profile?.name || "",
-        phoneNumber: profile?.phone || "",
+        recipientName: defaultAddress?.fullName || "",
+        phoneNumber: defaultAddress?.phone || "",
         address: defaultAddress?.address || "",
       },
       voucher: [],

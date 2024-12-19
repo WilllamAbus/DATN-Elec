@@ -35,7 +35,7 @@ const addPostProduct: React.FC = () => {
       ).unwrap();
       notify(actionResult.msg);
       setTimeout(() => {
-        navigate("/admin/listproduct");
+        navigate("/admin/list-post");
       }, 2000);
     } catch (error) {
       notifyError((error as responsePost).msg);

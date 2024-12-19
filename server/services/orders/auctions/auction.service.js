@@ -75,7 +75,7 @@ const auctionService = {
         auction_quantity: 0,
         auction_total: 0,
         auctionTime: currentTime,
-    
+        emailSent: false, // Chỉ chọn những phiên đấu giá chưa gửi email
         auctionEndTime: timeTrackID, // Set auctionEndTime to timeTrackID
         biddings: [],
       });
@@ -98,8 +98,7 @@ const auctionService = {
         bidEndTime: { $eq: bidEndTime },
         status: "active", // Chỉ xét các biddings trong khoảng thời gian này
       }).lean();
-      console.log('bdiing', biddings);
-      console.log('lengthBids', biddings.length);
+ 
       
       if (biddings.length === 0) {
         throw new Error("Không có giá đấu nào cho phiên đấu giá này.");
@@ -142,9 +141,9 @@ const auctionService = {
               
               const newWinner = earliestBid.bidder.toString();
               const newWinnerRef = earliestBid.bidder;
-              const winningPrice = earliestBid.bidAmount;
+              const winningPriceCommom = earliestBid.bidAmount;
         
-              console.log('Trường hợp cùng giá bid - Người thắng:', newWinner, 'Giá:', winningPrice);
+              // console.log('Trường hợp cùng giá bid - Người thắng:', newWinner, 'Giá:', winningPriceCommom);
         
               // Cập nhật cơ sở dữ liệu với winner mới
               await Auction.findOneAndUpdate(
@@ -153,7 +152,7 @@ const auctionService = {
                   $set: {
                     auction_winner: newWinner,
                     auctionUser: newWinnerRef,
-                    auction_total: winningPrice,
+                    auction_total: winningPriceCommom,
                     stateAuction: "Xác nhận",
                     isActive: true,
                     auction_quantity: 1,
@@ -184,15 +183,23 @@ const auctionService = {
                 status: "active",
               }).select("email").lean();
         
-              const mailWinner = userWinner.email;
+              const mailWinnerCommon = userWinner.email;
+        
+     
               const orderDetails = {
                 product_name: product.product_name,
                 product_image: product.image[0],
-                amount: winningPrice,
+                amount: winningPriceCommom,
                 winningTime: currentTime,
               };
-        
-              await sendMail(mailWinner, orderDetails);
+            
+              // Gửi email thông báo người chiến thắng
+              await sendMail(mailWinnerCommon, orderDetails);
+            
+              // Cập nhật trạng thái emailSent thành true sau khi đã gửi email
+            
+            
+           
             }
           } else {
             // Xử lý trường hợp các giá bid khác nhau
@@ -201,15 +208,15 @@ const auctionService = {
             });
             const newWinner = highestBid.bidder.toString();
             const newWinnerRef = highestBid.bidder;
-            const winningPrice = highestBid.bidAmount;
-            console.log('Trường hợp giá bid khác nhau - Người thắng:', newWinner, 'Giá:', winningPrice);
+            const winningPriceHids = highestBid.bidAmount;
+            // console.log('Trường hợp giá bid khác nhau - Người thắng:', newWinner, 'Giá:', winningPriceHids);
             await Auction.findOneAndUpdate(
               { productId, auctionEndTime: timeTrackID },
               {
                 $set: {
                   auction_winner: newWinner,
                   auctionUser: newWinnerRef,
-                  auction_total: winningPrice,
+                  auction_total: winningPriceHids,
                   stateAuction: "Xác nhận",
                   isActive: true,
                   auction_quantity: 1,
@@ -235,24 +242,26 @@ const auctionService = {
               }
             );
         
-         
-      
             const userWinner = await User.findOne({
             _id: newWinner,
             status: "active",
            }).select("email").lean();
-            const mailWinner = userWinner.email;
-           
+            const mailWinnerHigis = userWinner.email;
+       
+      
+            // Cập nhật cơ sở dữ liệu với winner mới
+      
             const orderDetails = {
               product_name: product.product_name,
               product_image: product.image[0],
-              amount: winningPrice,
+              amount: winningPriceHids,
               winningTime: currentTime,
             };
         
-            await sendMail(mailWinner, orderDetails);
-            // Cập nhật cơ sở dữ liệu với winner mới
-      
+            await sendMail(mailWinnerHigis, orderDetails);
+          
+            // Cập nhật trạng thái emailSent thành true sau khi đã gửi email
+        
           }
           break;
         
@@ -286,6 +295,7 @@ const auctionService = {
            { new: true }
           );
           const winnerEmailCase = winner;
+       
           const userWinnerCase = await User.findOne({
             _id: winnerEmailCase,
             status: "active",
@@ -294,6 +304,8 @@ const auctionService = {
             .lean();
     
           const mailWinnerCase = userWinnerCase.email;
+     
+          
           const orderDetailsCase = {
             product_name: product.product_name,
             product_image: product.image[0], // Thêm ảnh sản phẩm
@@ -302,10 +314,9 @@ const auctionService = {
           };
     
           await sendMail(mailWinnerCase, orderDetailsCase);
-          // Gửi email thông báo cho người chiến thắng
-      
     
-          // Cập nhật trạng thái các bidding không thắng
+        
+        
          
           break;
        
@@ -335,7 +346,7 @@ const auctionService = {
       ]);
       
       const updatedAuction = await Auction.findOne({productId: productId, auctionEndTime: timeTrackID })
-      console.log('Updated', updatedAuction);
+      // console.log('Updated', updatedAuction);
       ;
       return updatedAuction;
     } else {

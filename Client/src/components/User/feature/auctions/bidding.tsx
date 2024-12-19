@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState,useRef ,useMemo} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../../redux/store";
 import { fetchBidsByUserThunk } from "../../../../redux/bidding/biddingThunk";
@@ -8,6 +8,7 @@ import { clearCompletedAuction } from "../../../../redux/bidding/biddingSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bid } from "../../../../types/bidding/bidding";
+// import { BiddingActive } from "../../../../types/listBiddings/listBidActive";
 import { parseISO } from "date-fns";
 import EditModalPopUp from "./modalEditAmout";
 import DeleteBidModal from "./deleteBid";
@@ -153,44 +154,45 @@ const ViewBidPage: React.FC = () => {
     closeDeleteModal();
     dispatch(fetchBidsByUserThunk(userId!));
   };
-  const groupBidsByProduct = () => {
-    const groupedBids: { [key: string]: Bid[] } = {};
 
-    bids.forEach((bid: Bid) => {
-   
-      const productId = bid.product_bidding?.productId?._id;
-    
-      
+  const groupBidsByProduct = (bids: Bid[]) => {
+    return bids.reduce((acc, bid) => {
+      const productId = bid.product_bidding?.productId?._id; // Lấy productId từ bid
       if (productId) {
-        if (!groupedBids[productId]) {
-          groupedBids[productId] = [];
+        if (!acc[productId]) {
+          acc[productId] = []; // Nếu chưa có nhóm đấu giá cho productId này, tạo mới
         }
-        groupedBids[productId].push(bid);
+        acc[productId].push(bid); // Thêm bid vào nhóm tương ứng
       }
-    });
-
-    return Object.values(groupedBids);
+      return acc;
+    }, {} as Record<string, Bid[]>); // Trả về một đối tượng nhóm theo productId
   };
-  // const calculateTimeLeft = (endTime: string) => {
-  //   const currentTime = new Date().getTime();
-  //   const endTimeMs = new Date(endTime).getTime();
-  //   return endTimeMs - currentTime;
-  // };
-  const bidGroups = groupBidsByProduct();
+  
 
+  const groupedBids = useMemo(() => groupBidsByProduct(bids), [bids]);
+ 
+
+  const bidGroups = Object.values(groupedBids);
 const completAuction = async (productId: string, timeTrackID: string) => {
   await dispatch(completeAuction({ productId, timeTrackID }));
 
 }
   const handleCompleteAuction = async (productId: string, timeTrackID: string) => {
-
+  // Chặn request nếu đang xử lý
+   
 
     if (completedAuctionsRef.current.has(productId)) {
       return; // Skip if auction is already completed
     }
+
     if(!userId){
       toast.error("Bạn chưa có tài khoản");
       return
+    }
+    const currentBidGroup = groupedBids[productId];
+    if (!currentBidGroup) {
+      toast.error("Không tìm thấy nhóm đấu giá này");
+      return;
     }
     if (BiddingActive.length === 1) {
       // Trường hợp chỉ có 1 user
@@ -203,10 +205,12 @@ const completAuction = async (productId: string, timeTrackID: string) => {
       //   toast.success("Chúc mừng bạn!",)
       // }, 2000); // Delay of 2000 milliseconds (2 seconds)
       await completAuction(singleWinnerOne, timeTrackID);
+      completedAuctionsRef.current.add(singleWinnerOne); // Đánh dấu đã xử lý
       dispatch(clearProductBidding(singleWinnerOne));
       dispatch(clearCompletedAuction(singleWinnerOne));
+      navigate('/checkoutAuc');
  
-      navigate('/checkoutAuc')
+     
     } else if (BiddingActive.length > 1) {
       // Trường hợp nhiều user nhưng cùng mức giá
       // Kiểm tra xem các user có cùng mức giá hay không
@@ -220,7 +224,7 @@ const completAuction = async (productId: string, timeTrackID: string) => {
           ...bid,
           bidTimeTimestamp: new Date(bid.bidTime).getTime(), // Convert bidTime to timestamp
         }));
-        console.log('bidsWithTimes', bidsWithTimes);
+    
         
         // const currentTime = Date.now(); // Current timestamp in milliseconds
         
@@ -260,11 +264,12 @@ const completAuction = async (productId: string, timeTrackID: string) => {
                       //   onClose: () => 
                       // });
                       // Complete the auction for the winner
-                    await  completAuction(productIdEra, timeTrackID);
-                
+                      await  completAuction(productIdEra, timeTrackID);
+                     
                       dispatch(clearCompletedAuction(productIdEra));
                       dispatch(clearProductBidding(productIdEra));
                       navigate('/checkoutAuc')
+                   
               }else {
                 navigate('/')
                 dispatch(clearAuctionData());
@@ -310,15 +315,17 @@ const completAuction = async (productId: string, timeTrackID: string) => {
  
         
         const productEndOfBid = endOfBids[0].productIdBis
-        // console.log('productEndOfBid', productEndOfBid);
+
         if (hidghBidsUserID === userId){
           // toast.success("Chúc mừng bạn!", {
                //   onClose: () => 
                // });
-               await completAuction(hidghBids, timeTrackID);
-               dispatch(clearProductBidding(hidghBids));
-               dispatch(clearCompletedAuction(hidghBids));
-               navigate('/checkoutAuc')
+              await completAuction(hidghBids, timeTrackID);
+                completedAuctionsRef.current.add(hidghBids );
+                dispatch(clearProductBidding(hidghBids));
+                dispatch(clearCompletedAuction(hidghBids));
+                navigate('/checkoutAuc')
+            
              }else {
               navigate('/')
               dispatch(clearAuctionData());
@@ -326,16 +333,7 @@ const completAuction = async (productId: string, timeTrackID: string) => {
           dispatch(clearCompletedAuction(productEndOfBid));
              }
 
-        // if (userEndOFBid !== userId) {
-        //   // toast.success("Hãy thử lại lần sau!", {
-        //   //   onClose: () => 
-        //   // });
-        //   // If it's not the logged-in user, you can perform the "losing" actions here
-        //   dispatch(clearProductBidding(productEndOfBid));
-        //   dispatch(clearCompletedAuction(productEndOfBid));
-        //   dispatch(clearAuctionData());
-        //   navigate('/auction')
-        // }
+  
 
     
       }
@@ -343,8 +341,62 @@ const completAuction = async (productId: string, timeTrackID: string) => {
     } else {
       console.warn("Không có user nào tham gia đấu giá");
     }
+
     
   };
+  // const completeAuctionForMultipleBidders = async (bids: Bid[], productId: string, timeTrackID: string) => {
+  //   // Kiểm tra xem những người tham gia có cùng mức giá hay không
+  //   const allBidsWithSamePrice = bids.every(bid => bid.bidAmount === bids[0].bidAmount);
+  
+  //   if (allBidsWithSamePrice) {
+  //     // Nếu tất cả có mức giá giống nhau, chọn người đặt bid sớm nhất
+  //     const winnerBid = bids.reduce((earliest, current) => {
+  //       return new Date(current.bidTime).getTime() < new Date(earliest.bidTime).getTime() ? current : earliest;
+  //     });
+  
+  //     // Hoàn tất đấu giá cho người thắng
+  //     if (winnerBid.bidder === userId) {
+  //       await completAuction(productId, timeTrackID);
+  //       completedAuctionsRef.current.add(productId);
+  //       dispatch(clearProductBidding(productId));
+  //       dispatch(clearCompletedAuction(productId));
+  //       navigate("/checkoutAuc");
+  //     } else {
+  //       dispatch(clearProductBidding(productId));
+  //       dispatch(clearCompletedAuction(productId));
+  //       dispatch(clearAuctionData());
+  //       navigate("/");
+  //     }
+  //   }else {
+  //     const highestBid = bids.reduce((max, current) => {
+  //       return current.bidAmount > max.bidAmount ? current : max;
+  //     });
+  
+  //     // Hoàn tất đấu giá cho người thắng với mức giá cao nhất
+  //     if (highestBid.bidder === userId) {
+  //       await completAuction(productId, timeTrackID);
+  //       completedAuctionsRef.current.add(productId);
+  //       dispatch(clearProductBidding(productId));
+  //       dispatch(clearCompletedAuction(productId));
+  //       navigate("/checkoutAuc");
+  //     } else {
+  //       // Nếu người tham gia không thắng, xóa thông tin đấu giá và quay lại trang chủ
+  //       dispatch(clearProductBidding(productId));
+  //       dispatch(clearCompletedAuction(productId));
+  //       dispatch(clearAuctionData());
+  //       navigate("/");
+  //     }
+  //   }
+  // };
+  // const completeAuctionForSingleBidder = async (bid: Bid, timeTrackID: string) => {
+  //   // Logic hoàn thành đấu giá với một người tham gia
+  //   const productId = bid.product_bidding?.productId?._id;
+  //   await completAuction(productId, timeTrackID);
+  //   completedAuctionsRef.current.add(productId);
+  //   dispatch(clearProductBidding(productId));
+  //   dispatch(clearCompletedAuction(productId));
+  //   navigate("/checkoutAuc");
+  // };
   const formatDateVN = (dateString: string) => {
     const date = new Date(dateString); // Chuyển đổi chuỗi thành đối tượng Date
     return date.toLocaleString("vi-VN", {
