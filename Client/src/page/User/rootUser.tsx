@@ -3,11 +3,10 @@ import { Outlet } from "react-router-dom";
 import { UserFooter } from "../../components/User/footer";
 import UserHeader from "../../components/User/header";
 import UserNav from "../../components/User/navbar";
-import Chatbox from "../../chatbox/chatbox";
+
 const User: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-800">
-      <Chatbox/>
       <UserHeader />
       <UserNav />
       <div className="flex pt-11 sm:pt-2 md:pt-4 lg:pt-6 xl:pt-9 overflow-hidden bg-white dark:bg-gray-900">

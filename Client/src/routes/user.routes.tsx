@@ -7,7 +7,7 @@ const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
 const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
 const UserRegister = React.lazy(() => import("../page/User/accounts/register"));
 const UserRegisOTP = React.lazy(() => import("../page/User/accounts/regisOTP"));
-
+import Chatbox from "../chatbox/chatbox";
 const UserVerifyOTP = React.lazy(
   () => import("../page/User/accounts/verifyOtp")
 );
@@ -96,6 +96,7 @@ const UserRoutes: RouteObject[] = [
     element: (
       <>
         <Title /> 
+        <Chatbox />
         <UserHome />
       </>
     ),
