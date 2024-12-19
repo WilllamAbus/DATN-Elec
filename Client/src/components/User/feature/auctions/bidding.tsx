@@ -13,7 +13,7 @@ import { parseISO } from "date-fns";
 import EditModalPopUp from "./modalEditAmout";
 import DeleteBidModal from "./deleteBid";
 import BidGroup from "./bidGroup";
-import {  Link, useNavigate} from "react-router-dom";
+import {   useNavigate} from "react-router-dom";
 import { fetchListBidActive } from "../../../../redux/listBidActive/listbidActiveThunk";
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import { clearProductBidding } from "../../../../redux/listBidActive/listBidActivveSlice";
@@ -415,13 +415,13 @@ const completAuction = async (productId: string, timeTrackID: string) => {
         <div className="md:col-span-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-800"> Lượt đấu giá</h2>
-          <Link to={'/profile'}
+          {/* <Link to={'/profile'}
            
             className="bg-indigo-500 text-white py-1 px-4 rounded-lg shadow 
             hover:bg-blue-600 transition duration-200"
           >
               Lịch sử lượt đấu giá
-          </Link>
+          </Link> */}
           
           </div>
           <br />
