@@ -96,7 +96,6 @@ const UserRoutes: RouteObject[] = [
     element: (
       <>
         <Title /> 
-     
         <UserHome />
       </>
     ),
