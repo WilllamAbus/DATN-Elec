@@ -157,18 +157,15 @@ const OrderDetails: React.FC = () => {
               Hoàn tất
             </Button>
             {/* Nút Hoàn tiền */}
-            {/* {selectedOrder?.payment.payment_method !==
-              "Thanh toán khi nhận hàng" && (
-              <Button
-                onClick={() => {
-                  setSelectedStatus("Đã hoàn tiền");
-                  handleUpdateStatus();
-                }}
-                className="mt-4 bg-red-500 text-white"
-              >
-                Hoàn tiền
-              </Button>
-            )} */}
+            <Button
+              onClick={() => {
+                // setSelectedStatus();
+                handleUpdateStatus("Giao hàng không thành công");
+              }}
+              className="mt-4 ml-2 bg-red-500 text-white"
+            >
+             Giao hàng không thành công
+            </Button>
           </>
         );
       
