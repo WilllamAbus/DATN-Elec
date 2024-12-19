@@ -237,15 +237,20 @@ const Arrivale: React.FC = () => {
                                     <p className="text-xs font-extrabold leading-tight text-gray-900 dark:text-white">
                                         {product.discountPercent > 1 ? (
                                             <div className="flex w-full">
+                                                {/* Giá đã giảm, hiển thị màu đỏ */}
                                                 <p className="text-xs font-medium text-rose-700 flex-grow">
-                                                    {formatCurrency(product.variant_price)} đ
+                                                    {formatCurrency(
+                                                        product.totalOriginalPrice * (1 - product.discountPercent / 100)
+                                                    )} đ
                                                 </p>
+                                                {/* Giá gốc, hiển thị gạch chéo và màu xám */}
                                                 <p className="text-xs line-through text-gray-400 font-medium flex-shrink-0">
                                                     {formatCurrency(product.totalOriginalPrice)}đ
                                                 </p>
                                             </div>
                                         ) : (
                                             <p className="text-xs text-rose-700 font-medium">
+                                                {/* Hiển thị giá nếu không có giảm giá */}
                                                 {formatCurrency(product.variant_price)}đ
                                             </p>
                                         )}

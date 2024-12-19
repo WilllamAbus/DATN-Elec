@@ -586,7 +586,7 @@ const OrderList: React.FC = () => {
                                       className="flex flex-col items-center gap-4 sm:flex-row mb-6 p-6 bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100 shadow-xl rounded-2xl hover:scale-105 transform transition-all duration-300"
                                     >
                                       <Link
-                                        to={`/product/${item.product.slug}`}
+                                        to={`/product/${item.product?.slug} || 'null'`}
                                       >
                                         <img
                                           src={

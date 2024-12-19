@@ -100,8 +100,12 @@ const getBestSellingProducts = async (req, res) => {
                 totalViewCount: {
                     $sum: "$productVariants.viewCount" // Tính tổng viewCount từ productVariants
                 },
-                totalOriginalPrice:"$productVariants.variant_original_price",
-                variant_price: "$productVariants.variant_price"
+                totalOriginalPrice: { 
+                    $arrayElemAt: ["$productVariants.variant_original_price", 0] 
+                }, // Lấy giá gốc của variant đầu tiên
+                variant_price: { 
+                    $arrayElemAt: ["$productVariants.variant_price", 0] 
+                } 
             },
         };
 
