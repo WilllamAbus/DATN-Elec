@@ -91,49 +91,53 @@ const Navbar: React.FC = () => {
   const handleVoiceSearch = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-  
+
     if (!SpeechRecognition) {
       alert("Trình duyệt không hỗ trợ tìm kiếm bằng giọng nói.");
       return;
     }
-  
+
     const recognition = new SpeechRecognition();
     recognition.lang = "vi-VN"; // Đặt ngôn ngữ là tiếng Việt
     recognition.start();
     setIsListening(true); // Bật trạng thái lắng nghe
-  
+
     recognition.onresult = async (event: SpeechRecognitionEvent) => {
       const keyword = event.results[0][0].transcript.trim(); // Lấy kết quả nhận diện
       setKeyword(keyword);
-  
+
       // Gọi tìm kiếm ngay sau khi nhận diện giọng nói
       if (keyword.length >= 2) { // Chỉ tìm kiếm khi từ khóa dài hơn 2 ký tự
         try {
           const result = await searchProduct(keyword);
+
+          // Điều hướng đến trang tìm kiếm dù có kết quả hay không
+          navigate(`/search/${encodeURIComponent(keyword)}`);
+
           if (result.data.length > 0) {
-            setFilteredProducts(result.data); // Cập nhật kết quả tìm kiếm
-            // Chuyển hướng đến trang tìm kiếm
-            navigate(`/search/${encodeURIComponent(keyword)}`);
+            // Nếu có kết quả, bạn có thể cập nhật kết quả tìm kiếm vào một nơi khác (ví dụ, trong trang tìm kiếm)
+            // Ví dụ: Cập nhật sản phẩm tìm thấy vào một state khác (nếu cần)
           } else {
-            // Nếu không tìm thấy sản phẩm, gọi lại hàm tìm kiếm thường
-            dataSearch(keyword);
+            // Nếu không có kết quả, bạn không cần phải làm gì ở đây, chỉ điều hướng thôi
           }
+
         } catch (error) {
           console.error("Lỗi khi tìm kiếm:", error);
-          setFilteredProducts([]); // Xóa kết quả nếu có lỗi
+          // Nếu có lỗi, có thể xử lý lại như xóa kết quả hoặc hiển thị thông báo lỗi nếu cần
         }
       } else {
-        setFilteredProducts([]); // Xóa kết quả nếu từ khóa ngắn hơn 2 ký tự
+        // Nếu từ khóa ngắn hơn 2 ký tự, không làm gì và giữ nguyên kết quả
       }
-  
+
+
       setIsListening(false); // Tắt trạng thái lắng nghe
     };
-  
+
     recognition.onerror = (event: Event) => {
       console.error("Lỗi nhận diện giọng nói:", event);
       setIsListening(false); // Tắt trạng thái lắng nghe nếu có lỗi
     };
-  
+
     recognition.onend = () => {
       setIsListening(false); // Kết thúc lắng nghe
     };
