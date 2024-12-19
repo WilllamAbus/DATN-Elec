@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getRecommendations } from "../../services/recommendation/getRecommendation";
 import { Link, useParams } from "react-router-dom";
-import { Recommendation, ItemDetails, AuctionDetails } from "../../types/recommendation";
-// import {
-//     addToWatchlistThunk,
-//     deleteWatchlistThunk,
-// } from "../../redux/product/wathList/wathlist";
-// import { useDispatch, useSelector } from "react-redux";
-// import { AppDispatch, RootState } from "../../redux/store";
+import { Recommendation, ItemDetails } from "../../types/recommendation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -18,15 +12,7 @@ import "swiper/css/pagination";
 const ListRecommendation: React.FC = () => {
 
     const [products, setProducts] = useState<Recommendation[]>([]); // Định nghĩa kiểu dữ liệu chính xác
-    // useSelector((state: RootState) => state.watchlist.items);
-    // const userId = useSelector(
-    //     (state: RootState) => state.auth.profile.profile?._id
-    // );
-
-    // const [isFavorite, setIsFavorite] = useState<boolean>(false);
     useParams<{ id: string }>();
-    // const dispatch = useDispatch<AppDispatch>();
-    // const [, setError] = useState<string | null>(null);
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -41,7 +27,12 @@ const ListRecommendation: React.FC = () => {
         fetchProducts();
     }, []);
 
-
+    const formatCurrency = (value: number): string => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        }).format(value);
+    };
 
     return (
         <div className="p-1 mb-4 m-4 bg-white border border-gray-100 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -85,21 +76,19 @@ const ListRecommendation: React.FC = () => {
                                                 className="rounded-md border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800 h-auto"
                                             >
                                                 <div className="h-56 w-auto">
-                                                    <Link to={`/product/${(product.itemDetails as ItemDetails).product?.slug}`}>
-                                                        <figure className="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0">
-                                                            <a href="#">
-                                                                <img
-                                                                    className="rounded-lg object-contain "
-                                                                    src={
-                                                                        product.itemType === "productVariant"
-                                                                            ? `${(product.itemDetails as ItemDetails).image?.[0].image[0]}`
-                                                                            : product.itemType === "productAuction"
-                                                                                ? `${(product.itemDetails as AuctionDetails).image[0]}`
-                                                                                : "Không có hình ảnh"
-                                                                    }
-                                                                    alt={`product ${index + 1}`}
-                                                                />
-                                                            </a>
+                                                    <Link to={`/product/${product.itemType === "productVariant" ? product.itemDetails?.product?.slug : "#"}`}>
+                                                        <figure className="relative max-w-sm transition-all duration-300 cursor-pointer">
+                                                            <img
+                                                                className="rounded-lg object-contain"
+                                                                src={
+                                                                    product.itemType === "productVariant"
+                                                                        ? product.itemDetails?.image?.[0]?.image?.[0] ?? "https://via.placeholder.com/150"
+                                                                        : "https://via.placeholder.com/150"
+                                                                }
+                                                                alt={product.itemType === "productVariant"
+                                                                    ? `Product ${(product.itemDetails as ItemDetails)?.variant_name || "Unknown"}`
+                                                                    : "No Image Available"}
+                                                            />
                                                         </figure>
                                                     </Link>
                                                 </div>
@@ -122,14 +111,8 @@ const ListRecommendation: React.FC = () => {
                                                                 data-tooltip-target="tooltip-quick-look"
                                                                 className="flex items-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                                                             >
-                                                                {product.itemType === "productVariant" ? (
-                                                                    (product.itemDetails as ItemDetails).viewCount ? (
-                                                                        <span className="mr-2">({(product.itemDetails as ItemDetails).viewCount})</span> // Hiển thị lượt xem cho productVariant
-                                                                    ) : null
-                                                                ) : product.itemType === "productAuction" ? (
-                                                                    (product.itemDetails as AuctionDetails).product_view ? (
-                                                                        <span className="mr-2">({(product.itemDetails as AuctionDetails).product_view})</span> // Hiển thị lượt xem cho productAuction
-                                                                    ) : null
+                                                                {product.itemDetails.viewCount ? (
+                                                                    <span className="mr-2">({product.itemDetails.viewCount})</span> // Hiển thị lượt xem nếu có
                                                                 ) : null}
 
                                                                 <svg
@@ -152,7 +135,7 @@ const ListRecommendation: React.FC = () => {
                                                                         d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                                                                     />
                                                                 </svg>
-                                                                <span className="sr-only"> Quick look </span>
+                                                                <span className="sr-only">Quick look</span>
                                                             </button>
 
                                                             <div
@@ -163,126 +146,54 @@ const ListRecommendation: React.FC = () => {
                                                             >
                                                                 fcdsf Quick look
                                                                 <div className="tooltip-arrow" data-popper-arrow="" />
-                                                            </div>
-
-                                                            {/* <button
-                                                            type="button"
-                                                            data-tooltip-target="tooltip-add-to-favorites"
-                                                            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                                        >
-                                                            <span className="sr-only"> Add to Favorites </span>
-                                                            <svg
-                                                                className={`h-5 w-5 ${isFavorite ? "text-red-500" : "text-gray-500"
-                                                                    }`}
-                                                                // className="h-5 w-5"
-                                                                aria-hidden="true"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                            >
-                                                                <path
-                                                                    stroke="currentColor"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    strokeWidth={2}
-                                                                    d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"
-                                                                />
-                                                            </svg>
-                                                        </button>
-                                                        <div
-                                                            id="tooltip-add-to-favorites"
-                                                            role="tooltip"
-                                                            className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
-                                                            data-popper-placement="top"
-                                                        >
-                                                            Add to favorites
-                                                            <div className="tooltip-arrow" data-popper-arrow="" />
-                                                        </div> */}
+                                                            </div> 
                                                         </div>
                                                     </div>
                                                     <a
                                                         href="#"
                                                         className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white"
                                                     >
-                                                        {product.itemType === "productVariant" ? (
-                                                            // Kiểm tra rằng itemDetails là ItemDetails
-                                                            'variant_name' in product.itemDetails ? (
-                                                                product.itemDetails.variant_name // Hiển thị tên phiên bản sản phẩm
-                                                            ) : (
-                                                                "Tên sản phẩm không xác định"
-                                                            )
-                                                        ) : product.itemType === "productAuction" ? (
-                                                            // Kiểm tra rằng itemDetails là AuctionDetails
-                                                            'product_name' in product.itemDetails ? (
-                                                                product.itemDetails.product_name // Hiển thị tên sản phẩm đấu giá
-                                                            ) : (
-                                                                "Tên sản phẩm không xác định"
-                                                            )
+                                                        {'variant_name' in product.itemDetails ? (
+                                                            product.itemDetails.variant_name // Hiển thị tên phiên bản sản phẩm nếu tồn tại
                                                         ) : (
                                                             "Tên sản phẩm không xác định"
                                                         )}
                                                     </a>
                                                     <div className="mt-2 flex items-center gap-2">
                                                         <div className="flex items-center">
+                                                            {product.itemType === "productVariant" && 'product' in product.itemDetails && (
+                                                                // Xử lý sản phẩm dạng productVariant
+                                                                Array.from({ length: 5 }, (_, i) => {
+                                                                    const rating = product.itemDetails.product?.product_ratingAvg || 0; // Type Narrowing để xác định product là ItemDetails
+                                                                    const isFullStar = i < Math.floor(rating); // Ngôi sao đầy
+                                                                    const isHalfStar = i === Math.floor(rating) && rating % 1 !== 0; // Ngôi sao nửa
 
-                                                            {
-                                                                product.itemType === "productVariant" && 'product' in product.itemDetails ? (
-                                                                    // Xử lý sản phẩm dạng productVariant
-                                                                    Array.from({ length: 5 }, (_, i) => {
-                                                                        const rating = (product.itemDetails as ItemDetails).product?.product_ratingAvg || 0; // Type Narrowing để xác định product là ItemDetails
-                                                                        const isFullStar = i < Math.floor(rating); // Ngôi sao đầy
-                                                                        const isHalfStar = i === Math.floor(rating) && rating % 1 !== 0; // Ngôi sao nửa
-
-                                                                        return (
-                                                                            <span key={i}>
-                                                                                <svg
-                                                                                    className={`h-4 w-4 ${isFullStar ? "text-yellow-400" : isHalfStar ? "text-yellow-300" : "text-gray-300"}`}
-                                                                                    aria-hidden="true"
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    fill="currentColor"
-                                                                                    viewBox="0 0 24 24"
-                                                                                >
-                                                                                    <path
-                                                                                        d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"
-                                                                                    />
-                                                                                </svg>
-                                                                            </span>
-                                                                        );
-                                                                    })
-                                                                ) : product.itemType === "productAuction" && 'product_ratingAvg' in product.itemDetails ? (
-                                                                    Array.from({ length: 5 }, (_, i) => {
-                                                                        const rating = (product.itemDetails as AuctionDetails).product_ratingAvg || 0; // Type Narrowing để xác định product là AuctionDetails
-                                                                        const isFullStar = i < Math.floor(rating); // Ngôi sao đầy
-                                                                        const isHalfStar = i === Math.floor(rating) && rating % 1 !== 0; // Ngôi sao nửa
-
-                                                                        return (
-                                                                            <span key={i}>
-                                                                                <svg
-                                                                                    className={`h-4 w-4 ${isFullStar ? "text-yellow-400" : isHalfStar ? "text-yellow-300" : "text-gray-300"}`}
-                                                                                    aria-hidden="true"
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    fill="currentColor"
-                                                                                    viewBox="0 0 24 24"
-                                                                                >
-                                                                                    <path
-                                                                                        d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"
-                                                                                    />
-                                                                                </svg>
-                                                                            </span>
-                                                                        );
-                                                                    })
-                                                                ) : null
-                                                            }
+                                                                    return (
+                                                                        <span key={i}>
+                                                                            <svg
+                                                                                className={`h-4 w-4 ${isFullStar ? "text-yellow-400" : isHalfStar ? "text-yellow-300" : "text-gray-300"
+                                                                                    }`}
+                                                                                aria-hidden="true"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="currentColor"
+                                                                                viewBox="0 0 24 24"
+                                                                            >
+                                                                                <path
+                                                                                    d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"
+                                                                                />
+                                                                            </svg>
+                                                                        </span>
+                                                                    );
+                                                                })
+                                                            )}
                                                         </div>
                                                         <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                             {product.itemType === "productVariant" && 'product' in product.itemDetails
-                                                                ? (product.itemDetails as ItemDetails).product?.product_ratingAvg || 0 // Type Narrowing ở đây
-                                                                : product.itemType === "productAuction" && 'product_ratingAvg' in product.itemDetails
-                                                                    ? (product.itemDetails as AuctionDetails).product_ratingAvg || 0
-                                                                    : 0}
+                                                                ? product.itemDetails.product?.product_ratingAvg || 0 // Type Narrowing ở đây
+                                                                : 0}
                                                         </p>
-
                                                     </div>
+
                                                     <ul className="mt-2 flex items-center gap-4">
                                                         <li className="flex items-center gap-2">
                                                             <svg
@@ -324,27 +235,29 @@ const ListRecommendation: React.FC = () => {
                                                             </p>
                                                         </li>
                                                     </ul>
-                                                    <div className="mt-4 flex items-center justify-between gap-6">
+                                                    <div className="mt-2 px-2 flex items-center gap-2">
                                                         <p className="text-xs leading-tight text-gray-900 dark:text-white">
-                                                            {/* {product.product_discount.discountPercent > 1 ? (
-                      <div>
-                        <p className="text-xs font-medium text-rose-700">
-                          {formatCurrency(
-                            product.product_price *
-                              (1 -
-                                product.product_discount.discountPercent / 100)
-                          )}
-                          đ
-                        </p>
-                        <p className="text-xs font-medium line-through text-gray-400">
-                          {formatCurrency(product.product_price)}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-xs font-medium text-rose-700">
-                        {formatCurrency(product.product_price)}đ
-                      </p>
-                    )} */}
+                                                            {product.itemType === "productVariant" && 'product' in product.itemDetails ? (
+                                                                // Kiểm tra nếu có thông tin giảm giá
+                                                                product.itemDetails.product_discount?.discountPercent && product.itemDetails.product_discount.discountPercent > 0 ? (
+                                                                    <div className="flex w-full">
+                                                                        <p className="text-xs font-medium text-rose-700 flex-grow">
+                                                                            {formatCurrency(
+                                                                                product.itemDetails.variant_price *
+                                                                                (1 - product.itemDetails.product_discount.discountPercent / 100)
+                                                                            )}
+                                                                            đ
+                                                                        </p>
+                                                                        <p className=" ms-4 text-xs font-medium line-through text-gray-400 flex-shrink-0">
+                                                                            {formatCurrency(product.itemDetails.variant_original_price)} {/* Hiển thị giá gốc */}
+                                                                        </p>
+                                                                    </div>
+                                                                ) : (
+                                                                    <p className="text-xs font-medium text-rose-700">
+                                                                        {formatCurrency(product.itemDetails.variant_price)}đ
+                                                                    </p>
+                                                                )
+                                                            ) : null}
                                                         </p>
                                                     </div>
                                                     <ul className="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
@@ -359,41 +272,12 @@ const ListRecommendation: React.FC = () => {
                                                                 <span>
                                                                     {product.itemType === "productVariant"
                                                                         ? `${(product.itemDetails as ItemDetails).product?.weight_g ?? 0} kg`
-                                                                        : product.itemType === "productAuction"
-                                                                            ? `${(product.itemDetails as AuctionDetails).weight_g ?? 0} kg`
-                                                                            : "0 kg"}
+                                                                        : "0 kg"}
                                                                 </span>
                                                             </li>
                                                         </div>
                                                     </ul>
-                                                    {/* 
-                                    <div className="mt-4 flex items-center justify-between gap-6">
-                                        {" "}
-                                        <button
-                                            type="button"
-                                            // onClick={() => handleAddToCart(product._id)}
-                                            className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
-                                        >
-                                            <svg
-                                                className="-ms-2 me-2 h-5 w-5"
-                                                aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width={24}
-                                                height={24}
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke="currentColor"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                                                />
-                                            </svg>
-                                            Thêm vào giỏ hàng
-                                        </button>{" "}
-                                    </div> */}
+                                                    
                                                 </div>
                                             </div>
                                         </SwiperSlide>

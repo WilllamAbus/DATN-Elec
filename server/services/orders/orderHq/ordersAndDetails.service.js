@@ -8,8 +8,8 @@ const Product_v2 = require("../../../model/productAuction/productAuction");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
-const path = require('path');
-const { spawn } = require('child_process');
+// const path = require('path');
+// const { spawn } = require('child_process');
 const Vnpay = require("../../../model/orders/vnpay.model");
 
 // const InventoryOut = require("../../../model/inventories/invenOut.model");
@@ -235,10 +235,6 @@ const orderAndDetailService = {
         .populate("shippingAddress.userID") // Populating userID inside shippingAddress
         .exec();
 
-
-
-      
-
       if (!order) throw new Error("Đơn hàng không tồn tại");
 
       // Find order details related to the order
@@ -294,10 +290,6 @@ const orderAndDetailService = {
         if (!inven) throw new Error("Sản phẩm trong kho không tồn tại");
 
   
-        
- 
-      
-  
         const numInventoriesShelf = inven.quantityShelf;
         const numQuantityDetails = quantiTyAucDetail;
         const remainingQuantityShelf = numInventoriesShelf + numQuantityDetails;
@@ -322,17 +314,72 @@ const orderAndDetailService = {
         );
   
         
-        const disbaleOrder = await OrderAuction.findOneAndUpdate(
+   
+        const paymentDataDisable = {
+          amount: vnpayAmou,
+          transaction: vnpTransNo,
+          bank_code:  vnpayOrderInfo,
+          card_type: 'ATM',
+          order_info: vnpayBankCode,
+          payment_date: vnpPayDate,
+          transaction_status: status,
+          response_code: vnpayResponCode,
+          payment_method: "vnPay", // Vì đây là VNPay
+    
+        };
+      
+        
+        const newVnpay = new Vnpay(paymentDataDisable);
+        await newVnpay.save();
+        const orderDetail = await OrderDetailAuction.findOne({
+          order: orderIds,
+          status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
+        }).lean();
+        const orderPayment = orderDetail.payment_method;
+     const vnPay = await Vnpay.find({transaction_status: '02'})
+                .lean()
+  
+       
+        if (!vnPay) {
+          return "Không tìm thấy ngân hàng ";
+        }
+    
+        const filteredVnPay = vnPay.filter(payment => {
+          return !payment.order_info.includes("Thanh toan");
+        });
+    
+        const lastIndex = filteredVnPay.length - 1;
+    
+        const lastElement = filteredVnPay[lastIndex];
+
+        const OrderInForPayment = lastElement.order_info
+   
+        
+        const transOrderId = orderIds.toString();
+
+        
+        let inforBank
+        let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+          bankCode: lastElement.bank_code,
+          orderInForVnPay: orderIds,
+          paymentDateVnPay: lastElement.payment_date,
+          transiTionAmout: lastElement.amount,
+        } : null
+
+
+        await OrderAuction.findOneAndUpdate(
           { _id: orderId },
           {
             $set: {
               status: "disable",
          
               stateOrder: "Hủy đơn hàng",
+              ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
             },
           }
         );
-        console.log('softDel',disbaleOrder );
+
+        
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -352,9 +399,64 @@ const orderAndDetailService = {
           response_code: vnpayResponCode,
           payment_method: "vnPay", // Vì đây là VNPay
         };
-
+      
+        
         const newVnpay = new Vnpay(paymentData);
         await newVnpay.save();
+         const orderDetail = await OrderDetailAuction.findOne({
+                order: orderIds,
+                status: "active", // Thay "yourStatusValue" bằng giá trị status bạn muốn lọc
+              }).lean();
+              const orderPayment = orderDetail.payment_method;
+           const vnPay = await Vnpay.find({transaction_status: '00'})
+                      .lean()
+             
+              if (!vnPay) {
+                return "Không tìm thấy ngân hàng ";
+              }
+          
+              const filteredVnPay = vnPay.filter(payment => {
+                return !payment.order_info.includes("Thanh toan");
+              });
+          
+              const lastIndex = filteredVnPay.length - 1;
+          
+              const lastElement = filteredVnPay[lastIndex];
+     
+              const OrderInForPayment = lastElement.order_info
+         
+              
+              const transOrderId = orderIds.toString();
+      
+              
+              let inforBank
+              let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+                bankCode: lastElement.bank_code,
+                orderInForVnPay: orderIds,
+                paymentDateVnPay: lastElement.payment_date,
+                transiTionAmout: lastElement.amount,
+              } : null
+         
+      
+            
+          
+               
+        
+         await OrderAuction.findOneAndUpdate(
+                { _id: orderIds }, // Query by the unique _id of the document
+                {
+                  $set: {
+                
+            
+                 
+                    ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
+                  },
+                },
+            
+                { new: true } // Optionally, return the updated document
+              ).exec();
+          
+              
         return {
           orderIds,
           shippingInfo, // Contains recipient, phone, address, and user email
@@ -475,7 +577,7 @@ const orderAndDetailService = {
 
           return {
             name: product.product_name,
-            price: detail.totalAmount,
+            price: detail.totalPriceWithShipping,
             image: product.image,
           };
         })
@@ -591,36 +693,12 @@ const orderAndDetailService = {
       });
 
       // Gọi script Python để tạo gợi ý sản phẩm
-      const userID = order.shippingAddress.userID.toString(); // Lấy userID dưới dạng chuỗi
+      // const userID = order.shippingAddress.userID.toString(); // Lấy userID dưới dạng chuỗi
       const productIDAuct = orderDetails[0].productID
 
 
       // Đường dẫn tới file Python
-      const pythonScriptPath = path.resolve(__dirname, '../../../Python Client Server/recommendation_service.py');
-
-      // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn('python', [pythonScriptPath, userID]); // Truyền userID dưới dạng tham số
-
-      // Xử lý kết quả từ script Python
-      pythonProcess.stdout.on('data', (data) => {
-        console.log(`Python Output: ${data.toString()}`);
-      });
-
-      pythonProcess.stderr.on('data', (data) => {
-        console.error(`Python Error: ${data.toString()}`);
-      });
-
-      pythonProcess.on('error', (error) => {
-        console.error(`Failed to start Python process: ${error.message}`);
-      });
-
-      pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Python script exited with code ${code}`);
-        } else {
-          console.log(`Python script finished successfully.`);
-        }
-      });
+   
 
       await Auction.findOneAndUpdate({
         productId:productIDAuct,

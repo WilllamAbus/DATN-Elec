@@ -9,8 +9,8 @@ const middlewareController = require("../../../middleware/auth");
 
 router.post('/createBiding',middlewareController.verifyTokenUserAuth, biddingController.createBid);
 
-router.get('/bidAlls', biddingController.getAllBids);
-router.get('/bidAllActive', biddingController.getAllBidsActive);
+router.get('/bidAlls',middlewareController.verifyTokenUserAuth, biddingController.getAllBids);
+router.get('/bidAllActive',middlewareController.verifyTokenUserAuth, biddingController.getAllBidsActive);
 
 router.get('/getBidID/:bidId', biddingController.getBidById);
 
@@ -20,6 +20,6 @@ router.patch('/softDeteBid/:bidId',middlewareController.verifyTokenAdminAuth, bi
 router.post('/deleteBidd',middlewareController.verifyTokenAdminAuth, biddingController.deleteBids);
 router.patch('/restoreBidd/:bidId',middlewareController.verifyTokenAdminAuth, biddingController.restoreBid);
 router.get('/soft-deleted-bids', biddingController.getSoftDeletedBids);
-router.get('/bids',middlewareController.verifyToken, biddingController.getBidsByUser);
-router.put('/update-bid',middlewareController.verifyToken, biddingController.updateBidAmountController);
+router.get('/bids',middlewareController.verifyTokenUserAuth, biddingController.getBidsByUser);
+router.put('/update-bid',middlewareController.verifyTokenUserAuth, biddingController.updateBidAmountController);
 module.exports = router;

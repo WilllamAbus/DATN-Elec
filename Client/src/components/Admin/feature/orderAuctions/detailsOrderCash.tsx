@@ -29,7 +29,7 @@ const OrderDetailsCash: React.FC = () => {
   }, [dispatch, id]);
 
   const selectedOrder = orders.confirmOrder;
-console.log('selectedOrder', selectedOrder);
+
 
   
   // const selectedOrderStatus = Array.isArray(orders.orders)

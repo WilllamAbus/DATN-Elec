@@ -97,8 +97,8 @@ const DeletedProductTime: React.FC = () => {
         <tbody>
           {timeTrackDeletds && timeTrackDeletds.length === 0 ? (
             <tr>
-              <td colSpan={5} className="text-center py-4">
-                No products found
+              <td colSpan={6} className="text-center py-4">
+                Không có dữ liệu
               </td>
             </tr>
           ) : (

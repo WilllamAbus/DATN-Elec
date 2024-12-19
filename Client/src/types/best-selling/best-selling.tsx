@@ -13,6 +13,7 @@ export interface BestSellingProductResponse {
     discountPercent: number;
     totalViewCount: number;
     totalOriginalPrice: number;
+    variant_price: number;
   }
   
   // Interface cho chi tiết sản phẩm

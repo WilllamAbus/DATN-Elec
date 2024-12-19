@@ -2,8 +2,6 @@ const { ObjectId } = require("mongoose").Types;
 
 const Recommendation = require("../../../model/recommendation/recommendation.js");
 const ProductVariant = require("../../../model/product_v2/productVariant.js");
-const ProductAuction = require("../../../model/productAuction/productAuction.js");
-const Discount = require("../../../model/discount.model.js"); // Thêm model discount
 
 const recommendations = {
   getRecommendationsByUserId: async (req, res) => {
@@ -40,18 +38,16 @@ const recommendations = {
         }
       });
 
-      // Lọc các items theo loại 'productVariant' hoặc 'productAuction'
-      const filteredItems = allRecommendedItems.filter(item =>
-        item.itemType === "productVariant" || item.itemType === "productAuction"
-      );
+      // Chỉ lấy các items loại 'productVariant'
+      const filteredItems = allRecommendedItems.filter(item => item.itemType === "productVariant");
 
       // Sắp xếp các items theo điểm số giảm dần và chỉ lấy 4 sản phẩm có điểm cao nhất
       const sortedItems = filteredItems
         .filter(item => item.score > 0)  // Lọc các item có score > 0
         .sort((a, b) => b.score - a.score)  // Sắp xếp theo điểm số giảm dần
-        .slice(0, 10);  
+        .slice(0, 10);
 
-      // Lấy thông tin chi tiết từ productVariant hoặc productAuction
+      // Lấy thông tin chi tiết từ productVariant
       const result = [];
       const uniqueItemDetails = new Set();  // Set để theo dõi các itemDetails._id đã có
 
@@ -61,28 +57,22 @@ const recommendations = {
           continue;  // Bỏ qua nếu itemId không hợp lệ
         }
 
-        let itemDetails = null;
-        if (item.itemType === "productVariant") {
-          // Tìm thông tin chi tiết từ collection productVariant và populate hình ảnh
-          itemDetails = await ProductVariant.findById(item.item)
-            .populate('image')  // Populating hình ảnh từ imageVariant
-            .populate('product_discount')
-            .populate({
-              path: 'product', // Truy xuất thông tin sản phẩm từ trường product
-              select: 'weight_g product_ratingAvg slug' // Chỉ lấy các trường cần thiết
-            })
-            .exec();
-        } else if (item.itemType === "productAuction") {
-          // Tìm thông tin chi tiết từ collection productAuction
-          itemDetails = await ProductAuction.findById(item.item);
-        }
+        // Tìm thông tin chi tiết từ collection productVariant và populate hình ảnh, giá, discount
+        const itemDetails = await ProductVariant.findById(item.item)
+          .populate('image')  // Populating hình ảnh từ imageVariant
+          .populate('product_discount')
+          .populate({
+            path: 'product', // Truy xuất thông tin sản phẩm từ trường product
+            select: 'weight_g product_ratingAvg slug' // Chỉ lấy các trường cần thiết
+          })
+          .exec();
 
         if (itemDetails) {
           // Kiểm tra nếu _id của itemDetails đã xuất hiện trong Set, nếu có thì bỏ qua
-          if (uniqueItemDetails.has(itemDetails._id.toString() + item.itemType)) {
+          if (uniqueItemDetails.has(itemDetails._id.toString())) {
             continue; // Bỏ qua sản phẩm trùng lặp hoàn toàn
           }
-          uniqueItemDetails.add(itemDetails._id.toString() + item.itemType);
+          uniqueItemDetails.add(itemDetails._id.toString());
 
           result.push({
             itemId: item.item,
@@ -90,6 +80,7 @@ const recommendations = {
             score: item.score,
             itemDetails: itemDetails,  // Thêm thông tin chi tiết vào kết quả
             images: itemDetails.image,  // Thêm thông tin hình ảnh vào kết quả
+            variantPrice: itemDetails.variant_price, // Thêm variant_price
             discountPercent: itemDetails.product_discount ? itemDetails.product_discount.discountPercent : 0, // Lấy discount từ product_discount
             productRatingAvg: itemDetails.product_ratingAvg, // Lấy product_ratingAvg
             weight: itemDetails.weight_g // Lấy weight
