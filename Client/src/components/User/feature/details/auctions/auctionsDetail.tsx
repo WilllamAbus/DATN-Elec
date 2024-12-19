@@ -51,7 +51,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
   const watchlistItems = useSelector(
     (state: RootState) => state.watchlist.items
   );
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [, setIsFavorite] = useState<boolean>(false);
   // const profile = useAppSelector(
   //   (state: RootState) => state.auth.profile.profile
   // );
@@ -312,7 +312,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
           <div className="mt-6 flex gap-3 border-t border-gray-200 pt-5">
             {productId && <ModalPopUp productId={productId} />}
 
-            <button
+            {/* <button
               //  onClick={() => handleAddToWatchlist(productId)}
               className="flex items-center space-x-2 bg-gray-200
                text-white px-4 py-2 font-medium rounded uppercase hover:bg-gray-300 transition"
@@ -323,7 +323,7 @@ const AuctDetail: React.FC<ProductDetailsProps> = () => {
                 }`}
               ></i>
               <span className="ml-2 text-slate-950">Yêu thích</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

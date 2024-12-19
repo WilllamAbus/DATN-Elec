@@ -8,8 +8,8 @@ const Product_v2 = require("../../../model/productAuction/productAuction");
 const Interaction = require("../../../model/recommendation/interaction.model");
 const Notification = require("../../../model/notification/notification.model");
 const { sendMail } = require("../../../config/nodemailler");
-const path = require('path');
-const { spawn } = require('child_process');
+// const path = require('path');
+// const { spawn } = require('child_process');
 const Vnpay = require("../../../model/orders/vnpay.model");
 
 // const InventoryOut = require("../../../model/inventories/invenOut.model");
@@ -596,31 +596,7 @@ const orderAndDetailService = {
 
 
       // Đường dẫn tới file Python
-      const pythonScriptPath = path.resolve(__dirname, '../../../Python Client Server/recommendation_service.py');
-
-      // Gọi script Python để tạo gợi ý sản phẩm
-      const pythonProcess = spawn('python', [pythonScriptPath, userID]); // Truyền userID dưới dạng tham số
-
-      // Xử lý kết quả từ script Python
-      pythonProcess.stdout.on('data', (data) => {
-        console.log(`Python Output: ${data.toString()}`);
-      });
-
-      pythonProcess.stderr.on('data', (data) => {
-        console.error(`Python Error: ${data.toString()}`);
-      });
-
-      pythonProcess.on('error', (error) => {
-        console.error(`Failed to start Python process: ${error.message}`);
-      });
-
-      pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Python script exited with code ${code}`);
-        } else {
-          console.log(`Python script finished successfully.`);
-        }
-      });
+   
 
       await Auction.findOneAndUpdate({
         productId:productIDAuct,
