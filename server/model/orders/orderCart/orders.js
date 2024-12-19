@@ -27,6 +27,7 @@ const orderSchema = new Schema(
         "Hủy đơn hàng",
         "Đã hoàn tiền",
         "Giao hàng không thành công",
+        "Trả hàng về cửa hàng",
       ],
       required: true,
     },

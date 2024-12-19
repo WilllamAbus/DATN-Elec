@@ -660,56 +660,169 @@ const iteractionOrderAucService = {
       },
       
 
-      updateOrderStatus : async (orderId, stateOrder) => {
+      updateOrderStatus: async (orderId, stateOrder) => {
         try {
-          const statusOrderFlow = ["Chờ giao hàng", "Chờ xử lý", "Đã xác nhận", "Vận chuyển", "Nhận hàng", "Hoàn tất"];
-        
-          // Tìm đơn hàng
+          const statusOrderFlow = [
+            "Chờ giao hàng",
+            "Chờ xử lý",
+            "Đã xác nhận",
+            "Vận chuyển",
+            "Nhận hàng",
+            "Hoàn tất",
+            "Giao hàng không thành công",
+          ];
+      
           const order = await OrderAuction.findById(orderId);
-
-        
-          if (!order ) {
-            throw new Error("Đơn hàng không tồn tại ");
+      
+          if (!order) {
+            throw new Error("Đơn hàng không tồn tại.");
           }
-        
-          // Kiểm tra trạng thái hiện tại
+      
           const currentIndex = statusOrderFlow.indexOf(order.stateOrder);
           const newIndex = statusOrderFlow.indexOf(stateOrder);
-        
-          // Nếu trạng thái hiện tại hoặc trạng thái mới không hợp lệ
+      
           if (currentIndex === -1 || newIndex === -1) {
             throw new Error("Trạng thái hiện tại hoặc trạng thái mới không hợp lệ.");
           }
-        
-          // Ngăn cản cập nhật khi đơn hàng đã "Hoàn tất"
+      
           if (order.stateOrder === "Hoàn tất") {
             return { message: "Đơn hàng đã 'Hoàn tất' và không thể chuyển sang trạng thái khác." };
           }
-        
-          // Ràng buộc chỉ có thể chuyển tới trạng thái tiếp theo
-          if (newIndex > currentIndex && newIndex === currentIndex + 1) {
+      
+          if (stateOrder === "Giao hàng không thành công" ) {
+            // Xử lý chuyển trạng thái đặc biệt
+            const orderDetail = await OrderDetailAuction.find({ order: orderId }).lean();
+            if (!orderDetail.length) {
+              throw new Error("Không tìm thấy chi tiết đơn hàng.");
+            }
+      
+            const productId = orderDetail[0].productID;
+            const orderPayment = orderDetail[0].payment_method;
+            const inventory = await Inventory.findOne({ productAuction: productId });
+            if (!inventory) {
+              throw new Error("Không tìm thấy thông tin tồn kho.");
+            }
+      
+            // Cập nhật tồn kho
+            await Inventory.findOneAndUpdate(
+              { productAuction: productId },
+              { $inc: { quantityShelf: 1 } }
+            ).exec();
+      
+            // Cập nhật trạng thái đơn hàng
             const updatedOrder = await OrderAuction.findOneAndUpdate(
               { _id: orderId },
-              { $set: { stateOrder: stateOrder } },
+              { $set: { stateOrder } },
               { new: true, runValidators: true }
             );
+            const orderIds = updatedOrder._id;
+            const vnPay = await Vnpay.find({transaction_status: '00'})
+       
+            .lean()
         
+                
+            if (!vnPay) {
+              return "Không tìm thấy ngân hàng ";
+            }
+        
+       
+      
+        
+            const filteredVnPay = vnPay.filter(payment => {
+              return !payment.order_info.includes("Thanh toan");
+            });
+            
+          
+         
+            const lastIndex = filteredVnPay.length - 1;
+            const lastElement = filteredVnPay[lastIndex];
+        
+            const OrderInForPayment = lastElement.order_info
+        
+            
+            const transOrderId = orderIds.toString();
+            let inforBank
+            let banksInfo =  OrderInForPayment === transOrderId ? inforBank = {
+              bankCode: lastElement.bank_code,
+              orderInForVnPay: orderIds,
+              paymentDateVnPay: lastElement.payment_date,
+              transiTionAmout: lastElement.amount,
+            } : null
   
-            return { order: updatedOrder, message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}` };
+        
+           const refundBanl =  await OrderAuction.findOneAndUpdate(
+              { _id: orderIds },
+              {
+                $set: {
+                
+                  ...(orderPayment !== "Thanh toán trực tiếp" && { refundBank: banksInfo }),
+                },
+              },
+              { new: true }
+
+
+            ).exec();
+
+            const orderDerCheck = refundBanl.refundBank.bankCode;
+      
+            if (orderDerCheck === 'NCB') {
+              await OrderAuction.findOneAndUpdate(
+                { _id: orderIds },
+                {
+                  $set: {
+                    status: "disable",
+                 
+                    stateOrder: "Hoàn tiền",
+               
+                  
+                  },
+                },
+                { new: true }
+              ).exec();
+              // Thực hiện các logic cần thiết với orderDerCheck
+            } else {
+              await OrderAuction.findOneAndUpdate(
+                { _id: orderIds },
+                {
+                  $set: {
+                    status: "disable",
+                 
+                    stateOrder: "Giao hàng không thành công",
+               
+                  
+                  },
+                },
+                { new: true }
+              ).exec();
+            }
+
+            return {
+              order: updatedOrder,
+              message: "Cập nhật trạng thái đơn hàng thành công: Giao hàng không thành công.",
+            };
+          }
+      
+          if (newIndex === currentIndex + 1) {
+            // Chuyển trạng thái tiếp theo
+            const updatedOrder = await OrderAuction.findOneAndUpdate(
+              { _id: orderId },
+              { $set: { stateOrder } },
+              { new: true, runValidators: true }
+            );
+      
+            return {
+              order: updatedOrder,
+              message: `Cập nhật trạng thái đơn hàng thành công: ${stateOrder}`,
+            };
           } else {
-            console.error("Trạng thái không hợp lệ. Current status:", order.stateOrder, "New status:", stateOrder);
             throw new Error("Không thể chuyển về trạng thái trước đó hoặc nhảy qua trạng thái.");
           }
         } catch (error) {
           console.error("Error updating order status:", error.message || "Lỗi cập nhật trạng thái đơn hàng.");
           throw new Error(error.message || "Lỗi cập nhật trạng thái đơn hàng.");
         }
-        
-
-
-      
-
       },
+      
 
 
 

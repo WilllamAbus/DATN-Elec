@@ -3,7 +3,7 @@ import AdminRecyBinOrder from '../../../components/Admin/feature/orderAuctions/r
 import { breadcrumbItems, ReusableBreadcrumb } from "../../../ultils/breadcrumb/admin";
 
 import ProductSummary from "../../../components/Admin/summary/ProductSummary";
-import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
+// import SearchFormProduct from "../../../components/Admin/searchform/searchFomProduct";
 const listOrders: React.FC = () => {
 
   return (
@@ -19,9 +19,9 @@ const listOrders: React.FC = () => {
         <div className="mb-4 col-span-full xl:mb-2">
           <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
             <ProductSummary />
-            <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+            {/* <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
               <SearchFormProduct />
-            </div>
+            </div> */}
             <div className="overflow-x-auto">
               <AdminRecyBinOrder />
             

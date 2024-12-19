@@ -454,6 +454,12 @@ const OrderList: React.FC = () => {
             cancelReason: cancelReason || customReason,
           })
         ).unwrap();
+        dispatch(
+          fetchUserOrdersThunk({
+            page: 1,
+            search: searchTerm,
+          })
+        );
         setCancelOrderId(null);
         setCancelReason("");
         setCustomReason("");
