@@ -15,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
 import { Button } from "@nextui-org/react";
+
 interface AddressSelectorProps {
   address: string | null;
   onBack: () => void;
@@ -37,6 +38,7 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
   const {
     handleSubmit,
     control,
+    watch,
     setValue,
     formState: { errors },
   } = useForm({
@@ -50,10 +52,49 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
     },
   });
 
+  // useEffect(() => {
+  //   dispatch(fetchProvinces());
+  // }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (address) {
+  //     const [house, ward, district, province] = address
+  //       .split(",")
+  //       .map((part) => part.trim());
+  //     setValue("houseNumber", house || "");
+  //     setValue("province", province || "");
+  //     setValue("district", district || "");
+  //     setValue("ward", ward || "");
+  //   } else {
+  //     // Xử lý trường hợp address là null
+  //     setValue("houseNumber", "");
+  //     setValue("province", "");
+  //     setValue("district", "");
+  //     setValue("ward", "");
+  //   }
+  // }, [address, setValue]);
+  // Fetch provinces on component mount
   useEffect(() => {
     dispatch(fetchProvinces());
   }, [dispatch]);
 
+  // Fetch districts when province changes
+  useEffect(() => {
+    const provinceId = watch("province");
+    if (provinceId) {
+      dispatch(fetchDistricts(provinceId));
+    }
+  }, [watch("province"), dispatch]);
+
+  // Fetch wards when district changes
+  useEffect(() => {
+    const districtId = watch("district");
+    if (districtId) {
+      dispatch(fetchWards(districtId));
+    }
+  }, [watch("district"), dispatch]);
+
+  // Populate form if address exists
   useEffect(() => {
     if (address) {
       const [house, ward, district, province] = address
@@ -63,29 +104,20 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
       setValue("province", province || "");
       setValue("district", district || "");
       setValue("ward", ward || "");
-    } else {
-      // Xử lý trường hợp address là null
-      setValue("houseNumber", "");
-      setValue("province", "");
-      setValue("district", "");
-      setValue("ward", "");
     }
   }, [address, setValue]);
-
   const onSubmit = async (data: any) => {
     try {
       const provinceName =
-        provinces.find((p) => p.province_id === data.province)?.province_name ||
-        "";
+        provinces.find((p) => p.id === data.province)?.full_name || "";
       const districtName =
-        districts.find((d) => d.district_id === data.district)?.district_name ||
-        "";
-      const wardName =
-        wards.find((w) => w.ward_id === data.ward)?.ward_name || "";
+        districts.find((d) => d.id === data.district)?.full_name || "";
+      const wardName = wards.find((w) => w.id === data.ward)?.full_name || "";
 
+      // const addressString =
+      //   `${data.houseNumber}, ${wardName}, ${districtName}, ${provinceName}`.trim();
       const addressString =
         `${data.houseNumber}, ${wardName}, ${districtName}, ${provinceName}`.trim();
-
       console.log("Address String for Server:", addressString);
 
       const addressData: Address = {
@@ -238,8 +270,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
               >
                 <option value="">Chọn tỉnh</option>
                 {provinces.map((p) => (
-                  <option key={p.province_id} value={p.province_id}>
-                    {p.province_name}
+                  <option key={p.id} value={p.id}>
+                    {p.full_name}
                   </option>
                 ))}
               </select>
@@ -276,8 +308,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
               >
                 <option value="">Chọn quận</option>
                 {districts.map((d) => (
-                  <option key={d.district_id} value={d.district_id}>
-                    {d.district_name}
+                  <option key={d.id} value={d.id}>
+                    {d.full_name}
                   </option>
                 ))}
               </select>
@@ -310,8 +342,8 @@ const CountrySelector: React.FC<AddressSelectorProps> = ({
               >
                 <option value="">Chọn phường</option>
                 {wards.map((w) => (
-                  <option key={w.ward_id} value={w.ward_id}>
-                    {w.ward_name}
+                  <option key={w.id} value={w.id}>
+                    {w.full_name}
                   </option>
                 ))}
               </select>

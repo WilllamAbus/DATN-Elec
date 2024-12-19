@@ -90,13 +90,10 @@ const EditAddress: React.FC<EditAddressProps> = ({ addressId, onBack }) => {
   const onSubmit = async (data: any) => {
     try {
       const provinceName =
-        provinces.find((p) => p.province_id === data.province)?.province_name ||
-        "";
+        provinces.find((p) => p.id === data.province)?.full_name || "";
       const districtName =
-        districts.find((d) => d.district_id === data.district)?.district_name ||
-        "";
-      const wardName =
-        wards.find((w) => w.ward_id === data.ward)?.ward_name || "";
+        districts.find((d) => d.id === data.district)?.full_name || "";
+      const wardName = wards.find((w) => w.id === data.ward)?.full_name || "";
 
       const addressString =
         `${data.houseNumber}, ${wardName}, ${districtName}, ${provinceName}`.trim();
@@ -208,6 +205,34 @@ const EditAddress: React.FC<EditAddressProps> = ({ addressId, onBack }) => {
             <span className="text-red-500 text-sm">{errors.phone.message}</span>
           )}
         </div>
+        {/* Số Nhà */}
+        <div>
+          <label
+            htmlFor="houseNumber"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Số Nhà
+          </label>
+          <Controller
+            name="houseNumber"
+            control={control}
+            rules={{ required: "Vui lòng nhập số nhà" }}
+            render={({ field }) => (
+              <input
+                {...field}
+                type="text"
+                id="houseNumber"
+                className={`form-input mt-1 block w-full border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.houseNumber ? "border-red-500" : "border-gray-300"
+                }`}
+                aria-label="Số nhà"
+              />
+            )}
+          />
+          {errors.houseNumber && (
+            <span className="text-red-500">{errors.houseNumber.message}</span>
+          )}
+        </div>
 
         {/* Province */}
         <div>
@@ -235,8 +260,8 @@ const EditAddress: React.FC<EditAddressProps> = ({ addressId, onBack }) => {
               >
                 <option value="">Chọn tỉnh</option>
                 {provinces.map((p) => (
-                  <option key={p.province_id} value={p.province_id}>
-                    {p.province_name}
+                  <option key={p.id} value={p.id}>
+                    {p.full_name}
                   </option>
                 ))}
               </select>
@@ -275,8 +300,8 @@ const EditAddress: React.FC<EditAddressProps> = ({ addressId, onBack }) => {
               >
                 <option value="">Chọn quận</option>
                 {districts.map((d) => (
-                  <option key={d.district_id} value={d.district_id}>
-                    {d.district_name}
+                  <option key={d.id} value={d.id}>
+                    {d.full_name}
                   </option>
                 ))}
               </select>
@@ -311,8 +336,8 @@ const EditAddress: React.FC<EditAddressProps> = ({ addressId, onBack }) => {
               >
                 <option value="">Chọn phường</option>
                 {wards.map((w) => (
-                  <option key={w.ward_id} value={w.ward_id}>
-                    {w.ward_name}
+                  <option key={w.id} value={w.id}>
+                    {w.full_name}
                   </option>
                 ))}
               </select>
