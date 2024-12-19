@@ -1,36 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
-import { getOrderDeletedThunk, restoreOrderThunk } from "../../../../redux/orderAucAdmin/getDeletedAucAdmin/getDeletedThunk";
-import { OrderDeleted } from "../../../../types/adminOrder/getDeletedOrder";
+import {
+  getOrderDeletedThunk,
+  // restoreOrderThunk,
+} from "../../../../redux/orderAucAdmin/getDeletedAucAdmin/getDeletedThunk";
+
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
-import Swal, { SweetAlertResult } from "sweetalert2";
+
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
-import withReactContent from "sweetalert2-react-content";
+
 import {
   downloadInvoiceExcelCash,
   getInvoicePDFCash,
 } from "../../../../services/orderAuction/getOrderAdmin";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-const MySwal = withReactContent(Swal);
-
+import SearchFormOrders from "./searchForm/searFormOrder";
+// const MySwal = withReactContent(Swal);
+// import withReactContent from "sweetalert2-react-content";
+// import { OrderDeleted } from "../../../../types/adminOrder/getDeletedOrder";
+// import Swal, { SweetAlertResult } from "sweetalert2";
 const ListOrdersDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const {deltedOrder, totalPages} = useSelector(
+  const { deltedOrder, totalPages } = useSelector(
     (state: RootState) => state.getDeletedOrderAucAdmin
-  ) ; // Default to an empty array if undefined
-
-
-
+  ); // Default to an empty array if undefined
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
-  const [search, ] = useState("");
+  const [search, setSearch] = useState("");
 
-
-  const [, setOrder] = useState<OrderDeleted[]>(deltedOrder);
+  // const [, setOrder] = useState<OrderDeleted[]>(deltedOrder);
   useEffect(() => {
     dispatch(getOrderDeletedThunk({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
@@ -39,43 +41,45 @@ const ListOrdersDelete: React.FC = () => {
     setPage(newPage);
   };
 
-  // const handleSearch = (searchTerm: string) => {
-  //   setSearch(searchTerm);
-  //   setPage(1);
-  // };
-  const handleRestoreDeleteOrder = async (_id: string) => {
-    MySwal.fire({
-      title: "Khôi phục đơn hàng?",
-      text: "Bạn có muốn khôi phục đơn hàng này không!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
-    }).then(async (result: SweetAlertResult) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(restoreOrderThunk(_id)).unwrap();
-
-          dispatch(getOrderDeletedThunk({ page, pageSize, search }));
-          setOrder((prevOrder) => prevOrder.filter((order) => order._id !== _id));
-          MySwal.fire({
-            title: "Đã xóa!",
-            text: "Đơn  hàng của bạn được khôi phục.",
-            icon: "success",
-          });
-        } catch (error) {
-          console.error("Error deleting order:", error);
-          MySwal.fire({
-            title: "Lỗi!",
-            text: "Đã xảy ra sự cố khi xóa sản phẩm.",
-            icon: "error",
-          });
-        }
-      }
-    });
+  const handleSearch = (searchTerm: string) => {
+    setSearch(searchTerm);
+    setPage(1);
   };
+  // const handleRestoreDeleteOrder = async (_id: string) => {
+  //   MySwal.fire({
+  //     title: "Khôi phục đơn hàng?",
+  //     text: "Bạn có muốn khôi phục đơn hàng này không!",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "Có",
+  //     cancelButtonText: "Hủy",
+  //   }).then(async (result: SweetAlertResult) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         await dispatch(restoreOrderThunk(_id)).unwrap();
+
+  //         dispatch(getOrderDeletedThunk({ page, pageSize, search }));
+  //         setOrder((prevOrder) =>
+  //           prevOrder.filter((order) => order._id !== _id)
+  //         );
+  //         MySwal.fire({
+  //           title: "Đã xóa!",
+  //           text: "Đơn  hàng của bạn được khôi phục.",
+  //           icon: "success",
+  //         });
+  //       } catch (error) {
+  //         console.error("Error deleting order:", error);
+  //         MySwal.fire({
+  //           title: "Lỗi!",
+  //           text: "Đã xảy ra sự cố khi xóa sản phẩm.",
+  //           icon: "error",
+  //         });
+  //       }
+  //     }
+  //   });
+  // };
 
   const handleDownloadInvoice = async (orderId: string) => {
     try {
@@ -98,36 +102,57 @@ const ListOrdersDelete: React.FC = () => {
   };
   return (
     <>
-      {/* Uncomment this to display loading state if needed */}
-      {/* {loading && <p>Loading...</p>} */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+        <SearchFormOrders onSearch={handleSearch} />
+      </div>
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-          <th scope="col" className="p-4">
+            <th scope="col" className="p-4">
               {/* <input type="checkbox" className="w-4 h-4" /> */}
             </th>
-            <th scope="col" className="p-4">NGƯỜI DÙNG</th>
-            <th scope="col" className="text-center">ĐỊA CHỈ</th>
-            <th scope="col" className="p-4">SỐ ĐIỆN THOẠI</th>
-        
-            <th scope="col" className="p-4">TRẠNG THÁI</th>
-            <th scope="col" className="p-4">CHỨC NĂNG</th>
+            <th scope="col" className="p-4">
+              NGƯỜI DÙNG
+            </th>
+            <th scope="col" className="text-center">
+              ĐỊA CHỈ
+            </th>
+            <th scope="col" className="p-4">
+              SỐ ĐIỆN THOẠI
+            </th>
+
+            <th scope="col" className="p-4">
+              TRẠNG THÁI
+            </th>
+            <th scope="col" className="p-4">
+              CHỨC NĂNG
+            </th>
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(deltedOrder) && deltedOrder.length > 0  ? (
-           deltedOrder?.map((order) => (
-            <tr key={order._id} className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+          {Array.isArray(deltedOrder) && deltedOrder.length > 0 ? (
+            deltedOrder?.map((order) => (
+              <tr
+                key={order._id}
+                className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
                 <td className="p-4">
                   {/* <input type="checkbox" className="w-4 h-4" /> */}
                 </td>
-              <td scope="row"  className="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                {order.shippingAddress.recipientName}
-              </td>
-              <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.address}</td>
-              <td className="py-4 px-6 border-b border-grey-light">{order.shippingAddress.phoneNumber}</td>
-           
-              <td className="py-4 px-6 border-b border-grey-light">
+                <td
+                  scope="row"
+                  className="px-4 py-3 font-medium text-gray-900 dark:text-white"
+                >
+                  {order.shippingAddress.recipientName}
+                </td>
+                <td className="py-4 px-6 border-b border-grey-light">
+                  {order.shippingAddress.address}
+                </td>
+                <td className="py-4 px-6 border-b border-grey-light">
+                  {order.shippingAddress.phoneNumber}
+                </td>
+
+                <td className="py-4 px-6 border-b border-grey-light">
                   <span
                     className={`mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
                       order.stateOrder === "Hoàn tiền"
@@ -136,11 +161,12 @@ const ListOrdersDelete: React.FC = () => {
                         ? "bg-violet-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                         : order.stateOrder === "Đã xác nhận hoàn tiền"
                         ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                       
                         : order.stateOrder === "Hoàn tiền thành công"
                         ? "bg-green-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
                         : order.stateOrder === "Hủy đơn hàng"
                         ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : order.stateOrder === "Giao hàng không thành công"
+                        ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
                         : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
                     }`}
                   >
@@ -202,7 +228,7 @@ const ListOrdersDelete: React.FC = () => {
                         />
                       </svg>
                     )}
-                
+
                     {order.stateOrder === "Hoàn tiền thành công" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -236,40 +262,65 @@ const ListOrdersDelete: React.FC = () => {
                         ></text>
                       </svg>
                     )}
-
+                    {order.stateOrder === "Giao hàng không thành công" && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        version="1.1"
+                        className="me-1 h-4 w-4"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 29 37.5"
+                      >
+                        <g transform="translate(-270 -380)">
+                          <g xmlns="http://www.w3.org/2000/svg">
+                            <path d="M281.5,382l-11.5,6.64v12l11,6.351l0.5,0.289l0.5-0.289l2.618-1.512c1.152,2.66,3.799,4.521,6.882,4.521    c4.143,0,7.5-3.357,7.5-7.5c0-3.629-2.576-6.654-6-7.35v-6.511L281.5,382z M281.5,383.154l10,5.774l-4.5,2.599l-10-5.774    L281.5,383.154z M281,405.836l-10-5.773v-10.269l10,5.774V405.836z M281.5,394.702l-10-5.773l4.5-2.599l10.001,5.773    L281.5,394.702z M282,405.836v-10.268l10-5.774v5.231c-0.166-0.011-0.331-0.025-0.5-0.025c-4.143,0-7.5,3.357-7.5,7.5    c0,0.7,0.104,1.375,0.283,2.018L282,405.836z M298,402.5c0,3.59-2.91,6.5-6.5,6.5s-6.5-2.91-6.5-6.5s2.91-6.5,6.5-6.5    S298,398.91,298,402.5z" />
+                            <polygon points="287.965,402.146 287.258,402.854 290.086,405.682 295.742,400.025 295.035,399.318 290.086,404.268   " />
+                          </g>
+                        </g>
+                        <text
+                          x="0"
+                          y="45"
+                          fill="#000000"
+                          font-size="5px"
+                          font-weight="bold"
+                          font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif"
+                        ></text>
+                        <text
+                          x="0"
+                          y="50"
+                          fill="#000000"
+                          font-size="5px"
+                          font-weight="bold"
+                          font-family="'Helvetica Neue', Helvetica, Arial-Unicode, Arial, Sans-serif"
+                        ></text>
+                      </svg>
+                    )}
                     {order.stateOrder}
                   </span>
                 </td>
-              <td className="py-4 px-6 border-b border-grey-light">
-                <div className="flex items-center space-x-4">
-                <button
+                <td className="py-4 px-6 border-b border-grey-light">
+                  <div className="flex items-center space-x-4">
+                    {/* <button
                       className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center ${
                         order.stateOrder === "Hủy đơn hàng"
                           ? "text-red-700 bg-red-200 hover:text-white border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                       
-                        
                           : "text-gray-500 bg-gray-200 border-gray-500 cursor-not-allowed dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
                       }`}
                       onClick={() => {
-                        if (
-                          order.stateOrder === "Hủy đơn hàng" 
-                        ) {
-                          order._id && handleRestoreDeleteOrder(order._id)
+                        if (order.stateOrder === "Hủy đơn hàng") {
+                          order._id && handleRestoreDeleteOrder(order._id);
                         }
                       }}
-                   
-                      disabled={
-                        !(
-                         
-                    
-                          order.stateOrder === "Hủy đơn hàng" 
-                          
-                        )
-                      }
-                      style={{ display: order.stateOrder === "Hủy đơn hàng" ? ' inline-flex ' : 'none' }} // Hide button if stateOrder is 'Hoàn tiền'
+                      disabled={!(order.stateOrder === "Hủy đơn hàng")}
+                      style={{
+                        display:
+                          order.stateOrder === "Hủy đơn hàng"
+                            ? " inline-flex "
+                            : "none",
+                      }} 
                     >
                       Khôi phục
-                    </button>
+                    </button> */}
                     <Link to={`/admin/detailOrderAuctionFrCash/${order._id}`}>
                       {/* SVG Icon embedded directly */}
                       <svg
@@ -293,7 +344,6 @@ const ListOrdersDelete: React.FC = () => {
                           d="M12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"
                         />
                       </svg>
-             
                     </Link>
                     {order.stateOrder === "Hoàn tiền thành công" && (
                       <div
@@ -345,16 +395,16 @@ const ListOrdersDelete: React.FC = () => {
                         {/* <span className="text-sm font-medium text-black">Đơn hàng PDF</span> */}
                       </div>
                     )}
-                </div>
-              </td>
-            </tr>
-          ))
+                  </div>
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
-            <td colSpan={6} className="text-center py-4">
-                 Không có đơn hàng
-            </td>
-          </tr>
+              <td colSpan={6} className="text-center py-4">
+                Không có đơn hàng
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -365,12 +415,9 @@ const ListOrdersDelete: React.FC = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
-       <ToastContainer />
+      <ToastContainer />
     </>
   );
 };
 
 export default ListOrdersDelete;
-
-
-

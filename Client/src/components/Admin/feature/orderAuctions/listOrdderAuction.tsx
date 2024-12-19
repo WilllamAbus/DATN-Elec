@@ -87,10 +87,26 @@ const ListOrderAuction: React.FC = () => {
       console.error("Error downloading invoice:", error);
     }
   };
+
+    // const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //   const selectedFilter = event.target.value;
+    //   setFilter(selectedFilter);
+  
+    //   dispatch(
+    //     getOrders({
+    //       page: 1,
+    //       search: searchTerm,
+    //       stateOrder: selectedFilter === "Tất cả" ? undefined : selectedFilter,
+    //     })
+    //   );
+    // };
   return (
     <>
-      <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+      <div className="flex flex-col md:flex-row items-center justify-between mx-4 py-4 border-t dark:border-gray-700 space-y-3 md:space-y-0 md:space-x-3">
+        <div className="flex-grow">
         <SearchFormOrders onSearch={handleSearch} />
+        </div>
+     
       </div>
 
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -152,6 +168,7 @@ const ListOrderAuction: React.FC = () => {
                         ? "bg-green-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
                         : order.stateOrder === "Hủy đơn hàng"
                         ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                     
                         : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
                     }`}
                   >
@@ -298,7 +315,7 @@ const ListOrderAuction: React.FC = () => {
                         ></text>
                       </svg>
                     )}
-
+    
                     {order.stateOrder}
                   </span>
                 </td>
