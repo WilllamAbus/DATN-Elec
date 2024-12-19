@@ -32,7 +32,7 @@ const Arrivale: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(6).svg?alt=media&token=8b339c30-9226-465e-a6ba-59a96504f454"
               alt="Icon"
               className="w-10 h-10"
             />
@@ -124,15 +124,6 @@ const Arrivale: React.FC = () => {
                                                 />
                                             </svg>
                                         </button>
-                                        {/* <div
-                                            id="tooltip-add-to-favorites"
-                                            role="tooltip"
-                                            className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
-                                            data-popper-placement="top"
-                                        >
-                                            Add to favorites
-                                            <div className="tooltip-arrow" data-popper-arrow="" />
-                                        </div> */}
                                     </div>
                                 </div>
                                 <a
@@ -199,9 +190,6 @@ const Arrivale: React.FC = () => {
                                                 </span>
                                             ))}
                                         </div>
-                                        {/* <div className="text-xs text-gray-500 items-center m-3">
-                                            {product.quantity > 0 ? `(Còn ${product.quantity} sản phẩm)` : " "}
-                                        </div> */}
                                     </p>
                                 </div>
                                 <ul className="mt-2 flex items-center gap-4">
@@ -266,32 +254,6 @@ const Arrivale: React.FC = () => {
                                         )}
                                     </p>
                                 </div>
-                                {/* <div className="mt-4 flex items-center justify-between gap-6">
-                                    {" "}
-                                    <button
-                                        type="button"
-                                        className="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500"
-                                    >
-                                        <svg
-                                            className="-ms-2 me-2 h-5 w-5"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width={24}
-                                            height={24}
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                                            />
-                                        </svg>
-                                        Thêm vào giỏ hàng
-                                    </button>{" "}
-                                </div> */}
                             </div>
                         </div>
                     ))}
