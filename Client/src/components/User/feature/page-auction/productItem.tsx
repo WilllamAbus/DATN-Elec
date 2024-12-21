@@ -1,11 +1,8 @@
   import { Link } from "react-router-dom";
   import { truncateText } from "../listPage/truncate/truncateText";
-  import currencyFormatter from "currency-formatter";
   import { products } from "../../../../services/product_v2/client/types/listPageAuction";
   import { motion } from "framer-motion";
-  function formatCurrency(value: number) {
-    return currencyFormatter.format(value, { code: "VND", symbol: "" });
-  }
+
   export interface ProductItemProps {
     product: products;
     index: number;
@@ -33,13 +30,7 @@
         </motion.div>
         <div className="pt-1 mb-10">
           <div className="mb-4 px-2 flex items-center justify-between gap-4">
-            {product.product_discount.discountPercent > 0 ? (
-              <span className=" rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
-                Giảm giá {product.product_discount.discountPercent}%
-              </span>
-            ) : (
-              <span className="me-2 rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"></span>
-            )}
+
             <div className="flex items-center justify-end gap-1">
               <button
                 type="button"
@@ -62,23 +53,7 @@
 
 
           <div className="mt-2 px-2 flex items-center gap-2">
-            {product.product_discount.discountPercent > 1 ? (
-              <div className="flex w-full">
-                <p className="text-xs font-medium text-rose-700 flex-grow">
-                  {formatCurrency(
-                    product.product_price * (1 - product.product_discount.discountPercent / 100)
-                  )}{" "}
-                  đ
-                </p>
-                <p className="text-xs font-medium text-gray-400 line-through flex-shrink-0">
-                  {formatCurrency(product.product_price)} đ
-                </p>
-              </div>
-            ) : (
-              <p className="text-xs font-medium text-rose-700">
-                {formatCurrency(product.product_price)} đ
-              </p>
-            )}
+
           </div>
           <div className="px-2 mt-2 text-xs font-medium text-gray-700">
             <span>Tình trạng: </span>
