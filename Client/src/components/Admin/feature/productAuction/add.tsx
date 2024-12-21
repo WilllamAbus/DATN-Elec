@@ -32,7 +32,7 @@ const AddProductAuction: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const { imgPreview, handleImageChange } = useImageUpload();
-  const { categories, brands, conditionShopping, suppliers, discounts } = useFetchData();
+  const { categories, brands, conditionShopping, suppliers } = useFetchData();
   const navigate = useNavigate();
 
   const submitFormAdd: SubmitHandler<ProductAuction> = async (data) => {
@@ -106,17 +106,7 @@ const AddProductAuction: React.FC = () => {
                 errorMessage={errors.product_supplier?.message}
               />
 
-              <FormSelect
-                label="Giảm giá"
-                id="product_discount"
-                options={(discounts ?? []).map((discount) => ({
-                  _id: discount._id,
-                  name: discount.discountPercent,
-                }))}
-                register={register}
-                validation={{ required: "Giảm giá là bắt buộc" }}
-                errorMessage={errors.product_discount?.message}
-              />
+        
             </div>
           </div>
         </div>
@@ -142,30 +132,7 @@ const AddProductAuction: React.FC = () => {
                 }}
               />
 
-              <FormInput
-                id="product_price"
-                label="Giá gốc"
-                format
-                suffix=" đ"
-                register={register}
-                error={errors.product_price}
-                validation={{
-                  required: "Giá sản phẩm không được bỏ trống",
-                  min: {
-                    value: 1000,
-                    message: "Giá sản phẩm không thể thấp hơn 1000",
-                  },
-                  max: {
-                    value: 2000000000,
-                    message: "Giá sản phẩm không thể vượt quá 2000000000",
-                  },
-                  valueAsNumber: true,
-                }}
-                onValueChange={(values) => {
-                  const { floatValue } = values;
-                  setValue("product_price", floatValue ?? 0);
-                }}
-              />
+  
 
               <FormInput
                 id="weight_g"

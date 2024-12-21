@@ -61,7 +61,6 @@ const EditProduct: React.FC = () => {
   useEffect(() => {
     if (fetchStatus === "succeeded" && product) {
       setValue("product_name", product.product_name);
-      setValue("product_price", product.product_price);
       setValue("createdAt", product.createdAt);
       setValue("weight_g", product.weight_g);
       setValue("product_brand", product.product_brand.name);
@@ -208,30 +207,7 @@ const EditProduct: React.FC = () => {
                   </div>
                 )}
               </div>
-              <FormInput
-                id="product_price"
-                label="Giá gốc"
-                format
-                suffix=" đ"
-                register={register}
-                error={errors.product_price}
-                validation={{
-                  required: "Giá sản phẩm không được bỏ trống",
-                  min: {
-                    value: 1000,
-                    message: "Giá sản phẩm không thể thấp hơn 1000",
-                  },
-                  max: {
-                    value: 2000000000,
-                    message: "Giá sản phẩm không thể vượt quá 2000000000",
-                  },
-                  valueAsNumber: true,
-                }}
-                onValueChange={(values) => {
-                  const { floatValue } = values;
-                  setValue("product_price", floatValue ?? 0);
-                }}
-              />
+
 
               <FormInput
                 id="weight_g"

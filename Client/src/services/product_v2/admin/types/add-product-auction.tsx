@@ -18,7 +18,6 @@ export interface ProductAuction {
   product_supplier: string;
   product_ratingAvg: number;
   product_view: number;
-  product_price: number;
   product_price_unit?: number;
   weight_g: number;
   isActive: boolean;
