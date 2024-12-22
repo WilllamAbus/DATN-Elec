@@ -46,6 +46,8 @@ const bankRouter = require("./client/bank");
 const statistical = require("./admin/statistical");
 const recommendationRoute = require("./client/recommendation/recommendation");
 const bestSellRoute = require("./client/best-selling/best-selling");
+const AutionRoute = require("./client/aution/bidding.router");
+
 
 
 const routes = (app) => {
@@ -95,6 +97,8 @@ const routes = (app) => {
   app.use("/api/bank", bankRouter);
   app.use("/api/client/recommendation", recommendationRoute);
   app.use("/api/client/best-selling", bestSellRoute);
+  app.use("/api/client/aution", AutionRoute);
+
 };
 
 module.exports = routes;
