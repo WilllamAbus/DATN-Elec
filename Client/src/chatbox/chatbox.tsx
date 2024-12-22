@@ -5,7 +5,11 @@ import { RootState } from "../redux/store";
 
 declare global {
   interface Window {
-    fpt_ai_render_chatbox: (configs: any, baseUrl: string, socketUrl: string) => void;
+    fpt_ai_render_chatbox: (
+      configs: any,
+      baseUrl: string,
+      socketUrl: string
+    ) => void;
   }
 }
 
@@ -17,6 +21,7 @@ const Chatbox = () => {
 
   // Check if the user is an admin
   const isAdmin = roles.some((role: { name: string }) => role.name === "admin");
+  console.log(isAdmin);
 
   useEffect(() => {
     if (isAdmin) {
@@ -51,7 +56,8 @@ const Chatbox = () => {
         headerBackground: "#338ef7",
         headerTextColor: "#ffffffff",
         headerLogoEnable: false,
-        headerLogoLink: "https://chatbot-tools.fpt.ai/livechat-builder/img/Icon-fpt-ai.png",
+        headerLogoLink:
+          "https://chatbot-tools.fpt.ai/livechat-builder/img/Icon-fpt-ai.png",
         headerText: "E - COM",
         primaryColor: "#F7F8FAFF",
         secondaryColor: "#ecececff",
@@ -63,10 +69,12 @@ const Chatbox = () => {
         bodyBackgroundLink: "",
         avatarBot: "https://chatbot-tools.fpt.ai/livechat-builder/img/bot.png",
         sendMessagePlaceholder: "Nhập tin nhắn của bạn ở đây",
-        floatButtonLogo: "https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(2).png?alt=media&token=c4c73842-527b-4552-8aee-8e48edd151cd",
+        floatButtonLogo:
+          "https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(2).png?alt=media&token=c4c73842-527b-4552-8aee-8e48edd151cd",
         floatButtonTooltip: "xin chào bạn cần gì",
         floatButtonTooltipEnable: true,
-        customerLogo: "https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=8690d839-6870-4960-9541-668b238f5674",
+        customerLogo:
+          "https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/logo%2Flogo.svg?alt=media&token=8690d839-6870-4960-9541-668b238f5674",
         customerWelcomeText: "Vui lòng nhập tên của bạn",
         customerButtonText: "Bắt đầu",
         prefixEnable: true,
@@ -95,7 +103,11 @@ const Chatbox = () => {
       document.body.appendChild(FptLiveChatStyles);
 
       FptLiveChatScript.onload = function () {
-        window.fpt_ai_render_chatbox(FptLiveChatConfigs, liveChatBaseUrl, LiveChatSocketUrl);
+        window.fpt_ai_render_chatbox(
+          FptLiveChatConfigs,
+          liveChatBaseUrl,
+          LiveChatSocketUrl
+        );
       };
 
       return () => {
@@ -103,7 +115,9 @@ const Chatbox = () => {
         if (scriptElement) {
           scriptElement.remove();
         }
-        const styleElement = document.querySelector("link[href*='fptai-livechat.css']");
+        const styleElement = document.querySelector(
+          "link[href*='fptai-livechat.css']"
+        );
         if (styleElement) {
           styleElement.remove();
         }

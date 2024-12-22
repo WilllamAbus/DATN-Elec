@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAllProductVariantsByVariantPriceThunk } from "../Thunk";
-import { GetAllProductVariantsByVariantPriceResponse } from "../../../../services/detailProduct/types/getAllProductVariantsByVariantPrice";
+import { GetAllProductVariantsByVariantPriceResponse,Pagination } from "../../../../services/detailProduct/types/getAllProductVariantsByVariantPrice";
 
 interface ProductVariantsState {
   productVariantsList: GetAllProductVariantsByVariantPriceResponse['data'] | null;
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
   isLoading: boolean;
+  pagination: Pagination | null;
 }
 
-// Khởi tạo state ban đầu
 const initialState: ProductVariantsState = {
   productVariantsList: null,
   status: "idle",
   error: null,
   isLoading: false,
+  pagination: null,
 };
 
-// Tạo Slice cho `getAllProductVariantsByVariantPrice`
 const getAllProductVariantsByVariantPriceSlice = createSlice({
   name: "productClient/getAllProductVariantsByVariantPrice",
   initialState,
@@ -38,6 +38,7 @@ const getAllProductVariantsByVariantPriceSlice = createSlice({
           state.status = "success";
           state.isLoading = false;
           state.productVariantsList = action.payload.data;
+          state.pagination = action.payload.pagination || null; 
           state.error = null;
         }
       )

@@ -18,7 +18,7 @@ const orderAuctionSchema = new Schema(
         "Đã xác nhận",  "Vận chuyển",
           "Nhận hàng", "Hoàn tất", 
           "Hủy đơn hàng", 
-
+          "Giao hàng không thành công",
           "Hoàn tiền", "Chờ xử lý hoàn tiền", "Đã xác nhận hoàn tiền", "Hoàn tiền thành công"], // Order status
     },
  

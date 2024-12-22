@@ -173,6 +173,20 @@ const orderSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
+      // .addCase(
+      //   cancelOrderThunk.fulfilled,
+      //   (state, action: PayloadAction<Order>) => {
+      //     state.status = "succeeded";
+
+      //     const index = state.orders.findIndex(
+      //       (order) => order._id === action.payload._id
+      //     );
+      //     if (index !== -1) {
+      //       state.orders[index] = action.payload;
+      //     }
+      //     state.error = null;
+      //   }
+      // )
       .addCase(
         cancelOrderThunk.fulfilled,
         (state, action: PayloadAction<Order>) => {
@@ -187,6 +201,7 @@ const orderSlice = createSlice({
           state.error = null;
         }
       )
+
       .addCase(cancelOrderThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "An error occurred";

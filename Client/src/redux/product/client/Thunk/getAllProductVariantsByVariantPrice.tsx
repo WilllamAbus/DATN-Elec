@@ -2,20 +2,19 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllProductVariantsByVariantPrice } from "../../../../services/detailProduct/getAllProductVariantsByVariantPrice";
 import { GetAllProductVariantsByVariantPriceResponse } from "../../../../services/detailProduct/types/getAllProductVariantsByVariantPrice";
 
-// Tạo Thunk cho API `getAllProductVariantsByVariantPrice`
 export const getAllProductVariantsByVariantPriceThunk = createAsyncThunk<
   GetAllProductVariantsByVariantPriceResponse,
-  { slug: string },
+  { slug: string; page: number },
   { rejectValue: string }
 >(
   "productClient/getAllProductVariantsByVariantPrice",
-  async ({ slug }, { rejectWithValue }) => {
+  async ({ slug, page }, { rejectWithValue }) => {
     try {
       if (!slug) {
         return rejectWithValue("Slug là bắt buộc");
       }
 
-      const response = await getAllProductVariantsByVariantPrice(slug);
+      const response = await getAllProductVariantsByVariantPrice(slug, page);
 
       if (response.success) {
         return response;

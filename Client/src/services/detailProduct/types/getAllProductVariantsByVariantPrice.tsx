@@ -23,10 +23,20 @@ export interface ProductVariantData {
 }
 
 // Interface cho phản hồi từ API
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;       // Tổng số items
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+// Interface cho phản hồi từ API
 export interface GetAllProductVariantsByVariantPriceResponse {
   success: boolean;
   err: number;
   msg: string;
   status: number;
   data: ProductVariantData[]; // Danh sách các sản phẩm
+  pagination?: Pagination;    // Thông tin về phân trang (optional)
 }

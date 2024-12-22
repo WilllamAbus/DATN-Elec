@@ -701,7 +701,11 @@ const authController = {
       }
 
       // Nếu trạng thái mới là "Hủy đơn hàng"
-      if (stateOrder === "Hủy đơn hàng") {
+
+      if (
+        stateOrder === "Hủy đơn hàng" ||
+        stateOrder === "Giao hàng không thành công"
+      ) {
         if (!order.user) {
           return res
             .status(404)
@@ -735,9 +739,10 @@ const authController = {
           };
         }
 
-        // Lưu lý do hủy
+        // Lưu lý do hủy nếu cần thiết (bỏ qua nếu không có lý do cụ thể)
         // order.cancelReason = cancelReason || "Không có lý do cụ thể";
       }
+
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();

@@ -110,7 +110,7 @@ const DeleteOrderModal: React.FC<DeleteBidModalProps> = ({
                   htmlFor="selectedService"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Services
+                  Dịch vụ
                 </label>
                 <select
                   id="selectedService"
@@ -211,7 +211,7 @@ const DeleteOrderModal: React.FC<DeleteBidModalProps> = ({
                 className="text-white bg-red-600 hover:bg-red-700 rounded-lg 
                 text-sm px-5 py-2.5 dark:bg-red-500 dark:hover:bg-red-600"
               >
-                Trả hàng
+                Hoàn trả
               </button>
             </div>
           </form>

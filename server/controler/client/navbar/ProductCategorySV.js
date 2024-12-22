@@ -168,9 +168,13 @@ const ProductCategoryService = {
       if (_sort) {
         const [sortField, sortDirection] = _sort.split(":");
         const direction = sortDirection === "DESC" ? -1 : 1;
-
+      
         if (sortField === "variant_price") {
-          filteredProducts.sort((a, b) => (a.variants[0]?.variant_price || 0) - (b.variants[0]?.variant_price || 0) * direction);
+          filteredProducts.sort((a, b) => {
+            const aMinPrice = Math.min(...a.variants.map(v => v.variant_price || Infinity));
+            const bMinPrice = Math.min(...b.variants.map(v => v.variant_price || Infinity));
+            return (aMinPrice - bMinPrice) * direction;
+          });
         } else {
           filteredProducts.sort((a, b) => {
             if (a[sortField] > b[sortField]) return direction;
@@ -179,6 +183,7 @@ const ProductCategoryService = {
           });
         }
       }
+      
       const categoryInfo = await ProductType.findById(categoryId).select('name');
       if (!categoryInfo) {
         return reject({
