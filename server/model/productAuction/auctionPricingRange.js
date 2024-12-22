@@ -8,7 +8,9 @@ const auctionPricingRangeSchema = new Schema(
     maxPrice: { type: Number, required: true },       // Giá tối đa
     currentPrice: { type: Number, default: 0 },  // Giá hiện tại (sẽ cập nhật khi bước giá tăng)
     priceStep: { type: Number, required: true },  // Bước giá
-    userBidPrice: { type: Number, default: null } // Giá do người dùng nhập
+    userBidPrice: { type: Number, default: null } ,
+    status: { type: String, default: 'active' },
+    product_randBib:{ type: Schema.Types.ObjectId, ref: 'productAuction' },
   },
   {
     collection: "auctionPricingRange",
@@ -16,4 +18,4 @@ const auctionPricingRangeSchema = new Schema(
   }
 );
 
-module.exports = model("auctionPricingRange", auctionPricingRangeSchema);
+module.exports = model("AuctionPricingRange", auctionPricingRangeSchema);

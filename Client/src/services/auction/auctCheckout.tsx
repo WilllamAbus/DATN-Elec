@@ -12,3 +12,18 @@ export const fetchAuctionData = async ( userId: string, productId: string): Prom
   
   return response.data.data;
 };
+
+
+
+
+// Function takes userId as an argument and passes it in the request as a query parameter
+export const fetchAuctionDataAuction = async ( userId: string, productId: string): Promise<AuctionData> => {
+  const response = await instance.get('client/auctions/getAuctDetails', {
+    params: {  userId: userId , productId: productId}
+  });
+
+
+
+  
+  return response.data.data;
+};

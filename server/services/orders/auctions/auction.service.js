@@ -441,9 +441,9 @@ const auctionService = {
       );
     }
   },
-  getAuctionDetails: async (userId, productId ) => {
+  getAuctionDetailsV2: async (userId, productId ) => {
     try {
-      const objectId = mongoose.Types.ObjectId(userId);
+ 
       const auctions = await Auction.find({
         auctionUser: userId
       })
@@ -452,9 +452,75 @@ const auctionService = {
         )
         .lean();
       
-        
-   
+      if (!auctions) {
+        throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
+      }
+     
+      const filteredAuctions = auctions.filter(auction => auction.productId.toString() === productId);
 
+      
+      if (filteredAuctions.length === 0) {
+        throw new Error("Không thể tìm thấy đấu giá cho sản phẩm này.");
+      }
+
+      const product = await Product_v2.findOne({ _id: productId })
+        .select("product_name image")
+        .lean();
+
+      if (!product) {
+   
+        throw new Error("Không tìm thấy sản phẩm.");
+      }
+
+      const user = await User.findOne({ _id: filteredAuctions[0].auctionUser })
+      .select("addresses name phone")
+      .lean();
+
+    if (!user) {
+      throw new Error("Không thể tìm thấy người dùng.");
+    }
+
+   
+      // If each bidding contains a productId, query for product details
+      const defaultAddress = user.addresses.find(address => address.isDefault);
+
+      const addressName =defaultAddress.address
+  
+      
+      return {
+        auctionId: filteredAuctions[0]._id,
+        auctionTotal: filteredAuctions[0].auction_total,
+        auctionQuantity: filteredAuctions[0].auction_quantity,
+        productName: product.product_name,
+        productImages: product.image,
+        userAddress:addressName,
+        userName: user.name,
+        userSdt: user.phone,
+        auctionTime: filteredAuctions[0].auctionTime,
+        auctionEndTime: filteredAuctions[0].auctionEndTime,
+        biddings: filteredAuctions[0],
+        stateAuction: filteredAuctions[0].stateAuction,
+      };
+
+      // Retrieve the product details
+
+      // Return the auction details along with product and user details
+    } catch (error) {
+      console.error("Error fetching auction details:", error.message);
+      throw new Error(`Cannot fetch auction details: ${error.message}`);
+    }
+  },
+  getAuctionDetails: async (userId, productId ) => {
+    try {
+ 
+      const auctions = await Auction.find({
+        auctionUser: userId
+      })
+        .select(
+          "auction_total auction_quantity auction_winner productId auctionUser auctionTime auctionEndTime biddings stateAuction"
+        )
+        .lean();
+      
       if (!auctions) {
         throw new Error("Không thể tìm thấy đấu giá cho người dùng này.");
       }

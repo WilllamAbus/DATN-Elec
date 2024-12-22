@@ -77,16 +77,15 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
       toast.error("Giá thầu là bắt buộc");
       return;
     }
-
+ 
     const minBid = bid?.minBid ?? 0;
     // const maxBid = bid?.maxBid ?? 0;
     const maxAllowedBid = minBid * 1.07; // 7% more than minBid
 
-    const isValidBid = finalBidAmount >= minBid && finalBidAmount <= maxAllowedBid;
-
+    const isValidBid = finalBidAmount >= minBid && finalBidAmount <= maxAllowedBid 
+    
     if (isValidBid && userId ) {
      
-
       dispatch(createBidThunk({ productId, userId, bidAmount: finalBidAmount }))
         .then(() => {
           socketService.emitCreateBidding(productId, { userId, bidAmount: finalBidAmount });
@@ -103,6 +102,7 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
     } else {
       toast.error(`Giá thầu phải lớn hơn hoặc bằng ${currencyFormatter.format(minBid, { code: "VND", symbol: "" })}
         và không vượt quá ${currencyFormatter.format(maxAllowedBid, { code: "VND", symbol: "" })}.`);
+
     }
   };
 
@@ -148,13 +148,13 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
   ].map((item, index) => (
     <div key={index} className="flex flex-col items-center w-1/3">
       <label className="text-sm text-gray-500 dark:text-gray-300 mb-1">{item.label}</label>
-      <button
-        type="button"
+      <span
+    
         className="w-full py-3 px-6 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-900"
         onClick={() => handleBidClick(item.value)}
       >
         {currencyFormatter.format(item.value ?? 0, { code: "VND", symbol: "" })} 
-      </button>
+      </span>
     </div>
   ))}
 </div>
@@ -176,7 +176,7 @@ const Modal: React.FC<{ productId: string }> = ({ productId }) => {
                   className="w-1/3 py-3 px-6 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-900"
                   onClick={() => handleSubmit()}
                 >
-                  Xem thầu
+                  Đặt thầu
                 </button>
               </div>
               {bidStatus === 'loading' && <p>Loading...</p>}

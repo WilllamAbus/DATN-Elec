@@ -10,7 +10,7 @@ const productAuctionSchema = new Schema({
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
-  auctionPricing: { type: Schema.Types.ObjectId, ref: 'auctionPricingRange' }, 
+  auctionPricing: { type: Schema.Types.ObjectId, ref: 'auctionPricingRange', required: true }, 
   product_view: { type: Number, default: 0 },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },

@@ -16,7 +16,7 @@ const pricRangeBidService = {
         status: { $ne: "disable" },
       })
   
-      console.log('product', product);
+
       
       if (!product) {
         throw new Error("Sản phẩm không tồn tại hoặc đã bị vô hiệu hóa.");

@@ -8,7 +8,8 @@ const biddingSchema = Schema(
         }, // Sản phẩm duy nhất đang được đấu giá
      
         bidder: { type: Schema.Types.ObjectId, ref: 'users', required: true }, // Người dùng thực hiện đấu giá
-        bidAmount: { type: Number, required: true }, // Số tiền đấu giá
+        bidAmount: { type: Number, required: true },
+        
         bidTime: { type: Date },
         bidEndTime: {  type: Schema.Types.ObjectId, ref: 'timetrack', required: true  }, // Thời gian kết thúc đấu giá // Thời gian thực hiện đấu giá
         biddingQuantity: { type: Number, default: 1 },
