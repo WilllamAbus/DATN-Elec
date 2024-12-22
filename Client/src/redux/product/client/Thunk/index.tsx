@@ -12,3 +12,4 @@ export * from "./getAllProductVariantsByVariantPrice";
 export * from "./getPhoneByVariants";
 export * from "./getLaptopByVariants";
 export * from "./getAccessoryByVariants";
+export * from "./getdetailAuction";

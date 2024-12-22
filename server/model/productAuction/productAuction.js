@@ -10,18 +10,13 @@ const productAuctionSchema = new Schema({
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
-  auctionPricing: { type: Schema.Types.ObjectId, ref: 'auctionPricingRange' }, 
-  product_view: { type: Number, default: 0 },
+  auctionPricing: { type: Schema.Types.ObjectId, ref: 'AuctionPricingRange' }, 
+  viewCount: { type: Number, default: 0 },
+  lastViewed: { type: Date, default: Date.now },
   weight_g: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
   status: { type: String, default: 'active' },
   disabledAt: { type: Date, default: null },
-  comments: [{
-    user: { type: Schema.Types.ObjectId, ref: 'users' },
-    content: { type: String, required: true },
-    rating: { type: Number, min: 1, max: 5, required: true },
-    createdAt: { type: Date, default: Date.now }
-  }],
 
 }, {
   collection: "productAuction",

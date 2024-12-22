@@ -17,8 +17,7 @@
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
           className="backdrop-blur-sm bg-white/30">
-
-          <Link to={`/detailAuc/${product._id}`}>
+          <Link to={`/product-auction/${product.slug}`}>
             <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer ">
               <img
                 className="absolute inset-0 w-full h-full object-contain rounded-lg p-8 "

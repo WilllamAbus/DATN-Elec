@@ -39,11 +39,12 @@ const UserListPage = React.lazy(
 const UserAuction = React.lazy(
   () => import("../page/User/shopping/gallery/auction")
 );
-const UserdetailsProd = React.lazy(
-  () => import("../page/User/shopping/details/detail")
-);
+
 const UserPageDetail = React.lazy(
-  () => import("../page/User/shopping/detailV2/detail")
+  () => import("../page/User/detailV2/detail")
+);
+const UserPageDetailAuction = React.lazy(
+  () => import("../page/User/detailAuction/detailAuction")
 );
 const UserdetailsAuc = React.lazy(
   () => import("../page/User/shopping/auction/auctionDetails")
@@ -120,7 +121,7 @@ const UserRoutes: RouteObject[] = [
       { path: "category/:slug", element: <UserListPage /> },
       { path: "auction", element: <UserAuction /> },
       { path: "product/:slug", element: <UserPageDetail /> },
-      { path: "detailProd/:id", element: <UserdetailsProd /> },
+      { path: "product-auction/:slug", element: <UserPageDetailAuction /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },
       { path: "search/:keyword", element: <UserSearch /> },

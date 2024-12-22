@@ -41,6 +41,7 @@ export interface products {
   weight_g: number;
   image: string[];
   status: string;
+  slug: string;
 }
 
 export interface Pagination {

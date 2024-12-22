@@ -12,3 +12,4 @@ export { default as getAllProductVariantsByVariantPriceSlice } from "./getAllPro
 export { default as getPhoneByVariantsSlice } from "./getPhoneByVariants";
 export { default as getLaptopByVariantsSlice } from "./getLaptopByVariants";
 export { default as getAccessoryByVariantsSlice } from "./getAccessoryByVariants";
+export { default as getProductDetailAuctionSlice } from "./getdetailAuction";
