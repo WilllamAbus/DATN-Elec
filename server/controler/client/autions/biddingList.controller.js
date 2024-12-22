@@ -1,5 +1,5 @@
 const BiddingModel = require("../../../model/autions/biddingList.model.js");
-const AuctionModel = require("../../../model/autions/autions.model.js");
+const AuctionPricingRangeModel  = require("../../../model/productAuction/auctionPricingRange.js");
 
 const BiddingListController = {
   // Đặt giá - Khi người dùng nhấn nút "Đặt giá"
@@ -9,7 +9,7 @@ const BiddingListController = {
       const userId = req.user.id;
 
       // Kiểm tra xem người dùng có đang tham gia phiên đấu giá không
-      const auction = await AuctionModel.findById(auctionPricingRangeId);
+      const auction = await AuctionPricingRangeModel.findById(auctionPricingRangeId);
       if (!auction || auction.status !== 'active') {
         return res.status(400).json({ message: "Phiên đấu giá không hợp lệ hoặc đã kết thúc." });
       }
@@ -43,6 +43,34 @@ const BiddingListController = {
 
       return res.status(200).json({ message: "Đặt giá thành công!", bid: newBid });
 
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Lỗi hệ thống" });
+    }
+  },
+
+  getBiddingList: async (req, res) => {
+    try {
+      const { auctionPricingRangeId } = req.params;
+
+      // Kiểm tra xem phiên đấu giá có tồn tại không
+      const auction = await AuctionPricingRangeModel.findById(auctionPricingRangeId);
+      if (!auction) {
+        return res.status(404).json({ message: "Phiên đấu giá không tồn tại." });
+      }
+
+      // Lấy danh sách người đặt giá, sắp xếp giảm dần theo giá thầu
+      const biddingList = await BiddingModel.find({ auctionPricingRangeId })
+        .sort({ bidPrice: -1 }) // Sắp xếp giá thầu từ cao đến thấp
+        .populate("userId", "username email") // Thay "username email" bằng các trường bạn muốn hiển thị từ User
+        .exec();
+
+      if (!biddingList.length) {
+        return res.status(200).json({ message: "Chưa có người tham gia đấu giá.", data: [] });
+      }
+
+      // Trả về danh sách
+      return res.status(200).json({ message: "Danh sách người tham gia đấu giá.", data: biddingList });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Lỗi hệ thống" });
