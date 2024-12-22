@@ -48,6 +48,8 @@ import listBidReducer from "./listBiddings/listBidSlice";
 import mailSoftDelOrderUserReducer from "./statusOrderUser/MailSoftOrder/mailSoftOrderSlicce";
 import BankReducer from "./auth/bank/bankSlice";
 import listBidActiveReducer from "./listBidActive/listBidActivveSlice";
+import listRandAuctReducer from "./adminPriceRandAuc/listPriceRandAuct/listPriceRandSlice";
+import listRandAuctDeletedReducer from "./adminPriceRandAuc/deletedPriceRandAuct/dletedPriceRandAuctSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -105,6 +107,8 @@ const rootReducer = combineReducers({
   mailSoftDelOrderUser: mailSoftDelOrderUserReducer,
   Bank: BankReducer,
   listBidActive: listBidActiveReducer,
+  listRandAuct: listRandAuctReducer,
+  deletedPriceRand: listRandAuctDeletedReducer
   // Add other reducers here to combine them with the persisted state.
 });
 

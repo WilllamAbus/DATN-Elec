@@ -22,4 +22,3 @@ const auctionPricingRangeSchema = new Schema(
 );
 
 module.exports = model("AuctionPricingRange", auctionPricingRangeSchema);
-

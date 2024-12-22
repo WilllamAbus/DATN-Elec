@@ -2,7 +2,87 @@
 
 const autionService = require('../../../services/orders/auctions/auction.service')
 const SocketService = require('../../../services/serviceSocket');
+const Cart = require('../../../model/orders/cart.model');
 const auctionControlller = {
+   selectCart: async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { selectAll, items } = req.body;
+  
+        const cartId = req.params.id;
+  
+        if (selectAll !== undefined) {
+          // Nếu selectAll được gửi, xử lý chọn hoặc bỏ chọn tất cả
+          const cart = await Cart.findOne({ user: userId }).populate({
+            path: "items.auctions",
+            select: "_id",
+          });
+          
+          console.log('cart', cart);
+          
+          if (!cart) {
+            return res.status(404).json({ message: "Không tìm thấy giỏ hàng" });
+          }
+  
+          // Cập nhật trạng thái isSelected của tất cả các sản phẩm trong giỏ hàng
+          cart.items.forEach((item) => {
+            item.isSelected = selectAll;
+          });
+  
+          // Cập nhật tổng giá trị
+          cart.totalPrice = cart.items.reduce((total, item) => {
+            return item.isSelected ? total + item.totalItemPrice : total;
+          }, 0);
+  
+          await cart.save();
+  
+          return res.status(200).json({
+            message: "Cập nhật trạng thái sản phẩm thành công",
+            allItems: cart.items,
+            totalPayment: cart.totalPrice,
+          });
+        }
+  
+        // Nếu items được gửi, xử lý chọn từng sản phẩm
+        if (items && items.length > 0) {
+          const cart = await Cart.findOne({ user: userId }).populate({
+            path: "items.auctions",
+            select: "_id",
+          });
+  
+          if (!cart) {
+            return res.status(404).json({ message: "Không tìm thấy giỏ hàng" });
+          }
+  
+          items.forEach((item) => {
+            const cartItem = cart.items.find(
+              (cartItem) =>
+                cartItem.auctions._id.toString() === item.productId 
+            );
+  
+            if (cartItem) {
+              cartItem.isSelected = !cartItem.isSelected;
+              cart.totalPrice = cart.items.reduce((total, item) => {
+                return item.isSelected ? total + item.totalItemPrice : total;
+              }, 0);
+            }
+          });
+  
+          await cart.save();
+  
+          return res.status(200).json({
+            message: "Cập nhật trạng thái sản phẩm thành công",
+            allItems: cart.items,
+            totalPayment: cart.totalPrice,
+          });
+        }
+  
+        return res.status(400).json({ message: "Dữ liệu không hợp lệ" });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+      }
+    },
   completeAuctionController : async (req, res) => {
   
   
@@ -58,6 +138,27 @@ getAllAuctions: async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+},
+getAuctionDetailsV2: async (req, res) => {
+ 
+
+  try {
+    const { userId , productId} = req.query;
+  
+
+    
+
+    const details = await autionService.getAuctionDetailsV2( userId, productId);
+
+    
+    res.status(200).json({
+      success:true,
+        status: 201,
+        data:details
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 },
 getAuctionDetails: async (req, res) => {

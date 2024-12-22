@@ -47,7 +47,7 @@ export default function ListPhone() {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(1).svg?alt=media&token=4479fba6-7e2a-431f-b203-c4e7952f02b7"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2Fdienthoai.svg?alt=media&token=0115fc9c-e628-4a41-88e7-4f8646f2fbc4"
               alt="Icon"
               className="w-10 h-10"
             />

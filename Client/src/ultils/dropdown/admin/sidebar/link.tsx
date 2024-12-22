@@ -40,8 +40,8 @@ export const links: Record<string, Link[]> = {
     { label: "Đơn hàng", to: "/admin/recycleBinOrder" },
 
     { label: "Tương tác", to: "/admin/recycleBinComment" },
-    { label: "Khoảng định giá", to: "/admin/recycleBinPriceRand" },
-    { label: "Đấu giá sản phẩm", to: "/admin/recycleBinProducTime" },
+    { label: "Khoảng định giá", to: "/admin/listPriceRandAuctRecy" },
+    // { label: "Đấu giá sản phẩm", to: "/admin/recycleBinProducTime" },
   ],
   categories: [
     { label: "Danh mục sản phẩm", to: "/admin/listCategories" },
@@ -56,8 +56,8 @@ export const links: Record<string, Link[]> = {
   ],
   auctions:[
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
-    { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
-    { label: "Khoảng định giá", to: "/admin/listPriceRand" },
+    // { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
+    { label: "Khoảng định giá", to: "/admin/listPriceRandAuct" },
     { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" },
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
  

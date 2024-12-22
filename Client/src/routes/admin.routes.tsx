@@ -267,6 +267,21 @@ const AdminDetailOrderAuction = React.lazy(
 const AdminDetailOrderAuctionFrCash = React.lazy(
   () => import("../page/Admin/orderAuction/detailOrderCash")
 );
+
+
+const AdminAucPriceRandList = React.lazy(
+  () => import("../page/Admin/priceRandAuc/listPriceRanAuct")
+);
+const AdminAucPriceRandAdd = React.lazy(
+  () => import("../page/Admin/priceRandAuc/addPriceRandAuc")
+);
+const AdminAucPriceRandEdit = React.lazy(
+  () => import("../page/Admin/priceRandAuc/editPriceRandAuct")
+);
+
+const AdminAucPriceRandRecy = React.lazy(
+  () => import("../page/Admin/priceRandAuc/listRecyPriceRandAuct")
+);
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -359,6 +374,11 @@ const AdminRoutes: RouteObject[] = [
       { path: "detailOrderAuction/:id", element: <AdminDetailOrderAuction /> },
       { path: "detailOrderAuctionFrCash/:id", element: <AdminDetailOrderAuctionFrCash /> },
       { path: "recBinOrderAuction", element: <AdminListRecybinOrderAuction /> },
+
+      { path: "listPriceRandAuct", element: <AdminAucPriceRandList /> },
+      { path: "addPriceRandAuct", element: <AdminAucPriceRandAdd /> },
+      { path: "editPriceRandAuct", element: <AdminAucPriceRandEdit /> },
+      { path: "listPriceRandAuctRecy", element: < AdminAucPriceRandRecy/> },
       { path: "*", element: <Dashboard /> },
     ],
   },
