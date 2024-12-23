@@ -10,7 +10,7 @@ interface BreadcrumbProps {
 
 const ReusableBreadcrumb: React.FC<BreadcrumbProps> = ({ paths }) => {
   return (
-    <Breadcrumbs variant="solid" className="mt-3 flex flex-wrap gap-4">
+    <Breadcrumbs variant="light" className="flex flex-wrap gap-4 m-4">
       {paths.map((path, index) => (
         <BreadcrumbItem key={index}>
           {path.link ? (
