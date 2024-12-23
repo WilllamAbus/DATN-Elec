@@ -1,60 +1,36 @@
-const AuctionPriceHistory = require("../../../model/productAuction/auctionPriceHistory");
-const AuctionPricingRange = require("../../../model/productAuction/auctionPricingRange");
-const ProductAuction = require("../../../model/productAuction/productAuction");
-/**
- * Lấy danh sách người tham gia đấu giá và lọc theo giá từ cao đến thấp
- */
+const BiddingService = require('../../../services/detailAuction/getBiddingListSV');
+
 const getBiddingList = async (req, res) => {
   const { slug } = req.params; // Lấy slug từ URL
+  const { page = 1, limit = 5 } = req.query; // Lấy page và limit từ query, có giá trị mặc định
 
   try {
-    // Tìm sản phẩm dựa trên slug
-    const product = await ProductAuction.findOne({ slug })
-      .populate("auctionPricing") // Lấy thông tin phiên đấu giá liên quan
-      .exec();
+    const response = await BiddingService.getBiddingListService(slug, +page, +limit);
 
-    if (!product || !product.auctionPricing) {
-      return res.status(404).json({
+    if (response.err) {
+      return res.status(response.status).json({
         success: false,
-        msg: "Không tìm thấy phiên đấu giá tương ứng với slug.",
+        err: response.err,
+        msg: response.msg || 'Lỗi khi lấy danh sách đấu giá.',
+        status: response.status,
       });
     }
 
-    const auctionPricing = product.auctionPricing;
-
-    // Kiểm tra trạng thái của phiên đấu giá
-    if (auctionPricing.status !== "active") {
-      return res.status(400).json({
-        success: false,
-        msg: "Phiên đấu giá không hoạt động.",
-      });
-    }
-
-    // Tìm lịch sử đấu giá liên quan đến phiên đấu giá
-    const biddingList = await AuctionPriceHistory.find({
-      auctionPricingRange: auctionPricing._id,
-    })
-      .populate("user", "name") // Populate thông tin người tham gia
-      .sort({ bidPrice: -1 }) // Sắp xếp theo giá từ cao xuống thấp
-      .select("user bidPrice bidTime"); // Lấy các trường cần thiết
-
-    return res.status(200).json({
+    return res.status(response.status).json({
       success: true,
-      msg: "Lấy danh sách đấu giá thành công.",
-      data: {
-        productDetails: {
-          id: product._id,
-          productName: product.product_name,
-          slug: slug,
-        },
-        biddingList: biddingList,
-      },
+      err: 0,
+      msg: response.msg || 'OK',
+      status: response.status,
+      data: response.response,
     });
   } catch (error) {
-    console.error("Lỗi khi lấy danh sách đấu giá:", error);
+    console.error("Error:", error);
+
     return res.status(500).json({
       success: false,
-      msg: "Đã xảy ra lỗi khi lấy danh sách đấu giá.",
+      err: -1,
+      msg: "Lỗi: " + error.message,
+      status: 500,
     });
   }
 };

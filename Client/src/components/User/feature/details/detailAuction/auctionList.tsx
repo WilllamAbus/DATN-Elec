@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -8,43 +8,47 @@ import {
   TableCell,
   Pagination,
   Spinner,
-
   Avatar,
   Card,
   CardHeader,
-  CardBody
+  CardBody,
 } from "@nextui-org/react";
-import useSWR from "swr";
 import { MyButton } from "src/common/customs/MyButton";
-
-// Fix for rest parameter 'args' implicitly has an 'any[]' type.
-const fetcher = (...args: [RequestInfo | URL, RequestInit?]) =>
-  fetch(...args).then((res) => res.json());
-
-interface Person {
-  name: string;
-  height: string;
-  mass: string;
-  birth_year: string;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../../redux/store";
+import { getBiddingListThunk } from "../../../../../redux/product/client/Thunk";
+import { useParams } from "react-router-dom";
 
 export default function AuctionList() {
-  const [page, setPage] = React.useState(1);
-  const { data, isLoading } = useSWR<{ count: number; results: Person[] }>(
-    `https://swapi.py4e.com/api/people?page=${page}`,
-    fetcher,
-    {
-      keepPreviousData: true,
-    }
+  const dispatch: AppDispatch = useDispatch();
+  const { slug } = useParams<{ slug: string }>();
+
+  // Local state for managing the current page
+  const [page, setPage] = useState(1);
+
+  // Fetching state from Redux
+  const biddingList = useSelector(
+    (state: RootState) => state.productClient.getBiddingList.biddingList
   );
 
-  const rowsPerPage = 3;
+  const isLoading = useSelector(
+    (state: RootState) => state.productClient.getBiddingList.isLoading
+  );
 
-  const pages = React.useMemo(() => {
-    return data?.count ? Math.ceil(data.count / rowsPerPage) : 0;
-  }, [data?.count, rowsPerPage]);
+  const currentPage = useSelector(
+    (state: RootState) =>
+      state.productClient.getBiddingList.pagination?.currentPage || 1
+  );
 
-  const loadingState = isLoading || data?.results.length === 0 ? "loading" : "idle";
+  const totalPages = useSelector(
+    (state: RootState) =>
+      state.productClient.getBiddingList.pagination?.totalPages || 1
+  );
+
+  // Fetch data on page load and page change
+  useEffect(() => {
+    dispatch(getBiddingListThunk({ slug, page }));
+  }, [dispatch, page]);
 
   return (
     <>
@@ -59,56 +63,54 @@ export default function AuctionList() {
             />
             <div className="flex flex-col gap-1 items-center justify-center">
               <h4 className="text-small font-bold leading-none text-default-600">
-                Diễn biến cuộc đấu giá
+                Diễn biến cuộc đấu giá
               </h4>
             </div>
           </div>
-          <MyButton radius="full" size="xl" variant="transparent">
-          </MyButton>
+          <MyButton radius="full" size="xl" variant="transparent" />
         </CardHeader>
         <CardBody className="px-1 py-1 text-small text-default-400">
-
           <Table
-            aria-label="Example table with client async pagination"
+            aria-label="Bidding List Table"
             bottomContent={
-              pages > 0 ? (
+              totalPages > 1 ? (
                 <div className="flex w-full justify-center">
                   <Pagination
                     isCompact
                     showControls
                     showShadow
                     color="primary"
-                    page={page}
-                    total={pages}
-                    onChange={(page) => setPage(page)}
+                    page={currentPage}
+                    total={totalPages}
+                    onChange={(newPage) => setPage(newPage)}
                   />
                 </div>
               ) : null
             }
           >
             <TableHeader>
-              <TableColumn key="name">Name</TableColumn>
-              <TableColumn key="height">Height</TableColumn>
-              <TableColumn key="mass">Mass</TableColumn>
-              <TableColumn key="birth_year">Birth year</TableColumn>
+              <TableColumn key="name">Tên</TableColumn>
+              <TableColumn key="bidPrice">Giá đặt</TableColumn>
+              <TableColumn key="bidTime">Thời gian đặt giá</TableColumn>
             </TableHeader>
             <TableBody
-              items={data?.results ?? []}
+              items={biddingList ?? []}
               loadingContent={<Spinner />}
-              loadingState={loadingState}
+              loadingState={isLoading ? "loading" : "idle"}
             >
               {(item) => (
-                <TableRow key={item.name}>
-                  {(columnKey) => <TableCell>{(item as any)[columnKey]}</TableCell>}
+                <TableRow key={item._id}>
+                  <TableCell>{item.user.name}</TableCell>
+                  <TableCell>{item.bidPrice.toLocaleString()} VND</TableCell>
+                  <TableCell>
+                    {new Date(item.bidTime).toLocaleString("vi-VN")}
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </CardBody>
       </Card>
-
-
     </>
-
   );
 }
