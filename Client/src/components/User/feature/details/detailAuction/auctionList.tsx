@@ -47,8 +47,10 @@ export default function AuctionList() {
 
   // Fetch data on page load and page change
   useEffect(() => {
-    dispatch(getBiddingListThunk({ slug, page }));
-  }, [dispatch, page]);
+    if (slug) {
+      dispatch(getBiddingListThunk({ slug, page }));
+    }
+  }, [dispatch, page, slug]);
 
   return (
     <>
