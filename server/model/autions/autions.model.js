@@ -8,7 +8,12 @@ const auctionSchema = new Schema(
     status: { type: String, enum: ['ongoing', 'completed', 'failed'], default: 'ongoing' },  // Trạng thái đấu giá
     paymentStatus: { type: String, enum: ['pending', 'paid', 'payment_failed'], default: 'pending' },  // Trạng thái thanh toán
     endTime: { type: Date, required: true },  // Thời gian kết thúc phiên đấu giá
-    paymentDeadline: { type: Date, required: true },  // Thời gian thanh toán hết hạn (sau khi đấu giá thành công)
+    paymentDeadline: { 
+      type: Date, 
+      default: function () { 
+        return new Date(this.endTime.getTime() + 24 * 60 * 60 * 1000); 
+      } 
+    },  // Thời gian thanh toán hết hạn (sau khi đấu giá thành công)
   },
   {
     collection: "Auctions",

@@ -5,7 +5,7 @@ const biddingController  = require("../../../controler/client/autions/biddingLis
 const middlewareController = require("../../../middleware/auth");
 
 router.post("/placeBid", middlewareController.verifyToken, biddingController.placeBid);
-
+router.get("bidding-list/:autionPricingRangeId")
 
 
 
