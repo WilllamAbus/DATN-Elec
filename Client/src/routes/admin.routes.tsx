@@ -377,8 +377,8 @@ const AdminRoutes: RouteObject[] = [
 
       { path: "listPriceRandAuct", element: <AdminAucPriceRandList /> },
       { path: "addPriceRandAuct", element: <AdminAucPriceRandAdd /> },
-      { path: "editPriceRandAuct", element: <AdminAucPriceRandEdit /> },
-      { path: "listPriceRandAuctRecy", element: < AdminAucPriceRandRecy/> },
+      { path: "editPriceRandAuct/:id", element: <AdminAucPriceRandEdit /> },
+      { path: "triggerAuct", element: < AdminAucPriceRandRecy/> },
       { path: "*", element: <Dashboard /> },
     ],
   },

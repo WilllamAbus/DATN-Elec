@@ -1,7 +1,7 @@
 import axios from '../axios';
 import { PriceRangeResponse } from '../../types/adminPriceRandAuct/listPriceRandAuct';
 import {PriceRangeResponseDeleted } from '../../types/adminPriceRandAuct/deletePriceRandAuct';
-
+import {EditPriceRandAuctData } from '../../types/adminPriceRandAuct/editPriceRandAuct';
 import {PriceRandData, PriceRandResponseAdd, InboundDataResponse, } from '../../types/adminPriceRandAuct/addPriceRandAuct';
 export const PriceRandService = {
   createPriceRand: async (product_randBib: string, data: PriceRandData) => {
@@ -76,6 +76,40 @@ export const PriceRandService = {
       throw new Error('Error fetching order data');
     }
   },
+
+  async editPriceRandAuctAdminService  (
+    id: string,
+    data: EditPriceRandAuctData
+  ) {
+    try {
+      const response = await axios.put<EditPriceRandAuctData>(`/client/auctions/putPriceRandAuc/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const updatedPriceRandAuct = response.data;
+ 
+      
+      return updatedPriceRandAuct;
+    } catch (error: any) {
+      console.error("Error in editTimeTrack service:", error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || "Failed to update TimeTrack");
+    }
+  },
+  async getPriceRandById(id: string) {
+    try {
+        const response = await axios.get(`/client/auctions/getIdPriceRandAuct/${id}`);
+  
+      
+        console.log('getPriceRand', response);
+        
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching TimeTrack data:', error);
+        return null;
+    }
+},
 };
 
 

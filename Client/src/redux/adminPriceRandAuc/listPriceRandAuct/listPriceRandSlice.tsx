@@ -1,12 +1,12 @@
 // src/redux/slices/timeTrackSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchPriceRand , softDelPriceRandAdminThunk} from './listPriceRandAuctThunk';
-import {PriceRange, PriceRangeAuctSoftDel  } from '../../../types/adminPriceRandAuct/listPriceRandAuct';
+import { fetchPriceRand  } from './listPriceRandAuctThunk';
+import {PriceRange,   } from '../../../types/adminPriceRandAuct/listPriceRandAuct';
 
 interface PriceRandState {
   listPriceRandAuct: PriceRange[];
-  softDelPriceRandAuct: PriceRangeAuctSoftDel[];
-  delPriceRand: PriceRangeAuctSoftDel|null
+//   softDelPriceRandAuct: PriceRangeAuctSoftDel[];
+//   delPriceRand: PriceRangeAuctSoftDel|null
   totalPages: number;
   currentPage: number;
 
@@ -17,8 +17,8 @@ interface PriceRandState {
 
 const initialState: PriceRandState = {
     listPriceRandAuct: [],
-    softDelPriceRandAuct:[],
-    delPriceRand: null,
+    // softDelPriceRandAuct:[],
+    // delPriceRand: null,
   totalPages: 1,
   currentPage: 1,
 
@@ -45,37 +45,6 @@ const priceRadnListAuctSlice = createSlice({
     
       })
       .addCase(fetchPriceRand.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      .addCase(softDelPriceRandAdminThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.successMessage = null;
-      })
-      .addCase(softDelPriceRandAdminThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        
-        state.delPriceRand = action.payload;
-      
-         // Thay đ��i kiểu đúng,
-        // Kiểm tra softDelorder trước khi gọi filter
-        // state.shippingStatus = state.shippingStatus.filter((order) => order._id !== action.payload._id);
-    
-        if (Array.isArray(state.listPriceRandAuct)) {
-          state.softDelPriceRandAuct = [];
-          // Remove the deleted time track from the timeTracks state
-          state.listPriceRandAuct = state.listPriceRandAuct.filter(
-            (rand) => rand._id !== action.payload._id // Filter out the deleted item
-          );
-        }
-       
-      state.softDelPriceRandAuct.push(action.payload);
-      state.successMessage = "Xóa đơn hàng thành công";
-        // state.successMessage = "Xóa đơn hàng thành công";
-      })
-      .addCase(softDelPriceRandAdminThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

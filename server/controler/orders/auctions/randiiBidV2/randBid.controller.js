@@ -129,6 +129,8 @@ const randBinController = {
         maxPrice,
         priceStep,
         product_randBib,
+        currentPrice: startingPrice,
+        status: 'disable'
       });
 
       // Save auction pricing range to the database
@@ -282,6 +284,8 @@ const randBinController = {
         priceStep,
         startingPrice,
       } = req.body;
+ 
+      
       const thousandPlace = Math.floor(parseFloat(maxPrice) / 1000) % 2;
       const lastThreeDigits = parseInt(maxPrice) % 1000;
       const thousanPriceStep = Math.floor(parseFloat(priceStep) / 1000) % 2;
@@ -313,11 +317,11 @@ const randBinController = {
           .json({ msg: "Sản phẩm đã tồn tại hoặc đã vô hiệu hóa" });
       }
 
-      if (productExists.auctionPricing) {
-        return res.status(400).json({
-          msg: "Sản phẩm này đã có khoảng giá đấu giá, không thể thêm mới",
-        });
-      }
+    //   if (productExists.auctionPricing) {
+    //     return res.status(400).json({
+    //       msg: "Sản phẩm này đã có khoảng giá đấu giá, không thể thêm mới",
+    //     });
+    //   }
 
       // Fetch `inBoundPrice` for the product
       const inboundPriceStep = await inBound.findOne({
@@ -396,18 +400,25 @@ const randBinController = {
       const endTimeLocal = convertToLocalTime(endTime);
 
       // Cập nhật document
-      const updatedAuction = await AuctionPricingRange.findByIdAndUpdate(
-        id,
+      const updatedAuction = await AuctionPricingRange.findOneAndUpdate(
+        { _id: id },
         {
-          maxPrice,
-          startTime: startTimeLocal,
-          endTime: endTimeLocal,
-          product_randBib,
-          startingPrice,
-          priceStep,
+          $set: {
+            _id: id,
+            maxPrice: maxPrice,
+            startTime: startTimeLocal,
+            endTime: endTimeLocal,
+            product_randBib: product_randBib,
+            startingPrice: startingPrice,
+            priceStep: priceStep,
+            currentPrice: startingPrice,
+            status: 'disable',
+          },
         },
-        { new: true, runValidators: true }
+        { new: true}
       );
+  
+      
 
       // Kiểm tra nếu không tìm thấy document cần cập nhật
       if (!updatedAuction) {
@@ -427,7 +438,47 @@ const randBinController = {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+  getByIdPriceRanAuct: async(req, res) =>{
+    try {
+        const { id } = req.params;
+    
+        // Find AuctionPricerand by ID
+        const auctionPricerand = await AuctionPricingRange.findOne({_id:id}).populate({
+            path: 'product_randBib',
+               });
+      ;
+    
+        
+    
+        if (!auctionPricerand) {
+          return res.status(404).json({ message: 'AuctionPricerand not found' });
+        }
+    
+        // Extract related data
 
+        const productAuctId = auctionPricerand.product_randBib._id;
+        const inBoundary = await inBound.findOne({productAuction:productAuctId}).lean()
+        const starTimeTrach = convertToLocalTime(auctionPricerand.startTime)
+        const endTimeTrach = convertToLocalTime(auctionPricerand.endTime)
+        const group = {
+            auctionPricerand: auctionPricerand,
+            auctTionStartTime: starTimeTrach,
+            auctionEndTime: endTimeTrach,
+            inboundPrice: inBoundary.inbound_price,
+        }
+        return res.status(200).json({
+            message: "Khoảng giá được cập nhật thành công",
+            status: "200",
+            data: group,
+          });
+
+        // Respond with data
+     
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error });
+      }
+  }, 
   restorePriceRangeBid: async (req, res) => {
     try {
       const { id } = req.params;
@@ -511,13 +562,17 @@ const randBinController = {
   softDeletePriceRangeBid: async (req, res) => {
     try {
       const { id } = req.params;
-
+      const updatedAuction = await AuctionPricingRange.findByIdAndUpdate(
+        id,
+        { status: "deleted" },
+        { new: true }
+      );
       const serchProductRand = await AuctionPricingRange.findOne({
         _id: id,
       }).lean();
 
       const productRand = serchProductRand.product_randBib;
-
+ 
       // Cập nhật trạng thái của sản phẩm thành 'disable'
       const updatedProduct = await ProductAuction.findByIdAndUpdate(
         productRand,
@@ -531,18 +586,10 @@ const randBinController = {
         });
       }
       // Tìm kiếm và cập nhật `status` thành `deleted`
-      const updatedAuction = await AuctionPricingRange.findByIdAndUpdate(
-        id,
-        { status: "disable" },
-        { new: true }
-      );
+  
 
       // Kiểm tra nếu không tìm thấy document cần xóa mềm
-      if (!updatedAuction) {
-        return res.status(404).json({
-          error: "Không tìm thấy khoảng định giá",
-        });
-      }
+   
 
       // Trả về kết quả thành công
       return res.status(200).json({
