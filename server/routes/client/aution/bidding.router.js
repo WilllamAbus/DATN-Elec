@@ -5,8 +5,8 @@ const biddingController  = require("../../../controler/client/autions/biddingLis
 const middlewareController = require("../../../middleware/auth");
 
 router.post("/placeBid", middlewareController.verifyToken, biddingController.placeBid);
-router.get("bidding-list/:autionPricingRangeId")
-
+router.get("/bidding-list/:auctionPricingRangeId", biddingController.getBiddingList);
+router.post("/handle-payment-result", middlewareController.verifyToken, biddingController.handlePaymentResult);
 
 
 module.exports = router;
