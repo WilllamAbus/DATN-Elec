@@ -13,3 +13,4 @@ export { default as getPhoneByVariantsSlice } from "./getPhoneByVariants";
 export { default as getLaptopByVariantsSlice } from "./getLaptopByVariants";
 export { default as getAccessoryByVariantsSlice } from "./getAccessoryByVariants";
 export { default as getProductDetailAuctionSlice } from "./getdetailAuction";
+export { default as createOneUpdateBidAuctionSlice } from "./createOneUpdateBidAuction";

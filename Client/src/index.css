@@ -179,7 +179,9 @@ body {
 .fc .fc-daygrid-day-frame {
   @apply hover:bg-gray-50 cursor-pointer !important;
 }
-
+.my-custom-form [type='number'] {
+  border-width: 0 !important;
+}
 
 @layer components {
   .btn-primary {

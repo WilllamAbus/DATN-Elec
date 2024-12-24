@@ -22,16 +22,13 @@ const ProductDetailService = {
         };
       }
 
-
-        
-        
         const now = new Date();
         const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); 
         
         if (userId) {
           const viewHistoryEntry = await ViewHistory.findOne({
             user: userId,
-            productAuction: productAuction._id, // Thay matchedVariant bằng productAuction
+            productAuction: productAuction._id, 
           });
   
           if (!viewHistoryEntry || viewHistoryEntry.lastViewed < tenMinutesAgo) {
@@ -42,7 +39,7 @@ const ProductDetailService = {
             } else {
               await ViewHistory.create({
                 user: userId,
-                productAuction: productAuction._id, // Thay matchedVariant bằng productAuction
+                productAuction: productAuction._id,
                 viewCount: 1,
                 lastViewed: now,
               });
@@ -52,7 +49,7 @@ const ProductDetailService = {
             });
           }
         } else {
-          const productAuctionEntry = await ProductAuction.findById(productAuction._id); // Thay matchedVariant bằng productAuction
+          const productAuctionEntry = await ProductAuction.findById(productAuction._id);
           if (!productAuctionEntry.lastViewed || productAuctionEntry.lastViewed < tenMinutesAgo) {
             await ProductAuction.findByIdAndUpdate(productAuction._id, {
               $inc: { viewCount: 1 },

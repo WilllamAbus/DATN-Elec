@@ -13,35 +13,25 @@ const http = require("http");
 // const redisClient = require("./services/redis.js");
 const socketIo = require("socket.io");
 const SocketServices = require("./services/serviceSocket");
+const monitorChangeStream = require("./services/changeStream.js");
 const cron = require("node-cron");
 const { checkInventoryAndNotify } = require("./services/inventoryChecker");
 require("./controler/cronJob.js");
-
-// Connect to database
+const { initializeSocket } = require('./services/skserver/socketServer.js');
 connectDb();
 
 // Setup view engine
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
-// Middleware
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-//Redis
-// app.get("/", async (req, res) => {
-//   await redisClient.set("key", "Hello Redis");
-//   const value = await redisClient.get("key");
-//   res.send(`Redis value: ${value}`);
-// });
 
-// Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve HTML file from socket.io folder
 
-// CORS setup
 app.use(
   cors({
     origin: process.env.URL_FE,
@@ -57,30 +47,24 @@ app.use(
   })
 );
 
-// Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: ["http://localhost:4000", "http://localhost:3150"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    maxAgeSeconds: 3600,
-  },
-});
+const io = initializeSocket(server);
 
-global.__basedir = __dirname;
-global._io = io;
-SocketServices.setSocketIO(io);
-
-// Handle socket connections
 io.on("connection", (socket) => {
-  SocketServices.connection(socket); // Use SocketServices to handle connections
+  const ip = socket.handshake.address;
+  console.log(`New user connected: ${socket.id}, IP: ${ip}`);
 });
 
+connectDb()
+  .then(() => {
+    monitorChangeStream(); 
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+  });
 // Set up routes
 app.use("/api", apiGeneral);
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "soket.io", "socket.html"));
-});
+
 routes(app);
 
 // Error handler

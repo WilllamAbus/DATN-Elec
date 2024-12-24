@@ -1,0 +1,49 @@
+const { Schema, model } = require("mongoose");
+
+const auctionWinnerSchema = new Schema(
+  {
+    auctionPricingRange: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'AuctionPricingRange',
+      required: true 
+    },
+    auctionRound: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'AuctionRound', 
+      required: true 
+    },
+    user: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'users', 
+      required: true 
+    },
+    bidPrice: { 
+      type: Number, 
+      required: true 
+    },
+    paymentStatus: { 
+      type: String, 
+      enum: ['pending', 'paid', 'failed'], 
+      default: 'pending' 
+    },
+    auctionStatus: { 
+      type: String, 
+      enum: ['won', 'pending','canceled'], 
+      default: 'won' 
+    },
+    createdAt: { 
+      type: Date, 
+      default: Date.now 
+    },
+    updatedAt: { 
+      type: Date, 
+      default: Date.now 
+    },
+  },
+  {
+    collection: "auctionWinner", 
+    timestamps: true,
+  }
+);
+
+module.exports = model("AuctionWinner", auctionWinnerSchema);

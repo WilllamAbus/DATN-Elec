@@ -1,61 +1,49 @@
+const ProductAuction = require('../model/productAuction/productAuction');
+
 class SocketService {
+  setSocketIO(io) {
+    global._io = io;
+  }
 
-     // Để lưu trữ đối tượng io toàn cục
-     setSocketIO(io) {
-        global._io = io;
-    }
-    // connection socket
-    connection(socket) {
-        console.log(`New user connected: ${socket.id}`);
-        socket.on('disconnect', () => {
-            console.log(`User disconnect id is ${socket.id}`);
+  connection(socket) {
+    console.log(`New user connected: ${socket.id}`);
+
+    // Sự kiện đấu giá
+    socket.on('bid-auction', async (data) => {
+      const { slug, bidPrice, userId } = data;
+
+      try {
+        // Xử lý logic đấu giá
+        const productAuction = await ProductAuction.findOne({ slug }).populate('auctionPricing');
+        if (!productAuction) {
+          return socket.emit('bid-error', { msg: 'Sản phẩm đấu giá không tồn tại' });
+        }
+
+        const auctionPricingRange = productAuction.auctionPricing;
+        if (bidPrice <= auctionPricingRange.currentPrice) {
+          return socket.emit('bid-error', { msg: 'Giá đặt phải lớn hơn giá hiện tại' });
+        }
+
+        // Cập nhật giá hiện tại và thông báo cho các client khác
+        auctionPricingRange.currentPrice = bidPrice;
+        await auctionPricingRange.save();
+
+        // Phát sự kiện cập nhật đấu giá tới tất cả client
+        global._io.emit('bid-update', {
+          slug,
+          currentPrice: auctionPricingRange.currentPrice,
         });
 
-        // event on here
-        socket.on('chat message', msg => {
-            console.log(`msg is:::${msg}`);
-          _io.emit('chat message', msg); 
+      } catch (error) {
+        console.error(error);
+        socket.emit('bid-error', { msg: 'Lỗi xử lý đấu giá' });
+      }
+    });
 
-        });
-
-        // on room...
-    }
-    emitAuctionComplete(productId, auctionData, timeTrackID) {
-        global._io.emit('auctionComplete', {
-            productId,
-            auction: auctionData,
-            timeTrackID
-        });
-    }
-
-    emitCreateBidding(productId, bidData) {
-        global._io.emit('createBidding', {
-            productId,
-            bid: bidData
-        });
-    }
-    emitUpdateAmountBidding(productId, bidData) {
-        global._io.emit('update-bid', {
-            productId,
-            bid: bidData
-        });
-    }
-    emitNotification(notificationData) {
-        global._io.emit('notification', notificationData);
-    }
-
-      // Phát sự kiện cảnh báo tồn kho thấp
-      emitInventory(productId, productName, quantityStock) {
-        global._io.emit('inventoryWarning', {
-            productId,
-            productName,
-            quantityStock,
-            message: `Sản phẩm ${productName} có số lượng tồn kho thấp: ${quantityStock}.`
-        });
-    }
-
-    
+    socket.on('disconnect', (reason) => {
+      console.log(`User disconnected: ${socket.id}. Reason: ${reason}`);
+    });
+  }
 }
 
-// Make sure to export the correct class name
 module.exports = new SocketService();
