@@ -10,11 +10,16 @@ const cartItemSchema = new Schema({
   isSelected: { type: Boolean, default: false },
   inventory: { type: Schema.Types.ObjectId, ref: "Inventory" },
 });
+const cartItemAuctionSchema = new Schema({
+  auctionWiner: { type: Schema.Types.ObjectId, ref: "AuctionWinner", required: true },
+  auctionStartTime: { type: Date, default: null },
+  auctionEndTime: { type: Date, default: null },
+});
 
 const cartSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
-    items: [cartItemSchema],
+    items: [cartItemSchema, cartItemAuctionSchema],
 
     totalPrice: { type: Number, required: true },
     stateNotifi: { type: String, default: "has" },
