@@ -6,10 +6,6 @@ module.exports = async (auctionPricingRange, auctionRound) => {
     auctionPricingRange: auctionPricingRange._id,
   }).sort({ bidPrice: -1 }).limit(3);
 
-  const allBidders = await AuctionPriceHistory.find({
-    auctionPricingRange: auctionPricingRange._id,
-  }).sort({ bidPrice: -1 });
-
   for (let i = 0; i < winners.length; i++) {
     const winner = winners[i];
     const auctionWinner = new AuctionWinner({
@@ -22,6 +18,4 @@ module.exports = async (auctionPricingRange, auctionRound) => {
     });
     await auctionWinner.save();
   }
-
-  return allBidders.filter(bidder => !winners.some(winner => winner.user.equals(bidder.user)));
 };
