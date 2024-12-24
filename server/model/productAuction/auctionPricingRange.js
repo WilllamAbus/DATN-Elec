@@ -8,7 +8,7 @@
       maxPrice: { type: Number, required: true },      
       currentPrice: { type: Number},  
       priceStep: { type: Number, required: true }, 
-      status: { type: String, enum: ['active', 'ended'], default: 'active' }, 
+      status: { type: String, default: 'active' },   /**'active','ended','deleted' */
       product_randBib:{ type: Schema.Types.ObjectId, ref: 'productAuction' },
       auctionPriceHistory:{ type: Schema.Types.ObjectId, ref: 'AuctionPriceHistory' },
     },
