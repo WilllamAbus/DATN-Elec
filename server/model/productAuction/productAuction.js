@@ -6,6 +6,7 @@ const productAuctionSchema = new Schema({
   image: { type: [String], required: true },
   product_description: { type: String, required: true },
   slug: { type: String, unique: true }, 
+  product_price: { type: Number},
   product_type: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   product_brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
   product_condition: { type: Schema.Types.ObjectId, ref: 'conditionShopping', required: true },

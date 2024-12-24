@@ -139,7 +139,8 @@ const randBinController = {
       // Update `ProductAuction` with reference to `AuctionPricingRange`
       await ProductAuction.findOneAndUpdate(
         { _id: product_randBib },
-        { $set: { auctionPricing: savedAuction._id } },
+        { $set: { auctionPricing: savedAuction._id ,
+             product_price: startingPrice} },
         { new: true }
       );
 
@@ -419,7 +420,12 @@ const randBinController = {
       );
   
       
-
+      await ProductAuction.findOneAndUpdate(
+        { _id: product_randBib },
+        { $set: { auctionPricing:id ,
+             product_price: startingPrice} },
+        { new: true }
+      );
       // Kiểm tra nếu không tìm thấy document cần cập nhật
       if (!updatedAuction) {
         return res.status(404).json({
