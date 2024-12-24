@@ -23,10 +23,8 @@ export default function AuctionList() {
   const dispatch: AppDispatch = useDispatch();
   const { slug } = useParams<{ slug: string }>();
 
-  // Local state for managing the current page
   const [page, setPage] = useState(1);
 
-  // Fetching state from Redux
   const biddingList = useSelector(
     (state: RootState) => state.productClient.getBiddingList.biddingList
   );
@@ -45,10 +43,11 @@ export default function AuctionList() {
       state.productClient.getBiddingList.pagination?.totalPages || 1
   );
 
-  // Fetch data on page load and page change
   useEffect(() => {
-    dispatch(getBiddingListThunk({ slug, page }));
-  }, [dispatch, page]);
+    if (slug) {
+      dispatch(getBiddingListThunk({ slug, page }));
+    }
+  }, [dispatch, slug, page]);
 
   return (
     <>
