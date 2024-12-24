@@ -2,46 +2,54 @@ const { Schema, model } = require("mongoose");
 
 const auctionWinnerSchema = new Schema(
   {
-    auctionPricingRange: { 
-      type: Schema.Types.ObjectId, 
+    auctionPricingRange: {
+      type: Schema.Types.ObjectId,
       ref: 'AuctionPricingRange',
-      required: true 
+      required: true
     },
-    auctionRound: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'AuctionRound', 
-      required: true 
+    auctionRound: {
+      type: Schema.Types.ObjectId,
+      ref: 'AuctionRound',
+      required: true
     },
-    user: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'users', 
-      required: true 
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'users',
+      required: true
     },
-    bidPrice: { 
-      type: Number, 
-      required: true 
+    bidPrice: {
+      type: Number,
+      required: true
     },
-    paymentStatus: { 
-      type: String, 
-      enum: ['pending', 'paid', 'failed'], 
-      default: 'pending' 
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending'
     },
-    auctionStatus: { 
-      type: String, 
-      enum: ['won', 'pending','canceled'], 
-      default: 'won' 
+    auctionStatus: {
+      type: String,
+      enum: ['won', 'pending', 'canceled'],
+      default: 'won'
     },
-    createdAt: { 
-      type: Date, 
-      default: Date.now 
+    status: {
+      status: { type: String, default: 'active' },
     },
-    updatedAt: { 
-      type: Date, 
-      default: Date.now 
+    auctionStausCheck: {
+      type: String,
+      enum: ['Chờ duyệt', 'Xử lý duyệt', 'Đã duyệt'],
+      default: 'Chờ duyệt'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
     },
   },
   {
-    collection: "auctionWinner", 
+    collection: "auctionWinner",
     timestamps: true,
   }
 );
