@@ -28,4 +28,9 @@ router.delete('/deletePriceRanAuc',middlewareController.verifyTokenAdminAuth,ran
 router.patch('/softDelPriceRanAuc/:id',middlewareController.verifyTokenAdminAuth,randinBidAuction.softDeletePriceRangeBid);
 router.patch('/restorePriceRanAuc/:id',middlewareController.verifyTokenAdminAuth,randinBidAuction.restorePriceRangeBid);
 router.put('/putPriceRandAuc/:id',middlewareController.verifyTokenAdminAuth,randinBidAuction.editPriceRange);
+
+// checkouAuction
+
+
+
 module.exports = router;

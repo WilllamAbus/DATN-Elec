@@ -56,13 +56,14 @@ export const links: Record<string, Link[]> = {
   ],
   auctions:[
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
-    // { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
     { label: "Phiên đấu giá", to: "/admin/listPriceRandAuct" },
     { label: "Thiết lập phiên", to: "/admin/triggerAuct" },
     { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" },
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
- 
-    { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
-    { label: "Đơn hàng hoàn trả", to: "/admin/recBinOrderAuction" },
+    { label: "Danh sách chờ duyệt", to: "/admin/listCheckAuct" },
+    { label: "Danh sách đã duyệt", to: "/admin/listEnableAuct" },
+        // { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
+    // { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
+    // { label: "Đơn hàng hoàn trả", to: "/admin/recBinOrderAuction" },
   ]
 };
