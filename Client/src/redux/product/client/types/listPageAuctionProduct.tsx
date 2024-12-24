@@ -19,7 +19,20 @@ export interface ProductSupplier {
   name: string;
   
 }
-
+export interface AuctionPricing {
+  _id: string;
+  startTime: string; 
+    endTime: string; 
+  startingPrice: number;
+  maxPrice: number;
+  currentPrice: number;
+  priceStep: number;
+  userBidPrice: number | null;
+  status: string;
+  product_randBib: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface products {
   _id: string;
   product_name: string;
@@ -36,7 +49,7 @@ export interface products {
   variants: ProductVariant[];
   product_quantity: number;
   product_price: number;
-  product_attributes: { k: string; v: string }[];
+  auctionPricing: AuctionPricing;
   weight_g: number;
   image: string[];
   status: string;

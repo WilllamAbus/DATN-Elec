@@ -44,7 +44,6 @@ const DetailPageAuction: React.FC = () => {
                 </div>
                 <div className="bg-white shadow-sm rounded-lg p-4 sm:p-6 space-y-6">
                   <ProductName product={productDetailAuction} />
-                  <ProductPrice product={productDetailAuction} />
                   <StartAndEndTime product={productDetailAuction} />
                   <hr className="border-gray-300 dark:border-gray-700" />
 
@@ -54,6 +53,7 @@ const DetailPageAuction: React.FC = () => {
                       Mọi thông tin chi tiết, vui lòng liên hệ với chúng tôi để biết thêm thông tin.
                     </p>
                   </div>
+                  <ProductPrice product={productDetailAuction} />
                   <AuctionTime product={productDetailAuction} />
                 </div>
               </>

@@ -15,6 +15,7 @@ import {
   getLaptopByVariantsSlice,
   getAccessoryByVariantsSlice,
   getProductDetailAuctionSlice,
+  createOneUpdateBidAuctionSlice,
   getBiddingListSlice
 
 
@@ -35,6 +36,7 @@ const productsReducer = combineReducers({
   getLaptopByVariants:getLaptopByVariantsSlice,
   getAccessoryByVarians:getAccessoryByVariantsSlice,
   getProductDetailAuction:getProductDetailAuctionSlice,
+  createOneUpdateBidAuction:createOneUpdateBidAuctionSlice,
   getBiddingList:getBiddingListSlice
 
 

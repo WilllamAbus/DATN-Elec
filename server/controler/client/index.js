@@ -4,7 +4,8 @@ const {getLimitProductClient, relatedProduct} = require('./product');
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
 const {getProductDetail,getAllStorageBySlugUrl,getAllProductVariantsByVariantPrice} = require('./detail');
-const {getProductDetailAuction,createOneUpdateBidAuction, biddingList} = require('./detailAuction');
+const {getProductDetailAuction,createOneUpdateBidAuction,getAuctionDetailsBySlug,biddingList} = require('./detailAuction');
+
 const {
   getAllBrandPageAuction,
   getALLConditionShopping,
@@ -55,6 +56,7 @@ module.exports = {
   getAccessoryByVariants,
   getProductDetailAuction,
   createOneUpdateBidAuction,
+  getAuctionDetailsBySlug
   biddingList,
 };
 

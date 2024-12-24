@@ -78,7 +78,7 @@ export const breadcrumbItems = {
   listPriceRand: [
     { href: "/admin", label: "Trang quản trị" },
 
-    { href: "/admin/listPriceRand", label: "Danh sách khoảng đấu giá" },
+    { href: "/admin/listPriceRand", label: "Phiên đấu giá " },
   ],
   addPriceRand: [
     { href: "/admin", label: "Trang quản trị" },
@@ -253,7 +253,7 @@ export const breadcrumbItems = {
 
   recycleBinPriceRand: [
     { href: "/admin", label: "Trang quản trị" },
-    { href: "/admin/recycleBinPriceRand", label: "Danh sách xóa mềm" },
+    { href: "/admin/recycleBinPriceRand", label: "Thiết lập phiên đấu giá" },
   ],
   recycleBinOrder: [
     { href: "/admin", label: "Trang quản trị" },

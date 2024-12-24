@@ -5,13 +5,14 @@ import {
   breadcrumbItems,
   ReusableBreadcrumb,
 } from "../../../../ultils/breadcrumb/admin";
-import { PriceRandService, getProductInbound } from "../../../../services/adminPriceRand/adminPriceRandAuct";
+import { PriceRandService, getProductInbound }
+ from "../../../../services/adminPriceRand/adminPriceRandAuct";
 import {
   Product,
   PriceRandData,
 } from "../../../../types/adminPriceRandAuct/addPriceRandAuct";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import FormInput from "../productV2/Form/forminput";
 import currencyFormatter from "currency-formatter";
 // import FormSelect from "./formSelect";
@@ -47,6 +48,10 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
   const handlePriceStep = (priceStep: string) => {
     setValue("priceStep", priceStep);
   };
+  const location = useLocation();
+
+
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -126,6 +131,18 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
     clearErrors("startTime");
     return true;
   };
+  useEffect(() => {
+    if (location.state?.selectedProducts) {
+      setSelectedProducts(location.state.selectedProducts);
+    }
+  }, [location.state]);
+  useEffect(() => {
+    // Lấy danh sách sản phẩm đã chọn từ localStorage khi component được mount
+    const storedSelectedProducts = localStorage.getItem("selectedProducts");
+    if (storedSelectedProducts) {
+      setSelectedProducts(JSON.parse(storedSelectedProducts));
+    }
+  }, []);
   const onSubmit = async (data: PriceRandData) => {
     try {
       if (!validateDates()) {
@@ -154,12 +171,29 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
   }
       await PriceRandService.createPriceRand(selectedProduct, data);
       toast.success("Tạo khoảng định giá thành công!");
-      setTimeout(() => {
-        navigate("/admin/listPriceRandAuct");
-      }, 2000);
+ 
 
       // Thêm sản phẩm vào danh sách đã chọn sau khi tạo thành công
-      setSelectedProducts([...selectedProducts, selectedProduct]);
+      const updatedSelectedProducts = [...selectedProducts, selectedProduct];
+
+      setSelectedProducts(updatedSelectedProducts);
+
+      // Lưu vào localStorage
+      localStorage.setItem(
+        "selectedProducts",
+        JSON.stringify(updatedSelectedProducts)
+      );
+  
+      // Cập nhật danh sách sản phẩm khả dụng
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product._id !== selectedProduct)
+      );
+  
+      setSelectedProduct("");
+      setInboundPrice(null);
+         setTimeout(() => {
+        navigate("/admin/triggerAuct");
+      }, 2000);
     } catch (error: any) {
       if (error.message === "Sản phẩm này đã tồn tại.") {
         toast.error(error.message);
@@ -186,7 +220,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
           <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">
               {" "}
-              Thêm khoảng định giá
+              Mở phiên đấu giá
             </h3>
 
             <div className="grid grid-cols-6 gap-6">
@@ -330,7 +364,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                             // Check if the last three digits are zeros
                             return (
                               numberValue % 1000 === 0 ||
-                              "Giá tối đa phải có số ở hàng trăm, hàng chục và hàng đơn vị là 0"
+                              "Giá khởi điểm phải có số ở hàng trăm, hàng chục và hàng đơn vị là 0"
                             );
                           },
                       },
@@ -402,14 +436,14 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                   control={control}
                   error={errors.maxPrice}
                   validation={{
-                    required: "Vui lòng nhập giá tối đa",
+                    required: "Vui lòng nhập bước giá",
                     min: {
                       value: 1000,
-                      message: "Giá tối đa không thể thấp hơn 1000",
+                      message: "bước giá  không thể thấp hơn 1000",
                     },
                     max: {
                       value: 2000000000,
-                      message: "Giá tối đa không thể vượt quá 2000000000",
+                      message: "Bước giá không thể vượt quá 2000000000",
                     },
                     validate: {
                         divisibleByTwo: (value: any) => {
@@ -430,7 +464,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                             // Check if the last three digits are zeros
                             return (
                               numberValue % 1000 === 0 ||
-                              "Giá tối đa phải có số ở hàng trăm, hàng chục và hàng đơn vị là 0"
+                              "Bước giá phải có số ở hàng trăm, hàng chục và hàng đơn vị là 0"
                             );
                           },
                       },
@@ -449,7 +483,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                 type="submit"
                 className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
-                Tạo ra khoảng định giá
+                Tạo ra phiên đấu giá
               </button>
             </div>
           </div>
