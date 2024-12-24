@@ -282,6 +282,24 @@ const AdminAucPriceRandEdit = React.lazy(
 const AdminAucPriceRandRecy = React.lazy(
   () => import("../page/Admin/priceRandAuc/listRecyPriceRandAuct")
 );
+
+
+
+const AdminListCheckAuct = React.lazy(
+  () => import("../page/Admin/auctionCheckDisable/isCheckedAucDisable")
+);
+
+const AdminListEnableAuct = React.lazy(
+  () => import("../page/Admin/auctionCheckDisable/isEnableDisabledAuct")
+);
+
+const AdminDetalDisableAuct = React.lazy(
+  () => import("../page/Admin/auctionCheckDisable/detailCheckAuct")
+);
+
+const AdminDetalEnableAuct = React.lazy(
+  () => import("../page/Admin/auctionCheckDisable/detaiEnableAuct")
+);
 const AdminRoutes: RouteObject[] = [
   {
     path: "/admin",
@@ -377,8 +395,14 @@ const AdminRoutes: RouteObject[] = [
 
       { path: "listPriceRandAuct", element: <AdminAucPriceRandList /> },
       { path: "addPriceRandAuct", element: <AdminAucPriceRandAdd /> },
-      { path: "editPriceRandAuct", element: <AdminAucPriceRandEdit /> },
-      { path: "listPriceRandAuctRecy", element: < AdminAucPriceRandRecy/> },
+      { path: "editPriceRandAuct/:id", element: <AdminAucPriceRandEdit /> },
+      { path: "triggerAuct", element: < AdminAucPriceRandRecy/> },
+
+
+      { path: "listCheckAuct", element: <AdminListCheckAuct /> },
+      { path: "listEnableAuct", element: <AdminListEnableAuct /> },
+      { path: "detailDisableCheck/:id", element: <AdminDetalDisableAuct /> },
+      { path: "detailEnable/:is", element: < AdminDetalEnableAuct/> },
       { path: "*", element: <Dashboard /> },
     ],
   },

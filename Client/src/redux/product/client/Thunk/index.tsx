@@ -15,3 +15,4 @@ export * from "./getAccessoryByVariants";
 export * from "./getdetailAuction";
 
 export * from "./createOneUpdateBidAuction";
+export * from "./getBiddingList";

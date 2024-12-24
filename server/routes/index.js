@@ -46,8 +46,7 @@ const bankRouter = require("./client/bank");
 const statistical = require("./admin/statistical");
 const recommendationRoute = require("./client/recommendation/recommendation");
 const bestSellRoute = require("./client/best-selling/best-selling");
-const BiddingRoute = require("./client/aution/bidding.router");
-const AutionRoute = require("./client/aution/aution.router");
+
 
 
 
@@ -99,8 +98,6 @@ const routes = (app) => {
   app.use("/api/bank", bankRouter);
   app.use("/api/client/recommendation", recommendationRoute);
   app.use("/api/client/best-selling", bestSellRoute);
-  app.use("/api/client/bidding", BiddingRoute);
-  app.use("/api/client/aution", AutionRoute);
 
 
 };

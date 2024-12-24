@@ -9,7 +9,7 @@ const TimeTrack = require("../../../model/time-track.model");
 const Bidding = require("../../../model/orders/bidding.model");
 const User = require("../../../model/users.model");
 const PriceRandBidder = require("../../../model/orders/priceRange.model");
-const { sendMail } = require("./mailForAuct");
+// const { sendMail } = require("./mailForAuct");
 const scheduelAuction = require("./crons/cronScheduleAuc");
 const auctionService = {
   completeAuction: async (productId, timeTrackID) => {
@@ -194,7 +194,7 @@ const auctionService = {
               };
             
               // Gửi email thông báo người chiến thắng
-              await sendMail(mailWinnerCommon, orderDetails);
+              // await sendMail(mailWinnerCommon, orderDetails);
             
               // Cập nhật trạng thái emailSent thành true sau khi đã gửi email
             

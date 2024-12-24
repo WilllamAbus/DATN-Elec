@@ -1,7 +1,7 @@
 // src/redux/thunks/timeTrackThunk.ts
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { PriceRandService } from '../../../services/adminPriceRand/adminPriceRandAuct';
-import { PriceRangeResponseDeleted, PriceRangeRestoreAuct, PriceRangeDelAuct } from '../../../types/adminPriceRandAuct/deletePriceRandAuct';
+import { PriceRangeResponseDeleted, PriceRangeRestoreAuct, PriceRangeDelAuct, PriceRangeAuctSoftDel} from '../../../types/adminPriceRandAuct/deletePriceRandAuct';
 interface FetchPriceRandParams {
     page: number;
     pageSize: number;
@@ -43,6 +43,22 @@ export const deletePriceRandAdminThunk = createAsyncThunk<PriceRangeDelAuct , { 
       try {
         const response  = await PriceRandService.delPriceRand(id);
   
+        
+        return response.data;
+      } catch (error: any) {
+        // Trả về thông báo lỗi cụ thể với rejectWithValue
+        return rejectWithValue('Failed to fetch order data');
+      }
+    }
+  );
+
+
+  export const softDelPriceRandAdminThunk = createAsyncThunk<PriceRangeAuctSoftDel , { id: string }, { rejectValue: string }>(
+    'prictRandAuctDlted/softDelPrictRadAuct',
+    async ({id}, { rejectWithValue }) => {
+      try {
+        const response  = await PriceRandService.softDelPriceRand(id);
+    
         
         return response.data;
       } catch (error: any) {

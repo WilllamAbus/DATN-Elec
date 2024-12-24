@@ -58,3 +58,18 @@ export interface Product {
     status: string;
     product: Product;
   }
+
+
+   export interface PriceRangeAuctSoftDel {
+      serialNumber: number;
+      _id: string;
+      product_randBib: string;
+      startTime: string;
+      endTime: string;
+      startingPrice:number;
+      maxPrice: number;
+      currentPrice: number;
+      priceStep: number;
+      status: string;
+      product: Product;
+    }

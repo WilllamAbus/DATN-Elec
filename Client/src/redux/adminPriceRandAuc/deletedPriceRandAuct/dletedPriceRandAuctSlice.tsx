@@ -1,14 +1,15 @@
 // src/redux/slices/timeTrackSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchPriceRandDeleted, restorePriceRandAdminThunk, deletePriceRandAdminThunk } from './deletedPriceRandAuctThunk';
-import {PriceRangeDeletedAuct,PriceRangeRestoreAuct, PriceRangeDelAuct  } from '../../../types/adminPriceRandAuct/deletePriceRandAuct';
+import { fetchPriceRandDeleted, restorePriceRandAdminThunk, softDelPriceRandAdminThunk } from './deletedPriceRandAuctThunk';
+import {PriceRangeDeletedAuct,PriceRangeRestoreAuct, PriceRangeAuctSoftDel  } from '../../../types/adminPriceRandAuct/deletePriceRandAuct';
+
 interface PriceRandState {
   deletedPriceRandAuct: PriceRangeDeletedAuct[];
   resoredPriceRand: PriceRangeRestoreAuct[];
   priceRandRestore: PriceRangeRestoreAuct | null
 
-  deletePriceRandAuct: PriceRangeDelAuct[];
-  priceRandAuctDelete: PriceRangeDelAuct | null
+  softDelPriceRandAuct: PriceRangeAuctSoftDel[];
+  delPriceRand: PriceRangeAuctSoftDel|null
   totalPages: number;
   currentPage: number;
 
@@ -22,8 +23,8 @@ const initialState: PriceRandState = {
     resoredPriceRand: [],
     priceRandRestore: null,
 
-    deletePriceRandAuct:[],
-    priceRandAuctDelete:null,
+    softDelPriceRandAuct:[],
+    delPriceRand: null,
   totalPages: 1,
   currentPage: 1,
 
@@ -89,35 +90,33 @@ const priceRadnDeletedSlice = createSlice({
       })
 
 
-      .addCase(deletePriceRandAdminThunk.pending, (state) => {
+      .addCase(softDelPriceRandAdminThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.successMessage = null;
       })
-      .addCase(deletePriceRandAdminThunk.fulfilled, (state, action) => {
+      .addCase(softDelPriceRandAdminThunk.fulfilled, (state, action) => {
         state.loading = false;
         
-        state.priceRandAuctDelete = action.payload;
+        state.delPriceRand = action.payload;
       
          // Thay đ��i kiểu đúng,
         // Kiểm tra softDelorder trước khi gọi filter
         // state.shippingStatus = state.shippingStatus.filter((order) => order._id !== action.payload._id);
     
         if (Array.isArray(state.deletedPriceRandAuct)) {
+          state.softDelPriceRandAuct = [];
           // Remove the deleted time track from the timeTracks state
           state.deletedPriceRandAuct = state.deletedPriceRandAuct.filter(
             (rand) => rand._id !== action.payload._id // Filter out the deleted item
           );
         }
-
-        if (!Array.isArray(state.deletePriceRandAuct)) {
-          state.deletePriceRandAuct = []; // Initialize if undefined
-        }
-        state.deletePriceRandAuct.push(action.payload);
+       
+      state.softDelPriceRandAuct.push(action.payload);
       state.successMessage = "Xóa đơn hàng thành công";
         // state.successMessage = "Xóa đơn hàng thành công";
       })
-      .addCase(deletePriceRandAdminThunk.rejected, (state, action) => {
+      .addCase(softDelPriceRandAdminThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
