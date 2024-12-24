@@ -47,7 +47,6 @@ const createOneUpdateBidAuction = async (req, res) => {
     const userName = await findUserName(userId);
 
     if (bidPrice === auctionPricingRange.maxPrice) {
-      const losers = await declareWinner(auctionPricingRange, auctionRound);
       await declareWinner(auctionPricingRange, auctionRound);
 
       getIO().emit('bidPlaced', { message: `Người dùng ${userName} đã thắng với giá tối đa là ${bidPrice}`, userId, bidPrice, slug });

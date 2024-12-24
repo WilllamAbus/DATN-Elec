@@ -31,9 +31,7 @@ const auctionWinnerSchema = new Schema(
       enum: ['won', 'pending', 'canceled'],
       default: 'won'
     },
-    status: {
-      status: { type: String, default: 'active' },
-    },
+    status: { type: String, default: 'active' },
     auctionStausCheck: {
       type: String,
       enum: ['Chờ duyệt', 'Xử lý duyệt', 'Đã duyệt'],
