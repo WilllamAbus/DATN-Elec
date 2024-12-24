@@ -125,6 +125,8 @@ const userSchema = new Schema(
     tokenLogin: String,
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
     banks: { type: [bankSchema], default: [] },
+    messgese:{type:String},
+    warning:{type:Number}
   },
   {
     collection: "users",
