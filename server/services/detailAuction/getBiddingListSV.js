@@ -77,6 +77,8 @@ const BiddingService = {
       });
     }
   }),
+
+  
 };
 
 module.exports = BiddingService;
