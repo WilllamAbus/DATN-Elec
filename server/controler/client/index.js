@@ -56,7 +56,7 @@ module.exports = {
   getAccessoryByVariants,
   getProductDetailAuction,
   createOneUpdateBidAuction,
-  getAuctionDetailsBySlug
+  getAuctionDetailsBySlug,
   biddingList,
 };
 
