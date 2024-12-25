@@ -37,6 +37,8 @@ const auctionWinnerSchema = new Schema(
       enum: ['Chờ duyệt', 'Xử lý duyệt', 'Đã duyệt'],
       default: 'Chờ duyệt'
     },
+    startTime: { type: Date, default: Date.now, required: true },
+    endTime: { type: Date, required: true },
     createdAt: {
       type: Date,
       default: Date.now

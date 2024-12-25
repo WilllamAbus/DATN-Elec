@@ -13,6 +13,6 @@ export * from "./getPhoneByVariants";
 export * from "./getLaptopByVariants";
 export * from "./getAccessoryByVariants";
 export * from "./getdetailAuction";
-
 export * from "./createOneUpdateBidAuction";
 export * from "./getBiddingList";
+export * from "./getAuctionDetailsBySlug";

@@ -7,14 +7,11 @@ import {
   Button,
   useDisclosure,
   Image,
-  Code
 } from "@nextui-org/react";
+import { Link } from "react-router-dom"
 
-interface AuctionLoseProps {
-  onClose: () => void;
-}
 
-export default function AuctionLose({ onClose }: AuctionLoseProps) {
+export default function AuctionPending() {
   const { isOpen, onOpenChange } = useDisclosure({ defaultOpen: true });
 
   return (
@@ -35,18 +32,20 @@ export default function AuctionLose({ onClose }: AuctionLoseProps) {
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Thông báo</ModalHeader>
         <ModalBody>
-          <Image
-            alt="Ảnh thua"
-            src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/winnerandlose%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(2).svg?alt=media&token=71a420cc-ce3e-4c96-966a-08aa6e5da4b8"
-            width={300}
-          />
-          <Code color="primary" size="lg">Không trúng đấu giá</Code>
-          <p>Đấu giá không thành công sản phẩm chúc bạn may mắn lần sao</p>
+          <div className="flex flex-col items-center">
+            <Image
+              alt="Ảnh chờ"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(5).svg?alt=media&token=a65549f3-c8d0-477d-b2bf-50a86022d46b"
+              width={300}
+              height={250}
+              className="mb-4"
+            />
+         <p> Bạn đang trong danh sách hàng chờ người trúng đấu giá</p>
+         
+          </div>
         </ModalBody>
         <ModalFooter>
-          <Button className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={onClose}>
-            Trở về danh sách đấu giá
-          </Button>
+        <Link to="/auction"> <Button color="danger" variant="flat"  > Trở về danh sách đấu giá </Button> </Link>
         </ModalFooter>
       </ModalContent>
     </Modal>
