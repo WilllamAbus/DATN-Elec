@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { homeAllProduct,listPageAuction,resetFilter, getID, getLimitProductClient,shopping,auction,upView,search,getPhoneByVariants,getLaptopByVariants,getAccessoryByVariants} = require('../../../controler/client');
-const { getProductsByCategory,relatedProduct } = require('../../../controler/client');
+const { getProductsByCategory } = require('../../../controler/client');
 
 
 
