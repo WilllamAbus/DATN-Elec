@@ -796,6 +796,10 @@ const CartController = {
         .populate({
           path: "itemAuction.auctionWiner",
           model: "AuctionWinner",
+          populate: {
+            path: "user",
+            model: "User",
+          },
         })
         .populate({
           path: "itemAuction.inventory",
@@ -809,10 +813,10 @@ const CartController = {
             model: "productAuction",
           },
         })
-        .populate({
-          path: "itemAuction.user",
-          model: "User",
-        })
+        // .populate({
+        //   path: "itemAuction.user",
+        //   model: "User",
+        // })
         .populate({
           path: "itemAuction.auctionRound",
           model: "AuctionRound",
