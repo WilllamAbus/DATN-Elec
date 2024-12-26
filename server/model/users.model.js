@@ -126,7 +126,8 @@ const userSchema = new Schema(
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
     banks: { type: [bankSchema], default: [] },
     messgese:{type:String},
-    warning:{type:Number}
+    warning: { type: Number, default: 0 },
+    noteWarning: { type: String, default: '' },
   },
   {
     collection: "users",

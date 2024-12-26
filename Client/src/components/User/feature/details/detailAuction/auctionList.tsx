@@ -11,13 +11,14 @@ import {
   Avatar,
   Card,
   CardHeader,
-  CardBody,
+  CardBody
 } from "@nextui-org/react";
 import { MyButton } from "src/common/customs/MyButton";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getBiddingListThunk } from "../../../../../redux/product/client/Thunk";
+import { getBiddingListThunk, getAuctionWinnerThunk } from "../../../../../redux/product/client/Thunk";
 import { useParams } from "react-router-dom";
+
 
 export default function AuctionList() {
   const dispatch: AppDispatch = useDispatch();
@@ -43,9 +44,14 @@ export default function AuctionList() {
       state.productClient.getBiddingList.pagination?.totalPages || 1
   );
 
+  const auctionWinner = useSelector(
+    (state: RootState) => state.productClient.getBiddingList.auctionWinner
+  );
+
   useEffect(() => {
     if (slug) {
       dispatch(getBiddingListThunk({ slug, page }));
+      dispatch(getAuctionWinnerThunk({ slug }));
     }
   }, [dispatch, slug, page]);
 
@@ -110,6 +116,46 @@ export default function AuctionList() {
           </Table>
         </CardBody>
       </Card>
+      {/* Section for the auction winner */}
+      {auctionWinner && (
+        <Card className="max-w-full shadow-none mt-4 bg-white">
+          <CardHeader className="justify-between">
+            <div className="flex gap-2 items-center">
+              {/* <Avatar
+                radius="full"
+                size="sm"
+                className="border-none"
+                src={auctionWinner.user.avatar || "/default-avatar.png"}
+              /> */}
+              <div className="flex flex-col gap-1 items-center justify-center">
+                <span className="text-small font-bold leading-none text-default-600">
+                  Người thắng cuộc
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardBody className="px-1 py-1 text-small text-default-400">
+            <div className="flex gap-2 items-center">
+              {/* <Avatar
+                radius="full"
+                size="lg"
+                className="border-none"
+                src={auctionWinner.user.avatar || "/default-avatar.png"}
+              /> */}
+              <div>
+                <span className="font-bold">{auctionWinner.user.name}</span>
+                <span>
+                  Giá thắng:{" "}
+                  <span className="text-green-500 font-bold">
+                    {auctionWinner.bidPrice.toLocaleString()} VND
+                  </span>
+                </span>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </>
   );
 }
