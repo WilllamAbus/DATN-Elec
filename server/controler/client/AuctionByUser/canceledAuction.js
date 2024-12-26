@@ -9,8 +9,9 @@ const canceledAuction = async (req, res) => {
     if (!auctionWinner) {
       return res.status(404).json({ code: 'KHONG_TIM_THAY_DAU_GIA', msg: 'Không tìm thấy kết quả đấu giá.' });
     }
-
+   
     auctionWinner.confirmationStatus = 'canceled';
+    auctionWinner.status = 'disabled';
     await auctionWinner.save();
 
     const user = auctionWinner.user;

@@ -4,10 +4,12 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import AppAuction from "./auctionApp";
 import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
 
+
 const AuctionPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const currentPage = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.pagination?.currentPage || 1);
   const auction = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.auctionWins || []);
+
 
   React.useEffect(() => {
     dispatch(getAuctionWinsByUserThunk({ page: currentPage }));

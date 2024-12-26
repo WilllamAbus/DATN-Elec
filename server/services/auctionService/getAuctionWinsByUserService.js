@@ -4,7 +4,6 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
   const query = { user: userId };
   const skip = (page - 1) * limit;
 
-  const total = await AuctionWinner.countDocuments(query);
   const auctionWins = await AuctionWinner.find(query)
     .populate({
       path: 'auctionPricingRange',
@@ -26,11 +25,25 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
       auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
       await auction.save();
     }
+
+    const endTime = new Date(auction.endTime).getTime();
+    const remainingTime = endTime - currentTime;
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+    auction.remainingTime = remainingTime > 0 
+      ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây` 
+      : "Đã kết thúc";
   }
+
 
   const filteredAuctionWins = auctionWins.filter(auction => auction.confirmationStatus === confirmationStatus);
 
-  const totalPages = Math.ceil(filteredAuctionWins.length / limit);
+  const total = filteredAuctionWins.length;
+
+  const totalPages = Math.ceil(total / limit);
 
   return {
     data: filteredAuctionWins.slice(0, limit), 
@@ -40,6 +53,7 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
+    total 
   };
 };
 

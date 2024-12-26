@@ -1,4 +1,4 @@
-
+import React from "react";
 import { Tabs, Tab } from '@nextui-org/react';
 import ListAuctionWin from './listAuctionWin';
 import ChipCount from './ChipCount/ChipCount';
@@ -11,12 +11,12 @@ interface AppAuctionProps {
   currentPage: number;
 }
 
-export default function AppAuction({ auction}: AppAuctionProps) {
+const AppAuction: React.FC<AppAuctionProps> = ({ auction, dispatch, currentPage }) => {
   const tabs = [
     {
       id: 'Chờ xác nhận',
       label: 'Chờ xác nhận',
-      content: <ListAuctionWin />,
+      content: <ListAuctionWin auction={auction} dispatch={dispatch} currentPage={currentPage} totalPages={1} />,
       confirmationStatus: 'pending',
       auctionStatus: ['won', 'pending'],
     },
@@ -60,3 +60,5 @@ export default function AppAuction({ auction}: AppAuctionProps) {
     </div>
   );
 }
+
+export default AppAuction;
