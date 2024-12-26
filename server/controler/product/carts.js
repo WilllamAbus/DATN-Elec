@@ -4,6 +4,7 @@ const Cart = require("../../model/orders/cart.model");
 // const Inventory = require("../../model/inventory/inventory.model");
 const Interaction = require("../../model/recommendation/interaction.model");
 const Voucher = require("../../model/voucher.model");
+const User = require("../../model/users.model");
 const mongoose = require("mongoose");
 const path = require("path");
 const { spawn } = require("child_process");
@@ -319,7 +320,6 @@ const CartController = {
         await newInteraction.save();
       }
 
-
       const pythonScriptPath = path.resolve(
         __dirname,
         "../../../Python Client Server/recommendation_service.py"
@@ -633,13 +633,145 @@ const CartController = {
     }
   },
 
+  // getCarts: async (req, res) => {
+  //   try {
+  //     let carts = await Cart.find({ user: req.user.id })
+
+  //       .populate({
+  //         path: "items.product",
+  //       })
+  //       .populate({
+  //         path: "items.productVariant",
+  //         model: "productVariant",
+  //         populate: [
+  //           { path: "image", model: "ImageVariant" },
+  //           { path: "battery", model: "Battery" },
+  //           { path: "color", model: "Color" },
+  //           { path: "cpu", model: "Cpu" },
+  //           { path: "operatingSystem", model: "OperatingSystem" },
+  //           { path: "ram", model: "Ram" },
+  //           { path: "screen", model: "Screen" },
+  //           { path: "storage", model: "Storage" },
+  //         ],
+  //       })
+  //       .populate({
+  //         path: "items.inventory",
+  //         model: "Inventory",
+  //       })
+  //       .populate({
+  //         path: "itemAuction.auctionWiner",
+  //         model: "AuctionWinner",
+  //       })
+  //       .populate({
+  //         path: "itemAuction.inventory",
+  //         model: "Inventory",
+  //       })
+
+  //       .populate({
+  //         path: "itemAuction.auctionPricingRange",
+  //         model: "AuctionPricingRange",
+  //         populate: {
+  //           path: "product_randBib",
+  //           model: "productAuction",
+  //         },
+  //       })
+  //       .populate({
+  //         path: "itemAuction.auctionRound",
+  //         model: "AuctionRound",
+  //       });
+
+  //     // Lọc các item hợp lệ
+  //     carts = carts.map((cart) => {
+  //       cart.items = cart.items.filter(
+  //         (item) => item.product !== null || item.auctionWiner !== null
+  //       );
+  //       return cart;
+  //     });
+
+  //     // Cập nhật lại giỏ hàng
+  //     await Promise.all(
+  //       carts.map((cart) =>
+  //         Cart.findByIdAndUpdate(cart._id, {
+  //           items: cart.items,
+  //           itemAuction: cart.itemAuction,
+  //         })
+  //       )
+  //     );
+
+  //     res.status(201).json({ message: "Lấy danh sách thành công", carts });
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
+  // Hàm loại bỏ sản phẩm khỏi giỏ hàng (chỉ áp dụng cho itemAuction)
+  // removeItemFromCart: async (cartId, itemId) => {
+  //   try {
+  //     // Loại bỏ sản phẩm khỏi giỏ hàng theo itemId trong itemAuction
+  //     await Cart.updateOne(
+  //       { _id: cartId },
+  //       { $pull: { itemAuction: { _id: itemId } } }
+  //     );
+  //   } catch (error) {
+  //     console.error("Lỗi khi loại bỏ sản phẩm khỏi giỏ hàng: ", error);
+  //   }
+  // },
+  removeItemFromCart: async (cartId, itemId) => {
+    try {
+      // Loại bỏ sản phẩm khỏi itemAuction theo itemId
+      const result = await Cart.updateOne(
+        { _id: cartId },
+        { $pull: { itemAuction: { _id: itemId } } }
+      );
+
+      // Kiểm tra nếu itemAuction đã rỗng, thì xóa toàn bộ itemAuction khỏi giỏ hàng
+      const cart = await Cart.findById(cartId);
+      if (cart.itemAuction.length === 0) {
+        // Xóa hẳn trường itemAuction nếu không còn sản phẩm đấu giá nào
+        await Cart.updateOne(
+          { _id: cartId },
+          { $unset: { itemAuction: "" } } // Xóa hoàn toàn trường itemAuction
+        );
+        console.log("Đã xóa trường itemAuction khỏi giỏ hàng.");
+      }
+
+      console.log(
+        `Sản phẩm ${itemId} đã được loại bỏ khỏi giỏ hàng ${cartId}.`
+      );
+    } catch (error) {
+      console.error("Lỗi khi loại bỏ sản phẩm khỏi giỏ hàng: ", error);
+    }
+  },
+
+  // Định nghĩa hàm xử lý cảnh báo người dùng
+  // Định nghĩa hàm xử lý cảnh báo người dùng
+  handleUserWarning: async (userId) => {
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        // Đảm bảo warning là một số hợp lệ
+        if (isNaN(user.warning)) {
+          user.warning = 0; // Khởi tạo warning nếu không phải là số
+        }
+
+        // Nếu đã bị cảnh báo 3 lần, khóa tài khoản
+        if (user.warning >= 3) {
+          user.status = "disabled";
+          user.messgese = "Vi phạm - Tài khoản đã bị khóa.";
+        } else {
+          // Tăng số lần cảnh báo
+          user.warning += 1;
+        }
+
+        await user.save();
+      }
+    } catch (error) {
+      console.error("Lỗi khi xử lý cảnh báo người dùng: ", error);
+    }
+  },
+
   getCarts: async (req, res) => {
     try {
       let carts = await Cart.find({ user: req.user.id })
-        .populate({
-          path: "user",
-          select: "name address phone email",
-        })
         .populate({
           path: "items.product",
         })
@@ -660,19 +792,56 @@ const CartController = {
         .populate({
           path: "items.inventory",
           model: "Inventory",
+        })
+        .populate({
+          path: "itemAuction.auctionWiner",
+          model: "AuctionWinner",
+        })
+        .populate({
+          path: "itemAuction.inventory",
+          model: "Inventory",
+        })
+        .populate({
+          path: "itemAuction.auctionPricingRange",
+          model: "AuctionPricingRange",
+          populate: {
+            path: "product_randBib",
+            model: "productAuction",
+          },
+        })
+        .populate({
+          path: "itemAuction.user",
+          model: "User",
+        })
+        .populate({
+          path: "itemAuction.auctionRound",
+          model: "AuctionRound",
         });
 
-      carts = carts.map((cart) => {
-        cart.items = cart.items.filter((item) => item.product !== null);
-        return cart;
-      });
+      // Xử lý các sản phẩm đấu giá hết thời gian
+      for (let cart of carts) {
+        cart.itemAuction = cart.itemAuction.filter(async (item) => {
+          const { auctionEndTime } = item;
+          if (auctionEndTime && new Date(auctionEndTime) < new Date()) {
+            // Sản phẩm đấu giá đã hết thời gian, loại bỏ khỏi giỏ hàng
+            await CartController.removeItemFromCart(cart._id, item._id); // Loại bỏ sản phẩm khỏi giỏ hàng
+            await CartController.handleUserWarning(req.user.id); // Cảnh báo người dùng nếu cần
+            return false; // Loại bỏ sản phẩm khỏi giỏ hàng
+          }
+          return true; // Giữ lại sản phẩm nếu chưa hết thời gian
+        });
+      }
 
+      // Cập nhật lại giỏ hàng sau khi lọc
       await Promise.all(
         carts.map((cart) =>
-          Cart.findByIdAndUpdate(cart._id, { items: cart.items })
+          Cart.findByIdAndUpdate(cart._id, {
+            itemAuction: cart.itemAuction, // Cập nhật chỉ phần itemAuction
+          })
         )
       );
-      res.status(201).json({ message: "lấy danh sách thành công", carts });
+
+      res.status(201).json({ message: "Lấy danh sách thành công", carts });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

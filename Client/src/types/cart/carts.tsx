@@ -57,7 +57,7 @@
 //   updatedAt: string;
 //   __v: number;
 // }
-
+import { ProductAuction } from "../../services/detailProductAuction/types/detailAuction";
 export interface CartItem {
   _id: string;
   product: {
@@ -116,7 +116,63 @@ export interface CartItem {
     __v: number;
   };
 }
+export interface AuctionWinner {
+  _id: string;
+  auctionPricingRange: string;
+  auctionRound: string;
+  user: string;
+  bidPrice: number;
+  paymentStatus: string;
+  auctionStatus: string;
+  status: string;
+  auctionStausCheck: string;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface AuctionPricingRange {
+  _id: string;
+  startTime: string;
+  endTime: string;
+  startingPrice: number;
+  maxPrice: number;
+  currentPrice: number;
+  priceStep: number;
+  status: string;
+  product_randBib: ProductAuction;
+  createdAt: string;
+  updatedAt: string;
+  auctionPriceHistory: string;
+}
 
+export interface AuctionRound {
+  _id: string;
+  auctionPricing: string;
+  participants: string[];
+  bids: {
+    user: string;
+    bidPrice: number;
+    bidTime: string;
+    _id: string;
+  }[];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface itemAuction {
+  auctionWiner: AuctionWinner;
+  auctionStartTime: string;
+  auctionEndTime: string;
+  quantity: number;
+  price: number;
+  totalItemPrice: number;
+  isSelected: boolean;
+  inventory: string | null;
+  auctionPricingRange: AuctionPricingRange;
+  auctionRound: AuctionRound;
+  _id: string;
+}
 export interface CartType {
   _id: string;
   user: {
@@ -127,6 +183,7 @@ export interface CartType {
     address?: string;
   };
   items: CartItem[];
+  itemAuction: itemAuction[];
   totalPrice: number;
   stateNotifi: string;
   isActive: boolean;
