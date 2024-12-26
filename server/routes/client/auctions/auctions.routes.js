@@ -3,7 +3,11 @@ const router = express.Router();
 
 // const auctionController  = require("../../../controler/orders/auctions/auction.controller");
 const middlewareController = require("../../../middleware/auth");
-const randinBidAuction = require("../../../controler/orders/auctions/randiiBidV2/randBid.controller");
+const randinBidAuction =
+ require("../../../controler/orders/auctions/randiiBidV2/randBid.controller");
+
+ const auctionWinner =
+ require("../../../controler/orders/auctions/checkAuction/checkAuction.controller");
 
 // router.get('/get-auction-details',middlewareController.verifyTokenUserAuth,auctionController.getAuctionDetails);
 // router.post('/complete',middlewareController.verifyToken,auctionController.completeAuctionController);
@@ -30,7 +34,7 @@ router.patch('/restorePriceRanAuc/:id',middlewareController.verifyTokenAdminAuth
 router.put('/putPriceRandAuc/:id',middlewareController.verifyTokenAdminAuth,randinBidAuction.editPriceRange);
 
 // checkouAuction
-
-
-
+router.get('/allAuctWinnerCheck',middlewareController.verifyTokenAdminAuth,auctionWinner.getCheckWonUser);
+router.get('/detailAuctWinnerCheck/:id',middlewareController.verifyTokenAdminAuth,auctionWinner.getDetailCheckWinnerAuct);
+router.put('/updatStatusCheck/:idWinner',middlewareController.verifyTokenAdminAuth,auctionWinner.updateStatusCheck);
 module.exports = router;

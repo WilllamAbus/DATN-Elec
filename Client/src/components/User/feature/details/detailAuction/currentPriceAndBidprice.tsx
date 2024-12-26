@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardBody, CardFooter, Avatar } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Avatar, Chip } from "@nextui-org/react";
 import { ProductAuction } from "../../../../../services/detailProductAuction/types/detailAuction";
 import { MyButton } from "../../../../../common/customs/MyButton";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,17 +7,19 @@ import { AppDispatch, RootState } from "../../../../../redux/store";
 import { createOneUpdateBidAuctionThunk } from "../../../../../redux/product/client/Thunk";
 import { toast, Toaster } from "react-hot-toast";
 import { io } from 'socket.io-client';
-
+import { convertToVietnameseCurrency } from "../../../../../common/pricecurrency/ConvertToVietnameseCurrency";
+import { useNavigate } from 'react-router-dom'; 
 const socket = io('http://localhost:4000'); 
 
 interface ProductCurrentPriceAndBidpriceProps {
   product: ProductAuction;
+  onAuctionEnd: () => void;
 }
 
-const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product }) => {
+const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd }) => {
   const [priceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
   const [currentPrice, setCurrentPrice] = useState<number>(product.auctionPricing.currentPrice ?? 0);
-  const [bidCount, setBidCount] = useState(0);
+  const navigate = useNavigate();
   const [userBidPrice, setUserBidPrice] = useState<number | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -31,25 +33,30 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
     socket.on('bidPlaced', (data) => {
       if (data.slug === product.slug) {
         setCurrentPrice(data.bidPrice);
+        
+        if (data.status === 'ended') {
+          onAuctionEnd();
+        }
+  
         if (data.userId !== userId) {
           toast.success(data.message);
         }
       }
     });
-
+  
     return () => {
       socket.off('bidPlaced');
     };
-  }, [product.slug, userId]);
+  }, [product.slug, userId, navigate]);
 
   const handleSubmitBidPrice = async () => {
     const bidPrice = userBidPrice ?? priceStep;
     const newPrice = currentPrice + bidPrice;
-    const previousPrice = currentPrice; // Lưu lại giá trị trước đó để khôi phục nếu có lỗi
+    const previousPrice = currentPrice;
 
     setCurrentPrice(newPrice);
     setUserBidPrice(null);
-    setBidCount((prevCount) => prevCount + 1);
+   
 
     try {
       const resultAction = await dispatch(
@@ -107,15 +114,12 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
 
         <CardBody className="px-3 py-4 text-small text-default-400">
           <div className="flex justify-between items-center gap-4">
-            <div className="inline-flex items-center gap-2">
-              <span className="text-default-600 text-medium">Bước giá:</span>
-              <input
-                type="number"
-                className="px-3 py-1 text-sm font-bold rounded-md border-none bg-gray-100"
-                value={userBidPrice ?? priceStep}
-                onChange={(e) => setUserBidPrice(Number(e.target.value))}
-              />
-            </div>
+          <div className="inline-flex items-center gap-2">
+            <span className="text-default-600 text-medium font-bold">Bước giá:</span>
+            <Chip className="px-3 py-1 text-sm font-bold rounded-md border-none" isDisabled>
+              {convertToVietnameseCurrency(priceStep)}
+            </Chip>
+          </div>
 
             <MyButton radius="full" size="sm" variant="gradient">
               {userBidPrice !== null
@@ -134,9 +138,7 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
             Trả giá {(currentPrice + (userBidPrice ?? priceStep)).toLocaleString()} đ
           </MyButton>
 
-          <div className="mt-4">
-            <p className="text-default-600">Số lần đã tăng: {bidCount}</p>
-          </div>
+
         </CardBody>
 
         <CardFooter className="gap-3">

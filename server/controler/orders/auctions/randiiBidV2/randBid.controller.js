@@ -14,6 +14,8 @@ const randBinController = {
         priceStep,
         startingPrice,
       } = req.body;
+
+      
       const thousandPlace = Math.floor(parseFloat(maxPrice) / 1000) % 2;
       const lastThreeDigits = parseInt(maxPrice) % 1000;
       const thousanPriceStep = Math.floor(parseFloat(priceStep) / 1000) % 2;
@@ -136,6 +138,7 @@ const randBinController = {
       // Save auction pricing range to the database
       const savedAuction = await auctionPricingRange.save();
 
+      
       // Update `ProductAuction` with reference to `AuctionPricingRange`
       await ProductAuction.findOneAndUpdate(
         { _id: product_randBib },
@@ -494,7 +497,8 @@ const randBinController = {
       }).lean();
 
       const productRand = serchProductRand.product_randBib;
-
+      // const startTimeConver = convertToLocalTime(serchProductRand.start_time)
+      // const endTimeConver = convertToLocalTime(serchProductRand.end_time)
       // Cập nhật trạng thái của sản phẩm thành 'disable'
       const updatedProduct = await ProductAuction.findByIdAndUpdate(
         productRand,
@@ -611,29 +615,34 @@ const randBinController = {
   getDeletedPriceRangeBid: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
+ 
+      
       const pageSize = parseInt(req.query.pageSize) || 5;
+
       const search = req.query.search || "";
+
+      
       const priceRange = await AuctionPricingRange.find({ status: "disable" })
         .select(
           "product_randBib startTime endTime startingPrice maxPrice currentPrice priceStep status"
         )
 
         .lean();
-
+   
+        
       const productIds = priceRange.map(
         (priceRange) => priceRange.product_randBib
       );
 
       const products = await ProductAuction.find({
         _id: { $in: productIds },
-        status: "disable",
+        status: "active",
       })
         .select("_id image product_name ")
         .lean();
 
-      // Bước 3.1: Lọc các sản phẩm có product_format.formats là 'Đấu giá'
 
-      // Bước 4: Tạo map productId -> product để dễ dàng truy cập
+      
       const productMap = {};
       products.forEach((product) => {
         productMap[product._id] = product;
@@ -654,10 +663,13 @@ const randBinController = {
           return null; // Trả về null nếu không tìm thấy sản phẩm
         })
         .filter((track) => track !== null); // Lọc các phần tử null
+        console.log('matchedPriceRandge', matchedPriceRandge);
+        
       const sortedPriceRandge = matchedPriceRandge.sort(
         (a, b) => b.maxPrice - a.maxPrice
       );
-
+    
+      
       const allPriceRand = matchedPriceRandge.map((track) => ({
         priceRandId: track._id,
 

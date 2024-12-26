@@ -1,9 +1,11 @@
 const ProductAuction = require("../../../model/productAuction/productAuction");
-const AuctionPriceHistory = require("../../../model/productAuction/auctionPriceHistory");
+const AuctionWinner = require("../../../model/productAuction/auctionWinner");
 const { getIO } = require('../../../services/skserver/socketServer');
+
 const getAuctionDetailsBySlug = async (req, res) => {
   const { slug } = req.params;
   try {
+    // Find the product auction by slug
     const productAuction = await ProductAuction.findOne({ slug });
     if (!productAuction) {
       return res.status(404).json({
@@ -12,13 +14,15 @@ const getAuctionDetailsBySlug = async (req, res) => {
         message: "Sản phẩm không tồn tại.",
       });
     }
-    const priceHistories = await AuctionPriceHistory.find({
+
+    // Find the auction winners for the auctionPricingRange associated with the product
+    const auctionWinners = await AuctionWinner.find({
       auctionPricingRange: productAuction.auctionPricing,
     })
       .populate("user", "name email")
       .sort({ bidPrice: -1 });
 
-    if (priceHistories.length === 0) {
+    if (auctionWinners.length === 0) {
       return res.status(404).json({
         code: "NO_HISTORY",
         status: "error",
@@ -26,7 +30,8 @@ const getAuctionDetailsBySlug = async (req, res) => {
       });
     }
 
-    const result = priceHistories.map((entry, index) => {
+    // Map auction winners to include status
+    const result = auctionWinners.map((entry, index) => {
       if (index === 0) {
         return {
           user: entry.user,
@@ -51,7 +56,7 @@ const getAuctionDetailsBySlug = async (req, res) => {
       }
     });
 
-    // Phát sự kiện socket để cập nhật client
+    // Emit socket event to update clients
     getIO().emit('auctionUpdate', {
       slug,
       bidders: result,

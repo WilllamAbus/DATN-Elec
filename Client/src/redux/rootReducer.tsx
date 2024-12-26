@@ -50,6 +50,7 @@ import BankReducer from "./auth/bank/bankSlice";
 import listBidActiveReducer from "./listBidActive/listBidActivveSlice";
 import listRandAuctReducer from "./adminPriceRandAuc/listPriceRandAuct/listPriceRandSlice";
 import listRandAuctDeletedReducer from "./adminPriceRandAuc/deletedPriceRandAuct/dletedPriceRandAuctSlice";
+import checkAuctWinnerAllReducer from "./adminCheckAuct/adminCheckAucSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -108,7 +109,8 @@ const rootReducer = combineReducers({
   Bank: BankReducer,
   listBidActive: listBidActiveReducer,
   listRandAuct: listRandAuctReducer,
-  deletedPriceRand: listRandAuctDeletedReducer
+  deletedPriceRand: listRandAuctDeletedReducer,
+  checkAuctWinnerAll: checkAuctWinnerAllReducer,
   // Add other reducers here to combine them with the persisted state.
 });
 
