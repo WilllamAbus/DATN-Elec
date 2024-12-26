@@ -45,6 +45,7 @@ const ListPriceRandRecy: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
+  const [autoActivated, setAutoActivated] = useState<{ [key: string]: boolean }>({});
   const [, setPriceRand] = useState<PriceRangeRestoreAuct[]>([]);
   const [, setPriceRandSoft] = useState<PriceRangeAuctSoftDel[]>([]);
   useEffect(() => {
@@ -60,28 +61,8 @@ const ListPriceRandRecy: React.FC = () => {
     setPage(1);
   };
 
-  const handleTriggerPriceRand = async (id: string) => {
-    MySwal.fire({
-      title: "Kích hoạt",
-      text: "Bạn có chắc muốn kích hoạt phiên đấu này không?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
-    }).then(async (result: SweetAlertResult) => {
-      if (result.isConfirmed) {
-        await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
-        setPriceRand((prevSoftDel) =>
-          prevSoftDel.filter((rand) => rand._id !== id)
-        );
-        toast.success("Kích hoạt phiên đấu giá thành công");
-      } else {
-        toast.error("Có lỗi xảy ra khi kích hoạt sản phẩm");
-      }
-    });
-  };
+
+
 
   const handleSoftDelPriceRand = async (id: string) => {
     MySwal.fire({
@@ -105,7 +86,48 @@ const ListPriceRandRecy: React.FC = () => {
       }
     });
   };
+  const autoTriggerPriceRand = async (id: string) => {
+    try {
+      await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
+      setPriceRand((prevSoftDel) =>     prevSoftDel.filter((rand) => rand._id!== id));
 
+      setAutoActivated((prev) => ({ ...prev, [id]: true }));
+      toast.success("Đưa sản phẩm lên phiên thành công");
+    } catch (error) {
+      toast.error(`Tự động kích hoạt thất bại cho sản phẩm ${id}`);
+    }
+  };
+
+  useEffect(() => {
+    const now = new Date().getTime();
+
+    // Đặt trạng thái ban đầu
+    const initialActivated: { [key: string]: boolean } = {};
+    deletedPriceRandAuct.forEach((rand) => {
+      const startTime = new Date(rand.startTime).getTime();
+      if (now >= startTime) {
+        initialActivated[rand._id] = true;
+        autoTriggerPriceRand(rand._id); // Tự động kích hoạt nếu đã đến thời gian
+      }
+    });
+    setAutoActivated(initialActivated);
+
+    // Đặt timeout cho các sản phẩm chưa kích hoạt
+    const timeouts = deletedPriceRandAuct
+      .filter((rand) => new Date(rand.startTime).getTime() > now)
+      .map((rand) => {
+        const delay = new Date(rand.startTime).getTime() - now;
+        return setTimeout(() => {
+          setAutoActivated((prev) => ({ ...prev, [rand._id]: true }));
+          autoTriggerPriceRand(rand._id); // Tự động kích hoạt khi đến thời gian
+        }, delay);
+      });
+
+    return () => {
+      // Xóa timeout khi component unmount
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+    };
+  }, [deletedPriceRandAuct]);
   //   const handleDeletePriceRand = async (id: string) => {
   //     MySwal.fire({
   //       title: "Hủy sản phẩm?",
@@ -243,7 +265,12 @@ const ListPriceRandRecy: React.FC = () => {
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
-                    <button
+                  {autoActivated[rand._id] ? (
+                <span className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Đã kích hoạt</span>
+              ) : (
+                <span className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Chưa đến thời gian</span>
+              )}
+                    {/* <button
                       onClick={() => handleTriggerPriceRand(rand._id)}
                       className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
                     >
@@ -269,7 +296,7 @@ const ListPriceRandRecy: React.FC = () => {
                       <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-[10px] text-white transition-opacity duration-300">
                         Kích hoạt
                       </span>
-                    </button>
+                    </button> */}
 
                     <Link
                       to={`/admin/editPriceRandAuct/${rand._id}`}

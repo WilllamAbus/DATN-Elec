@@ -497,7 +497,8 @@ const randBinController = {
       }).lean();
 
       const productRand = serchProductRand.product_randBib;
-
+      // const startTimeConver = convertToLocalTime(serchProductRand.start_time)
+      // const endTimeConver = convertToLocalTime(serchProductRand.end_time)
       // Cập nhật trạng thái của sản phẩm thành 'disable'
       const updatedProduct = await ProductAuction.findByIdAndUpdate(
         productRand,

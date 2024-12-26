@@ -1,0 +1,253 @@
+const AuctionPricingRange = require("../../../../model/productAuction/auctionPricingRange"); // Đường dẫn đến model
+const ProductAuction = require("../../../../model/productAuction/productAuction");
+const AuctiomWinner = require("../../../../model/productAuction/auctionWinner");
+const User = require("../../../../model/users.model");
+const AuctionRound = require("../../../../model/productAuction/auctionRound");
+const {sendMailPenDingToWinner} = require("../mailer/mailerCheckWinnerAuct/mailerPendingToWinner");
+const checkAuctionCOntroller = {
+  getCheckWonUser: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 5;
+      const search = req.query.search || "";
+
+      // Fetch price range with active status
+      const priceRangeWinnwe = await AuctiomWinner.find({ status: "disable" })
+        .select("user bidPrice status auctionStatus auctionStausCheck")
+        .lean();
+
+      const userIds = priceRangeWinnwe.map((auctWin) => auctWin.user);
+
+      // Fetch active products that are in the price range
+      const auctWinnerCheck = await User.find({
+        _id: { $in: userIds },
+        status: "active",
+      })
+        .select("_id name phone email")
+        .lean();
+
+      // Map products to a productMap for easier access
+      const productMap = {};
+      auctWinnerCheck.forEach((product) => {
+        productMap[product._id] = product;
+      });
+
+      // Combine price range with product data
+      const matchedPriceRandge = priceRangeWinnwe
+        .map((priceRange) => {
+          const productIdStr = priceRange.user.toString(); // Convert ObjectId to string
+          const userWinnerAuct = productMap[productIdStr]; // Get product from productMap
+
+          if (userWinnerAuct) {
+            return {
+              ...priceRange, // Include price range info
+              userWinnerAuct, // Include product info
+            };
+          }
+          return null;
+        })
+        .filter((track) => track !== null); // Filter out null values
+
+      // Sort matched price range by maxPrice in descending order
+      const sortedWinnerAuct = matchedPriceRandge.sort(
+        (a, b) => b.bidPrice - a.bidPrice
+      );
+
+      // Filter by search term if provided
+      const searchResults = search
+        ? sortedWinnerAuct.filter((priceRange) => {
+            const nameWinnerAuct = priceRange.userWinnerAuct.name.toLowerCase();
+            return nameWinnerAuct.includes(search.toLowerCase());
+          })
+        : sortedWinnerAuct;
+
+      const totalItems = searchResults.length; // Total items after filtering
+      const totalBuckets = Math.ceil(totalItems / pageSize); // Total buckets (pages)
+      const bucket = Math.min(totalBuckets, page); // Current bucket (page)
+      const paginatedResults = searchResults.slice(
+        (bucket - 1) * pageSize,
+        bucket * pageSize
+      ); // Get the current page's results
+
+      // Add serial number to each item in the paginated results
+      const paginatedResultsWithIndex = paginatedResults.map((item, index) => ({
+        serialNumber: (page - 1) * pageSize + index + 1, // Calculate the serial number based on the page and index
+        ...item,
+      }));
+
+      const totalPages = totalBuckets;
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách người chiến thắng thành công",
+        data: {
+          auctWinnerCheck: paginatedResultsWithIndex, // Return the paginated results with serial numbers
+          totalPages: totalPages,
+          currentPage: page,
+          allPriceRandWinner: sortedWinnerAuct, // Return the sorted full list as well
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+   formatCustomId : (id) => {
+    if (typeof id !== 'string' || id.length < 4) {
+      throw new Error('ID không hợp lệ. Vui lòng cung cấp một chuỗi có ít nhất 4 ký tự.');
+    }
+    const lastFourChars = id.slice(-4).toUpperCase(); // Lấy 4 ký tự cuối và viết hoa
+    return `EBIDW-${lastFourChars}`;
+  },
+  getDetailCheckWinnerAuct: async (req, res) => {
+    try {
+        const { id } = req.params;
+   
+        
+            const auctionWinnerInfo = await AuctiomWinner.findOne({_id: id , status: 'disable'})
+                .select("user bidPrice status auctionStatus createdAt auctionStausCheck auctionPricingRange") // Populating userID inside shippingAddress
+                .exec();
+  
+      
+            
+              if (!auctionWinnerInfo) throw new Error("Đơn hàng không tồn tại");
+                const inForUser = auctionWinnerInfo.user
+              // Find order details related to the order
+              const userInforWinnerAuct = await User.findOne({
+                _id:inForUser, status: 'active'
+              }).lean();
+  
+              
+                    const productDetail = await ProductAuction.findOne({
+                        auctionPricing: auctionWinnerInfo.auctionPricingRange,
+                    }).lean();
+          
+        
+              // Extract the user and address information from the shippingAddress
+              const userInforWinner = {
+                userId: userInforWinnerAuct._id,
+                recipientName: userInforWinnerAuct.name,
+               
+                phone: userInforWinnerAuct.phone,
+                email: userInforWinnerAuct.email, // Assuming the user's email is stored here
+              };
+              
+       
+              
+              
+              const productDetails = {
+                productName: productDetail.product_name,
+                productPrice: productDetail.product_price,
+                quantity: 1,
+                image: productDetail.image[0]
+              }
+
+              const customData = {
+                userInforWinner, 
+                productDetails,// Contains recipient, phone, address, and user email
+                winnerPrice: auctionWinnerInfo.bidPrice,
+              
+                state: auctionWinnerInfo.auctionStausCheck,
+                date: auctionWinnerInfo.createdAt,
+                auctionWinnerid: auctionWinnerInfo._id,
+           
+              };
+              // Return the consolidated order information
+          
+
+              return res.status(200).json({
+                success: true,
+                status: 200,
+                 error: -2,
+                message: "Lấy chi tiết thành công",
+                data:customData
+              });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+
+  updateStatusCheck: async (req, res) => {
+    try {
+      const { idWinner } = req.params;
+      const { stateCheck } = req.body;
+  
+      console.log("updateStatusCheck", idWinner);
+      console.log("stateCheck:", `"${stateCheck}"`);
+  
+      // Các trạng thái hợp lệ
+      const statusOrderFlow = [
+        "Chờ duyệt",
+        "Xử lý duyệt",
+        "Đã duyệt hủy chiến thắng",
+      ];
+  
+      const winnerCheck = await AuctiomWinner.findById(idWinner);
+      console.log("winnerCheck", winnerCheck);
+  
+      if (!winnerCheck) {
+        throw new Error("Đơn hàng không tồn tại.");
+      }
+  
+      // Loại bỏ khoảng trắng dư thừa
+      const trimmedStateCheck = stateCheck.trim();
+      const currentIndex = statusOrderFlow.indexOf(winnerCheck.auctionStausCheck);
+      const newIndex = statusOrderFlow.indexOf(trimmedStateCheck);
+  
+      console.log("currentIndex", currentIndex);
+      console.log("newIndex", newIndex);
+  
+    //   if (currentIndex === -1 || newIndex === -1) {
+    //     throw new Error("Trạng thái hiện tại hoặc trạng thái mới không hợp lệ.");
+    //   }
+    const auctionCheck = await AuctiomWinner.find({
+        auctionRound: winnerCheck.auctionRound,
+      });
+      console.log("AuctiomWinner", auctionCheck);
+      // Nếu trạng thái hiện tại là "Đã duyệt hủy chiến thắng"
+      if (auctionCheck[0].auctionStausCheck === "Đã duyệt hủy chiến thắng") {
+   
+  
+        if (auctionCheck.length > 0) {
+          throw new Error(
+            "Đơn hàng này đã tồn tại trong lịch sử duyệt hủy."
+          );
+        }
+      }
+  
+      // Chuyển trạng thái tiếp theo
+      if (newIndex === currentIndex + 1) {
+        const updatedStatus = await AuctiomWinner.findOneAndUpdate(
+          { _id: idWinner },
+          { $set: { auctionStausCheck: trimmedStateCheck } },
+          { new: true }
+        );
+  
+        return res.status(200).json({
+          msg: `Cập nhật trạng thái đơn hàng thành công: ${trimmedStateCheck}`,
+          success: true,
+          status: 200,
+          data: updatedStatus,
+        });
+      } else {
+        throw new Error(
+          "Không thể chuyển về trạng thái trước đó hoặc nhảy qua trạng thái."
+        );
+      }
+    } catch (error) {
+      console.error(error.message);
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+  
+};
+
+module.exports = checkAuctionCOntroller;
