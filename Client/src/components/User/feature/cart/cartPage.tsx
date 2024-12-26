@@ -583,7 +583,7 @@ const CartPage: React.FC = () => {
           )}
           {activeTab === "auction" && (
             <>
-              {cartauction[0].itemAuction.length === 0 ? (
+              {cartauction?.[0]?.itemAuction?.length === 0 ? (
                 <div className="text-center mt-10">
                   <div className="flex justify-center">
                     <img
