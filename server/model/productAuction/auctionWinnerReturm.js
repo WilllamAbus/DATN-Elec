@@ -2,21 +2,13 @@ const { Schema, model } = require("mongoose");
 
 const auctionWinnerReturnSchema = new Schema(
   {
-    auctionPricingRangeReturn: { 
+
+    auctionWinnerReturn: { 
       type: Schema.Types.ObjectId, 
-      ref: 'AuctionPricingRange',
+      ref: 'AuctionWinner',
       required: true 
     },
-    auctionRoundReturn: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'AuctionRound', 
-      required: true 
-    },
-    userReturn: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'users', 
-      required: true 
-    },
+
     bidPriceReturn: { 
       type: Number, 
       required: true 
@@ -36,10 +28,11 @@ const auctionWinnerReturnSchema = new Schema(
     },
     auctionStausIsCheck:{
         type: String, 
-  
-        default: 'Đã duyệt' 
+     enum: ['Cảnh cáo tiếp theo ', 'Cảnh cáo lần cuối','Hủy tài khoản'], 
+        default: 'Đã duyệt hủy chiển thắng' 
     },
     coundDisabledAuction :{type: "Number", default: 1},
+    mess :{type: "String"},
     createdAt: { 
       type: Date, 
       default: Date.now 
