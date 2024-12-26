@@ -8,17 +8,18 @@ import { createOneUpdateBidAuctionThunk } from "../../../../../redux/product/cli
 import { toast, Toaster } from "react-hot-toast";
 import { io } from 'socket.io-client';
 import { convertToVietnameseCurrency } from "../../../../../common/pricecurrency/ConvertToVietnameseCurrency";
-
+import { useNavigate } from 'react-router-dom'; 
 const socket = io('http://localhost:4000'); 
 
 interface ProductCurrentPriceAndBidpriceProps {
   product: ProductAuction;
+  onAuctionEnd: () => void;
 }
 
-const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product }) => {
+const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd }) => {
   const [priceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
   const [currentPrice, setCurrentPrice] = useState<number>(product.auctionPricing.currentPrice ?? 0);
-
+  const navigate = useNavigate();
   const [userBidPrice, setUserBidPrice] = useState<number | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -32,21 +33,26 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
     socket.on('bidPlaced', (data) => {
       if (data.slug === product.slug) {
         setCurrentPrice(data.bidPrice);
+        
+        if (data.status === 'ended') {
+          onAuctionEnd();
+        }
+  
         if (data.userId !== userId) {
           toast.success(data.message);
         }
       }
     });
-
+  
     return () => {
       socket.off('bidPlaced');
     };
-  }, [product.slug, userId]);
+  }, [product.slug, userId, navigate]);
 
   const handleSubmitBidPrice = async () => {
     const bidPrice = userBidPrice ?? priceStep;
     const newPrice = currentPrice + bidPrice;
-    const previousPrice = currentPrice; // Lưu lại giá trị trước đó để khôi phục nếu có lỗi
+    const previousPrice = currentPrice;
 
     setCurrentPrice(newPrice);
     setUserBidPrice(null);

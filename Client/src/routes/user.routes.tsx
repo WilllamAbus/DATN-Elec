@@ -4,6 +4,7 @@ import User from "../page/User/Home/home";
 import Title from "../common/title/Title";
 const UserHome = React.lazy(() => import("../page/User/rootUser"));
 const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
+const AuctionResultPage = React.lazy(() => import("../page/User/auctionResult"));
 const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
 const UserRegister = React.lazy(() => import("../page/User/accounts/register"));
 const UserRegisOTP = React.lazy(() => import("../page/User/accounts/regisOTP"));
@@ -45,6 +46,9 @@ const UserPageDetail = React.lazy(
 );
 const UserPageDetailAuction = React.lazy(
   () => import("../page/User/detailAuction/detailAuction")
+);
+const UserAuctionResult = React.lazy(
+  () => import("../page/User/detailAuction/auctionResult")
 );
 const UserdetailsAuc = React.lazy(
   () => import("../page/User/shopping/auction/auctionDetails")
@@ -142,20 +146,32 @@ const UserRoutes: RouteObject[] = [
     path: "/",
     element: (
       <>
-        <Title /> {/* Title component bên trong route */}
+        <Title /> 
         <ExternalPage />
       </>
     ),
     children: [
       { path: "link-account", element: <LinkAccount /> },
-      { path: "link-account-success", element: <LinkAccountSuccess /> }
+      { path: "link-account-success", element: <LinkAccountSuccess /> },
+    ],
+  },
+  {
+    path: "/",
+    element: (
+      <>
+        <Title /> 
+        <AuctionResultPage />
+      </>
+    ),
+    children: [
+      { path: "auction-results", element: <UserAuctionResult /> },
     ],
   },
   {
     path: "*",
     element: (
       <>
-        <Title /> {/* Title component bên trong route */}
+        <Title />
         <UserHome />
       </>
     ),

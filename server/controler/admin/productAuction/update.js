@@ -3,7 +3,6 @@ const { uploadImage } = require('../../../utils/uploadImage');
 const { calculateDiscount } = require('../product_v2/calculator/discount');
 const { 
   checkProductNameExists, 
-  validateProductPriceInput ,
   isValidProductName,
   validateWeightInput
 } = require('./validators');
@@ -34,15 +33,7 @@ const update = async (req, res) => {
       }
     }
 
-    const productPrice = req.body.product_price; 
-    if (!validateProductPriceInput(productPrice)) {
-      return res.status(400).json({
-        success: false,
-        err: 3,
-        msg: 'Giá sản phẩm không hợp lệ. Nó phải là một số dương và không chứa ký tự.',
-        status: 400
-      });
-    }
+
 
 
 
@@ -63,7 +54,7 @@ const update = async (req, res) => {
         status: 400
       });
     }
-    const { discount, productPriceUnit } = await calculateDiscount(req.body.product_discount, productPrice);
+
 
     let imageUrls = existingProduct.image; 
     if (req.files && req.files.length) {
@@ -78,18 +69,8 @@ const update = async (req, res) => {
     existingProduct.image = imageUrls;
     existingProduct.product_description = req.body.product_description || existingProduct.product_description;
     existingProduct.product_type = req.body.product_type || existingProduct.product_type;
-    existingProduct.product_discount = {
-      discountId: discount._id,
-      code: discount.code,
-      discountPercent: discount.discountPercent,
-      isActive: discount.isActive,
-      status: discount.status,
-      disabledAt: discount.disabledAt
-    };
     existingProduct.product_brand = req.body.product_brand || existingProduct.product_brand;
     existingProduct.product_condition = req.body.product_condition || existingProduct.product_condition;
-    existingProduct.product_price = productPrice; 
-    existingProduct.product_price_unit = productPriceUnit;
     existingProduct.weight_g = weightInput;
     existingProduct.product_supplier = req.body.product_supplier || existingProduct.product_supplier;
 

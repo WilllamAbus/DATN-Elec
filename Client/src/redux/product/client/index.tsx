@@ -16,7 +16,8 @@ import {
   getAccessoryByVariantsSlice,
   getProductDetailAuctionSlice,
   createOneUpdateBidAuctionSlice,
-  getBiddingListSlice
+  getBiddingListSlice,
+  getAuctionDetailsBySlugSlice
 
 
 } from "./Slicle";
@@ -37,7 +38,8 @@ const productsReducer = combineReducers({
   getAccessoryByVarians:getAccessoryByVariantsSlice,
   getProductDetailAuction:getProductDetailAuctionSlice,
   createOneUpdateBidAuction:createOneUpdateBidAuctionSlice,
-  getBiddingList:getBiddingListSlice
+  getBiddingList:getBiddingListSlice,
+  getAuctionDetailsBySlug:getAuctionDetailsBySlugSlice
 
 
 });
