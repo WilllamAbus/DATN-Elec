@@ -4,17 +4,14 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   useDisclosure,
-  Image,
-  Code
+  Image,  
 } from "@nextui-org/react";
+import { Link } from "react-router-dom";
+import { MyButton } from "../../../../../common/customs/MyButton";
 
-interface AuctionLoseProps {
-  onClose: () => void;
-}
 
-export default function AuctionLose({ onClose }: AuctionLoseProps) {
+export default function AuctionLose() {
   const { isOpen, onOpenChange } = useDisclosure({ defaultOpen: true });
 
   return (
@@ -31,22 +28,20 @@ export default function AuctionLose({ onClose }: AuctionLoseProps) {
       isOpen={isOpen}
       radius="lg"
       onOpenChange={onOpenChange}
+      size="3xl"
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Thông báo</ModalHeader>
-        <ModalBody>
+        <ModalBody className="flex flex-col items-center">
           <Image
             alt="Ảnh thua"
             src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/winnerandlose%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(2).svg?alt=media&token=71a420cc-ce3e-4c96-966a-08aa6e5da4b8"
             width={300}
           />
-          <Code color="primary" size="lg">Không trúng đấu giá</Code>
           <p>Đấu giá không thành công sản phẩm chúc bạn may mắn lần sao</p>
         </ModalBody>
         <ModalFooter>
-          <Button className="bg-[#6f4ef2] shadow-lg shadow-indigo-500/20" onPress={onClose}>
-            Trở về danh sách đấu giá
-          </Button>
+        <Link to="/auction"> <MyButton variant="gradientBlue" size="sm"  >Trở về danh sách đấu giá </MyButton> </Link>
         </ModalFooter>
       </ModalContent>
     </Modal>

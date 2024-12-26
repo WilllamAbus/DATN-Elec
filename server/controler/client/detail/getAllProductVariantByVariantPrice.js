@@ -1,47 +1,63 @@
-  const getAllProductsByVariantPriceService = require('../../../services/product/admin/product-variant/getAllProductsByVariantPrice.Service');
+const AuctionWinner = require('../../model/productAuction/auctionWinner');
 
-  const getAllProductVariantsByVariantPrice = async (req, res) => {
-    const { slug } = req.params;
-    const { page = 1, limit = 5 } = req.query; 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); 
-      const response = await getAllProductsByVariantPriceService.getAllProductsByVariantPrice(slug, parseInt(page), parseInt(limit));
+const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirmationStatus = 'pending') => {
+  const query = { user: userId };
+  const skip = (page - 1) * limit;
 
-      if (!response.success) {
-        return res.status(response.status).json({
-          success: response.success,
-          err: response.err,
-          msg: response.msg,
-          status: response.status,
-        });
+  const auctionWins = await AuctionWinner.find(query)
+    .populate({
+      path: 'auctionPricingRange',
+      populate: {
+        path: 'product_randBib',
+        select: 'product_name'
       }
-      console.log('Total Items:', response.pagination.totalItems);
+    })
+    .populate('auctionRound user')
+    .skip(skip)
+    .limit(limit);
 
-      return res.status(200).json({
-        success: true,
-        err: 0,
-        msg: 'OK',
-        status: 200,
-        data: response.data,
-        pagination: {
-          currentPage: response.pagination.currentPage,
-          totalPages: response.pagination.totalPages,
-          totalItems: response.pagination.totalItems,
-          hasNextPage: response.pagination.currentPage < response.pagination.totalPages,
-          hasPrevPage: response.pagination.currentPage > 1,
-        },
-      });
-    } catch (error) {
-      console.error('Error in getAllProductsByPrice:', error);
-      return res.status(500).json({
-        success: false,
-        err: -1,
-        msg: 'Error: ' + error.message,
-        status: 500,
-      });
+  const currentTime = new Date().getTime();
+
+  for (const auction of auctionWins) {
+    if (new Date(auction.endTime).getTime() < currentTime && auction.confirmationStatus === 'pending') {
+      auction.confirmationStatus = 'canceled';
+      auction.status = 'disabled';
+      auction.auctionStatus = 'lose';
+      auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
+      await auction.save();
     }
-  };
 
-  module.exports = {
-    getAllProductVariantsByVariantPrice,
+    const endTime = new Date(auction.endTime).getTime();
+    const remainingTime = endTime - currentTime;
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+    auction.remainingTime = remainingTime > 0 
+      ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây` 
+      : "Đã kết thúc";
+  }
+
+
+  const filteredAuctionWins = auctionWins.filter(auction => auction.confirmationStatus === confirmationStatus);
+
+  const total = filteredAuctionWins.length;
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data: filteredAuctionWins.slice(0, limit), 
+    pagination: {
+      currentPage: page,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
+    total 
   };
+};
+
+module.exports = {
+  getAuctionWinsByUserService,
+};
