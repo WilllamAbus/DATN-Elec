@@ -47,6 +47,9 @@ const UserPageDetail = React.lazy(
 const UserPageDetailAuction = React.lazy(
   () => import("../page/User/detailAuction/detailAuction")
 );
+const UserAuctionPage = React.lazy(
+  () => import("../page/User/AuctionPage/AuctionPage")
+);
 const UserAuctionResult = React.lazy(
   () => import("../page/User/detailAuction/auctionResult")
 );
@@ -74,9 +77,7 @@ const UserWatchList = React.lazy(
 const UserSearch = React.lazy(
   () => import("../page/User/shopping/search/index")
 );
-const UserFilter = React.lazy(
-  () => import("../page/User/shopping/filter/index")
-);
+
 const UserViewBids = React.lazy(
   () => import("../page/User/shopping/auction/biddings/viewBid")
 );
@@ -126,10 +127,10 @@ const UserRoutes: RouteObject[] = [
       { path: "auction", element: <UserAuction /> },
       { path: "product/:slug", element: <UserPageDetail /> },
       { path: "product-auction/:slug", element: <UserPageDetailAuction /> },
+      { path: "session-auction", element: <UserAuctionPage /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },
       { path: "search/:keyword", element: <UserSearch /> },
-      { path: "filter/:price", element: <UserFilter /> },
       { path: "checkout/:id", element: <UserCheckoutpage /> },
       { path: "complete/:id", element: <UserPaymentpage /> },
       { path: "profile", element: <UserProdfile /> },

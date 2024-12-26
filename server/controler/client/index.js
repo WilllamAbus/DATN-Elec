@@ -5,6 +5,7 @@ const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
 const {getProductDetail,getAllStorageBySlugUrl,getAllProductVariantsByVariantPrice} = require('./detail');
 const {getProductDetailAuction,createOneUpdateBidAuction,getAuctionDetailsBySlug,biddingList} = require('./detailAuction');
+const {getAuctionWinsByUser,confirmAuction,canceledAuction} = require('./AuctionByUser');
 
 const {
   getAllBrandPageAuction,
@@ -58,5 +59,8 @@ module.exports = {
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
   biddingList,
+  getAuctionWinsByUser,
+  confirmAuction,
+  canceledAuction
 };
 

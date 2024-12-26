@@ -10,6 +10,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import checkoutSlice from "./checkout/checkoutSlice";
 import productAdminReducer from "./product/admin";
 import productClientReducer from "./product/client";
+import auctionWinReducer from "./sessionAuction";
 import postReducer from "./post";
 import attributeReducer from "./attribute";
 import getAttributesReducer from "./product/attributes";
@@ -108,8 +109,8 @@ const rootReducer = combineReducers({
   Bank: BankReducer,
   listBidActive: listBidActiveReducer,
   listRandAuct: listRandAuctReducer,
-  deletedPriceRand: listRandAuctDeletedReducer
-  // Add other reducers here to combine them with the persisted state.
+  deletedPriceRand: listRandAuctDeletedReducer,
+  auctionWin:auctionWinReducer
 });
 
 export type AppDispatch = typeof store.dispatch;
