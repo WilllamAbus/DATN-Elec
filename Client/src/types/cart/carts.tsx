@@ -120,7 +120,13 @@ export interface AuctionWinner {
   _id: string;
   auctionPricingRange: string;
   auctionRound: string;
-  user: string;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address?: string;
+  };
   bidPrice: number;
   paymentStatus: string;
   auctionStatus: string;
