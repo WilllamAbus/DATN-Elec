@@ -21,7 +21,8 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
   for (const auction of auctionWins) {
     if (new Date(auction.endTime).getTime() < currentTime && auction.confirmationStatus === 'pending') {
       auction.confirmationStatus = 'canceled';
-      auction.auctionStatus = 'canceled';
+      auction.status = 'disabled';
+      auction.auctionStatus = 'lose';
       auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
       await auction.save();
     }
