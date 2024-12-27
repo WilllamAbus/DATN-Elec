@@ -2,8 +2,10 @@ const AuctionPricingRange = require("../../../../model/productAuction/auctionPri
 const ProductAuction = require("../../../../model/productAuction/productAuction");
 const AuctiomWinner = require("../../../../model/productAuction/auctionWinner");
 const User = require("../../../../model/users.model");
-const AuctionRound = require("../../../../model/productAuction/auctionRound");
+// const AuctionRound = require("../../../../model/productAuction/auctionRound");
 const {sendMailPenDingToWinner} = require("../mailer/mailerCheckWinnerAuct/mailerPendingToWinner");
+const {sendMailWinnerDel} = require("../mailer/mailerCheckWinnerAuct/maillerWinnerDis");
+const AuctionWinnerReetirn  = require("../../../../model/productAuction/auctionWinnerReturm")
 const checkAuctionCOntroller = {
   getCheckWonUser: async (req, res) => {
     try {
@@ -177,8 +179,7 @@ const checkAuctionCOntroller = {
       const { idWinner } = req.params;
       const { stateCheck } = req.body;
   
-      console.log("updateStatusCheck", idWinner);
-      console.log("stateCheck:", `"${stateCheck}"`);
+  
   
       // Các trạng thái hợp lệ
       const statusOrderFlow = [
@@ -188,7 +189,7 @@ const checkAuctionCOntroller = {
       ];
   
       const winnerCheck = await AuctiomWinner.findById(idWinner);
-      console.log("winnerCheck", winnerCheck);
+ 
   
       if (!winnerCheck) {
         throw new Error("Đơn hàng không tồn tại.");
@@ -199,34 +200,144 @@ const checkAuctionCOntroller = {
       const currentIndex = statusOrderFlow.indexOf(winnerCheck.auctionStausCheck);
       const newIndex = statusOrderFlow.indexOf(trimmedStateCheck);
   
-      console.log("currentIndex", currentIndex);
-      console.log("newIndex", newIndex);
+   
   
     //   if (currentIndex === -1 || newIndex === -1) {
     //     throw new Error("Trạng thái hiện tại hoặc trạng thái mới không hợp lệ.");
     //   }
-    const auctionCheck = await AuctiomWinner.find({
-        auctionRound: winnerCheck.auctionRound,
-      });
-      console.log("AuctiomWinner", auctionCheck);
-      // Nếu trạng thái hiện tại là "Đã duyệt hủy chiến thắng"
-      if (auctionCheck[0].auctionStausCheck === "Đã duyệt hủy chiến thắng") {
-   
-  
-        if (auctionCheck.length > 0) {
-          throw new Error(
-            "Đơn hàng này đã tồn tại trong lịch sử duyệt hủy."
-          );
-        }
-      }
-  
-      // Chuyển trạng thái tiếp theo
-      if (newIndex === currentIndex + 1) {
+    if (newIndex === currentIndex + 1) {
         const updatedStatus = await AuctiomWinner.findOneAndUpdate(
           { _id: idWinner },
           { $set: { auctionStausCheck: trimmedStateCheck } },
           { new: true }
         );
+  
+      // Nếu trạng thái hiện tại là "Đã duyệt hủy chiến thắng"
+      if (updatedStatus.auctionStausCheck === "Đã duyệt hủy chiến thắng") {
+   
+        
+  
+
+        const auctionCheckRound = await AuctiomWinner.find({
+            auctionRound: updatedStatus.auctionRound, status:'disable', auctionStatus:"won"
+          });
+       
+          const checkVariable = auctionCheckRound[0].auctionStausCheck 
+      
+          
+          if(checkVariable === 'Đã duyệt hủy chiến thắng'){
+            
+            const winnerSetUp = await AuctiomWinner.findOne(
+                {_id: auctionCheckRound[0]._id}
+            
+            ).lean();
+            
+                       
+         
+
+            const winnerSetUpId = winnerSetUp._id
+            const winnnerBidPrice = winnerSetUp.bidPrice
+            const converPrice = winnnerBidPrice.toLocaleString('vi-VN')
+            const wiinerUser = winnerSetUp.user
+            const winnerPriceRand = winnerSetUp.auctionPricingRange
+                 await AuctiomWinner.findByIdAndUpdate({
+                _id: winnerSetUpId
+            }, {$set:{auctionStatus: 'lose', status: 'disable'}},  { new: true })
+
+            const auctWinnerCheck = await User.findOne({
+                _id: wiinerUser,
+                status: "active",
+              })
+                .select("_id name phone email")
+                .lean();
+        
+              
+              const emailWinner = auctWinnerCheck.email
+              const productWinnser = await ProductAuction.findOne({auctionPricing:winnerPriceRand }).lean();
+              
+              const winnserProductDetail = {
+                productName: productWinnser.product_name,
+                productPrice: converPrice,
+                quantity: 1,
+                image: productWinnser.image[0],
+
+
+              }
+
+         
+              
+              const addWinnerReturn = await AuctionWinnerReetirn({
+                auctionWinnerReturn: winnerSetUpId,
+                bidPriceReturn: winnnerBidPrice,
+                auctionWinnerUserReturn: wiinerUser,
+                isPaymentReturnStatus:'failed',
+                auctionReturnStatus: 'canceled',
+                status: 'disable',
+                auctionStausIsCheck: 'Đã duyệt hủy chiến thắng',
+                coundDisabledAuction: 1
+              })
+              await addWinnerReturn.save()
+              sendMailWinnerDel(emailWinner, winnerSetUpId, winnserProductDetail)
+
+         
+
+              const auctionCheckRoundTwo = await AuctiomWinner.find({
+                auctionRound: winnerCheck.auctionRound, 
+                 auctionStatus:"pending",
+                 auctionStausCheck:"Chờ duyệt",
+                  status:'active',
+
+              });
+         
+              
+            const checkVariableTwo = auctionCheckRoundTwo[0].auctionStausCheck
+          
+            
+            if(checkVariableTwo === 'Chờ duyệt'){
+                const winnerSetUpTwo = await AuctiomWinner.findOne(
+                {_id: auctionCheckRoundTwo[0]._id}
+                
+              ).lean();
+          
+              
+              const winnerSetUpId = winnerSetUpTwo._id
+              const winnerSetUpPrice = winnerSetUpTwo.bidPrice
+              const converPrice = winnerSetUpPrice.toLocaleString('vi-VN')
+              const wiinerUser = winnerSetUpTwo.user
+              const winnerPriceRand = winnerSetUpTwo.auctionPricingRange
+                   await AuctiomWinner.findByIdAndUpdate({
+                  _id: winnerSetUpId
+              }, {$set:{auctionStatus: 'won'}},  { new: true })
+
+              const auctWinnerCheck = await User.findOne({
+                _id: wiinerUser,
+                status: "active",
+              })
+                .select("_id name phone email")
+                .lean();
+           
+              
+              const emailWinner = auctWinnerCheck.email
+              const productWinnser = await ProductAuction.findOne({auctionPricing:winnerPriceRand }).lean();
+             
+                
+              const winnserProductDetail = {
+                productName: productWinnser.product_name,
+                productPrice: converPrice,
+                quantity: 1,
+                image: productWinnser.image[0],
+              }
+              sendMailPenDingToWinner(emailWinner, winnerSetUpId, winnserProductDetail)
+
+
+            }
+          } 
+
+         
+      }
+  
+      // Chuyển trạng thái tiếp theo
+     
   
         return res.status(200).json({
           msg: `Cập nhật trạng thái đơn hàng thành công: ${trimmedStateCheck}`,

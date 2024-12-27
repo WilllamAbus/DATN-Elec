@@ -1,11 +1,11 @@
 const ProductAuction = require("../../../model/productAuction/productAuction");
 const AuctionWinner = require("../../../model/productAuction/auctionWinner");
+const AuctionRound = require("../../../model/productAuction/auctionRound");
 const { getIO } = require('../../../services/skserver/socketServer');
 
 const getAuctionDetailsBySlug = async (req, res) => {
   const { slug } = req.params;
   try {
-    // Find the product auction by slug
     const productAuction = await ProductAuction.findOne({ slug });
     if (!productAuction) {
       return res.status(404).json({
@@ -14,49 +14,38 @@ const getAuctionDetailsBySlug = async (req, res) => {
         message: "Sản phẩm không tồn tại.",
       });
     }
+    const auctionRound = await AuctionRound.findOne({ auctionPricing: productAuction.auctionPricing })
+      .populate('bids.user', 'name email');
 
-    // Find the auction winners for the auctionPricingRange associated with the product
+    if (!auctionRound) {
+      return res.status(404).json({
+        code: "NO_ROUND",
+        status: "error",
+        message: "Không có vòng đấu giá.",
+      });
+    }
     const auctionWinners = await AuctionWinner.find({
       auctionPricingRange: productAuction.auctionPricing,
     })
       .populate("user", "name email")
       .sort({ bidPrice: -1 });
-
-    if (auctionWinners.length === 0) {
-      return res.status(404).json({
-        code: "NO_HISTORY",
-        status: "error",
-        message: "Không có lịch sử đấu giá.",
-      });
-    }
-
-    // Map auction winners to include status
-    const result = auctionWinners.map((entry, index) => {
-      if (index === 0) {
-        return {
-          user: entry.user,
-          bidPrice: entry.bidPrice,
-          status: "Đã trúng đấu giá",
-          statusCode: 0,
-        };
-      } else if (index < 3) {
-        return {
-          user: entry.user,
-          bidPrice: entry.bidPrice,
-          status: "Đang trong danh sách hàng chờ",
-          statusCode: 1,
-        };
+    const winnersMap = new Map(auctionWinners.map((entry, index) => {
+      const status = index === 0 ? "Đã trúng đấu giá" : "Đang trong danh sách hàng chờ";
+      const statusCode = index === 0 ? 0 : 1;
+      return [entry.user._id.toString(), { user: entry.user, bidPrice: entry.bidPrice, status, statusCode }];
+    }));
+    const result = auctionRound.bids.map(bid => {
+      if (winnersMap.has(bid.user._id.toString())) {
+        return winnersMap.get(bid.user._id.toString());
       } else {
         return {
-          user: entry.user,
-          bidPrice: entry.bidPrice,
+          user: bid.user,
+          bidPrice: bid.bidPrice,
           status: "Không trúng đấu, chúc bạn may mắn lần sau",
           statusCode: 2,
         };
       }
     });
-
-    // Emit socket event to update clients
     getIO().emit('auctionUpdate', {
       slug,
       bidders: result,

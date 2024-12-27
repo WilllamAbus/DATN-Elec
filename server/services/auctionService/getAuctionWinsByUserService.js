@@ -1,10 +1,13 @@
 const AuctionWinner = require('../../model/productAuction/auctionWinner');
 
 const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirmationStatus = 'pending') => {
-  const query = { user: userId };
+  const query = { 
+    user: userId,
+    confirmationStatus: confirmationStatus,
+    auctionStatus: { $in: ['won', 'pending'] } 
+  };
   const skip = (page - 1) * limit;
 
-  const total = await AuctionWinner.countDocuments(query);
   const auctionWins = await AuctionWinner.find(query)
     .populate({
       path: 'auctionPricingRange',
@@ -22,24 +25,36 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
   for (const auction of auctionWins) {
     if (new Date(auction.endTime).getTime() < currentTime && auction.confirmationStatus === 'pending') {
       auction.confirmationStatus = 'canceled';
-      auction.auctionStatus = 'canceled';
+      auction.status = 'disabled';
+      auction.auctionStatus = 'lose';
       auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
       await auction.save();
     }
+
+    const endTime = new Date(auction.endTime).getTime();
+    const remainingTime = endTime - currentTime;
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+    auction.remainingTime = remainingTime > 0 
+      ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây` 
+      : "Đã kết thúc";
   }
 
-  const filteredAuctionWins = auctionWins.filter(auction => auction.confirmationStatus === confirmationStatus);
-
-  const totalPages = Math.ceil(filteredAuctionWins.length / limit);
+  const total = auctionWins.length;
+  const totalPages = Math.ceil(total / limit);
 
   return {
-    data: filteredAuctionWins.slice(0, limit), 
+    data: auctionWins.slice(0, limit), 
     pagination: {
       currentPage: page,
       totalPages,
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
+    total
   };
 };
 

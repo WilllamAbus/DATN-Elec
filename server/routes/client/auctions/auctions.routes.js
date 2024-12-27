@@ -8,6 +8,8 @@ const randinBidAuction =
 
  const auctionWinner =
  require("../../../controler/orders/auctions/checkAuction/checkAuction.controller");
+ const auctionEnable =
+ require("../../../controler/orders/auctions/checkAuction/enableAuction.controller");
 
 // router.get('/get-auction-details',middlewareController.verifyTokenUserAuth,auctionController.getAuctionDetails);
 // router.post('/complete',middlewareController.verifyToken,auctionController.completeAuctionController);
@@ -37,4 +39,10 @@ router.put('/putPriceRandAuc/:id',middlewareController.verifyTokenAdminAuth,rand
 router.get('/allAuctWinnerCheck',middlewareController.verifyTokenAdminAuth,auctionWinner.getCheckWonUser);
 router.get('/detailAuctWinnerCheck/:id',middlewareController.verifyTokenAdminAuth,auctionWinner.getDetailCheckWinnerAuct);
 router.put('/updatStatusCheck/:idWinner',middlewareController.verifyTokenAdminAuth,auctionWinner.updateStatusCheck);
+
+
+// enableAuction
+router.get('/allAuctWinnerEnable',middlewareController.verifyTokenAdminAuth,auctionEnable.getEnableUser);
+router.get('/detailAuctWinnerEnable/:id',middlewareController.verifyTokenAdminAuth,auctionEnable.getDetailCheckEnableAuct);
+router.put('/updatStatusEnable/:idEnale',middlewareController.verifyTokenAdminAuth,auctionEnable.updateStatusEnable);
 module.exports = router;

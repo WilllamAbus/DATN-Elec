@@ -124,7 +124,7 @@ const isCheckedAuct: React.FC = () => {
                       : "bg-red-50 text-red-700"
                   }`}
                 >
-                  {winnneerCheck.auctionStatus === "won" ? "Thắng phiên đấu giá" : "Thua đấu giá"}
+                  {winnneerCheck.auctionStatus === "won" ? "Thắng phiên đấu giá" : "Đã hủy chiến thắng"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
