@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../../redux/store";
 import { AuctionWin } from "../../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser";
-import { confirmAuctionThunk,getAuctionWinsByUserThunk } from "../../../../../redux/sessionAuction/thunk";
+import { confirmAuctionThunk,getAuctionWinsByUserThunk,canceledAuctionThunk } from "../../../../../redux/sessionAuction/thunk";
 import {
   Table,
   TableHeader,
@@ -64,16 +64,25 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ auction,curre
         setIsModalOpen(false);
       } catch (error: any) {
         toast.error(error.msg || "Xác nhận đấu giá thất bại!");
-        console.error("Xác nhận đấu giá thất bại:", error);
       }
     }
   };
   
 
-  const handleCancel = () => {
-    // Thêm hành động hủy ở đây nếu cần thiết
-    setIsModalOpen(false);
+  const handleCancel = async () => {
+    if (selectedAuction) {
+      try {
+        const response = await dispatch(canceledAuctionThunk({ auctionWinnerId: selectedAuction._id })).unwrap(); 
+        toast.success(response.msg || "Hủy đấu giá thành công!");
+        await dispatch(getAuctionWinsByUserThunk({ page: currentPage }));
+        setIsModalOpen(false);
+      } catch (error: any) {
+        toast.error(error.msg || "Hủy đấu giá thất bại!");
+        console.error("Hủy đấu giá thất bại:", error);
+      }
+    }
   };
+
 
   const renderCell = (auction: AuctionWin, columnKey: string) => {
     switch (columnKey) {
