@@ -1,21 +1,19 @@
+import React from "react";
 import { Pagination } from "@nextui-org/react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../../redux/store";
-import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
 import AuctionPendingTable from "./table/auctionPendingTable";
 import NoAuctionWin from "./noAuction/noAuctionWin";
+import { AppDispatch } from "../../../../redux/store";
+import { AuctionWin } from "../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser";
+import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
 
-export default function ListAuctionWin() {
-  const dispatch = useDispatch<AppDispatch>();
-  const currentPage = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.pagination?.currentPage || 1);
-  const totalPages = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.pagination?.totalPages || 1);
-  const auction = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.auctionWins || []);
+interface ListAuctionWinProps {
+  auction: AuctionWin[];
+  dispatch: AppDispatch;
+  currentPage: number;
+  totalPages: number;
+}
 
-  useEffect(() => {
-    dispatch(getAuctionWinsByUserThunk({ page: currentPage }));
-  }, [dispatch, currentPage]);
-
+const ListAuctionWin: React.FC<ListAuctionWinProps> = ({ auction, dispatch, currentPage, totalPages }) => {
   const handlePageChange = (page: number) => {
     dispatch(getAuctionWinsByUserThunk({ page }));
   };
@@ -26,7 +24,6 @@ export default function ListAuctionWin() {
         <>
           <AuctionPendingTable
             auction={auction}
-            dispatch={dispatch}
             currentPage={currentPage}
           />
           {totalPages > 1 && (
@@ -48,4 +45,6 @@ export default function ListAuctionWin() {
       )}
     </>
   );
-}
+};
+
+export default ListAuctionWin;

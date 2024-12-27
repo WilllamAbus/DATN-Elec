@@ -14,7 +14,6 @@ const cartItemAuctionSchema = new Schema({
   auctionWiner: {
     type: Schema.Types.ObjectId,
     ref: "AuctionWinner",
-    // required: true,
   },
   auctionStartTime: { type: Date, default: null },
   auctionEndTime: { type: Date, default: null },
