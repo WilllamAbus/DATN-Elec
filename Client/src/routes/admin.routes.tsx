@@ -402,7 +402,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "listCheckAuct", element: <AdminListCheckAuct /> },
       { path: "listEnableAuct", element: <AdminListEnableAuct /> },
       { path: "detailDisableCheck/:id", element: <AdminDetalDisableAuct /> },
-      { path: "detailEnable/:is", element: < AdminDetalEnableAuct/> },
+      { path: "detailEnable/:id", element: < AdminDetalEnableAuct/> },
       { path: "*", element: <Dashboard /> },
     ],
   },

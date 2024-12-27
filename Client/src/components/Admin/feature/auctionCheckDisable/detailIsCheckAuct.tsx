@@ -73,7 +73,7 @@ const OrderDetails: React.FC = () => {
 
   
   const handleUpdateStatus = async(newStatus: string) => {
-    console.log('updateStatus', newStatus);
+
     
     if (selectedOrder ) {
  
@@ -92,7 +92,7 @@ const OrderDetails: React.FC = () => {
      }
 
   };
-  console.log('Updated status', selectedOrder?.state);
+
   
   const renderStatusButton = () => {
     switch (selectedOrder?.state) {
@@ -113,7 +113,7 @@ const OrderDetails: React.FC = () => {
           <Button
             onClick={() => {
               // setSelectedStatus();
-              handleUpdateStatus("   Đã duyệt hủy chiến thắng");
+              handleUpdateStatus("Đã duyệt hủy chiến thắng");
             }}
             className="mt-4 bg-red-500 text-white"
           >
@@ -205,7 +205,7 @@ const OrderDetails: React.FC = () => {
       
             <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">
-            Thông Tin Khách Hàng
+            Thông tin khách hàng
           </h2>
           <div className="space-y-2">
             <p className="text-lg mb-2 text-gray-700">
@@ -217,7 +217,7 @@ const OrderDetails: React.FC = () => {
               {selectedOrder.userInforWinner?.phone}
             </p>
             <p className="text-lg text-gray-700">
-              <span className="font-medium">Địa chỉ giao hàng:</span>{" "}
+              <span className="font-medium">Email:</span>{" "}
               {selectedOrder.userInforWinner?.email}
             </p>
           </div>

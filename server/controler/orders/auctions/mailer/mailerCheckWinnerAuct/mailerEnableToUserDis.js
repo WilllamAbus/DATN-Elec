@@ -22,7 +22,7 @@ function generateInvoiceId() {
   const uniqueId = uuidv4(); // Generate a UUID
   return `INV-${uniqueId}`;
 }
-exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
+exports.sendMailEnableDel = async (userEmail, order, orderDetailSummary) => {
   try {
     const invoiceId = generateInvoiceId();
     const accesToken = await oAuth2Client.getAccessToken();
@@ -479,7 +479,7 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                                         mso-text-raise: 1px;
                                       "
                                     >
-                                     Chiến thắng phiên đấu giá đã hủy
+                                    Tài khoản cảnh báo
                                     </h1>
                                   </td>
                                 </tr>
@@ -527,7 +527,7 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                                         mso-text-raise: 2px;
                                       "
                                     >
-                                Chúng tôi xin thông báo rằng yêu cầu hủy chiến thắng của phiên đấu giá thành công.
+                                Chúng tôi xin thông báo rằng tài khoản của quý khách đang trong giai đoạn cảnh báo.
                                 Chúng tôi rất vui khi có cơ hội phục vụ bạn và hy vọng bạn sẽ hài lòng với sản phẩm. 
                                 Nếu bạn cần bất kỳ sự hỗ trợ nào hoặc có câu hỏi về đơn hàng của mình, xin vui lòng liên hệ với chúng tôi.
                                 Một lần nữa, xin cảm ơn bạn đã tin tưởng và lựa chọn dịch vụ của chúng tôi
@@ -978,10 +978,10 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                       <td class="t52">
                         <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 500; font-size: 14px; text-transform: uppercase; color: #333333; text-align: right;">
                           Giá chiến thắng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.productPrice} đ</span>
-                             Giá chiến thắng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity} </span>
+                           <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity} </span>
                         </p>
                       </td>
-                      <td class="t53" style="width: 10px" width="10"></td>
+
                     </tr>
                   </table>
                 </td>

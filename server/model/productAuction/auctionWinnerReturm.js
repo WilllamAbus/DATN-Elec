@@ -8,6 +8,11 @@ const auctionWinnerReturnSchema = new Schema(
       ref: 'AuctionWinner',
       required: true 
     },
+    auctionWinnerUserReturn: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'users',
+      required: true 
+    },
 
     bidPriceReturn: { 
       type: Number, 
@@ -15,21 +20,22 @@ const auctionWinnerReturnSchema = new Schema(
     },
     isPaymentReturnStatus: { 
       type: String, 
-    //   enum: ['pending', 'paid', 'failed'], 
+
       default: 'failed' 
     },
     auctionReturnStatus: { 
       type: String, 
-    //   enum: ['won', 'pending','canceled'], 
+ 
       default: 'canceled' 
     },
-    status:{
-        status: { type: String, default: 'disable' },
-    },
+    status: { type: String, default: 'deleted' },
     auctionStausIsCheck:{
         type: String, 
-     enum: ['Cảnh cáo tiếp theo ', 'Cảnh cáo lần cuối','Hủy tài khoản'], 
-        default: 'Đã duyệt hủy chiển thắng' 
+        enum: ['Đã duyệt hủy chiến thắng',
+          'Cảnh báo đầu tiên', 
+          'Cảnh báo cuối cùng',
+          'Khóa tài khoản'], 
+    
     },
     coundDisabledAuction :{type: "Number", default: 1},
     mess :{type: "String"},

@@ -12,7 +12,7 @@ const listProducCheckedPage: React.FC = () => {
       <ReusableBreadcrumb items={breadcrumbItems.listPriceRand} />
       <div className="mb-4 ml-4 col-span-full xl:mb-2">
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-          Danh sách chờ duyệt
+          Danh sách  duyệt
         </h1>
       </div>
       <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
