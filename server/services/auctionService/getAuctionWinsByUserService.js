@@ -1,7 +1,11 @@
 const AuctionWinner = require('../../model/productAuction/auctionWinner');
 
 const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirmationStatus = 'pending') => {
-  const query = { user: userId };
+  const query = { 
+    user: userId,
+    confirmationStatus: confirmationStatus,
+    auctionStatus: { $in: ['won', 'pending'] } 
+  };
   const skip = (page - 1) * limit;
 
   const auctionWins = await AuctionWinner.find(query)
@@ -39,22 +43,18 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
       : "Đã kết thúc";
   }
 
-
-  const filteredAuctionWins = auctionWins.filter(auction => auction.confirmationStatus === confirmationStatus);
-
-  const total = filteredAuctionWins.length;
-
+  const total = auctionWins.length;
   const totalPages = Math.ceil(total / limit);
 
   return {
-    data: filteredAuctionWins.slice(0, limit), 
+    data: auctionWins.slice(0, limit), 
     pagination: {
       currentPage: page,
       totalPages,
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
-    total 
+    total
   };
 };
 

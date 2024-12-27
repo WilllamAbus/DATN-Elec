@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import AppAuction from "./auctionApp";
-import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
+import { getAuctionWinsByUserThunk, } from "../../../../redux/sessionAuction/thunk";
 
 
 const AuctionPage: React.FC = () => {

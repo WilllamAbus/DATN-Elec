@@ -27,6 +27,8 @@ export const MyButton = extendVariants(Button, {
       outlined: "border-2 border-[#3490dc] text-[#3490dc] bg-transparent", // Viền với màu xanh dương
       neon: "bg-[#2bd4b0] text-white shadow-lg border-2 border-[#00df9a]", // Neon xanh lá
       transparent: "bg-transparent text-[#3b9f82] bg-[#3b9f82] font-bold", // Màu nền trong suốt
+      confirmSolid: "bg-gradient-to-r from-[#015C92] to-[#2D82B5] text-white font-bold", // Gradient xanh dương cho nút xác nhận
+      cancelSolid: "bg-gradient-to-r from-[#C73866] to-[#FE676E] text-white font-bold", // Gradient đỏ cho nút hủy
     },
   },
   defaultVariants: {

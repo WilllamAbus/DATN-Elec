@@ -5,6 +5,7 @@ import NoAuctionWin from "./noAuction/noAuctionWin";
 import { AppDispatch } from "../../../../redux/store";
 import { AuctionWin } from "../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser";
 import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
+
 interface ListAuctionWinProps {
   auction: AuctionWin[];
   dispatch: AppDispatch;
@@ -23,7 +24,6 @@ const ListAuctionWin: React.FC<ListAuctionWinProps> = ({ auction, dispatch, curr
         <>
           <AuctionPendingTable
             auction={auction}
-            dispatch={dispatch}
             currentPage={currentPage}
           />
           {totalPages > 1 && (

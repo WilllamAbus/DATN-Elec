@@ -18,7 +18,7 @@ const getAuctionWinsByUser = async (req, res) => {
     const { data: auctionWins, pagination, total } = await getAuctionWinsByUserService(userId, +page || 1, +limit || 10, confirmationStatus || 'pending');
 
     if (!auctionWins.length) {
-      return res.status(200).json({ code: 'KHONG_CO_KET_QUA_DAU_GIA', msg: 'Không tìm thấy kết quả đấu giá trúng nào cho người dùng này.', total });
+      return res.status(200).json({ code: 'KHONG_CO_KET_QUA_DAU_GIA', msg: 'Không tìm thấy kết quả đấu giá trúng nào cho người dùng này.', data: [], pagination: { currentPage: page, totalPages: 0, hasNextPage: false, hasPrevPage: false }, total });
     }
 
     return res.status(200).json({ code: 'THANH_CONG', msg: 'Danh sách trúng đấu giá được lấy thành công.', data: auctionWins, pagination, total });
