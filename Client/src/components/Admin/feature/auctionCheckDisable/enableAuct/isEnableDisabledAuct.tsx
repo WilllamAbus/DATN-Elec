@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getEnableAuctWinner } from "../../../../../redux/adminEnableAuct/enableAuctThunk";
+import { getEnableAuctWinner, softDelAdminThunk } from "../../../../../redux/adminEnableAuct/enableAuctThunk";
 
 // import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer,  } from "react-toastify";
-// import Swal, { SweetAlertResult } from "sweetalert2";
+import { ToastContainer,  toast} from "react-toastify";
+import Swal, { SweetAlertResult } from "sweetalert2";
 import PaginationComponent from "../../../../../ultils/pagination/admin/paginationcrud";
-import { EnableWinnerAll } from "../../../../../types/adminEnbaleAuct/allEnableAuct";
+import { EnableWinnerAll, EnableWinnerAllSoftDel } from "../../../../../types/adminEnbaleAuct/allEnableAuct";
 import SearchFormOrders from "../serachForm/searchForm.isCheck";
-// import { softDelAdminThunk } from "../../../../redux/orderAucAdmin/softDelAucAdmin/softDelAdminThunk";
-// import withReactContent from "sweetalert2-react-content";
-// const MySwal = withReactContent(Swal);
+
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 const IsEnableAuct: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
@@ -25,7 +25,7 @@ const IsEnableAuct: React.FC = () => {
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
 
-  // const [, setOrders] = useState<Order[]>([]);
+  const [, setEnable] = useState<EnableWinnerAllSoftDel[]>([]);
   useEffect(() => {
     dispatch(getEnableAuctWinner({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
@@ -63,6 +63,30 @@ const IsEnableAuct: React.FC = () => {
     //     })
     //   );
     // };
+
+
+      const handleSoftDelEnableAuct = async (id: string) => {
+        MySwal.fire({
+          title: "Hủy sản phẩm?",
+          text: "Bạn có chắc muốn hủy sản phẩm này không?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Có",
+          cancelButtonText: "Hủy",
+        }).then(async (result: SweetAlertResult) => {
+          if (result.isConfirmed) {
+            await dispatch(softDelAdminThunk({ id })).unwrap();
+            setEnable((prevSoftDel) =>
+              prevSoftDel.filter((rand) => rand._id !== id)
+            );
+            toast.success("Xóa sản phẩm thành công");
+          } else {
+            toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+          }
+        });
+      };
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between mx-4 py-4 border-t dark:border-gray-700 space-y-3 md:space-y-0 md:space-x-3">
@@ -89,6 +113,9 @@ const IsEnableAuct: React.FC = () => {
             </th>
             <th scope="col" className="p-4">
               VỊ THẾ 
+            </th>
+            <th scope="col" className="p-4">
+              CẢNH BÁO
             </th>
             <th scope="col" className="p-4">
               TRẠNG THÁI
@@ -124,6 +151,9 @@ const IsEnableAuct: React.FC = () => {
                   }`}
                 >
                   {winnneerCheck.auctionReturnStatus === "canceled" ? "Hủy chiến thắng đấu giá" : "Khóa tài khoản"}
+                </td>
+                <td className="py-4 px-6 border-b border-grey-light">
+                  {winnneerCheck.coundDisabledAuction}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
@@ -273,6 +303,43 @@ const IsEnableAuct: React.FC = () => {
                     >
                       Hủy đơn hàng
                     </button> */}
+                        {winnneerCheck.coundDisabledAuction === 4 && (
+                      <button
+                        onClick={() => handleSoftDelEnableAuct(winnneerCheck._id)}
+                        className="group relative flex items-center text-red-700
+                        bg-red-200 hover:text-white border
+                         border-red-700 hover:bg-red-800 focus:ring-4
+                          focus:outline-none focus:ring-red-300 font-medium 
+                       rounded-lg text-sm px-2 py-2 text-center 
+                       dark:border-red-500 dark:text-red-500 
+                       dark:hover:text-white dark:hover:bg-red-600 
+                       dark:focus:ring-red-900"
+                      >
+                          <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-3"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                      <span
+                        className="absolute top-1/2 
+                      left-1/2 -translate-x-1/2 
+                      -translate-y-1/2 opacity-0
+                       group-hover:opacity-100 text-[10px] text-white
+                       transition-opacity duration-300"
+                      >
+                        Hủy
+                      </span>
+                      </button>
+                    )}
                     <Link to={`/admin/detailEnable/${winnneerCheck._id}`}>
                       {/* SVG Icon embedded directly */}
                       <svg

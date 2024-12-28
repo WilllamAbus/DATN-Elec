@@ -51,3 +51,13 @@ export const updateStatusEnable = async (idEnale: string, stateEnable: string) =
   return response.data; // Return the order data
 };
 
+
+
+export const softDelEnable = async (id: string) => {
+    try {
+      const response = await axios.patch(`/client/auctions/softEnable/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error('Error fetching order data');
+    }
+  };

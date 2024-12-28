@@ -45,4 +45,5 @@ router.put('/updatStatusCheck/:idWinner',middlewareController.verifyTokenAdminAu
 router.get('/allAuctWinnerEnable',middlewareController.verifyTokenAdminAuth,auctionEnable.getEnableUser);
 router.get('/detailAuctWinnerEnable/:id',middlewareController.verifyTokenAdminAuth,auctionEnable.getDetailCheckEnableAuct);
 router.put('/updatStatusEnable/:idEnale',middlewareController.verifyTokenAdminAuth,auctionEnable.updateStatusEnable);
+router.patch('/softEnable/:id',middlewareController.verifyTokenAdminAuth,auctionEnable.softDeleteEnablCheck);
 module.exports = router;

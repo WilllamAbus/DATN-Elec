@@ -63,3 +63,23 @@ export interface UserID {
       currentPage: number;
     };
   }
+
+
+
+  export interface EnableWinnerAllSoftDel {
+    userWinnerAuct: ShippingAddress;
+    _id: string;
+  
+    serialNumber:number,
+ 
+    status: string;
+    disabledAt: string | null;
+    auctionStausIsCheck:string
+    createdAt: string;
+    updatedAt: string;
+    bidPriceReturn:number;
+    auctionReturnStatus:string | null;
+    coundDisabledAuction: number
+    __v: number,
+ 
+  }

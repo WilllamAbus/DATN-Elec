@@ -32,7 +32,7 @@ const enableAuctionCOntroller = {
       // Fetch active products that are in the price range
       const auctWinnerCheck = await User.find({
         _id: { $in: userIds },
-        status: "active",
+   
       })
         .select("id email phone name")
         .lean();
@@ -124,7 +124,7 @@ const enableAuctionCOntroller = {
       // Find order details related to the order
       const userInforWinnerAuct = await User.findOne({
         _id: inForUser,
-        status: "active",
+    
       }).lean();
 
       const auctionWinnerInformed = await AuctiomWinner.findOne({
@@ -154,7 +154,7 @@ const enableAuctionCOntroller = {
         userInforWinner,
         productDetails, // Contains recipient, phone, address, and user email
         winnerPrice: auctionWinnerInfo.bidPriceReturn,
-
+        countDisabled: auctionWinnerInfo.coundDisabledAuction,
         state: auctionWinnerInfo.auctionStausIsCheck,
         date: auctionWinnerInfo.createdAt,
         auctionWinnerid: auctionWinnerInfo._id,
@@ -229,7 +229,7 @@ const enableAuctionCOntroller = {
           const enableAuctID = updatedStatus._id;
           const auctWinnerCheck = await User.findOne({
             _id: userMail,
-            status: "active",
+    
           })
             .select("_id name phone email")
             .lean();
@@ -237,7 +237,7 @@ const enableAuctionCOntroller = {
 
           const auctionCheckRound = await AuctiomWinner.findOne({
             _id: updatedStatus.auctionWinnerReturn,
-            status: "disable",
+            status: "disabled",
             auctionStatus: "lose",
           });
           console.log("auction", auctionCheckRound);
@@ -245,11 +245,11 @@ const enableAuctionCOntroller = {
           const productDetail = await ProductAuction.findOne({
             auctionPricing: auctionCheckRound.auctionPricingRange,
           }).lean();
-          console.log("productDetail", productDetail);
+        
 
           const enableBidPrice = updatedStatus.bidPriceReturn;
           const converPrice = enableBidPrice.toLocaleString("vi-VN");
-          console.log("enableBidPrice", converPrice);
+       
 
           const enableProductDetail = {
             productName: productDetail.product_name,
@@ -280,7 +280,7 @@ const enableAuctionCOntroller = {
           const enableAuctID = updatedStatus._id;
           const auctWinnerCheck = await User.findOne({
             _id: userMail,
-            status: "active",
+        
           })
             .select("_id name phone email")
             .lean();
@@ -288,7 +288,7 @@ const enableAuctionCOntroller = {
 
           const auctionCheckRound = await AuctiomWinner.findOne({
             _id: updatedStatus.auctionWinnerReturn,
-            status: "disable",
+            status: "disabled",
             auctionStatus: "lose",
           });
 
@@ -322,11 +322,10 @@ const enableAuctionCOntroller = {
             { new: true }
           );
           const userMail = updatedStatus.auctionWinnerUserReturn;
-          const enableAuctID = updatedStatus._id;
-          const enableWinners = updatedStatus.auctionWinnerReturn;
+     
           const auctWinnerCheck = await User.findOne({
             _id: userMail,
-            status: "active",
+         
           })
             .select("_id name phone email")
             .lean();
@@ -339,23 +338,10 @@ const enableAuctionCOntroller = {
               {
                 _id: userMail,
               },
-              { $set: { status: "disable" } },
+              { $set: { status: "disabled" } },
               { new: true }
             ),
-            auctionReturn.findByIdAndUpdate(
-              {
-                _id: enableAuctID,
-              },
-              { $set: { status: "delete" } },
-              { new: true }
-            ),
-            AuctiomWinner.findByIdAndUpdate(
-              {
-                _id: enableWinners,
-              },
-              { $set: { status: "delete" } },
-              { new: true }
-            ),
+       
           ]);
         }
         // Chuyển trạng thái tiếp theo
@@ -379,6 +365,50 @@ const enableAuctionCOntroller = {
       });
     }
   },
+
+    softDeleteEnablCheck: async (req, res) => {
+      try {
+        const { id } = req.params;
+        const updatedAuction = await auctionReturn.findByIdAndUpdate(
+            {_id:id},
+          { $set: { status: "delete" } },
+          { new: true }
+        );
+
+        const productRand = updatedAuction.auctionWinnerReturn;
+   
+  
+  
+   
+        // Cập nhật trạng thái của sản phẩm thành 'disable'
+        const updatedProduct = await AuctiomWinner.findByIdAndUpdate(
+           {_id:productRand},
+           { $set: { status: "delete" } },
+          { new: true }
+        );
+  
+        if (!updatedProduct) {
+          return res.status(404).json({
+            error: "Không tìm thấy dữ liệu để cập nhật trạng thái",
+          });
+        }
+        // Tìm kiếm và cập nhật `status` thành `deleted`
+    
+  
+        // Kiểm tra nếu không tìm thấy document cần xóa mềm
+     
+  
+        // Trả về kết quả thành công
+        return res.status(200).json({
+          message: "Dữ liệu được xóa thành công",
+          status: "200",
+          data: updatedAuction,
+        });
+      } catch (error) {
+        console.error("Error soft deleting AuctionPricingRange:", error);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+    },
 };
 
 module.exports = enableAuctionCOntroller;

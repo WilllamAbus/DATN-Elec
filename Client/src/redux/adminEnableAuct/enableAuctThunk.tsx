@@ -1,6 +1,6 @@
 import {  createAsyncThunk } from '@reduxjs/toolkit';
-import { getAllAuctEnableAdmin, fetAuctEnableDetailAdminData } from '../../services/adminEnableAuct/enableService'; // Adjust path as necessary
-import { EnableAllResponse, } from '../../types/adminEnbaleAuct/allEnableAuct';
+import { getAllAuctEnableAdmin, fetAuctEnableDetailAdminData, softDelEnable } from '../../services/adminEnableAuct/enableService'; // Adjust path as necessary
+import { EnableAllResponse, EnableWinnerAllSoftDel} from '../../types/adminEnbaleAuct/allEnableAuct';
 import { EnableAuctDetailAdminResponse, } from '../../types/adminEnbaleAuct/detailEnable';
 
 interface FetchEnableCheckParams {
@@ -43,3 +43,17 @@ export const getEnableAuctionDetailsAdmin = createAsyncThunk(
     }
   }
 );
+
+
+export const softDelAdminThunk = createAsyncThunk<EnableWinnerAllSoftDel , { id: string }, { rejectValue: string }>(
+    'enableAuct/softDelAdminThunk',
+    async ({id}, { rejectWithValue }) => {
+      try {
+        const response  = await softDelEnable(id);
+        return response.data;
+      } catch (error: any) {
+        // Trả về thông báo lỗi cụ thể với rejectWithValue
+        return rejectWithValue('Failed to fetch order data');
+      }
+    }
+  );

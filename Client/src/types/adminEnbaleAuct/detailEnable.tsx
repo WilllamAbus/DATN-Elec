@@ -12,7 +12,7 @@ export interface ShippingInfo {
     userInforWinner?: ShippingInfo;  // Thay đổi từ shippingInfo bắt buộc sang tùy chọn
     productDetails: Product;
     state: string, 
-   
+    countDisabled: number,
     winnerPrice: string ,
     auctionWinnerid: string,
     date:string,
