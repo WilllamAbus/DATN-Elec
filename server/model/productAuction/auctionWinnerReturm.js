@@ -3,11 +3,28 @@ const { Schema, model } = require("mongoose");
 const auctionWinnerReturnSchema = new Schema(
   {
 
-    auctionWinnerReturn: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'AuctionWinner',
-      required: true 
-    },
+  
+    cancelledProducts: [
+      {
+        auctionWinnerReturn: { 
+          type: Schema.Types.ObjectId, 
+          ref: 'AuctionWinner', 
+          required: true 
+        },
+        productName: { 
+          type: String, 
+        
+        },
+        quantity: { 
+          type: Number,  
+          default: 1
+        },
+        image: { 
+          type: String,  
+    
+        },
+      }
+    ],
     auctionWinnerUserReturn: { 
       type: Schema.Types.ObjectId, 
       ref: 'users',
@@ -37,7 +54,7 @@ const auctionWinnerReturnSchema = new Schema(
           'Khóa tài khoản'], 
     
     },
-    coundDisabledAuction :{type: "Number", default: 1},
+    countDisabledAuction: { type: Number, default: 1 }, // Sửa lỗi kiểu
     mess :{type: "String"},
     createdAt: { 
       type: Date, 

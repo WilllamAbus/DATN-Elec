@@ -19,7 +19,7 @@ const checkAuctionCOntroller = {
 
       // Fetch price range with active status
       const priceRangeWinnwe = await AuctiomWinner.find({ status: "disabled" })
-        .select("user bidPrice status auctionStatus auctionStausCheck")
+        .select("user bidPrice status auctionStatus auctionStausCheck endTime")
         .lean();
 
       const userIds = priceRangeWinnwe.map((auctWin) => auctWin.user);
@@ -117,7 +117,7 @@ const checkAuctionCOntroller = {
         status: "disabled",
       })
         .select(
-          "user bidPrice status auctionStatus createdAt auctionStausCheck auctionPricingRange"
+          "user bidPrice status auctionStatus endTime auctionStausCheck auctionPricingRange"
         ) // Populating userID inside shippingAddress
         .exec();
 
@@ -154,7 +154,7 @@ const checkAuctionCOntroller = {
         winnerPrice: auctionWinnerInfo.bidPrice,
 
         state: auctionWinnerInfo.auctionStausCheck,
-        date: auctionWinnerInfo.createdAt,
+        date: auctionWinnerInfo.endTime,
         auctionWinnerid: auctionWinnerInfo._id,
       };
       // Return the consolidated order information
@@ -252,19 +252,78 @@ const checkAuctionCOntroller = {
               quantity: 1,
               image: productWinnser.image[0],
             };
-
-            const addWinnerReturn = await AuctionWinnerReetirn({
-              auctionWinnerReturn: winnerSetUpId,
-              bidPriceReturn: winnnerBidPrice,
-              auctionWinnerUserReturn: wiinerUser,
-              isPaymentReturnStatus: "failed",
-              auctionReturnStatus: "canceled",
-              status: "disable",
-              auctionStausIsCheck: "Đã duyệt hủy chiến thắng",
-              coundDisabledAuction: 1,
-            });
-            await addWinnerReturn.save();
             sendMailWinnerDel(emailWinner, winnerSetUpId, winnserProductDetail);
+        //     const priceRangeWinners = await AuctiomWinner.find({auctionStatus:'lose', status: "disabled" })
+        //     .select("_id user bidPrice status auctionStatus auctionStausCheck auctionPricingRange")
+        //     .lean();
+      
+        //   // Nhóm dữ liệu theo user
+        //   const userGrouped = priceRangeWinners.reduce((acc, item) => {
+        //     if (!acc[item.user]) {
+        //       acc[item.user] = [];
+        //     }
+        //     acc[item.user].push(item);
+        //     return acc;
+        //   }, {});
+      
+        //   const result = [];
+        //   for (const [userId, auctionItems] of Object.entries(userGrouped)) {
+        //     // Lấy thông tin user
+        //     const userInfo = await User.findOne({ _id: userId })
+        //       .select("_id name phone email")
+        //       .lean();
+      
+        //     if (!userInfo) {
+        //       console.error(`User với ID ${userId} không tồn tại.`);
+        //       continue;
+        //     }
+      
+        //     // Lấy thông tin sản phẩm liên quan tới các auctionPricingRange
+        //     const auctionPricingRanges = auctionItems.map((item) => item.auctionPricingRange);
+        //     const products = await ProductAuction.find({
+        //       auctionPricing: { $in: auctionPricingRanges },
+        //     })
+        //       .select("product_name image _id auctionPricing")
+        //       .lean();
+      
+        //     // Định dạng dữ liệu sản phẩm bị huỷ
+        //     const cancelledProducts = auctionItems.map((auctionItem) => {
+        //       const product = products.find(
+        //         (p) => p.auctionPricing === auctionItem.auctionPricingRange
+        //       );
+      
+        //       return {
+        //         auctionWinnerReturn: auctionItem._id, // ID của AuctionWinner
+        //         productName: product?.product_name || "Không xác định",
+        //         quantity: 1,
+        //         image: product?.image?.[0] || "Không có hình ảnh",
+        //       };
+        //     });
+      
+        //     // Tạo một bản ghi mới trong AuctionWinnerReturn
+        //     const auctionWinnerReturn = new AuctionWinnerReetirn({
+        //       cancelledProducts,
+        //       auctionWinnerUserReturn: userId,
+        //       bidPriceReturn: auctionItems[0]?.bidPrice || 0,
+             
+        //       isPaymentReturnStatus: "failed",
+        //       auctionReturnStatus: "canceled",
+        //       status: "disable",
+        //       auctionStausIsCheck: "Đã duyệt hủy chiến thắng",
+        //       coundDisabledAuction: 1,
+        //     });
+      
+        //     // Lưu vào cơ sở dữ liệu
+        //     await auctionWinnerReturn.save();
+      
+        //     // Push dữ liệu cuối cùng vào mảng kết quả
+        //     result.push({
+        //       user: userInfo,
+        //       cancelledProducts,
+        //     });
+        //   }
+     
+       
 
             const auctionCheckRoundTwo = await AuctiomWinner.find({
               auctionRound: winnerCheck.auctionRound,

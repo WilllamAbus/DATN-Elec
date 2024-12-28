@@ -155,6 +155,18 @@ const OrderDetails: React.FC = () => {
 
   const customeID = String(selectedOrder?.auctionWinnerid)
   const customeFine = formatCustomId(customeID)
+  const formatDateVN = (dateString: string) => {
+    const date = new Date(dateString); // Chuyển đổi chuỗi thành đối tượng Date
+    return date.toLocaleString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh", // Thiết lập múi giờ
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  };
   return (
     <main className="w-full flex-grow p-6 bg-gray-50">
       <div className="max-w-4xl mx-auto">
@@ -176,7 +188,7 @@ const OrderDetails: React.FC = () => {
 
               <p className="text-lg mb-2">
                 <span className="font-medium">Ngày chiến thắng:</span>{" "}
-                {new Date(selectedOrder.date).toLocaleDateString('vi-VN')}
+                {formatDateVN(selectedOrder.date)}
               </p>
               <p className="text-lg text-red-600 mb-2">
                 <span className="font-medium">Tổng tiền:</span>{" "}

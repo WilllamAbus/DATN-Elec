@@ -62,7 +62,7 @@ export const links: Record<string, Link[]> = {
     { label: "Thiết lập phiên", to: "/admin/triggerAuct" },
 
     { label: "Danh sách duyệt ", to: "/admin/listCheckAuct" },
-    { label: "Danh sách cảnh báo", to: "/admin/listEnableAuct" },
+    // { label: "Danh sách cảnh báo", to: "/admin/listEnableAuct" },
         // { label: "Thời gian đấu giá", to: "/admin/listProdAuc" },
     // { label: "Đơn hàng đấu giá", to: "/admin/listOrderAuction" },
     // { label: "Đơn hàng hoàn trả", to: "/admin/recBinOrderAuction" },
