@@ -4,7 +4,9 @@ import User from "../page/User/Home/home";
 import Title from "../common/title/Title";
 const UserHome = React.lazy(() => import("../page/User/rootUser"));
 const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
-const AuctionResultPage = React.lazy(() => import("../page/User/auctionResult"));
+const AuctionResultPage = React.lazy(
+  () => import("../page/User/auctionResult")
+);
 const UserLogin = React.lazy(() => import("../page/User/accounts/login"));
 const UserRegister = React.lazy(() => import("../page/User/accounts/register"));
 const UserRegisOTP = React.lazy(() => import("../page/User/accounts/regisOTP"));
@@ -41,11 +43,12 @@ const UserAuction = React.lazy(
   () => import("../page/User/shopping/gallery/auction")
 );
 
-const UserPageDetail = React.lazy(
-  () => import("../page/User/detailV2/detail")
-);
+const UserPageDetail = React.lazy(() => import("../page/User/detailV2/detail"));
 const UserPageDetailAuction = React.lazy(
   () => import("../page/User/detailAuction/detailAuction")
+);
+const UserAuctionPage = React.lazy(
+  () => import("../page/User/AuctionPage/AuctionPage")
 );
 const UserAuctionResult = React.lazy(
   () => import("../page/User/detailAuction/auctionResult")
@@ -59,8 +62,14 @@ const UserCartPage = React.lazy(
 const UserCheckoutpage = React.lazy(
   () => import("../page/User/shopping/cart/paymentPage")
 );
+const CartAuction = React.lazy(
+  () => import("../page/User/shopping/cart/paymentAuction")
+);
 const UserPaymentpage = React.lazy(
   () => import("../page/User/shopping/cart/complate")
+);
+const UserPaymentAuctionpage = React.lazy(
+  () => import("../page/User/shopping/cart/complateAuction")
 );
 const UserProdfile = React.lazy(
   () => import("../page/User/shoppingMange/profile")
@@ -74,9 +83,7 @@ const UserWatchList = React.lazy(
 const UserSearch = React.lazy(
   () => import("../page/User/shopping/search/index")
 );
-const UserFilter = React.lazy(
-  () => import("../page/User/shopping/filter/index")
-);
+
 const UserViewBids = React.lazy(
   () => import("../page/User/shopping/auction/biddings/viewBid")
 );
@@ -90,9 +97,15 @@ const UserConfirmAucPage = React.lazy(
 const UserConfirmAucDefaultPage = React.lazy(
   () => import("../page/User/shopping/auction/biddings/completAucDefault")
 );
-const LinkAccount = React.lazy(() => import("../page/User/accounts/link-account"));
-const UserLoginError = React.lazy(() => import("../page/User/accounts/login_error"));
-const LinkAccountSuccess = React.lazy(() => import("../page/User/accounts/link-account-success")); 
+const LinkAccount = React.lazy(
+  () => import("../page/User/accounts/link-account")
+);
+const UserLoginError = React.lazy(
+  () => import("../page/User/accounts/login_error")
+);
+const LinkAccountSuccess = React.lazy(
+  () => import("../page/User/accounts/link-account-success")
+);
 const UserContact = React.lazy(() => import("../page/User/contact/contact"));
 
 const UserRoutes: RouteObject[] = [
@@ -100,7 +113,7 @@ const UserRoutes: RouteObject[] = [
     path: "/",
     element: (
       <>
-        <Title /> 
+        <Title />
         <UserHome />
       </>
     ),
@@ -126,12 +139,14 @@ const UserRoutes: RouteObject[] = [
       { path: "auction", element: <UserAuction /> },
       { path: "product/:slug", element: <UserPageDetail /> },
       { path: "product-auction/:slug", element: <UserPageDetailAuction /> },
+      { path: "session-auction", element: <UserAuctionPage /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },
       { path: "search/:keyword", element: <UserSearch /> },
-      { path: "filter/:price", element: <UserFilter /> },
       { path: "checkout/:id", element: <UserCheckoutpage /> },
+      { path: "checkAuction/:id", element: <CartAuction /> },
       { path: "complete/:id", element: <UserPaymentpage /> },
+      { path: "completeAuction/:id", element: <UserPaymentAuctionpage /> },
       { path: "profile", element: <UserProdfile /> },
       { path: "listCart", element: <UserListCart /> },
       { path: "watchList", element: <UserWatchList /> },
@@ -146,7 +161,7 @@ const UserRoutes: RouteObject[] = [
     path: "/",
     element: (
       <>
-        <Title /> 
+        <Title />
         <ExternalPage />
       </>
     ),
@@ -159,13 +174,11 @@ const UserRoutes: RouteObject[] = [
     path: "/",
     element: (
       <>
-        <Title /> 
+        <Title />
         <AuctionResultPage />
       </>
     ),
-    children: [
-      { path: "auction-results", element: <UserAuctionResult /> },
-    ],
+    children: [{ path: "auction-results", element: <UserAuctionResult /> }],
   },
   {
     path: "*",

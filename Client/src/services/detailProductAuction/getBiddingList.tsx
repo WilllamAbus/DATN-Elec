@@ -1,5 +1,5 @@
 import instance from "../axios";
-import { BiddingListResponse } from "./types/getBiddingList";
+import { BiddingListResponse, AuctionWinner } from "./types/getBiddingList";
 
 export const getBiddingList = async (
   slug: string,
@@ -20,5 +20,17 @@ export const getBiddingList = async (
   } catch (error) {
     console.error("Error fetching bidding list:", error);
     throw new Error("Failed to fetch bidding list");
+  }
+};
+
+export const getAuctionWinner = async (slug: string): Promise<AuctionWinner> => {
+  try {
+    const response = await instance.get<AuctionWinner>(
+      `/client/product-detail-auction/process-winner/${slug}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching auction winner:", error);
+    throw new Error("Failed to fetch auction winner");
   }
 };

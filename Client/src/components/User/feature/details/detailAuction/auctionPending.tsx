@@ -4,11 +4,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   useDisclosure,
   Image,
 } from "@nextui-org/react";
 import { Link } from "react-router-dom"
+import { MyButton } from "../../../../../common/customs/MyButton";
 
 
 export default function AuctionPending() {
@@ -28,6 +28,7 @@ export default function AuctionPending() {
       isOpen={isOpen}
       radius="lg"
       onOpenChange={onOpenChange}
+      size="3xl"
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">Thông báo</ModalHeader>
@@ -45,7 +46,7 @@ export default function AuctionPending() {
           </div>
         </ModalBody>
         <ModalFooter>
-        <Link to="/auction"> <Button color="danger" variant="flat"  > Trở về danh sách đấu giá </Button> </Link>
+        <Link to="/auction"> <MyButton variant="gradientBlue" size="sm"  >Trở về danh sách đấu giá </MyButton> </Link>
         </ModalFooter>
       </ModalContent>
     </Modal>

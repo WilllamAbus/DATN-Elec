@@ -1,36 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getOrders } from "../../../../../redux/orderAucAdmin/getAllOrder/orderAucAdminThunk";
-import {
-  downloadInvoiceExcel,
-  getInvoicePDF,
-} from "../../../../../services/orderAuction/getOrderAdmin";
+import { getEnableAuctWinner, softDelAdminThunk } from "../../../../../redux/adminEnableAuct/enableAuctThunk";
+
 // import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer,  toast} from "react-toastify";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import PaginationComponent from "../../../../../ultils/pagination/admin/paginationcrud";
-import { Order } from "../../../../../types/adminOrder/orderAll";
+import { EnableWinnerAll, EnableWinnerAllSoftDel } from "../../../../../types/adminEnbaleAuct/allEnableAuct";
 import SearchFormOrders from "../serachForm/searchForm.isCheck";
-import { softDelAdminThunk } from "../../../../../redux/orderAucAdmin/softDelAucAdmin/softDelAdminThunk";
+
 import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
-const isEnableAuct: React.FC = () => {
+const IsEnableAuct: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
-  const { orders, totalPages } = useSelector(
-    (state: RootState) => state.orderAucAdmin
+  const { enableWinnerAll, totalPages } = useSelector(
+    (state: RootState) => state.enableAuct
   );
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
 
-  const [, setOrders] = useState<Order[]>([]);
+  const [, setEnable] = useState<EnableWinnerAllSoftDel[]>([]);
   useEffect(() => {
-    dispatch(getOrders({ page, pageSize, search }));
+    dispatch(getEnableAuctWinner({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
 
   const handlePageChange = (newPage: number) => {
@@ -41,52 +38,18 @@ const isEnableAuct: React.FC = () => {
     setSearch(searchTerm);
     setPage(1);
   };
-  const handleSoftDelOrder = async (orderId: string) => {
-    MySwal.fire({
-      title: "Hủy đơn hàng?",
-      text: "Bạn có chắc muốn hủy đơn hàng này không?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
-    }).then(async (result: SweetAlertResult) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(softDelAdminThunk({ orderId })).unwrap();
-          dispatch(getOrders({ page, pageSize, search }));
-          // dispatch(fetchOrderDataShippingThunk(userId));
-          setOrders((prevCategories) =>
-            prevCategories.filter((order) => order._id !== orderId)
-          );
 
-          toast.success("Đơn hàng của bạn đã hủy.");
-        } catch (error) {
-          toast.error("Đã xảy ra sự cố khi hủy đơn hàng.");
-        }
-      }
-    });
-  };
-  const handleDownloadInvoice = async (orderId: string) => {
-    try {
-      await downloadInvoiceExcel(orderId);
-      toast.success("Tải về thành công!");
-    } catch (error) {
-      toast.error("Failed to download the invoice.");
-      console.error("Error downloading invoice:", error);
-    }
-  };
 
-  const handleDownloadInvoicePDF = async (orderId: string) => {
-    try {
-      await getInvoicePDF(orderId);
-      toast.success("Tải về thành công!");
-    } catch (error) {
-      toast.error("Failed to download the invoice.");
-      console.error("Error downloading invoice:", error);
-    }
-  };
+
+  // const handleDownloadInvoicePDF = async (orderId: string) => {
+  //   try {
+  //     await getInvoicePDF(orderId);
+  //     toast.success("Tải về thành công!");
+  //   } catch (error) {
+  //     toast.error("Failed to download the invoice.");
+  //     console.error("Error downloading invoice:", error);
+  //   }
+  // };
 
     // const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     //   const selectedFilter = event.target.value;
@@ -100,6 +63,30 @@ const isEnableAuct: React.FC = () => {
     //     })
     //   );
     // };
+
+
+      const handleSoftDelEnableAuct = async (id: string) => {
+        MySwal.fire({
+          title: "Hủy sản phẩm?",
+          text: "Bạn có chắc muốn hủy sản phẩm này không?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Có",
+          cancelButtonText: "Hủy",
+        }).then(async (result: SweetAlertResult) => {
+          if (result.isConfirmed) {
+            await dispatch(softDelAdminThunk({ id })).unwrap();
+            setEnable((prevSoftDel) =>
+              prevSoftDel.filter((rand) => rand._id !== id)
+            );
+            toast.success("Xóa sản phẩm thành công");
+          } else {
+            toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+          }
+        });
+      };
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between mx-4 py-4 border-t dark:border-gray-700 space-y-3 md:space-y-0 md:space-x-3">
@@ -113,16 +100,22 @@ const isEnableAuct: React.FC = () => {
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" className="p-4">
-              {/* <input type="checkbox" className="w-4 h-4" /> */}
+               STT
             </th>
             <th scope="col" className="p-4">
               NGƯỜI DÙNG
             </th>
-            <th scope="col" className="text-center">
-              ĐỊA CHỈ
+            <th scope="col" className="p-4">
+              EMAIL
             </th>
             <th scope="col" className="p-4">
               SỐ ĐIỆN THOẠI
+            </th>
+            <th scope="col" className="p-4">
+              VỊ THẾ 
+            </th>
+            <th scope="col" className="p-4">
+              CẢNH BÁO
             </th>
             <th scope="col" className="p-4">
               TRẠNG THÁI
@@ -133,46 +126,51 @@ const isEnableAuct: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(orders) && orders.length > 0 ? (
-            orders?.map((order: Order) => (
+          {Array.isArray(enableWinnerAll) && enableWinnerAll.length > 0 ? (
+            enableWinnerAll?.map((winnneerCheck: EnableWinnerAll) => (
               <tr
-                key={order._id}
+                key={winnneerCheck._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <td className="p-4">
-                  {/* <input type="checkbox" className="w-4 h-4" /> */}
+                <td className="px-4 py-3 font-medium text-gray-900">
+                  {winnneerCheck.serialNumber}
                 </td>
                 <th scope="row" className="px-4 py-3 font-medium text-gray-900">
-                  {order.shippingAddress.recipientName}
+                  {winnneerCheck.userWinnerAuct.name}
                 </th>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shippingAddress.address}
+                  {winnneerCheck.userWinnerAuct.email}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shippingAddress.phoneNumber}
+                  {winnneerCheck.userWinnerAuct.phone}
+                </td>
+                <td  className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
+                    winnneerCheck.auctionReturnStatus === "canceled"
+                      ? "bg-green-50 text-green-700"
+                      : "bg-red-50 text-red-700"
+                  }`}
+                >
+                  {winnneerCheck.auctionReturnStatus === "canceled" ? "Hủy chiến thắng đấu giá" : "Khóa tài khoản"}
+                </td>
+                <td className="py-4 px-6 border-b border-grey-light">
+                  {winnneerCheck.coundDisabledAuction}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
                     className={`mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
-                      order.stateOrder === "Chờ giao hàng"
+                      winnneerCheck.auctionStausIsCheck === "Đã duyệt hủy chiến thắng"
                         ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                        : order.stateOrder === "Chờ xử lý"
+                        : winnneerCheck.auctionStausIsCheck === "Cảnh báo đầu tiên"
                         ? "bg-violet-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        : order.stateOrder === "Đã xác nhận"
+                        : winnneerCheck.auctionStausIsCheck === "Cảnh báo cuối cùng"
                         ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        : order.stateOrder === "Vận chuyển"
-                        ? "bg-indigo-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        : order.stateOrder === "Nhận hàng"
+                        : winnneerCheck.auctionStausIsCheck === "Khóa tài khoản"
                         ? "bg-orange-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
-                        : order.stateOrder === "Hoàn tất"
-                        ? "bg-green-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
-                        : order.stateOrder === "Hủy đơn hàng"
-                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                      
                         : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
                     }`}
                   >
-                    {order.stateOrder === "Chờ giao hàng" && (
+                    {winnneerCheck.auctionStausIsCheck === "Đã duyệt hủy chiến thắng" && (
                       <svg
                         className="me-1 h-3 w-3"
                         aria-hidden="true"
@@ -191,7 +189,7 @@ const isEnableAuct: React.FC = () => {
                         />
                       </svg>
                     )}
-                    {order.stateOrder === "Chờ xử lý" && (
+                    {winnneerCheck.auctionStausIsCheck === "Cảnh báo đầu tiên" && (
                       <svg
                         className="me-1 h-3 w-3"
                         aria-hidden="true"
@@ -211,45 +209,8 @@ const isEnableAuct: React.FC = () => {
                       </svg>
                     )}
 
-                    {order.stateOrder === "Đã xác nhận" && (
-                      <svg
-                        className="me-1 h-3 w-3"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 11.917 9.724 16.5 19 7.5"
-                        />
-                      </svg>
-                    )}
-                    {order.stateOrder === "Vận chuyển" && (
-                      <svg
-                        className="me-1 h-3 w-3"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-                        />
-                      </svg>
-                    )}
-                    {order.stateOrder === "Nhận hàng" && (
+                
+                    {winnneerCheck.auctionStausIsCheck === "Cảnh báo cuối cùng" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         version="1.1"
@@ -282,7 +243,8 @@ const isEnableAuct: React.FC = () => {
                         ></text>
                       </svg>
                     )}
-                    {order.stateOrder === "Hoàn tất" && (
+
+                    {winnneerCheck.auctionStausIsCheck === "Khóa tài khoản" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         version="1.1"
@@ -315,13 +277,12 @@ const isEnableAuct: React.FC = () => {
                         ></text>
                       </svg>
                     )}
-    
-                    {order.stateOrder}
+                    {winnneerCheck.auctionStausIsCheck}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center space-x-4">
-                    <button
+                    {/* <button
                       className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center ${
                         order.stateOrder === "Chờ xử lý"
                           ? "text-yellow-700 bg-yellow-200 hover:text-white border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900"
@@ -341,8 +302,45 @@ const isEnableAuct: React.FC = () => {
                       style={{ display: order.stateOrder === "Chờ xử lý" ? ' inline-flex ' : 'none' }}
                     >
                       Hủy đơn hàng
-                    </button>
-                    <Link to={`/admin/detailOrderAuction/${order._id}`}>
+                    </button> */}
+                        {winnneerCheck.coundDisabledAuction === 4 && (
+                      <button
+                        onClick={() => handleSoftDelEnableAuct(winnneerCheck._id)}
+                        className="group relative flex items-center text-red-700
+                        bg-red-200 hover:text-white border
+                         border-red-700 hover:bg-red-800 focus:ring-4
+                          focus:outline-none focus:ring-red-300 font-medium 
+                       rounded-lg text-sm px-2 py-2 text-center 
+                       dark:border-red-500 dark:text-red-500 
+                       dark:hover:text-white dark:hover:bg-red-600 
+                       dark:focus:ring-red-900"
+                      >
+                          <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-3"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                      <span
+                        className="absolute top-1/2 
+                      left-1/2 -translate-x-1/2 
+                      -translate-y-1/2 opacity-0
+                       group-hover:opacity-100 text-[10px] text-white
+                       transition-opacity duration-300"
+                      >
+                        Hủy
+                      </span>
+                      </button>
+                    )}
+                    <Link to={`/admin/detailEnable/${winnneerCheck._id}`}>
                       {/* SVG Icon embedded directly */}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -367,56 +365,7 @@ const isEnableAuct: React.FC = () => {
                       </svg>
                       {/* Xem chi tiết */}
                     </Link>
-                    {order.stateOrder === "Hoàn tất" && (
-                      <div
-                        onClick={() => handleDownloadInvoice(order._id)}
-                        className="flex items-center cursor-pointer"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="32"
-                          height="32"
-                          viewBox="0 0 64 64"
-                          className="mr-2"
-                        >
-                          <rect width="64" height="64" rx="8" fill="#27AE60" />
-                          <path d="M20 20H44V44H20z" fill="#FFF" />
-                          <path
-                            d="M24 24L40 40M40 24L24 40"
-                            stroke="#27AE60"
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        {/* <span className="text-sm font-medium text-white">Đơn hàng Excel</span> */}
-                      </div>
-                    )}
-
-                    {order.stateOrder === "Vận chuyển" && (
-                      <div
-                        onClick={() => handleDownloadInvoicePDF(order._id)}
-                        className="flex items-center cursor-pointer"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="32"
-                          height="32"
-                          viewBox="0 0 64 64"
-                          className="mr-2"
-                        >
-                          <rect width="64" height="64" rx="8" fill="#E74C3C" />
-                          <path
-                            d="M32 12V52M22 22H42M22 32H42M22 42H32"
-                            stroke="#FFF"
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        {/* <span className="text-sm font-medium text-black">Đơn hàng PDF</span> */}
-                      </div>
-                    )}
+                
                   </div>
                 </td>
               </tr>
@@ -424,7 +373,7 @@ const isEnableAuct: React.FC = () => {
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
-                Không có đơn hàng
+                Không có dữ liệu
               </td>
             </tr>
           )}
@@ -440,4 +389,4 @@ const isEnableAuct: React.FC = () => {
   );
 };
 
-export default isEnableAuct;
+export default IsEnableAuct;

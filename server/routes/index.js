@@ -13,6 +13,7 @@ const adminAttributes = require("./admin/attributes");
 const clientProduct = require("./client/product");
 const clientProductDetail = require("./client/product-detail");
 const clientProductDetailAuction = require("./client/detailAuction");
+const clientAuction = require("./client/AuctionWinsByUser");
 // const productRouter_v2 = require("./admin/product_v2");
 const inboundRouter = require("./admin/inboundshipments/inbound");
 const inventoryRouter = require("./admin/inventory");
@@ -27,6 +28,7 @@ const Contact = require("./client/contact/contact");
 // const WathListRouter = require("./product/product");
 
 const vnPayRouter = require("./admin/vnpay/order");
+const vnPayAuctionRouter = require("./admin/vnpayAuction/order");
 const randBidRouter = require("./admin/randBid/randBid.routes");
 const biddingRouter = require("./client/bidding/bidding.routes");
 const auctionsRouter = require("./client/auctions/auctions.routes");
@@ -47,10 +49,6 @@ const statistical = require("./admin/statistical");
 const recommendationRoute = require("./client/recommendation/recommendation");
 const bestSellRoute = require("./client/best-selling/best-selling");
 
-
-
-
-
 const routes = (app) => {
   app.use("/api/admin/statistical", statistical);
 
@@ -68,6 +66,7 @@ const routes = (app) => {
   app.use("/api/client/product", clientProduct);
   app.use("/api/client/product-detail", clientProductDetail);
   app.use("/api/client/product-detail-auction", clientProductDetailAuction);
+  app.use("/api/client/auction", clientAuction);
 
   app.use("/api/client/sidebar/auction", clientSidebarAuction);
   app.use("/api/attributes", attributesRouter);
@@ -78,6 +77,7 @@ const routes = (app) => {
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
   app.use("/api/vnpay", vnPayRouter);
+  app.use("/api/vnpayAuction", vnPayAuctionRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
   app.use("/api/client/bidding", biddingRouter);
@@ -98,8 +98,6 @@ const routes = (app) => {
   app.use("/api/bank", bankRouter);
   app.use("/api/client/recommendation", recommendationRoute);
   app.use("/api/client/best-selling", bestSellRoute);
-
-
 };
 
 module.exports = routes;

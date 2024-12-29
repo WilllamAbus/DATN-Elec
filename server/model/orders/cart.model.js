@@ -14,7 +14,6 @@ const cartItemAuctionSchema = new Schema({
   auctionWiner: {
     type: Schema.Types.ObjectId,
     ref: "AuctionWinner",
-    required: true,
   },
   auctionStartTime: { type: Date, default: null },
   auctionEndTime: { type: Date, default: null },
@@ -36,7 +35,7 @@ const cartItemAuctionSchema = new Schema({
 const cartSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
-    items: [cartItemSchema, cartItemAuctionSchema],
+    items: [cartItemSchema],
     itemAuction: [cartItemAuctionSchema],
     totalPrice: { type: Number, required: true },
     stateNotifi: { type: String, default: "has" },

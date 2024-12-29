@@ -48,9 +48,6 @@ const DetailPageAuction: React.FC = () => {
     }
   };
 
-  const handleClose = () => {
-    setAuctionStatus(null);
-  };
 
   return (
     <>
@@ -99,9 +96,9 @@ const DetailPageAuction: React.FC = () => {
           )}
         </div>
       </div>
-      {auctionStatus === 0 && <AuctionWin onClose={handleClose} />}
+      {auctionStatus === 0 && <AuctionWin  />}
       {auctionStatus === 1 && <AuctionPending />}
-      {auctionStatus === 2 && <AuctionLose onClose={handleClose} />}
+      {auctionStatus === 2 && <AuctionLose  />}
     </>
   );
 };
