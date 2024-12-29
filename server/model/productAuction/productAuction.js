@@ -13,6 +13,7 @@ const productAuctionSchema = new Schema({
   product_supplier: { type: Schema.Types.ObjectId, ref: 'Supplier', required: true },
   auctionPricing: { type: Schema.Types.ObjectId, ref: 'AuctionPricingRange' }, 
   auctionRound: { type: Schema.Types.ObjectId, ref: 'AuctionRound' }, 
+  inventory: [{ type: Schema.Types.ObjectId, ref: 'Inventory' }],
   viewCount: { type: Number, default: 0 },
   lastViewed: { type: Date, default: Date.now },
   weight_g: { type: Number, required: true },

@@ -1,22 +1,18 @@
 import React from "react";
 import { Tabs, Tab } from '@nextui-org/react';
 import ListAuctionWin from './listAuctionWin';
-import ChipCount from './ChipCount/ChipCount';
-import { AuctionWin } from '../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser';
-import { AppDispatch } from '../../../../redux/store';
+import ChipCount from "./ChipCount/ChipCount";
 
 interface AppAuctionProps {
-  auction: AuctionWin[];
-  dispatch: AppDispatch;
   currentPage: number;
 }
 
-const AppAuction: React.FC<AppAuctionProps> = ({ auction, dispatch, currentPage }) => {
+const AppAuction: React.FC<AppAuctionProps> = ({ currentPage }) => {
   const tabs = [
     {
       id: 'Chờ xác nhận',
       label: 'Chờ xác nhận',
-      content: <ListAuctionWin auction={auction} dispatch={dispatch} currentPage={currentPage} totalPages={1} />,
+      content: <ListAuctionWin currentPage={currentPage} totalPages={1} />,
       confirmationStatus: 'pending',
       auctionStatus: ['won', 'pending'],
     },
@@ -46,7 +42,6 @@ const AppAuction: React.FC<AppAuctionProps> = ({ auction, dispatch, currentPage 
               <div className="flex items-center space-x-2">
                 <span>{item.label}</span>
                 <ChipCount
-                  auction={auction}
                   confirmationStatus={item.confirmationStatus}
                   auctionStatus={item.auctionStatus}
                 />

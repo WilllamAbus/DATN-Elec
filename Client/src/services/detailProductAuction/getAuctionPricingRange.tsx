@@ -1,12 +1,9 @@
-import instance from '../axios';
-import { AuctionCanceledResponse } from './types/canceledAuction';
+import instance from "../axios";
+import { AuctionPricingRangeResponse } from "./types/getAuctionPricingRange";
 
-export const canceledAuction = async (auctionWinnerId: string): Promise<AuctionCanceledResponse> => {
+export const getAuctionPricingRange = async (slug: string): Promise<AuctionPricingRangeResponse> => {
   try {
-    const response = await instance.post<AuctionCanceledResponse>('/client/auction/canceled-auction', {
-      auctionWinnerId
-    });
-    console.log('API Response:', response);
+    const response = await instance.get<AuctionPricingRangeResponse>(`/client/product-detail-auction/product-auction-check-current-price/${slug}`);
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -19,3 +16,4 @@ export const canceledAuction = async (auctionWinnerId: string): Promise<AuctionC
     }
   }
 };
+

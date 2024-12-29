@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { confirmAuctionThunk } from "../../thunk";
-import { ConfirmAuctionResponse, AuctionWinner, ItemAuction } from "../../../../services/AuctionWinsByUser/types/confirmAuction";
+import { ConfirmAuctionResponse, AuctionWin, ItemAuction } from "../../../../services/AuctionWinsByUser/types/confirmAuction";
 
 interface ConfirmAuctionState {
-  auctionWinner: AuctionWinner | null;
+  auctionWinner: AuctionWin | null;
   itemAuction: ItemAuction | null;
   status: "idle" | "loading" | "success" | "fail";
   error: { code: string; msg: string } | null;
   isLoading: boolean;
+  auctions: AuctionWin[];
 }
 
 const initialState: ConfirmAuctionState = {
@@ -16,6 +17,7 @@ const initialState: ConfirmAuctionState = {
   status: "idle",
   error: null,
   isLoading: false,
+  auctions: [], // Khởi tạo auctions là mảng rỗng
 };
 
 const confirmAuctionSlice = createSlice({
@@ -34,9 +36,21 @@ const confirmAuctionSlice = createSlice({
         (state, action: PayloadAction<ConfirmAuctionResponse>) => {
           state.status = "success";
           state.isLoading = false;
-          state.auctionWinner = action.payload.auctionWinner;
+          state.auctionWinner = {
+            ...action.payload.auctionWinner,
+            confirmationStatus: "confirmed",
+          };
           state.itemAuction = action.payload.itemAuction;
           state.error = null;
+
+          // Kiểm tra nếu `auctions` tồn tại trước khi gọi `.map`
+          if (state.auctions) {
+            state.auctions = state.auctions.map((item: AuctionWin) =>
+              item._id === action.payload.auctionWinner._id
+                ? { ...item, confirmationStatus: "confirmed" }
+                : item
+            );
+          }
         }
       )
       .addCase(confirmAuctionThunk.rejected, (state, action) => {

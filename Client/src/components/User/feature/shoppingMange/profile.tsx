@@ -16,6 +16,7 @@ import Bank from "./bank/listBank";
 import ListAddress from "./address/listAddress";
 import OrderList from "./order";
 import OrderAuct from "./orderAuctStatus";
+import ListBid from "./listBidding";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 import { Transition } from "@headlessui/react";
@@ -36,6 +37,7 @@ const ProfileUse: React.FC = () => {
     | "password"
     | "watchlist"
     | "listAddress"
+    | "listBid"
     | "Bank"
   >("info");
 
@@ -91,6 +93,7 @@ const ProfileUse: React.FC = () => {
       | "address"
       | "password"
       | "watchlist"
+      | "listBid"
       | "Bank";
   }) => (
     <li>
@@ -153,7 +156,12 @@ const ProfileUse: React.FC = () => {
             <span className="ms-3"> Đơn hàng đấu giá</span>
           </>
         )}
-
+        {item === "listBid" && (
+          <>
+            <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Lịch sử đấu giá</span>
+          </>
+        )}
       </button>
     </li>
   );
@@ -198,6 +206,7 @@ const ProfileUse: React.FC = () => {
                   "watchlist",
                   "order",
                   "orderAuct",
+                  "listBid",
                   "Bank",
                 ].map((item) => (
                   <MenuItem
@@ -206,6 +215,7 @@ const ProfileUse: React.FC = () => {
                       item as
                         | "order"
                         | "orderAuct"
+                        | "listBid"
                         | "info"
                         | "edit"
                         | "address"
@@ -239,7 +249,7 @@ const ProfileUse: React.FC = () => {
             {view === "watchlist" && <Watchlist profiles={profile} />}
             {view === "order" && <OrderList />}
             {view === "orderAuct" && <OrderAuct />}
-            {/* {view === "listBid" && <ListBid />} */}
+            {view === "listBid" && <ListBid />}
             {view === "Bank" && <Bank />}
           </section>
         </div>
@@ -290,7 +300,7 @@ const ProfileUse: React.FC = () => {
                         | "watchlist"
                         | "order"
                         | "orderAuct"
-                        // | "listBid"
+                        | "listBid"
                         | "Bank"
                     }
                   />

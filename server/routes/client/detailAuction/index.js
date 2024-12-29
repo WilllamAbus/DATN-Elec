@@ -4,6 +4,7 @@ const {
     getProductDetailAuction,
     createOneUpdateBidAuction,
     getAuctionDetailsBySlug,
+    getAuctionPricingRange,
     biddingList,
     processAuctionWinner,
     getUserBiddingHistory,
@@ -18,6 +19,7 @@ router.post('/create-one-update-bid-auction/:slug', middlewareController.getHead
 router.get('/product-auction/:slug', middlewareController.getHeader, getProductDetailAuction);
 
 router.get('/product-auction-win-and-lose/:slug', middlewareController.getHeader, getAuctionDetailsBySlug);
+router.get('/product-auction-check-current-price/:slug', middlewareController.getHeader, getAuctionPricingRange);
 router.get('/bidding-list/:slug', biddingList);
 router.post("/process-winner/:slug", processAuctionWinner);
 

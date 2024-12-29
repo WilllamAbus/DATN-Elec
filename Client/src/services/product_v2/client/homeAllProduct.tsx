@@ -100,7 +100,7 @@ export const searchProduct = async (keyword: string) => {
   try {
     const encodedKeyword = encodeURIComponent(keyword);
     const response = await instance.get(`/client/product/search/${encodedKeyword}`);
-    return response.data;
+    return response;
   } catch (error) {
     console.log(error);
   }

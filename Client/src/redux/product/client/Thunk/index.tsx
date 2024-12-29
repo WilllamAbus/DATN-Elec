@@ -16,3 +16,4 @@ export * from "./getdetailAuction";
 export * from "./createOneUpdateBidAuction";
 export * from "./getBiddingList";
 export * from "./getAuctionDetailsBySlug";
+export * from "./getAuctionPricingRange";

@@ -54,7 +54,7 @@ const createOneUpdateBidAuction = async (req, res) => {
         userId,
         bidPrice,
         slug,
-        status: 'ended'  // Thêm thông tin trạng thái ở đây
+        status: 'ended'  
       });
 
       auctionPricingRange.status = 'ended';

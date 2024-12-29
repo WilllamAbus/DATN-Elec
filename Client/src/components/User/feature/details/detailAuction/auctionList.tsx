@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { getBiddingListThunk, getAuctionWinnerThunk } from "../../../../../redux/product/client/Thunk";
 import { useParams } from "react-router-dom";
-
+import { io } from "socket.io-client"; // Thêm socket.io-client
 
 export default function AuctionList() {
   const dispatch: AppDispatch = useDispatch();
@@ -49,10 +49,39 @@ export default function AuctionList() {
   );
 
   useEffect(() => {
+    // Kiểm tra slug có tồn tại không trước khi dispatch
     if (slug) {
       dispatch(getBiddingListThunk({ slug, page }));
       dispatch(getAuctionWinnerThunk({ slug }));
     }
+  }, [dispatch, slug, page]);
+
+  useEffect(() => {
+    if (!slug) return; // Nếu slug không tồn tại thì không kết nối socket
+
+    // Kết nối WebSocket khi component được mount
+    const socketInstance = io("http://localhost:4000"); // URL của server WebSocket
+
+    // Lắng nghe sự kiện 'updateBiddingList' từ server
+    socketInstance.on("updateBiddingList", (data) => {
+      if (data.slug === slug) {
+        // Cập nhật lại danh sách đấu giá
+        dispatch(getBiddingListThunk({ slug, page }));
+      }
+    });
+
+    // Lắng nghe sự kiện 'auctionWinnerDeclared' từ server
+    socketInstance.on("auctionWinnerDeclared", (data) => {
+      if (data.slug === slug) {
+        // Cập nhật lại người thắng
+        dispatch(getAuctionWinnerThunk({ slug }));
+      }
+    });
+
+    // Dọn dẹp socket khi component unmount
+    return () => {
+      socketInstance.disconnect();
+    };
   }, [dispatch, slug, page]);
 
   return (
@@ -121,12 +150,6 @@ export default function AuctionList() {
         <Card className="max-w-full shadow-none mt-4 bg-white">
           <CardHeader className="justify-between">
             <div className="flex gap-2 items-center">
-              {/* <Avatar
-                radius="full"
-                size="sm"
-                className="border-none"
-                src={auctionWinner.user.avatar || "/default-avatar.png"}
-              /> */}
               <div className="flex flex-col gap-1 items-center justify-center">
                 <span className="text-small font-bold leading-none text-default-600">
                   Người thắng cuộc
@@ -137,12 +160,6 @@ export default function AuctionList() {
 
           <CardBody className="px-1 py-1 text-small text-default-400">
             <div className="flex gap-2 items-center">
-              {/* <Avatar
-                radius="full"
-                size="lg"
-                className="border-none"
-                src={auctionWinner.user.avatar || "/default-avatar.png"}
-              /> */}
               <div>
                 <span className="font-bold">{auctionWinner.user.name}</span>
                 <span>

@@ -5,7 +5,7 @@ const updateUserWarningStatus = (user) => {
   user.warning += 1;
   user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${3 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
 
-  if (user.warning >= 3) {
+  if (user.warning >= 100) {
     user.status = 'disabled'; 
     user.disabledAt = new Date();
     user.messgese = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';

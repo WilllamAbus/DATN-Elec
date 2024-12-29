@@ -1,93 +1,88 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardBody, CardFooter, Avatar, Chip } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Avatar, Chip, Alert } from "@nextui-org/react";
 import { ProductAuction } from "../../../../../services/detailProductAuction/types/detailAuction";
 import { MyButton } from "../../../../../common/customs/MyButton";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { createOneUpdateBidAuctionThunk } from "../../../../../redux/product/client/Thunk";
 import { toast, Toaster } from "react-hot-toast";
-import { io } from 'socket.io-client';
-import { convertToVietnameseCurrency } from "../../../../../common/pricecurrency/ConvertToVietnameseCurrency";
-import { useNavigate } from 'react-router-dom'; 
-const socket = io('http://localhost:4000'); 
+import { useNavigate } from 'react-router-dom';
+import { handleBidSubmission } from "./handle/handleBidSubmission";
+import socket from '../../../../../services/rtsk/sk'; // This is where the socket connection is imported
+import { convertToVietnameseCurrency } from "src/common/pricecurrency/ConvertToVietnameseCurrency";
+import { getAuctionPricingRangeThunk } from "../../../../../redux/product/client/Thunk";
 
 interface ProductCurrentPriceAndBidpriceProps {
   product: ProductAuction;
   onAuctionEnd: () => void;
+  onChange: () => void;
 }
 
-const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd }) => {
-  const [priceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
+const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd, onChange }) => {
+  const [priceStep, setPriceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
   const [currentPrice, setCurrentPrice] = useState<number>(product.auctionPricing.currentPrice ?? 0);
+  const [isPriceStepAdjusted, setIsPriceStepAdjusted] = useState<boolean>(false);
   const navigate = useNavigate();
   const [userBidPrice, setUserBidPrice] = useState<number | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
-  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
+  const userId = useSelector((state: RootState) => state.auth.profile.profile?._id) || "";
+
+  const updateAuctionPricing = async () => {
+    const result = await dispatch(getAuctionPricingRangeThunk({ slug: product.slug }));
+    if (result.payload && typeof result.payload !== "string") {
+      setPriceStep(result.payload.auctionPricing.priceStep ?? 0);
+      setCurrentPrice(result.payload.auctionPricing.currentPrice ?? 0);
+      setIsPriceStepAdjusted(result.payload.auctionPricing.isPriceStepAdjusted ?? false);
+    }
+  };
 
   useEffect(() => {
-    setCurrentPrice(product.auctionPricing.currentPrice ?? 0);
-  }, [product.auctionPricing.currentPrice]);
+    updateAuctionPricing();
+  }, [product]);
 
   useEffect(() => {
-    socket.on('bidPlaced', (data) => {
+    socket.on('auctionPriceUpdated', async (data) => {
+      if (data.productSlug === product.slug) {
+        await updateAuctionPricing();
+        if (data.status === 'ended') {
+          onAuctionEnd(); // Handle auction end
+        }
+      }
+    });
+
+    return () => {
+      socket.off('auctionPriceUpdated'); // Clean up the listener on unmount
+    };
+  }, [product.slug, onAuctionEnd]);
+
+  useEffect(() => {
+    socket.on('bidPlaced', async (data) => {
       if (data.slug === product.slug) {
-        setCurrentPrice(data.bidPrice);
-        
+        await updateAuctionPricing();
+
         if (data.status === 'ended') {
           onAuctionEnd();
         }
-  
+
         if (data.userId !== userId) {
           toast.success(data.message);
         }
       }
     });
-  
+
     return () => {
       socket.off('bidPlaced');
     };
   }, [product.slug, userId, navigate]);
 
   const handleSubmitBidPrice = async () => {
-    const bidPrice = userBidPrice ?? priceStep;
-    const newPrice = currentPrice + bidPrice;
-    const previousPrice = currentPrice;
-
-    setCurrentPrice(newPrice);
-    setUserBidPrice(null);
-   
-
-    try {
-      const resultAction = await dispatch(
-        createOneUpdateBidAuctionThunk({ slug: product.slug, bidPrice: newPrice })
-      );
-
-      if (createOneUpdateBidAuctionThunk.fulfilled.match(resultAction)) {
-        if (resultAction.payload && typeof resultAction.payload !== 'string') {
-          if (resultAction.payload.userId !== userId) {
-            toast.success(resultAction.payload.msg || "Đã đấu giá thành công!");
-          }
-        } else {
-          // Nếu phản hồi không hợp lệ, khôi phục giá trị trước đó
-          setCurrentPrice(previousPrice);
-          toast.error("Không có dữ liệu trả về từ máy chủ hoặc phản hồi không hợp lệ.");
-        }
-      } else {
-        const errorMessage =
-          typeof resultAction.payload === 'string'
-            ? resultAction.payload
-            : resultAction.payload?.msg ?? "Có gì đó không ổn!";
-
-        // Nếu có lỗi từ backend, khôi phục giá trị trước đó
-        setCurrentPrice(previousPrice);
-        toast.error(errorMessage);
-      }
-    } catch (error) {
-      // Nếu có lỗi từ backend, khôi phục giá trị trước đó
-      setCurrentPrice(previousPrice);
-      toast.error("Lỗi khi gửi giá thầu: " + error);
+    if (!product.slug) {
+      toast.error("Slug của sản phẩm không hợp lệ.");
+      return;
     }
+    await handleBidSubmission({ ...product, slug: product.slug as string }, userBidPrice, priceStep, currentPrice, dispatch, userId, setCurrentPrice, setUserBidPrice);
+    onChange(); // Gọi hàm onChange khi submit
   };
 
   return (
@@ -108,18 +103,19 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
           </div>
 
           <MyButton radius="full" size="xl" variant="transparent">
-            {currentPrice.toLocaleString()} đ
+            {(currentPrice || 0).toLocaleString()} đ
           </MyButton>
         </CardHeader>
 
         <CardBody className="px-3 py-4 text-small text-default-400">
           <div className="flex justify-between items-center gap-4">
-          <div className="inline-flex items-center gap-2">
-            <span className="text-default-600 text-medium font-bold">Bước giá:</span>
-            <Chip className="px-3 py-1 text-sm font-bold rounded-md border-none" isDisabled>
-              {convertToVietnameseCurrency(priceStep)}
-            </Chip>
-          </div>
+ 
+            <div className="inline-flex items-center gap-2">
+              <span className="text-default-600 text-medium font-bold">Bước giá:</span>
+              <Chip className="px-3 py-1 text-sm font-bold rounded-md border-none" isDisabled>
+                {convertToVietnameseCurrency(priceStep)}
+              </Chip>
+            </div>
 
             <MyButton radius="full" size="sm" variant="gradient">
               {userBidPrice !== null
@@ -127,7 +123,19 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
                 : priceStep.toLocaleString() + " đ"}
             </MyButton>
           </div>
-
+          <div className="mt-2">
+          {isPriceStepAdjusted && (
+            <Alert 
+              hideIcon 
+              color="warning" 
+              description="Do quá trình đấu giá tạo ra số lẻ nên hệ thống sẽ điều chỉnh lại bước giá."
+              title="Chú ý"
+              variant="faded" 
+            
+            />
+          )}
+          </div>
+        
           <MyButton
             radius="full"
             size="xl"
@@ -135,14 +143,11 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
             className="mt-4"
             onClick={handleSubmitBidPrice}
           >
-            Trả giá {(currentPrice + (userBidPrice ?? priceStep)).toLocaleString()} đ
+            Trả giá {(currentPrice + (userBidPrice !== null ? userBidPrice : priceStep)).toLocaleString()} đ
           </MyButton>
-
-
         </CardBody>
 
         <CardFooter className="gap-3">
-        
         </CardFooter>
       </Card>
     </>

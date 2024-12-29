@@ -16,7 +16,8 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
         select: 'product_name'
       }
     })
-    .populate('auctionRound user')
+    .populate({ path: 'auctionRound', select: 'auctionPricing participants bids status' })
+    .populate({ path: 'user', select: 'name email avatar' })
     .skip(skip)
     .limit(limit);
 
