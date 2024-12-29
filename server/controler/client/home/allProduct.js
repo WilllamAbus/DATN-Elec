@@ -1,6 +1,7 @@
 const modelProduct = require('../../../model/product_v2');
-
+const removeAccents = require("remove-accents");
 const Repcomment = require('../../../model/repComment.model');
+const modelProductAuction = require('../../../model/productAuction/productAuction');
 const mongoose = require('mongoose'); 
 const homeAllProduct = async (req, res) => {
   try {
@@ -182,51 +183,83 @@ const upView = async (req, res) => {
 };
 
 
+
 const search = async (req, res) => {
   try {
-    const keyword = req.params.keyword.trim(); 
+    let keyword = req.params.keyword?.trim();
 
-    // Điều kiện không thực hiện tìm kiếm với từ khóa quá ngắn
-    if (keyword.length < 2) {
+    // Điều kiện từ khóa không hợp lệ
+    if (!keyword || keyword.length < 2) {
       return res.status(400).json({
         success: false,
-        message: "Keyword must be at least 3 characters long"
+        message: "Keyword must be at least 2 characters long and cannot be empty",
       });
     }
 
-    // Truy vấn chỉ tìm kiếm các sản phẩm khớp với từ khóa
-    const result = await modelProduct.find({
-      product_name: { $regex: `${keyword}`, $options: 'i' } // Bắt đầu với từ khóa (case-insensitive)
-    }).populate({
-      path: 'variants',
-      select: 'variant_price product_discount variant_original_price',
-      populate: [
-        { path: 'storage', select: 'name' },
-        { path: 'ram', select: 'name' },
-        { path: 'product_discount', select: 'discountPercent' }
-      ]
-    });
+    // Chuẩn hóa từ khóa: loại bỏ dấu tiếng Việt
+    const normalizedKeyword = removeAccents(keyword).toLowerCase();
 
-    if (result.length > 0) {
-      res.status(200).json({
-        success: true,
-        data: result
-      });
-    } else {
-      res.status(404).json({
+    // Tạo biểu thức tìm kiếm
+    const searchRegex = new RegExp(keyword, "i"); // Tìm kiếm có dấu
+    const normalizedSearchRegex = new RegExp(normalizedKeyword, "i"); // Tìm kiếm không dấu
+
+    // Tìm kiếm trong cả hai mô hình
+    const [result1, result2] = await Promise.all([
+      modelProduct.find({
+        $or: [
+          { product_name: { $regex: searchRegex } }, // Tìm kiếm theo tên có dấu
+          { normalized_name: { $regex: normalizedSearchRegex } }, // Tìm kiếm theo tên không dấu
+        ],
+      }).populate({
+        path: "variants",
+        select: "variant_price product_discount variant_original_price",
+        populate: [
+          { path: "storage", select: "name" },
+          { path: "ram", select: "name" },
+          { path: "product_discount", select: "discountPercent" },
+        ],
+      }),
+      modelProductAuction.find({
+        $or: [
+          { product_name: { $regex: searchRegex } }, // Tìm kiếm theo tên có dấu
+          { normalized_name: { $regex: normalizedSearchRegex } }, // Tìm kiếm theo tên không dấu
+        ],
+        status: "active", // Điều kiện bổ sung
+      }).populate([
+        "product_type",
+        "product_brand",
+        "product_condition",
+        "product_supplier",
+        "auctionPricing",
+      ]),
+    ]);
+
+    // Xử lý không tìm thấy kết quả
+    if (result1.length === 0 && result2.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: "No results found"
+        message: "No products found matching the search criteria",
       });
     }
+
+    // Trả về kết quả tìm kiếm
+    return res.status(200).json({
+      success: true,
+      data1: result1, // Kết quả từ modelProduct
+      data2: result2, // Kết quả từ modelProductAuction
+    });
   } catch (error) {
-    console.error('Error during search:', error);
-    res.status(500).json({
+    console.error("Error during search:", error);
+    return res.status(500).json({
       success: false,
-      message: 'Internal Server Error',
-      error: error.message
+      message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
+
+
+
 
 
 
