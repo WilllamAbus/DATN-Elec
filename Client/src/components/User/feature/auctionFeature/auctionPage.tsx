@@ -2,14 +2,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import AppAuction from "./auctionApp";
-import { getAuctionWinsByUserThunk, } from "../../../../redux/sessionAuction/thunk";
-
+import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
 
 const AuctionPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const currentPage = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.pagination?.currentPage || 1);
-  const auction = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.auctionWins || []);
-
 
   React.useEffect(() => {
     dispatch(getAuctionWinsByUserThunk({ page: currentPage }));
@@ -31,7 +28,7 @@ const AuctionPage: React.FC = () => {
         <div className="max-w-screen-2xl px-4 mx-auto lg:px-1">
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 items-start dark:bg-gray-900">
             <div className="col-span-full">
-              <AppAuction auction={auction} dispatch={dispatch} currentPage={currentPage} />
+              <AppAuction currentPage={currentPage} />
             </div>
           </div>
         </div>

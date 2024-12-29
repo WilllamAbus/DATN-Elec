@@ -13,13 +13,15 @@ interface ModalComponentProps {
 
 const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClose, onConfirm, onCancel }) => {
   if (!auction) return null;
-
+  const productName = auction.auctionPricingRange && auction.auctionPricingRange.product_randBib 
+    ? auction.auctionPricingRange.product_randBib.product_name 
+    : "Tên sản phẩm"; 
   return (
     <Modal isOpen={isOpen} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description" placement="center" size="xl">
       <ModalContent>
         <ModalHeader id="modal-title">Chi tiết đấu giá</ModalHeader>
         <ModalBody>
-          <p><strong>Tên sản phẩm:</strong> {auction.auctionPricingRange.product_randBib.product_name}</p>
+        <p><strong>Tên sản phẩm:</strong> {productName}</p>
           <p><strong>Giá trúng:</strong> {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(auction.bidPrice)}</p>
           <p><strong>Thời gian bắt đầu:</strong> {new Date(auction.startTime).toLocaleString()}</p>
           <p><strong>Thời gian kết thúc:</strong> {new Date(auction.endTime).toLocaleString()}</p>

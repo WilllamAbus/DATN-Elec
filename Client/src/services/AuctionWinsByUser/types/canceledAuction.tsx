@@ -27,15 +27,54 @@ export interface User {
   noteWarning: string;
   messgese?: string;
 }
-
-export interface AuctionWinner {
-  id: string;
-  user: User;
-  confirmationStatus: string;
+export interface AuctionPricingRange {
+  _id: string;
+  startTime: string;
+  endTime: string;
+  startingPrice: number;
+  maxPrice: number;
+  currentPrice: number;
+  priceStep: number;
   status: string;
-  auctionStatus: string;
+  product_randBib: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  auctionPriceHistory: string;
 }
 
+export interface AuctionRound {
+  _id: string;
+  auctionPricing: string;
+  participants: string[];
+  bids: Array<{
+    user: string;
+    bidPrice: number;
+    bidTime: string;
+    _id: string;
+  }>;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+export interface AuctionWin {
+  _id: string;
+  auctionPricingRange: AuctionPricingRange;
+  auctionRound: AuctionRound;
+  user: User;
+  bidPrice: number;
+  paymentStatus: string;
+  auctionStatus: string;
+  status: string;
+  confirmationStatus: string;
+  auctionStausCheck: string;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  updatedAt: string;
+  remainingTime: string; 
+}
 export interface UserWarningInfo {
   id: string;
   warning: number;
@@ -50,7 +89,7 @@ export interface AuctionCanceledResponse {
   status: string;
   error: string | null;
   data: {
-    auctionWinner: AuctionWinner;
+    auctionWinner: AuctionWin;
     user: UserWarningInfo;
   };
 }

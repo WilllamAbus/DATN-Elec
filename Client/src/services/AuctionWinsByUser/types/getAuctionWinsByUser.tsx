@@ -37,7 +37,12 @@ export interface AuctionRound {
   updatedAt: string;
   __v: number;
 }
-export interface ProductRandBib { _id: string; product_name: string; }
+
+export interface ProductRandBib {
+  _id: string;
+  product_name: string;
+}
+
 export interface AuctionPricingRange {
   _id: string;
   startTime: string;
@@ -69,13 +74,20 @@ export interface AuctionWin {
   endTime: string;
   createdAt: string;
   updatedAt: string;
- 
+  remainingTime: string; 
 }
-export interface Pagination { currentPage: number; totalPages: number; hasNextPage: boolean; hasPrevPage: boolean; }
+
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
 
 export interface AuctionWinsResponse {
   code: string;
   msg: string;
   data: AuctionWin[];
   pagination: Pagination;
+  total:number
 }

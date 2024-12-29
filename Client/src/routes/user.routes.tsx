@@ -2,6 +2,7 @@ import React from "react";
 import { RouteObject } from "react-router-dom";
 import User from "../page/User/Home/home";
 import Title from "../common/title/Title";
+import ProtectedRoute from "src/ultils/protectedRoute/ProtectedRoute";
 const UserHome = React.lazy(() => import("../page/User/rootUser"));
 const ExternalPage = React.lazy(() => import("../page/User/externalpage"));
 const AuctionResultPage = React.lazy(() => import("../page/User/auctionResult"));
@@ -124,7 +125,11 @@ const UserRoutes: RouteObject[] = [
       { path: "allList", element: <UserAllList /> },
       { path: "listTing", element: <UserMyList /> },
       { path: "category/:slug", element: <UserListPage /> },
-      { path: "auction", element: <UserAuction /> },
+      {
+        path: "auction",
+        element: <ProtectedRoute />,
+        children: [{ index: true, element: <UserAuction /> }],
+      },
       { path: "product/:slug", element: <UserPageDetail /> },
       { path: "product-auction/:slug", element: <UserPageDetailAuction /> },
       { path: "session-auction", element: <UserAuctionPage /> },
