@@ -8,6 +8,7 @@ import {
   cancelOrderThunk,
   getOrderByIdThunk,
   applyVoucherThunk,
+  createOrdeAuctionThunk,
 } from "./orderThunks";
 import {
   getOrderDetailByIdThunk,
@@ -31,6 +32,7 @@ import {
 
 interface OrderState {
   selectedOrder: Order | null;
+  selectedOrderAuction: Order | null;
   orders: Order[];
 
   order: Order[] | null;
@@ -46,6 +48,7 @@ interface OrderState {
 
 const initialState: OrderState = {
   selectedOrder: null,
+  selectedOrderAuction: null,
   items: [],
   orders: [],
   order: null,
@@ -79,6 +82,23 @@ const orderSlice = createSlice({
         }
       )
       .addCase(createOrderThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message ?? "An error occurred";
+      })
+      //
+      .addCase(createOrdeAuctionThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(
+        createOrdeAuctionThunk.fulfilled,
+        (state, action: PayloadAction<{ order: Order }>) => {
+          state.status = "succeeded";
+          state.selectedOrderAuction = action.payload.order;
+          state.error = null;
+        }
+      )
+      .addCase(createOrdeAuctionThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message ?? "An error occurred";
       })

@@ -41,6 +41,7 @@ export interface UserID {
     disabledAt: string | null;
     auctionStatus: string;
     auctionStausCheck:string
+    endTime:string
     createdAt: string;
     updatedAt: string;
     bidPrice:number;

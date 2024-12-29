@@ -479,7 +479,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                         mso-text-raise: 1px;
                                       "
                                     >
-                                     Xác nhận bưu kiện 
+                                    Chúc mừng chiến thắng
                                     </h1>
                                   </td>
                                 </tr>
@@ -527,7 +527,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                         mso-text-raise: 2px;
                                       "
                                     >
-                                Chúng tôi xin thông báo rằng bưu kiện của bạn đã được gửi thành công đến địa chỉ yêu cầu.
+                                Chúng tôi xin thông báo rằng phiên đấu giá này thuộc về bạn.
                                 Chúng tôi rất vui khi có cơ hội phục vụ bạn và hy vọng bạn sẽ hài lòng với sản phẩm. 
                                 Nếu bạn cần bất kỳ sự hỗ trợ nào hoặc có câu hỏi về đơn hàng của mình, xin vui lòng liên hệ với chúng tôi.
                                 Một lần nữa, xin cảm ơn bạn đã tin tưởng và lựa chọn dịch vụ của chúng tôi
@@ -586,7 +586,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                           font-weight: bold;
                                           mso-line-height-rule: exactly;
                                         "
-                                        >Mã đơn hàng</span
+                                        >Mã phiên chiên thắng</span
                                       >
                                     </p>
                                   </td>
@@ -635,7 +635,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                         mso-text-raise: 2px;
                                       "
                                     >
-                                   INV-${order._id}
+                                   EBIDWIN-${order}
                                     </p>
                                   </td>
                                 </tr>
@@ -688,7 +688,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                           font-weight: bold;
                                           mso-line-height-rule: exactly;
                                         "
-                                        >Số hiệu theo dõi đơn hàng</span
+                                        >Số hiệu theo dõi phiên chiến thắng</span
                                       >
                                     </p>
                                   </td>
@@ -737,7 +737,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                         mso-text-raise: 2px;
                                       "
                                     >
-                                     ${invoiceId}
+                                     ${order}
                                     </p>
                                   </td>
                                 </tr>
@@ -758,42 +758,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
 <td width="500" class="t25">
 <![endif]-->
                                   <!--[if !mso]>-->
-                                  <td class="t25" style="width: 500px">
-                                    <!--<![endif]-->
-                                    <p
-                                      class="t24"
-                                      style="
-                                        margin: 0;
-                                        margin: 0;
-                                        font-family: Albert Sans,
-                                          BlinkMacSystemFont, Segoe UI,
-                                          Helvetica Neue, Arial, sans-serif;
-                                        line-height: 22px;
-                                        font-weight: 500;
-                                        font-style: normal;
-                                        font-size: 14px;
-                                        text-decoration: none;
-                                        text-transform: none;
-                                        letter-spacing: -0.56px;
-                                        direction: ltr;
-                                        color: #333333;
-                                        text-align: left;
-                                        mso-line-height-rule: exactly;
-                                        mso-text-raise: 2px;
-                                      "
-                                    >
-                                      <span
-                                        class="t23"
-                                        style="
-                                          margin: 0;
-                                          margin: 0;
-                                          font-weight: bold;
-                                          mso-line-height-rule: exactly;
-                                        "
-                                        >Địa chỉ giao hàng</span
-                                      >
-                                    </p>
-                                  </td>
+                                // 
                                 </tr>
                               </table>
                             </td>
@@ -836,7 +801,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                         mso-text-raise: 2px;
                                       "
                                     >
-                                        ${order.shippingAddress?.address}
+                                     
                                     </p>
                                   </td>
                                 </tr>
@@ -973,9 +938,8 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                                   >
                                     <!--<![endif]-->
                                       <div style="width: 100%; text-align: left">
-      ${orderDetailSummary
-        .map(
-          (item) => `
+ 
+     
         <div class="t59" style="width: 100%; text-align: left">
           <div class="t58" style="display: inline-block">
             <table class="t57" role="presentation" cellpadding="0" cellspacing="0" align="left" valign="middle">
@@ -988,7 +952,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                       <td class="t39">
                         <div style="font-size: 0px">
                           <img class="t37" style="display: block; border: 0; height: auto; width: 100%; margin: 0; max-width: 100%;" 
-                               width="79.09324208725407" height="105.859375" alt="${item.productName}" src="${item.image}" />
+                               width="79.09324208725407" height="105.859375" alt="${orderDetailSummary.productName}" src="${orderDetailSummary.image}" />
                         </div>
                       </td>
                       <td class="t40" style="width: 10px" width="10"></td>
@@ -1001,7 +965,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                       <td class="t44" style="width: 10px" width="10"></td>
                       <td class="t45" style="padding: 0 0 0 24px">
                         <h1 class="t43" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 16px; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #1a1a1a;">
-                          ${item.productName}
+                          ${orderDetailSummary.productName}
                         </h1>
                       </td>
                       <td class="t46" style="width: 10px" width="10"></td>
@@ -1014,10 +978,15 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                       <td class="t51" style="width: 10px" width="10"></td>
                       <td class="t52">
                         <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 500; font-size: 14px; text-transform: uppercase; color: #333333; text-align: right;">
-                          Số lượng: <span class="t49" style="font-weight: bold;">${item.quantity}</span>
+                          Giá chiến thắng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.productPrice} đ</span>
+                             Số lượng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity}</span>
                         </p>
                       </td>
-                      <td class="t53" style="width: 10px" width="10"></td>
+                      <td class="t53" style="width: 10px" width="10">
+                         <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 300; font-size: 10px; text-transform: lowercase; color: #333333; text-align: right;">
+                         
+                        </p>
+                      </td>
                     </tr>
                   </table>
                 </td>
@@ -1026,9 +995,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
             </table>
           </div>
         </div>
-      `
-        )
-        .join("")}
+
     </div>
 
                                   </td>

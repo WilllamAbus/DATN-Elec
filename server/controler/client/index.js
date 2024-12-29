@@ -1,9 +1,10 @@
 
 const { homeAllProduct, getID, auction, upView, shopping, search, recommendations, getPhoneByVariants, getLaptopByVariants, getAccessoryByVariants } = require('./home');
+const {listcatenav,getProductsByCategory} = require('./navbar');
+const {listPageAuction,resetFilter} = require('./page-auction-product');
+const {getProductDetail,getAllStorageBySlugUrl,getAllProductVariantsByVariantPrice} = require('./detail');
+const {getAuctionWinsByUser,confirmAuction,canceledAuction} = require('./AuctionByUser');
 const { getLimitProductClient, relatedProduct } = require('./product');
-const { listcatenav, getProductsByCategory } = require('./navbar');
-const { listPageAuction, resetFilter } = require('./page-auction-product');
-const { getProductDetail, getAllStorageBySlugUrl, getAllProductVariantsByVariantPrice } = require('./detail');
 const {
   getProductDetailAuction,
   createOneUpdateBidAuction,
@@ -66,6 +67,9 @@ module.exports = {
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
   biddingList,
+  getAuctionWinsByUser,
+  confirmAuction,
+  canceledAuction,
   processAuctionWinner,
   getUserBiddingHistory,
   getUserBiddingDetails

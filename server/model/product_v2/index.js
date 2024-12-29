@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const slugify = require('slugify');
 const { v4: uuidv4 } = require("uuid");
-
+const removeAccents = require('remove-accents');
 
 const productV2Schema = new Schema({
   product_name: { type: String, required: true },
@@ -28,6 +28,7 @@ const productV2Schema = new Schema({
   comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   posts: { type: Schema.Types.ObjectId, ref: 'Post' },
   slug: { type: String, unique: true, sparse: true },
+  normalized_name:  { type: String, unique: true, sparse: true }, //thêm cái này để tìm kiếm ko dấu
 }, {
   collection: "product_v2",
   timestamps: true
@@ -60,6 +61,12 @@ productV2Schema.pre('findOneAndUpdate', function (next) {
     update.slug = slugify(update.product_name, options);
     this.setUpdate(update);
   }
+  next();
+});
+//thêm cái này để tìm kiếm ko dấu
+productV2Schema.pre('save', function (next) {
+  const productName = this.product_name || '';
+  this.normalized_name = removeAccents(productName).toLowerCase().replace(/\s+/g, ' ');
   next();
 });
 

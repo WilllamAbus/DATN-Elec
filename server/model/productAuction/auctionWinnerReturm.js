@@ -3,9 +3,31 @@ const { Schema, model } = require("mongoose");
 const auctionWinnerReturnSchema = new Schema(
   {
 
-    auctionWinnerReturn: { 
+  
+    cancelledProducts: [
+      {
+        auctionWinnerReturn: { 
+          type: Schema.Types.ObjectId, 
+          ref: 'AuctionWinner', 
+          required: true 
+        },
+        productName: { 
+          type: String, 
+        
+        },
+        quantity: { 
+          type: Number,  
+          default: 1
+        },
+        image: { 
+          type: String,  
+    
+        },
+      }
+    ],
+    auctionWinnerUserReturn: { 
       type: Schema.Types.ObjectId, 
-      ref: 'AuctionWinner',
+      ref: 'users',
       required: true 
     },
 
@@ -15,23 +37,24 @@ const auctionWinnerReturnSchema = new Schema(
     },
     isPaymentReturnStatus: { 
       type: String, 
-    //   enum: ['pending', 'paid', 'failed'], 
+
       default: 'failed' 
     },
     auctionReturnStatus: { 
       type: String, 
-    //   enum: ['won', 'pending','canceled'], 
+ 
       default: 'canceled' 
     },
-    status:{
-        status: { type: String, default: 'disable' },
-    },
+    status: { type: String, default: 'deleted' },
     auctionStausIsCheck:{
         type: String, 
-     enum: ['Cảnh cáo tiếp theo ', 'Cảnh cáo lần cuối','Hủy tài khoản'], 
-        default: 'Đã duyệt hủy chiển thắng' 
+        enum: ['Đã duyệt hủy chiến thắng',
+          'Cảnh báo đầu tiên', 
+          'Cảnh báo cuối cùng',
+          'Khóa tài khoản'], 
+    
     },
-    coundDisabledAuction :{type: "Number", default: 1},
+    countDisabledAuction: { type: Number, default: 1 }, // Sửa lỗi kiểu
     mess :{type: "String"},
     createdAt: { 
       type: Date, 
