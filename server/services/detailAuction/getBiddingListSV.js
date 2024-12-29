@@ -2,6 +2,9 @@ const AuctionPriceHistory = require("../../model/productAuction/auctionPriceHist
 const AuctionPricingRange = require("../../model/productAuction/auctionPricingRange");
 const ProductAuction = require("../../model/productAuction/productAuction");
 const AuctionWinner = require("../../model/productAuction/auctionWinner");
+const AuctionRound = require("../../model/productAuction/auctionRound");
+const AuctionUserHistories = require("../../model/productAuction/userAuctionHistory");
+const mongoose = require('mongoose');
 
 const BiddingService = {
   getBiddingListService: (slug, page = 1, limit = 5) => new Promise(async (resolve, reject) => {
@@ -181,71 +184,90 @@ const BiddingService = {
   }),
 
 
-  getUserBiddingHistoryService: (userId, page = 1, limit = 5) => new Promise(async (resolve, reject) => {
-    try {
-      const offset = (page - 1) * limit;
+  getUserParticipatedProductsService: (userId) =>
+    new Promise(async (resolve, reject) => {
+      try {
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return reject({
+            success: false,
+            err: 1,
+            msg: "User ID không hợp lệ.",
+            status: 400,
+          });
+        }
 
-      // Tìm tất cả các bản ghi lịch sử đấu giá liên quan đến userId
-      const total = await AuctionPriceHistory.countDocuments({ user: userId });
-
-      const biddingHistory = await AuctionPriceHistory.find({ user: userId })
-        .populate({
-          path: "auctionPricingRange",
+        const auctionRounds = await AuctionRound.find({
+          "bids.user": mongoose.Types.ObjectId(userId),
+        }).populate({
+          path: "auctionPricing",
           populate: {
-            path: "product", // Populate thông tin sản phẩm liên quan
-            select: "product_name slug",
+            path: "product_randBib",
+            select: "product_name slug image",
           },
-        })
-        .sort({ bidTime: -1 }) // Sắp xếp theo thời gian đấu giá gần nhất
-        .skip(offset)
-        .limit(limit)
-        .select("bidPrice bidTime auctionPricingRange"); // Lấy các trường cần thiết
+          select: "status", // Thêm 'status' vào danh sách trường được chọn
+        });
 
-      // Format dữ liệu
-      const history = biddingHistory.map((bid) => ({
-        productId: bid.auctionPricingRange?.product?._id || null,
-        productName: bid.auctionPricingRange?.product?.product_name || "Sản phẩm không xác định",
-        slug: bid.auctionPricingRange?.product?.slug || null,
-        bidPrice: bid.bidPrice,
-        bidTime: bid.bidTime,
-      }));
+        if (!auctionRounds || !auctionRounds.length) {
+          return resolve({
+            success: false,
+            err: 1,
+            msg: "Không có dữ liệu đấu giá nào.",
+            status: 404,
+          });
+        }
 
-      resolve({
-        success: true,
-        err: 0,
-        msg: history.length ? "Lấy lịch sử đấu giá thành công." : "Không có dữ liệu lịch sử đấu giá.",
-        status: 200,
-        response: {
-          history,
-          pagination: {
-            total,
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-            hasNextPage: page < Math.ceil(total / limit),
-            hasPrevPage: page > 1,
-          },
-        },
-      });
-    } catch (error) {
-      reject({
-        success: false,
-        err: -1,
-        msg: "Đã xảy ra lỗi khi lấy lịch sử đấu giá: " + error.message,
-        status: 500,
-      });
-    }
+        const uniqueProducts = {};
+        auctionRounds.forEach((round) => {
+          const product = round.auctionPricing?.product_randBib;
+          const status = round.auctionPricing?.status; // Lấy trường status từ auctionPricing
+          if (product && !uniqueProducts[product._id]) {
+            uniqueProducts[product._id] = {
+              productId: product._id,
+              productName: product.product_name,
+              slug: product.slug,
+              image: product.image[0] || null,
+              status, // Thêm status vào dữ liệu trả về
+            };
+          }
+        });
+
+        const productList = Object.values(uniqueProducts);
+
+        resolve({
+          success: true,
+          err: 0,
+          msg: productList.length
+            ? "Lấy danh sách sản phẩm thành công."
+            : "Người dùng chưa tham gia đấu giá sản phẩm nào.",
+          status: 200,
+          response: productList,
+        });
+      } catch (error) {
+        reject({
+          success: false,
+          err: -1,
+          msg: "Đã xảy ra lỗi khi lấy danh sách sản phẩm: " + error.message,
+          status: 500,
+        });
+      }
+    }),
 
 
-  }),
 
 
-  getUserBiddingDetailsService: (userId, productSlug) => new Promise(async (resolve, reject) => {
+
+  getUserProductBiddingDetailsService: (userId, productSlug) => new Promise(async (resolve, reject) => {
     try {
-      // Tìm sản phẩm dựa trên slug
-      const product = await ProductAuction.findOne({ slug: productSlug })
-        .populate("auctionPricing") // Lấy thông tin phiên đấu giá liên quan
-        .exec();
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return reject({
+          success: false,
+          err: 1,
+          msg: "User ID không hợp lệ.",
+          status: 400,
+        });
+      }
 
+      const product = await ProductAuction.findOne({ slug: productSlug }).exec();
       if (!product || !product.auctionPricing) {
         return resolve({
           success: false,
@@ -255,20 +277,38 @@ const BiddingService = {
         });
       }
 
-      const auctionPricing = product.auctionPricing;
+      const userBiddingHistory = await AuctionUserHistories.findOne({ user: userId })
+        .populate('bids.auctionRound')
+        .exec();
 
-      // Tìm tất cả các bản ghi đấu giá của userId liên quan đến sản phẩm này
-      const userBiddingDetails = await AuctionPriceHistory.find({
-        user: userId,
-        auctionPricingRange: auctionPricing._id,
-      })
-        .sort({ bidTime: -1 }) // Sắp xếp theo thời gian đấu giá gần nhất
-        .select("bidPrice bidTime"); // Lấy các trường cần thiết
+      if (!userBiddingHistory || !userBiddingHistory.bids.length) {
+        return resolve({
+          success: false,
+          err: 1,
+          msg: "Không tìm thấy lịch sử đấu giá của người dùng.",
+          status: 404,
+        });
+      }
+
+      const filteredBids = userBiddingHistory.bids.filter(bid =>
+        bid.auctionRound && bid.auctionRound.auctionPricing.toString() === product.auctionPricing.toString()
+      );
+
+      if (!filteredBids.length) {
+        return resolve({
+          success: false,
+          err: 1,
+          msg: "Người dùng không tham gia đấu giá sản phẩm này.",
+          status: 404,
+        });
+      }
+
+      const sortedBids = filteredBids.sort((a, b) => b.bidPrice - a.bidPrice);
 
       resolve({
         success: true,
         err: 0,
-        msg: userBiddingDetails.length ? "Lấy chi tiết lịch sử đấu giá thành công." : "Người dùng chưa tham gia đấu giá sản phẩm này.",
+        msg: "Lấy chi tiết lịch sử đấu giá thành công.",
         status: 200,
         response: {
           productDetails: {
@@ -276,7 +316,11 @@ const BiddingService = {
             productName: product.product_name,
             slug: productSlug,
           },
-          userBiddingDetails,
+          userBiddingDetails: sortedBids.map(bid => ({
+            auctionRoundId: bid.auctionRound._id,
+            bidPrice: bid.bidPrice,
+            bidTime: bid.bidTime,
+          })),
         },
       });
     } catch (error) {
@@ -289,6 +333,16 @@ const BiddingService = {
     }
   }),
 
+
+
+
+
+
+
+
+
+
+
 }
 
-  module.exports = BiddingService;
+module.exports = BiddingService;

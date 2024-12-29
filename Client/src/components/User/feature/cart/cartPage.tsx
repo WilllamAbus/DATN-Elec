@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Button, Checkbox } from "@nextui-org/react";
 import CartSummary from "./hook/CartSumma";
+import Cartauction from "./hook/Cartauction";
 
 const CartPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,8 +38,8 @@ const CartPage: React.FC = () => {
   const [itemQuantities, setItemQuantities] = useState<{
     [key: string]: number;
   }>({});
+  const [totalAuctionPrice, setTotalAuctionPrice] = useState(0);
   const [totalCartPrice, setTotalCartPrice] = useState(0);
-
   // useEffect(() => {
   //   dispatch(fetchCartList());
   // }, [dispatch]);
@@ -64,6 +65,24 @@ const CartPage: React.FC = () => {
       console.error("Expected carts to be an array but received:", carts);
     }
   }, [carts]);
+
+  useEffect(() => {
+    const total = carts.reduce((total, cart) => {
+      return (
+        total +
+        cart.itemAuction.reduce((itemTotal, item) => {
+          if (item.isSelected) {
+            const quantity =
+              itemQuantities[item.auctionPricingRange.product_randBib._id] ||
+              item.quantity;
+            return itemTotal + (item.auctionWiner.bidPrice || 0) * quantity;
+          }
+          return itemTotal;
+        }, 0)
+      );
+    }, 0);
+    setTotalAuctionPrice(total);
+  }, [carts, itemQuantities]);
 
   useEffect(() => {
     const total = carts.reduce((total, cart) => {
@@ -188,6 +207,9 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     navigate(`/checkout/${carts[0]._id}`, {});
+  };
+  const handleCheckoutAuction = () => {
+    navigate(`/checkAuction/${carts[0]._id}`, {});
   };
 
   const handleDeleteProduct = async (
@@ -676,12 +698,12 @@ const CartPage: React.FC = () => {
                                   )
                                 : "Giá chưa được cập nhật"}
                             </h4>
-                            {/* <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600">
                               {`Người chiến thắng: ${
-                                auction?.itemAuction?.[0]?.auctionWiner
-                                  ?.userName || "Ẩn danh"
+                                auction?.itemAuction?.[0]?.auctionWiner?.user
+                                  .name || "Ẩn danh"
                               }`}
-                            </p> */}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -715,11 +737,11 @@ const CartPage: React.FC = () => {
         )}
 
         {activeTab === "auction" && (
-          <CartSummary
+          <Cartauction
             groupedCarts={groupedCarts}
-            totalCartPrice={totalCartPrice}
+            totalAuctionPrice={totalAuctionPrice}
             itemQuantities={itemQuantities}
-            handleCheckout={handleCheckout}
+            handleCheckoutAuction={handleCheckoutAuction}
             userRole={userRole}
             activeTab={activeTab}
           />

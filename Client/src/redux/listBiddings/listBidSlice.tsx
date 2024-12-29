@@ -1,56 +1,41 @@
-// src/redux/slices/timeTrackSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchListBid} from './listBidThunk';
-import {Bidding} from '../../types/listBiddings/listBids';
-interface biddingState {
-    Bidding: Bidding[];
+import { fetchListBid } from './listBidThunk';
+import { Product, Pagination, BiddingHistoryResponse } from '../../types/listBiddings/BiddingList';
 
-  totalPages: number;
-  currentPage: number;
-
+interface BiddingState {
+  products: Product[];
+  pagination: Pagination | null;
   loading: boolean;
   error: string | null;
-  successMessage: string | null;
 }
 
-const initialState: biddingState = {
-    Bidding: [],
-
-  totalPages: 1,
-  currentPage: 1,
-
+const initialState: BiddingState = {
+  products: [],
+  pagination: null,
   loading: false,
   error: null,
-  successMessage: null
 };
 
-const timeTrackSlice = createSlice({
-  name: 'timeTracks',
+const biddingSlice = createSlice({
+  name: 'bidding',
   initialState,
-  reducers: {
-   
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchListBid.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchListBid.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchListBid.fulfilled, (state, action: PayloadAction<BiddingHistoryResponse>) => {
         state.loading = false;
-        state.Bidding = action.payload.data.Bidding;
-        state.totalPages = action.payload.data.totalPages;
-        state.currentPage = action.payload.data.currentPage;
-    
+        state.products = action.payload.data.products;
+        state.pagination = action.payload.data.pagination;
       })
       .addCase(fetchListBid.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      })
-
-
-  
+      });
   },
 });
 
-export default timeTrackSlice.reducer;
+export default biddingSlice.reducer;

@@ -28,6 +28,7 @@ const Contact = require("./client/contact/contact");
 // const WathListRouter = require("./product/product");
 
 const vnPayRouter = require("./admin/vnpay/order");
+const vnPayAuctionRouter = require("./admin/vnpayAuction/order");
 const randBidRouter = require("./admin/randBid/randBid.routes");
 const biddingRouter = require("./client/bidding/bidding.routes");
 const auctionsRouter = require("./client/auctions/auctions.routes");
@@ -47,10 +48,6 @@ const bankRouter = require("./client/bank");
 const statistical = require("./admin/statistical");
 const recommendationRoute = require("./client/recommendation/recommendation");
 const bestSellRoute = require("./client/best-selling/best-selling");
-
-
-
-
 
 const routes = (app) => {
   app.use("/api/admin/statistical", statistical);
@@ -80,6 +77,7 @@ const routes = (app) => {
   app.use("/api/inbound", inboundRouter);
   app.use("/api/inventory", inventoryRouter);
   app.use("/api/vnpay", vnPayRouter);
+  app.use("/api/vnpayAuction", vnPayAuctionRouter);
   app.use("/api/order", orderCart);
   app.use("/api/admin/randBid", randBidRouter);
   app.use("/api/client/bidding", biddingRouter);
@@ -100,8 +98,6 @@ const routes = (app) => {
   app.use("/api/bank", bankRouter);
   app.use("/api/client/recommendation", recommendationRoute);
   app.use("/api/client/best-selling", bestSellRoute);
-
-
 };
 
 module.exports = routes;

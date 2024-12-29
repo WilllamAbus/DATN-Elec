@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createOrder,
+  createOrdeAuction,
   listOrder,
   fetchUserOrders,
   cancelOrder,
@@ -25,7 +26,18 @@ export const createOrderThunk = createAsyncThunk<
     return rejectWithValue((error as Error).message); // Trả về lỗi nếu thất bại
   }
 });
-
+export const createOrdeAuctionThunk = createAsyncThunk<
+  { order: Order; message: string }, // Cập nhật kiểu dữ liệu trả về
+  Order,
+  { rejectValue: string }
+>("order/createOrdeAuction", async (orderData: Order, { rejectWithValue }) => {
+  try {
+    const response = await createOrdeAuction(orderData);
+    return response;
+  } catch (error) {
+    return rejectWithValue((error as Error).message); // Trả về lỗi nếu thất bại
+  }
+});
 export const listOrderThunk = createAsyncThunk<
   { orders: Order[] },
   void,

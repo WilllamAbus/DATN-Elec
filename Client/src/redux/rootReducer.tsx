@@ -52,6 +52,9 @@ import listBidActiveReducer from "./listBidActive/listBidActivveSlice";
 import listRandAuctReducer from "./adminPriceRandAuc/listPriceRandAuct/listPriceRandSlice";
 import listRandAuctDeletedReducer from "./adminPriceRandAuc/deletedPriceRandAuct/dletedPriceRandAuctSlice";
 import checkAuctWinnerAllReducer from "./adminCheckAuct/adminCheckAucSlice";
+import biddingDetailsSlice from "./listBiddings/listBidDetails";
+
+import checkAuctEnableAllReducer from "./adminEnableAuct/enableAuctSlice";
 const authConfig = {
   key: "auth",
   storage,
@@ -113,6 +116,8 @@ const rootReducer = combineReducers({
   deletedPriceRand: listRandAuctDeletedReducer,
   auctionWin:auctionWinReducer,
   checkAuctWinnerAll: checkAuctWinnerAllReducer,
+  listBidDetails: biddingDetailsSlice,
+  enableAuct: checkAuctEnableAllReducer,
   // Add other reducers here to combine them with the persisted state.
 });
 

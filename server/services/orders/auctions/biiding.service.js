@@ -9,43 +9,7 @@ const User = require('../../../model/users.model'); // Model User
 
 
 const moment = require('moment-timezone');
-const cron = require('node-cron');
 
- // Đảm bảo đường dẫn đúng đến model Bidding
-
-// Tác vụ cron chạy mỗi ngày lúc nửa đêm
-
-const scheduleBidding = cron.schedule('* * * * *', async()=>{
-  console.log('Running task every minute');
-  const now = new Date();
- 
-      const thresholdDate = new Date();
-      // thresholdDate.setTime(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 ngày trước
-      thresholdDate.setTime(now.getTime() -  24 * 60 * 60 * 1000); //30s để test
- 
-
-      
-      // Tìm và xóa các bản ghi có `createdAt` cũ hơn 24 giờ
-      const deletedBiddings = await Bidding.find({
-        status: "disable",
-        createdAt: { $lte: thresholdDate }
-      });
-
-  
-
-  
-   
-  
-      await Bidding.deleteMany({
-        _id: { $in: deletedBiddings.map((bid) => bid._id) },
-      });
-  
-  
-      
-      console.log(`Deleted ${deletedBiddings.length} expired bidding records.`);
-})
-
-scheduleBidding.start();
 
 const biddingService = {
    createBid : async (productId, userId,  bidAmount) => {

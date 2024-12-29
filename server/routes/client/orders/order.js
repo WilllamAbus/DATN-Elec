@@ -8,7 +8,11 @@ router.post(
   middlewareController.verifyToken,
   orderController.createOrder
 );
-
+router.post(
+  "/createAuction",
+  middlewareController.verifyToken,
+  orderController.createOrderAuction
+);
 // Lấy danh sách đơn hàng của người dùng
 router.get(
   "/listOrder",

@@ -798,7 +798,7 @@ const CartController = {
           model: "AuctionWinner",
           populate: {
             path: "user",
-            model: "User",
+            model: "users",
           },
         })
         .populate({
@@ -850,7 +850,6 @@ const CartController = {
       res.status(500).json({ message: error.message });
     }
   },
-
   getCartById: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -876,10 +875,6 @@ const CartController = {
         user: userId,
       })
         .populate({
-          path: "user",
-          select: "name address phone email",
-        })
-        .populate({
           path: "items.product",
         })
         .populate({
@@ -897,11 +892,32 @@ const CartController = {
           ],
         })
         .populate({
-          path: "items",
+          path: "items.inventory",
+          model: "Inventory",
+        })
+        .populate({
+          path: "itemAuction.auctionWiner",
+          model: "AuctionWinner",
           populate: {
-            path: "inventory",
-            model: "Inventory",
+            path: "user",
+            model: "users",
           },
+        })
+        .populate({
+          path: "itemAuction.inventory",
+          model: "Inventory",
+        })
+        .populate({
+          path: "itemAuction.auctionPricingRange",
+          model: "AuctionPricingRange",
+          populate: {
+            path: "product_randBib",
+            model: "productAuction",
+          },
+        })
+        .populate({
+          path: "itemAuction.auctionRound",
+          model: "AuctionRound",
         });
 
       console.log("Found Cart:", cart);
@@ -917,8 +933,13 @@ const CartController = {
         (item) => item.isSelected === true
       );
 
+      // Lọc các mục đấu giá có `isSelected` là true
+      const selectedAuctionItems = cart.itemAuction.filter(
+        (item) => item.isSelected === true
+      );
+
       // Kiểm tra nếu không có sản phẩm nào được chọn
-      if (selectedItems.length === 0) {
+      if (selectedItems.length === 0 && selectedAuctionItems.length === 0) {
         return res.status(404).json({
           message: "Không có sản phẩm nào được chọn trong giỏ hàng",
         });
@@ -928,6 +949,7 @@ const CartController = {
       res.status(200).json({
         ...cart.toObject(), // Dùng toObject để chuyển đổi Document thành Object thông thường
         items: selectedItems,
+        itemAuction: selectedAuctionItems,
       });
     } catch (error) {
       console.error("Error:", error.stack);

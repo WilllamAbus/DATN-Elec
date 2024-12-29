@@ -28,7 +28,25 @@ const orderDetailSchema = new Schema(
         totalItemPrice: { type: Number, required: true }, // Tổng giá cho từng sản phẩm (quantity * price)
       },
     ],
+    itemAuction: [
+      {
+        product_randBib: {
+          type: Schema.Types.ObjectId,
+          ref: "productAuction",
+          required: true,
+        },
+        inventory: {
+          type: Schema.Types.ObjectId,
+          ref: "Inventory",
+          required: true,
+        },
 
+        // Số lượng và giá từng sản phẩm
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        totalItemPrice: { type: Number, required: true }, // Tổng giá cho từng sản phẩm (quantity * price)
+      },
+    ],
     // Tổng giá của tất cả các sản phẩm trong đơn hàng
     totalItemPrice: { type: Number, required: true },
   },

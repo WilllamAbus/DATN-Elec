@@ -18,7 +18,23 @@ export const createOrder = async (orderData: Order) => {
     }
   }
 };
-
+export const createOrdeAuction = async (orderData: Order) => {
+  try {
+    const response = await instance.post(
+      `${API_URL}/order/createAuction`,
+      orderData
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || error.message);
+    } else if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Error creating order: An unknown error occurred");
+    }
+  }
+};
 // export const listOrder = async () => {
 //   try {
 //     const response = await instance.get(`${API_URL}/admin/order/listOrder`);
