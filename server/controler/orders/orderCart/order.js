@@ -415,7 +415,7 @@ const authController = {
       // Tạo chi tiết đơn hàng
       const orderDetailItems = [];
       for (const item of selectedItems) {
-        const selectedAuction = await AuctionWinner.findById(item.auctionWiner)
+        const selectedAuction = await AuctionWinner.findById(item.auctionWinner)
           .populate("auctionRound")
           .populate("auctionPricingRange");
         if (!selectedAuction) {

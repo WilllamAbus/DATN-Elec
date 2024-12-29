@@ -75,7 +75,7 @@ const CartPage: React.FC = () => {
             const quantity =
               itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
               item.quantity;
-            return itemTotal + (item.auctionWiner?.bidPrice || 0) * quantity;
+            return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
           }
           return itemTotal;
         }, 0)
@@ -688,8 +688,8 @@ const CartPage: React.FC = () => {
                           <div className="text-right">
                             <h4 className="text-lg font-bold text-gray-800">
                               {auction.itemAuction.length > 0 &&
-                              auction.itemAuction[0].auctionWiner?.bidPrice
-                                ? auction.itemAuction[0].auctionWiner?.bidPrice.toLocaleString(
+                              auction.itemAuction[0].auctionWinner?.bidPrice
+                                ? auction.itemAuction[0].auctionWinner?.bidPrice.toLocaleString(
                                     "vi-VN",
                                     {
                                       style: "currency",
@@ -700,7 +700,7 @@ const CartPage: React.FC = () => {
                             </h4>
                             <p className="text-sm text-gray-600">
                               {`Người chiến thắng: ${
-                                auction?.itemAuction?.[0]?.auctionWiner?.user
+                                auction?.itemAuction?.[0]?.auctionWinner?.user
                                   .name || "Ẩn danh"
                               }`}
                             </p>

@@ -794,7 +794,7 @@ const CartController = {
           model: "Inventory",
         })
         .populate({
-          path: "itemAuction.auctionWinner", 
+          path: "itemAuction.auctionWinner",
           model: "AuctionWinner",
           populate: {
             path: "user",
@@ -850,6 +850,112 @@ const CartController = {
       res.status(500).json({ message: error.message });
     }
   },
+  // getCartById: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
+  //     const cartId = req.params.id;
+
+  //     console.log("Cart ID:", cartId);
+  //     console.log("User ID:", userId);
+
+  //     // Kiểm tra tính hợp lệ của cartId và userId
+  //     if (
+  //       !mongoose.Types.ObjectId.isValid(userId) ||
+  //       !mongoose.Types.ObjectId.isValid(cartId)
+  //     ) {
+  //       return res.status(400).json({ message: "ID không hợp lệ" });
+  //     }
+
+  //     const carts = await Cart.find({ user: userId });
+  //     console.log("All Carts for User:", carts);
+
+  //     // Tìm giỏ hàng theo cartId và userId
+  //     const cart = await Cart.findOne({
+  //       _id: mongoose.Types.ObjectId(cartId),
+  //       user: userId,
+  //     })
+  //       .populate({
+  //         path: "items.product",
+  //       })
+  //       .populate({
+  //         path: "items.productVariant",
+  //         model: "productVariant",
+  //         populate: [
+  //           { path: "image", model: "ImageVariant" },
+  //           { path: "battery", model: "Battery" },
+  //           { path: "color", model: "Color" },
+  //           { path: "cpu", model: "Cpu" },
+  //           { path: "operatingSystem", model: "OperatingSystem" },
+  //           { path: "ram", model: "Ram" },
+  //           { path: "screen", model: "Screen" },
+  //           { path: "storage", model: "Storage" },
+  //         ],
+  //       })
+  //       .populate({
+  //         path: "items.inventory",
+  //         model: "Inventory",
+  //       })
+  //       .populate({
+  //         path: "itemAuction.auctionWinner",
+  //         model: "AuctionWinner",
+  //         populate: {
+  //           path: "user",
+  //           model: "users",
+  //         },
+  //       })
+  //       .populate({
+  //         path: "itemAuction.inventory",
+  //         model: "Inventory",
+  //       })
+  //       .populate({
+  //         path: "itemAuction.auctionPricingRange",
+  //         model: "AuctionPricingRange",
+  //         populate: {
+  //           path: "product_randBib",
+  //           model: "productAuction",
+  //         },
+  //       })
+  //       .populate({
+  //         path: "itemAuction.auctionRound",
+  //         model: "AuctionRound",
+  //       });
+
+  //     console.log("Found Cart:", cart);
+
+  //     if (!cart) {
+  //       return res.status(404).json({
+  //         message: "Giỏ hàng không tồn tại hoặc không thuộc người dùng",
+  //       });
+  //     }
+
+  //     // Lọc các mục có `isSelected` là true
+  //     const selectedItems = cart.items.filter(
+  //       (item) => item.isSelected === true
+  //     );
+
+  //     // Lọc các mục đấu giá có `isSelected` là true
+  //     const selectedAuctionItems = cart.itemAuction.filter(
+  //       (item) => item.isSelected === true
+  //     );
+
+  //     // Kiểm tra nếu không có sản phẩm nào được chọn
+  //     if (selectedItems.length === 0 && selectedAuctionItems.length === 0) {
+  //       return res.status(404).json({
+  //         message: "Không có sản phẩm nào được chọn trong giỏ hàng",
+  //       });
+  //     }
+
+  //     // Trả về giỏ hàng chỉ với các mục được chọn
+  //     res.status(200).json({
+  //       ...cart.toObject(), // Dùng toObject để chuyển đổi Document thành Object thông thường
+  //       items: selectedItems,
+  //       itemAuction: selectedAuctionItems,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error:", error.stack);
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
   getCartById: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -865,9 +971,6 @@ const CartController = {
       ) {
         return res.status(400).json({ message: "ID không hợp lệ" });
       }
-
-      const carts = await Cart.find({ user: userId });
-      console.log("All Carts for User:", carts);
 
       // Tìm giỏ hàng theo cartId và userId
       const cart = await Cart.findOne({
@@ -896,7 +999,7 @@ const CartController = {
           model: "Inventory",
         })
         .populate({
-          path: "itemAuction.auctionWiner",
+          path: "itemAuction.auctionWinner",
           model: "AuctionWinner",
           populate: {
             path: "user",
@@ -928,29 +1031,8 @@ const CartController = {
         });
       }
 
-      // Lọc các mục có `isSelected` là true
-      const selectedItems = cart.items.filter(
-        (item) => item.isSelected === true
-      );
-
-      // Lọc các mục đấu giá có `isSelected` là true
-      const selectedAuctionItems = cart.itemAuction.filter(
-        (item) => item.isSelected === true
-      );
-
-      // Kiểm tra nếu không có sản phẩm nào được chọn
-      if (selectedItems.length === 0 && selectedAuctionItems.length === 0) {
-        return res.status(404).json({
-          message: "Không có sản phẩm nào được chọn trong giỏ hàng",
-        });
-      }
-
-      // Trả về giỏ hàng chỉ với các mục được chọn
-      res.status(200).json({
-        ...cart.toObject(), // Dùng toObject để chuyển đổi Document thành Object thông thường
-        items: selectedItems,
-        itemAuction: selectedAuctionItems,
-      });
+      // Trả về toàn bộ giỏ hàng mà không lọc theo `isSelected`
+      res.status(200).json(cart);
     } catch (error) {
       console.error("Error:", error.stack);
       res.status(500).json({ message: error.message });
