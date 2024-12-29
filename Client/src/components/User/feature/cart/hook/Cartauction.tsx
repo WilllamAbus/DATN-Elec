@@ -28,18 +28,17 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />
           <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
-
           {groupedCarts.map((cart) => (
             <div key={cart._id} className="flex justify-between mt-2">
               <span className="text-gray-800">
-                {
-                  cart.itemAuction[0].auctionPricingRange.product_randBib
-                    .product_name
-                }{" "}
+                {cart.itemAuction[0]?.auctionPricingRange?.product_randBib
+                  ?.product_name || "Unknown Product"}{" "}
                 x{" "}
                 {itemQuantities[
-                  cart.itemAuction[0].auctionPricingRange.product_randBib._id
-                ] || cart.itemAuction[0].quantity}
+                  cart.itemAuction[0]?.auctionPricingRange?.product_randBib?._id
+                ] ||
+                  cart.itemAuction[0]?.quantity ||
+                  0}
               </span>
             </div>
           ))}

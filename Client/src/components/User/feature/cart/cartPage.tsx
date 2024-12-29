@@ -73,9 +73,9 @@ const CartPage: React.FC = () => {
         cart.itemAuction.reduce((itemTotal, item) => {
           if (item.isSelected) {
             const quantity =
-              itemQuantities[item.auctionPricingRange?.product_randBib._id] ||
+              itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
               item.quantity;
-            return itemTotal + (item.auctionWiner.bidPrice || 0) * quantity;
+            return itemTotal + (item.auctionWiner?.bidPrice || 0) * quantity;
           }
           return itemTotal;
         }, 0)

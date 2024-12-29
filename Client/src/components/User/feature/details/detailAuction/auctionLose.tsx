@@ -5,11 +5,10 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Image,  
+  Image,
 } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 import { MyButton } from "../../../../../common/customs/MyButton";
-
 
 export default function AuctionLose() {
   const { isOpen, onOpenChange } = useDisclosure({ defaultOpen: true });
@@ -41,7 +40,12 @@ export default function AuctionLose() {
           <p>Đấu giá không thành công sản phẩm chúc bạn may mắn lần sao</p>
         </ModalBody>
         <ModalFooter>
-        <Link to="/auction"> <MyButton variant="gradientBlue" size="sm"  >Trở về danh sách đấu giá </MyButton> </Link>
+          <Link to="/auction">
+            {" "}
+            <MyButton variant="gradientBlue" size="sm">
+              Trở về danh sách đấu giá{" "}
+            </MyButton>{" "}
+          </Link>
         </ModalFooter>
       </ModalContent>
     </Modal>

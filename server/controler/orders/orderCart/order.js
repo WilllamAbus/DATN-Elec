@@ -198,7 +198,7 @@ const authController = {
         if (!inventory || inventory.quantityShelf < item.quantity) {
           return res
             .status(400)
-            .json({ message: "Số lượng trong kho không đủ" });
+            .json({ message: "Số lượng trong kho không đủ!" });
         }
 
         orderDetailItems.push({
@@ -423,12 +423,12 @@ const authController = {
             .status(404)
             .json({ message: "Không tìm thấy sản phẩm đấu giá" });
         }
-        const inventory = item.inventory;
-        if (!inventory || inventory.quantityShelf < item.quantity) {
-          return res
-            .status(400)
-            .json({ message: "Số lượng trong kho không đủ" });
-        }
+        // const inventory = item.inventory;
+        // if (!inventory || inventory.quantityShelf < item.quantity) {
+        //   return res
+        //     .status(400)
+        //     .json({ message: "Số lượng trong kho không đủ" });
+        // }
         orderDetailItems.push({
           // auctionWiner: selectedAuction._id,
           // auctionStartTime: item.auctionStartTime,
@@ -439,7 +439,7 @@ const authController = {
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.totalItemPrice,
-          inventory: inventory,
+          // inventory: inventory,
         });
       }
       const orderDetail = new OrderDetail({
