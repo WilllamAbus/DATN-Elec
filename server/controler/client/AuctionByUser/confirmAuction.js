@@ -4,8 +4,9 @@ const mongoose = require('mongoose');
 
 const confirmAuction = async (req, res) => {
   try {
-    const { auctionWinnerId } = req.body; 
-    const auctionWinner = await AuctionWinner.findById(auctionWinnerId).populate('auctionPricingRange auctionRound user');
+    const { auctionWinnerId } = req.body;
+    const auctionWinner = await AuctionWinner.findById(auctionWinnerId)
+      .populate('auctionPricingRange auctionRound user');
 
     if (!auctionWinner) {
       return res.status(404).json({
@@ -39,9 +40,12 @@ const confirmAuction = async (req, res) => {
       totalItemPrice: auctionWinner.bidPrice,
       auctionPricingRange: auctionWinner.auctionPricingRange._id,
       auctionRound: auctionWinner.auctionRound._id,
+      isSelected: false,
+      quantity: 1,
     };
 
-    const userCart = await Cart.findOne({ user: auctionWinner.user });
+    const userCart = await Cart.findOne({ user: auctionWinner.user })
+      .populate('itemAuction.auctionWinner');
     if (userCart) {
       userCart.itemAuction.push(itemAuction);
       userCart.totalPrice += auctionWinner.bidPrice;
@@ -70,13 +74,15 @@ const confirmAuction = async (req, res) => {
           confirmationStatus: auctionWinner.confirmationStatus,
         },
         itemAuction: {
-          auctionWinner: itemAuction.auctionWinner,
+          auctionWinner: auctionWinner,
           auctionStartTime: itemAuction.auctionStartTime,
           auctionEndTime: itemAuction.auctionEndTime,
           price: itemAuction.price,
           totalItemPrice: itemAuction.totalItemPrice,
           auctionPricingRange: itemAuction.auctionPricingRange,
           auctionRound: itemAuction.auctionRound,
+          isSelected: itemAuction.isSelected,
+          quantity: itemAuction.quantity,
         },
       },
     });

@@ -8,7 +8,7 @@ import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
 import StartAndEndTime from "./startAndEndtime";
-import AuctionList from "./auctionList";
+// import AuctionList from "./auctionList";
 import CurrentPriceAndBidprice from "./currentPriceAndBidprice";
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
@@ -102,7 +102,7 @@ const DetailPageAuction: React.FC = () => {
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded ? 'opacity-50 pointer-events-none' : ''}`}>
-            <AuctionList />
+            {/* <AuctionList /> */}
           </div>
         </div>
         <div className="col-span-full xl:col-auto">

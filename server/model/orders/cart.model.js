@@ -11,7 +11,7 @@ const cartItemSchema = new Schema({
   inventory: { type: Schema.Types.ObjectId, ref: "Inventory" },
 });
 const cartItemAuctionSchema = new Schema({
-  auctionWiner: {
+  auctionWinner: {
     type: Schema.Types.ObjectId,
     ref: "AuctionWinner",
   },
@@ -31,6 +31,7 @@ const cartItemAuctionSchema = new Schema({
     ref: "AuctionRound",
   },
 });
+
 
 const cartSchema = new Schema(
   {
