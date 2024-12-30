@@ -66,18 +66,32 @@ const CartPage: React.FC = () => {
     }
   }, [carts]);
 
+  // useEffect(() => {
+  //   const total = carts.reduce((total, cart) => {
+  //     return (
+  //       total +
+  //       cart.itemAuction.reduce((itemTotal, item) => {
+  //         if (item.isSelected) {
+  //           const quantity =
+  //             itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
+  //             item.quantity;
+  //           return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
+  //         }
+  //         return itemTotal;
+  //       }, 0)
+  //     );
+  //   }, 0);
+  //   setTotalAuctionPrice(total);
+  // }, [carts, itemQuantities]);
   useEffect(() => {
     const total = carts.reduce((total, cart) => {
       return (
         total +
         cart.itemAuction.reduce((itemTotal, item) => {
-          if (item.isSelected) {
-            const quantity =
-              itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
-              item.quantity;
-            return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
-          }
-          return itemTotal;
+          const quantity =
+            itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
+            item.quantity;
+          return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
         }, 0)
       );
     }, 0);
@@ -738,7 +752,7 @@ const CartPage: React.FC = () => {
 
         {activeTab === "auction" && (
           <Cartauction
-            groupedCarts={groupedCarts}
+            cartauction={cartauction}
             totalAuctionPrice={totalAuctionPrice}
             itemQuantities={itemQuantities}
             handleCheckoutAuction={handleCheckoutAuction}

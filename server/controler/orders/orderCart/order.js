@@ -309,17 +309,21 @@ const authController = {
         payment: paymentInfo,
       } = req.body;
       // Kiểm tra giỏ hàng
-      const cart = await Cart.findById(cartId);
+      const cart = await Cart.findById(cartId).populate({
+        path: "itemAuction.auctionPricingRange", // Populate auctionPricingRange
+        select: "product_randBib", // Chỉ lấy trường cần thiết
+      });
       if (!cart) {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
-      // Lọc các sản phẩm đấu giá đã chọn
       const selectedItems = cart.itemAuction.filter((item) => item.isSelected);
-      if (selectedItems.length === 0) {
+      if (!selectedItems || selectedItems.length === 0) {
         return res
           .status(400)
-          .json({ message: "Chưa có sản phẩm đấu giá nào được chọn" });
+          .json({ message: "Không có sản phẩm nào được chọn để tạo đơn hàng" });
       }
+      console.log(selectedItems);
+
       // Kiểm tra thông tin thanh toán và giao hàng
       if (!paymentInfo) {
         return res
@@ -383,14 +387,7 @@ const authController = {
       });
       await newShipping.save();
       // Kiểm tra voucher
-      if (voucherIds.length > 0) {
-        const vouchers = await Voucher.find({ _id: { $in: voucherIds } });
-        if (voucherIds.length !== vouchers.length) {
-          return res
-            .status(404)
-            .json({ message: "Một số voucher không tìm thấy" });
-        }
-      }
+
       // Tính tổng giá trị và phí vận chuyển
       const totalamount = selectedItems.reduce(
         (sum, item) => sum + item.totalItemPrice,
@@ -415,31 +412,37 @@ const authController = {
       // Tạo chi tiết đơn hàng
       const orderDetailItems = [];
       for (const item of selectedItems) {
-        const selectedAuction = await AuctionWinner.findById(item.auctionWinner)
-          .populate("auctionRound")
-          .populate("auctionPricingRange");
-        if (!selectedAuction) {
+        const inventory = await Inventory.findOne({
+          productAuction: item.productAuction,
+        });
+        if (!inventory) {
           return res
             .status(404)
-            .json({ message: "Không tìm thấy sản phẩm đấu giá" });
+            .json({ message: "Không tìm thấy kho hàng cho sản phẩm đấu giá" });
         }
-        // const inventory = item.inventory;
-        // if (!inventory || inventory.quantityShelf < item.quantity) {
-        //   return res
-        //     .status(400)
-        //     .json({ message: "Số lượng trong kho không đủ" });
-        // }
+
+        // Kiểm tra số lượng tồn kho
+        if (inventory.quantityShelf < item.quantity) {
+          return res.status(400).json({
+            message: `Số lượng sản phẩm không đủ. Sản phẩm: ${item.productAuction}, số lượng còn lại: ${inventory.quantityShelf}`,
+          });
+        }
+        if (
+          !item.auctionPricingRange ||
+          !item.auctionPricingRange.product_randBib
+        ) {
+          return res.status(400).json({
+            message: `Dữ liệu sản phẩm bị thiếu thông tin: ${JSON.stringify(
+              item
+            )}`,
+          });
+        }
         orderDetailItems.push({
-          // auctionWiner: selectedAuction._id,
-          // auctionStartTime: item.auctionStartTime,
-          // auctionEndTime: item.auctionEndTime,
-          // auctionRound: selectedAuction.auctionRound._id,
-          // auctionPricingRange: selectedAuction.auctionPricingRange._id,
-          product_randBib: selectedAuction.auctionPricingRange.product_randBib,
+          product_randBib: item.auctionPricingRange.product_randBib,
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.totalItemPrice,
-          // inventory: inventory,
+          inventory: inventory,
         });
       }
       const orderDetail = new OrderDetail({
@@ -458,7 +461,7 @@ const authController = {
         user: userId,
         OrderCart: newOrder._id,
         type: "purchase",
-        auctionItems: selectedItems.map((item) => item.auctionWiner),
+        auctionItems: selectedItems.map((item) => item.auctionWinner),
         score: 5,
       });
       await newInteraction.save();
