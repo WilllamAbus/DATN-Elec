@@ -360,6 +360,33 @@ const checkAuctionCOntroller = {
                   status: 200,
                 });
               }
+
+              if (bidPriceOne.bidPrice === bidPriceOne.bidPrice) {
+                const checkVariableTwo =
+                  auctionCheckRoundTwo[0].auctionStausCheck;
+
+                if (checkVariableTwo === "Chờ duyệt") {
+                  const winnerSetUpTwo = await AuctiomWinner.findOne({
+                    _id: auctionCheckRoundTwo[0]._id,
+                  }).lean();
+
+                  console.log("winnerSetUpTwo", winnerSetUpTwo);
+
+                  const winnerSetUpId = winnerSetUpTwo._id;
+                  // const winnerSetUpPrice = winnerSetUpTwo.bidPrice;
+             
+                  await AuctiomWinner.findByIdAndUpdate(
+                    {
+                      _id: winnerSetUpId,
+                    },
+                    { $set: { auctionStausCheck: "Đã duyệt hủy chiến thắng" } },
+                    { new: true }
+                  );
+
+            
+                }
+                // Xử lý logic khi bidPriceTwo nhỏ hơn bidPriceOne
+              }
               if (bidPriceOne.bidPrice > bidPriceTwo.bidPrice) {
                 const checkVariableTwo =
                   auctionCheckRoundTwo[1].auctionStausCheck;
