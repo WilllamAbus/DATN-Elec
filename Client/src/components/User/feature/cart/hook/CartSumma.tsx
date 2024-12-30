@@ -38,8 +38,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           {groupedCarts.map((cart) => (
             <div key={cart._id} className="flex justify-between mt-2">
               <span className="text-gray-800">
-                {cart.items[0].product.product_name} x{" "}
-                {itemQuantities[cart.items[0].product._id] ||
+                {cart.items[0].product?.product_name} x{" "}
+                {itemQuantities[cart.items[0].product?._id] ||
                   cart.items[0].quantity}
               </span>
             </div>
