@@ -9,6 +9,7 @@ const {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
+  enterAuctionPrice,
   biddingList,
   getAuctionPricingRange,
   processAuctionWinner,
@@ -74,6 +75,7 @@ module.exports = {
   processAuctionWinner,
   getUserBiddingHistory,
   getUserBiddingDetails,
-  getAuctionPricingRange
+  getAuctionPricingRange,
+  enterAuctionPrice
 };
 

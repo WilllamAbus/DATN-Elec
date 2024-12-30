@@ -2,6 +2,7 @@ const getProductDetailAuction = require('./getProductDetailAuction').getProductD
 const createOneUpdateBidAuction = require('./creatOneBidAuction').createOneUpdateBidAuction;
 const getAuctionDetailsBySlug = require('./getAuctionDetailsBySlug').getAuctionDetailsBySlug;
 const getAuctionPricingRange = require('./getAuctionPricingRange').getAuctionPricingRange;
+const enterAuctionPrice = require('./enterAuctionPrice').enterAuctionPrice;
 const biddingList  = require('./biddingList.controller').getBiddingList;
 const processAuctionWinner = require('./biddingList.controller').processAuctionWinner;
 const getUserBiddingHistory = require('./biddingList.controller').getUserBiddingHistory;
@@ -15,5 +16,6 @@ module.exports = {
   biddingList,
   processAuctionWinner,
   getUserBiddingHistory, 
-  getUserBiddingDetails
+  getUserBiddingDetails,
+  enterAuctionPrice
 }
