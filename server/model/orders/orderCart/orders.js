@@ -35,7 +35,7 @@ const orderSchema = new Schema(
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
     cancelReason: { type: String, default: null },
-
+    status: { type: String, default:'active'},
     refundBank: {
       bankName: { type: String, required: false },
       accountNumber: { type: String, required: false },
