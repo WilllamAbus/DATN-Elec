@@ -14,6 +14,10 @@ import SearchFormOrders from "./serachForm/searchForm.isCheck";
 // import { softDelAdminThunk } from "../../../../redux/orderAucAdmin/softDelAucAdmin/softDelAdminThunk";
 // import withReactContent from "sweetalert2-react-content";
 // const MySwal = withReactContent(Swal);
+import currencyFormatter from "currency-formatter";
+function formatCurrency(value: number) {
+  return currencyFormatter.format(value, { code: "VND", symbol: "" });
+}
 const isCheckedAuct: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
@@ -108,6 +112,9 @@ const isCheckedAuct: React.FC = () => {
               THỜI GIAN CHIẾN THẮNG
             </th>
             <th scope="col" className="p-4">
+              GIÁ CHIẾN THẮNG
+            </th>
+            <th scope="col" className="p-4">
               TRẠNG THÁI
             </th>
             <th scope="col" className="p-4">
@@ -144,6 +151,9 @@ const isCheckedAuct: React.FC = () => {
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   {formatDateVN(winnneerCheck.endTime)}
+                </td>
+                <td className="py-4 px-6 border-b border-grey-light">
+                  {formatCurrency(winnneerCheck.bidPrice)}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span

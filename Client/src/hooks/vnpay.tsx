@@ -39,7 +39,7 @@ export const useVNPay = () => {
 export const useVNPayAuction = () => {
   const [loading, setLoading] = useState(false);
 
-  const createPaymentUrl = async (
+  const createPaymentAuctionUrl = async (
     amount: number,
     bankCode?: string,
     language: string = "vn"
@@ -68,5 +68,5 @@ export const useVNPayAuction = () => {
   };
 
   // Không cần verifyPayment trong hook này vì bạn xử lý trực tiếp trong component
-  return { createPaymentUrl, loading };
+  return { createPaymentAuctionUrl, loading };
 };

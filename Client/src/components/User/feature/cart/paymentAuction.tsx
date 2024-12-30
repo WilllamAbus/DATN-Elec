@@ -456,7 +456,7 @@ const CheckoutPage: React.FC = () => {
   const carts = useSelector((state: RootState) => state.cart.carts);
   console.log(carts);
 
-  const { createPaymentUrl } = useVNPayAuction();
+  const { createPaymentAuctionUrl } = useVNPayAuction();
 
   const [cart, setCart] = useState<any>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -504,8 +504,8 @@ const CheckoutPage: React.FC = () => {
             // },
 
             quantity: item.quantity,
-            price: item.auctionWinner.bidPrice,
-            totalItemPrice: item.auctionWinner.bidPrice * item.quantity,
+            price: item.auctionWinner?.bidPrice,
+            totalItemPrice: item.auctionWinner?.bidPrice * item.quantity,
             _id: item._id,
           })),
         },
@@ -659,7 +659,7 @@ const CheckoutPage: React.FC = () => {
 
     try {
       if (selectedPayment === "vnPay") {
-        const paymentUrl = await createPaymentUrl(
+        const paymentUrl = await createPaymentAuctionUrl(
           carts[0].itemAuction[0].totalItemPrice
         );
         if (paymentUrl) {
