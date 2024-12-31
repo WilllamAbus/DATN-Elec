@@ -28,7 +28,7 @@ const auctionWinnerSchema = new Schema(
     },
     auctionStatus: {
       type: String,
-      enum: ['won', 'pending', 'lose','canceled'],
+      enum: ['won', 'pending', 'lose','canceled','temporary'],
       default: 'won'
     },
     status: { type: String, default: 'active' },
@@ -41,6 +41,7 @@ const auctionWinnerSchema = new Schema(
     startTime: { type: Date, default: Date.now, required: true },
     endTime: { type: Date, required: true },
     remainingTime: { type: String },
+    noteAuctionWinner: { type: String },
     createdAt: {
       type: Date,
       default: Date.now

@@ -1,27 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
 import { AuctionWin } from "../../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser";
-import { confirmAuctionThunk, getAuctionWinsByUserThunk, canceledAuctionThunk, clearAuctionWinById } from "../../../../../redux/sessionAuction/thunk";
+import { confirmAuctionThunk, getAuctionWinsByUserThunk, canceledAuctionThunk, clearAuctionWinById, getUserPendingAuctionWinsThunk } from "../../../../../redux/sessionAuction/thunk";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip } from "@nextui-org/react";
 import ModalComponent from "../auctionDetail/auctionDetail";
 import { toast, Toaster } from "react-hot-toast";
+import AlerWaringAuction from "src/common/alert/alerWaringAuction";
+
 interface AuctionPendingTableProps {
   currentPage: number;
 }
+
 const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }) => {
   const dispatch = useDispatch<AppDispatch>();
   const auctions = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.auctionWins ?? []);
   const [selectedAuction, setSelectedAuction] = useState<AuctionWin | null>(null);
   const [remainingTimes, setRemainingTimes] = useState<{ [key: string]: string }>({});
+  const [alertVisible, setAlertVisible] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const notificationFlag = useRef(false);
+
   const handleRowClick = (auction: AuctionWin) => {
     setSelectedAuction(auction);
     setIsModalOpen(true);
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const newRemainingTimes = auctions.reduce<{ [key: string]: string }>((acc, auction) => {
         const endTime = new Date(auction.endTime).getTime();
         const currentTime = new Date().getTime();
@@ -29,7 +35,7 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
 
         const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
         const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
         const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
         acc[auction._id] = remainingTime > 0
@@ -40,12 +46,39 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
       }, {});
 
       setRemainingTimes(newRemainingTimes);
+
+      const expiredAuctions = auctions.filter((auction) => newRemainingTimes[auction._id] === "Đã kết thúc");
+      if (expiredAuctions.length > 0 && !notificationFlag.current) {
+        notificationFlag.current = true;
+
+        try {
+          const response = await dispatch(getUserPendingAuctionWinsThunk()).unwrap();
+          
+          if (response.code === 'THANH_CONG') {
+            toast.success(response.msg || "Cập nhật trạng thái thành công!");
+
+            setTimeout(() => {
+              setAlertVisible(true);
+              setTimeout(() => {
+                expiredAuctions.forEach((auction) => dispatch(clearAuctionWinById(auction._id)));
+                notificationFlag.current = false;
+                setAlertVisible(false);
+              }, 5000);
+            }, 3000);
+          } else {
+            toast.success(response.msg || "Không có thay đổi trạng thái!");
+            notificationFlag.current = false;
+          }
+        } catch (error: any) {
+          toast.error(error.msg || "Cập nhật trạng thái thất bại!");
+          notificationFlag.current = false;
+        }
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [auctions]);
-
-
+  }, [auctions, dispatch]);
+  
   const handleConfirm = async () => {
     if (selectedAuction) {
       try {
@@ -64,6 +97,7 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
       }
     }
   };
+
   const handleCancel = async () => {
     if (selectedAuction) {
       try {
@@ -83,8 +117,6 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
     }
   };
 
-
-
   const renderCell = (auction: AuctionWin, columnKey: string) => {
     switch (columnKey) {
       case "auctionPricingRange.product_randBib.product_name":
@@ -102,7 +134,6 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
           </Tooltip>
         );
 
-
       case "bidPrice":
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(auction.bidPrice);
 
@@ -112,19 +143,18 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
       case "endTime":
         return new Date(auction.endTime).toLocaleString();
 
-        case "remainingTime": {
-          const remainingTimeInMs = new Date(auction.endTime).getTime() - new Date().getTime();
-          let colorClass = "text-green-500";
-        
-          if (remainingTimeInMs <= 60 * 1000) {
-            colorClass = "text-red-500"; 
-          } else if (remainingTimeInMs <= 60 * 60 * 1000) {
-            colorClass = "text-orange-500"; 
-          }
-        
-          return <span className={colorClass}>{remainingTimes[auction._id]}</span>;
+      case "remainingTime": {
+        const remainingTimeInMs = new Date(auction.endTime).getTime() - new Date().getTime();
+        let colorClass = "text-green-500";
+
+        if (remainingTimeInMs <= 60 * 1000) {
+          colorClass = "text-red-500";
+        } else if (remainingTimeInMs <= 60 * 60 * 1000) {
+          colorClass = "text-orange-500";
         }
-        
+
+        return <span className={colorClass}>{remainingTimes[auction._id]}</span>;
+      }
 
       case "confirmationStatus":
         let confirmationStatus = "";
@@ -154,6 +184,7 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
 
   return (
     <>
+    <AlerWaringAuction visible={alertVisible} />
       <Table isStriped aria-label="Danh sách đấu giá">
         <TableHeader>
           <TableColumn>Tên sản phẩm</TableColumn>
@@ -187,6 +218,7 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
         />
       )}
       <Toaster />
+      
     </>
   );
 };

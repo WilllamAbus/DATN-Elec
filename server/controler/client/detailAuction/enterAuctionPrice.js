@@ -1,15 +1,15 @@
-const checkMissingParams = require('./handles/checkMissingParams');
-const findAuctionProduct = require('./handles/findAuctionProduct');
-const validateAuctionPricing = require('./handles/validateAuctionPricing');
-const updateCurrentPrice = require('./handles/updateCurrentPrice');
-const findOrCreateUserBidPrice = require('./handles/findOrCreateUserBidPrice');
-const updateAuctionRound = require('./handles/updateAuctionRound');
-const handleAuctionPriceHistory = require('./handles/handleAuctionPriceHistory');
-const updateUserAuctionHistory = require('./handles/updateUserAuctionHistory');
-const declareWinner = require('./handles/declareWinner');
-const checkUserTopBid = require('./handles/checkUserTopBid');
-const checkAuctionRoundTopBid = require('./handles/checkAuctionRoundTopBid');
-const findUserName = require('./handles/findUserName');
+const checkMissingParams = require('./enter-handles/checkMissingParams');
+const findAuctionProduct = require('./enter-handles/findAuctionProduct');
+const validateAuctionPricing = require('./enter-handles/validateAuctionPricing');
+const updateCurrentPrice = require('./enter-handles/updateCurrentPrice');
+const findOrCreateUserBidPrice = require('./enter-handles/findOrCreateUserBidPrice');
+const updateAuctionRound = require('./enter-handles/updateAuctionRound');
+const handleAuctionPriceHistory = require('./enter-handles/handleAuctionPriceHistory');
+const updateUserAuctionHistory = require('./enter-handles/updateUserAuctionHistory');
+const declareWinner = require('./enter-handles/declareWinner');
+const checkUserTopBid = require('./enter-handles/checkUserTopBid');
+const checkAuctionRoundTopBid = require('./enter-handles/checkAuctionRoundTopBid');
+const findUserName = require('./enter-handles/findUserName');
 const { getIO } = require('../../../services/skserver/socketServer');
 
 const enterAuctionPrice = async (req, res) => {
@@ -50,22 +50,19 @@ const enterAuctionPrice = async (req, res) => {
       await declareWinner(auctionPricingRange, auctionRound);
 
       getIO().emit('bidPlaced', {
-        message: `Người dùng ${userName} đã thắng với giá tối đa là ${bidPrice}`,
+        message: `Người dùng ${userName} đã đặt giá tối đa và cần xác nhận thanh toán trong 5 phút.`,
         userId,
         bidPrice,
         slug,
-        status: 'ended'  
+        status: 'temporary'
       });
-
-      auctionPricingRange.status = 'ended';
-      await auctionPricingRange.save();
 
       return res.status(200).json({
         success: true,
         err: 0,
-        msg: 'Đã đặt giá thành công. Bạn đã chiến thắng sản phẩm đấu giá này!',
+        msg: 'Đã đặt giá thành công. Bạn cần xác nhận thanh toán trong 5 phút.',
         userId,
-        status: 'success',
+        status: 'temporary',
       });
     }
 
