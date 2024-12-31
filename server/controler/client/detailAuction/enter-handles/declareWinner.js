@@ -3,24 +3,29 @@ const AuctionWinner = require('../../../../model/productAuction/auctionWinner');
 const { convertToLocalTime } = require('../../../../utils/timeConverter');
 
 module.exports = async (auctionPricingRange, auctionRound) => {
-  const winners = await AuctionPriceHistory.find({
+  const winner = await AuctionPriceHistory.findOne({
     auctionPricingRange: auctionPricingRange._id,
-  }).sort({ bidPrice: -1 }).limit(2);
+    bidPrice: auctionPricingRange.maxPrice,
+  }).sort({ bidPrice: -1 });
 
   const currentTime = new Date();
+  const temporaryEndTime = new Date(currentTime.getTime() + 1 * 60 * 1000); // 5 phút sau
 
-  for (let i = 0; i < winners.length; i++) {
-    const winner = winners[i];
+  if (winner) {
     const auctionWinner = new AuctionWinner({
       user: winner.user,
       auctionPricingRange: auctionPricingRange._id,
       bidPrice: winner.bidPrice,
       bidTime: winner.bidTime,
       auctionRound: auctionRound._id,
-      auctionStatus: i === 0 ? 'won' : 'pending',
+      auctionStatus: 'temporary',
       startTime: convertToLocalTime(currentTime),
-      endTime: convertToLocalTime(new Date(currentTime.getTime() + (i === 0 ? 3 : 5) * 24 * 60 * 60 * 1000)), 
+      endTime: convertToLocalTime(temporaryEndTime),
     });
     await auctionWinner.save();
+
+    // Thay đổi trạng thái đấu giá thành temporary
+    auctionPricingRange.status = 'temporary';
+    await auctionPricingRange.save();
   }
 };

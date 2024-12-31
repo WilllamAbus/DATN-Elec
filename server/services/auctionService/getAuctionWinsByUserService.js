@@ -4,7 +4,7 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
   const query = { 
     user: userId,
     confirmationStatus: confirmationStatus,
-    auctionStatus: { $in: ['won', 'pending'] } 
+    auctionStatus: { $in: ['won', 'pending','temporary'] } 
   };
   const skip = (page - 1) * limit;
 
@@ -24,7 +24,7 @@ const getAuctionWinsByUserService = async (userId, page = 1, limit = 10, confirm
   const currentTime = new Date().getTime();
 
   for (const auction of auctionWins) {
-    if (new Date(auction.endTime).getTime() < currentTime && auction.confirmationStatus === 'pending') {
+    if (new Date(auction.endTime).getTime() + (3 * 60 * 1000) < currentTime && auction.confirmationStatus === 'pending') {
       auction.confirmationStatus = 'canceled';
       auction.status = 'disabled';
       auction.auctionStatus = 'lose';

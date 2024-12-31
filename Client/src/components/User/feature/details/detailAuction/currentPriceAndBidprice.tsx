@@ -46,13 +46,13 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
       if (data.productSlug === product.slug) {
         await updateAuctionPricing();
         if (data.status === 'ended') {
-          onAuctionEnd(); // Handle auction end
+          onAuctionEnd(); 
         }
       }
     });
 
     return () => {
-      socket.off('auctionPriceUpdated'); // Clean up the listener on unmount
+      socket.off('auctionPriceUpdated'); 
     };
   }, [product.slug, onAuctionEnd]);
 
@@ -82,7 +82,7 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
       return;
     }
     await handleBidSubmission({ ...product, slug: product.slug as string }, userBidPrice, priceStep, currentPrice, dispatch, userId, setCurrentPrice, setUserBidPrice);
-    onChange(); // Gọi hàm onChange khi submit
+    onChange(); 
   };
 
   return (
