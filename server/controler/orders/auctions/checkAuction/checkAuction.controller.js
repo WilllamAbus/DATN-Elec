@@ -370,10 +370,10 @@ const checkAuctionCOntroller = {
                     _id: auctionCheckRoundTwo[0]._id,
                   }).lean();
 
-                  console.log("winnerSetUpTwo", winnerSetUpTwo);
+                
 
                   const winnerSetUpId = winnerSetUpTwo._id;
-                  // const winnerSetUpPrice = winnerSetUpTwo.bidPrice;
+                  const winnerPriceRange = winnerSetUpTwo.auctionPricingRange;
              
                   await AuctiomWinner.findByIdAndUpdate(
                     {
@@ -382,7 +382,13 @@ const checkAuctionCOntroller = {
                     { $set: { auctionStausCheck: "Đã duyệt hủy chiến thắng" } },
                     { new: true }
                   );
-
+                  await ProductAuction.findByIdAndUpdate(
+                    {
+                      auctionPricing: winnerPriceRange,
+                    },
+                    { $set: { status: "disable" } },
+                    { new: true }
+                  );
             
                 }
                 // Xử lý logic khi bidPriceTwo nhỏ hơn bidPriceOne
