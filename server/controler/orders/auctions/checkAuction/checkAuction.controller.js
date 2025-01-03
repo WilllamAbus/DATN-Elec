@@ -253,146 +253,17 @@ const checkAuctionCOntroller = {
               image: productWinnser.image[0],
             };
             sendMailWinnerDel(emailWinner, winnerSetUpId, winnserProductDetail);
-        //     const priceRangeWinners = await AuctiomWinner.find({auctionStatus:'lose', status: "disabled" })
-        //     .select("_id user bidPrice status auctionStatus auctionStausCheck auctionPricingRange")
-        //     .lean();
-      
-        //   // Nhóm dữ liệu theo user
-        //   const userGrouped = priceRangeWinners.reduce((acc, item) => {
-        //     if (!acc[item.user]) {
-        //       acc[item.user] = [];
-        //     }
-        //     acc[item.user].push(item);
-        //     return acc;
-        //   }, {});
-      
-        //   const result = [];
-        //   for (const [userId, auctionItems] of Object.entries(userGrouped)) {
-        //     // Lấy thông tin user
-        //     const userInfo = await User.findOne({ _id: userId })
-        //       .select("_id name phone email")
-        //       .lean();
-      
-        //     if (!userInfo) {
-        //       console.error(`User với ID ${userId} không tồn tại.`);
-        //       continue;
-        //     }
-      
-        //     // Lấy thông tin sản phẩm liên quan tới các auctionPricingRange
-        //     const auctionPricingRanges = auctionItems.map((item) => item.auctionPricingRange);
-        //     const products = await ProductAuction.find({
-        //       auctionPricing: { $in: auctionPricingRanges },
-        //     })
-        //       .select("product_name image _id auctionPricing")
-        //       .lean();
-      
-        //     // Định dạng dữ liệu sản phẩm bị huỷ
-        //     const cancelledProducts = auctionItems.map((auctionItem) => {
-        //       const product = products.find(
-        //         (p) => p.auctionPricing === auctionItem.auctionPricingRange
-        //       );
-      
-        //       return {
-        //         auctionWinnerReturn: auctionItem._id, // ID của AuctionWinner
-        //         productName: product?.product_name || "Không xác định",
-        //         quantity: 1,
-        //         image: product?.image?.[0] || "Không có hình ảnh",
-        //       };
-        //     });
-      
-        //     // Tạo một bản ghi mới trong AuctionWinnerReturn
-        //     const auctionWinnerReturn = new AuctionWinnerReetirn({
-        //       cancelledProducts,
-        //       auctionWinnerUserReturn: userId,
-        //       bidPriceReturn: auctionItems[0]?.bidPrice || 0,
-             
-        //       isPaymentReturnStatus: "failed",
-        //       auctionReturnStatus: "canceled",
-        //       status: "disable",
-        //       auctionStausIsCheck: "Đã duyệt hủy chiến thắng",
-        //       coundDisabledAuction: 1,
-        //     });
-      
-        //     // Lưu vào cơ sở dữ liệu
-        //     await auctionWinnerReturn.save();
-      
-        //     // Push dữ liệu cuối cùng vào mảng kết quả
-        //     result.push({
-        //       user: userInfo,
-        //       cancelledProducts,
-        //     });
-        //   }
-     
+ 
        
 
             const auctionCheckRoundTwo = await AuctiomWinner.find({
               auctionRound: winnerCheck.auctionRound,
             });
-
+     
+            
             if (auctionCheckRoundTwo.length >= 2) {
               const bidPriceOne = auctionCheckRoundTwo[0];
               const bidPriceTwo = auctionCheckRoundTwo[1];
-              if (
-                bidPriceOne.auctionStatus === "lose" &&
-                bidPriceTwo.auctionStatus === "lose"
-              ) {
-                console.log(
-                  "Cả bidPriceOne và bidPriceTwo đều có aucTionStatus là 'disabled'. Hủy phiên đấu giá."
-                );
-                await Promise.all([
-                  AuctiomWinner.findOneAndUpdate(
-                    {
-                      auctionPricingRange: winnerCheck.auctionPricingRange,
-                    },
-                    { $set: { status: "delete" } }
-                  ),
-                  ProductAuction.findOneAndUpdate(
-                    {
-                      auctionPricing: winnerCheck.auctionPricingRange,
-                    },
-                    { $set: { status: "disable" } }
-                  ),
-                ]);
-
-                return res.status(200).json({
-                  msg: "Phiên đấu giá đã bị hủy do cả hai bidPrice đều có trạng thái 'lose'.",
-                  success: true,
-                  status: 200,
-                });
-              }
-
-              if (bidPriceOne.bidPrice === bidPriceOne.bidPrice) {
-                const checkVariableTwo =
-                  auctionCheckRoundTwo[0].auctionStausCheck;
-
-                if (checkVariableTwo === "Chờ duyệt") {
-                  const winnerSetUpTwo = await AuctiomWinner.findOne({
-                    _id: auctionCheckRoundTwo[0]._id,
-                  }).lean();
-
-                
-
-                  const winnerSetUpId = winnerSetUpTwo._id;
-                  const winnerPriceRange = winnerSetUpTwo.auctionPricingRange;
-             
-                  await AuctiomWinner.findByIdAndUpdate(
-                    {
-                      _id: winnerSetUpId,
-                    },
-                    { $set: { auctionStausCheck: "Đã duyệt hủy chiến thắng" } },
-                    { new: true }
-                  );
-                  await ProductAuction.findByIdAndUpdate(
-                    {
-                      auctionPricing: winnerPriceRange,
-                    },
-                    { $set: { status: "disable" } },
-                    { new: true }
-                  );
-            
-                }
-                // Xử lý logic khi bidPriceTwo nhỏ hơn bidPriceOne
-              }
               if (bidPriceOne.bidPrice > bidPriceTwo.bidPrice) {
                 const checkVariableTwo =
                   auctionCheckRoundTwo[1].auctionStausCheck;
@@ -402,7 +273,7 @@ const checkAuctionCOntroller = {
                     _id: auctionCheckRoundTwo[1]._id,
                   }).lean();
 
-                  console.log("winnerSetUpTwo", winnerSetUpTwo);
+                
 
                   const winnerSetUpId = winnerSetUpTwo._id;
                   const winnerSetUpPrice = winnerSetUpTwo.bidPrice;
@@ -441,6 +312,67 @@ const checkAuctionCOntroller = {
                   );
                 }
                 // Xử lý logic khi bidPriceTwo nhỏ hơn bidPriceOne
+              }
+
+              if (bidPriceTwo.status === 'disabled') {
+                const checkVariableTwo =
+                  auctionCheckRoundTwo[1].auctionStausCheck;
+
+                if (checkVariableTwo === "Đã duyệt hủy chiến thắng") {
+                  const winnerSetUpTwo = await AuctiomWinner.findOne({
+                    _id: auctionCheckRoundTwo[1]._id,
+                  }).lean();
+
+                
+
+                  const winnerSetUpId = winnerSetUpTwo._id;
+              
+
+              
+                  await Promise.all([
+                     AuctiomWinner.findByIdAndUpdate(
+                      {
+                        _id: winnerSetUpId,
+                      },
+                      { $set: {auctionStatus : "lose", auctionStausCheck: "Đã duyệt hủy chiến thắng" } },
+                      { new: true }
+                    ),
+              
+                  ]);
+             
+            
+                }
+                // Xử lý logic khi bidPriceTwo nhỏ hơn bidPriceOne
+              }
+            
+
+              if (
+                bidPriceOne.auctionStatus === "lose" &&
+                bidPriceTwo.auctionStatus === "lose"
+              ) {
+                console.log(
+                  "Cả bidPriceOne và bidPriceTwo đều có aucTionStatus là 'lose'. Hủy phiên đấu giá."
+                );
+                await Promise.all([
+                  AuctiomWinner.findOneAndUpdate(
+                    {
+                      auctionPricingRange: winnerCheck.auctionPricingRange,
+                    },
+                    { $set: { status: "delete" } }
+                  ),
+                  ProductAuction.findOneAndUpdate(
+                    {
+                      auctionPricing: winnerCheck.auctionPricingRange,
+                    },
+                    { $set: { status: "disable" } }
+                  ),
+                ]);
+
+                return res.status(200).json({
+                  msg: "Phiên đấu giá đã bị hủy do cả hai bidPrice đều có trạng thái 'lose'.",
+                  success: true,
+                  status: 200,
+                });
               }
             } else {
               console.log("auctionCheckRoundTwo không đủ dữ liệu để so sánh");
