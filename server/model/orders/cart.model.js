@@ -11,7 +11,7 @@ const cartItemSchema = new Schema({
   inventory: { type: Schema.Types.ObjectId, ref: "Inventory" },
 });
 const cartItemAuctionSchema = new Schema({
-  auctionWiner: {
+  auctionWinner: {
     type: Schema.Types.ObjectId,
     ref: "AuctionWinner",
   },
@@ -20,7 +20,6 @@ const cartItemAuctionSchema = new Schema({
   quantity: { type: Number, default: 1 },
   price: { type: Number, required: true },
   totalItemPrice: { type: Number, required: true },
-  isSelected: { type: Boolean, default: false },
   inventory: { type: Schema.Types.ObjectId, ref: "Inventory" },
   auctionPricingRange: {
     type: Schema.Types.ObjectId,

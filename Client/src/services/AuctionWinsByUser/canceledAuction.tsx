@@ -6,6 +6,7 @@ export const canceledAuction = async (auctionWinnerId: string): Promise<AuctionC
     const response = await instance.post<AuctionCanceledResponse>('/client/auction/canceled-auction', {
       auctionWinnerId
     });
+    console.log('API Response:', response);
     return response.data;
   } catch (error: any) {
     if (error.response) {

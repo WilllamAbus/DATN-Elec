@@ -187,6 +187,25 @@ const CompletePage: React.FC = () => {
       cartId: carts[0]._id,
       user: profile?._id ? profile : null,
       cartDetails: [
+        // {
+        //   _id: cart?._id,
+        //   order: orderIdParam || "",
+        //   items: cart?.items.map((item: CartItem) => ({
+        //     product: {
+        //       ...item.product,
+        //       product_attributes: item.product.product_attributes.map(
+        //         (attr) => ({
+        //           k: attr.k,
+        //           v: attr.v,
+        //         })
+        //       ),
+        //     },
+        //     quantity: item.quantity,
+        //     price: item.product.product_price_unit,
+        //     totalItemPrice: item.product.product_price_unit * item.quantity,
+        //     _id: item._id,
+        //   })),
+        // },
         {
           _id: cart?._id,
           order: orderIdParam || "",
@@ -205,6 +224,7 @@ const CompletePage: React.FC = () => {
             totalItemPrice: item.product.product_price_unit * item.quantity,
             _id: item._id,
           })),
+          itemAuction: [], // Thêm thuộc tính itemAuction mặc định là mảng rỗng
         },
       ],
       payment: {

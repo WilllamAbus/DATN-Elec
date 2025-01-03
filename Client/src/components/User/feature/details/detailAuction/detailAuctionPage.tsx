@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 import ImageAuction from "./imageAuction";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk } from "../../../../../redux/product/client/Thunk";
+import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk,getAuctionPricingRangeThunk} from "../../../../../redux/product/client/Thunk";
 import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
 import StartAndEndTime from "./startAndEndtime";
-import AuctionList from "./auctionList";
+// import AuctionList from "./auctionList";
 import CurrentPriceAndBidprice from "./currentPriceAndBidprice";
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
@@ -48,7 +48,24 @@ const DetailPageAuction: React.FC = () => {
     }
   };
 
+  const handleBidPriceChange = async () => {
+    if (slug) {
+      const result = await dispatch(getAuctionPricingRangeThunk({ slug }));
+      if (result.payload && typeof result.payload !== "string") {
+        const auctionPricing = result.payload.auctionPricing;
+        const currentPrice = auctionPricing.currentPrice;
+        const priceStep = auctionPricing.priceStep;
+        const maxPrice = auctionPricing.maxPrice;
 
+        // Điều chỉnh priceStep sao cho vừa đủ để đạt giá tối đa
+        const newPrice = currentPrice + priceStep;
+        if (newPrice > maxPrice) {
+          auctionPricing.priceStep = maxPrice - currentPrice;
+          
+        }
+      }
+    }
+  };
   return (
     <>
       <ReusableBreadcrumb paths={breadcrumbPaths} />
@@ -85,13 +102,13 @@ const DetailPageAuction: React.FC = () => {
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
         <div className="col-span-full xl:col-auto">
           <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded ? 'opacity-50 pointer-events-none' : ''}`}>
-            <AuctionList />
+            {/* <AuctionList /> */}
           </div>
         </div>
         <div className="col-span-full xl:col-auto">
           {productDetailAuction && (
             <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded ? 'opacity-50 pointer-events-none' : ''}`}>
-              <CurrentPriceAndBidprice product={productDetailAuction} onAuctionEnd={handleAuctionEnd} />
+              <CurrentPriceAndBidprice product={productDetailAuction} onAuctionEnd={handleAuctionEnd} onChange={handleBidPriceChange} />
             </div>
           )}
         </div>

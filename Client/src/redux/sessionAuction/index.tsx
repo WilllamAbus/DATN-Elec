@@ -2,13 +2,15 @@ import { combineReducers } from "@reduxjs/toolkit";
 import {
   getAuctionWinsByUserSlice,
   confirmAuctionSlice,
-  canceledAuctionSlice
+  canceledAuctionSlice,
+  getUserPendingAuctionWinsSlice
 
 } from "./slice";
 const auctionWinReducer = combineReducers({
   getAuctionWinsByUser: getAuctionWinsByUserSlice,
   confirmAuction:confirmAuctionSlice,
-  canceledAuction:canceledAuctionSlice
+  canceledAuction:canceledAuctionSlice,
+  getUserPendingAuctionWins:getUserPendingAuctionWinsSlice
 
 });
 

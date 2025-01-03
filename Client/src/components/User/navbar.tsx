@@ -5,10 +5,12 @@ import Dropdown from "../../ultils/dropdown/client/nav/dropdown.LogoUser.nav";
 import UserMenuDropdown from "../../ultils/dropdown/client/nav/toggleDropdown";
 import { listCateNavItemThunk } from "../../redux/clientcate/client/Thunk/";
 import logoNav from "../../assets/images/logoHeader/logo.svg";
-import { useAppDispatch } from "../../redux/rootReducer";
+import { useAppDispatch, type RootState } from "../../redux/rootReducer";
 import cateDropdownItems from "./listCateNav/path/hookspathnav";
 import { searchProduct } from "../../services/product_v2/client/homeAllProduct";
 import { Drawer, Sidebar } from "flowbite-react";
+import { useSelector } from "react-redux";
+import { Tooltip } from "@nextui-org/react";
 // import algoliasearch from "algoliasearch/lite";
 
 interface SpeechRecognitionEvent extends Event {
@@ -136,6 +138,10 @@ const Navbar: React.FC = () => {
     };
   };
 
+
+
+  const isLoggedIn = useSelector((state: RootState) => state.auth.login.isLoggedIn);
+
   return (
     <header>
       <nav className="fixed z-30 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 py-2 px-4">
@@ -153,13 +159,21 @@ const Navbar: React.FC = () => {
                   <Dropdown buttonText="Danh mục" items={dropdownItems} />
                 </span>
                 <li>
-                  <Link
-                    to="auction"
-                    className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    Đấu giá
-                  </Link>
-                </li>
+            {isLoggedIn ? (
+              <Link
+                to="/auction"
+                className="block text-gray-700 hover:text-primary-700 dark:text-gray-400 dark:hover:text-white"
+              >
+                Đấu giá
+              </Link>
+            ) : (
+              <Tooltip content="Đăng nhập để vào đấu giá" placement="bottom">
+                <span className="block text-gray-500 cursor-not-allowed dark:text-gray-600">
+                  Đấu giá
+                </span>
+              </Tooltip>
+            )}
+          </li>
               </ul>
             </div>
           </div>
@@ -270,12 +284,20 @@ const Navbar: React.FC = () => {
 
                 <Dropdown buttonText="Danh mục" items={dropdownItems} />
 
-                <Link
-                  to="/auction"
-                  className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
-                >
-                  Đấu giá
-                </Link>
+                {isLoggedIn ? (
+                  <Link
+                    to="/auction"
+                    className="flex items-center mb-2 text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white rounded-md p-2"
+                  >
+                    Đấu giá
+                  </Link>
+                ) : (
+                  <Tooltip content="Đăng nhập để vào đấu giá" placement="bottom">
+                    <div className="flex items-center mb-2 text-gray-500 rounded-md p-2 cursor-not-allowed">
+                      Đấu giá
+                    </div>
+                  </Tooltip>
+                )}
 
                 <Link
                   to="/profile"

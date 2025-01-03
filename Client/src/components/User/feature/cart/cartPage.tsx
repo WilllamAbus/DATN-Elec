@@ -54,7 +54,7 @@ const CartPage: React.FC = () => {
       carts.forEach((cart) => {
         if (Array.isArray(cart.items)) {
           cart.items.forEach((item) => {
-            updatedItemQuantities[item.product._id] = item.quantity;
+            updatedItemQuantities[item.product?._id] = item.quantity;
           });
         } else {
           console.warn("Cart items are not in an array format:", cart.items);
@@ -66,18 +66,32 @@ const CartPage: React.FC = () => {
     }
   }, [carts]);
 
+  // useEffect(() => {
+  //   const total = carts.reduce((total, cart) => {
+  //     return (
+  //       total +
+  //       cart.itemAuction.reduce((itemTotal, item) => {
+  //         if (item.isSelected) {
+  //           const quantity =
+  //             itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
+  //             item.quantity;
+  //           return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
+  //         }
+  //         return itemTotal;
+  //       }, 0)
+  //     );
+  //   }, 0);
+  //   setTotalAuctionPrice(total);
+  // }, [carts, itemQuantities]);
   useEffect(() => {
     const total = carts.reduce((total, cart) => {
       return (
         total +
         cart.itemAuction.reduce((itemTotal, item) => {
-          if (item.isSelected) {
-            const quantity =
-              itemQuantities[item.auctionPricingRange.product_randBib._id] ||
-              item.quantity;
-            return itemTotal + (item.auctionWiner.bidPrice || 0) * quantity;
-          }
-          return itemTotal;
+          const quantity =
+            itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
+            item.quantity;
+          return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
         }, 0)
       );
     }, 0);
@@ -246,7 +260,7 @@ const CartPage: React.FC = () => {
 
   filteredCarts.forEach((cart) => {
     cart.items.forEach((item) => {
-      const key = `${item.product._id}-${item.productVariant._id}`; // Nhóm theo cả productId và variantId
+      const key = `${item.product?._id}-${item.productVariant?._id}`; // Nhóm theo cả productId và variantId
 
       if (!groupedMap.has(key)) {
         groupedMap.set(key, { ...cart, items: [item] });
@@ -256,8 +270,8 @@ const CartPage: React.FC = () => {
 
         const itemIndex = updatedItems.findIndex(
           (i) =>
-            i.product._id === item.product._id &&
-            i.productVariant._id === item.productVariant._id
+            i.product?._id === item.product?._id &&
+            i.productVariant?._id === item.productVariant?._id
         );
 
         if (itemIndex !== -1) {
@@ -266,7 +280,7 @@ const CartPage: React.FC = () => {
             quantity: updatedItems[itemIndex].quantity + item.quantity,
             totalItemPrice:
               updatedItems[itemIndex].totalItemPrice +
-              item.productVariant.variant_price * item.quantity,
+              item.productVariant?.variant_price * item.quantity,
           };
         } else {
           updatedItems.push({
@@ -463,7 +477,7 @@ const CartPage: React.FC = () => {
                             </div>
                             <div className="flex flex-col gap-2 w-full">
                               <h3 className="text-base font-bold text-gray-800">
-                                {cart.items[0].productVariant.variant_name}
+                                {cart.items[0].productVariant?.variant_name}
                               </h3>
                               <h6
                                 onClick={() =>
@@ -486,7 +500,7 @@ const CartPage: React.FC = () => {
                                   className="flex items-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md"
                                 >
                                   <h5 className="text-gray-800 font-semibold">
-                                    {cart.items[0].productVariant.ram?.name}
+                                    {cart.items[0].productVariant?.ram?.name}
                                   </h5>
                                 </button>
 
@@ -497,9 +511,9 @@ const CartPage: React.FC = () => {
                                     onClick={() =>
                                       handleDecreaseQuantity(
                                         cart._id,
-                                        cart.items[0].product._id,
+                                        cart.items[0].product?._id,
                                         itemQuantities[
-                                          cart.items[0].product._id
+                                          cart.items[0].product?._id
                                         ] || cart.items[0].quantity
                                       )
                                     }
@@ -518,7 +532,7 @@ const CartPage: React.FC = () => {
                                     className="w-12 text-center border border-gray-300 text-gray-800 text-xs rounded-md"
                                     value={
                                       itemQuantities[
-                                        cart.items[0].product._id
+                                        cart.items[0].product?._id
                                       ] || cart.items[0].quantity
                                     }
                                     onChange={(e) => {
@@ -532,7 +546,7 @@ const CartPage: React.FC = () => {
                                       ) {
                                         setItemQuantities((prev) => ({
                                           ...prev,
-                                          [cart.items[0].product._id]:
+                                          [cart.items[0].product?._id]:
                                             newQuantity,
                                         }));
                                       } else if (newQuantity > 99) {
@@ -542,14 +556,14 @@ const CartPage: React.FC = () => {
                                         );
                                         setItemQuantities((prev) => ({
                                           ...prev,
-                                          [cart.items[0].product._id]: 99,
+                                          [cart.items[0].product?._id]: 99,
                                         }));
                                       }
                                     }}
                                     onBlur={(e) =>
                                       handleQuantityChange(
                                         cart._id,
-                                        cart.items[0].product._id,
+                                        cart.items[0].product?._id,
                                         Number(e.target.value)
                                       )
                                     }
@@ -561,9 +575,9 @@ const CartPage: React.FC = () => {
                                     onClick={() =>
                                       handleIncreaseQuantity(
                                         cart._id,
-                                        cart.items[0].product._id,
+                                        cart.items[0].product?._id,
                                         itemQuantities[
-                                          cart.items[0].product._id
+                                          cart.items[0].product?._id
                                         ] || cart.items[0].quantity
                                       )
                                     }
@@ -585,7 +599,7 @@ const CartPage: React.FC = () => {
                             <h4 className="text-base font-bold text-gray-800">
                               {cart.items.length > 0 &&
                               cart.items[0].productVariant?.variant_price
-                                ? cart.items[0].productVariant.variant_price.toLocaleString(
+                                ? cart.items[0].productVariant?.variant_price.toLocaleString(
                                     "vi-VN",
                                     {
                                       style: "currency",
@@ -688,8 +702,8 @@ const CartPage: React.FC = () => {
                           <div className="text-right">
                             <h4 className="text-lg font-bold text-gray-800">
                               {auction.itemAuction.length > 0 &&
-                              auction.itemAuction[0].auctionWiner?.bidPrice
-                                ? auction.itemAuction[0].auctionWiner?.bidPrice.toLocaleString(
+                              auction.itemAuction[0].auctionWinner?.bidPrice
+                                ? auction.itemAuction[0].auctionWinner?.bidPrice.toLocaleString(
                                     "vi-VN",
                                     {
                                       style: "currency",
@@ -700,7 +714,7 @@ const CartPage: React.FC = () => {
                             </h4>
                             <p className="text-sm text-gray-600">
                               {`Người chiến thắng: ${
-                                auction?.itemAuction?.[0]?.auctionWiner?.user
+                                auction?.itemAuction?.[0]?.auctionWinner?.user
                                   .name || "Ẩn danh"
                               }`}
                             </p>
@@ -738,7 +752,7 @@ const CartPage: React.FC = () => {
 
         {activeTab === "auction" && (
           <Cartauction
-            groupedCarts={groupedCarts}
+            cartauction={cartauction}
             totalAuctionPrice={totalAuctionPrice}
             itemQuantities={itemQuantities}
             handleCheckoutAuction={handleCheckoutAuction}

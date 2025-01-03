@@ -52,8 +52,8 @@ export interface AuctionRound {
   __v: number;
 }
 
-export interface AuctionWinner {
-  id: string;
+export interface AuctionWin {
+  _id: string;
   user: User;
   auctionPricingRange: AuctionPricingRange;
   auctionRound: AuctionRound;
@@ -72,7 +72,7 @@ export interface ItemAuction {
 }
 
 export interface ConfirmAuctionResponse {
-  auctionWinner: AuctionWinner;
+  auctionWinner: AuctionWin;
   itemAuction: ItemAuction;
   code: string;
   msg: string;

@@ -1,31 +1,29 @@
 import React from "react";
 import { Pagination } from "@nextui-org/react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../redux/store";
 import AuctionPendingTable from "./table/auctionPendingTable";
 import NoAuctionWin from "./noAuction/noAuctionWin";
-import { AppDispatch } from "../../../../redux/store";
-import { AuctionWin } from "../../../../services/AuctionWinsByUser/types/getAuctionWinsByUser";
 import { getAuctionWinsByUserThunk } from "../../../../redux/sessionAuction/thunk";
 
 interface ListAuctionWinProps {
-  auction: AuctionWin[];
-  dispatch: AppDispatch;
   currentPage: number;
   totalPages: number;
 }
 
-const ListAuctionWin: React.FC<ListAuctionWinProps> = ({ auction, dispatch, currentPage, totalPages }) => {
+const ListAuctionWin: React.FC<ListAuctionWinProps> = ({ currentPage, totalPages }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const auctions = useSelector((state: RootState) => state.auctionWin.getAuctionWinsByUser.auctionWins ?? []);
+
   const handlePageChange = (page: number) => {
     dispatch(getAuctionWinsByUserThunk({ page }));
   };
 
   return (
     <>
-      {auction.length > 0 ? (
+      {auctions.length > 0 ? (
         <>
-          <AuctionPendingTable
-            auction={auction}
-            currentPage={currentPage}
-          />
+          <AuctionPendingTable currentPage={currentPage} />
           {totalPages > 1 && (
             <div className="flex justify-center my-4">
               <Pagination

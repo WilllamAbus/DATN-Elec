@@ -116,7 +116,7 @@ export interface CartItem {
     __v: number;
   };
 }
-export interface AuctionWinner {
+export interface auctionWinner {
   _id: string;
   auctionPricingRange: string;
   auctionRound: string;
@@ -167,7 +167,7 @@ export interface AuctionRound {
   updatedAt: string;
 }
 export interface itemAuction {
-  auctionWiner: AuctionWinner;
+  auctionWinner: auctionWinner;
   auctionStartTime: string;
   auctionEndTime: string;
   quantity: number;

@@ -16,3 +16,4 @@ export { default as getProductDetailAuctionSlice } from "./getdetailAuction";
 export { default as createOneUpdateBidAuctionSlice } from "./createOneUpdateBidAuction";
 export { default as getBiddingListSlice } from "./getBiddingList";
 export { default as getAuctionDetailsBySlugSlice } from "./getAuctionDetailsBySlug";
+export { default as getAuctionPricingRangeSlice } from "./getAuctionPricingRange";

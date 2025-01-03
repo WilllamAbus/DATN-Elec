@@ -663,7 +663,7 @@ const randBinController = {
           return null; // Trả về null nếu không tìm thấy sản phẩm
         })
         .filter((track) => track !== null); // Lọc các phần tử null
-        console.log('matchedPriceRandge', matchedPriceRandge);
+      
         
       const sortedPriceRandge = matchedPriceRandge.sort(
         (a, b) => b.maxPrice - a.maxPrice

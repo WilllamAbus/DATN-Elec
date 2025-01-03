@@ -5,20 +5,21 @@ const {
     createOneUpdateBidAuction,
     getAuctionDetailsBySlug,
     getBiddingListAndWinner,
+    getAuctionPricingRange,
     getUserBiddingHistory,
-    getUserBiddingDetails
+    getUserBiddingDetails,
+    enterAuctionPrice
 } = require('../../../controler/client');
 
 const middlewareController = require("../../../middleware/auth");
 
-// Cập nhật router POST
 router.post('/create-one-update-bid-auction/:slug', middlewareController.getHeader, createOneUpdateBidAuction);
-
+router.post('/enter-one-update-bid-auction/:slug', middlewareController.getHeader, enterAuctionPrice);
 router.get('/product-auction/:slug', middlewareController.getHeader, getProductDetailAuction);
 
 router.get('/product-auction-win-and-lose/:slug', middlewareController.getHeader, getAuctionDetailsBySlug);
 router.get('/bidding-list/:slug', getBiddingListAndWinner);
-// router.post("/process-winner/:slug", processAuctionWinner);
+router.get('/product-auction-check-current-price/:slug', middlewareController.getHeader, getAuctionPricingRange);
 
 router.get('/user/bidding-history', middlewareController.getHeader, getUserBiddingHistory);
 router.get('/user/bidding-details/:slug', middlewareController.getHeader, getUserBiddingDetails);

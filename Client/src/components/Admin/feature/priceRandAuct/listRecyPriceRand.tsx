@@ -103,9 +103,39 @@ const ListPriceRandRecy: React.FC = () => {
 
     // Đặt trạng thái ban đầu
     const initialActivated: { [key: string]: boolean } = {};
+    interface StartTimesMap {
+      [key: string]: string[]; // Maps startTime (string) to an array of _id (string)
+    }
+    
+    const startTimesMap: StartTimesMap = {};
     deletedPriceRandAuct.forEach((rand) => {
-      const startTime = new Date(rand.startTime).getTime();
-      if (now >= startTime) {
+      const startTime = new Date(rand.startTime);
+      
+      // Lấy phần giờ và phút từ startTime (HH:mm)
+      const timeKey = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
+  
+      // Kiểm tra trùng lặp theo phút
+      if (startTimesMap[timeKey]) {
+        startTimesMap[timeKey].push(rand.product.product_name);
+      } else {
+        startTimesMap[timeKey] = [rand.product.product_name];
+      }
+  
+      // Nếu có hơn 1 phiên đấu giá có cùng giờ và phút
+      if (startTimesMap[timeKey].length > 1) {
+        MySwal.fire({
+          title: "Cảnh báo",
+          text: `Các phiên đấu giá với thời gian bắt đầu giống nhau: ${startTimesMap[timeKey].join(", ")}. Vui lòng điều chỉnh thời gian.`,
+          icon: "warning",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        }).then(() => {
+          // Chuyển hướng đến trang thêm nếu có trùng lặp
+        });
+      }
+  
+      // Kiểm tra thời gian bắt đầu
+      if (now >= startTime.getTime()) {
         initialActivated[rand._id] = true;
         autoTriggerPriceRand(rand._id); // Tự động kích hoạt nếu đã đến thời gian
       }
@@ -266,9 +296,19 @@ const ListPriceRandRecy: React.FC = () => {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
                   {autoActivated[rand._id] ? (
-                <span className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Đã kích hoạt</span>
+                <span className="group relative flex items-center 
+                text-blue-700 bg-blue-200 hover:text-white border 
+                border-blue-700 hover:bg-blue-800 focus:ring-4 
+                focus:outline-none focus:ring-blue-300 font-medium rounded-lg 
+                text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 
+                dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Đã kích hoạt</span>
               ) : (
-                <span className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Chưa đến thời gian</span>
+                <span className="group relative flex items-center text-blue-700 bg-blue-200 
+                hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 
+                focus:outline-none focus:ring-blue-300 font-medium rounded-lg
+                 text-sm px-2 py-2 text-center dark:border-blue-500
+                  dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 
+                  dark:focus:ring-blue-900">Chờ ...</span>
               )}
                     {/* <button
                       onClick={() => handleTriggerPriceRand(rand._id)}

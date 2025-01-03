@@ -454,7 +454,9 @@ const CheckoutPage: React.FC = () => {
 
   const profile = useSelector((state: RootState) => state.auth.profile.profile);
   const carts = useSelector((state: RootState) => state.cart.carts);
-  const { createPaymentUrl } = useVNPayAuction();
+  console.log(carts);
+
+  const { createPaymentAuctionUrl } = useVNPayAuction();
 
   const [cart, setCart] = useState<any>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -481,7 +483,8 @@ const CheckoutPage: React.FC = () => {
         {
           _id: cart?._id,
           order: orderIdParam || "",
-          items: cart?.itemAuction.map((item: itemAuction) => ({
+          items: [],
+          itemAuction: cart?.itemAuction.map((item: itemAuction) => ({
             // product: {
             //   ...item.product,
             //   product_attributes: item.product.product_attributes.map(
@@ -502,8 +505,8 @@ const CheckoutPage: React.FC = () => {
             // },
 
             quantity: item.quantity,
-            price: item.auctionWiner.bidPrice,
-            totalItemPrice: item.auctionWiner.bidPrice * item.quantity,
+            price: item.auctionWinner?.bidPrice,
+            totalItemPrice: item.auctionWinner?.bidPrice * item.quantity,
             _id: item._id,
           })),
         },
@@ -657,7 +660,7 @@ const CheckoutPage: React.FC = () => {
 
     try {
       if (selectedPayment === "vnPay") {
-        const paymentUrl = await createPaymentUrl(
+        const paymentUrl = await createPaymentAuctionUrl(
           carts[0].itemAuction[0].totalItemPrice
         );
         if (paymentUrl) {
@@ -749,7 +752,7 @@ const CheckoutPage: React.FC = () => {
                 <Card>
                   <h4 className="text-md font-medium">Tổng giá trị đơn hàng</h4>
                   <p className="text-lg font-semibold">
-                    {carts[0].itemAuction[0].totalItemPrice.toLocaleString(
+                    {carts[0].itemAuction[0]?.totalItemPrice.toLocaleString(
                       "vi-VN",
                       {
                         style: "currency",

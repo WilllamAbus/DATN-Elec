@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@nextui-org/react";
 import { itemAuction } from "src/types/cart/carts";
 interface CartSummaryProps {
-  groupedCarts: {
+  cartauction: {
     _id: string;
     itemAuction: itemAuction[];
   }[];
@@ -14,7 +14,7 @@ interface CartSummaryProps {
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
-  groupedCarts,
+  cartauction,
   totalAuctionPrice,
   itemQuantities,
   handleCheckoutAuction,
@@ -23,23 +23,22 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 }) => {
   return (
     <div>
-      {groupedCarts.length > 0 && (
+      {cartauction.length > 0 && (
         <div className="p-4 rounded-md bg-gray-50">
           <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />
           <h3 className="text-gray-800">Danh sách sản phẩm:</h3>
-
-          {groupedCarts.map((cart) => (
+          {cartauction.map((cart) => (
             <div key={cart._id} className="flex justify-between mt-2">
               <span className="text-gray-800">
-                {
-                  cart.itemAuction[0].auctionPricingRange.product_randBib
-                    .product_name
-                }{" "}
+                {cart.itemAuction[0]?.auctionPricingRange?.product_randBib
+                  ?.product_name || "Unknown Product"}{" "}
                 x{" "}
                 {itemQuantities[
-                  cart.itemAuction[0].auctionPricingRange.product_randBib._id
-                ] || cart.itemAuction[0].quantity}
+                  cart.itemAuction[0]?.auctionPricingRange?.product_randBib?._id
+                ] ||
+                  cart.itemAuction[0]?.quantity ||
+                  0}
               </span>
             </div>
           ))}
@@ -77,12 +76,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             <Button
               onClick={handleCheckoutAuction}
               className="w-full bg-blue-600 font-semibold text-white hover:bg-primary-dark focus:ring-primary-light"
-              isDisabled={
-                userRole.includes("admin") ||
-                !groupedCarts.some((cart) =>
-                  cart.itemAuction.some((item) => item.isSelected)
-                )
-              }
+              isDisabled={userRole.includes("admin")}
             >
               Thanh toán
             </Button>
