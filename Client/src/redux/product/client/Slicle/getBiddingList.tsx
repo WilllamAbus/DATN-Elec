@@ -1,38 +1,47 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getBiddingListThunk, getAuctionWinnerThunk } from "../Thunk";
+import { getBiddingListThunk } from "../Thunk";
 import {
   BiddingListResponse,
   Pagination,
-  AuctionWinner,
+  ProductDetails,
+  BiddingItem,
 } from "../../../../services/detailProductAuction/types/getBiddingList";
 
 interface BiddingListState {
-  productDetails: BiddingListResponse["data"]["productDetails"] | null;
-  biddingList: BiddingListResponse["data"]["biddingList"] | null;
+  productDetails: ProductDetails | null;
+  biddingList: BiddingItem[] | null;
   pagination: Pagination | null;
-  auctionWinner: AuctionWinner | null; // Thêm trạng thái cho người thắng
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
   isLoading: boolean;
+  isFetched: boolean;
 }
 
 const initialState: BiddingListState = {
   productDetails: null,
   biddingList: null,
   pagination: null,
-  auctionWinner: null, // Khởi tạo trạng thái người thắng
   status: "idle",
   error: null,
   isLoading: false,
+  isFetched: false,
 };
 
 const getBiddingListSlice = createSlice({
-  name: "auctionClient/getBiddingList/auctionWinner", // Đổi tên cho rõ ràng
+  name: "auctionClient/getBiddingList",
   initialState,
-  reducers: {},
+  reducers: {
+    resetFetchStatus(state) {
+      state.isFetched = false;
+    },
+    addNewBid(state, action: PayloadAction<BiddingItem>) {
+      if (state.biddingList) {
+        state.biddingList.unshift(action.payload); // Thêm bid mới vào đầu danh sách
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // **Bidding List**
       .addCase(getBiddingListThunk.pending, (state) => {
         state.status = "loading";
         state.isLoading = true;
@@ -43,6 +52,7 @@ const getBiddingListSlice = createSlice({
         (state, action: PayloadAction<BiddingListResponse>) => {
           state.status = "success";
           state.isLoading = false;
+          state.isFetched = true;
           state.productDetails = action.payload.data.productDetails;
           state.biddingList = action.payload.data.biddingList;
           state.pagination = action.payload.data.pagination || null;
@@ -52,31 +62,11 @@ const getBiddingListSlice = createSlice({
       .addCase(getBiddingListThunk.rejected, (state, action) => {
         state.status = "fail";
         state.isLoading = false;
+        state.isFetched = false;
         state.error = action.payload || "Error fetching bidding list";
-      })
-      
-      // **Auction Winner**
-      .addCase(getAuctionWinnerThunk.pending, (state) => {
-        state.status = "loading";
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(
-        getAuctionWinnerThunk.fulfilled,
-        (state, action: PayloadAction<AuctionWinner>) => {
-          state.status = "success";
-          state.isLoading = false;
-          state.auctionWinner = action.payload;
-          state.error = null;
-        }
-      )
-      .addCase(getAuctionWinnerThunk.rejected, (state, action) => {
-        state.status = "fail";
-        state.isLoading = false;
-        state.auctionWinner = null;
-        state.error = action.payload || "Error fetching auction winner";
       });
   },
 });
 
+export const { resetFetchStatus, addNewBid } = getBiddingListSlice.actions;
 export default getBiddingListSlice.reducer;

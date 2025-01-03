@@ -1,44 +1,41 @@
 const BiddingService = require('../../../services/detailAuction/getBiddingListSV');
-const { getIO } = require('../../../services/skserver/socketServer');
 
-const getBiddingList = async (req, res) => {
+
+const getBiddingListAndWinner = async (req, res) => {
   const { slug } = req.params; // Lấy slug từ URL
   const { page = 1, limit = 5 } = req.query; // Lấy page và limit từ query
-  const io = getIO(); // WebSocket instance
 
   try {
-    const response = await BiddingService.getBiddingListService(slug, +page, +limit);
+    // Gọi hàm service xử lý logic
+    const response = await BiddingService.getBiddingListAndWinnerService(slug, +page, +limit);
 
-    if (response.err) {
-      return res.status(response.status).json({
+    // Nếu không tìm thấy hoặc có lỗi từ service
+    if (!response.success) {
+      console.error("Service Error:", response.msg);
+      return res.status(response.status || 500).json({
         success: false,
-        err: response.err,
-        msg: response.msg || 'Lỗi khi lấy danh sách đấu giá.',
-        status: response.status,
+        err: response.err || -1,
+        msg: response.msg || "Lỗi khi lấy danh sách đấu giá.",
+        status: response.status || 500,
       });
     }
 
-    // Phát thông báo thời gian thực qua WebSocket
-    io.emit('updateBiddingList', {
-      slug,
-      biddingList: response.response.biddingList,
-      pagination: response.response.pagination,
-    });
-
-    return res.status(response.status).json({
+    // Trả về kết quả thành công
+    return res.status(response.status || 200).json({
       success: true,
       err: 0,
-      msg: response.msg || 'OK',
-      status: response.status,
+      msg: response.msg || "Lấy danh sách đấu giá thành công.",
+      status: response.status || 200,
       data: response.response,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Controller Error:", error);
 
+    // Xử lý lỗi chung
     return res.status(500).json({
       success: false,
       err: -1,
-      msg: "Lỗi: " + error.message,
+      msg: "Đã xảy ra lỗi trong quá trình xử lý: " + error.message,
       status: 500,
     });
   }
@@ -47,39 +44,9 @@ const getBiddingList = async (req, res) => {
 
 
 
-const processAuctionWinner = async (req, res) => {
-  const io = getIO(); // WebSocket instance
 
-  try {
-    const { slug } = req.params;
 
-    const result = await BiddingService.processAuctionWinner(slug);
 
-    // Nếu có lỗi hoặc không tìm thấy người thắng
-    if (!result.success) {
-      return res.status(result.status).json(result);
-    }
-
-    // Phát thông báo người chiến thắng qua WebSocket
-    io.emit('auctionWinnerDeclared', {
-      message: `Người chiến thắng cho phiên đấu giá ${slug} đã được xác định.`,
-      winner: result.winner, // Thông tin người thắng
-      bidPrice: result.bidPrice, // Giá thắng
-      slug,
-      status: 'ended', // Trạng thái phiên đấu giá
-    });
-
-    return res.status(result.status).json(result);
-  } catch (error) {
-    console.error("Error processing auction winner:", error);
-
-    return res.status(500).json({
-      success: false,
-      err: -1,
-      msg: "Lỗi server: " + error.message,
-    });
-  }
-};
 
 
 
@@ -204,8 +171,7 @@ const getUserBiddingDetails = async (req, res) => {
 
 
 module.exports = {
-  getBiddingList,
-  processAuctionWinner,
+  getBiddingListAndWinner,
   getUserBiddingHistory,
   getUserBiddingDetails
 };

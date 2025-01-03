@@ -9,8 +9,7 @@ const {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
-  biddingList,
-  processAuctionWinner,
+  getBiddingListAndWinner,
   getUserBiddingHistory,
   getUserBiddingDetails
 } = require('./detailAuction');
@@ -66,12 +65,11 @@ module.exports = {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
-  biddingList,
   getAuctionWinsByUser,
   confirmAuction,
   canceledAuction,
-  processAuctionWinner,
   getUserBiddingHistory,
-  getUserBiddingDetails
+  getUserBiddingDetails,
+  getBiddingListAndWinner
 };
 
