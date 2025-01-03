@@ -22,6 +22,7 @@ const orderSchema = new Schema(
       enum: [
         "Chờ xử lý",
         "Đã xác nhận",
+        "Đóng gói",
         "Đang vận chuyển",
         "Hoàn tất",
         "Hủy đơn hàng",
