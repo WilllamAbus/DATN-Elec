@@ -65,10 +65,10 @@ const ListProductTime: React.FC = () => {
         {error && <p className="text-center text-red-600">{error}</p>}
 
         <div className="order-item">
-          {products.length === 0 ? (
+          {products?.length === 0 ? (
             <p className="text-center text-gray-600">Không có lịch sử đấu giá nào.</p>
           ) : (
-            products.map((product) => (
+            products?.map((product) => (
               <div
                 key={product.productId}
                 className={`flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-6 shadow-xl rounded-2xl hover:scale-105 transform transition-all duration-300 ${product?.status === "active"
@@ -81,14 +81,14 @@ const ListProductTime: React.FC = () => {
                 <div className="flex items-center">
                   <Link to={`/product/${product.slug}`}>
                     <img
-                      src={product.image || "https://via.placeholder.com/150"}
-                      alt={`product ${product.productName}`}
+                      src={product?.image || "https://via.placeholder.com/150"}
+                      alt={`product ${product?.productName}`}
                       className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                     />
                   </Link>
                   <div className="flex flex-col justify-center sm:ml-4 text-center sm:text-left">
                     <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-indigo-900">
-                      {product.productName}
+                      {product?.productName}
                     </h6>
                   </div>
                 </div>
