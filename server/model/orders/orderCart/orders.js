@@ -4,7 +4,7 @@ const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "users", required: true },
     cartDetails: [{ type: Schema.Types.ObjectId, ref: "OrderDetail" }],
-    payment: { type: Schema.Types.ObjectId, ref: "payment", default: null },
+    payment: { type: Schema.Types.ObjectId, ref: "payment", required: true },
     shipping: { type: Schema.Types.ObjectId, ref: "shipping", required: true },
     voucherIds: [{ type: Schema.Types.ObjectId, ref: "voucher" }],
 
@@ -35,7 +35,7 @@ const orderSchema = new Schema(
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
     cancelReason: { type: String, default: null },
-    status: { type: String, default:'active'},
+    status: { type: String, default: "active" },
     refundBank: {
       bankName: { type: String, required: false },
       accountNumber: { type: String, required: false },

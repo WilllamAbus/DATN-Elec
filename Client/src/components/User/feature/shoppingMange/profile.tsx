@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import {
   RootState,
@@ -15,7 +13,8 @@ import UpdatePassword from "./changePassword";
 import Bank from "./bank/listBank";
 import ListAddress from "./address/listAddress";
 import OrderList from "./order";
-import OrderAuct from "./orderAuctStatus";
+import OrderAuction from "./orderAuct";
+// import OrderAuct from "./orderAuctStatus";
 import ListBid from "./listBidding";
 import useAuth from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
@@ -30,7 +29,7 @@ const ProfileUse: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<
     | "order"
-    | "orderAuct"
+    // | "orderAuct"
     | "info"
     | "edit"
     | "address"
@@ -39,6 +38,7 @@ const ProfileUse: React.FC = () => {
     | "listAddress"
     | "listBid"
     | "Bank"
+    | "OrderAuction"
   >("info");
 
   const profile = useAppSelector(
@@ -87,14 +87,15 @@ const ProfileUse: React.FC = () => {
   }: {
     item:
       | "order"
-      | "orderAuct"
+      // | "orderAuct"
       | "info"
       | "edit"
       | "address"
       | "password"
       | "watchlist"
       | "listBid"
-      | "Bank";
+      | "Bank"
+      | "OrderAuction";
   }) => (
     <li>
       <button
@@ -150,12 +151,18 @@ const ProfileUse: React.FC = () => {
             <span className="ms-3"> Đơn hàng</span>
           </>
         )}
-        {item === "orderAuct" && (
+        {item === "OrderAuction" && (
+          <>
+            <i className="iconify mdi--cart-outline w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
+            <span className="ms-3"> Đơn hàng đấu giá</span>
+          </>
+        )}
+        {/* {item === "orderAuct" && (
           <>
             <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
             <span className="ms-3"> Đơn hàng đấu giá</span>
           </>
-        )}
+        )} */}
         {item === "listBid" && (
           <>
             <i className="iconify mdi--gavel w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white "></i>
@@ -169,7 +176,6 @@ const ProfileUse: React.FC = () => {
   return (
     <>
       <nav className="py-4  flex items-center space-x-3 bg-blue-50 rounded-lg shadow-sm">
-
         <div className="flex pl-8 items-center">
           <span
             onClick={() => setIsOpen(!isOpen)}
@@ -184,7 +190,6 @@ const ProfileUse: React.FC = () => {
 
       <div className="pb-0 pt-10 min-h-[calc(76vh-10rem)]">
         <div className="container  mx-auto grid grid-cols-12 gap-6 pt-4 pb-16">
-
           <div className="hidden lg:block lg:col-span-3 ">
             <aside className="bg-white shadow-md rounded-lg p-4 h-full min-h-[calc(64vh-10rem)]">
               <User
@@ -205,16 +210,17 @@ const ProfileUse: React.FC = () => {
                   "password",
                   "watchlist",
                   "order",
-                  "orderAuct",
+                  // "orderAuct",
                   "listBid",
                   "Bank",
+                  "OrderAuction",
                 ].map((item) => (
                   <MenuItem
                     key={item}
                     item={
                       item as
                         | "order"
-                        | "orderAuct"
+                        // | "orderAuct"
                         | "listBid"
                         | "info"
                         | "edit"
@@ -222,6 +228,7 @@ const ProfileUse: React.FC = () => {
                         | "password"
                         | "watchlist"
                         | "Bank"
+                        | "OrderAuction"
                     }
                   />
                 ))}
@@ -248,7 +255,8 @@ const ProfileUse: React.FC = () => {
             {view === "password" && <UpdatePassword profile={profile} />}
             {view === "watchlist" && <Watchlist profiles={profile} />}
             {view === "order" && <OrderList />}
-            {view === "orderAuct" && <OrderAuct />}
+            {view === "OrderAuction" && <OrderAuction />}
+            {/* {view === "orderAuct" && <OrderAuct />} */}
             {view === "listBid" && <ListBid />}
             {view === "Bank" && <Bank />}
           </section>
@@ -286,8 +294,9 @@ const ProfileUse: React.FC = () => {
                   "password",
                   "watchlist",
                   "order",
-                  "orderAuct",
+                  // "orderAuct",
                   "Bank",
+                  "OrderAuction",
                 ].map((item) => (
                   <MenuItem
                     key={item}
@@ -299,9 +308,10 @@ const ProfileUse: React.FC = () => {
                         | "password"
                         | "watchlist"
                         | "order"
-                        | "orderAuct"
+                        // | "orderAuct"
                         | "listBid"
                         | "Bank"
+                        | "OrderAuction"
                     }
                   />
                 ))}

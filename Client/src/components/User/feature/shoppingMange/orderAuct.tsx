@@ -389,7 +389,7 @@ import {
 } from "../../../../redux/order/orderThunks";
 import { Order } from "../../../../types/order/order";
 import { Link, useNavigate } from "react-router-dom";
-import DetailOrder from "./order/detailOrders/detail";
+import DetailOrder from "./order/detailOrders/detailAuction";
 import { Button, Pagination, Select, SelectItem } from "@nextui-org/react";
 
 const OrderList: React.FC = () => {
@@ -417,13 +417,13 @@ const OrderList: React.FC = () => {
   const filteredOrders = Order.filter((order) =>
     order.cartDetails.every(
       (cartDetail) =>
-        cartDetail.items.length > 0 || cartDetail.itemAuction.length === 0
+        cartDetail.itemAuction.length > 0 || cartDetail.items.length === 0
     )
   ).map((order) => ({
     ...order,
     cartDetails: order.cartDetails.map((cartDetail) => ({
       ...cartDetail,
-      itemAuction: undefined, // Loại bỏ itemAuction
+      items: undefined, // Loại bỏ itemAuction
     })),
   }));
 
@@ -516,8 +516,8 @@ const OrderList: React.FC = () => {
     <div className="py-5 relative">
       <h2 className="text-3xl leading-10 text-black mb-9 flex justify-between items-center">
         Đơn hàng
-        {!selectedOrder && (
-          <div className="flex flex-row items-center w-1/3">
+        <div className="flex flex-row items-center w-1/3">
+          {!selectedOrder && (
             <Select
               isRequired
               aria-label="Order Status Filter"
@@ -534,8 +534,8 @@ const OrderList: React.FC = () => {
                 </SelectItem>
               ))}
             </Select>
-          </div>
-        )}
+          )}
+        </div>
       </h2>
 
       <div className="mt-7 border border-gray-300 pt-9">
@@ -543,7 +543,7 @@ const OrderList: React.FC = () => {
           <DetailOrder order={selectedOrder} onBack={handleBackToList} />
         ) : (
           <>
-            {filteredOrders[0]?.cartDetails?.[0]?.items?.length > 0 ? (
+            {filteredOrders[0]?.cartDetails?.[0]?.itemAuction?.length > 0 ? (
               filteredOrders.map((order) => (
                 <div key={order._id} className="order-item">
                   <div className="flex flex-col md:flex-row items-center justify-between px-3 md:px-11 mb-6">
@@ -613,26 +613,27 @@ const OrderList: React.FC = () => {
                             {order.cartDetails
                               .slice(0, showAll ? order.cartDetails.length : 2)
                               .map((cartDetail) =>
-                                cartDetail.items?.length > 0 ? (
-                                  cartDetail.items.map((item) => (
+                                cartDetail.itemAuction?.length > 0 ? (
+                                  cartDetail.itemAuction.map((item) => (
                                     <div
-                                      key={item.productVariant._id}
+                                      key={item.product_randBib._id}
                                       className="flex items-center gap-6 bg-white p-4 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300"
                                     >
                                       <Link
                                         to={`/product/${
-                                          item.product.slug || "null"
+                                          item.product_randBib.slug || "null"
                                         }`}
                                         className="flex-shrink-0"
                                       >
                                         <img
                                           src={
-                                            item.productVariant.image?.[0]
-                                              ?.image?.[0] ||
+                                            item.product_randBib.image?.[0] ||
                                             "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
                                           }
                                           onClick={() =>
-                                            handleRepurchase(item.product.slug)
+                                            handleRepurchase(
+                                              item.product_randBib.slug
+                                            )
                                           }
                                           alt="action"
                                           className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded-md"
@@ -641,7 +642,7 @@ const OrderList: React.FC = () => {
 
                                       <div className="flex-1">
                                         <h6 className="text-base lg:text-lg font-semibold text-gray-900">
-                                          {item.productVariant?.variant_name ||
+                                          {item.product_randBib?.product_name ||
                                             "Tên sản phẩm không có"}
                                         </h6>
                                         <div className="text-sm text-gray-500 mt-1">

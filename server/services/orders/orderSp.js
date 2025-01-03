@@ -13,6 +13,42 @@ const OrderService = {
           searchQuery = { ...searchQuery, stateOrder };
         }
 
+        // const orders = await Order.find(searchQuery)
+        //   .sort({ createdAt: -1 })
+        //   .skip(offset)
+        //   .limit(limit)
+        //   .populate({
+        //     path: "shipping",
+        //     match: search
+        //       ? {
+        //           $or: [
+        //             { phoneNumber: { $regex: search, $options: "i" } },
+        //             { recipientName: { $regex: search, $options: "i" } },
+        //           ],
+        //         }
+        //       : undefined,
+        //   })
+        //   .populate("cartDetails")
+        //   .populate("payment")
+        //   .populate({
+        //     path: "voucherIds",
+        //     model: "Voucher",
+        //   })
+        //   .populate({
+        //     path: "cartDetails",
+        //     populate: {
+        //       path: "items.product",
+        //       model: "product_v2",
+        //     },
+        //   })
+        //   .populate({
+        //     path: "cartDetails",
+        //     populate: {
+        //       path: "items.productVariant",
+        //       model: "productVariant",
+        //     },
+        //   })
+        //   .lean();
         const orders = await Order.find(searchQuery)
           .sort({ createdAt: -1 })
           .skip(offset)
@@ -36,17 +72,20 @@ const OrderService = {
           })
           .populate({
             path: "cartDetails",
-            populate: {
-              path: "items.product",
-              model: "product_v2",
-            },
-          })
-          .populate({
-            path: "cartDetails",
-            populate: {
-              path: "items.productVariant",
-              model: "productVariant",
-            },
+            populate: [
+              {
+                path: "items.product",
+                model: "product_v2",
+              },
+              {
+                path: "items.productVariant",
+                model: "productVariant",
+              },
+              {
+                path: "itemAuction.product_randBib",
+                model: "productAuction",
+              },
+            ],
           })
           .lean();
 
@@ -91,6 +130,34 @@ const OrderService = {
           .skip(offset)
           .limit(limit)
           .populate({
+            path: "cartDetails",
+            populate: [
+              {
+                path: "items.product",
+                model: "product_v2",
+              },
+              {
+                path: "items.productVariant",
+                model: "productVariant",
+                populate: [
+                  { path: "image", model: "ImageVariant" },
+                  { path: "battery", model: "Battery" },
+                  { path: "color", model: "Color" },
+                  { path: "cpu", model: "Cpu" },
+                  { path: "operatingSystem", model: "OperatingSystem" },
+                  { path: "ram", model: "Ram" },
+                  { path: "screen", model: "Screen" },
+                  { path: "storage", model: "Storage" },
+                ],
+              },
+              {
+                path: "itemAuction.product_randBib",
+                model: "productAuction",
+              },
+            ],
+          })
+          .populate("payment")
+          .populate({
             path: "shipping",
             match: search
               ? {
@@ -101,25 +168,9 @@ const OrderService = {
                 }
               : undefined,
           })
-          .populate("cartDetails")
-          .populate("payment")
           .populate({
             path: "voucherIds",
             model: "Voucher",
-          })
-          .populate({
-            path: "cartDetails",
-            populate: {
-              path: "items.product",
-              model: "product_v2",
-            },
-          })
-          .populate({
-            path: "cartDetails",
-            populate: {
-              path: "items.productVariant",
-              model: "productVariant",
-            },
           })
           .lean();
 
@@ -186,6 +237,10 @@ const OrderService = {
                   { path: "screen", model: "Screen" },
                   { path: "storage", model: "Storage" },
                 ],
+              },
+              {
+                path: "itemAuction.product_randBib",
+                model: "productAuction",
               },
             ],
           })
