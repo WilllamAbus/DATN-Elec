@@ -162,9 +162,14 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
           confirmationStatus = "Chờ xác nhận";
         } else if (auction.confirmationStatus === "pending" && auction.auctionStatus === "pending") {
           confirmationStatus = "Chờ xử lý";
+        } else if (auction.confirmationStatus === "pending" && auction.auctionStatus === "temporary") {
+          confirmationStatus = "Cần thanh toán"; 
+        } else if (auction.confirmationStatus === "temporary" && auction.auctionStatus === "temporary") {
+          confirmationStatus = "Cần thanh toán";
         } else {
           confirmationStatus = auction.confirmationStatus;
         }
+    
         return (
           <Tooltip content={confirmationStatus} delay={0}>
             <span>

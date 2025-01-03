@@ -4,9 +4,14 @@
     {
       startTime: { type: Date, required: true },  
       endTime: { type: Date, required: true },   
+      remainingTime: { type: String },
       startingPrice: { type: Number, required: true }, 
       maxPrice: { type: Number, required: true },      
       currentPrice: { type: Number},  
+      currentPriceTemporarily: { type: Number },
+      startTimeTemporarily: { type: Date }, 
+      endTimeTemporarily: { type: Date },
+      remainingTimeTemporarily: { type: String },
       priceStep: { type: Number, required: true }, 
       status: { type: String, default: 'active' },   /**'active','ended','deleted' */
       product_randBib:{ type: Schema.Types.ObjectId, ref: 'productAuction' },

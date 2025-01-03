@@ -17,6 +17,7 @@ const cartItemAuctionSchema = new Schema({
   },
   auctionStartTime: { type: Date, default: null },
   auctionEndTime: { type: Date, default: null },
+  remainingTime: { type: String },
   quantity: { type: Number, default: 1 },
   price: { type: Number, required: true },
   totalItemPrice: { type: Number, required: true },

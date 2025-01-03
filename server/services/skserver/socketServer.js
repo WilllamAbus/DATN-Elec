@@ -11,10 +11,10 @@ const initializeSocket = (server) => {
   });
 
   io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+    console.log('ON:', socket.id);
 
     socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
+      console.log('OFF:', socket.id);
     });
   });
 
@@ -23,7 +23,7 @@ const initializeSocket = (server) => {
 
 const getIO = () => {
   if (!io) {
-    throw new Error('Socket.io not initialized');
+    throw new Error('LOI-skserver/socketServer');
   }
   return io;
 };

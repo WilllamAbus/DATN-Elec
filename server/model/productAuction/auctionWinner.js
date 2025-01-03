@@ -28,7 +28,7 @@ const auctionWinnerSchema = new Schema(
     },
     auctionStatus: {
       type: String,
-      enum: ['won', 'pending', 'lose','canceled','temporary'],
+      enum: ['won', 'pending', 'lose','canceled','temporary','expired'],
       default: 'won'
     },
     status: { type: String, default: 'active' },

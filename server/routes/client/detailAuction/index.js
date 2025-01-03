@@ -9,7 +9,10 @@ const {
     processAuctionWinner,
     getUserBiddingHistory,
     getUserBiddingDetails,
-    enterAuctionPrice
+    enterAuctionPrice,
+    checkAuctionTime,
+    checkStatusAuctionPricingRange,
+    highBidderInformation
 } = require('../../../controler/client');
 
 const middlewareController = require("../../../middleware/auth");
@@ -17,7 +20,9 @@ const middlewareController = require("../../../middleware/auth");
 router.post('/create-one-update-bid-auction/:slug', middlewareController.getHeader, createOneUpdateBidAuction);
 router.post('/enter-one-update-bid-auction/:slug', middlewareController.getHeader, enterAuctionPrice);
 router.get('/product-auction/:slug', middlewareController.getHeader, getProductDetailAuction);
-
+router.get('/check-auction-time/:slug', middlewareController.getHeader, checkAuctionTime);
+router.get('/check-status-auction-pricing-range/:slug',checkStatusAuctionPricingRange);
+router.get('/high-bidder-information/:slug',highBidderInformation);
 router.get('/product-auction-win-and-lose/:slug', middlewareController.getHeader, getAuctionDetailsBySlug);
 router.get('/product-auction-check-current-price/:slug', middlewareController.getHeader, getAuctionPricingRange);
 router.get('/bidding-list/:slug', biddingList);

@@ -2,9 +2,11 @@ const getAuctionWinsByUser = require('./getAuctionWinsByUser').getAuctionWinsByU
 const confirmAuction = require('./confirmAuction').confirmAuction;
 const canceledAuction = require('./canceledAuction').canceledAuction;
 const getUserPendingAuctionWins = require('./getUserPendingAuctionWin').getUserPendingAuctionWins;
+const canceledAuctionTemporary = require('./canceledAuctionTemporary').canceledAuctionTemporary;
 module.exports = {
   getAuctionWinsByUser,
   confirmAuction,
   canceledAuction,
-  getUserPendingAuctionWins
+  getUserPendingAuctionWins,
+  canceledAuctionTemporary
 }

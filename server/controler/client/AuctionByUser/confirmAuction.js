@@ -29,13 +29,24 @@ const confirmAuction = async (req, res) => {
     auctionWinner.confirmationStatus = 'confirmed';
     await auctionWinner.save();
 
-    const auctionEndTime = new Date(auctionWinner.startTime);
-    auctionEndTime.setDate(auctionEndTime.getDate() + 3);
+    // Set auction end time to 1 hour from now
+    const auctionEndTime = new Date();
+    auctionEndTime.setHours(auctionEndTime.getHours() + 1);
+
+    // Calculate remaining time
+    const currentTime = new Date();
+    const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+    const remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
 
     const itemAuction = {
       auctionWinner: auctionWinner._id,
-      auctionStartTime: auctionWinner.startTime,
+      auctionStartTime: currentTime, 
       auctionEndTime: auctionEndTime,
+      remainingTime: remainingTimeString,
       price: auctionWinner.bidPrice,
       totalItemPrice: auctionWinner.bidPrice,
       auctionPricingRange: auctionWinner.auctionPricingRange._id,
@@ -77,6 +88,7 @@ const confirmAuction = async (req, res) => {
           auctionWinner: auctionWinner,
           auctionStartTime: itemAuction.auctionStartTime,
           auctionEndTime: itemAuction.auctionEndTime,
+          remainingTime: itemAuction.remainingTime,
           price: itemAuction.price,
           totalItemPrice: itemAuction.totalItemPrice,
           auctionPricingRange: itemAuction.auctionPricingRange,

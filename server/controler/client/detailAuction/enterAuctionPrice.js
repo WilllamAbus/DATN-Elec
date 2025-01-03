@@ -36,17 +36,24 @@ const enterAuctionPrice = async (req, res) => {
     const auctionRoundTopBidError = await checkAuctionRoundTopBid(userId, auctionPricingRange);
     if (auctionRoundTopBidError) return res.status(400).json(auctionRoundTopBidError);
 
-    await updateCurrentPrice(auctionPricingRange, bidPrice);
-    await findOrCreateUserBidPrice(userId, auctionPricingRange, bidPrice);
-    const auctionRound = await updateAuctionRound(auctionPricingRange, userId, bidPrice);
-    const auctionPriceHistory = await handleAuctionPriceHistory(auctionPricingRange, auctionRound, userId, bidPrice);
-    await updateUserAuctionHistory(userId, auctionRound, bidPrice);
-
-    auctionPricingRange.auctionPriceHistory = auctionPriceHistory._id;
-
-    const userName = await findUserName(userId);
-
     if (bidPrice === auctionPricingRange.maxPrice) {
+      // Lưu các giá trị tạm thời
+      auctionPricingRange.currentPriceTemporarily = auctionPricingRange.currentPrice;
+      auctionPricingRange.startTimeTemporarily = auctionPricingRange.startTime;
+      auctionPricingRange.endTimeTemporarily = auctionPricingRange.endTime;
+      auctionPricingRange.remainingTimeTemporarily = auctionPricingRange.remainingTime;
+      await auctionPricingRange.save();
+
+      await updateCurrentPrice(auctionPricingRange, bidPrice);
+      await findOrCreateUserBidPrice(userId, auctionPricingRange, bidPrice);
+      const auctionRound = await updateAuctionRound(auctionPricingRange, userId, bidPrice);
+      const auctionPriceHistory = await handleAuctionPriceHistory(auctionPricingRange, auctionRound, userId, bidPrice);
+      await updateUserAuctionHistory(userId, auctionRound, bidPrice);
+
+      auctionPricingRange.auctionPriceHistory = auctionPriceHistory._id;
+      await auctionPricingRange.save();
+
+      const userName = await findUserName(userId);
       await declareWinner(auctionPricingRange, auctionRound);
 
       getIO().emit('bidPlaced', {
@@ -65,6 +72,15 @@ const enterAuctionPrice = async (req, res) => {
         status: 'temporary',
       });
     }
+
+    await updateCurrentPrice(auctionPricingRange, bidPrice);
+    await findOrCreateUserBidPrice(userId, auctionPricingRange, bidPrice);
+    const auctionRound = await updateAuctionRound(auctionPricingRange, userId, bidPrice);
+    const auctionPriceHistory = await handleAuctionPriceHistory(auctionPricingRange, auctionRound, userId, bidPrice);
+    await updateUserAuctionHistory(userId, auctionRound, bidPrice);
+
+    auctionPricingRange.auctionPriceHistory = auctionPriceHistory._id;
+    await auctionPricingRange.save();
 
     getIO().emit('bidPlaced', { message: `Giá hiện tại đã tăng lên ${bidPrice}!`, userId, bidPrice, slug });
 
