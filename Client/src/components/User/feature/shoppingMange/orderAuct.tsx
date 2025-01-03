@@ -616,23 +616,23 @@ const OrderList: React.FC = () => {
                                 cartDetail.itemAuction?.length > 0 ? (
                                   cartDetail.itemAuction.map((item) => (
                                     <div
-                                      key={item.product_randBib._id}
+                                      key={item.product_randBib?._id}
                                       className="flex items-center gap-6 bg-white p-4 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300"
                                     >
                                       <Link
                                         to={`/product/${
-                                          item.product_randBib.slug || "null"
+                                          item.product_randBib?.slug || "null"
                                         }`}
                                         className="flex-shrink-0"
                                       >
                                         <img
                                           src={
-                                            item.product_randBib.image?.[0] ||
+                                            item.product_randBib?.image?.[0] ||
                                             "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
                                           }
                                           onClick={() =>
                                             handleRepurchase(
-                                              item.product_randBib.slug
+                                              item.product_randBib?.slug
                                             )
                                           }
                                           alt="action"
