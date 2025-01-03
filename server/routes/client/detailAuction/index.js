@@ -4,9 +4,8 @@ const {
     getProductDetailAuction,
     createOneUpdateBidAuction,
     getAuctionDetailsBySlug,
+    getBiddingListAndWinner,
     getAuctionPricingRange,
-    biddingList,
-    processAuctionWinner,
     getUserBiddingHistory,
     getUserBiddingDetails,
     enterAuctionPrice,
@@ -24,9 +23,8 @@ router.get('/check-auction-time/:slug', middlewareController.getHeader, checkAuc
 router.get('/check-status-auction-pricing-range/:slug',checkStatusAuctionPricingRange);
 router.get('/high-bidder-information/:slug',highBidderInformation);
 router.get('/product-auction-win-and-lose/:slug', middlewareController.getHeader, getAuctionDetailsBySlug);
+router.get('/bidding-list/:slug', getBiddingListAndWinner);
 router.get('/product-auction-check-current-price/:slug', middlewareController.getHeader, getAuctionPricingRange);
-router.get('/bidding-list/:slug', biddingList);
-router.post("/process-winner/:slug", processAuctionWinner);
 
 router.get('/user/bidding-history', middlewareController.getHeader, getUserBiddingHistory);
 router.get('/user/bidding-details/:slug', middlewareController.getHeader, getUserBiddingDetails);

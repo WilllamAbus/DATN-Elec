@@ -76,7 +76,7 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
           </p>
           <p className="text-red-600 font-medium">
             Tổng tiền:{" "}
-            {order.cartDetails[0].items[0].totalItemPrice.toLocaleString(
+            {order.cartDetails[0].itemAuction[0].totalItemPrice.toLocaleString(
               "vi-VN",
               {
                 style: "currency",
@@ -136,35 +136,34 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
         <p>{order.payment?.payment_method}</p>
       </div>
 
-      {/* Danh sách sản phẩm */}
       <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 border-gray-200">
           Sản phẩm
         </h3>
         <ul className="space-y-4">
           {order.cartDetails.map((cartDetail) =>
-            cartDetail.items.map((item) => (
+            cartDetail.itemAuction.map((item) => (
               <li
-                key={item.product._id}
+                key={item.product_randBib._id}
                 className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 ease-in-out"
               >
                 <div className="flex items-center space-x-4">
                   {/* Hình ảnh sản phẩm */}
                   <img
                     src={
-                      item?.productVariant?.image?.[0]?.image?.[0] ||
+                      item?.product_randBib?.image?.[0] ||
                       "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
                     }
-                    onClick={() => handleRepurchase(item.product._id)}
+                    onClick={() => handleRepurchase(item.product_randBib._id)}
                     alt={`product ${
-                      item.productVariant?.variant_name || "Unknown"
+                      item.product_randBib?.product_name || "Unknown"
                     }`}
                     className="w-20 h-20 object-cover rounded-lg border border-gray-200 cursor-pointer hover:scale-105 transform transition-transform duration-200"
                   />
 
                   <div>
                     <h4 className="font-medium text-lg text-gray-900 mb-1">
-                      {item.productVariant.variant_name}
+                      {item.product_randBib.product_name}
                     </h4>
                     <p className="text-sm text-gray-500">
                       Số lượng: {item.quantity}
@@ -172,7 +171,7 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
                   </div>
                 </div>
                 <p className="text-lg font-semibold text-gray-700">
-                  {item.productVariant.variant_price.toLocaleString("vi-VN", {
+                  {item.price.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}

@@ -309,14 +309,49 @@ const authController = {
         payment: paymentInfo,
       } = req.body;
       // Kiểm tra giỏ hàng
-      const cart = await Cart.findById(cartId).populate({
-        path: "itemAuction.auctionPricingRange", // Populate auctionPricingRange
-        select: "product_randBib", // Chỉ lấy trường cần thiết
-      });
+      const cart = await Cart.findById(cartId).populate([
+        {
+          path: "itemAuction.auctionPricingRange",
+          select: "product_randBib status",
+        },
+        {
+          path: "itemAuction.auctionWinner", // Populate auctionWinner
+          select: "auctionStatus", // Chỉ lấy trường cần thiết
+        },
+      ]);
+
       if (!cart) {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
+
       const selectedItems = cart.itemAuction.filter((item) => item.isSelected);
+
+      if (!selectedItems || selectedItems.length === 0) {
+        return res
+          .status(400)
+          .json({ message: "Không có sản phẩm nào được chọn để tạo đơn hàng" });
+      }
+
+      // Cập nhật trạng thái sau khi tạo đơn hàng
+      for (const item of selectedItems) {
+        const auctionPricingRange = item.auctionPricingRange;
+        const auctionWinner = item.auctionWinner;
+
+        if (auctionPricingRange) {
+          auctionPricingRange.status = "paid"; // Cập nhật trạng thái của auctionPricingRange
+          await auctionPricingRange.save(); // Lưu thay đổi vào cơ sở dữ liệu
+        }
+
+        if (auctionWinner) {
+          auctionWinner.auctionStatus = "paid"; // Cập nhật trạng thái của auctionWinner
+          await auctionWinner.save(); // Lưu thay đổi vào cơ sở dữ liệu
+        }
+      }
+
+      if (!cart) {
+        return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
+      }
+      // const selectedItems = cart.itemAuction.filter((item) => item.isSelected);
       if (!selectedItems || selectedItems.length === 0) {
         return res
           .status(400)

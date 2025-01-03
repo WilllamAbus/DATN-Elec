@@ -483,7 +483,8 @@ const CheckoutPage: React.FC = () => {
         {
           _id: cart?._id,
           order: orderIdParam || "",
-          items: cart?.itemAuction.map((item: itemAuction) => ({
+          items: [],
+          itemAuction: cart?.itemAuction.map((item: itemAuction) => ({
             // product: {
             //   ...item.product,
             //   product_attributes: item.product.product_attributes.map(

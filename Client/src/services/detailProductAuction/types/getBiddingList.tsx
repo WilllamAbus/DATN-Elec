@@ -35,10 +35,3 @@ export interface BiddingListResponse {
     pagination: Pagination;
   };
 }
-
-
-export interface AuctionWinner {
-  _id: string;
-  user: User;
-  bidPrice: number;
-}
