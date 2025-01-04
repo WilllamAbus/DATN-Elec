@@ -50,8 +50,8 @@ export const links: Record<string, Link[]> = {
     { label: "Sản phẩm đấu giá", to: "/admin/list-auction" },
     { label: "Nhập hàng đấu giá", to: "/admin/listInboundV2" },
     { label: "Kho hàng đấu giá", to: "/admin/listInventoryV2" },
-    { label: "Phiên đấu giá", to: "/admin/listPriceRandAuct" },
-    { label: "Thiết lập phiên", to: "/admin/triggerAuct" },
+    // { label: "Phiên đấu giá", to: "/admin/listPriceRandAuct" },
+    { label: "Thiết lập phiên đấu giá", to: "/admin/triggerAuct" },
 
     { label: "Danh sách duyệt ", to: "/admin/listCheckAuct" },
     // { label: "Danh sách cảnh báo", to: "/admin/listEnableAuct" },
