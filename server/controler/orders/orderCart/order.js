@@ -410,6 +410,7 @@ const authController = {
           payment_date: paymentInfo.payment_date || new Date(),
           payment_method: paymentInfo.payment_method,
         });
+
         await newPayment.save();
         paymentId = newPayment._id;
       }
@@ -763,6 +764,10 @@ const authController = {
           populate: {
             path: "items.product",
             model: "product_v2",
+          },
+          populate: {
+            path: "items.productVariant",
+            model: "productVariant",
           },
         })
 

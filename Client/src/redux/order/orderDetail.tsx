@@ -6,7 +6,7 @@ import {
   getAllOrderDetails,
   getAllOUserOrderdetails,
 } from "../../services/order/orderDetail";
-import { Order, OrderItem } from "../../types/order/order";
+import { itemAuction, Order, OrderItem } from "../../types/order/order";
 
 // export const getOrderDetailByIdThunk = createAsyncThunk<
 //   { order: Order[]; items: any[] },
@@ -34,7 +34,7 @@ import { Order, OrderItem } from "../../types/order/order";
 // Thunk to fetch order detail by ID
 // orderSlice.ts
 export const getOrderDetailByIdThunk = createAsyncThunk<
-  { order: Order[]; items: OrderItem[] },
+  { order: Order[]; items: OrderItem[]; itemAuction?: itemAuction[] },
   string,
   { rejectValue: string }
 >("order/getOrderDetailById", async (orderId, { rejectWithValue }) => {
@@ -51,6 +51,7 @@ export const getOrderDetailByIdThunk = createAsyncThunk<
     return {
       order: response.order,
       items: response.items,
+      itemAuction: response.itemAuction,
     };
   } catch (error) {
     return rejectWithValue((error as Error).message);

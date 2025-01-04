@@ -1,6 +1,3 @@
-
-
-
 export const breadcrumbItems = {
   listProducts: [
     { href: "/admin", label: "Trang quản trị" },
@@ -26,7 +23,6 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Trang quản trị" },
     { href: "/admin/list-post", label: "Danh sách bài viết" },
   ],
-
 
   listInbounds: [
     { href: "/admin", label: "Trang quản trị" },
@@ -124,7 +120,6 @@ export const breadcrumbItems = {
     { href: "/admin", label: "Trang quản trị" },
     { href: "/admin/delete-list-auction", label: "danh sách xóa mềm đấu giá" },
   ],
-
 
   addProductV2: [
     { href: "/admin", label: "Trang quản trị" },
@@ -283,6 +278,7 @@ export const breadcrumbItems = {
   orderCart: [
     { href: "/admin", label: "Trang quản trị" },
     { href: "/admin/listOrders", label: "Danh sách đơn hàng" },
+    { href: "/admin/listOrdersAuction", label: "Danh sách đơn hàng đấu giá" },
   ],
   listDetailOrder: [
     { href: "/admin", label: "Trang quản trị" },

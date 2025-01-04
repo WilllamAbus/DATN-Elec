@@ -2,130 +2,82 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store";
 import {
-  cancelOrderAdminThunk,
-  deleteOrderAdminThunk,
+  restoreOrderAdminThunk,
+  listSoftOrderThunk,
 } from "../../../../redux/order/Admin/orderAdmin";
-// import { listOrderThunk } from "../../../../redux/order/orderThunks";
+
 import "../../../../assets/css/admin.style.css";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { Order } from "../../../../types/order/order";
-import withReactContent from "sweetalert2-react-content";
 
-import { fetchPaginatedOrder } from "../../../../redux/order/pagiOrder/pagination";
-import handleExportPDF from "../../../../hooks/ExportInvoice";
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Pagination,
-} from "@nextui-org/react";
+import withReactContent from "sweetalert2-react-content";
+import { Pagination } from "@nextui-org/react";
+
 const MySwal = withReactContent(Swal);
 
-const ListOrders: React.FC = () => {
+const ListOrdersDelete: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const Order = useSelector((state: RootState) => state.orderPagi.orders || []);
+
+  const Order = useSelector(
+    (state: RootState) => state.order.softDeletedOrders || []
+  );
 
   const currentPage = useSelector(
-    (state: RootState) => state.orderPagi.pagination?.currentPage || 1
+    (state: RootState) => state.order.pagination?.currentPage || 1
   );
   const totalPages = useSelector(
-    (state: RootState) => state.orderPagi.pagination?.totalPages || 1
+    (state: RootState) => state.order.pagination?.totalPages || 1
   );
 
   const [filter, setFilter] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const filteredOrders = Order.filter((order) =>
-    order.cartDetails.every(
-      (cartDetail) =>
-        cartDetail.items.length > 0 || cartDetail.itemAuction.length === 0
-    )
-  ).map((order) => ({
-    ...order,
-    cartDetails: order.cartDetails.map((cartDetail) => ({
-      ...cartDetail,
-      itemAuction: cartDetail.itemAuction ?? [], // Nếu itemAuction không có, gán là mảng rỗng
-    })),
-  }));
 
   useEffect(() => {
     dispatch(
-      fetchPaginatedOrder({
+      listSoftOrderThunk({
         page: currentPage,
         search: searchTerm,
         stateOrder: filter === "Tất cả" ? undefined : filter,
       })
     );
   }, [dispatch, currentPage, searchTerm]);
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const SearchTerm = event.target.value;
-    setSearchTerm(SearchTerm);
-    dispatch(
-      fetchPaginatedOrder({
-        page: 1,
-        search: searchTerm,
-      })
-    );
-  };
-
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedFilter = event.target.value;
     setFilter(selectedFilter);
 
     dispatch(
-      fetchPaginatedOrder({
+      listSoftOrderThunk({
         page: 1,
         search: searchTerm,
         stateOrder: selectedFilter === "Tất cả" ? undefined : selectedFilter,
       })
     );
   };
-
-  const handleCancelOrder = async (orderId: string) => {
-    MySwal.fire({
-      title: "Hủy đơn hàng?",
-      text: "Bạn có chắc muốn hủy đơn hàng này không?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Có",
-      cancelButtonText: "Hủy",
-    }).then(async (result: SweetAlertResult) => {
-      if (result.isConfirmed) {
-        try {
-          await dispatch(cancelOrderAdminThunk({ orderId })).unwrap();
-          dispatch(
-            fetchPaginatedOrder({
-              page: currentPage,
-              search: searchTerm,
-            })
-          );
-          toast.success("Đơn hàng của bạn đã bị hủy.");
-        } catch (error) {
-          toast.error("Đã xảy ra sự cố khi hủy đơn hàng.");
-        }
-      }
-    });
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const SearchTerm = event.target.value;
+    setSearchTerm(SearchTerm);
+    dispatch(
+      listSoftOrderThunk({
+        page: 1,
+        search: searchTerm,
+      })
+    );
   };
   const handlePageChange = (page: number) => {
     dispatch(
-      fetchPaginatedOrder({
+      listSoftOrderThunk({
         page,
         search: searchTerm,
         stateOrder: filter === "Tất cả" ? undefined : filter,
       })
     );
   };
-
-  const handleDeleteOrder = async (orderId: string) => {
+  const handlrestoreOrder = async (orderId: string) => {
     MySwal.fire({
-      title: "Xóa đơn hàng?",
-      text: "Bạn có chắc muốn xóa đơn hàng này không?",
+      title: "Khôi phục đơn hàng?",
+      text: "Bạn có chắc muốn khôi phục đơn hàng này không?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -135,62 +87,24 @@ const ListOrders: React.FC = () => {
     }).then(async (result: SweetAlertResult) => {
       if (result.isConfirmed) {
         try {
-          await dispatch(deleteOrderAdminThunk({ orderId })).unwrap();
+          await dispatch(restoreOrderAdminThunk({ orderId })).unwrap();
           dispatch(
-            fetchPaginatedOrder({
+            listSoftOrderThunk({
               page: currentPage,
               search: searchTerm,
             })
           );
-          toast.success("Đơn hàng đã được xóa.");
+          toast.success("Đơn hàng đã được khôi phục.");
         } catch (error) {
-          toast.error("Đã xảy ra sự cố khi xóa đơn hàng.");
+          console.error("Lỗi khi khôi phục đơn hàng:", error);
+          toast.error("Đã xảy ra sự cố khi khôi phục đơn hàng.");
         }
       }
     });
   };
 
-  const navigate = useNavigate();
-  const handleAction = (action: string, order: Order) => {
-    switch (action) {
-      case "cancel":
-        if (
-          order.stateOrder !== "Chờ xử lý" &&
-          order.stateOrder !== "Đã xác nhận"
-        ) {
-          toast.error("Không thể hủy đơn ở trạng thái này.");
-          return;
-        }
-        handleCancelOrder(order._id!);
-        break;
-      case "delete":
-        if (
-          order.stateOrder !== "Hủy đơn hàng" &&
-          order.stateOrder !== "Hoàn tất" &&
-          order.stateOrder !== "Đã hoàn tiền" &&
-          order.stateOrder !== "Giao hàng không thành công"
-        ) {
-          toast.error("Chỉ có thể xóa đơn đã bị hủy hoặc hoàn tất.");
-          return;
-        }
-        handleDeleteOrder(order._id!);
-        break;
-      case "viewDetails":
-        navigate(`/admin/listDetailOrder/${order._id}`);
-        break;
-      case "export":
-        handleExportPDF(order);
-        break;
-      default:
-        break;
-    }
-  };
-
-  // const totalAmount = Order.reduce((sum, order) => sum + order.totalAmount, 0);
-  const totalAmount = Order.filter(
-    (order) =>
-      order.stateOrder !== "Hủy đơn hàng" && order.stateOrder !== "Đã hoàn tiền"
-  ).reduce((sum, order) => sum + order.totalAmount, 0);
+  // Tính tổng số tiền của tất cả đơn hàng
+  const totalAmount = Order.reduce((sum, order) => sum + order.totalAmount, 0);
 
   return (
     <>
@@ -219,9 +133,9 @@ const ListOrders: React.FC = () => {
                 className="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
               >
                 <option value="Tất cả">Tất cả</option>
-                <option value="Chờ xử lý">Chờ xử lý</option>
+                {/* <option value="Chờ xử lý">Chờ xử lý</option>
                 <option value="Đã xác nhận">Đã xác nhận</option>
-                <option value="Đang vận chuyển">Đang vận chuyển</option>
+                <option value="Đang vận chuyển">Đang vận chuyển</option> */}
                 <option value="Hoàn tất">Hoàn tất</option>
                 <option value="Hủy đơn hàng">Hủy đơn hàng</option>
                 <option value="Đã hoàn tiền">Đã hoàn tiền</option>
@@ -258,10 +172,22 @@ const ListOrders: React.FC = () => {
           </form>
         </div>
       </div>
-
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
+            <th scope="col" className="p-4">
+              <div className="flex items-center">
+                <input
+                  id="checkbox-all-orders"
+                  type="checkbox"
+                  className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="checkbox-all-orders" className="sr-only">
+                  checkbox
+                </label>
+              </div>
+            </th>
+
             <th scope="col" className="p-4">
               STT
             </th>
@@ -283,12 +209,28 @@ const ListOrders: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order, index) => (
+          {Order.length > 0 ? (
+            Order.map((order, index) => (
               <tr
                 key={order._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
+                <td className="p-4 w-4">
+                  <div className="flex items-center">
+                    <input
+                      id={`checkbox-order-${order._id}`}
+                      type="checkbox"
+                      className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label
+                      htmlFor={`checkbox-order-${order._id}`}
+                      className="sr-only"
+                    >
+                      checkbox
+                    </label>
+                  </div>
+                </td>
+
                 <th
                   scope="row"
                   className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -296,7 +238,7 @@ const ListOrders: React.FC = () => {
                   {index + 1}
                 </th>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {order.shipping.phoneNumber}
+                  {order.shipping?.phoneNumber || "Không có số điện thoại"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   {order.shipping.recipientName.length > 15
@@ -470,90 +412,26 @@ const ListOrders: React.FC = () => {
                   </span>
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light text-primary-600">
-                  {order.totalAmount.toLocaleString("vi-VN", {
+                  {order.totalAmount?.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  })}
+                  }) || "0 VND"}
                 </td>
-
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button
-                          variant="bordered"
-                          className="flex items-center justify-between px-4 py-2 text-gray-800 bg-white border border-gray-300 rounded-lg shadow-md hover:bg-gray-100 hover:border-gray-400 transition duration-200"
-                        >
-                          <span className="flex items-center">
-                            <i className="iconify mdi--dots-vertical w-5 h-5 mr-2 text-gray-600" />
-                            Hành động
-                          </span>
-                          <i className="iconify mdi--chevron-down w-4 h-4 text-gray-600" />
-                        </Button>
-                      </DropdownTrigger>
+                    <button
+                      className={`flex items-center border font-medium rounded-lg text-sm px-3 py-2 text-center text-blue-700 bg-blue-200 hover:text-white border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900`}
+                      onClick={() => handlrestoreOrder(order._id!)}
+                    >
+                      Khôi phục
+                    </button>
 
-                      <DropdownMenu
-                        variant="faded"
-                        aria-label="Menu hành động đơn hàng"
-                      >
-                        <DropdownItem
-                          key="cancel"
-                          onClick={() => handleAction("cancel", order)}
-                          startContent={
-                            <i className="iconify mdi--cancel w-5 h-5 text-yellow-500 mr-2" />
-                          }
-                          isDisabled={
-                            !(
-                              order.stateOrder === "Chờ xử lý" ||
-                              order.stateOrder === "Đã xác nhận"
-                            )
-                          }
-                        >
-                          Hủy đơn
-                        </DropdownItem>
-
-                        <DropdownItem
-                          key="delete"
-                          color="danger"
-                          onClick={() => handleAction("delete", order)}
-                          startContent={
-                            <i className="iconify mdi--delete w-5 h-5 text-red-500 mr-2" />
-                          }
-                          isDisabled={
-                            !(
-                              order.stateOrder === "Hủy đơn hàng" ||
-                              order.stateOrder === "Hoàn tất" ||
-                              order.stateOrder === "Đã hoàn tiền" ||
-                              order.stateOrder === "Giao hàng không thành công"
-                            )
-                          }
-                        >
-                          Xóa đơn
-                        </DropdownItem>
-
-                        <DropdownItem
-                          key="viewDetails"
-                          onClick={() =>
-                            navigate(`/admin/listDetailOrder/${order._id}`)
-                          }
-                          startContent={
-                            <i className="iconify mdi--eye w-5 h-5 text-blue-500 mr-2" />
-                          }
-                        >
-                          Xem chi tiết
-                        </DropdownItem>
-
-                        <DropdownItem
-                          key="export"
-                          onClick={() => handleExportPDF(order)}
-                          startContent={
-                            <i className="iconify mdi--file-pdf-box w-5 h-5 text-green-500 mr-2" />
-                          }
-                        >
-                          Xuất hóa đơn
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
+                    <Link
+                      to={`/admin/listDetailOrder/${order._id}`}
+                      className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    >
+                      Xem chi tiết
+                    </Link>
                   </div>
                 </td>
               </tr>
@@ -566,9 +444,9 @@ const ListOrders: React.FC = () => {
             </tr>
           )}
         </tbody>
+
         <ToastContainer />
       </table>
-
       <div className="flex justify-center my-4">
         <Pagination
           isCompact
@@ -585,4 +463,4 @@ const ListOrders: React.FC = () => {
   );
 };
 
-export default ListOrders;
+export default ListOrdersDelete;

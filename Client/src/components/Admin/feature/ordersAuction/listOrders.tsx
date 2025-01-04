@@ -42,13 +42,13 @@ const ListOrders: React.FC = () => {
   const filteredOrders = Order.filter((order) =>
     order.cartDetails.every(
       (cartDetail) =>
-        cartDetail.items.length > 0 || cartDetail.itemAuction.length === 0
+        cartDetail.itemAuction.length > 0 || cartDetail.items.length === 0
     )
   ).map((order) => ({
     ...order,
     cartDetails: order.cartDetails.map((cartDetail) => ({
       ...cartDetail,
-      itemAuction: cartDetail.itemAuction ?? [], // Nếu itemAuction không có, gán là mảng rỗng
+      items: cartDetail.items ?? [], // Loại bỏ itemAuction
     })),
   }));
 
@@ -176,7 +176,7 @@ const ListOrders: React.FC = () => {
         handleDeleteOrder(order._id!);
         break;
       case "viewDetails":
-        navigate(`/admin/listDetailOrder/${order._id}`);
+        navigate(`/admin/detailOrderAuction/${order._id}`);
         break;
       case "export":
         handleExportPDF(order);
@@ -534,7 +534,7 @@ const ListOrders: React.FC = () => {
                         <DropdownItem
                           key="viewDetails"
                           onClick={() =>
-                            navigate(`/admin/listDetailOrder/${order._id}`)
+                            navigate(`/admin/detailOrderAuction/${order._id}`)
                           }
                           startContent={
                             <i className="iconify mdi--eye w-5 h-5 text-blue-500 mr-2" />

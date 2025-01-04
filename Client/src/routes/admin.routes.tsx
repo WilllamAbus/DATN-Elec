@@ -13,7 +13,6 @@ const AdminListCategories = React.lazy(
   () => import("../page/Admin/categories/listCategories")
 );
 
-
 /**ProductsV2 */
 const AdminAddProductV2 = React.lazy(
   () => import("../page/Admin/product/add/add")
@@ -130,7 +129,6 @@ const AdminListDetailComments = React.lazy(
 
 /**ConditionAuc */
 
-
 /**CustomerService */
 const AdminListCService = React.lazy(
   () => import("../page/Admin/customerService/listCService")
@@ -153,6 +151,13 @@ const AdminListOrder = React.lazy(
 const AdminDetailsOrder = React.lazy(
   () => import("../page/Admin/orders/detailsOrder")
 );
+/**OrderAuction */
+const AdminListOrderAuction = React.lazy(
+  () => import("../page/Admin/ordersAuction/listOrder")
+);
+const AdminDetailsOrderAuction = React.lazy(
+  () => import("../page/Admin/ordersAuction/detailsOrder")
+);
 
 /**productionAuc */
 const AdminAddProdAuc = React.lazy(
@@ -164,7 +169,6 @@ const AdminEditProdAuc = React.lazy(
 const AdminListProdAuc = React.lazy(
   () => import("../page/Admin/productTime/list")
 );
-
 
 /**priceRand */
 const AdminAddPriceRand = React.lazy(
@@ -236,7 +240,6 @@ const AdminEditInboundV2 = React.lazy(
   () => import("../page/Admin/inbound/editInboundV2")
 );
 
-
 //Inventory
 const AdminAddInventory = React.lazy(
   () => import("../page/Admin/inventory/addInventory")
@@ -253,21 +256,20 @@ const AdminListInventoryV2 = React.lazy(
   () => import("../page/Admin/inventory/listInventoryV2")
 );
 
-// OrderAuction 
-const AdminListOrderAuction = React.lazy(
-  () => import("../page/Admin/orderAuction/listOrder")
-);
+// OrderAuction
+// const AdminListOrderAuction = React.lazy(
+//   () => import("../page/Admin/orderAuction/listOrder")
+// );
 const AdminListRecybinOrderAuction = React.lazy(
   () => import("../page/Admin/orderAuction/recycleBinOrderAuction")
 );
 
-const AdminDetailOrderAuction = React.lazy(
-  () => import("../page/Admin/orderAuction/detailsOrderAuction")
-);
+// const AdminDetailOrderAuction = React.lazy(
+//   () => import("../page/Admin/orderAuction/detailsOrderAuction")
+// );
 const AdminDetailOrderAuctionFrCash = React.lazy(
   () => import("../page/Admin/orderAuction/detailOrderCash")
 );
-
 
 const AdminAucPriceRandList = React.lazy(
   () => import("../page/Admin/priceRandAuc/listPriceRanAuct")
@@ -282,8 +284,6 @@ const AdminAucPriceRandEdit = React.lazy(
 const AdminAucPriceRandRecy = React.lazy(
   () => import("../page/Admin/priceRandAuc/listRecyPriceRandAuct")
 );
-
-
 
 const AdminListCheckAuct = React.lazy(
   () => import("../page/Admin/auctionCheckDisable/isCheckedAucDisable")
@@ -322,16 +322,34 @@ const AdminRoutes: RouteObject[] = [
       { path: "list-post", element: <AdminFetPostList /> },
       { path: "add-product-auction", element: <AdminFetAddProductAuction /> },
       { path: "list-auction", element: <AdminFetListProductAuction /> },
-      { path: "delete-list-auction", element: <AdminFetDeleteListProductAuction /> },
+      {
+        path: "delete-list-auction",
+        element: <AdminFetDeleteListProductAuction />,
+      },
       { path: "product/:productId/addvariant", element: <AdminAddVariant /> },
       { path: "product/:variantId", element: <AdminFetEditVariant /> },
-      { path: "product/:product_variant_id/add-image-variant", element: <AdminFetAddImageVariant /> },
-      { path: "edit-image-and-color/:imageId", element: <AdminFetEditImageVariant /> },
+      {
+        path: "product/:product_variant_id/add-image-variant",
+        element: <AdminFetAddImageVariant />,
+      },
+      {
+        path: "edit-image-and-color/:imageId",
+        element: <AdminFetEditImageVariant />,
+      },
       { path: "listproduct", element: <AdminListProductV2 /> },
-      { path: "list-product-variant/:productId", element: <AdminFetVariantsByProductId /> },
-      { path: "list-image-and-color/:variantId", element: <AdminFetImageByVariantId /> },
+      {
+        path: "list-product-variant/:productId",
+        element: <AdminFetVariantsByProductId />,
+      },
+      {
+        path: "list-image-and-color/:variantId",
+        element: <AdminFetImageByVariantId />,
+      },
       { path: "editproduct/:id", element: <AdminEditProductV2 /> },
-      { path: "edit-product-auction/:id", element: <AdminFetEditProductAuction /> },
+      {
+        path: "edit-product-auction/:id",
+        element: <AdminFetEditProductAuction />,
+      },
       { path: "add-screen", element: <AdminAddScreen /> },
       { path: "add-ram", element: <AdminAddRam /> },
       { path: "edit-screen/:screenId", element: <AdminEditScreen /> },
@@ -360,7 +378,7 @@ const AdminRoutes: RouteObject[] = [
       { path: "listBuyingFormat", element: <AdminListBuyingFormat /> },
       { path: "listComments", element: <AdminListComments /> },
       { path: "listDetailComments/:id", element: <AdminListDetailComments /> },
-  
+
       { path: "listCusSer", element: <AdminListCService /> },
       { path: "addVouchers", element: <AdminAddVoucher /> },
       { path: "editVouchers/:id", element: <AdminEditVoucher /> },
@@ -388,21 +406,23 @@ const AdminRoutes: RouteObject[] = [
       { path: "listUser", element: <AdminListUser /> },
       { path: "listDelete", element: <AdminListDeleted /> },
       { path: "editUser", element: <AdminEditUser /> },
-      { path: "listOrderAuction", element: <AdminListOrderAuction /> },
-      { path: "detailOrderAuction/:id", element: <AdminDetailOrderAuction /> },
-      { path: "detailOrderAuctionFrCash/:id", element: <AdminDetailOrderAuctionFrCash /> },
+      { path: "OrderAuction", element: <AdminListOrderAuction /> },
+      { path: "detailOrderAuction/:id", element: <AdminDetailsOrderAuction /> },
+      {
+        path: "detailOrderAuctionFrCash/:id",
+        element: <AdminDetailOrderAuctionFrCash />,
+      },
       { path: "recBinOrderAuction", element: <AdminListRecybinOrderAuction /> },
 
       { path: "listPriceRandAuct", element: <AdminAucPriceRandList /> },
       { path: "addPriceRandAuct", element: <AdminAucPriceRandAdd /> },
       { path: "editPriceRandAuct/:id", element: <AdminAucPriceRandEdit /> },
-      { path: "triggerAuct", element: < AdminAucPriceRandRecy/> },
-
+      { path: "triggerAuct", element: <AdminAucPriceRandRecy /> },
 
       { path: "listCheckAuct", element: <AdminListCheckAuct /> },
       { path: "listEnableAuct", element: <AdminListEnableAuct /> },
       { path: "detailDisableCheck/:id", element: <AdminDetalDisableAuct /> },
-      { path: "detailEnable/:id", element: < AdminDetalEnableAuct/> },
+      { path: "detailEnable/:id", element: <AdminDetalEnableAuct /> },
       { path: "*", element: <Dashboard /> },
     ],
   },
