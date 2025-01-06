@@ -549,8 +549,8 @@ const OrderDetails: React.FC = () => {
         <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Sản Phẩm</h2>
           <div className="space-y-4">
-            {itemAuction.length ? (
-              itemAuction.map((item, index) => (
+            {itemAuction?.length ? (
+              itemAuction?.map((item, index) => (
                 <div
                   key={item?.product_randBib?._id || index}
                   className="flex justify-between items-center p-4 bg-gray-100 rounded-lg shadow-md transition-all duration-200 hover:bg-gray-200"
