@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const config = require("../../../config/default.json");
+const config = require("../../../config/defaultv1.json");
 const Order = require("../../../model/orders/orderCart/orders");
 const querystring = require("qs");
 const request = require("request");

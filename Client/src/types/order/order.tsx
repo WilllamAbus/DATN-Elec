@@ -45,7 +45,14 @@ export interface CartDetail {
     _id: string;
   }[];
 }
-
+export interface itemAuction {
+  product_randBib: ProductAuction;
+  quantity: number;
+  price: number;
+  totalItemPrice: number;
+  inventory: string | null;
+  _id: string;
+}
 export interface Payment {
   amount: number;
   payment_method: string;

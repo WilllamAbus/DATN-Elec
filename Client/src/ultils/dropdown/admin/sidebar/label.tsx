@@ -9,7 +9,8 @@ export const labels: Record<string, string> = {
   product: "Sản phẩm",
   inbound: "Nhập hàng",
   orderCart: "Đơn hàng",
+  orderAuction: "Đơn hàng đấu giá",
   post: "Bài viết",
-  attribute:"Biến thể",
-  auctions:"Đấu giá"
+  attribute: "Biến thể",
+  auctions: "Đấu giá",
 };

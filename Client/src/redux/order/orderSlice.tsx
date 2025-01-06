@@ -24,6 +24,7 @@ import {
   listSoftOrderThunk,
 } from "./Admin/orderAdmin";
 import {
+  itemAuction,
   LimitCrudOrderResponse,
   Order,
   OrderItem,
@@ -38,7 +39,7 @@ interface OrderState {
   order: Order[] | null;
 
   items: OrderItem[];
-
+  itemAuction: itemAuction[];
   pagination: Pagination | null;
   softDeletedOrders: Order[];
 
@@ -50,6 +51,7 @@ const initialState: OrderState = {
   selectedOrder: null,
   selectedOrderAuction: null,
   items: [],
+  itemAuction: [],
   orders: [],
   order: null,
   pagination: null,
@@ -295,10 +297,15 @@ const orderSlice = createSlice({
         getOrderDetailByIdThunk.fulfilled,
         (
           state,
-          action: PayloadAction<{ order: Order[]; items: OrderItem[] }>
+          action: PayloadAction<{
+            order: Order[];
+            items: OrderItem[];
+            itemAuction?: itemAuction[];
+          }>
         ) => {
           state.order = action.payload.order;
           state.items = action.payload.items;
+          state.itemAuction = action.payload.itemAuction || [];
         }
       )
       .addCase(getOrderDetailByIdThunk.rejected, (state, action) => {

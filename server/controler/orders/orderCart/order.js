@@ -371,45 +371,72 @@ const authController = {
           .json({ message: "Thông tin giao hàng không được cung cấp" });
       }
       // Xử lý thanh toán
+      // Xử lý thanh toán
       let paymentId = null;
+
       if (paymentInfo.payment_method === "vnPay") {
+        // Kiểm tra giao dịch VNPay
         const existingVnpay = await Vnpay.findOne({
           transaction: paymentInfo.order_info,
         });
+
         if (!existingVnpay) {
           return res
             .status(400)
             .json({ message: "Giao dịch VNPay không tồn tại" });
         }
+
+        // Kiểm tra nếu thanh toán đã tồn tại
         const existingPayment = await Payment.findOne({
           order_info: paymentInfo.order_info,
+          payment_method: "vnPay", // Kiểm tra phương thức thanh toán
         });
+
         if (existingPayment) {
           return res
             .status(400)
-            .json({ message: "Giao dịch đã tồn tại trong Payment" });
+            .json({ message: "Giao dịch VNPay đã tồn tại" });
         }
+
         const newPayment = new Payment({
-          amount: paymentInfo.amount || 0,
-          order_info: paymentInfo.order_info,
-          payment_date: paymentInfo.payment_date || new Date(),
+          amount: paymentInfo?.amount || 0,
+          order_info: paymentInfo?.order_info || "null",
+          payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: "vnPay",
         });
+
         await newPayment.save();
         paymentId = newPayment._id;
-      } else if (paymentInfo.payment_method !== "Thanh toán khi nhận hàng") {
+      } else if (paymentInfo.payment_method === "Thanh toán khi nhận hàng") {
+        // Lưu giao dịch với phương thức thanh toán "cash"
+        const newPayment = new Payment({
+          amount: paymentInfo?.amount || 0,
+          order_info: paymentInfo?.order_info || "null",
+          payment_date: paymentInfo?.payment_date || new Date(),
+          payment_method: "Thanh toán khi nhận hàng",
+        });
+
+        await newPayment.save();
+        paymentId = newPayment._id;
+      } else {
+        // Kiểm tra nếu thanh toán không phải VNPay hoặc cash
         const existingPayment = await Payment.findOne({
           order_info: paymentInfo.order_info,
+          payment_method: paymentInfo.payment_method, // Kiểm tra theo phương thức thanh toán
         });
+
         if (existingPayment) {
           return res.status(400).json({ message: "Giao dịch đã tồn tại" });
         }
+
         const newPayment = new Payment({
-          amount: paymentInfo.amount || 0,
-          order_info: paymentInfo.order_info,
-          payment_date: paymentInfo.payment_date || new Date(),
-          payment_method: paymentInfo.payment_method,
+          amount: paymentInfo?.amount || 0,
+          order_info: paymentInfo?.order_info || "null",
+          payment_date: paymentInfo?.payment_date || new Date(),
+          payment_method:
+            paymentInfo?.payment_method || "Chưa chọn phương thức",
         });
+
         await newPayment.save();
         paymentId = newPayment._id;
       }
@@ -601,6 +628,79 @@ const authController = {
       });
     }
   },
+  // cancelOrder: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
+  //     const { orderId } = req.params;
+  //     const { cancelReason } = req.body;
+
+  //     const order = await Order.findOne({
+  //       _id: orderId,
+  //       user: userId,
+  //       isDeleted: false,
+  //     }).populate("payment");
+
+  //     if (!order) {
+  //       return res
+  //         .status(404)
+  //         .json({ message: "Order not found or does not belong to this user" });
+  //     }
+
+  //     if (
+  //       order.stateOrder !== "Chờ xử lý" &&
+  //       order.stateOrder !== "Đã xác nhận"
+  //     ) {
+  //       return res.status(400).json({
+  //         message:
+  //           "Order cannot be canceled. Only orders with 'Chờ xử lý' or 'Đã xác nhận' status can be canceled.",
+  //       });
+  //     }
+
+  //     // Kiểm tra phương thức thanh toán
+  //     if (order.payment.payment_method === "Thanh toán khi nhận hàng") {
+  //       // Nếu là "Thanh toán khi nhận hàng", không cần lấy thông tin ngân hàng
+  //       order.stateOrder = "Hủy đơn hàng";
+  //       order.cancelReason = cancelReason;
+  //     } else {
+  //       // Nếu là phương thức thanh toán khác, lấy thông tin ngân hàng
+  //       const user = await User.findById(userId).populate("banks");
+  //       if (!user) {
+  //         return res.status(404).json({ message: "User not found" });
+  //       }
+
+  //       const defaultBank =
+  //         user.banks.find((bank) => bank.isDefault) || user.banks[0];
+
+  //       if (!defaultBank) {
+  //         return res.status(400).json({
+  //           message: "No bank information found for the user",
+  //         });
+  //       }
+
+  //       // Cập nhật thông tin ngân hàng
+  //       order.stateOrder = "Hủy đơn hàng";
+  //       order.cancelReason = cancelReason;
+  //       order.refundBank = {
+  //         bankName: defaultBank.name,
+  //         accountNumber: defaultBank.accountNumber,
+  //         accountName: defaultBank.fullName,
+  //       };
+  //     }
+
+  //     await order.save();
+
+  //     res.status(200).json({
+  //       message: "Order successfully canceled",
+  //       order,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error canceling order:", error);
+  //     res.status(500).json({
+  //       message: "Error canceling order",
+  //       error: error.message || error,
+  //     });
+  //   }
+  // },
   cancelOrder: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -611,7 +711,33 @@ const authController = {
         _id: orderId,
         user: userId,
         isDeleted: false,
-      }).populate("payment");
+      })
+        .populate({
+          path: "cartDetails",
+          populate: [
+            {
+              path: "items.product",
+              model: "product_v2",
+            },
+            {
+              path: "items.productVariant",
+              model: "productVariant",
+            },
+            {
+              path: "items.inventory",
+              model: "Inventory",
+            },
+            {
+              path: "itemAuction.product_randBib",
+              model: "productAuction",
+            },
+            {
+              path: "itemAuction.inventory",
+              model: "Inventory",
+            },
+          ],
+        })
+        .populate("payment");
 
       if (!order) {
         return res
@@ -629,36 +755,33 @@ const authController = {
         });
       }
 
-      // Kiểm tra phương thức thanh toán
-      if (order.payment.payment_method === "Thanh toán khi nhận hàng") {
-        // Nếu là "Thanh toán khi nhận hàng", không cần lấy thông tin ngân hàng
-        order.stateOrder = "Hủy đơn hàng";
-        order.cancelReason = cancelReason;
-      } else {
-        // Nếu là phương thức thanh toán khác, lấy thông tin ngân hàng
-        const user = await User.findById(userId).populate("banks");
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        const defaultBank =
-          user.banks.find((bank) => bank.isDefault) || user.banks[0];
-
-        if (!defaultBank) {
-          return res.status(400).json({
-            message: "No bank information found for the user",
-          });
-        }
-
-        // Cập nhật thông tin ngân hàng
-        order.stateOrder = "Hủy đơn hàng";
-        order.cancelReason = cancelReason;
-        order.refundBank = {
-          bankName: defaultBank.name,
-          accountNumber: defaultBank.accountNumber,
-          accountName: defaultBank.fullName,
-        };
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
+
+      // Kiểm tra nếu đơn hàng có item đấu giá
+      const hasAuctionItems = order.cartDetails.some(
+        (detail) => detail.itemAuction && detail.itemAuction.length > 0
+      );
+
+      // Chỉ tăng cảnh báo nếu có sản phẩm đấu giá
+      if (hasAuctionItems) {
+        user.warning += 1;
+
+        // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
+        if (user.warning > 3) {
+          user.status = "disable";
+          user.noteWarning =
+            "Đã hủy đơn hàng đấu giá quá số lần quy định, vui lòng liên hệ CSKH để được hỗ trợ.";
+        }
+
+        await user.save();
+      }
+
+      // Cập nhật trạng thái đơn hàng
+      order.stateOrder = "Hủy đơn hàng";
+      order.cancelReason = cancelReason;
 
       await order.save();
 
@@ -763,6 +886,10 @@ const authController = {
           populate: {
             path: "items.product",
             model: "product_v2",
+          },
+          populate: {
+            path: "items.productVariant",
+            model: "productVariant",
           },
         })
 
