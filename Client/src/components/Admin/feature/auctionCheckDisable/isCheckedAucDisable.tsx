@@ -112,7 +112,7 @@ const isCheckedAuct: React.FC = () => {
               THỜI GIAN CHIẾN THẮNG
             </th>
             <th scope="col" className="p-4">
-              GIÁ CHIẾN THẮNG
+              GIÁ CHIẾN THẮNG (VNĐ)
             </th>
             <th scope="col" className="p-4">
               TRẠNG THÁI
@@ -126,50 +126,50 @@ const isCheckedAuct: React.FC = () => {
           {Array.isArray(checkWinnerAll) && checkWinnerAll.length > 0 ? (
             checkWinnerAll?.map((winnneerCheck: CheckWinnerAll) => (
               <tr
-                key={winnneerCheck._id}
+                key={winnneerCheck?._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <td className="px-4 py-3 font-medium text-gray-900">
-                  {winnneerCheck.serialNumber}
+                  {winnneerCheck?.serialNumber}
                 </td>
                 <th scope="row" className="px-4 py-3 font-medium text-gray-900">
-                  {winnneerCheck.userWinnerAuct.name}
+                  {winnneerCheck?.userWinnerAuct?.name}
                 </th>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {winnneerCheck.userWinnerAuct.email}
+                  {winnneerCheck?.userWinnerAuct?.email}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {winnneerCheck.userWinnerAuct.phone}
+                  {winnneerCheck?.userWinnerAuct?.phone}
                 </td>
                 <td  className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
-                    winnneerCheck.auctionStatus === "won"
+                    winnneerCheck?.auctionStatus === "won"
                       ? "bg-green-50 text-green-700"
                       : "bg-red-50 text-red-700"
                   }`}
                 >
-                  {winnneerCheck.auctionStatus === "won" ? "Thắng phiên đấu giá" : "Đã hủy chiến thắng"}
+                  {winnneerCheck?.auctionStatus === "won" ? "Thắng phiên đấu giá" : "Đã hủy chiến thắng"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {formatDateVN(winnneerCheck.endTime)}
+                  {formatDateVN(winnneerCheck?.endTime)}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
-                  {formatCurrency(winnneerCheck.bidPrice)}
+                  {formatCurrency(winnneerCheck?.bidPrice)}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
                     className={`mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
-                      winnneerCheck.auctionStausCheck === "Chờ duyệt"
+                      winnneerCheck?.auctionStausCheck === "Chờ duyệt"
                         ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                        : winnneerCheck.auctionStausCheck === "Xử lý duyệt"
+                        : winnneerCheck?.auctionStausCheck === "Xử lý duyệt"
                         ? "bg-violet-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        : winnneerCheck.auctionStausCheck === "Đã duyệt hủy chiến thắng"
+                        : winnneerCheck?.auctionStausCheck === "Đã duyệt hủy chiến thắng"
                         ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                        
                      
                         : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
                     }`}
                   >
-                    {winnneerCheck.auctionStausCheck === "Chờ giao hàng" && (
+                    {winnneerCheck?.auctionStausCheck === "Chờ giao hàng" && (
                       <svg
                         className="me-1 h-3 w-3"
                         aria-hidden="true"
@@ -188,7 +188,7 @@ const isCheckedAuct: React.FC = () => {
                         />
                       </svg>
                     )}
-                    {winnneerCheck.auctionStausCheck === "Xử lý duyệt" && (
+                    {winnneerCheck?.auctionStausCheck === "Xử lý duyệt" && (
                       <svg
                         className="me-1 h-3 w-3"
                         aria-hidden="true"
@@ -209,7 +209,7 @@ const isCheckedAuct: React.FC = () => {
                     )}
 
                 
-                    {winnneerCheck.auctionStausCheck === "Đã duyệt hủy chiến thắng" && (
+                    {winnneerCheck?.auctionStausCheck === "Đã duyệt hủy chiến thắng" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         version="1.1"
@@ -243,7 +243,7 @@ const isCheckedAuct: React.FC = () => {
                       </svg>
                     )}
     
-                    {winnneerCheck.auctionStausCheck}
+                    {winnneerCheck?.auctionStausCheck}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -301,7 +301,7 @@ const isCheckedAuct: React.FC = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={6} className="text-center py-4">
+              <td colSpan={8} className="text-center py-4">
                 Không có dữ liệu
               </td>
             </tr>

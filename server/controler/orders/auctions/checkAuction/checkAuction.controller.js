@@ -27,6 +27,7 @@ const checkAuctionCOntroller = {
       // Fetch active products that are in the price range
       const auctWinnerCheck = await User.find({
         _id: { $in: userIds },
+        status:'active'
       })
         .select("_id name phone email")
         .lean();
@@ -126,6 +127,7 @@ const checkAuctionCOntroller = {
       // Find order details related to the order
       const userInforWinnerAuct = await User.findOne({
         _id: inForUser,
+          status:'active'
       }).lean();
 
       const productDetail = await ProductAuction.findOne({
@@ -237,6 +239,7 @@ const checkAuctionCOntroller = {
 
             const auctWinnerCheck = await User.findOne({
               _id: wiinerUser,
+                status:'active'
             })
               .select("_id name phone email")
               .lean();
@@ -290,6 +293,7 @@ const checkAuctionCOntroller = {
 
                   const auctWinnerCheck = await User.findOne({
                     _id: wiinerUser,
+                    status:'active'
                   })
                     .select("_id name phone email")
                     .lean();
@@ -401,6 +405,50 @@ const checkAuctionCOntroller = {
       });
     }
   },
+
+   softDeleteEnablCheck: async (req, res) => {
+        try {
+          const { id } = req.params;
+          const updatedAuction = await auctionReturn.findByIdAndUpdate(
+              {_id:id},
+            { $set: { status: "delete" } },
+            { new: true }
+          );
+  
+          const productRand = updatedAuction.auctionWinnerReturn;
+     
+    
+    
+     
+          // Cập nhật trạng thái của sản phẩm thành 'disable'
+          const updatedProduct = await AuctiomWinner.findByIdAndUpdate(
+             {_id:productRand},
+             { $set: { status: "delete" } },
+            { new: true }
+          );
+    
+          if (!updatedProduct) {
+            return res.status(404).json({
+              error: "Không tìm thấy dữ liệu để cập nhật trạng thái",
+            });
+          }
+          // Tìm kiếm và cập nhật `status` thành `deleted`
+      
+    
+          // Kiểm tra nếu không tìm thấy document cần xóa mềm
+       
+    
+          // Trả về kết quả thành công
+          return res.status(200).json({
+            message: "Dữ liệu được xóa thành công",
+            status: "200",
+            data: updatedAuction,
+          });
+        } catch (error) {
+          console.error("Error soft deleting AuctionPricingRange:", error);
+          return res.status(500).json({ error: "Internal server error" });
+        }
+      },
 };
 
 module.exports = checkAuctionCOntroller;
