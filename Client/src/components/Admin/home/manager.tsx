@@ -28,6 +28,7 @@ const Manager = () => {
     setCurrentPage(1); // Reset to page 1 when filter changes
   };
 
+  
   // Hàm gọi API lấy dữ liệu
   const fetchData = async (page: number = 1) => {
     try {
