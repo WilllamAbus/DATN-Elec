@@ -9,9 +9,11 @@ module.exports = async (auctionPricingRange, auctionRound) => {
   }).sort({ bidPrice: -1 });
 
   const currentTime = new Date();
-  const temporaryEndTime = new Date(currentTime.getTime() + 1 * 60 * 1000); // 5 phút sau
+  const temporaryEndTime = new Date(currentTime.getTime() +  1 * 60 * 1000); 
 
   if (winner) {
+    const remainingTime = calculateRemainingTime(temporaryEndTime);
+
     const auctionWinner = new AuctionWinner({
       user: winner.user,
       auctionPricingRange: auctionPricingRange._id,
@@ -21,11 +23,29 @@ module.exports = async (auctionPricingRange, auctionRound) => {
       auctionStatus: 'temporary',
       startTime: convertToLocalTime(currentTime),
       endTime: convertToLocalTime(temporaryEndTime),
+      remainingTime: remainingTime, 
     });
     await auctionWinner.save();
 
-    // Thay đổi trạng thái đấu giá thành temporary
+    // Đồng bộ thời gian từ AuctionWinner qua AuctionPricingRange
+    auctionPricingRange.startTime = auctionWinner.startTime;
+    auctionPricingRange.endTime = auctionWinner.endTime;
     auctionPricingRange.status = 'temporary';
     await auctionPricingRange.save();
   }
 };
+
+// Hàm tính toán remainingTime
+function calculateRemainingTime(endTime) {
+  const currentTime = new Date().getTime();
+  const remainingTime = endTime.getTime() - currentTime;
+  
+  const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+  return remainingTime > 0 
+    ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây` 
+    : "Đã kết thúc";
+}

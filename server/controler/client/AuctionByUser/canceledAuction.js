@@ -8,7 +8,7 @@ const updateUserWarningStatus = (user) => {
   if (user.warning >= 100) {
     user.status = 'disabled'; 
     user.disabledAt = new Date();
-    user.messgese = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
+    user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
   }
 };
 
@@ -62,7 +62,7 @@ const canceledAuction = async (req, res) => {
           noteWarning: user.noteWarning,
           status: user.status,
           disabledAt: user.disabledAt,
-          messgese: user.messgese,
+          message: user.message,
         },
       }
     });

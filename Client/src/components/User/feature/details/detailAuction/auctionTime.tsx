@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardBody } from "@nextui-org/react";
-import { ProductAuction } from "../../../../../services/detailProductAuction/types/detailAuction";
+import type { RootState } from "src/redux/rootReducer";
+import { useSelector } from "react-redux";
 
-interface ProductAuctionTimeProps {
-  product: ProductAuction;
-}
+const AuctionTime: React.FC = () => {
+  const auctionPricing = useSelector(
+    (state: RootState) => state.productClient.getProductDetailAuction.productDetailAuction?.auctionPricing
+  );
 
-const AuctionTime: React.FC<ProductAuctionTimeProps> = ({ product }) => {
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const endTime = new Date(product.auctionPricing.endTime).getTime();
+  const [timeLeft, setTimeLeft] = useState<string>(auctionPricing?.remainingTime || "Đang tải...");
 
   useEffect(() => {
+    if (!auctionPricing) return;
+
+    const endTime = new Date(auctionPricing.endTime).getTime();
+
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const difference = endTime - now;
@@ -19,23 +23,26 @@ const AuctionTime: React.FC<ProductAuctionTimeProps> = ({ product }) => {
         clearInterval(interval);
         setTimeLeft("Hết thời gian!");
       } else {
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / (1000 * 60)) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
         setTimeLeft(
-          `${hours.toString().padStart(2, "0")}h:${minutes
-            .toString()
-            .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
+          `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`
         );
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [endTime]);
+  }, [auctionPricing]);
+
+  if (!auctionPricing) {
+    return <div>Đang tải...</div>;
+  }
 
   return (
-    <Card className="max-w-full shadow-sm bg-red-50 pt-10 pb-10">
+    <Card className="max-w-full shadow-sm bg-red-50 pt-16 pb-16">
       <CardBody className="text-left">
         <label className="block mb-2 text-sm text-center font-medium text-gray-900 dark:text-white">
           Thời gian còn lại:
@@ -45,9 +52,6 @@ const AuctionTime: React.FC<ProductAuctionTimeProps> = ({ product }) => {
         </div>
       </CardBody>
     </Card>
-
-
-
   );
 };
 

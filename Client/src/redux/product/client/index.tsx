@@ -18,7 +18,12 @@ import {
   createOneUpdateBidAuctionSlice,
   getBiddingListSlice,
   getAuctionDetailsBySlugSlice,
-  getAuctionPricingRangeSlice
+  getAuctionPricingRangeSlice,
+  checkStatusAuctionPricingRangeSlice,
+  highBidderInformationSlice,
+  getAuctionProgressSlice,
+  getTop3HighestBiddersSlice,
+  getUserCartSlice
 
 
 } from "./Slicle";
@@ -41,7 +46,12 @@ const productsReducer = combineReducers({
   createOneUpdateBidAuction:createOneUpdateBidAuctionSlice,
   getBiddingList:getBiddingListSlice,
   getAuctionDetailsBySlug:getAuctionDetailsBySlugSlice,
-  getAuctionPricingRange:getAuctionPricingRangeSlice
+  getAuctionPricingRange:getAuctionPricingRangeSlice,
+  checkStatusAuctionPricingRange:checkStatusAuctionPricingRangeSlice,
+  highBidderInformation:highBidderInformationSlice,
+  getAuctionProgress:getAuctionProgressSlice,
+  getTop3HighestBidders:getTop3HighestBiddersSlice,
+  getUserCart:getUserCartSlice
 
 
 });

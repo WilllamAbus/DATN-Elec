@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Order } from "../../../../../../types/order/order";
-import { Button, ListGroup } from "flowbite-react";
+import { Button } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@nextui-org/react";
 
@@ -138,13 +138,15 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
 
       {/* Danh sách sản phẩm */}
       <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-700 mb-4">Sản phẩm</h3>
-        <ListGroup className="space-y-4">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 border-gray-200">
+          Sản phẩm
+        </h3>
+        <ul className="space-y-4">
           {order.cartDetails.map((cartDetail) =>
             cartDetail.items.map((item) => (
-              <ListGroup.Item
+              <li
                 key={item.product._id}
-                className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-md"
+                className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 ease-in-out"
               >
                 <div className="flex items-center space-x-4">
                   {/* Hình ảnh sản phẩm */}
@@ -157,11 +159,11 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
                     alt={`product ${
                       item.productVariant?.variant_name || "Unknown"
                     }`}
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-200 cursor-pointer"
+                    className="w-20 h-20 object-cover rounded-lg border border-gray-200 cursor-pointer hover:scale-105 transform transition-transform duration-200"
                   />
 
                   <div>
-                    <h4 className="font-medium text-lg text-gray-800 mb-1">
+                    <h4 className="font-medium text-lg text-gray-900 mb-1">
                       {item.productVariant.variant_name}
                     </h4>
                     <p className="text-sm text-gray-500">
@@ -169,16 +171,16 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
                     </p>
                   </div>
                 </div>
-                <p className="text-lg font-medium text-gray-700">
+                <p className="text-lg font-semibold text-gray-700">
                   {item.productVariant.variant_price.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
                 </p>
-              </ListGroup.Item>
+              </li>
             ))
           )}
-        </ListGroup>
+        </ul>
       </div>
 
       {/* Nút quay lại */}

@@ -3,18 +3,23 @@ const { homeAllProduct, getID, auction, upView, shopping, search, recommendation
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
 const {getProductDetail,getAllStorageBySlugUrl,getAllProductVariantsByVariantPrice} = require('./detail');
-const {getAuctionWinsByUser,confirmAuction,canceledAuction,getUserPendingAuctionWins} = require('./AuctionByUser');
+const {getAuctionWinsByUser,confirmAuction,canceledAuction,getUserPendingAuctionWins,canceledAuctionTemporary} = require('./AuctionByUser');
 const { getLimitProductClient, relatedProduct } = require('./product');
 const {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
+  getBiddingListAndWinner,
   enterAuctionPrice,
-  biddingList,
   getAuctionPricingRange,
-  processAuctionWinner,
   getUserBiddingHistory,
-  getUserBiddingDetails
+  getUserBiddingDetails,
+  checkAuctionTime,
+  checkStatusAuctionPricingRange,
+  highBidderInformation,
+  getAuctionProgress,
+  getTop3HighestBidders,
+  getUserCart
 } = require('./detailAuction');
 
 const {
@@ -68,15 +73,21 @@ module.exports = {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
-  biddingList,
   getAuctionWinsByUser,
   confirmAuction,
   canceledAuction,
-  processAuctionWinner,
   getUserBiddingHistory,
   getUserBiddingDetails,
+  getBiddingListAndWinner,
   getAuctionPricingRange,
   enterAuctionPrice,
-  getUserPendingAuctionWins
+  getUserPendingAuctionWins,
+  checkAuctionTime,
+  checkStatusAuctionPricingRange,
+  highBidderInformation,
+  canceledAuctionTemporary,
+  getAuctionProgress,
+  getTop3HighestBidders,
+  getUserCart
 };
 

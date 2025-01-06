@@ -390,7 +390,7 @@ import {
 import { Order } from "../../../../types/order/order";
 import { Link, useNavigate } from "react-router-dom";
 import DetailOrder from "./order/detailOrders/detail";
-import { Pagination, Select, SelectItem } from "@nextui-org/react";
+import { Button, Pagination, Select, SelectItem } from "@nextui-org/react";
 
 const OrderList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -414,6 +414,18 @@ const OrderList: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [searchTerm] = useState<string>("");
   const navigate = useNavigate();
+  const filteredOrders = Order.filter((order) =>
+    order.cartDetails.every(
+      (cartDetail) =>
+        cartDetail.items.length > 0 || cartDetail.itemAuction.length === 0
+    )
+  ).map((order) => ({
+    ...order,
+    cartDetails: order.cartDetails.map((cartDetail) => ({
+      ...cartDetail,
+      itemAuction: undefined, // Loại bỏ itemAuction
+    })),
+  }));
 
   useEffect(() => {
     dispatch(
@@ -504,24 +516,26 @@ const OrderList: React.FC = () => {
     <div className="py-5 relative">
       <h2 className="text-3xl leading-10 text-black mb-9 flex justify-between items-center">
         Đơn hàng
-        <div className="flex flex-row items-center w-1/3">
-          <Select
-            isRequired
-            aria-label="Order Status Filter"
-            value={filter}
-            onChange={handleFilterChange}
-            label="Chọn trạng thái đơn hàng"
-            placeholder="Chọn trạng thái"
-            color="primary"
-            className="w-full"
-          >
-            {orderStatuses.map((status) => (
-              <SelectItem key={status.key} value={status.key}>
-                {status.label}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
+        {!selectedOrder && (
+          <div className="flex flex-row items-center w-1/3">
+            <Select
+              isRequired
+              aria-label="Order Status Filter"
+              value={filter}
+              onChange={handleFilterChange}
+              label="Chọn trạng thái đơn hàng"
+              placeholder="Chọn trạng thái"
+              color="primary"
+              className="w-full"
+            >
+              {orderStatuses.map((status) => (
+                <SelectItem key={status.key} value={status.key}>
+                  {status.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        )}
       </h2>
 
       <div className="mt-7 border border-gray-300 pt-9">
@@ -529,8 +543,8 @@ const OrderList: React.FC = () => {
           <DetailOrder order={selectedOrder} onBack={handleBackToList} />
         ) : (
           <>
-            {Order.length > 0 ? (
-              Order.map((order: Order) => (
+            {filteredOrders[0]?.cartDetails?.[0]?.items?.length > 0 ? (
+              filteredOrders.map((order) => (
                 <div key={order._id} className="order-item">
                   <div className="flex flex-col md:flex-row items-center justify-between px-3 md:px-11 mb-6">
                     <div className="order-info mb-4 md:mb-0">
@@ -546,137 +560,155 @@ const OrderList: React.FC = () => {
                     <div className="flex items-center gap-3">
                       {(order.stateOrder === "Chờ xử lý" ||
                         order.stateOrder === "Đã xác nhận") && (
-                        <button
+                        <Button
                           onClick={() => openCancelOrderModal(order._id!)}
-                          className={`rounded-full px-7 py-3 ${
+                          color="primary"
+                          className={`${
                             order.stateOrder === "Chờ xử lý"
                               ? "bg-indigo-600 hover:bg-indigo-700"
                               : "bg-yellow-600 hover:bg-yellow-700"
                           } shadow-sm text-white font-semibold text-sm transition-all duration-500`}
                         >
                           Hủy đơn hàng
-                        </button>
+                        </Button>
                       )}
 
                       {order.stateOrder === "Đang vận chuyển" && (
-                        <button
-                          // onClick={() => handleTrackOrder(order._id!)}
-                          className="rounded-full px-7 py-3 bg-blue-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-blue-700"
+                        <Button
+                          color="secondary"
+                          className="bg-blue-600 hover:bg-blue-700 shadow-sm text-white font-semibold text-sm transition-all duration-500"
                         >
                           Đang vận chuyển
-                        </button>
+                        </Button>
                       )}
 
                       {order.stateOrder === "Hoàn tất" && (
-                        <button
-                          // onClick={() => handleReviewOrder(order._id!)}
-                          className="rounded-full px-7 py-3 bg-gray-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-gray-700"
+                        <Button
+                          color="warning"
+                          className="bg-gray-600 hover:bg-gray-700 shadow-sm text-white font-semibold text-sm transition-all duration-500"
                         >
                           Giao hàng thành công
-                        </button>
+                        </Button>
                       )}
+
+                      <Button
+                        onClick={() => handleViewOrderDetail(order._id!)}
+                        color="default"
+                        className="bg-gray-600 hover:bg-gray-700 shadow-sm text-white font-semibold text-sm transition-all duration-500"
+                      >
+                        Chi tiết đơn hàng
+                      </Button>
                     </div>
                   </div>
-                  <div className="border-t border-gray-300 my-6">
-                    <div className="flex flex-col lg:flex-row gap-8 px-3 md:px-11 mb-8">
-                      {order.cartDetails?.length > 0 ? (
-                        <div className="w-full">
-                          <div className="relative h-auto">
+
+                  <div className="border-t border-gray-300 py-6 bg-gray-50">
+                    <div className="container mx-auto px-4 lg:px-8">
+                      {order.cartDetails.length > 0 ? (
+                        <div>
+                          <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 mb-6">
+                            Chi tiết đơn hàng
+                          </h2>
+
+                          <div className="flex flex-col space-y-6">
                             {order.cartDetails
                               .slice(0, showAll ? order.cartDetails.length : 2)
                               .map((cartDetail) =>
                                 cartDetail.items?.length > 0 ? (
                                   cartDetail.items.map((item) => (
                                     <div
-                                      key={item.product?._id}
-                                      className="flex flex-col items-center gap-4 sm:flex-row mb-6 p-6 bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100 shadow-xl rounded-2xl hover:scale-105 transform transition-all duration-300"
+                                      key={item.productVariant._id}
+                                      className="flex items-center gap-6 bg-white p-4 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300"
                                     >
                                       <Link
-                                        to={`/product/${item.product?.slug} || 'null'`}
+                                        to={`/product/${
+                                          item.product.slug || "null"
+                                        }`}
+                                        className="flex-shrink-0"
                                       >
                                         <img
                                           src={
-                                            item?.productVariant?.image?.[0]
+                                            item.productVariant.image?.[0]
                                               ?.image?.[0] ||
                                             "https://img.lovepik.com/free-png/20220126/lovepik-404-page-not-accessible-png-image_401803272_wh1200.png"
                                           }
                                           onClick={() =>
                                             handleRepurchase(item.product.slug)
                                           }
-                                          alt={`product ${
-                                            item.productVariant?.variant_name ||
-                                            "Unknown"
-                                          }`}
-                                          className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                                          alt="action"
+                                          className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded-md"
                                         />
                                       </Link>
 
-                                      <div className="flex flex-col justify-center sm:ml-4 text-center sm:text-left">
-                                        <h6 className="font-manrope font-semibold text-lg sm:text-xl leading-7 sm:leading-8 text-indigo-900">
+                                      <div className="flex-1">
+                                        <h6 className="text-base lg:text-lg font-semibold text-gray-900">
                                           {item.productVariant?.variant_name ||
                                             "Tên sản phẩm không có"}
                                         </h6>
-                                        <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-700 mt-2">
-                                          Số lượng: {item.quantity || 0}
+                                        <div className="text-sm text-gray-500 mt-1">
+                                          Số lượng:{" "}
+                                          <span>{item.quantity || 0}</span>
                                         </div>
-                                        <div className="font-normal text-sm sm:text-lg leading-6 sm:leading-8 text-gray-700 mt-2">
+                                        <div className="text-sm text-gray-500 mt-1">
                                           Giá:{" "}
-                                          {item.productVariant?.variant_price
-                                            ? item.productVariant.variant_price.toLocaleString(
-                                                "vi-VN",
-                                                {
-                                                  style: "currency",
-                                                  currency: "VND",
-                                                }
-                                              )
-                                            : "Không có giá"}
+                                          <span className="font-semibold text-red-500">
+                                            {item.price
+                                              ? item.price.toLocaleString(
+                                                  "vi-VN",
+                                                  {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                  }
+                                                )
+                                              : "Không có giá"}
+                                          </span>
                                         </div>
+                                      </div>
+
+                                      <div className="text-right">
+                                        <p className="text-sm text-gray-700">
+                                          Tổng tiền:
+                                        </p>
+                                        <p className="font-semibold text-lg text-red-600">
+                                          {item.totalItemPrice.toLocaleString(
+                                            "vi-VN",
+                                            {
+                                              style: "currency",
+                                              currency: "VND",
+                                            }
+                                          )}
+                                        </p>
                                       </div>
                                     </div>
                                   ))
                                 ) : (
-                                  <p className="text-red-500 text-center">
+                                  <p className="text-gray-500 text-center">
                                     Không có sản phẩm trong đơn hàng.
                                   </p>
                                 )
                               )}
+                          </div>
 
-                            {order.cartDetails.length > 2 && (
+                          {order.cartDetails.length > 2 && (
+                            <div className="text-center mt-6">
                               <button
                                 onClick={() => setShowAll(!showAll)}
-                                className="mt-4 px-8 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-md transition-all duration-300 hover:bg-indigo-800 focus:outline-none"
+                                className="px-6 py-3 bg-gray-200 text-gray-700 text-sm font-semibold rounded-md hover:bg-gray-300 transition-all"
                               >
                                 {showAll
                                   ? "Ẩn bớt sản phẩm"
                                   : "Hiển thị tất cả"}
                               </button>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
                       ) : (
-                        <p className="text-red-500 text-center">
-                          Giỏ hàng trống.
-                        </p>
+                        <div className="text-center py-10">
+                          <p className="text-gray-500 text-lg">
+                            Giỏ hàng trống.
+                          </p>
+                        </div>
                       )}
                     </div>
-                  </div>
-
-                  <div className="flex justify-between items-center py-9 px-3 md:px-11 border-t border-gray-300">
-                    <p className="font-semibold text-lg leading-8 text-black">
-                      Tổng tiền:{" "}
-                      <span className="text-red-600">
-                        {order.totalAmount.toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
-                      </span>
-                    </p>
-                    <button
-                      onClick={() => handleViewOrderDetail(order._id!)}
-                      className="rounded-full px-7 py-3 bg-indigo-600 shadow-sm text-white font-semibold text-sm transition-all duration-500 hover:bg-indigo-700"
-                    >
-                      Chi tiết đơn hàng
-                    </button>
                   </div>
 
                   <div className="border-t border-gray-300 my-6"></div>

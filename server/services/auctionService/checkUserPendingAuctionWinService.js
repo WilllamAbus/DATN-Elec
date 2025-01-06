@@ -1,5 +1,6 @@
 const AuctionWinner = require('../../model/productAuction/auctionWinner');
-const User = require('../../model/users.model'); 
+const User = require('../../model/users.model');
+
 
 const checkAndUpdateUserPendingAuctionWins = async (userId) => {
   const query = {
@@ -20,14 +21,15 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
 
   const currentTime = new Date().getTime();
 
-  const updateUserWarningStatus = (user) => {
+  const updateUserWarningStatus = async (user) => {
     user.warning += 1;
     user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${100 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
     if (user.warning >= 100) {
       user.status = 'disabled';
       user.disabledAt = new Date();
-      user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
+      user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá nhiều lần.';
     }
+    await user.save();
   };
 
   let isUpdated = false;
@@ -39,12 +41,26 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
       auction.auctionStatus = 'lose';
       auction.noteAuctionWinner = 'Lý do hủy đơn trúng đấu giá là do hết thời gian mà bạn không bấm xác nhận nên hệ thống ghi nhận và tự động hủy đơn trúng đấu giá của bạn';
       auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
+
+      const auctionPricingRange = auction.auctionPricingRange;
+      if (auctionPricingRange.status === 'temporary' && auctionPricingRange.currentPriceTemporarily != null) {
+        auctionPricingRange.currentPrice = auctionPricingRange.currentPriceTemporarily;
+        auctionPricingRange.startTime = auctionPricingRange.startTimeTemporarily;
+        auctionPricingRange.endTime = auctionPricingRange.endTimeTemporarily;
+        auctionPricingRange.remainingTime = auctionPricingRange.remainingTimeTemporarily;
+        auctionPricingRange.status = 'active';
+        auctionPricingRange.currentPriceTemporarily = null;
+        auctionPricingRange.startTimeTemporarily = null;
+        auctionPricingRange.endTimeTemporarily = null;
+        auctionPricingRange.remainingTimeTemporarily = null;
+        await auctionPricingRange.save();
+      }
+
       await auction.save();
 
       const user = await User.findById(auction.user);
       if (user) {
-        updateUserWarningStatus(user);
-        await user.save();
+        await updateUserWarningStatus(user);
       }
 
       isUpdated = true;
@@ -56,8 +72,8 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
       const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
       const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
-      auction.remainingTime = remainingTime > 0 
-        ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây` 
+      auction.remainingTime = remainingTime > 0
+        ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`
         : "Đã kết thúc";
     }
   }

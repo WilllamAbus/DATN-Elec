@@ -1,8 +1,9 @@
 export interface AuctionPricing {
   _id: string;
-  startTime: string; 
-    endTime: string; 
+  startTime: string;
+  endTime: string;
   startingPrice: number;
+  remainingTime: string; 
   maxPrice: number;
   currentPrice: number;
   priceStep: number;
@@ -20,8 +21,8 @@ export interface ProductType {
   pid: string;
   path: string;
   imgURL: string;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
   slug: string;
 }
 
@@ -33,17 +34,17 @@ export interface ProductBrand {
   status: string;
   category_id: string;
   supplier_id: string;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductCondition {
   _id: string;
   nameCondition: string;
   status: string;
-  disabledAt: string | null; 
+  disabledAt: string | null;
   createdAt: string;
-  updatedAt: string; 
+  updatedAt: string;
 }
 
 export interface ProductSupplier {
@@ -54,7 +55,7 @@ export interface ProductSupplier {
   image: string;
   description: string;
   status: string;
-  createdAt: string; 
+  createdAt: string;
   updatedAt: string;
 }
 
@@ -71,12 +72,12 @@ export interface ProductAuction {
   isActive: boolean;
   status: string;
   disabledAt: string | null;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
   slug: string;
   __v: number;
   auctionPricing: AuctionPricing;
-  lastViewed: string; 
+  lastViewed: string;
   viewCount: number;
 }
 

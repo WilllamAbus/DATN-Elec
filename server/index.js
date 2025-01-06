@@ -41,9 +41,9 @@ const io = initializeSocket(server);
 app.use((req, res, next) => { req.io = io; next(); });
 io.on("connection", (socket) => {
   const ip = socket.handshake.address;
-  console.log(`New user connected: ${socket.id}, IP: ${ip}`);
+  console.log(`KNTC: ${socket.id}, IP: ${ip}`);
 });
-
+require('./cron');
 
 app.use("/api", apiGeneral);
 

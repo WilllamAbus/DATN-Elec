@@ -14,7 +14,7 @@ const AppAuction: React.FC<AppAuctionProps> = ({ currentPage }) => {
       label: 'Chờ xác nhận',
       content: <ListAuctionWin currentPage={currentPage} totalPages={1} />,
       confirmationStatus: 'pending',
-      auctionStatus: ['won', 'pending'],
+      auctionStatus: ['won', 'pending','temporary'],
     },
     {
       id: 'Đã xác nhận',

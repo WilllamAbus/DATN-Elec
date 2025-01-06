@@ -1,21 +1,30 @@
 const getProductDetailAuction = require('./getProductDetailAuction').getProductDetailAuction;
 const createOneUpdateBidAuction = require('./creatOneBidAuction').createOneUpdateBidAuction;
 const getAuctionDetailsBySlug = require('./getAuctionDetailsBySlug').getAuctionDetailsBySlug;
+const getBiddingListAndWinner  = require('./biddingList.controller').getBiddingListAndWinner;
 const getAuctionPricingRange = require('./getAuctionPricingRange').getAuctionPricingRange;
 const enterAuctionPrice = require('./enterAuctionPrice').enterAuctionPrice;
-const biddingList  = require('./biddingList.controller').getBiddingList;
-const processAuctionWinner = require('./biddingList.controller').processAuctionWinner;
 const getUserBiddingHistory = require('./biddingList.controller').getUserBiddingHistory;
 const getUserBiddingDetails = require('./biddingList.controller').getUserBiddingDetails;
-
+const checkAuctionTime = require('./checkAuctionTime').checkAuctionTime;
+const checkStatusAuctionPricingRange = require('./checkStatusAuctionPricingRange').checkStatusAuctionPricingRange;
+const highBidderInformation = require('./highBidderInformation').highBidderInformation;
+const getAuctionProgress = require('./auctionProgress').getAuctionProgress;
+const getTop3HighestBidders = require('./getTop3HighestBidders').getTop3HighestBidders;
+const getUserCart = require('./getUserCart').getUserCart;
 module.exports = {
   getProductDetailAuction,
   createOneUpdateBidAuction,
   getAuctionDetailsBySlug,
-  getAuctionPricingRange,
-  biddingList,
-  processAuctionWinner,
   getUserBiddingHistory, 
   getUserBiddingDetails,
-  enterAuctionPrice
+  enterAuctionPrice,
+  checkAuctionTime,
+  checkStatusAuctionPricingRange,
+  highBidderInformation,
+  getBiddingListAndWinner,
+  getAuctionPricingRange,
+  getAuctionProgress,
+  getTop3HighestBidders,
+  getUserCart
 }

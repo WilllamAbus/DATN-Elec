@@ -12,9 +12,9 @@ const User: React.FC = () => {
       <div className="flex pt-11 sm:pt-2 md:pt-4 lg:pt-6 xl:pt-9 overflow-hidden bg-white dark:bg-gray-900">
         <div
           id="main-content"
-          className="relative w-full max-w-screen-2xl mx-auto h-full overflow-y-auto bg-white dark:bg-gray-900"
+          className="relative flex flex-col w-full max-w-screen-2xl mx-auto min-h-screen bg-white dark:bg-gray-900"
         >
-          <main>
+          <main className="flex-grow">
             <div className="pt-6 2xl:px-0 ">
               <Outlet />
             </div>

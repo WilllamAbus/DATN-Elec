@@ -39,6 +39,18 @@ const ListOrders: React.FC = () => {
 
   const [filter, setFilter] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const filteredOrders = Order.filter((order) =>
+    order.cartDetails.every(
+      (cartDetail) =>
+        cartDetail.items.length > 0 || cartDetail.itemAuction.length === 0
+    )
+  ).map((order) => ({
+    ...order,
+    cartDetails: order.cartDetails.map((cartDetail) => ({
+      ...cartDetail,
+      itemAuction: cartDetail.itemAuction ?? [], // Nếu itemAuction không có, gán là mảng rỗng
+    })),
+  }));
 
   useEffect(() => {
     dispatch(
@@ -271,8 +283,8 @@ const ListOrders: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {Order.length > 0 ? (
-            Order.map((order, index) => (
+          {filteredOrders.length > 0 ? (
+            filteredOrders.map((order, index) => (
               <tr
                 key={order._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"

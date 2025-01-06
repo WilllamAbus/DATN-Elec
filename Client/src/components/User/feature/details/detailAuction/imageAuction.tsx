@@ -22,12 +22,12 @@ const ImageAuction: React.FC<ImageAuctionProps> = ({ productDetailAuction, produ
         navigation={true}
         modules={[FreeMode, Navigation, Thumbs]}
         thumbs={{ swiper: thumbSwiperRef.current }}
-        className="mySwiper"
+        className="mySwiper -mb-2"
         onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
       >
         {Array.isArray(image) && image.map((imageUrl, index) => (
-          <SwiperSlide key={index} className="grid gap-4">
+          <SwiperSlide key={index} className="grid gap-4 rounded-lg">
             <div className="backdrop-blur-sm bg-white/30 rounded-lg overflow-hidden shadow-sm">
               <figure className="relative w-full h-full py-2 overflow-hidden transition-all duration-300 cursor-pointer filter grayscale-0">
                 {imageUrl ? (
@@ -35,7 +35,7 @@ const ImageAuction: React.FC<ImageAuctionProps> = ({ productDetailAuction, produ
                     src={imageUrl}
                     alt={product_name}
                     className="w-full h-full object-contain rounded-lg"
-                    style={{ maxHeight: '250px' }}
+                    style={{ maxHeight: '450px' }}
                   />
                 ) : (
                   <div className="w-full h-full flex justify-center items-center">
@@ -53,17 +53,17 @@ const ImageAuction: React.FC<ImageAuctionProps> = ({ productDetailAuction, produ
         slidesPerView={4}
         freeMode={true}
         watchSlidesProgress={true}
-        className="mySwiperThumbs mt-4"
+        className="mySwiperThumbs mt-1"
       >
         {Array.isArray(image) && image.map((imageUrl, index) => (
-          <SwiperSlide key={index} className="flex justify-center items-center p-2">
+          <SwiperSlide key={index} className="flex justify-center items-center pt-1 pb-1">
             {imageUrl ? (
               <img
                 src={imageUrl}
                 alt={product_name}
                 className={`max-w-full h-32 object-cover rounded-lg shadow-sm transition-transform duration-300 ease-in-out transform hover:scale-105 ${activeIndex === index ? 'border-solid border-2 border-sky-500' : ''
                   }`}
-                style={{ maxHeight: '100px' }} 
+                style={{ maxHeight: '80px' }} 
               />
             ) : (
               <div className="w-full h-full flex justify-center items-center">

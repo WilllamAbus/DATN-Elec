@@ -2,25 +2,17 @@ const cron = require('node-cron');
 const Screen = require('../model/attributes/screen');
 const softDeleteForModel = require('../utils/softDelete');
 const BiddingService = require("../services/detailAuction/getBiddingListSV");
-
+const ProductAuction = require('../model/productAuction/productAuction');
 cron.schedule('0 0 * * *', async () => {
   try {
-    console.log('Cron Job bắt đầu: Xóa vĩnh viễn các tài nguyên đã bị xóa mềm quá 10 ngày');
-
     await softDeleteForModel(Screen, { status: 'disabled' }, { status: 'disabled', deletedAt: new Date() });
-
-    console.log('Cron Job hoàn thành!');
   } catch (error) {
-    console.error('Lỗi khi chạy Cron Job:', error.message);
+    console.error('lỗi softDeleteForModel nằm ở file cron/cronJobs.js:', error.message);
   }
 });
 
-
-
-// Cron job kiểm tra phiên đấu giá mỗi phút
 cron.schedule("* * * * *", async () => {
-  console.log("Kiểm tra các phiên đấu giá kết thúc...");
-
+ 
   try {
     const activeAuctions = await ProductAuction.find({
       "auctionPricing.status": "active",
@@ -31,6 +23,6 @@ cron.schedule("* * * * *", async () => {
       await BiddingService.processAuctionWinner(auction.slug);
     }
   } catch (error) {
-    console.error("Lỗi khi chạy cron job:", error.message);
+    console.error("lỗi activeAuctions nằm ở file cron/cronJobs.js:", error.message);
   }
 });

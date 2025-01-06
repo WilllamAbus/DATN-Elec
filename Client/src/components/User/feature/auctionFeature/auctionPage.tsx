@@ -14,7 +14,7 @@ const AuctionPage: React.FC = () => {
 
   return (
     <>
-      <div className="p-1 mb-4 m-4 bg-[#d5e7f2] rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div className="p-1 mb-4 m-4 bg-[#d5e7f2] min-h-screen rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
         <div className="flex ml-3 items-center gap-2 mb-3">
           <img
             src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/icon%2Fdsatdg.svg?alt=media&token=c57cd4ab-096f-4352-a29d-f4076b127968"
