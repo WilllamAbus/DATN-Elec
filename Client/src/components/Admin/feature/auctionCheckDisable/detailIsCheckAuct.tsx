@@ -144,7 +144,7 @@ const OrderDetails: React.FC = () => {
   
   // const formattedDate = formatDate(selectedOrder?.refundPay?.paymentDateVnPay);
   const converNumber = Number(selectedOrder?.winnerPrice)
-  const productPrice = Number(selectedOrder?.productDetails.productPrice)
+  const productPrice = Number(selectedOrder?.productDetails?.productPrice)
   const formatCustomId = (id: string): string => {
     if (!id || id.length < 3) {
       throw new Error("ID không hợp lệ. Cần có ít nhất 3 ký tự.");
@@ -175,7 +175,11 @@ const OrderDetails: React.FC = () => {
         {selectedOrder ? (
         
             <div className="mb-6">
-                <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                <section className="mb-8 bg-white rounded-lg shadow-lg p-6 hover:shadow-xl 
+                transition-shadow duration-300">
+                   <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            Thông tin phiên đấu giá
+          </h2>
                   <div className="space-y-2">
                   <p className="text-lg mb-2 text-gray-700">
                 <span className="font-medium ">Mã chiến thắng:</span> {" "}
@@ -183,12 +187,12 @@ const OrderDetails: React.FC = () => {
               </p>
               <p className="text-lg mb-2 text-blue-700">
                 <span className="font-medium ">Trạng thái xử lý:</span>{" "}  
-                 {selectedOrder.state}
+                 {selectedOrder?.state}
               </p>
 
               <p className="text-lg mb-2">
                 <span className="font-medium">Ngày chiến thắng:</span>{" "}
-                {formatDateVN(selectedOrder.date)}
+                {formatDateVN(selectedOrder?.date)}
               </p>
               <p className="text-lg text-red-600 mb-2">
                 <span className="font-medium">Tổng tiền:</span>{" "}
@@ -222,7 +226,7 @@ const OrderDetails: React.FC = () => {
           <div className="space-y-2">
             <p className="text-lg mb-2 text-gray-700">
               <span className="font-medium">Họ tên:</span>{" "}
-              {selectedOrder.userInforWinner?.recipientName}
+              {selectedOrder?.userInforWinner?.recipientName}
             </p>
             <p className="text-lg mb-2 text-gray-700">
               <span className="font-medium">Số điện thoại:</span>{" "}
@@ -246,15 +250,15 @@ const OrderDetails: React.FC = () => {
       >
         <div className="flex items-center space-x-4">
           <img
-            src={selectedOrder?.productDetails.image}
-            alt={selectedOrder.productDetails.productName}
+            src={selectedOrder?.productDetails?.image}
+            alt={selectedOrder?.productDetails?.productName}
             className="w-16 h-16 object-cover rounded-md"
           />
           <div>
             <h4 className="font-medium text-lg text-gray-800">
-              {selectedOrder.productDetails.productName}
+              {selectedOrder?.productDetails?.productName}
             </h4>
-            <p className="text-gray-600">Số lượng: {selectedOrder.productDetails.quantity}</p>
+            <p className="text-gray-600">Số lượng: {selectedOrder?.productDetails?.quantity}</p>
           </div>
         </div>
         <p className="text-lg text-gray-800">
