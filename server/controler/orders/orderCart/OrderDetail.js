@@ -76,6 +76,10 @@ const OrderController = {
           ],
         })
         .populate({
+          path: "itemAuction.product_randBib",
+          model: "productAuction",
+        })
+        .populate({
           path: "items.product",
           model: "product_v2",
         })
@@ -98,28 +102,37 @@ const OrderController = {
         return res.status(404).json({ message: "Order not found" });
       }
 
-      // Kiểm tra sản phẩm bị xóa
-      const itemsWithDeletedProducts = order.items.filter(
-        (item) => !item.product
+      const deletedItemAuctions = order.itemAuction.filter(
+        (item) => !item.product_randBib
       );
+      const deletedItems = order.items.filter((item) => !item.product);
 
-      if (itemsWithDeletedProducts.length > 0) {
-        console.log("Deleted Products:", itemsWithDeletedProducts);
+      order.itemAuction = order.itemAuction.filter(
+        (item) => item.product_randBib
+      );
+      order.items = order.items.filter((item) => item.product);
 
-        // Loại bỏ sản phẩm bị xóa khỏi danh sách trả về
-        order.items = order.items.filter((item) => item.product);
+      const responsePayload = order.toObject();
 
+      // Nếu có sản phẩm bị xóa, trả về thông tin chi tiết
+      if (deletedItemAuctions.length > 0 || deletedItems.length > 0) {
         return res.status(200).json({
-          ...order.toObject(),
+          ...responsePayload,
           message: "Some products have been deleted",
-          deletedProducts: itemsWithDeletedProducts.map((item) => ({
-            quantity: item.quantity,
-            price: item.price,
-          })),
+          deletedProducts: {
+            deletedItemAuctions: deletedItemAuctions.map((item) => ({
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            deletedItems: deletedItems.map((item) => ({
+              quantity: item.quantity,
+              price: item.price,
+            })),
+          },
         });
       }
 
-      res.status(200).json(order);
+      res.status(200).json(responsePayload);
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).json({ message: "Error fetching order", error });

@@ -166,6 +166,7 @@ export interface AuctionRound {
   createdAt: string;
   updatedAt: string;
 }
+
 export interface itemAuction {
   auctionWinner: auctionWinner;
   auctionStartTime: string;
