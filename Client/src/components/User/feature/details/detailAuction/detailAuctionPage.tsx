@@ -8,6 +8,7 @@ import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
 import StartAndEndTime from "./startAndEndtime";
+import AuctionList from "./auctionList";
 import CurrentPriceAndBidprice from "./currentPriceAndBidprice";
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
@@ -22,6 +23,8 @@ import AuctionNotice from "./auctionNotice";
 import AppAuctionList from "./appAuctionList/appAuctionList";
 import { Bid } from "../../../../../services/detailProductAuction/types/getAuctionProgress";
 import AlertCheckStatusCart from "src/common/alert/alertcheckStatusCart";
+import RelatedProduct from "./relatedAuction";
+
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { slug } = useParams<{ slug: string }>();
@@ -266,6 +269,11 @@ const DetailPageAuction: React.FC = () => {
         </div>
 
       </div>
+
+      <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
+        <RelatedProduct/>
+      </div>
+
 
 
       {auctionStatus === 0 && <AuctionWin />}
