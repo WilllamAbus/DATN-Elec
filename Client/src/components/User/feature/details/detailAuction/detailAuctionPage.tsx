@@ -8,7 +8,6 @@ import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
 import StartAndEndTime from "./startAndEndtime";
-import AuctionList from "./auctionList";
 import CurrentPriceAndBidprice from "./currentPriceAndBidprice";
 import { getBreadcrumbPaths } from "../../../../../ultils/breadcrumb/client/getBreadcrumbPaths";
 import ReusableBreadcrumb from "../../../../../ultils/breadcrumb/client/reusableBreadcrumb";
