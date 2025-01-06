@@ -1111,7 +1111,6 @@ const authController = {
         // Lưu lý do hủy nếu cần thiết (bỏ qua nếu không có lý do cụ thể)
         // order.cancelReason = cancelReason || "Không có lý do cụ thể";
       }
-
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();

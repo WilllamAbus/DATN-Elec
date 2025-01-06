@@ -1,0 +1,44 @@
+import * as XLSX from "xlsx";
+import { Order } from "../.../../types/order/order";
+
+const handleExportExcel = (order: Order) => {
+  // Chuẩn bị dữ liệu cho file Excel
+  const customerInfo = [
+    ["Hóa Đơn Bán Hàng"],
+    ["Mã đơn hàng", order._id],
+    ["Khách hàng", order.shipping.recipientName || "Không có tên khách hàng"],
+    ["Số điện thoại", order.shipping.phoneNumber || "Chưa có số điện thoại"],
+    ["Địa chỉ", order.shipping.address || "Chưa có địa chỉ"],
+  ];
+
+  const productDetails = [
+    ["STT", "Tên sản phẩm", "Số lượng", "Giá", "Thành tiền"],
+    ...order.cartDetails.map((item, index) => [
+      index + 1,
+      item.itemAuction[0]?.product_randBib?.product_name || "Không có tên sản phẩm",
+      item.itemAuction[0]?.quantity || 0,
+      item.itemAuction[0]?.price.toLocaleString("vi-VN") || 0,
+      (item.itemAuction[0]?.quantity || 0) * (item.itemAuction[0]?.price || 0),
+    ]),
+  ];
+
+  // Thêm tổng tiền vào cuối
+  const totalAmount = [
+    [],
+    ["Tổng tiền", order.totalAmount?.toLocaleString("vi-VN") + " VNĐ"],
+  ];
+
+  // Kết hợp tất cả dữ liệu
+  const finalData = [...customerInfo, [], ...productDetails, [], ...totalAmount];
+
+  // Tạo workbook và worksheet
+  const worksheet = XLSX.utils.aoa_to_sheet(finalData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Hóa Đơn");
+
+  // Xuất file Excel
+  XLSX.writeFile(workbook, `HoaDon_${order._id}.xlsx`);
+};
+
+export default handleExportExcel;
+

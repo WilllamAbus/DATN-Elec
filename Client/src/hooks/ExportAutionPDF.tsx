@@ -97,14 +97,14 @@ const handleExportPDF = (order: Order) => {
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableCell}>{index + 1}</Text>
               <Text style={styles.tableCell}>
-                {item.items[0]?.productVariant?.variant_name ||
+                {item.itemAuction[0]?.product_randBib?.product_name ||
                   "Không có tên sản phẩm"}
               </Text>
               <Text style={styles.tableCell}>
-                {item.items[0]?.quantity || 0}
+                {item.itemAuction[0]?.quantity || 0}
               </Text>
               <Text style={styles.tableCell}>
-                {item.items[0]?.productVariant?.variant_price.toLocaleString(
+                {item.itemAuction[0]?.price.toLocaleString(
                   "vi-VN"
                 ) || 0}
                 VNĐ
