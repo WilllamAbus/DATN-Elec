@@ -82,3 +82,11 @@ export const totalUser = async () => {
     console.log(error);
   }
 };
+export const revenue = async (params:any ) => {
+  try {
+    const response = await instance.get(`/admin/statistical/revenue`, { params });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

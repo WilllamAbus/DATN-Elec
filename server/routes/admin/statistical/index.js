@@ -12,5 +12,7 @@ router.get('/charProduct',product.productCate);
 router.get('/productInCateActive',product.productByCategoryActive);
 router.get('/productInCateDisable',product.productByCategoryDisable);
 router.get('/getTopComment',product.topComments);
-router.get('/accCountUser',product.totalUser)
+router.get('/accCountUser',product.totalUser);
+router.get('/revenue', product.revenue);
+
 module.exports = router;
