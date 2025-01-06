@@ -16,7 +16,8 @@
       status: { type: String, default: 'active' },   /**'active','ended','deleted' */
       product_randBib:{ type: Schema.Types.ObjectId, ref: 'productAuction' },
       auctionPriceHistory:{ type: Schema.Types.ObjectId, ref: 'AuctionPriceHistory' },
-      isPriceStepAdjusted: { type: Boolean, default: false }
+      isPriceStepAdjusted: { type: Boolean, default: false },
+      checkCurrentPrice: { type: Number },
     },
     {
       collection: "auctionPricingRange",

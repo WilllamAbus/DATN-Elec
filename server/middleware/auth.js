@@ -2,24 +2,7 @@ const jwt = require("jsonwebtoken");
 const Role = require("../model/role.model");
 const User = require("../model/users.model");
 const middlewareController = {
-  // verifyToken: (req, res, next) => {
-  //   const token = req.headers["authorization"];
-  //   const jwt = require("jsonwebtoken");
 
-  //   if (token) {
-  //     const accessToken = token.split(" ")[1];
-  //     jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
-  //       if (err) {
-  //         return res.status(403).json("Token is not valid");
-  //       }
-
-  //       req.user = user;
-  //       next();
-  //     });
-  //   } else {
-  //     return res.status(401).json("You're not authenticated");
-  //   }
-  // },
   verifyToken: async (req, res, next) => {
     const token = req.headers["authorization"];
 

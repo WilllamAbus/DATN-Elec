@@ -9,9 +9,10 @@ interface ModalComponentProps {
   onClose: () => void;
   onConfirm: () => void;
   onCancel: () => void;
+  onCancelTemporary: () => void;
 }
 
-const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClose, onConfirm, onCancel }) => {
+const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClose, onConfirm, onCancel, onCancelTemporary }) => {
   if (!auction) return null;
   const productName = auction.auctionPricingRange && auction.auctionPricingRange.product_randBib
     ? auction.auctionPricingRange.product_randBib.product_name
@@ -34,7 +35,15 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClos
               Xác nhận
             </MyButton>
           )}
-          <MyButton variant="cancelSolid" size="sm" onPress={onCancel}> Hủy </MyButton>
+          {auction.auctionStatus === "temporary" ? (
+            <MyButton variant="cancelSolidTemporary" size="sm" onPress={onCancelTemporary}>
+              Hủy
+            </MyButton>
+          ) : (
+            <MyButton variant="cancelSolid" size="sm" onPress={onCancel}>
+              Hủy
+            </MyButton>
+          )}
           <Button variant="bordered" size="sm" color="default" onPress={onClose}>
             Đóng
           </Button>

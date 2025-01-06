@@ -10,21 +10,24 @@ import { handleBidSubmission } from "./handle/handleBidSubmission";
 import { handleBidSubmissionForEnterAuction } from "./handle/handleBidSubmissionForEnterAuction";
 import socket from '../../../../../services/rtsk/sk';
 import { convertToVietnameseCurrency } from "src/common/pricecurrency/ConvertToVietnameseCurrency";
-import { getAuctionPricingRangeThunk } from "../../../../../redux/product/client/Thunk";
+import { getAuctionPricingRangeThunk, getUserCartThunk } from "../../../../../redux/product/client/Thunk";
 import { useForm, SubmitHandler } from "react-hook-form";
+import useNumberFormat from "./useNumberFormat";
 
 interface ProductCurrentPriceAndBidpriceProps {
   product: ProductAuction;
   onAuctionEnd: () => void;
   onChange: () => void;
   onChangeTemporary: () => void;
+  onChangeTop3Bidder: () => void;
 }
+
 
 interface FormValues {
   bidPrice: number;
 }
 
-const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd, onChange, onChangeTemporary }) => {
+const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd, onChange, onChangeTemporary,onChangeTop3Bidder }) => {
   const [priceStep, setPriceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
   const [currentPrice, setCurrentPrice] = useState<number>(product.auctionPricing.currentPrice ?? 0);
   const [isPriceStepAdjusted, setIsPriceStepAdjusted] = useState<boolean>(false);
@@ -32,10 +35,22 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { register, handleSubmit } = useForm<FormValues>();
-
+  const { register, handleSubmit,setValue } = useForm<FormValues>();
+  const { value, handleChange } = useNumberFormat();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id) || "";
-
+  const userCart = useSelector((state: RootState) => state.productClient.getUserCart.cart);
+  useEffect(() => { dispatch(getUserCartThunk()); }, [dispatch]);
+  const checkStatusCart = (): number => {
+    if (userCart && userCart.user === userId) {
+      if (userCart.itemAuction && userCart.itemAuction.length > 0) {
+        return 1; 
+      } else if (userCart.items && userCart.items.length > 0) {
+        return 2; 
+      }
+    }
+    return 0; 
+  };
+  const statusCart = checkStatusCart();
   const updateAuctionPricing = async () => {
     const result = await dispatch(getAuctionPricingRangeThunk({ slug: product.slug }));
     if (result.payload && typeof result.payload !== "string") {
@@ -96,14 +111,15 @@ useEffect(() => {
     }
     await handleBidSubmission({ ...product, slug: product.slug as string }, userBidPrice, priceStep, currentPrice, dispatch, userId, setCurrentPrice, setUserBidPrice);
     onChange();
+    onChangeTop3Bidder();
   };
 
-  const handleSubmitBidPriceForm: SubmitHandler<FormValues> = async (data) => {
+  const handleSubmitBidPriceForm: SubmitHandler<FormValues> = async () => {
+    const bidPrice = Number(value.replace(/,/g, ''));
     if (!product.slug) {
       toast.error("Slug của sản phẩm không hợp lệ.");
       return;
     }
-    const bidPrice = Number(data.bidPrice);
     const result = await handleBidSubmissionForEnterAuction(
       { ...product, slug: product.slug as string },
       bidPrice,
@@ -118,7 +134,9 @@ useEffect(() => {
     if (result.success) {
       toast.success(result.msg);
     }
+    onChangeTop3Bidder();
   };
+
   
   
   return (
@@ -176,6 +194,7 @@ useEffect(() => {
             variant="gradientBlue"
             className="mt-4"
             onClick={handleSubmitBidPrice}
+            isDisabled={statusCart !== 0}
           >
             Trả giá {(currentPrice + (userBidPrice !== null ? userBidPrice : priceStep)).toLocaleString()} đ
           </MyButton>
@@ -184,16 +203,19 @@ useEffect(() => {
         <CardFooter className="px-3 py-4 text-small text-default-400">
           <form className="w-full justify-between items-center" onSubmit={handleSubmit(handleSubmitBidPriceForm)}>
             <div className="flex w-full items-center">
-              <Input
+            <Input
                 labelPlacement="outside"
-                type="number"
-                className="my-custom-form"
+                type="text"
+                className="my-custom-form my-custom-form-text"
                 placeholder="0.00"
                 variant="underlined"
                 color="success"
-                {...register("bidPrice", { required: true })}
+                isDisabled={statusCart !== 0}
+                {...register("bidPrice", { required: true, setValueAs: (value) => Number(value.replace(/,/g, '')) })}
+                value={value}
+                onChange={(e) => { handleChange(e); setValue('bidPrice', Number(e.target.value.replace(/,/g, ''))); }}
               />
-              <MyButton color="danger" size="md" type="submit" variant="gradientBlue" className="m-2">
+           <MyButton color="danger" size="md" type="submit" variant="gradientBlue" className="m-2" isDisabled={statusCart !== 0}>
                 Nhập giá
               </MyButton>
             </div>

@@ -1,5 +1,5 @@
 const AuctionWinner = require('../../../model/productAuction/auctionWinner');
-const AuctionPricingRange = require('../../../model/productAuction/auctionPricingRange');
+const AuctionPriceHistory = require('../../../model/productAuction/auctionPriceHistory');
 const mongoose = require('mongoose');
 
 const updateUserWarningStatus = (user) => {
@@ -9,7 +9,7 @@ const updateUserWarningStatus = (user) => {
   if (user.warning >= 100) {
     user.status = 'disabled'; 
     user.disabledAt = new Date();
-    user.messgese = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
+    user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
   }
 };
 
@@ -20,7 +20,8 @@ const canceledAuctionTemporary = async (req, res) => {
   try {
     const { auctionWinnerId } = req.body;
     const auctionWinner = await AuctionWinner.findById(auctionWinnerId)
-      .populate('auctionPricingRange user')
+      .populate('auctionPricingRange')
+      .populate({ path: 'user', select: '_id name email noteWarning warning' })
       .session(session);
 
     if (!auctionWinner) {
@@ -57,6 +58,7 @@ const canceledAuctionTemporary = async (req, res) => {
       });
     }
 
+    // Restore the auctionPricingRange details from temporary values
     if (auctionPricingRange.currentPriceTemporarily != null) {
       auctionPricingRange.currentPrice = auctionPricingRange.currentPriceTemporarily;
       auctionPricingRange.startTime = auctionPricingRange.startTimeTemporarily;
@@ -69,6 +71,13 @@ const canceledAuctionTemporary = async (req, res) => {
       auctionPricingRange.remainingTimeTemporarily = null;
       await auctionPricingRange.save({ session });
     }
+
+    // Update AuctionPriceHistory status to 'disabled'
+    await AuctionPriceHistory.updateMany(
+      { auctionPricingRange: auctionPricingRange._id, status: 'active' },
+      { $set: { status: 'disabled' } },
+      { session }
+    );
 
     auctionWinner.confirmationStatus = 'canceled';
     auctionWinner.status = 'disabled';
@@ -101,7 +110,7 @@ const canceledAuctionTemporary = async (req, res) => {
           noteWarning: user.noteWarning,
           status: user.status,
           disabledAt: user.disabledAt,
-          messgese: user.messgese,
+          message: user.message,
         },
       }
     });
