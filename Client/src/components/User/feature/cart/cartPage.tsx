@@ -405,10 +405,10 @@ const CartPage: React.FC = () => {
       }
     };
 
-    updateTimeLeft(); // Cập nhật ngay lập tức
+    updateTimeLeft();
     const interval = setInterval(updateTimeLeft, 1000);
 
-    return () => clearInterval(interval); // Dọn dẹp
+    return () => clearInterval(interval);
   }, [cartauction]);
 
   if (!Array.isArray(carts)) {
