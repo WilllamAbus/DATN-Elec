@@ -37,7 +37,7 @@ const highBidderInformation = async (req, res) => {
 
         // Kiểm tra giá hiện tại với giá tối đa
         if (auctionPricing.currentPrice === auctionPricing.maxPrice) {
-     
+
             // Chuyển đổi auctionPricing._id sang ObjectId nếu cần thiết
             const auctionPricingObjectId = auctionPricing._id.toString();
 
@@ -46,7 +46,7 @@ const highBidderInformation = async (req, res) => {
                 auctionPricingRange: auctionPricingObjectId,
                 auctionStatus: 'temporary'
             }).session(session);
-            
+
 
             if (!auctionWinner) {
                 await session.endSession();
@@ -69,41 +69,41 @@ const highBidderInformation = async (req, res) => {
             const minutes = Math.floor((remainingTimeMillis % (1000 * 60)) / (1000 * 60));
             const seconds = Math.floor((remainingTimeMillis % (1000 * 60)) / 1000);
 
-            const remainingTime = remainingTimeMillis > 0 
+            const remainingTime = remainingTimeMillis > 0
                 ? `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`
                 : "Đã kết thúc";
 
-                if (remainingTime === "Đã kết thúc") {
-                    const auctionPricingRange = auctionPricing;
-                    if (auctionPricingRange.status === 'temporary' && auctionPricingRange.currentPriceTemporarily != null) {
-                        auctionPricingRange.currentPrice = auctionPricingRange.currentPriceTemporarily;
-                        auctionPricingRange.startTime = auctionPricingRange.startTimeTemporarily;
-                        auctionPricingRange.endTime = auctionPricingRange.endTimeTemporarily;
-                        auctionPricingRange.remainingTime = auctionPricingRange.remainingTimeTemporarily;
-                        auctionPricingRange.status = 'active';
-                        auctionPricingRange.currentPriceTemporarily = null;
-                        auctionPricingRange.startTimeTemporarily = null;
-                        auctionPricingRange.endTimeTemporarily = null;
-                        auctionPricingRange.remainingTimeTemporarily = null;
-                        await auctionPricingRange.save();
-                    }
-                    
-                    // Reset trạng thái của AuctionWinner khi thời gian tạm ngưng kết thúc
-                    auctionWinner.auctionStatus = 'lose';
-                    await auctionWinner.save();
-
-                    // Phát sự kiện socket với trạng thái "active"
-                    getIO().emit('auctionStatusChange', { status: 'active' });
-
-                    await session.commitTransaction();
-                    await session.endSession();
-                    
-                    return res.status(200).json({
-                        code: "TIME_EXPIRED",
-                        status: "info",
-                        msg: "Người dùng không thanh toán trong thời gian tạm ngưng. Đấu giá sẽ tiếp tục.",
-                    });
+            if (remainingTime === "Đã kết thúc") {
+                const auctionPricingRange = auctionPricing;
+                if (auctionPricingRange.status === 'temporary' && auctionPricingRange.currentPriceTemporarily != null) {
+                    auctionPricingRange.currentPrice = auctionPricingRange.currentPriceTemporarily;
+                    auctionPricingRange.startTime = auctionPricingRange.startTimeTemporarily;
+                    auctionPricingRange.endTime = auctionPricingRange.endTimeTemporarily;
+                    auctionPricingRange.remainingTime = auctionPricingRange.remainingTimeTemporarily;
+                    auctionPricingRange.status = 'active';
+                    auctionPricingRange.currentPriceTemporarily = null;
+                    auctionPricingRange.startTimeTemporarily = null;
+                    auctionPricingRange.endTimeTemporarily = null;
+                    auctionPricingRange.remainingTimeTemporarily = null;
+                    await auctionPricingRange.save();
                 }
+
+                // Reset trạng thái của AuctionWinner khi thời gian tạm ngưng kết thúc
+                auctionWinner.auctionStatus = 'lose';
+                await auctionWinner.save();
+
+                // Phát sự kiện socket với trạng thái "active"
+                getIO().emit('auctionStatusChange', { status: 'active' });
+
+                await session.commitTransaction();
+                await session.endSession();
+
+                return res.status(200).json({
+                    code: "TIME_EXPIRED",
+                    status: "info",
+                    msg: "Người dùng không thanh toán trong thời gian tạm ngưng. Đấu giá sẽ tiếp tục.",
+                });
+            }
 
             // Phát sự kiện socket với trạng thái "temporary"
             getIO().emit('auctionStatusChange', { status: 'temporary' });

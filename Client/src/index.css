@@ -181,8 +181,12 @@ body {
 }
 .my-custom-form [type='number'] {
   border-width: 0 !important;
+  border-color: transparent !important
 }
-
+.my-custom-form-text [type='text'] {
+  border-width: 0 !important;
+  border-color: transparent !important
+}
 @layer components {
   .btn-primary {
     @apply py-1.5 px-3 text-center bg-blue-700 rounded-md text-white;

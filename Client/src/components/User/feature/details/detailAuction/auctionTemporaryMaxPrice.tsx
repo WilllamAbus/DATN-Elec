@@ -44,7 +44,7 @@ export default function AuctionTemporaryMaxPrice() {
           >
             <img
               alt="Đã trúng đấu giá"
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2Fgia-toi-da-3.svg?alt=media&token=920b6fcb-7212-4eeb-9c4d-dfe27047cea4"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2Fgia-cao-4.svg?alt=media&token=6a288df1-4c71-4ec7-b3e1-512e5c403488"
               className="w-full"
             />
           </motion.div>

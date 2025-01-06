@@ -30,6 +30,7 @@ export const MyButton = extendVariants(Button, {
       confirmSolid: "bg-gradient-to-r from-[#015C92] to-[#2D82B5] text-white font-bold", // Gradient xanh dương cho nút xác nhận
       cancelSolid: "bg-gradient-to-r from-[#C73866] to-[#FE676E] text-white font-bold", // Gradient đỏ cho nút hủy
       waitSolid: "bg-gradient-to-r from-[#F9D423] to-[#FF4E50] text-white font-bold",
+      cancelSolidTemporary: "bg-gradient-to-r from-[#FF5733] to-[#FF8D1A] text-white font-bold",
     },
   },
   defaultVariants: {

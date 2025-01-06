@@ -9,14 +9,14 @@ const BiddingService = {
     new Promise(async (resolve, reject) => {
       try {
         const offset = (page - 1) * limit;
-  
+
         // Tìm sản phẩm dựa trên slug
         const product = await ProductAuction.findOne({ slug })
           .populate({
             path: "auctionPricing",
           }) // Chỉ populate auctionPricing
           .exec();
-  
+
         if (!product || !product.auctionPricing) {
           return resolve({
             success: false,
@@ -25,23 +25,25 @@ const BiddingService = {
             status: 404,
           });
         }
-  
+
         const auctionPricing = product.auctionPricing;
-  
+
         // Lấy danh sách lịch sử đấu giá
         const total = await AuctionPriceHistory.countDocuments({
           auctionPricingRange: auctionPricing._id,
+          status: 'active', // Chỉ lấy những bản ghi có trạng thái "active"
         });
-  
+
         const biddingList = await AuctionPriceHistory.find({
           auctionPricingRange: auctionPricing._id,
+          status: 'active', // Chỉ lấy những bản ghi có trạng thái "active"
         })
           .populate("user", "name") // Lấy thông tin người dùng
           .sort({ bidPrice: -1 }) // Sắp xếp giá từ cao đến thấp
           .skip(offset)
           .limit(limit)
           .select("user bidPrice bidTime"); // Chỉ chọn các trường cần thiết
-  
+
         resolve({
           success: true,
           err: 0,

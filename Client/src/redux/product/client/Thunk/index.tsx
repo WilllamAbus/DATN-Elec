@@ -20,3 +20,6 @@ export * from "./getAuctionPricingRange";
 export * from "./checkStatusAuctionPricingRange";
 export * from "./enterAuctionPrice";
 export * from "./highBidderInformation";
+export * from "./getAuctionProgress";
+export * from "./getTop3HighestBidders";
+export * from "./getUserCart";

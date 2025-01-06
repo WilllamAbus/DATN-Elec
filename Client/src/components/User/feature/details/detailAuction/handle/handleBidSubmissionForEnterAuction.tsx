@@ -33,7 +33,6 @@ export const handleBidSubmissionForEnterAuction = async (
           if (resultAction.payload.status === 'temporary') {
             return { success: true, status: 'temporary', msg: resultAction.payload.msg };
           }
-          toast.success("Giá thầu của bạn đã được ghi nhận!");
         }
         return { success: true, status: resultAction.payload.status, msg: resultAction.payload.msg };
       } else {
