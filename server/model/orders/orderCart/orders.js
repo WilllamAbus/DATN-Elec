@@ -14,7 +14,7 @@ const orderSchema = new Schema(
       required: true,
     },
 
-    totalAmount: { type: Number, required: true },
+    // totalAmount: { type: Number, required: true },
     shippingFee: { type: Number, default: 31000 },
     totalPriceWithShipping: { type: Number, required: true },
     stateOrder: {

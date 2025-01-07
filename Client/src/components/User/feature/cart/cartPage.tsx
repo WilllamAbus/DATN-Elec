@@ -464,7 +464,6 @@ const CartPage: React.FC = () => {
                   <h2 className="text-2xl font-bold text-gray-800">
                     Giỏ hàng thông thường
                   </h2>
-                  <hr className="border-gray-300 mt-4 mb-8" />
 
                   <hr className="border-gray-300 mt-4 mb-8" />
                   {groupedCarts.length > 0 && (

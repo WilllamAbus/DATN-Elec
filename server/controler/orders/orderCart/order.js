@@ -10,6 +10,7 @@ const User = require("../../../model/users.model");
 const Vnpay = require("../../../model/orders/vnpay.model");
 const productVariant = require("../../../model/product_v2/productVariant");
 const AuctionWinner = require("../../../model/productAuction/auctionWinner");
+const productAuction = require("../../../model/productAuction/productAuction");
 const OrderService = require("../../../services/orders/orderSp");
 const path = require("path");
 const { spawn } = require("child_process");
@@ -315,8 +316,8 @@ const authController = {
           select: "product_randBib status",
         },
         {
-          path: "itemAuction.auctionWinner", // Populate auctionWinner
-          select: "auctionStatus", // Chỉ lấy trường cần thiết
+          path: "itemAuction.auctionWinner",
+          select: "auctionStatus",
         },
       ]);
 
@@ -332,26 +333,25 @@ const authController = {
           .json({ message: "Không có sản phẩm nào được chọn để tạo đơn hàng" });
       }
 
-      // Cập nhật trạng thái sau khi tạo đơn hàng
       for (const item of selectedItems) {
         const auctionPricingRange = item.auctionPricingRange;
         const auctionWinner = item.auctionWinner;
 
         if (auctionPricingRange) {
-          auctionPricingRange.status = "paid"; // Cập nhật trạng thái của auctionPricingRange
-          await auctionPricingRange.save(); // Lưu thay đổi vào cơ sở dữ liệu
+          auctionPricingRange.status = "paid";
+          await auctionPricingRange.save();
         }
 
         if (auctionWinner) {
-          auctionWinner.auctionStatus = "paid"; // Cập nhật trạng thái của auctionWinner
-          await auctionWinner.save(); // Lưu thay đổi vào cơ sở dữ liệu
+          auctionWinner.auctionStatus = "paid";
+          await auctionWinner.save();
         }
       }
 
       if (!cart) {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
-      // const selectedItems = cart.itemAuction.filter((item) => item.isSelected);
+
       if (!selectedItems || selectedItems.length === 0) {
         return res
           .status(400)
@@ -359,7 +359,6 @@ const authController = {
       }
       console.log(selectedItems);
 
-      // Kiểm tra thông tin thanh toán và giao hàng
       if (!paymentInfo) {
         return res
           .status(400)
@@ -370,12 +369,10 @@ const authController = {
           .status(400)
           .json({ message: "Thông tin giao hàng không được cung cấp" });
       }
-      // Xử lý thanh toán
-      // Xử lý thanh toán
+
       let paymentId = null;
 
       if (paymentInfo.payment_method === "vnPay") {
-        // Kiểm tra giao dịch VNPay
         const existingVnpay = await Vnpay.findOne({
           transaction: paymentInfo.order_info,
         });
@@ -386,10 +383,9 @@ const authController = {
             .json({ message: "Giao dịch VNPay không tồn tại" });
         }
 
-        // Kiểm tra nếu thanh toán đã tồn tại
         const existingPayment = await Payment.findOne({
           order_info: paymentInfo.order_info,
-          payment_method: "vnPay", // Kiểm tra phương thức thanh toán
+          payment_method: "vnPay",
         });
 
         if (existingPayment) {
@@ -408,7 +404,6 @@ const authController = {
         await newPayment.save();
         paymentId = newPayment._id;
       } else if (paymentInfo.payment_method === "Thanh toán khi nhận hàng") {
-        // Lưu giao dịch với phương thức thanh toán "cash"
         const newPayment = new Payment({
           amount: paymentInfo?.amount || 0,
           order_info: paymentInfo?.order_info || "null",
@@ -419,10 +414,9 @@ const authController = {
         await newPayment.save();
         paymentId = newPayment._id;
       } else {
-        // Kiểm tra nếu thanh toán không phải VNPay hoặc cash
         const existingPayment = await Payment.findOne({
           order_info: paymentInfo.order_info,
-          payment_method: paymentInfo.payment_method, // Kiểm tra theo phương thức thanh toán
+          payment_method: paymentInfo.payment_method,
         });
 
         if (existingPayment) {
@@ -440,7 +434,7 @@ const authController = {
         await newPayment.save();
         paymentId = newPayment._id;
       }
-      // Tạo thông tin giao hàng
+
       const newShipping = new Shipping({
         recipientName: shipping.recipientName || "Chưa có tên người nhận",
         phoneNumber: shipping.phoneNumber || "Chưa có số điện thoại",
@@ -448,16 +442,14 @@ const authController = {
         stateShipping: "Xác nhận",
       });
       await newShipping.save();
-      // Kiểm tra voucher
 
-      // Tính tổng giá trị và phí vận chuyển
       const totalamount = selectedItems.reduce(
         (sum, item) => sum + item.totalItemPrice,
         0
       );
       const shippingFee = shipping.shipping || 0;
       const totalPriceWithShipping = totalamount + shippingFee;
-      // Tạo đơn hàng
+
       const newOrder = new Order({
         user: userId,
         payment: paymentId || null,
@@ -471,7 +463,7 @@ const authController = {
         stateOrder: "Chờ xử lý",
       });
       await newOrder.save();
-      // Tạo chi tiết đơn hàng
+
       const orderDetailItems = [];
       for (const item of selectedItems) {
         const inventory = await Inventory.findOne({
@@ -483,7 +475,6 @@ const authController = {
             .json({ message: "Không tìm thấy kho hàng cho sản phẩm đấu giá" });
         }
 
-        // Kiểm tra số lượng tồn kho
         if (inventory.quantityShelf < item.quantity) {
           return res.status(400).json({
             message: `Số lượng sản phẩm không đủ. Sản phẩm: ${item.productAuction}, số lượng còn lại: ${inventory.quantityShelf}`,
@@ -518,7 +509,7 @@ const authController = {
       await orderDetail.save();
       newOrder.cartDetails = [orderDetail._id];
       await newOrder.save();
-      // Ghi lại tương tác
+
       const newInteraction = new Interaction({
         user: userId,
         OrderCart: newOrder._id,
@@ -527,9 +518,24 @@ const authController = {
         score: 5,
       });
       await newInteraction.save();
-      // Loại bỏ các sản phẩm đã chọn khỏi giỏ hàng
+
       cart.itemAuction = cart.itemAuction.filter((item) => !item.isSelected);
       await cart.save();
+      for (const item of selectedItems) {
+        if (
+          item.auctionPricingRange &&
+          item.auctionPricingRange.product_randBib
+        ) {
+          const productRandBibId = item.auctionPricingRange.product_randBib;
+
+          await productAuction.findByIdAndUpdate(
+            productRandBibId,
+            { status: "disable" },
+            { new: true }
+          );
+        }
+      }
+
       res.status(201).json({
         message: "Đơn hàng đã được tạo thành công",
         order: newOrder,

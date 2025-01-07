@@ -19,7 +19,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   itemQuantities,
   handleCheckoutAuction,
   userRole,
-  // activeTab,
 }) => {
   return (
     <div>
