@@ -6,6 +6,7 @@ const Categories = require(`../../../model/catgories.model`);
 const modelComment = require("../../../model/comment.model");
 const modelViewProduct = require("../../../model/product_v2/productVariant");
 const modelUser = require("../../../model/users.model");
+const modelProductAucation = require("../../../model/productAuction/productAuction");
 const statisticalController = {
   // top sản phẩm có lượt xem
   topViewProduct: async (req, res) => {
@@ -344,7 +345,107 @@ const statisticalController = {
         message: 'Internal Server Error'
       });
     }
-  }
+  },
+  //doanh thu 
+  revenue: async (req, res) => {
+    try {
+      const { startDate, endDate, page = 1, limit = 5 } = req.query; // Nhận tham số từ query params
+  
+      const filter = {};
+  
+      // Xử lý lọc theo khoảng thời gian
+      if (startDate && endDate) {
+        filter.createdAt = {
+          $gte: new Date(new Date(startDate).setHours(0, 0, 0, 0)), // Từ đầu ngày
+          $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)), // Đến cuối ngày
+        };
+      } else if (startDate) {
+        filter.createdAt = {
+          $gte: new Date(new Date(startDate).setHours(0, 0, 0, 0)),
+          $lte: new Date(new Date(startDate).setHours(23, 59, 59, 999)),
+        };
+      } else if (endDate) {
+        filter.createdAt = {
+          $gte: new Date(new Date(endDate).setHours(0, 0, 0, 0)),
+          $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+        };
+      }
+  
+      // Tính tổng doanh thu
+      const totalRevenueResult = await OrderDetail.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$totalItemPrice" },
+          },
+        },
+      ]);
+      const totalRevenue =
+        totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
+  
+      // Lấy dữ liệu chi tiết
+      const orderDetails = await OrderDetail.find(filter)
+        .populate([
+          { path: "order", model: "OrderCart" },
+          { path: "items.product", model: "product_v2" },
+          { path: "items.productVariant", model: "productVariant" },
+          { path: "itemAuction.product_randBib", model: "productAuction" },
+        ])
+        .select("createdAt items itemAuction order") // Chọn thêm các trường liên quan
+        .sort({ createdAt: -1 });
+  
+      // Gộp sản phẩm từ items và itemAuction
+      const allProducts = orderDetails.flatMap((order) => {
+        return [
+          ...(order.items || []).map((item) => ({
+            ...item.toObject(),
+            createdAt: order.createdAt, // Gắn createdAt của OrderDetail vào từng item
+          })),
+          ...(order.itemAuction || []).map((item) => ({
+            ...item.toObject(),
+            createdAt: order.createdAt, // Gắn createdAt của OrderDetail vào từng item
+          })),
+        ];
+      });
+  
+      // Tính tổng số trang
+      const totalProducts = allProducts.length;
+      const totalPages = Math.ceil(totalProducts / limit);
+  
+      // Áp dụng phân trang
+      const paginatedProducts = allProducts.slice(
+        (page - 1) * limit,
+        page * limit
+      );
+  
+      // Trả về kết quả
+      res.status(200).json({
+        success: true,
+        message: "Products and revenue fetched successfully",
+        data: {
+          totalRevenue,
+          products: paginatedProducts,
+          totalPages,
+          currentPage: Number(page),
+        },
+      });
+    } catch (error) {
+      console.error("Error in fetching products and revenue:", error);
+      res.status(500).json({ success: false, message: "An error occurred" });
+    }
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
 };
 
