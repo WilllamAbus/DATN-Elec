@@ -7,6 +7,8 @@ const modelComment = require("../../../model/comment.model");
 const modelViewProduct = require("../../../model/product_v2/productVariant");
 const modelUser = require("../../../model/users.model");
 const modelProductAucation = require("../../../model/productAuction/productAuction");
+const removeAccents = require('remove-accents');
+const mongoose = require('mongoose');
 const statisticalController = {
   // top sản phẩm có lượt xem
   topViewProduct: async (req, res) => {
@@ -435,7 +437,36 @@ const statisticalController = {
       res.status(500).json({ success: false, message: "An error occurred" });
     }
   },
+   updateNormalizedNames : async (req, res) => {
+    try {
+      // Lấy tất cả các sản phẩm từ database
+      const products = await ProductV2.find();
   
+      // Lập qua từng sản phẩm và cập nhật trường normalized_name
+      const updatePromises = products.map((product) => {
+        const normalizedName = removeAccents(product.product_name || '')
+          .toLowerCase()
+          .replace(/\s+/g, ' ');
+  
+        return ProductV2.updateOne(
+          { _id: product._id },
+          { $set: { normalized_name: normalizedName } }
+        );
+      });
+  
+      // Chờ tất cả các cập nhật hoàn thành
+      await Promise.all(updatePromises);
+  
+      console.log('All products updated with normalized_name.');
+    } catch (err) {
+      console.error('Error updating products:', err);
+    } finally {
+      // Đóng kết nối MongoDB
+      mongoose.connection.close();
+    }
+  },
+  
+ 
   
   
   

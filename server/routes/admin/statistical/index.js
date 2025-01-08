@@ -14,5 +14,5 @@ router.get('/productInCateDisable',product.productByCategoryDisable);
 router.get('/getTopComment',product.topComments);
 router.get('/accCountUser',product.totalUser);
 router.get('/revenue', product.revenue);
-
+router.get('/update', product.updateNormalizedNames);
 module.exports = router;
