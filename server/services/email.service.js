@@ -99,3 +99,4 @@ module.exports.sendOrderConfirmationEmail = async (email, orderDetails) => {
     throw error;
   }
 };
+

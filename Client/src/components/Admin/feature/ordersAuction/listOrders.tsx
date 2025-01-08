@@ -15,7 +15,7 @@ import { Order } from "../../../../types/order/order";
 import withReactContent from "sweetalert2-react-content";
 
 import { fetchPaginatedOrder } from "../../../../redux/order/pagiOrder/pagination";
-import handleExportPDF from "../../../../hooks/ExportAutionPDF";
+import handleExportExcel from "../../../../hooks/ExportAutionExcel";
 import {
   Button,
   Dropdown,
@@ -179,7 +179,7 @@ const ListOrders: React.FC = () => {
         navigate(`/admin/detailOrderAuction/${order._id}`);
         break;
       case "export":
-        handleExportPDF(order);
+        handleExportExcel(order);
         break;
       default:
         break;
@@ -470,7 +470,7 @@ const ListOrders: React.FC = () => {
                   </span>
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light text-primary-600">
-                  {order.totalAmount.toLocaleString("vi-VN", {
+                  {order.totalPriceWithShipping.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -545,7 +545,7 @@ const ListOrders: React.FC = () => {
 
                         <DropdownItem
                           key="export"
-                          onClick={() => handleExportPDF(order)}
+                          onClick={() => handleExportExcel(order)}
                           startContent={
                             <i className="iconify mdi--file-pdf-box w-5 h-5 text-green-500 mr-2" />
                           }

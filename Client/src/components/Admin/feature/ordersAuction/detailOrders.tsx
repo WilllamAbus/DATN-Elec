@@ -442,7 +442,7 @@ const OrderDetails: React.FC = () => {
             </p>
             <p className="text-lg text-red-600 mb-2">
               <span className="font-medium">Tổng tiền:</span>{" "}
-              {selectedOrder?.totalAmount?.toLocaleString() || "0"} VND
+              {selectedOrder?.totalPriceWithShipping?.toLocaleString() || "0"} VND
             </p>
             <div className="mb-4">
               <label className="text-lg font-medium mb-2 block">

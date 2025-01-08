@@ -1009,9 +1009,8 @@ const authController = {
               const inventory = item.inventory;
               if (!inventory) {
                 return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                    item.product?.name || "không xác định"
-                  }.`,
+                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                    }.`,
                 });
               }
               inventory.quantityShelf += item.quantity;
@@ -1028,17 +1027,15 @@ const authController = {
 
           if (!inventory) {
             return res.status(400).json({
-              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 
           if (!isRestocking && inventory.quantityShelf < item.quantity) {
             return res.status(400).json({
-              message: `Số lượng tồn kho không đủ cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 
@@ -1111,9 +1108,39 @@ const authController = {
         // Lưu lý do hủy nếu cần thiết (bỏ qua nếu không có lý do cụ thể)
         // order.cancelReason = cancelReason || "Không có lý do cụ thể";
       }
+
+      if (stateOrder !== "Hoàn tất") {
+        const transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.EMAIL_USERNAME,
+            pass: process.env.EMAIL_PASSWORD,
+          },
+        });
+
+        // Render email template bằng EJS
+        const emailTemplate = await ejs.renderFile(
+          path.join(__dirname, "..", "views", "orderEmail.ejs"),
+          { order }
+        );
+
+        // Gửi email
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: "daodinhhay@gmail.com",
+          subject: `Cập nhật trạng thái đơn hàng: ${stateOrder}`,
+          html: emailTemplate,
+        });
+
+        console.log("Email đã được gửi thành công!");
+      }
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();
+
+      
 
       res.status(200).json({
         message: "Trạng thái đơn hàng đã được cập nhật thành công.",
