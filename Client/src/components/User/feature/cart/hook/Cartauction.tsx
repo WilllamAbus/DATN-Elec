@@ -19,11 +19,10 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   itemQuantities,
   handleCheckoutAuction,
   userRole,
-  // activeTab,
 }) => {
   return (
     <div>
-      {cartauction[0].itemAuction.length > 0 && (
+      {cartauction[0]?.itemAuction.length > 0 && (
         <div className="p-4 rounded-md bg-gray-50">
           <h2 className="text-xl font-bold text-gray-800">Tổng cộng</h2>
           <hr className="border-gray-300 mt-4 mb-8" />

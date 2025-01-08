@@ -190,7 +190,7 @@ const ListOrders: React.FC = () => {
   const totalAmount = Order.filter(
     (order) =>
       order.stateOrder !== "Hủy đơn hàng" && order.stateOrder !== "Đã hoàn tiền"
-  ).reduce((sum, order) => sum + order.totalAmount, 0);
+  ).reduce((sum, order) => sum + order.totalPriceWithShipping, 0);
 
   return (
     <>
