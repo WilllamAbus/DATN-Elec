@@ -38,14 +38,14 @@ const Manager = () => {
         ...(filters.startDate && { startDate: filters.startDate }),
         ...(filters.endDate && { endDate: filters.endDate }),
       };
-  
+
       const res = await revenue(params);
-  
+
       if (res?.data) {
         const { totalRevenue = 0, products = [] } = res.data;
-  
+
         setTotalRevenue(totalRevenue);
-  
+
         // Lọc theo loại sản phẩm
         const filteredData =
           productType === "0"
@@ -55,18 +55,18 @@ const Manager = () => {
                   ? item?.product_randBib
                   : !item?.product_randBib
               );
-  
+
         // Phân trang dữ liệu đã lọc
         const startIndex = (page - 1) * 5;
         const paginatedData = filteredData.slice(startIndex, startIndex + 5);
-  
+
         setData(paginatedData);
         setTotalPages(Math.ceil(filteredData.length / 5));
-  
+
         // Tính doanh thu cho từng loại sản phẩm
         let auctionRev = 0;
         let normalRev = 0;
-  
+
         filteredData.forEach((item: any) => {
           const itemTotal = item?.price * item?.quantity;
           if (item?.product_randBib) {
@@ -75,10 +75,10 @@ const Manager = () => {
             normalRev += itemTotal;
           }
         });
-  
+
         setAuctionRevenue(auctionRev);
         setNormalRevenue(normalRev);
-  
+
         if (!filters.startDate && !filters.endDate) {
           setOverallRevenue(totalRevenue);
         }
@@ -94,13 +94,11 @@ const Manager = () => {
       setTotalRevenue(0);
     }
   };
-  
 
   // Xử lý khi thay đổi bộ lọc ngày
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
-    
   };
 
   // Làm mới bộ lọc
@@ -245,7 +243,10 @@ const Manager = () => {
                   key={index}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <td className="px-6 py-4 break-words text-ellipsis max-w-xs" text-center>
+                  <td
+                    className="px-6 py-4 break-words text-ellipsis max-w-xs"
+                    text-center
+                  >
                     {item?.product?.product_name ||
                       item?.product_randBib?.product_name ||
                       "N/A"}
@@ -281,19 +282,18 @@ const Manager = () => {
 
       {/* Phân trang */}
       <div className="flex justify-center my-4">
-  {totalPages > 1 && (
-    <Pagination
-      isCompact
-      loop
-      showControls
-      color="primary"
-      total={totalPages}
-      page={currentPage}
-      onChange={handlePageChange}
-    />
-  )}
-</div>
-
+        {totalPages > 1 && (
+          <Pagination
+            isCompact
+            loop
+            showControls
+            color="primary"
+            total={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+          />
+        )}
+      </div>
     </div>
   );
 };
