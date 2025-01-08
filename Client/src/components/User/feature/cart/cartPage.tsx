@@ -405,10 +405,10 @@ const CartPage: React.FC = () => {
       }
     };
 
-    updateTimeLeft(); // Cập nhật ngay lập tức
+    updateTimeLeft();
     const interval = setInterval(updateTimeLeft, 1000);
 
-    return () => clearInterval(interval); // Dọn dẹp
+    return () => clearInterval(interval);
   }, [cartauction]);
 
   if (!Array.isArray(carts)) {
@@ -464,7 +464,6 @@ const CartPage: React.FC = () => {
                   <h2 className="text-2xl font-bold text-gray-800">
                     Giỏ hàng thông thường
                   </h2>
-                  <hr className="border-gray-300 mt-4 mb-8" />
 
                   <hr className="border-gray-300 mt-4 mb-8" />
                   {groupedCarts.length > 0 && (
