@@ -109,71 +109,118 @@ if df_merged is not None:
 
 # --- PART 2: RECOMMENDATION FOR AUCTION PRODUCTS ---
 
-# Load data for auction products
-product_auction_collection = db['productAuction']
-auction_pricing_collection = db['auctionPricingRange']
+try:
+    # Tập hợp dữ liệu từ MongoDB
+    product_auction_collection = db['productAuction']
+    auction_pricing_collection = db['auctionPricingRange']
 
-product_data = product_auction_collection.find()
-auction_pricing_data = auction_pricing_collection.find({"status": "active"})
+    product_data = product_auction_collection.find()
+    auction_pricing_data = auction_pricing_collection.find({"status": "active"})
 
-df_products_auction = pd.DataFrame(list(product_data))
-df_auction_pricing = pd.DataFrame(list(auction_pricing_data))
+    # Chuyển dữ liệu thành DataFrame
+    df_products_auction = pd.DataFrame(list(product_data))
+    df_auction_pricing = pd.DataFrame(list(auction_pricing_data))
 
-if not df_products_auction.empty and not df_auction_pricing.empty:
-    df_products_auction['_id'] = df_products_auction['_id'].astype(str)
-    df_auction_pricing['product_randBib'] = df_auction_pricing['product_randBib'].astype(str)
+    # Kiểm tra nếu dữ liệu không rỗng
+    if not df_products_auction.empty and not df_auction_pricing.empty:
+        # Chuyển `_id` và `product_randBib` sang dạng chuỗi để dễ nối
+        df_products_auction['_id'] = df_products_auction['_id'].astype(str)
+        df_auction_pricing['product_randBib'] = df_auction_pricing['product_randBib'].astype(str)
 
-    df_products_auction = pd.merge(
-        df_products_auction,
-        df_auction_pricing[['product_randBib', 'status']],
-        left_on='_id',
-        right_on='product_randBib',
-        how='inner'
-    )
+        # Lọc các sản phẩm chỉ liên quan đến các bản ghi trong auctionPricingRange (trạng thái "active")
+        df_products_auction = pd.merge(
+            df_products_auction,
+            df_auction_pricing[['product_randBib', 'status']],
+            left_on='_id',
+            right_on='product_randBib',
+            how='inner'
+        )
 
-    def combine_features_auction(row):
-        product_name = row['product_name'] if pd.notnull(row['product_name']) else ''
-        product_type = row.get('product_type', '') if pd.notnull(row.get('product_type', '')) else ''
-        product_brand = row.get('product_brand', '') if pd.notnull(row.get('product_brand', '')) else ''
-        return f"{product_name} {product_type} {product_brand}"
+        # Hàm tạo chuỗi đặc điểm kết hợp (combined features)
+        def combine_features_auction(row):
+            product_name = row['product_name'] if pd.notnull(row['product_name']) else ''
+            product_type = row.get('product_type', '') if pd.notnull(row.get('product_type', '')) else ''
+            product_brand = row.get('product_brand', '') if pd.notnull(row.get('product_brand', '')) else ''
+            return f"{product_name} {product_type} {product_brand}".strip()
 
-    df_products_auction['combinedFeatures'] = df_products_auction.apply(combine_features_auction, axis=1)
+        df_products_auction['combinedFeatures'] = df_products_auction.apply(combine_features_auction, axis=1)
 
-    # Kiểm tra dữ liệu
-    if df_products_auction['combinedFeatures'].isnull().all() or df_products_auction['combinedFeatures'].str.strip().eq('').all():
-        print("Cột combinedFeatures rỗng!")
-    else:
+        # Xử lý giá trị NaN nếu có
+        df_products_auction['combinedFeatures'] = df_products_auction['combinedFeatures'].fillna('default')
+
+        # Tạo ma trận TF-IDF
         tfidf = TfidfVectorizer(stop_words=None)
         tfidf_matrix = tfidf.fit_transform(df_products_auction['combinedFeatures'])
         similarity_matrix = cosine_similarity(tfidf_matrix)
 
-    @app.route('/auction-recom/<slug>', methods=['GET'])
-    def recommend_auctions(slug):
-        if slug not in df_products_auction['slug'].values:
-            available_slugs = df_products_auction['slug'].tolist()[:5]
-            return jsonify({
-                'error': 'Invalid slug',
-                'requested_slug': slug,
-                'available_slugs': available_slugs
-            }), 400
+        @app.route('/auction-recom/<slug>', methods=['GET'])
+        def recommend_auctions(slug):
+            """
+            API để gợi ý sản phẩm dựa trên slug.
+            """
+            print(f"Received slug: {slug}")
+            print("Current slugs:", df_products_auction['slug'].tolist())
 
-        product_index = df_products_auction[df_products_auction['slug'] == slug].index[0]
-        similarity_scores = list(enumerate(similarity_matrix[product_index]))
-        sorted_products = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
+            # Kiểm tra nếu slug không tồn tại
+            if slug not in df_products_auction['slug'].values:
+                available_slugs = df_products_auction['slug'].dropna().tolist()[:5]
+                return jsonify({
+                    'error': 'Invalid slug',
+                    'requested_slug': slug,
+                    'available_slugs': available_slugs
+                }), 400
 
-        recommendations = []
-        for i in range(1, min(6, len(sorted_products))):
-            recommended_index = sorted_products[i][0]
-            recommendations.append({
-                'product_name': df_products_auction.iloc[recommended_index]['product_name'],
-                'slug': df_products_auction.iloc[recommended_index]['slug'],
-                'image': df_products_auction.iloc[recommended_index].get('image', '')
-            })
+            # Tiếp tục xử lý nếu slug hợp lệ
+            product_index = df_products_auction[df_products_auction['slug'] == slug].index[0]
+            similarity_scores = list(enumerate(similarity_matrix[product_index]))
+            sorted_products = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
 
-        if not recommendations:
-            return jsonify({'error': 'No similar products found'}), 404
+            # Tạo danh sách gợi ý sản phẩm
+            recommendations = []
+            for i in range(1, min(6, len(sorted_products))):
+                recommended_index = sorted_products[i][0]
+                # Kiểm tra nếu cột 'status' có tồn tại trong DataFrame
+                product_id = df_products_auction.iloc[recommended_index]['product_brand']  # Lấy _id của thương hiệu
+                brand_name = None
 
-        return jsonify({'Sản phẩm gợi ý': recommendations})
+                # Kiểm tra và lấy tên thương hiệu từ collection 'Brand'
+                brand_data = db['brands'].find_one({'_id': ObjectId(product_id)})
+                if brand_data:
+                    brand_name = brand_data.get('name', 'Unknown Brand')
+                    
+                supplier_name = 'Unknown Supplier'  # Giá trị mặc định
+                supplier_id = df_products_auction.iloc[recommended_index]['product_supplier']  # Lấy _id nhà cung cấp
+                supplier_data = db['suppliers'].find_one({'_id': ObjectId(supplier_id)})
+                if supplier_data:
+                    supplier_name = supplier_data.get('name', 'Unknown Supplier')
+                df_products_auction.rename(columns={'status_y': 'status'}, inplace=True)
+
+                # Kiểm tra cột 'status' đã được đổi tên chưa
+                if 'status' not in df_products_auction.columns:
+                    print("Cột 'status' không tồn tại trong DataFrame.")
+                else:
+                    recommendations.append({
+                        'product_name': df_products_auction.iloc[recommended_index]['product_name'],
+                        'slug': df_products_auction.iloc[recommended_index]['slug'],
+                        'image': df_products_auction.iloc[recommended_index].get('image', ''),
+                        'status': df_products_auction.iloc[recommended_index]['status'],
+                        'brand_name': brand_name,
+                        'supplier_name': supplier_name
+                    })
+
+            # Trả về kết quả
+            if not recommendations:
+                return jsonify({'error': 'No similar products found'}), 404
+
+            return jsonify({'Sản phẩm gợi ý': recommendations})
+
+    else:
+        print("No data found in either productAuction or auctionPricingRange.")
+
+
+except Exception as e:
+    print(f"Error: {e}")
 
 if __name__ == "__main__":
     app.run(port=1111)
+
