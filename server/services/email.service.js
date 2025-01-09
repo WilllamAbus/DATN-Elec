@@ -100,3 +100,15 @@ module.exports.sendOrderConfirmationEmail = async (email, orderDetails) => {
   }
 };
 
+const sendEmail = async (mailOptions) => {
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email đã được gửi thành công');
+  } catch (error) {
+    console.error('Lỗi khi gửi email:', error);
+    throw error; // Ném lỗi để xử lý trong controller
+  }
+};
+
+module.exports = { sendEmail };
+
