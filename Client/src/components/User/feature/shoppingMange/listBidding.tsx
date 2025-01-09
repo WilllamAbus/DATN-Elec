@@ -60,7 +60,7 @@ const ListProductTime: React.FC = () => {
       <h2 className="text-3xl leading-10 text-black mb-9 flex justify-between items-center">
         Lịch sử lượt đấu giá
       </h2>
-      <div className="mt-7 border border-gray-300 pt-9">
+      <div className="mt-7 pt-9">
         {loading && <p className="text-center text-gray-600">Đang tải...</p>}
         {error && <p className="text-center text-red-600">{error}</p>}
 

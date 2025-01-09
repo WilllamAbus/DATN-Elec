@@ -190,7 +190,7 @@ const ListOrders: React.FC = () => {
   const totalAmount = Order.filter(
     (order) =>
       order.stateOrder !== "Hủy đơn hàng" && order.stateOrder !== "Đã hoàn tiền"
-  ).reduce((sum, order) => sum + order.totalAmount, 0);
+  ).reduce((sum, order) => sum + order.totalPriceWithShipping, 0);
 
   return (
     <>
@@ -470,7 +470,7 @@ const ListOrders: React.FC = () => {
                   </span>
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light text-primary-600">
-                  {order.totalAmount.toLocaleString("vi-VN", {
+                  {order.totalPriceWithShipping.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}

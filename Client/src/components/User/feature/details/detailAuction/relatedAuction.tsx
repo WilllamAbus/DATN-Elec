@@ -24,9 +24,9 @@ const RelatedProduct: React.FC = () => {
       }
       try {
         setLoading(true);
-        const relatedData: RelatedProductsAuctionResponse  = await fetchRelatedProductAuctions(slug); // Lấy mảng Recommendation[]
+        const relatedData: RelatedProductsAuctionResponse = await fetchRelatedProductAuctions(slug); // Lấy mảng Recommendation[]
         console.log("Related Data:", relatedData);  // Kiểm tra lại cấu trúc dữ liệu trả về
-   
+
         // Kiểm tra có đúng dữ liệu trả về là mảng trong "Sản phẩm gợi ý"
         if (relatedData && Array.isArray(relatedData["Sản phẩm gợi ý"])) {
           console.log('Sản phẩm gợi ý là:', relatedData["Sản phẩm gợi ý"]);
@@ -71,7 +71,8 @@ const RelatedProduct: React.FC = () => {
             },
           }}
         >
-          {relatedProducts.map((product) => (
+        <div className={`gridContainer ${styles.gridContainer}`}>
+         {relatedProducts.map((product) => (
             <SwiperSlide key={product.slug}>
               <div className={styles.productCard}>
                 <div className="backdrop-blur-sm bg-white/30">
@@ -103,10 +104,28 @@ const RelatedProduct: React.FC = () => {
                       {product.product_name}
                     </h5>
                   </div>
+
+                  <div className="px-2 mt-2 text-xs font-medium text-gray-700">
+                    <span>Thương hiệu: </span>
+                    {product.brand_name ? (
+                      <span className="text-gray-900">{product.brand_name}</span>
+                    ) : (
+                      <span className="text-gray-900">N/A</span>
+                    )}
+                  </div>
+                  <div className="px-2 mt-2 text-xs font-medium text-gray-700">
+                    <span>Nhà cung cấp: </span>
+                    {product.supplier_name ? (
+                      <span className="text-gray-900">{product.supplier_name}</span>
+                    ) : (
+                      <span className="text-gray-900">N/A</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </SwiperSlide>
           ))}
+         </div>
         </Swiper>
       )}
     </div>

@@ -4,6 +4,7 @@ import UserStatistics from '../../../components/Admin/home/user';
 import CharCategories from "../../../components/Admin/home/categories";
 import CharProduct  from "../../../components/Admin/home/productCate";
 import TopComment from "../../../components/Admin/home/topComment";
+import Manager from "../../../components/Admin/home/manager"
 const AdminHome: React.FC = () => {
   return (
     <div className="px-4 pt-6">
@@ -14,6 +15,10 @@ const AdminHome: React.FC = () => {
       
       </div>
       
+      <div className="grid w-full grid-cols-1 gap-4 mt-4 xl:grid-cols-2 2xl:grid-cols-3">
+        
+      <Manager/>
+      </div>
       <div className="grid w-full grid-cols-1 gap-4 mt-4 xl:grid-cols-2 2xl:grid-cols-3">
         
       <CharCategories/>
