@@ -14,7 +14,8 @@ const {
     highBidderInformation,
     getAuctionProgress,
     getTop3HighestBidders,
-    getUserCart
+    getUserCart,
+    checkAuctionTimeAuctionPricingRange
 } = require('../../../controler/client');
 
 const middlewareController = require("../../../middleware/auth");
@@ -33,6 +34,6 @@ router.get('/top-3-highest-bidder/:slug', getTop3HighestBidders);
 router.get('/user/bidding-history', middlewareController.getHeader, getUserBiddingHistory);
 router.get('/user/bidding-details/:slug', middlewareController.getHeader, getUserBiddingDetails);
 router.get('/check-list-cart', middlewareController.getHeader,getUserCart);
-
+router.get('/check-auctio-time-auction-pricing-range/:slug', middlewareController.getHeader,checkAuctionTimeAuctionPricingRange);
 module.exports = router;
 getTop3HighestBidders

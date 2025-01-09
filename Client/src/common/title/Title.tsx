@@ -30,6 +30,7 @@ const Title = () => {
     "/contact": "Liên hệ",
     "/link-account": "Liên kết tài khoản",
     "/link-account-success": "Liên kết tài khoản thành công",
+    "/session-auction": "Phiên đấu giá",
   };
 
   // Route động và tiêu đề tương ứng
@@ -39,7 +40,7 @@ const Title = () => {
     { prefix: "/search/", title: "Tìm kiếm sản phẩm" },
     { prefix: "/filter/", title: "Lọc sản phẩm" },
     { prefix: "/detailProd/", title: "Chi tiết sản phẩm (ID)" },
-    { prefix: "/detailAuc/", title: "Chi tiết đấu giá" },
+    { prefix: "/product-auction/", title: "Chi tiết đấu giá" },
     { prefix: "/checkout/", title: "Thanh toán" },
     { prefix: "/complete/", title: "Hoàn tất thanh toán" },
   ];

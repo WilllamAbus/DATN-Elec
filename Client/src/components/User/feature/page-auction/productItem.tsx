@@ -10,7 +10,7 @@ export interface ProductItemProps {
 }
 
 const ProductItem: React.FC<ProductItemProps> = ({ product, index }) => {
-  const isEnded = product.auctionPricing.status === 'ended'; 
+  const isEnded = product.auctionPricing && product.auctionPricing.status === 'ended';
 
   return (
     <div

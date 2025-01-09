@@ -27,7 +27,7 @@ interface FormValues {
   bidPrice: number;
 }
 
-const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd, onChange, onChangeTemporary,onChangeTop3Bidder }) => {
+const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = ({ product, onAuctionEnd, onChange, onChangeTemporary, onChangeTop3Bidder }) => {
   const [priceStep, setPriceStep] = useState<number>(product.auctionPricing.priceStep ?? 0);
   const [currentPrice, setCurrentPrice] = useState<number>(product.auctionPricing.currentPrice ?? 0);
   const [isPriceStepAdjusted, setIsPriceStepAdjusted] = useState<boolean>(false);
@@ -35,22 +35,26 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { register, handleSubmit,setValue } = useForm<FormValues>();
+  const { register, handleSubmit, setValue } = useForm<FormValues>();
   const { value, handleChange } = useNumberFormat();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id) || "";
+  const roles = useSelector((state: RootState) => state.auth.login.roles);
   const userCart = useSelector((state: RootState) => state.productClient.getUserCart.cart);
+
+
   useEffect(() => { dispatch(getUserCartThunk()); }, [dispatch]);
   const checkStatusCart = (): number => {
     if (userCart && userCart.user === userId) {
       if (userCart.itemAuction && userCart.itemAuction.length > 0) {
-        return 1; 
+        return 1;
       } else if (userCart.items && userCart.items.length > 0) {
-        return 2; 
+        return 2;
       }
     }
-    return 0; 
+    return 0;
   };
   const statusCart = checkStatusCart();
+  const isDisabled = statusCart === 1 || roles.some((role) => role.name === "admin");
   const updateAuctionPricing = async () => {
     const result = await dispatch(getAuctionPricingRangeThunk({ slug: product.slug }));
     if (result.payload && typeof result.payload !== "string") {
@@ -79,30 +83,30 @@ const CurrentPriceAndBidprice: React.FC<ProductCurrentPriceAndBidpriceProps> = (
     };
   }, [product.slug, onAuctionEnd]);
 
-useEffect(() => {
-  socket.on('bidPlaced', async (data) => {
-    if (data.slug === product.slug) {
-      await updateAuctionPricing();
-      if (data.status === 'ended') {
-        onAuctionEnd();
+  useEffect(() => {
+    socket.on('bidPlaced', async (data) => {
+      if (data.slug === product.slug) {
+        await updateAuctionPricing();
+        if (data.status === 'ended') {
+          onAuctionEnd();
+        }
+        if (data.status === 'temporary') {
+          console.log("onChangeTemporary called");
+          onChangeTemporary();
+        }
+        if (data.userId !== userId) {
+          toast.success(data.message);
+        }
       }
-      if (data.status === 'temporary') {
-        console.log("onChangeTemporary called");
-        onChangeTemporary();
-      }
-      if (data.userId !== userId) {
-        toast.success(data.message);
-      }
-    }
-  });
+    });
 
-  return () => {
-    socket.off('bidPlaced');
-  };
-}, [product.slug, userId, navigate]);
+    return () => {
+      socket.off('bidPlaced');
+    };
+  }, [product.slug, userId, navigate]);
 
-  
-  
+
+
 
   const handleSubmitBidPrice = async () => {
     if (!product.slug) {
@@ -130,15 +134,15 @@ useEffect(() => {
       setCurrentPrice,
       setUserBidPrice
     );
-  
+
     if (result.success) {
       toast.success(result.msg);
     }
     onChangeTop3Bidder();
   };
 
-  
-  
+
+
   return (
     <>
       <Toaster />
@@ -194,7 +198,7 @@ useEffect(() => {
             variant="gradientBlue"
             className="mt-4"
             onClick={handleSubmitBidPrice}
-            isDisabled={statusCart !== 0}
+            isDisabled={isDisabled}
           >
             Trả giá {(currentPrice + (userBidPrice !== null ? userBidPrice : priceStep)).toLocaleString()} đ
           </MyButton>
@@ -203,19 +207,19 @@ useEffect(() => {
         <CardFooter className="px-3 py-4 text-small text-default-400">
           <form className="w-full justify-between items-center" onSubmit={handleSubmit(handleSubmitBidPriceForm)}>
             <div className="flex w-full items-center">
-            <Input
+              <Input
                 labelPlacement="outside"
                 type="text"
                 className="my-custom-form my-custom-form-text"
                 placeholder="0.00"
                 variant="underlined"
                 color="success"
-                isDisabled={statusCart !== 0}
+                isDisabled={isDisabled}
                 {...register("bidPrice", { required: true, setValueAs: (value) => Number(value.replace(/,/g, '')) })}
                 value={value}
                 onChange={(e) => { handleChange(e); setValue('bidPrice', Number(e.target.value.replace(/,/g, ''))); }}
               />
-           <MyButton color="danger" size="md" type="submit" variant="gradientBlue" className="m-2" isDisabled={statusCart !== 0}>
+              <MyButton color="danger" size="md" type="submit" variant="gradientBlue" className="m-2" isDisabled={isDisabled}>
                 Nhập giá
               </MyButton>
             </div>

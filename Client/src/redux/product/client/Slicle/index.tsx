@@ -23,3 +23,5 @@ export { default as highBidderInformationSlice } from "./highBidderInformation";
 export { default as getAuctionProgressSlice } from "./getAuctionProgress";
 export { default as getTop3HighestBiddersSlice } from "./getTop3HighestBidders";
 export { default as getUserCartSlice } from "./getUserCart";
+export { default as checkAuctionTimeSlice } from "./checkAuctionTime";
+export { default as checkAuctionTimeAuctionPricingRangeSlice } from "./checkAuctionTimeAuctionPricingRange";
