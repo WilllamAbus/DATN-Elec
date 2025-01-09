@@ -34,3 +34,6 @@
 .productCardHeader {
   @apply mb-4 px-1 flex items-center justify-between gap-4;
 }
+.gridContainer {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6;
+}

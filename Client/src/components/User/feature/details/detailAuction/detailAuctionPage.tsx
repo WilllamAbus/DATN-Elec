@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import ImageAuction from "./imageAuction";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk, getAuctionPricingRangeThunk, checkStatusAuctionPricingRangeThunk, highBidderInformationThunk, getAuctionProgressThunk, getTop3HighestBiddersThunk, getUserCartThunk } from "../../../../../redux/product/client/Thunk";
+import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk, getAuctionPricingRangeThunk, checkStatusAuctionPricingRangeThunk, highBidderInformationThunk, getAuctionProgressThunk, getTop3HighestBiddersThunk, getUserCartThunk, checkAuctionTimeThunk } from "../../../../../redux/product/client/Thunk";
 import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
@@ -23,9 +23,12 @@ import AppAuctionList from "./appAuctionList/appAuctionList";
 import { Bid } from "../../../../../services/detailProductAuction/types/getAuctionProgress";
 import AlertCheckStatusCart from "src/common/alert/alertcheckStatusCart";
 import RelatedProduct from "./relatedAuction";
+import AuctionStatusOutOfTime from "./auctionStatusOutOfTime";
+import AuctionEnded from "./auctionEnded";
 
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   const category = useSelector(
@@ -43,6 +46,8 @@ const DetailPageAuction: React.FC = () => {
   const [auctionStatus, setAuctionStatus] = useState<null | 0 | 1 | 2>(null);
   const [checkAuctionStatusPricingRange, setAuctionStatusPricingRange] = useState<null | 4 | 5>(null);
   const [auctionStatusTop3Bidder, setAuctionStatusTop3Bidder] = useState<null | 9 | 10 | 11>(null);
+  const [auctionStatusOutOfTime, setAuctionStatusOutOfTime] = useState(false);
+  const [auctionEnded, setAuctionEnded] = useState(false);
   const [isAuctionTemporary, setIsAuctionTemporary] = useState(auctionPricing?.status === 'temporary');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -200,7 +205,36 @@ const DetailPageAuction: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [dispatch, auctionPricing, slug, isAuctionTemporary]);
+  const handleAuctionTimeChange = () => {
+    if (slug) {
+      dispatch(checkAuctionTimeThunk(slug)).then((result: any) => {
+        if (result.payload && result.payload.statusOutOfTime && result.payload.statuscheckAuctionTime === 3) {
+          setAuctionStatusOutOfTime(true);
+        }
+        if (result.payload && result.payload.statuscheckAuctionTime === 1) {
+          setTimeout(() => {
+            setAuctionEnded(true);
+            setTimeout(() => {
+              navigate('/auction'); // Chuyển hướng về trang đấu giá sau 5 giây
+            }, 5000);
+          }, 5000); // Hiển thị modal sau 5 giây
+        }
+        dispatch(getProductDetailAuctionThunk({ slug })); // Làm mới lại trang
+      });
+    }
+  };
 
+  useEffect(() => {
+    socket.on('auctionStatusOutOfTime', (data: { status: string }) => {
+      if (data.status === 'outOfTime') {
+        handleAuctionTimeChange();
+      }
+    });
+
+    return () => {
+      socket.off('auctionStatusOutOfTime');
+    };
+  }, []);
   return (
     <>
       <ReusableBreadcrumb paths={breadcrumbPaths} />
@@ -222,7 +256,7 @@ const DetailPageAuction: React.FC = () => {
                   <hr className="border-gray-300 dark:border-gray-700" />
                   <AuctionNotice />
                   <ProductPrice product={productDetailAuction} />
-                  <AuctionTime />
+                  {!auctionStatusOutOfTime && ( <AuctionTime onChangeCheckAuctionTimeAuctionPricingRange={handleAuctionTimeChange} /> )} {auctionStatusOutOfTime && <AuctionStatusOutOfTime />}
                 </div>
               </>
             )}
@@ -262,25 +296,19 @@ const DetailPageAuction: React.FC = () => {
                 onChangeTemporary={handleTemporaryChange}
                 onChangeTop3Bidder={handleTop3BidderChange}
               />
-            </div>
-            
+            </div>           
           )}
         </div>
-
       </div>
-
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
         <RelatedProduct/>
       </div>
-
-
-
       {auctionStatus === 0 && <AuctionWin />}
       {auctionStatus === 1 && <AuctionPending />}
       {auctionStatus === 2 && <AuctionLose />}
       {checkAuctionStatusPricingRange === 4 && <AuctionTemporaryMaxPrice />}
       {checkAuctionStatusPricingRange === 5 && <AuctionTemporary />}
-     
+      {auctionEnded && <AuctionEnded />}
     </>
   );
 };

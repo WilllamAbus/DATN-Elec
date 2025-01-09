@@ -11,10 +11,11 @@ const checkAuctionTime = async (req, res) => {
       code: response.code,
       msg: response.msg,
       status: response.status,
+      statusOutOfTime:response.statusOutOfTime,
+      statuscheckAuctionTime:response.statuscheckAuctionTime
     });
 
   } catch (error) {
-    console.error('Error in checkAuctionTime:', error);
     return res.status(500).json({
       success: false,
       code: 'SERVER_ERROR',

@@ -28,15 +28,23 @@ const listPageAuction = async (req, res) => {
       });
     }
 
+    const products = response.response.products.filter(product => 
+      product.status === 'active' && 
+      ['active', 'ended'].includes(product.auctionPricing.status)
+    );
+
     const currentPage = page ? +page : 1;
-    const totalPages = Math.ceil(response.response.total / limit);
+    const totalPages = Math.ceil(products.length / limit);
 
     return res.status(200).json({
       success: true,
       err: 0,
       msg: 'OK',
       status: 200,
-      data: response.response,
+      data: {
+        total: products.length,
+        products
+      },
       pagination: {
         currentPage,
         totalPages,
