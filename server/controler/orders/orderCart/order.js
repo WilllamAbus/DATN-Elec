@@ -15,7 +15,7 @@ const OrderService = require("../../../services/orders/orderSp");
 const path = require("path");
 const { spawn } = require("child_process");
 const {
-  sendOrderConfirmationEmail,
+  sendOrderConfirmationEmail, sendEmail,
 } = require("../../../services/email.service");
 const authController = {
   createOrder: async (req, res) => {
@@ -1115,38 +1115,25 @@ const authController = {
         // order.cancelReason = cancelReason || "Không có lý do cụ thể";
       }
 
-      if (stateOrder !== "Hoàn tất") {
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.EMAIL_USERNAME,
-            pass: process.env.EMAIL_PASSWORD,
-          },
-        });
-
-        // Render email template bằng EJS
-        const emailTemplate = await ejs.renderFile(
-          path.join(__dirname, "..", "views", "orderEmail.ejs"),
-          { order }
-        );
-
-        // Gửi email
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: "daodinhhay@gmail.com",
-          subject: `Cập nhật trạng thái đơn hàng: ${stateOrder}`,
-          html: emailTemplate,
-        });
-
-        console.log("Email đã được gửi thành công!");
-      }
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();
 
-      
+      if (stateOrder !== "Hoàn tất") {
+        const order = await Order.findById(orderId).populate('user');
+        const userEmail = order.user.email;
+        const mailOptions = {
+          from: "DuPiNDuPi <noreply@gmail.com>",
+          to: userEmail,
+          subject: "Cập nhật trạng thái đơn hàng của bạn",
+          html: `
+        <h1>Xin chào ${order.user.name} </h1>
+        <p>Đơn hàng của bạn trong trạng thái: ${order.stateOrder}</p>
+        `,};
+        await sendEmail(mailOptions);
+      }
+
+  
 
       res.status(200).json({
         message: "Trạng thái đơn hàng đã được cập nhật thành công.",
