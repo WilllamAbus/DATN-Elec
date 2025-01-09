@@ -24,6 +24,7 @@ const getRowColor = (index: number): string => {
 };
 
 const renderCell = (item: Bid, columnKey: string, userId: string, index: number) => {
+  if (!item.user) { return <TableCell key={columnKey} className="text-red-500">N/A</TableCell>; }
   const cellClass = getRowColor(index);
   const content = columnKey === "name" ? item.user.name : columnKey === "bidPrice" ? `${item.bidPrice.toLocaleString()} đ` : new Date(item.bidTime).toLocaleString("vi-VN");
 

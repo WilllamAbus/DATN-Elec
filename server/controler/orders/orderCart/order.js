@@ -15,7 +15,7 @@ const OrderService = require("../../../services/orders/orderSp");
 const path = require("path");
 const { spawn } = require("child_process");
 const {
-  sendOrderConfirmationEmail,
+  sendOrderConfirmationEmail, sendEmail,
 } = require("../../../services/email.service");
 const authController = {
   createOrder: async (req, res) => {
@@ -1015,9 +1015,8 @@ const authController = {
               const inventory = item.inventory;
               if (!inventory) {
                 return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                    item.product?.name || "không xác định"
-                  }.`,
+                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                    }.`,
                 });
               }
               inventory.quantityShelf += item.quantity;
@@ -1034,17 +1033,15 @@ const authController = {
 
           if (!inventory) {
             return res.status(400).json({
-              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 
           if (!isRestocking && inventory.quantityShelf < item.quantity) {
             return res.status(400).json({
-              message: `Số lượng tồn kho không đủ cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 
@@ -1121,6 +1118,22 @@ const authController = {
       // Cập nhật trạng thái đơn hàng
       order.stateOrder = stateOrder;
       await order.save();
+
+      if (stateOrder !== "Hoàn tất") {
+        const order = await Order.findById(orderId).populate('user');
+        const userEmail = order.user.email;
+        const mailOptions = {
+          from: "DuPiNDuPi <noreply@gmail.com>",
+          to: userEmail,
+          subject: "Cập nhật trạng thái đơn hàng của bạn",
+          html: `
+        <h1>Xin chào ${order.user.name} </h1>
+        <p>Đơn hàng của bạn trong trạng thái: ${order.stateOrder}</p>
+        `,};
+        await sendEmail(mailOptions);
+      }
+
+  
 
       res.status(200).json({
         message: "Trạng thái đơn hàng đã được cập nhật thành công.",

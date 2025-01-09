@@ -127,6 +127,7 @@ const userSchema = new Schema(
     banks: { type: [bankSchema], default: [] },
     message:{type:String},
     warning: { type: Number, default: 0 },
+    statusAuction: { type: String, default: "active" },
     noteWarning: { type: String, default: '' },
   },
   {
