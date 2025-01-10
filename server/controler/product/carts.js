@@ -965,16 +965,13 @@ const CartController = {
       console.log("User ID:", userId);
 
       // Kiểm tra tính hợp lệ của cartId và userId
-      if (
-        !mongoose.Types.ObjectId.isValid(userId) ||
-        !mongoose.Types.ObjectId.isValid(cartId)
-      ) {
+      if (!userId || !cartId) {
         return res.status(400).json({ message: "ID không hợp lệ" });
       }
 
       // Tìm giỏ hàng theo cartId và userId
       const cart = await Cart.findOne({
-        _id: mongoose.Types.ObjectId(cartId),
+        _id: cartId,
         user: userId,
       })
         .populate({
