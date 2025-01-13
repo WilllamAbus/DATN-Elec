@@ -158,29 +158,29 @@ const ListPriceRandRecy: React.FC = () => {
       timeouts.forEach((timeout) => clearTimeout(timeout));
     };
   }, [deletedPriceRandAuct]);
-  //   const handleDeletePriceRand = async (id: string) => {
-  //     MySwal.fire({
-  //       title: "Hủy sản phẩm?",
-  //       text: "Bạn có chắc muốn hủy sản phẩm này không?",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Có",
-  //       cancelButtonText: "Hủy",
-  //     }).then(async (result: SweetAlertResult) => {
-  //       if (result.isConfirmed) {
-  //  await dispatch(deletePriceRandAdminThunk({ id })).unwrap();
-  //  setPriceRandAuct((prevSoftDel) =>
-  //   prevSoftDel.filter((rand) => rand._id!== id)
-  //       );
-  //       toast.success("Hủy sản phẩm thành công");
+    const handleTriggrtPriceRand = async (id: string) => {
+      MySwal.fire({
+        title: "Hủy sản phẩm?",
+        text: "Bạn có chắc muốn hủy sản phẩm này không?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có",
+        cancelButtonText: "Hủy",
+      }).then(async (result: SweetAlertResult) => {
+        if (result.isConfirmed) {
+          await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
+          setPriceRand((prevSoftDel) =>     prevSoftDel.filter((rand) => rand._id!== id));
+    
+     
+          toast.success("Đưa sản phẩm lên phiên thành công");
 
-  //       }else {
-  //         toast.error("Có lỗi xảy ra khi xóa sản phẩm");
-  //       }
-  //     });
-  //   };
+        }else {
+          toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+        }
+      });
+    };
 
   return (
     <>
@@ -244,6 +244,9 @@ const ListPriceRandRecy: React.FC = () => {
               Trạng thái
             </th>
             <th scope="col" className="p-4">
+              Kích hoạt tự động 
+            </th>
+            <th scope="col" className="p-4">
               Chức năng
             </th>
           </tr>
@@ -294,8 +297,7 @@ const ListPriceRandRecy: React.FC = () => {
                   {rand.status === "active" ? "Hiển thị" : "Đã ẩn"}
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  <div className="flex items-center space-x-4">
-                  {autoActivated[rand._id] ? (
+                {autoActivated[rand._id] ? (
                 <span className="group relative flex items-center 
                 text-blue-700 bg-blue-200 hover:text-white border 
                 border-blue-700 hover:bg-blue-800 focus:ring-4 
@@ -310,8 +312,12 @@ const ListPriceRandRecy: React.FC = () => {
                   dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 
                   dark:focus:ring-blue-900">Chờ ...</span>
               )}
-                    {/* <button
-                      onClick={() => handleTriggerPriceRand(rand._id)}
+                </td>
+                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  <div className="flex items-center space-x-4">
+             
+                    <button
+                      onClick={() => handleTriggrtPriceRand(rand._id)}
                       className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"
                     >
                       <svg
@@ -336,7 +342,7 @@ const ListPriceRandRecy: React.FC = () => {
                       <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-[10px] text-white transition-opacity duration-300">
                         Kích hoạt
                       </span>
-                    </button> */}
+                    </button>
 
                     <Link
                       to={`/admin/editPriceRandAuct/${rand._id}`}
@@ -412,7 +418,7 @@ const ListPriceRandRecy: React.FC = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={8} className="text-center py-4">
+              <td colSpan={10} className="text-center py-4">
                 Không có dữ liệu
               </td>
             </tr>
