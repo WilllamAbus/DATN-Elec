@@ -17,6 +17,7 @@ const { spawn } = require("child_process");
 const {
   sendOrderConfirmationEmail, sendEmail,
 } = require("../../../services/email.service");
+const PDFDocument = require("pdfkit");
 const authController = {
   createOrder: async (req, res) => {
     try {
@@ -918,6 +919,8 @@ const authController = {
     }
   },
 
+
+
   updateOrderStatus: async (req, res) => {
     try {
       const { orderId } = req.params;
@@ -1127,13 +1130,99 @@ const authController = {
           to: userEmail,
           subject: "Cập nhật trạng thái đơn hàng của bạn",
           html: `
-        <h1>Xin chào ${order.user.name} </h1>
-        <p>Đơn hàng của bạn trong trạng thái: ${order.stateOrder}</p>
-        `,};
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+              <h1 style="color: #2c3e50;">Xin chào, ${order.user.name}!</h1>
+            </div>
+            <div style="padding: 20px;">
+              <p style="font-size: 16px; line-height: 1.6;">
+                Chúng tôi rất vui được thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+              </p>
+              <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
+                Trạng thái đơn hàng: ${order.stateOrder}
+              </p>
+              <p style="font-size: 16px; line-height: 1.6;">
+                Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này. Cảm ơn bạn đã tin tưởng sử dụng dịch vụ của <strong>DuPiNDuPi</strong>.
+              </p>
+            </div>
+            <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+              <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 DuPiNDuPi. All Rights Reserved.</p>
+            </div>
+          </div>
+          `,
+        };
+
         await sendEmail(mailOptions);
+      } else {
+        // Tạo PDF và gửi email khi đơn hàng hoàn tất
+        const order = await Order.findById(orderId).populate('user');
+        const userEmail = order.user.email;
+        const doc = new PDFDocument();
+        let buffers = [];
+
+        doc.on("data", buffers.push.bind(buffers));
+        doc.on("end", async () => {
+          const pdfBuffer = Buffer.concat(buffers);
+
+          const mailOptions = {
+            from: "DuPiNDuPi <noreply@gmail.com>",
+            to: userEmail,
+            subject: "Hóa đơn đơn hàng của bạn",
+            html: `
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+              <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <h1 style="color: #2c3e50;">Xin chào, ${order.user.name}!</h1>
+              </div>
+              <div style="padding: 20px;">
+                <p style="font-size: 16px; line-height: 1.6;">
+                  Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.
+                </p>
+                <p style="font-size: 16px; line-height: 1.6; color: #1abc9c; font-weight: bold; text-align: center;">
+                  Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>DuPiNDuPi</strong>.
+                </p>
+                <p style="font-size: 16px; line-height: 1.6;">
+                  Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua email này. Chúng tôi luôn sẵn sàng hỗ trợ bạn!
+                </p>
+              </div>
+              <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 DuPiNDuPi. All Rights Reserved.</p>
+              </div>
+            </div>
+            `,
+            attachments: [
+              {
+                filename: `Hoadon.pdf`,
+                content: pdfBuffer,
+              },
+            ],
+          };
+
+          await sendEmail(mailOptions);
+        });
+
+        // Nội dung PDF
+        doc.fontSize(18).text(`Hóa đơn đơn hàng`, { align: "center" });
+        doc.text(`Tên khách hàng: ${order.user.name}`);
+        doc.text(`Email: ${order.user.email}`);
+        doc.text(`Tổng tiền: ${order.OrderCart?.totalPriceWithShipping} VND`);
+
+        // Danh sách sản phẩm
+        doc.moveDown();
+        doc.text("Danh sách sản phẩm:", { underline: true });
+        order.cartDetails.forEach((detail, index) => {
+          detail.itemAuction.forEach((item) => {
+            doc.text(
+              `${index + 1}. ${item.product_randBib?.product_name || "Sản phẩm không xác định"} - Số lượng: ${item.quantity} - Giá: ${item.price} VND`
+            );
+          });
+        });
+
+        // Kết thúc quá trình tạo PDF
+        doc.end();
       }
 
-  
+
+
 
       res.status(200).json({
         message: "Trạng thái đơn hàng đã được cập nhật thành công.",
