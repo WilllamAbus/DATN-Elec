@@ -346,6 +346,7 @@ const authController = {
 
         if (auctionWinner) {
           auctionWinner.auctionStatus = "paid";
+          auctionWinner.paymentStatus = "paid";
           await auctionWinner.save();
         }
       }
@@ -468,6 +469,8 @@ const authController = {
 
       const orderDetailItems = [];
       for (const item of selectedItems) {
+        const auctionPricingRange = item.auctionPricingRange;
+
         const inventory = await Inventory.findOne({
           productAuction: item.productAuction,
         });
@@ -492,9 +495,11 @@ const authController = {
             )}`,
           });
         }
+        await auctionPricingRange.populate("product_randBib");
+        const productName = auctionPricingRange.product_randBib?.product_name;
         orderDetailItems.push({
           product_randBib: item.auctionPricingRange.product_randBib,
-          productName: item.auctionPricingRange.product_randBib.product_name,
+          productName: productName,
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.totalItemPrice,
@@ -521,7 +526,11 @@ const authController = {
         score: 5,
       });
       await newInteraction.save();
-
+      // cart.itemAuction = cart.itemAuction.filter((item) => {
+      //   return !selectedItems.some(
+      //     (selectedItem) => selectedItem._id.toString() === item._id.toString()
+      //   );
+      // });
       await cart.save();
 
       for (const item of selectedItems) {
@@ -538,23 +547,21 @@ const authController = {
           );
         }
       }
-      // const user = await User.findById(userId);
-      // if (
-      //   !user.email ||
-      //   !newShipping.recipientName ||
-      //   !orderDetailItems.length
-      // ) {
-      //   await sendOrderAuctionConfirmationEmail(user.email, {
-      //     recipientName: newShipping.recipientName,
-      //     address: newShipping.address,
-      //     paymentMethod: paymentInfo.payment_method,
-      //     itemAuction: orderDetailItems,
-      //     totalPriceWithShipping,
-      //   });
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Dữ liệu gửi email không hợp lệ" });
-      // }
+      const user = await User.findById(userId);
+      try {
+        await sendOrderAuctionConfirmationEmail(user.email, {
+          recipientName: newShipping.recipientName,
+          address: newShipping.address,
+          paymentMethod: paymentInfo.payment_method,
+          itemAuction: orderDetailItems,
+          totalPriceWithShipping,
+        });
+      } catch (error) {
+        console.error("Lỗi khi gửi email:", error);
+        return res
+          .status(500)
+          .json({ message: "Gửi email thất bại", error: error.message });
+      }
       res.status(201).json({
         message: "Đơn hàng đã được tạo thành công",
         order: newOrder,
@@ -653,79 +660,7 @@ const authController = {
       });
     }
   },
-  // cancelOrder: async (req, res) => {
-  //   try {
-  //     const userId = req.user.id;
-  //     const { orderId } = req.params;
-  //     const { cancelReason } = req.body;
 
-  //     const order = await Order.findOne({
-  //       _id: orderId,
-  //       user: userId,
-  //       isDeleted: false,
-  //     }).populate("payment");
-
-  //     if (!order) {
-  //       return res
-  //         .status(404)
-  //         .json({ message: "Order not found or does not belong to this user" });
-  //     }
-
-  //     if (
-  //       order.stateOrder !== "Chờ xử lý" &&
-  //       order.stateOrder !== "Đã xác nhận"
-  //     ) {
-  //       return res.status(400).json({
-  //         message:
-  //           "Order cannot be canceled. Only orders with 'Chờ xử lý' or 'Đã xác nhận' status can be canceled.",
-  //       });
-  //     }
-
-  //     // Kiểm tra phương thức thanh toán
-  //     if (order.payment.payment_method === "Thanh toán khi nhận hàng") {
-  //       // Nếu là "Thanh toán khi nhận hàng", không cần lấy thông tin ngân hàng
-  //       order.stateOrder = "Hủy đơn hàng";
-  //       order.cancelReason = cancelReason;
-  //     } else {
-  //       // Nếu là phương thức thanh toán khác, lấy thông tin ngân hàng
-  //       const user = await User.findById(userId).populate("banks");
-  //       if (!user) {
-  //         return res.status(404).json({ message: "User not found" });
-  //       }
-
-  //       const defaultBank =
-  //         user.banks.find((bank) => bank.isDefault) || user.banks[0];
-
-  //       if (!defaultBank) {
-  //         return res.status(400).json({
-  //           message: "No bank information found for the user",
-  //         });
-  //       }
-
-  //       // Cập nhật thông tin ngân hàng
-  //       order.stateOrder = "Hủy đơn hàng";
-  //       order.cancelReason = cancelReason;
-  //       order.refundBank = {
-  //         bankName: defaultBank.name,
-  //         accountNumber: defaultBank.accountNumber,
-  //         accountName: defaultBank.fullName,
-  //       };
-  //     }
-
-  //     await order.save();
-
-  //     res.status(200).json({
-  //       message: "Order successfully canceled",
-  //       order,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error canceling order:", error);
-  //     res.status(500).json({
-  //       message: "Error canceling order",
-  //       error: error.message || error,
-  //     });
-  //   }
-  // },
   cancelOrder: async (req, res) => {
     try {
       const userId = req.user.id;
