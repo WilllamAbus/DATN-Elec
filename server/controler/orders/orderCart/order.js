@@ -15,7 +15,9 @@ const OrderService = require("../../../services/orders/orderSp");
 const path = require("path");
 const { spawn } = require("child_process");
 const {
-  sendOrderConfirmationEmail, sendEmail,
+  sendOrderConfirmationEmail,
+  sendOrderAuctionConfirmationEmail,
+  sendEmail,
 } = require("../../../services/email.service");
 const PDFDocument = require("pdfkit");
 const authController = {
@@ -326,12 +328,12 @@ const authController = {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
 
-      const selectedItems = cart.itemAuction.filter((item) => item.isSelected);
+      const selectedItems = cart.itemAuction;
 
       if (!selectedItems || selectedItems.length === 0) {
         return res
           .status(400)
-          .json({ message: "Không có sản phẩm nào được chọn để tạo đơn hàng" });
+          .json({ message: "KKhông có sản phẩm đấu giá trong giỏ hàng" });
       }
 
       for (const item of selectedItems) {
@@ -493,6 +495,7 @@ const authController = {
         }
         orderDetailItems.push({
           product_randBib: item.auctionPricingRange.product_randBib,
+          productName: item.auctionPricingRange.product_randBib.product_name,
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.totalItemPrice,
@@ -520,8 +523,8 @@ const authController = {
       });
       await newInteraction.save();
 
-      cart.itemAuction = cart.itemAuction.filter((item) => !item.isSelected);
       await cart.save();
+
       for (const item of selectedItems) {
         if (
           item.auctionPricingRange &&
@@ -536,7 +539,23 @@ const authController = {
           );
         }
       }
-
+      // const user = await User.findById(userId);
+      // if (
+      //   !user.email ||
+      //   !newShipping.recipientName ||
+      //   !orderDetailItems.length
+      // ) {
+      //   await sendOrderAuctionConfirmationEmail(user.email, {
+      //     recipientName: newShipping.recipientName,
+      //     address: newShipping.address,
+      //     paymentMethod: paymentInfo.payment_method,
+      //     itemAuction: orderDetailItems,
+      //     totalPriceWithShipping,
+      //   });
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Dữ liệu gửi email không hợp lệ" });
+      // }
       res.status(201).json({
         message: "Đơn hàng đã được tạo thành công",
         order: newOrder,
@@ -1018,8 +1037,9 @@ const authController = {
               const inventory = item.inventory;
               if (!inventory) {
                 return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
-                    }.`,
+                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
+                    item.product?.name || "không xác định"
+                  }.`,
                 });
               }
               inventory.quantityShelf += item.quantity;
@@ -1036,15 +1056,17 @@ const authController = {
 
           if (!inventory) {
             return res.status(400).json({
-              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
-                }.`,
+              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
+                item.product?.name || "không xác định"
+              }.`,
             });
           }
 
           if (!isRestocking && inventory.quantityShelf < item.quantity) {
             return res.status(400).json({
-              message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
-                }.`,
+              message: `Số lượng tồn kho không đủ cho sản phẩm ${
+                item.product?.name || "không xác định"
+              }.`,
             });
           }
 
@@ -1123,7 +1145,7 @@ const authController = {
       await order.save();
 
       if (stateOrder !== "Hoàn tất") {
-        const order = await Order.findById(orderId).populate('user');
+        const order = await Order.findById(orderId).populate("user");
         const userEmail = order.user.email;
         const mailOptions = {
           from: "DuPiNDuPi <noreply@gmail.com>",
