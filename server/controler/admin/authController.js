@@ -265,7 +265,11 @@ exports.restore = async (req, res) => {
     const id = req.params.id;
     const restoredUser = await modelUser.findByIdAndUpdate(
       id,
-      { status: "active" },
+      {
+        status: "active",
+        warning: 0,
+        noteWarning: "",
+      },
       { new: true }
     );
     if (!restoredUser) {

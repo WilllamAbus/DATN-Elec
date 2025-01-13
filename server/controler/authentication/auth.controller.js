@@ -32,6 +32,27 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 let refreshTokens = [];
 const authController = {
+  // CheckEmailHunter: async (email) => {
+  //   const apiKey = process.env.HUNTER_API_KEY;
+  //   const apiUrl = process.env.HUNTER_API_URL;
+
+  //   const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
+
+  //   try {
+  //     await axios.get(url);
+  //     const data = response.data;
+  //     if (
+  //       data.data.result === "undeliverable" ||
+  //       data.data.result === "risky"
+  //     ) {
+  //       return false;
+  //     }
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Lỗi xác thực email với Hunter.io:", error);
+  //     throw new Error("Không thể xác thực email");
+  //   }
+  // },
   CheckEmailHunter: async (email) => {
     const apiKey = process.env.HUNTER_API_KEY;
     const apiUrl = process.env.HUNTER_API_URL;
@@ -39,14 +60,16 @@ const authController = {
     const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
 
     try {
-      await axios.get(url);
-      // const data = response.data;
-      // if (
-      //   data.data.result === "undeliverable" ||
-      //   data.data.result === "risky"
-      // ) {
-      //   return false;
-      // }
+      const response = await axios.get(url);
+
+      const data = response.data;
+
+      if (
+        data.data.status === "undeliverable" ||
+        data.data.status === "risky"
+      ) {
+        return false;
+      }
       return true;
     } catch (error) {
       console.error("Lỗi xác thực email với Hunter.io:", error);

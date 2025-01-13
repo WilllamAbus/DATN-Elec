@@ -4,8 +4,9 @@ import { useLocation } from "react-router-dom";
 import { AppDispatch } from "../../../redux/store";
 import { resetPasswordThunk } from "../../../redux/auth/authThunk";
 import { useDispatch } from "react-redux";
-import { Alert, Button, Label, TextInput } from "flowbite-react";
-
+import { Alert, Label, TextInput } from "flowbite-react";
+import { Button } from "@nextui-org/react";
+// import { Button } from "";
 const ResetPassword: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -78,11 +79,11 @@ const ResetPassword: React.FC = () => {
             <div className="mt-8">
               <Button
                 type="submit"
-                className="w-full"
-                gradientDuoTone="cyanToBlue"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white"
               >
                 XÁC NHẬN
               </Button>
+
               {message && (
                 <Alert color="success" className="mt-4">
                   {message}
