@@ -48,7 +48,12 @@ const ListPriceRandRecy: React.FC = () => {
   const [autoActivated, setAutoActivated] = useState<{ [key: string]: boolean }>({});
   const [, setPriceRand] = useState<PriceRangeRestoreAuct[]>([]);
   const [, setPriceRandSoft] = useState<PriceRangeAuctSoftDel[]>([]);
+  const [warnedTimes, setWarnedTimes] = useState<string[]>([]);
   useEffect(() => {
+    setAutoActivated({});
+    setPriceRand([]);
+    setPriceRandSoft([]);
+    setWarnedTimes([]);
     dispatch(fetchPriceRandDeleted({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
 
@@ -100,64 +105,70 @@ const ListPriceRandRecy: React.FC = () => {
 
   useEffect(() => {
     const now = new Date().getTime();
-
-    // Đặt trạng thái ban đầu
+  
+    // Trạng thái ban đầu cho các phiên đã kích hoạt
     const initialActivated: { [key: string]: boolean } = {};
+  
+    // Lưu trữ các phiên có cùng thời gian bắt đầu
     interface StartTimesMap {
-      [key: string]: string[]; // Maps startTime (string) to an array of _id (string)
+      [key: string]: string[]; // Maps startTime (HH:mm) to an array of product names
     }
-    
     const startTimesMap: StartTimesMap = {};
+  
+    // Kiểm tra và xử lý các phiên
     deletedPriceRandAuct.forEach((rand) => {
       const startTime = new Date(rand.startTime);
-      
-      // Lấy phần giờ và phút từ startTime (HH:mm)
       const timeKey = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
   
-      // Kiểm tra trùng lặp theo phút
+      // Nhóm sản phẩm theo giờ và phút
       if (startTimesMap[timeKey]) {
         startTimesMap[timeKey].push(rand.product.product_name);
       } else {
         startTimesMap[timeKey] = [rand.product.product_name];
       }
   
-      // Nếu có hơn 1 phiên đấu giá có cùng giờ và phút
-      if (startTimesMap[timeKey].length > 1) {
-        MySwal.fire({
-          title: "Cảnh báo",
-          text: `Các phiên đấu giá với thời gian bắt đầu giống nhau: ${startTimesMap[timeKey].join(", ")}. Vui lòng điều chỉnh thời gian.`,
-          icon: "warning",
-          confirmButtonColor: "#3085d6",
-          confirmButtonText: "OK",
-        }).then(() => {
-          // Chuyển hướng đến trang thêm nếu có trùng lặp
-        });
-      }
-  
-      // Kiểm tra thời gian bắt đầu
+      // Kích hoạt ngay nếu thời gian hiện tại >= startTime
       if (now >= startTime.getTime()) {
         initialActivated[rand._id] = true;
-        autoTriggerPriceRand(rand._id); // Tự động kích hoạt nếu đã đến thời gian
+        autoTriggerPriceRand(rand._id);
       }
     });
+  
+    // Hiển thị cảnh báo nếu có phiên trùng lặp
+    const duplicateWarnings = Object.entries(startTimesMap).filter(([time, names]) => 
+      names.length > 1 && !warnedTimes.includes(time)
+    );
+    if (duplicateWarnings.length > 0) {
+      Swal.fire({
+        title: "Cảnh báo",
+        text: `Các phiên đấu giá trùng lặp:\n${duplicateWarnings
+          .map(([time, names]) => `Thời gian ${time}: ${names.join(", ")}`)
+          .join("\n")}`,
+        icon: "warning",
+      });
+  
+      setWarnedTimes((prev) => [...prev, ...duplicateWarnings.map(([time]) => time)]);
+    }
     setAutoActivated(initialActivated);
-
-    // Đặt timeout cho các sản phẩm chưa kích hoạt
+  
+    // Đặt timeout cho các phiên chưa đến thời gian bắt đầu
     const timeouts = deletedPriceRandAuct
       .filter((rand) => new Date(rand.startTime).getTime() > now)
       .map((rand) => {
         const delay = new Date(rand.startTime).getTime() - now;
         return setTimeout(() => {
           setAutoActivated((prev) => ({ ...prev, [rand._id]: true }));
-          autoTriggerPriceRand(rand._id); // Tự động kích hoạt khi đến thời gian
+          autoTriggerPriceRand(rand._id);
         }, delay);
       });
-
+  
+    // Dọn dẹp khi component unmount hoặc danh sách thay đổi
     return () => {
-      // Xóa timeout khi component unmount
-      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.forEach(clearTimeout);
+      setWarnedTimes([]);
     };
   }, [deletedPriceRandAuct]);
+
     const handleTriggrtPriceRand = async (id: string) => {
       MySwal.fire({
         title: "Hủy sản phẩm?",
