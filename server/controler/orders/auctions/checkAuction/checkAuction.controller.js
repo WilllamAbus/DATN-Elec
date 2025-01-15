@@ -19,7 +19,7 @@ const checkAuctionCOntroller = {
 
       // Fetch price range with active status
       const priceRangeWinnwe = await AuctiomWinner.find({ status: "disabled", notWinner: true })
-        .select("user bidPrice status auctionStatus auctionStausCheck endTime")
+        .select("user bidPrice status auctionStatus auctionStausCheck endTime emailSent")
         .lean();
 
       const userIds = priceRangeWinnwe.map((auctWin) => auctWin.user);
