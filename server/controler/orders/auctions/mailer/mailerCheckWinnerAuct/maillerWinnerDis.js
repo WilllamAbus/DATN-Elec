@@ -965,6 +965,7 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                       <td class="t45" style="padding: 0 0 0 24px">
                         <h1 class="t43" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 16px; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #1a1a1a;">
                           ${orderDetailSummary.productName}
+                      
                         </h1>
                       </td>
                       <td class="t46" style="width: 10px" width="10"></td>
@@ -977,8 +978,8 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                       <td class="t51" style="width: 10px" width="10"></td>
                       <td class="t52">
                         <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 500; font-size: 14px; text-transform: uppercase; color: #333333; text-align: right;">
-                          Giá chiến thắng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.productPrice} đ</span>
-                          Số lượng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity} </span>
+                     <span class="t49" style="font-weight: bold;">${orderDetailSummary.productPrice} đ x ${orderDetailSummary.quantity}</span>
+                          
                         </p>
                       </td>
                       <td class="t53" style="width: 10px" width="10"></td>
