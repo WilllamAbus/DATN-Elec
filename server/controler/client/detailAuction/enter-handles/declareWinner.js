@@ -9,7 +9,7 @@ module.exports = async (auctionPricingRange, auctionRound) => {
   }).sort({ bidPrice: -1 });
 
   const currentTime = new Date();
-  const temporaryEndTime = new Date(currentTime.getTime() +  1 * 60 * 1000); 
+  const temporaryEndTime = new Date(currentTime.getTime() +  30 * 60 * 1000); 
 
   if (winner) {
     const remainingTime = calculateRemainingTime(temporaryEndTime);
@@ -25,6 +25,7 @@ module.exports = async (auctionPricingRange, auctionRound) => {
       endTime: convertToLocalTime(temporaryEndTime),
       remainingTime: remainingTime, 
       product_randBib: auctionPricingRange.product_randBib,
+      notWinner: true,
     });
     await auctionWinner.save();
 
