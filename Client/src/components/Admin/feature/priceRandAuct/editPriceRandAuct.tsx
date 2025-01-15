@@ -232,6 +232,7 @@ const EditPriceRandProduct: React.FC = () => {
       toast.success("Cập nhật thành công")
       setTimeout(() => {
         navigate("/admin/triggerAuct");
+     
     }, 2000);
    
   
@@ -240,6 +241,10 @@ const EditPriceRandProduct: React.FC = () => {
       toast.error("Cập nhật thất bại");
     }
   };
+
+  // const goBack = () => {
+  
+  // };
 //   const availableProducts = products.filter(
 //     (product) => !selectedProducts.includes(product._id.toString())
 //   );
@@ -504,14 +509,21 @@ const EditPriceRandProduct: React.FC = () => {
             </div>
           </div>
           <br />
-          <div className="col-span-6 sm:col-full">
-            <button
-              type="submit"
-              className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            >
-              Cập nhật
-            </button>
-          </div>
+          <div className="col-span-6 sm:col-full flex space-x-4">
+  <button
+    type="submit"
+    className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+  >
+    Cập nhật
+  </button>
+  {/* <button
+    onClick={() => goBack()}
+    className="text-white bg-blue-600 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+  >
+    Quay lại danh sách
+  </button> */}
+</div>
+
         </div>
       </div>
     </div>

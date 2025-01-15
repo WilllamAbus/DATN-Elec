@@ -76,13 +76,17 @@ const DetailOrder: React.FC<DetailOrderProps> = ({ order, onBack }) => {
           </p>
           <p className="text-red-600 font-medium">
             Tổng tiền:{" "}
-            {order.cartDetails[0].items[0].totalItemPrice.toLocaleString(
+            {/* {order.cartDetails[0].items[0].totalItemPrice.toLocaleString(
               "vi-VN",
               {
                 style: "currency",
                 currency: "VND",
               }
-            )}
+            )} */}
+            {order.totalPriceWithShipping.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
           </p>
 
           <p>

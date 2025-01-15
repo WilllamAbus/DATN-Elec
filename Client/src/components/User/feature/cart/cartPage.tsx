@@ -428,7 +428,7 @@ const CartPage: React.FC = () => {
                   : "bg-gray-200"
               }`}
             >
-              Giỏ hàng thông thường
+              Giỏ hàng
             </Button>
             <Button
               onClick={() => handleTabChange("auction")}
@@ -438,7 +438,7 @@ const CartPage: React.FC = () => {
                   : "bg-gray-200"
               }`}
             >
-              Giỏ hàng Đấu giá
+              Sản phẩm đấu giá
             </Button>
           </div>
           {activeTab === "regular" && (
@@ -461,10 +461,9 @@ const CartPage: React.FC = () => {
                 </div>
               ) : (
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">
+                  <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                     Giỏ hàng thông thường
-                  </h2>
-
+                  </h1>
                   <hr className="border-gray-300 mt-4 mb-8" />
                   {groupedCarts.length > 0 && (
                     <div className="flex ml-4 items-center">
@@ -692,6 +691,7 @@ const CartPage: React.FC = () => {
                   <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                     Giỏ Hàng Đấu Giá
                   </h1>
+                  <hr className="border-gray-300 mt-4 mb-8" />
                   {cartauction.length > 0 ? (
                     cartauction.map((auction, index) => (
                       <div

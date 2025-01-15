@@ -52,7 +52,7 @@ const OrderDetails: React.FC = () => {
     }
   }, [selectedOrder?.stateOrder]);
   const handleBackToList = () => {
-    navigate("/admin/listOrders");
+    navigate("/admin/orderAuction");
   };
 
   // const handleUpdateStatus = async () => {
@@ -442,8 +442,7 @@ const OrderDetails: React.FC = () => {
             </p>
             <p className="text-lg text-red-600 mb-2">
               <span className="font-medium">Tổng tiền:</span>{" "}
-              {selectedOrder?.totalPriceWithShipping?.toLocaleString() || "0"}{" "}
-              VND
+              {selectedOrder?.totalPriceWithShipping?.toLocaleString() || "0"} VND
             </p>
             <div className="mb-4">
               <label className="text-lg font-medium mb-2 block">
@@ -594,7 +593,7 @@ const OrderDetails: React.FC = () => {
           onClick={handleBackToList}
           className="w-full bg-blue-600 text-white py-3 rounded-md shadow-lg hover:bg-blue-700 transition duration-300"
         >
-          Quay lại danh sách đơn hàng
+          Quay lại danh sách đơn hàng đấu giá
         </button>
       </div>
 

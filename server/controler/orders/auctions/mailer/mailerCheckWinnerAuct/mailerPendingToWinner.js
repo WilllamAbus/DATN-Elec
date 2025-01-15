@@ -979,7 +979,7 @@ exports.sendMailPenDingToWinner = async (userEmail, order, orderDetailSummary) =
                       <td class="t52">
                         <p class="t50" style="margin: 0; font-family: Albert Sans, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Arial, sans-serif; line-height: 22px; font-weight: 500; font-size: 14px; text-transform: uppercase; color: #333333; text-align: right;">
                           Giá chiến thắng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.productPrice} đ</span>
-                             Số lượng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity}</span>
+                          Số lượng: <span class="t49" style="font-weight: bold;">${orderDetailSummary.quantity}</span>
                         </p>
                       </td>
                       <td class="t53" style="width: 10px" width="10">
