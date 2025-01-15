@@ -84,12 +84,13 @@ const canceledAuctionTemporary = async (req, res) => {
     auctionWinner.confirmationStatus = 'canceled';
     auctionWinner.status = 'disabled';
     auctionWinner.auctionStatus = 'canceled';
+    auctionWinner.notWinner = true;
     await auctionWinner.save({ session });
 
     const user = auctionWinner.user;
     updateUserWarningStatus(user);
     await user.save({ session });
-
+    console.log(`Slug: ${auctionWinner.product_randBib.slug}`);
     const io = getIO(); 
     io.emit('auctionCanceled', {  
       auctionWinnerId: auctionWinner._id,
@@ -116,6 +117,7 @@ const canceledAuctionTemporary = async (req, res) => {
           confirmationStatus: auctionWinner.confirmationStatus,
           status: auctionWinner.status,
           auctionStatus: auctionWinner.auctionStatus,
+          notWinner: auctionWinner.notWinner,
         },
         user: {
           id: user._id,

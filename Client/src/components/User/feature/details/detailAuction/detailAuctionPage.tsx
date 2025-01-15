@@ -34,6 +34,7 @@ import AuctionWait1 from "./auctionWait";
 import AuctionBetterLuckNextTime2 from "./auctionBetterLuckNextTime1";
 import TheAuctionContinues from "./TheAuctionContinues";
 import RelatedProduct from "../detalsListting/relatedProduct/relatedProduct";
+import PaidAuctionIsOver from "./paidAuctionIsOver";
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,12 +58,14 @@ const DetailPageAuction: React.FC = () => {
   const [auctionStatusTop3Bidder, setAuctionStatusTop3Bidder] = useState<null | 9 | 10 | 11>(null);
   const [statuscheckAuctionTime, setStatuscheckAuctionTime] = useState<null | 0 | 1 | 2 | 3 | 4 | 5>(null);
   const [auctionCanceled, setAuctionCanceled] = useState(false)
+  const [showPaidAuctionModal, setShowPaidAuctionModal] = useState(false);
   const [isAuctionTemporary, setIsAuctionTemporary] = useState(auctionPricing?.status === 'temporary');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const auctionProgress = useSelector((state: RootState) => state.productClient.getAuctionProgress);
   const totalPages = useSelector((state: RootState) => state.productClient.getAuctionProgress.pagination?.totalPages || 1);
   const total = useSelector((state: RootState) => state.productClient.getAuctionProgress.pagination?.total || 0);
+
   const hasPrevPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
   const biddingList: Bid[] = auctionProgress.biddingList || [];
@@ -230,6 +233,21 @@ const DetailPageAuction: React.FC = () => {
     };
   }, [dispatch, slug]);
 
+  useEffect(() => {
+    socket.on('auctionPaid', (data) => {
+      if (data.slug === slug) {
+        setShowPaidAuctionModal(true);
+        setStatuscheckAuctionTime(3);
+        dispatch(getProductDetailAuctionThunk({ slug }));
+        dispatch(getAuctionProgressThunk({ slug, page: currentPage }));
+        setTimeout(() => { setShowPaidAuctionModal(false); navigate("/auction"); }, 10000);
+      }
+    });
+
+    return () => {
+      socket.off('auctionPaid');
+    };
+  }, [slug, dispatch, currentPage]);
 
 
 
@@ -278,7 +296,6 @@ const DetailPageAuction: React.FC = () => {
         if (slug) {
           await dispatch(emailTwowinnerThunk({ slug }));
         }
-
         break;
       case 1:
         if (slug) {
@@ -287,7 +304,6 @@ const DetailPageAuction: React.FC = () => {
         if (slug) {
           await dispatch(emailTwowinnerThunk({ slug }));
         }
-
         showAuctionWaitModal();
         break;
       case 2:
@@ -297,6 +313,7 @@ const DetailPageAuction: React.FC = () => {
         showAuctionBetterLuckNextTimeModal();
         break;
       case 3:
+        showPaidAuctionIsOverModal();
         break;
       case 4:
         if (slug) {
@@ -319,10 +336,8 @@ const DetailPageAuction: React.FC = () => {
   const showAuctionWinModal = () => { return <AuctionWin0 />; };
   const showAuctionWaitModal = () => { return <AuctionWait1 />; };
   const showAuctionBetterLuckNextTimeModal = () => { return <AuctionBetterLuckNextTime2 />; };
-  const showTheAuctionContinuesModal = () => {
-    return <TheAuctionContinues onClose={() => setAuctionCanceled(false)} />;
-  };
-
+  const showTheAuctionContinuesModal = () => {return <TheAuctionContinues onClose={() => setAuctionCanceled(false)} />;};
+  const showPaidAuctionIsOverModal = () => {return <PaidAuctionIsOver onClose={() => setShowPaidAuctionModal(false)} />;};
 
 
   useEffect(() => {
@@ -444,7 +459,7 @@ const DetailPageAuction: React.FC = () => {
         <div className="col-span-full xl:col-auto">
           {statusCart === 1 && <AlertCheckStatusCart visible={alertVisible} setVisible={setAlertVisible} />}
           {productDetailAuction && (
-            <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded || isAuctionTemporary ? 'opacity-50 pointer-events-none' : ''}`}>
+            <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded || isAuctionTemporary || statuscheckAuctionTime === 3 ? 'opacity-50 pointer-events-none' : ''}`}>
               <CurrentPriceAndBidprice
                 product={productDetailAuction}
                 onAuctionEnd={handleAuctionEnd}
@@ -471,6 +486,7 @@ const DetailPageAuction: React.FC = () => {
         {statuscheckAuctionTime === 2 && showAuctionBetterLuckNextTimeModal()}
         {statuscheckAuctionTime === 5 && showTheAuctionContinuesModal()}
         {auctionCanceled && showTheAuctionContinuesModal()}
+        {showPaidAuctionModal && showPaidAuctionIsOverModal()}
       </motion.div>
 
 

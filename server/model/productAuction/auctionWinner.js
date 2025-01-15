@@ -44,6 +44,7 @@ const auctionWinnerSchema = new Schema(
       default: "pending",
     },
     hasWinner: { type: Boolean},
+    notWinner:{ type: Boolean},
     startTime: { type: Date, default: Date.now, required: true },
     endTime: { type: Date, required: true },
     remainingTime: { type: String },
