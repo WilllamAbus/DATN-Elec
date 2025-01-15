@@ -125,7 +125,7 @@ const userSchema = new Schema(
     tokenLogin: String,
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
     banks: { type: [bankSchema], default: [] },
-    // message:{type:String},
+    message:{type:String},
     warning: { type: Number, default: 0 },
     statusAuction: { type: String, default: "active" },
     noteWarning: { type: String, default: "" },

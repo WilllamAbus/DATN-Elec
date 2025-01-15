@@ -33,6 +33,7 @@ import AuctionWin0 from "./auctionWin0";
 import AuctionWait1 from "./auctionWait";
 import AuctionBetterLuckNextTime2 from "./auctionBetterLuckNextTime1";
 import TheAuctionContinues from "./TheAuctionContinues";
+import RelatedProduct from "../detalsListting/relatedProduct/relatedProduct";
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -456,7 +457,7 @@ const DetailPageAuction: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
-        {/* <RelatedProduct/> */}
+      <RelatedProduct/> 
       </div>
       {auctionStatus === 0 && <AuctionWin />}
       {auctionStatus === 1 && <AuctionPending />}
