@@ -35,6 +35,10 @@ const orderDetailSchema = new Schema(
           ref: "productAuction",
           required: true,
         },
+        auctionWinner: {
+          type: Schema.Types.ObjectId,
+          ref: "AuctionWinner",
+        },
         inventory: {
           type: Schema.Types.ObjectId,
           ref: "Inventory",

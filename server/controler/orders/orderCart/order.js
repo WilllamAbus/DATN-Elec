@@ -661,6 +661,102 @@ const authController = {
     }
   },
 
+  // cancelOrder: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
+  //     const { orderId } = req.params;
+  //     const { cancelReason } = req.body;
+
+  //     const order = await Order.findOne({
+  //       _id: orderId,
+  //       user: userId,
+  //       isDeleted: false,
+  //     })
+  //       .populate({
+  //         path: "cartDetails",
+  //         populate: [
+  //           {
+  //             path: "items.product",
+  //             model: "product_v2",
+  //           },
+  //           {
+  //             path: "items.productVariant",
+  //             model: "productVariant",
+  //           },
+  //           {
+  //             path: "items.inventory",
+  //             model: "Inventory",
+  //           },
+  //           {
+  //             path: "itemAuction.product_randBib",
+  //             model: "productAuction",
+  //           },
+  //           {
+  //             path: "itemAuction.inventory",
+  //             model: "Inventory",
+  //           },
+  //         ],
+  //       })
+  //       .populate("payment");
+
+  //     if (!order) {
+  //       return res
+  //         .status(404)
+  //         .json({ message: "Order not found or does not belong to this user" });
+  //     }
+
+  //     if (
+  //       order.stateOrder !== "Chờ xử lý" &&
+  //       order.stateOrder !== "Đã xác nhận"
+  //     ) {
+  //       return res.status(400).json({
+  //         message:
+  //           "Order cannot be canceled. Only orders with 'Chờ xử lý' or 'Đã xác nhận' status can be canceled.",
+  //       });
+  //     }
+
+  //     const user = await User.findById(userId);
+  //     if (!user) {
+  //       return res.status(404).json({ message: "User not found" });
+  //     }
+
+  //     // Kiểm tra nếu đơn hàng có item đấu giá
+  //     const hasAuctionItems = order.cartDetails.some(
+  //       (detail) => detail.itemAuction && detail.itemAuction.length > 0
+  //     );
+
+  //     // Chỉ tăng cảnh báo nếu có sản phẩm đấu giá
+  //     if (hasAuctionItems) {
+  //       user.warning += 1;
+
+  //       // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
+  //       if (user.warning > 3) {
+  //         user.statusAuction = "disable";
+  //         user.noteWarning =
+  //           "Đã hủy đơn hàng đấu giá quá số lần quy định, vui lòng liên hệ CSKH để được hỗ trợ.";
+  //       }
+
+  //       await user.save();
+  //     }
+
+  //     // Cập nhật trạng thái đơn hàng
+  //     order.stateOrder = "Hủy đơn hàng";
+  //     order.cancelReason = cancelReason;
+
+  //     await order.save();
+
+  //     res.status(200).json({
+  //       message: "Order successfully canceled",
+  //       order,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error canceling order:", error);
+  //     res.status(500).json({
+  //       message: "Error canceling order",
+  //       error: error.message || error,
+  //     });
+  //   }
+  // },
   cancelOrder: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -695,6 +791,10 @@ const authController = {
               path: "itemAuction.inventory",
               model: "Inventory",
             },
+            {
+              path: "itemAuction.auctionWinner",
+              model: "AuctionWinner",
+            },
           ],
         })
         .populate("payment");
@@ -725,13 +825,27 @@ const authController = {
         (detail) => detail.itemAuction && detail.itemAuction.length > 0
       );
 
-      // Chỉ tăng cảnh báo nếu có sản phẩm đấu giá
       if (hasAuctionItems) {
+        for (const detail of order.cartDetails) {
+          if (detail.itemAuction) {
+            for (const auctionItem of detail.itemAuction) {
+              const auctionWinner = auctionItem.auctionWinner;
+              if (auctionWinner) {
+                // Cập nhật trạng thái của auctionWinner
+                auctionWinner.confirmationStatus = "canceled";
+                auctionWinner.auctionStatus = "canceled";
+                auctionWinner.status = "ended";
+                await auctionWinner.save();
+              }
+            }
+          }
+        }
+
         user.warning += 1;
 
         // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
         if (user.warning > 3) {
-          user.status = "disable";
+          user.statusAuction = "disable";
           user.noteWarning =
             "Đã hủy đơn hàng đấu giá quá số lần quy định, vui lòng liên hệ CSKH để được hỗ trợ.";
         }
