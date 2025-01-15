@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { checkAuctionTimeAuctionPricingRangeThunk } from "../Thunk";
-import { CheckAuctionTimeAuctionPricingRangeResponse } from "../../../../services/detailProductAuction/types/checkAuctionTimeAuctionPricingRange";
+import { CheckAuctionTimeAuctionPricingRangeResponse, AuctionPricing } from "../../../../services/detailProductAuction/types/checkAuctionTimeAuctionPricingRange";
 
-interface CheckAuctionTimeAuctionPricingRangeState {
-  auctionTimeData: CheckAuctionTimeAuctionPricingRangeResponse | null;
+interface AuctionCheckTimeState {
+  auctionPricing: AuctionPricing | null;
   status: "idle" | "loading" | "success" | "fail";
-  error: { code: string; msg: string } | null;
+  error: string | null;
   isLoading: boolean;
 }
 
-const initialState: CheckAuctionTimeAuctionPricingRangeState = {
-  auctionTimeData: null,
+const initialState: AuctionCheckTimeState = {
+  auctionPricing: null,
   status: "idle",
   error: null,
   isLoading: false,
@@ -32,14 +32,14 @@ const checkAuctionTimeAuctionPricingRangeSlice = createSlice({
         (state, action: PayloadAction<CheckAuctionTimeAuctionPricingRangeResponse>) => {
           state.status = "success";
           state.isLoading = false;
-          state.auctionTimeData = action.payload;
+          state.auctionPricing = action.payload.auctionPricing || null;
           state.error = null;
         }
       )
       .addCase(checkAuctionTimeAuctionPricingRangeThunk.rejected, (state, action) => {
         state.status = "fail";
         state.isLoading = false;
-        state.error = action.payload || { code: "LOI_KHONG_XAC_DINH", msg: "Lỗi không xác định" };
+        state.error = action.payload || "Lỗi khi kiểm tra thời gian đấu giá";
       });
   },
 });

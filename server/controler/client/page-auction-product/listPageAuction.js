@@ -30,7 +30,7 @@ const listPageAuction = async (req, res) => {
 
     const products = response.response.products.filter(product => 
       product.status === 'active' && 
-      ['active', 'ended'].includes(product.auctionPricing.status)
+      ['active', 'ended','temporary'].includes(product.auctionPricing.status)
     );
 
     const currentPage = page ? +page : 1;

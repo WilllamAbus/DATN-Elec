@@ -10,6 +10,7 @@ export interface AuctionPricing {
   userBidPrice: number | null;
   status: string;
   product_randBib: string;
+  hasWinner:Boolean;
   createdAt: string;
   updatedAt: string;
 }

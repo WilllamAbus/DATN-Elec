@@ -46,7 +46,7 @@ export default function AuctionTemporary() {
               >
                 <img
                   alt="Ảnh thua"
-                  src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2Fgia-toi-da-2.svg?alt=media&token=e0adbce9-689e-46c5-9ceb-d9d18a83299a"
+                  src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2F10min.svg?alt=media&token=c769c117-123a-4a2d-8ee1-32391648fb9e"
                   className="w-full"
                 />
               </motion.div>

@@ -1,3 +1,4 @@
+const { getIO } = require('../../../services/skserver/socketServer'); 
 const AuctionWinner = require('../../../model/productAuction/auctionWinner');
 const AuctionPriceHistory = require('../../../model/productAuction/auctionPriceHistory');
 const mongoose = require('mongoose');
@@ -7,7 +8,7 @@ const updateUserWarningStatus = (user) => {
   user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${3 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
 
   if (user.warning >= 100) {
-    user.status = 'disabled'; 
+    user.statusAuction = 'disabled'; 
     user.disabledAt = new Date();
     user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
   }
@@ -22,6 +23,7 @@ const canceledAuctionTemporary = async (req, res) => {
     const auctionWinner = await AuctionWinner.findById(auctionWinnerId)
       .populate('auctionPricingRange')
       .populate({ path: 'user', select: '_id name email noteWarning warning' })
+      .populate({ path: 'product_randBib', select: 'slug' }) 
       .session(session);
 
     if (!auctionWinner) {
@@ -58,7 +60,8 @@ const canceledAuctionTemporary = async (req, res) => {
       });
     }
 
-    // Restore the auctionPricingRange details from temporary values
+    const slug = auctionWinner.product_randBib.slug;
+
     if (auctionPricingRange.currentPriceTemporarily != null) {
       auctionPricingRange.currentPrice = auctionPricingRange.currentPriceTemporarily;
       auctionPricingRange.startTime = auctionPricingRange.startTimeTemporarily;
@@ -72,7 +75,6 @@ const canceledAuctionTemporary = async (req, res) => {
       await auctionPricingRange.save({ session });
     }
 
-    // Update AuctionPriceHistory status to 'disabled'
     await AuctionPriceHistory.updateMany(
       { auctionPricingRange: auctionPricingRange._id, status: 'active' },
       { $set: { status: 'disabled' } },
@@ -87,6 +89,17 @@ const canceledAuctionTemporary = async (req, res) => {
     const user = auctionWinner.user;
     updateUserWarningStatus(user);
     await user.save({ session });
+
+    const io = getIO(); 
+    io.emit('auctionCanceled', {  
+      auctionWinnerId: auctionWinner._id,
+      userId: user._id,
+      userMessage: user.message,
+      userWarning: user.warning,
+      status: auctionWinner.status,
+      auctionStatus: auctionWinner.auctionStatus,
+      slug: slug, 
+    });
 
     await session.commitTransaction();
     session.endSession();

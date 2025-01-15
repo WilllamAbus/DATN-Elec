@@ -9,6 +9,7 @@ const auctionPriceHistorySchema = new Schema(
     bidPrice: { type: Number, required: true }, 
     bidTime: { type: Date, default: Date.now }, 
     status: { type: String, default: 'active' },
+    emailSent: { type: Boolean, default: false },
   },
   {
     collection: "auctionPriceHistory", 

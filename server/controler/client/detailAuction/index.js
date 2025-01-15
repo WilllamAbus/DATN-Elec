@@ -13,6 +13,7 @@ const getAuctionProgress = require('./auctionProgress').getAuctionProgress;
 const getTop3HighestBidders = require('./getTop3HighestBidders').getTop3HighestBidders;
 const getUserCart = require('./getUserCart').getUserCart;
 const checkAuctionTimeAuctionPricingRange = require('./checkAuctionTimeAuctionPricingRange').checkAuctionTimeAuctionPricingRange;
+const emailTwowinners = require('./emailTwowinners').emailTwowinners;
 module.exports = {
   getProductDetailAuction,
   createOneUpdateBidAuction,
@@ -28,5 +29,6 @@ module.exports = {
   getAuctionProgress,
   getTop3HighestBidders,
   getUserCart,
-  checkAuctionTimeAuctionPricingRange
+  checkAuctionTimeAuctionPricingRange,
+  emailTwowinners
 }

@@ -22,7 +22,6 @@ const AuctionService = {
     const currentTime = new Date().getTime();
     const endTime = new Date(auctionPricingRange.endTime).getTime();
 
-    // Kiểm tra nếu auctionPricingRange đã kết thúc
     if (auctionPricingRange.status === 'ended') {
       return {
         success: true,

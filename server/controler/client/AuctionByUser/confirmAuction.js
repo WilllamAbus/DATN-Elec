@@ -1,5 +1,6 @@
 const AuctionWinner = require('../../../model/productAuction/auctionWinner');
 const Cart = require('../../../model/orders/cart.model');
+const AuctionPricingRange = require('../../../model/productAuction/auctionPricingRange');
 const mongoose = require('mongoose');
 
 const confirmAuction = async (req, res) => {
@@ -29,22 +30,50 @@ const confirmAuction = async (req, res) => {
     auctionWinner.confirmationStatus = 'confirmed';
     await auctionWinner.save();
 
-    // Set auction end time to 1 hour from now
-    const auctionEndTime = new Date();
-    auctionEndTime.setHours(auctionEndTime.getHours() + 1);
+    let auctionStartTime, auctionEndTime, remainingTimeString;
 
-    // Calculate remaining time
-    const currentTime = new Date();
-    const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
-    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
-    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-    const remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+    if (auctionWinner.status === 'active') {
+      // Set auction end time to 1 hour from now
+      auctionEndTime = new Date();
+      auctionEndTime.setHours(auctionEndTime.getHours() + 1);
+      
+      // Calculate remaining time
+      const currentTime = new Date();
+      const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
+      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+      remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+
+      auctionStartTime = currentTime;
+    } else if (auctionWinner.status === 'temporary') {
+      const auctionPricingRange = await AuctionPricingRange.findById(auctionWinner.auctionPricingRange._id);
+
+      if (auctionPricingRange.status !== 'temporary') {
+        return res.status(400).json({
+          code: 'KHONG_DUNG_TAM',
+          msg: 'Trạng thái phiên đấu giá không phù hợp.',
+          status: 'error',
+          error: 'Mismatched auction pricing range status'
+        });
+      }
+
+      auctionStartTime = auctionPricingRange.startTime;
+      auctionEndTime = auctionPricingRange.endTime;
+
+      // Calculate remaining time
+      const remainingTime = new Date(auctionEndTime).getTime() - new Date().getTime();
+      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+      remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+    }
 
     const itemAuction = {
       auctionWinner: auctionWinner._id,
-      auctionStartTime: currentTime, 
+      auctionStartTime: auctionStartTime, 
       auctionEndTime: auctionEndTime,
       remainingTime: remainingTimeString,
       price: auctionWinner.bidPrice,

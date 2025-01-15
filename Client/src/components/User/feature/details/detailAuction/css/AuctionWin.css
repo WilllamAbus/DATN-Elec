@@ -1,0 +1,33 @@
+.curved-text {
+  font-size: 4rem; /* Tăng kích thước phông chữ */
+  font-weight: bold;
+  color: #ff0000; /* Chữ màu đỏ */
+  text-align: center;
+  text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; /* Viền màu vàng */
+  position: relative;
+  display: inline-block;
+}
+
+.curved-text:before {
+  content: "TRÚNG ĐẤU GIÁ";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  text-align: center;
+  transform-origin: center;
+  transform: rotate(-30deg);
+}
+
+.curved-text:after {
+  content: "TRÚNG ĐẤU GIÁ";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  text-align: center;
+  transform-origin: center;
+  transform: rotate(30deg);
+}
