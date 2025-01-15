@@ -65,24 +65,13 @@ const handleExportPDF = (order: Order) => {
   const MyDocument = () => (
     <Document>
       <Page size="A6" style={styles.page}>
-        {/* Tiêu đề */}
         <Text style={styles.header}>Hóa Đơn Bán Hàng</Text>
-
-        {/* Thông tin khách hàng */}
         <View style={styles.section}>
           <Text>Mã đơn hàng: {order._id}</Text>
-          <Text>
-            Khách hàng:{" "}
-            {order.shipping.recipientName || "Không có tên khách hàng"}
-          </Text>
-          <Text>
-            Số điện thoại:{" "}
-            {order.shipping.phoneNumber || "Chưa có số điện thoại"}
-          </Text>
+          <Text>Khách hàng: {order.shipping.recipientName || "Không có tên khách hàng"}</Text>
+          <Text>Số điện thoại: {order.shipping.phoneNumber || "Chưa có số điện thoại"}</Text>
           <Text>Địa chỉ: {order.shipping.address || "Chưa có địa chỉ"}</Text>
         </View>
-
-        {/* Bảng chi tiết sản phẩm */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableCell}>STT</Text>
@@ -91,49 +80,21 @@ const handleExportPDF = (order: Order) => {
             <Text style={styles.tableCell}>Giá</Text>
             <Text style={styles.tableCell}>Thành tiền</Text>
           </View>
-
-          {/* Dữ liệu trong bảng */}
           {order.cartDetails.map((item, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableCell}>{index + 1}</Text>
-              <Text style={styles.tableCell}>
-                {item.items[0]?.productVariant?.variant_name ||
-                  "Không có tên sản phẩm"}
-              </Text>
-              <Text style={styles.tableCell}>
-                {item.items[0]?.quantity || 0}
-              </Text>
-              <Text style={styles.tableCell}>
-                {item.items[0]?.productVariant?.variant_price.toLocaleString(
-                  "vi-VN"
-                ) || 0}
-                VNĐ
-              </Text>
-              <Text style={styles.tableCell}>
-                {order.totalAmount?.toLocaleString("vi-VN")} VNĐ
-              </Text>
+              <Text style={styles.tableCell}>{item.items[0]?.productVariant?.variant_name || "Không có tên sản phẩm"}</Text>
+              <Text style={styles.tableCell}>{item.items[0]?.quantity || 0}</Text>
+              <Text style={styles.tableCell}>{item.items[0]?.productVariant?.variant_price.toLocaleString("vi-VN") || 0} VNĐ</Text>
+              <Text style={styles.tableCell}>{order.totalPriceWithShipping?.toLocaleString("vi-VN")} VNĐ</Text>
             </View>
           ))}
         </View>
-
-        {/* Tổng tiền */}
-        <Text style={styles.total}>
-          Tổng tiền: {order.totalAmount?.toLocaleString("vi-VN")} VNĐ
-        </Text>
+        <Text style={styles.total}>Tổng tiền: {order.totalPriceWithShipping?.toLocaleString("vi-VN")} VNĐ</Text>
       </Page>
     </Document>
   );
 
-  pdf(<MyDocument />)
-    .toBlob()
-    .then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `HoaDon_${order._id}.pdf`;
-      link.click();
-      window.URL.revokeObjectURL(url);
-    });
+  return pdf(<MyDocument />).toBuffer();
 };
-
 export default handleExportPDF;

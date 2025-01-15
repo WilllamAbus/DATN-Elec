@@ -24,6 +24,7 @@ module.exports = async (auctionPricingRange, auctionRound) => {
       startTime: convertToLocalTime(currentTime),
       endTime: convertToLocalTime(temporaryEndTime),
       remainingTime: remainingTime, 
+      product_randBib: auctionPricingRange.product_randBib,
     });
     await auctionWinner.save();
 

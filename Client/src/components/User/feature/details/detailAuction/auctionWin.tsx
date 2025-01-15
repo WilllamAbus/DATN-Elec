@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 
 
-export default function AuctionWin( ) {
+export default function AuctionWin() {
   const { isOpen, onOpenChange } = useDisclosure({ defaultOpen: true });
 
   return (
@@ -38,15 +38,19 @@ export default function AuctionWin( ) {
             <Image
               alt="Ảnh thắng"
               src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2FBOD.gif?alt=media&token=95ad3955-c06d-4e74-89d8-884978773c81"
-              className="w-full" 
+              className="w-full"
               width={800}
               height={250}
 
             />
-         
+
           </ModalBody>
           <ModalFooter>
-          <Link to="/auction"> <MyButton variant="gradientBlue" size="sm"  >Trở về danh sách đấu giá </MyButton> </Link>
+            <Link to="/session-auction">
+              <MyButton variant="gradientBlue" size="sm">
+                Đến phiên đấu giá
+              </MyButton>
+            </Link>
           </ModalFooter>
         </>
       </ModalContent>

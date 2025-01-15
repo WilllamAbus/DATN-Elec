@@ -606,7 +606,7 @@ const OrderList: React.FC = () => {
                       {order.cartDetails.length > 0 ? (
                         <div>
                           <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 mb-6">
-                            Chi tiết đơn hàng
+                            Sản phẩm
                           </h2>
 
                           <div className="flex flex-col space-y-6">

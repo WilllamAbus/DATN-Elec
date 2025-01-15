@@ -23,7 +23,7 @@ module.exports.sendPasswordResetEmail = async (email, token) => {
     );
 
     const info = await transporter.sendMail({
-      from: "DuPiNDuPi <noreply@gmail.com",
+      from: "E-Com  <noreply@gmail.com",
       to: email,
       subject: "Reset Password",
       html: emailTemplate,
@@ -46,7 +46,7 @@ module.exports.sendVerificationEmail = async (email, token) => {
     );
 
     const info = await transporter.sendMail({
-      from: "DuPiNDuPi <noreply@gmail.com",
+      from: "E-Com  <noreply@gmail.com",
       to: email,
       subject: "Verify Email",
       html: emailTemplate,
@@ -67,7 +67,7 @@ module.exports.sendRandomPasswordEmail = async (email, randomPassword) => {
     );
 
     const info = await transporter.sendMail({
-      from: "DuPiNDuPi <noreply@gmail.com",
+      from: "E-Com  <noreply@gmail.com",
       to: email,
       subject: "Your Temporary Password",
       html: emailTemplate,
@@ -87,7 +87,7 @@ module.exports.sendOrderConfirmationEmail = async (email, orderDetails) => {
     );
 
     const info = await transporter.sendMail({
-      from: "DuPiNDuPi <noreply@gmail.com>",
+      from: "E-Com <noreply@gmail.com>",
       to: email,
       subject: "Xác nhận đơn hàng của bạn",
       html: emailTemplate,
@@ -99,3 +99,38 @@ module.exports.sendOrderConfirmationEmail = async (email, orderDetails) => {
     throw error;
   }
 };
+module.exports.sendOrderAuctionConfirmationEmail = async (
+  email,
+  orderDetails
+) => {
+  try {
+    const emailTemplate = await ejs.renderFile(
+      path.join(__dirname, "..", "views", "orderEmailAuction.ejs"),
+      orderDetails
+    );
+
+    const info = await transporter.sendMail({
+      from: "E-Com <noreply@gmail.com>",
+      to: email,
+      subject: "Xác nhận đơn hàng của bạn",
+      html: emailTemplate,
+    });
+
+    return info;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+module.exports.sendEmail = async (mailOptions) => {
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email đã được gửi thành công");
+  } catch (error) {
+    console.error("Lỗi khi gửi email:", error);
+    throw error; // Ném lỗi để xử lý trong controller
+  }
+};
+
+// module.exports = { sendEmail };

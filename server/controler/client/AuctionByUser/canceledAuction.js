@@ -6,7 +6,7 @@ const updateUserWarningStatus = (user) => {
   user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${3 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
 
   if (user.warning >= 100) {
-    user.status = 'disabled'; 
+    user.statusAuction = 'disabled'; 
     user.disabledAt = new Date();
     user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
   }
@@ -60,7 +60,7 @@ const canceledAuction = async (req, res) => {
           id: user._id,
           warning: user.warning,
           noteWarning: user.noteWarning,
-          status: user.status,
+          statusAuction: user.statusAuction,
           disabledAt: user.disabledAt,
           message: user.message,
         },

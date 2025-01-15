@@ -19,7 +19,9 @@ const {
   highBidderInformation,
   getAuctionProgress,
   getTop3HighestBidders,
-  getUserCart
+  getUserCart,
+  checkAuctionTimeAuctionPricingRange,
+  emailTwowinners
 } = require('./detailAuction');
 
 const {
@@ -88,6 +90,8 @@ module.exports = {
   canceledAuctionTemporary,
   getAuctionProgress,
   getTop3HighestBidders,
-  getUserCart
+  getUserCart,
+  checkAuctionTimeAuctionPricingRange,
+  emailTwowinners
 };
 

@@ -1,6 +1,6 @@
 const AuctionWinner = require('../../model/productAuction/auctionWinner');
 const User = require('../../model/users.model');
-
+const AuctionPriceHistory = require('../../model/productAuction/auctionPriceHistory');
 
 const checkAndUpdateUserPendingAuctionWins = async (userId) => {
   const query = {
@@ -35,6 +35,10 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
   let isUpdated = false;
 
   for (const auction of pendingAuctionWinners) {
+    if (auction.auctionStatus !== 'temporary') {
+      continue;
+    }
+
     if (new Date(auction.endTime).getTime() < currentTime && auction.confirmationStatus === 'pending') {
       auction.confirmationStatus = 'canceled';
       auction.status = 'disabled';
@@ -55,6 +59,12 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
         auctionPricingRange.remainingTimeTemporarily = null;
         await auctionPricingRange.save();
       }
+
+      // Update AuctionPriceHistory status to 'disabled'
+      await AuctionPriceHistory.updateMany(
+        { auctionPricingRange: auctionPricingRange._id, status: 'active' },
+        { $set: { status: 'disabled' } }
+      );
 
       await auction.save();
 
