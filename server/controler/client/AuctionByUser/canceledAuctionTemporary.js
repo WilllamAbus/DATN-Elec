@@ -84,7 +84,7 @@ const canceledAuctionTemporary = async (req, res) => {
     auctionWinner.confirmationStatus = 'canceled';
     auctionWinner.status = 'disabled';
     auctionWinner.auctionStatus = 'canceled';
-    auctionWinner.notWinner = true;
+    auctionWinner.notWinner = false;
     await auctionWinner.save({ session });
 
     const user = auctionWinner.user;

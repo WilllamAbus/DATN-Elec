@@ -18,7 +18,7 @@ const checkAuctionCOntroller = {
       const search = req.query.search || "";
 
       // Fetch price range with active status
-      const priceRangeWinnwe = await AuctiomWinner.find({ status: "disabled" })
+      const priceRangeWinnwe = await AuctiomWinner.find({ status: "disabled", notWinner: true })
         .select("user bidPrice status auctionStatus auctionStausCheck endTime")
         .lean();
 
