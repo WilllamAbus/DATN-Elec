@@ -31,45 +31,30 @@ const confirmAuction = async (req, res) => {
     await auctionWinner.save();
 
     let auctionStartTime, auctionEndTime, remainingTimeString;
+    const currentTime = new Date();
 
     if (auctionWinner.status === 'active') {
-      // Set auction end time to 1 hour from now
-      auctionEndTime = new Date();
-      auctionEndTime.setHours(auctionEndTime.getHours() + 1);
-      
-      // Calculate remaining time
-      const currentTime = new Date();
-      const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
-      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-      remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
-
-      auctionStartTime = currentTime;
+      auctionEndTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // 1 giờ từ bây giờ
     } else if (auctionWinner.status === 'temporary') {
-      const auctionPricingRange = await AuctionPricingRange.findById(auctionWinner.auctionPricingRange._id);
-
-      if (auctionPricingRange.status !== 'temporary') {
-        return res.status(400).json({
-          code: 'KHONG_DUNG_TAM',
-          msg: 'Trạng thái phiên đấu giá không phù hợp.',
-          status: 'error',
-          error: 'Mismatched auction pricing range status'
-        });
-      }
-
-      auctionStartTime = auctionPricingRange.startTime;
-      auctionEndTime = auctionPricingRange.endTime;
-
-      // Calculate remaining time
-      const remainingTime = new Date(auctionEndTime).getTime() - new Date().getTime();
-      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-      remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+      auctionEndTime = new Date(currentTime.getTime() + 30 * 60 * 1000); // 30 phút từ bây giờ
+    } else {
+      return res.status(400).json({
+        code: 'TRANG_THAI_KHONG_HOP_LE',
+        msg: 'Trạng thái không hợp lệ.',
+        status: 'error',
+        error: 'Invalid status'
+      });
     }
+
+    auctionStartTime = currentTime;
+    
+    // Tính thời gian còn lại
+    const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
+    const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+    remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
 
     const itemAuction = {
       auctionWinner: auctionWinner._id,

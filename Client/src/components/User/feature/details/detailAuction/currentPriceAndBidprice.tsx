@@ -42,8 +42,8 @@
     const userId = useSelector((state: RootState) => state.auth.profile.profile?._id) || "";
     const roles = useSelector((state: RootState) => state.auth.login.roles);
     const userCart = useSelector((state: RootState) => state.productClient.getUserCart.cart);
-    const [maxPrice] = useState<number>(product.auctionPricing.maxPrice ?? 0);
-
+    const [maxPrice,setMaxPrice] = useState<number>(product.auctionPricing.maxPrice ?? 0);
+    useEffect(() => { setMaxPrice(product.auctionPricing.maxPrice ?? 0); setCurrentPrice(product.auctionPricing.currentPrice ?? 0); }, [product]);
     const handleQuickCalculate = () => {
       const calculatedPrice = maxPrice - currentPrice;
       setValue('bidPrice', calculatedPrice);
