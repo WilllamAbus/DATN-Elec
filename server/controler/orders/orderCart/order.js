@@ -526,11 +526,11 @@ const authController = {
         score: 5,
       });
       await newInteraction.save();
-      // cart.itemAuction = cart.itemAuction.filter((item) => {
-      //   return !selectedItems.some(
-      //     (selectedItem) => selectedItem._id.toString() === item._id.toString()
-      //   );
-      // });
+      cart.itemAuction = cart.itemAuction.filter((item) => {
+        return !selectedItems.some(
+          (selectedItem) => selectedItem._id.toString() === item._id.toString()
+        );
+      });
       await cart.save();
 
       for (const item of selectedItems) {
