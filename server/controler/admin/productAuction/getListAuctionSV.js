@@ -21,7 +21,7 @@ const ProductService = {
             .populate('product_condition', 'name')
             .populate('product_supplier', 'name')
    
-            .select('product_name image product_description hasVariants  product_brand product_format product_condition product_supplier  product_ratingAvg product_view  weight_g isActive status disabledAt comments')
+            .select('product_name product_price image product_description hasVariants  product_brand product_format product_condition product_supplier  product_ratingAvg product_view  weight_g isActive status disabledAt comments')
             .lean();
 
           const total = await ProductAuction.countDocuments(searchQuery); 
