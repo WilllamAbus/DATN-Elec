@@ -2,89 +2,75 @@ import * as XLSX from "xlsx";
 import { Order } from "../.../../types/order/order";
 
 const handleExportExcel = (order: Order) => {
+  if (!order) return;
+
   // Thông tin khách hàng
   const customerInfo = [
-    ["HÓA ĐƠN BÁN HÀNG"], // Tiêu đề lớn
-    ["Mã đơn hàng:", order._id],
-    ["Khách hàng:", order.shipping.recipientName || "Không có tên khách hàng"],
-    ["Số điện thoại:", order.shipping.phoneNumber || "Chưa có số điện thoại"],
-    ["Địa chỉ:", order.shipping.address || "Chưa có địa chỉ"],
+    [{ v: "HÓA ĐƠN BÁN HÀNG", s: { bold: true, fontSize: 16, alignment: { horizontal: "center" } } }],
+    [],
+    [{ v: "Mã đơn hàng:", s: { bold: true } }, order._id || "Không có"],
+    [{ v: "Khách hàng:", s: { bold: true } }, order.shipping?.recipientName || "Không có tên khách hàng"],
+    [{ v: "Số điện thoại:", s: { bold: true } }, order.shipping?.phoneNumber || "Chưa có số điện thoại"],
+    [{ v: "Địa chỉ:", s: { bold: true } }, order.shipping?.address || "Chưa có địa chỉ"],
     [],
   ];
 
-  // Dữ liệu header cho bảng sản phẩm
-  const headers = ["STT", "Tên sản phẩm", "Số lượng", "Giá", "Thành tiền"];
+  // Tiêu đề bảng sản phẩm
+  const headers = [
+    [
+      { v: "STT", s: { bold: true, fill: { fgColor: { rgb: "FFFF00" } }, border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: "Tên sản phẩm", s: { bold: true, fill: { fgColor: { rgb: "FFFF00" } }, border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: "Số lượng", s: { bold: true, fill: { fgColor: { rgb: "FFFF00" } }, border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: "Giá", s: { bold: true, fill: { fgColor: { rgb: "FFFF00" } }, border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: "Thành tiền", s: { bold: true, fill: { fgColor: { rgb: "FFFF00" } }, border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+    ],
+  ];
 
-  // Chuyển đổi dữ liệu đơn hàng thành mảng để đưa vào Excel
-  const productDetails = order.cartDetails.map((item, index) => [
-    index + 1,
-    item.items[0]?.productVariant?.variant_name || "Không có tên sản phẩm",
-    item.items[0]?.quantity || 0,
-    (item.items[0]?.productVariant?.variant_price || 0).toLocaleString("vi-VN") +
-      " VNĐ",
-    (
-      (item.items[0]?.quantity || 0) * (item.items[0]?.productVariant?.variant_price || 0)
-    ).toLocaleString("vi-VN") + " VNĐ",
-  ]);
+  // Dữ liệu chi tiết sản phẩm
+  const productDetails = order.cartDetails?.map((item, index) => {
+    const productName = item.items[0]?.productVariant?.variant_name || "Không có tên sản phẩm";
+    const quantity = item.items[0]?.quantity || 0;
+    const price = item.items[0]?.productVariant?.variant_price || 0;
+    const total = quantity * price;
 
-  // Thêm tổng tiền vào cuối bảng
+    return [
+      { v: index + 1, s: { border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: productName, s: { border: { top: "thin", bottom: "thin", left: "thin", right: "thin" } } },
+      { v: quantity, s: { border: { top: "thin", bottom: "thin", left: "thin", right: "thin" }, alignment: { horizontal: "center" } } },
+      { v: price.toLocaleString("vi-VN") + " VNĐ", s: { border: { top: "thin", bottom: "thin", left: "thin", right: "thin" }, alignment: { horizontal: "right" } } },
+      { v: total.toLocaleString("vi-VN") + " VNĐ", s: { border: { top: "thin", bottom: "thin", left: "thin", right: "thin" }, alignment: { horizontal: "right" } } },
+    ];
+  }) || [];
+
+  // Tổng tiền
   const totalAmount = [
     [],
-    ["Tổng tiền:", order.totalPriceWithShipping?.toLocaleString("vi-VN") + " VNĐ"],
+    [
+      { v: "TỔNG TIỀN:", s: { bold: true, alignment: { horizontal: "right" } } },
+      { v: (order.totalPriceWithShipping || 0).toLocaleString("vi-VN") + " VNĐ", s: { bold: true, alignment: { horizontal: "right" } } },
+    ],
   ];
 
-  // Kết hợp tất cả dữ liệu
-  const finalData = [...customerInfo, headers, ...productDetails, ...totalAmount];
+  // Gộp tất cả dữ liệu
+  const finalData = [...customerInfo, ...headers, ...productDetails, ...totalAmount];
 
   // Tạo worksheet
   const worksheet = XLSX.utils.aoa_to_sheet(finalData);
 
-  // Định dạng cột
-  const wscols = [
-    { wch: 10 }, // STT
+  // Cài đặt độ rộng cột
+  worksheet["!cols"] = [
+    { wch: 20 }, // STT
     { wch: 30 }, // Tên sản phẩm
     { wch: 15 }, // Số lượng
     { wch: 20 }, // Giá
-    { wch: 20 }, // Thành tiền
+    { wch: 25 }, // Thành tiền
   ];
-  worksheet["!cols"] = wscols;
 
-  // Căn giữa tiêu đề
-  worksheet["A1"].s = {
-    font: { bold: true, sz: 16 }, // Cỡ chữ lớn hơn
-    alignment: { horizontal: "center" }, // Căn giữa
-  };
-
-  // Định dạng header
-  const headerRange = XLSX.utils.decode_range("A7:E7");
-  for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
-    const cell = XLSX.utils.encode_cell({ r: headerRange.s.r, c: C });
-    if (worksheet[cell]) {
-      worksheet[cell].s = {
-        font: { bold: true, color: { rgb: "FFFFFF" } }, // Chữ trắng
-        fill: { fgColor: { rgb: "4CAF50" } }, // Nền xanh
-        alignment: { horizontal: "center" }, // Căn giữa
-      };
-    }
-  }
-
-  // Định dạng border cho toàn bộ bảng
-  Object.keys(worksheet).forEach((cell) => {
-    if (cell[0] === "!") return; // Bỏ qua metadata
-    worksheet[cell].s = {
-      ...worksheet[cell].s,
-      border: {
-        top: { style: "thin", color: { rgb: "000000" } },
-        bottom: { style: "thin", color: { rgb: "000000" } },
-        left: { style: "thin", color: { rgb: "000000" } },
-        right: { style: "thin", color: { rgb: "000000" } },
-      },
-    };
-  });
-
-  // Tạo workbook và xuất file
+  // Tạo workbook và thêm worksheet
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Hóa Đơn");
+
+  // Xuất file Excel
   XLSX.writeFile(workbook, `HoaDon_${order._id}.xlsx`);
 };
 

@@ -876,7 +876,7 @@ const authController = {
                 productDetails += `
                         <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
                             <div style="display: flex; align-items: center;">
-                                <img src="${item?.product_randBib?.image?.[0]?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                <img src="${item?.product_randBib?.image?.[0] || 'https://via.placeholder.com/64'}" 
                                      alt="${item?.product_randBib?.product_name || 'No Image'}" 
                                      style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
                                 <div>
@@ -1015,7 +1015,8 @@ const authController = {
             model: "Inventory",
           },
         ],
-      }).populate("user");
+      }).populate("user")
+      .populate("shipping");;
 
       if (!order) {
         return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
@@ -1075,17 +1076,36 @@ const authController = {
 
         if (stateOrder === "Giao hàng không thành công") {
           // Hoàn lại số lượng tồn kho
-          for (const detail of order.cartDetails) {
-            for (const item of detail.items) {
-              const inventory = item.inventory;
-              if (!inventory) {
-                return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
-                    }.`,
-                });
+          const hasAuctionItems = order.cartDetails.some(
+            (detail) => detail.itemAuction && detail.itemAuction.length > 0
+          );
+          if(hasAuctionItems){
+            for (const detail of order.cartDetails) {
+              for (const item of detail.itemAuction) {
+                const inventory = item.inventory;
+                if (!inventory) {
+                  return res.status(400).json({
+                    message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product_randBib?.product_name || "không xác định"
+                      }.`,
+                  });
+                }
+                inventory.quantityShelf += item.quantity;
+                await inventory.save();
               }
-              inventory.quantityShelf += item.quantity;
-              await inventory.save();
+            }
+          }else{
+            for (const detail of order.cartDetails) {
+              for (const item of detail.items) {
+                const inventory = item.inventory;
+                if (!inventory) {
+                  return res.status(400).json({
+                    message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                      }.`,
+                  });
+                }
+                inventory.quantityShelf += item.quantity;
+                await inventory.save();
+              }
             }
           }
         }
@@ -1093,29 +1113,58 @@ const authController = {
 
       // Quản lý kho cho các trạng thái chuyển đổi khác
       const handleInventoryUpdate = async (items, isRestocking) => {
-        for (const item of items) {
-          const inventory = item.inventory;
-
-          if (!inventory) {
-            return res.status(400).json({
-              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
-                }.`,
-            });
+        const hasAuctionItems = order.cartDetails.some(
+          (detail) => detail.itemAuction && detail.itemAuction.length > 0
+        );
+        if(hasAuctionItems){
+          for (const item of items) {
+            const inventory = item.inventory;
+  
+            if (!inventory) {
+              return res.status(400).json({
+                message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product_randBib?.product_name || "không xác định"
+                  }.`,
+              });
+            }
+  
+            if (!isRestocking && inventory.quantityShelf < item.quantity) {
+              return res.status(400).json({
+                message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product_randBib?.product_name || "không xác định"
+                  }.`,
+              });
+            }
+  
+            inventory.quantityShelf += isRestocking
+              ? item.quantity
+              : -item.quantity;
+            await inventory.save();
           }
-
-          if (!isRestocking && inventory.quantityShelf < item.quantity) {
-            return res.status(400).json({
-              message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
-                }.`,
-            });
+        }else{
+          for (const item of items) {
+            const inventory = item.inventory;
+  
+            if (!inventory) {
+              return res.status(400).json({
+                message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                  }.`,
+              });
+            }
+  
+            if (!isRestocking && inventory.quantityShelf < item.quantity) {
+              return res.status(400).json({
+                message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
+                  }.`,
+              });
+            }
+  
+            inventory.quantityShelf += isRestocking
+              ? item.quantity
+              : -item.quantity;
+            await inventory.save();
           }
-
-          inventory.quantityShelf += isRestocking
-            ? item.quantity
-            : -item.quantity;
-          await inventory.save();
         }
       };
+        
 
       // Trừ kho khi chuyển trạng thái sang "Đang vận chuyển"
       if (
@@ -1290,52 +1339,99 @@ const authController = {
 
       else if (stateOrder === "Hoàn tất") {
         const userEmail = order.user.email;
-
+      
+        // Kiểm tra xem có sản phẩm đấu giá không
+        const hasAuctionItems = order.cartDetails.some(
+          (detail) => detail.itemAuction && detail.itemAuction.length > 0
+        );
+      
+        // Tạo bảng danh sách sản phẩm
+        let productList = `
+          <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="background-color: #f2f2f2;">
+                <th style="padding: 8px;">STT</th>
+                <th style="padding: 8px;">Tên sản phẩm</th>
+                <th style="padding: 8px;">Số lượng</th>
+                <th style="padding: 8px;">Giá</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+      
+        let index = 1;
+      
+        if (hasAuctionItems) {
+          for (let detail of order.cartDetails) {
+            for (let item of detail.itemAuction || []) {
+              productList += `
+                <tr>
+                  <td style="padding: 8px;">${index}</td>
+                  <td style="padding: 8px;">${item?.product_randBib?.product_name || "Sản phẩm không xác định"}</td>
+                  <td style="padding: 8px;">${item?.quantity}</td>
+                  <td style="padding: 8px;">${item?.totalItemPrice.toLocaleString("vi-VN")} VND</td>
+                </tr>
+              `;
+              index++;
+            }
+          }
+        } else {
+          for (let detail of order.cartDetails) {
+            for (let item of detail.items || []) {
+              productList += `
+                <tr>
+                  <td style="padding: 8px;">${index}</td>
+                  <td style="padding: 8px;">${item?.product_randBib?.product_name || "Sản phẩm không xác định"}</td>
+                  <td style="padding: 8px;">${item?.quantity}</td>
+                  <td style="padding: 8px;">${item?.totalItemPrice.toLocaleString("vi-VN")} VND</td>
+                </tr>
+              `;
+              index++;
+            }
+          }
+        }
+      
+        productList += `</tbody></table>`;
+      
+        // Nội dung HTML cho PDF
         const htmlContent = `
-          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto;">
-            <h1>Xin chào, ${order.user.name}!</h1>
-            <p>Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.</p>
-            <p>Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.</p>
-
-            <h2>Hóa đơn đơn hàng</h2>
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 20px auto;">
+            <h2 style="text-align: center;">HÓA ĐƠN ĐƠN HÀNG</h2>
             <p><strong>Tên khách hàng:</strong> ${order.user.name}</p>
-            <p><strong>Email:</strong> ${order.user.email}</p>
-            <p><strong>Tổng tiền:</strong> ${order?.cartDetails?.totalItemPrice} VND</p>
-
+            <p><strong>Số điện thoại:</strong> ${order.shipping.phoneNumber}</p>
+            <p><strong>Địa chỉ:</strong> ${order.shipping.address}</p>
+            <p><strong>Tổng tiền:</strong> ${order.totalPriceWithShipping.toLocaleString("vi-VN")} VND</p>
             <h3>Danh sách sản phẩm:</h3>
-            <ul>
-              ${order.cartDetails.map((detail, index) => {
-                const items = detail.itemAuction?.length > 0 ? detail.itemAuction : detail.items;
-                return items.map((item) => `
-                  <li>
-                    ${index + 1}. ${item?.product_randBib?.product_name || "Sản phẩm không xác định"} 
-                    - Số lượng: ${item?.quantity} 
-                    - Giá: ${item?.totalItemPrice} VND
-                  </li>
-                `).join('');
-              }).join('')}
-            </ul>
+            ${productList}
           </div>
         `;
-
+      
         (async () => {
           const browser = await puppeteer.launch();
           const page = await browser.newPage();
-          await page.setContent(htmlContent);
-          const pdfBuffer = await page.pdf();
-
+          await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
+          const pdfBuffer = await page.pdf({ format: "A4" });
+      
           await browser.close();
-
+      
           const mailOptions = {
             from: "E-Com <noreply@gmail.com>",
             to: userEmail,
             subject: "Hóa đơn đơn hàng của bạn",
-            html:`
-            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto;">
-            <h1>Xin chào, ${order.user.name}!</h1>
-            <p>Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.</p>
-            <p>Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.</p>
-            </div>
+            html: `
+              <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                  Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.
+                </p>
+                <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
+                  Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.
+                </p>
+                <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                  Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+                </p>
+                <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+              </div>
             `,
             attachments: [
               {
@@ -1344,10 +1440,11 @@ const authController = {
               },
             ],
           };
-
+      
           await sendEmail(mailOptions);
         })();
       }
+      
 
       else {
         const userId = order.user.id;

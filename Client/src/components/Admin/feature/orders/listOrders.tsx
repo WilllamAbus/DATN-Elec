@@ -179,12 +179,6 @@ const ListOrders: React.FC = () => {
         navigate(`/admin/listDetailOrder/${order._id}`);
         break;
       case "export":
-        if (
-          order.stateOrder !== "Hoàn tất"
-        ) {
-          toast.error("Chỉ có thể xuất đơn nếu đơn hàng hoàn tất.");
-          return;
-        }
         handleExportExcel(order);
         break;
       default:
