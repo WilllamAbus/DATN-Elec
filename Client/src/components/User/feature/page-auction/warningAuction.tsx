@@ -7,7 +7,9 @@ interface WarningAuctionProps {
 }
 
 const WarningAuction: React.FC<WarningAuctionProps> = ({ warningCount, penaltyDuration }) => {
-  const message = `Hệ thống ghi nhận bạn hủy lần ${warningCount} nên hệ thống sẽ phạt bạn ${penaltyDuration}.`;
+  const message = warningCount > 3 
+    ? "Tài khoản của bạn đã bị cấm vào đấu giá vĩnh viễn." 
+    : `Hệ thống ghi nhận bạn hủy lần ${warningCount} nên hệ thống sẽ phạt bạn ${penaltyDuration}.`;
 
   return (
     <Popover placement="bottom" showArrow backdrop="opaque" className="w-[240px]">

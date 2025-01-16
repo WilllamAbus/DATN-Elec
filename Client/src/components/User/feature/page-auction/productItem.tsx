@@ -27,8 +27,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, index }) => {
 
   const cannotClickProduct = isDisabled || hasWarningTimeout || isUserBanned || isWithinTimeLimit;
 
-  const warningMessage = `Hệ thống ghi nhận bạn đã hủy ${warning} lần, nên hệ thống sẽ phạt bạn ${timeLimit ? `${Math.ceil((new Date(timeLimit).getTime() - new Date().getTime()) / 60000)} phút mới vào được đấu giá` : "0 phút"
-    }.`;
+  const warningMessage = `Hệ thống ghi nhận bạn đã hủy ${warning} lần, nên hệ thống sẽ phạt bạn ${timeLimit ? `${Math.ceil((new Date(timeLimit).getTime() - new Date().getTime()) / 60000)} phút mới vào được đấu giá` : "0 phút"}.`;
 
   const handleProductClick = () => {
     if (cannotClickProduct) {
@@ -69,7 +68,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, index }) => {
       )}
       {!cannotClickProduct && (
         <Link to={`/product-auction/${product.slug}`} className="absolute inset-0">
-          <span className="sr-only">đi đến trang chi tiết</span>
+          <span className="sr-only">đi đến trang chi tiết</span>
         </Link>
       )}
       <div className="pt-1 mb-10">
