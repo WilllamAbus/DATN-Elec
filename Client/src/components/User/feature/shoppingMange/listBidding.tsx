@@ -72,10 +72,12 @@ const ListProductTime: React.FC = () => {
               <div
                 key={product.productId}
                 className={`flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 p-6 shadow-xl rounded-2xl hover:scale-105 transform transition-all duration-300 ${product?.status === "active"
-                  ? "bg-gradient-to-r from-[#c33d42] to-[#d18286]"
-                  : product?.status === "ended"
-                    ? "bg-gray-500"
-                    : "bg-white"
+                    ? "bg-gradient-to-r from-[#c33d42] to-[#d18286]"
+                    : product?.status === "ended"
+                      ? "bg-gray-500"
+                      : product?.status === "paid"
+                        ? "bg-blue-400"
+                        : "bg-white"
                   }`}
               >
                 <div className="flex items-center">
