@@ -8,6 +8,13 @@ interface UserCartState {
   status: "idle" | "loading" | "success" | "fail";
   error: string | null;
   isLoading: boolean;
+  statusWarningTimeout: boolean;
+  timeLimit: string | null;
+  isBanned: boolean;
+  statusAuction: string;
+  message: string | null;
+  warning: number;
+  noteWarning: string | null;
 }
 
 const initialState: UserCartState = {
@@ -16,7 +23,15 @@ const initialState: UserCartState = {
   status: "idle",
   error: null,
   isLoading: false,
+  statusWarningTimeout: false,
+  timeLimit: null,
+  isBanned: false,
+  statusAuction: "active",
+  message: null,
+  warning: 0,
+  noteWarning: null,
 };
+
 
 const getUserCartSlice = createSlice({
   name: "userCart",
@@ -36,6 +51,13 @@ const getUserCartSlice = createSlice({
           state.isLoading = false;
           state.cart = action.payload.cart || null;
           state.statusCart = action.payload.statusCart || null;
+          state.statusWarningTimeout = action.payload.statusWarningTimeout || false;
+          state.timeLimit = action.payload.timeLimit || null;
+          state.isBanned = action.payload.isBanned || false;
+          state.statusAuction = action.payload.statusAuction || "active";
+          state.message = action.payload.message || null;
+          state.warning = action.payload.warning || 0;
+          state.noteWarning = action.payload.noteWarning || null;
           state.error = null;
         }
       )
@@ -48,3 +70,4 @@ const getUserCartSlice = createSlice({
 });
 
 export default getUserCartSlice.reducer;
+

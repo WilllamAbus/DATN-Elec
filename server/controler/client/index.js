@@ -3,7 +3,7 @@ const { homeAllProduct, getID, auction, upView, shopping, search, recommendation
 const {listcatenav,getProductsByCategory} = require('./navbar');
 const {listPageAuction,resetFilter} = require('./page-auction-product');
 const {getProductDetail,getAllStorageBySlugUrl,getAllProductVariantsByVariantPrice} = require('./detail');
-const {getAuctionWinsByUser,confirmAuction,canceledAuction,getUserPendingAuctionWins,canceledAuctionTemporary} = require('./AuctionByUser');
+const {getAuctionWinsByUser,confirmAuction,canceledAuction,getUserPendingAuctionWins,canceledAuctionTemporary,confirmAuctionTemporary} = require('./AuctionByUser');
 const { getLimitProductClient, relatedProduct } = require('./product');
 const {
   getProductDetailAuction,
@@ -21,7 +21,8 @@ const {
   getTop3HighestBidders,
   getUserCart,
   checkAuctionTimeAuctionPricingRange,
-  emailTwowinners
+  emailTwowinners,
+
 } = require('./detailAuction');
 
 const {
@@ -92,6 +93,7 @@ module.exports = {
   getTop3HighestBidders,
   getUserCart,
   checkAuctionTimeAuctionPricingRange,
-  emailTwowinners
+  emailTwowinners,
+  confirmAuctionTemporary
 };
 

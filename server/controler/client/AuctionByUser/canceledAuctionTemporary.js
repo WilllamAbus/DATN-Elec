@@ -3,16 +3,25 @@ const AuctionWinner = require('../../../model/productAuction/auctionWinner');
 const AuctionPriceHistory = require('../../../model/productAuction/auctionPriceHistory');
 const mongoose = require('mongoose');
 
-const updateUserWarningStatus = (user) => {
+const updateUserWarningStatus = async (user, session) => {
   user.warning += 1;
   user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${3 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
 
-  if (user.warning >= 100) {
+  if (user.warning === 1) {
+    user.timeLimit = new Date(Date.now() + 20 * 60 * 1000); 
+    user.statusWarningTimeout = true;
+  } else if (user.warning === 2) {
+    user.timeLimit = new Date(Date.now() + 40 * 60 * 1000); 
+    user.statusWarningTimeout = true;
+  } else if (user.warning >= 3) {
     user.statusAuction = 'disabled'; 
+    user.isBanned = true;
     user.disabledAt = new Date();
     user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá 3 lần.';
   }
+  await user.save({ session });
 };
+
 
 const canceledAuctionTemporary = async (req, res) => {
   const session = await mongoose.startSession();
@@ -22,7 +31,7 @@ const canceledAuctionTemporary = async (req, res) => {
     const { auctionWinnerId } = req.body;
     const auctionWinner = await AuctionWinner.findById(auctionWinnerId)
       .populate('auctionPricingRange')
-      .populate({ path: 'user', select: '_id name email noteWarning warning' })
+      .populate({ path: 'user', select: '_id name email noteWarning warning timeLimit' })
       .populate({ path: 'product_randBib', select: 'slug' }) 
       .session(session);
 
@@ -88,8 +97,7 @@ const canceledAuctionTemporary = async (req, res) => {
     await auctionWinner.save({ session });
 
     const user = auctionWinner.user;
-    updateUserWarningStatus(user);
-    await user.save({ session });
+    await updateUserWarningStatus(user, session);
     console.log(`Slug: ${auctionWinner.product_randBib.slug}`);
     const io = getIO(); 
     io.emit('auctionCanceled', {  
@@ -126,6 +134,7 @@ const canceledAuctionTemporary = async (req, res) => {
           status: user.status,
           disabledAt: user.disabledAt,
           message: user.message,
+          timeLimit: user.timeLimit,
         },
       }
     });
