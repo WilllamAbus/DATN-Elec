@@ -2,6 +2,7 @@ const ProductV2 = require("../../../model/product_v2");
 const Inventory = require("../../../model/inventory/inventory.model");
 const Order = require("../../../model/orders/orderCart/orders");
 const OrderDetail = require("../../../model/orders/orderCart/OrderDetails");
+const OrderCart = require("../../../model/orders/orderCart/orders");
 const Categories = require(`../../../model/catgories.model`);
 const modelComment = require("../../../model/comment.model");
 const modelViewProduct = require("../../../model/product_v2/productVariant");
@@ -352,7 +353,6 @@ const statisticalController = {
   revenue: async (req, res) => {
     try {
       const { startDate, endDate, page = 1, limit = 5 } = req.query; // Nhận tham số từ query params
-  
       const filter = {};
   
       // Xử lý lọc theo khoảng thời gian
@@ -373,21 +373,32 @@ const statisticalController = {
         };
       }
   
-      // Tính tổng doanh thu
+      // Bước 1: Lấy danh sách đơn hàng từ model Order có stateOrder là "Hoàn tất"
+      const completedOrders = await OrderCart.find({ stateOrder: "Hoàn tất" }).select("_id");
+  
+      // Bước 2: Tính tổng doanh thu chỉ từ các OrderDetail liên quan đến đơn hàng hoàn tất
       const totalRevenueResult = await OrderDetail.aggregate([
-        { $match: filter },
+        {
+          $match: {
+            ...filter, // Thêm điều kiện lọc theo thời gian
+            order: { $in: completedOrders.map(order => order._id) }, // Chỉ lấy các OrderDetail liên quan đến đơn hàng hoàn tất
+          },
+        },
         {
           $group: {
             _id: null,
-            total: { $sum: "$totalItemPrice" },
+            total: { $sum: "$totalItemPrice" }, // Tính tổng trường totalItemPrice
           },
         },
       ]);
-      const totalRevenue =
-        totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
   
-      // Lấy dữ liệu chi tiết
-      const orderDetails = await OrderDetail.find(filter)
+      const totalRevenue = totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
+  
+      // Bước 3: Lấy các OrderDetail liên quan đến danh sách đơn hàng này
+      const orderDetails = await OrderDetail.find({
+        ...filter, // Áp dụng điều kiện lọc theo thời gian
+        order: { $in: completedOrders.map(order => order._id) }, // Lọc theo đơn hàng hoàn tất
+      })
         .populate([
           { path: "order", model: "OrderCart" },
           { path: "items.product", model: "product_v2" },
@@ -437,6 +448,7 @@ const statisticalController = {
       res.status(500).json({ success: false, message: "An error occurred" });
     }
   },
+  
    updateNormalizedNames : async (req, res) => {
     try {
       // Lấy tất cả các sản phẩm từ database
