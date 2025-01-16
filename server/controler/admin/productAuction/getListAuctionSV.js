@@ -6,37 +6,39 @@ const ProductService = {
       const offset = (!page || +page <= 1) ? 0 : (+page - 1) * limit;
       const searchQuery = search
         ? {
-            status: { $ne: 'disable' },
-            product_name: { $regex: search, $options: 'i' }
-          }
-        : { status: { $ne: 'disable' },
-       };
-        
+          status: { $ne: 'disable' },
+          product_name: { $regex: search, $options: 'i' }
+        }
+        : {
+          status: { $ne: 'disable' },
+        };
 
-       const products = await ProductAuction.find(searchQuery)
-            .skip(offset)
-            .limit(limit)
-            .populate('product_type', 'name imgURL')  
-            .populate('product_brand', 'name')
-            .populate('product_condition', 'name')
-            .populate('product_supplier', 'name')
-   
-            .select('product_name product_price image product_description hasVariants  product_brand product_format product_condition product_supplier  product_ratingAvg product_view  weight_g isActive status disabledAt comments')
-            .lean();
 
-          const total = await ProductAuction.countDocuments(searchQuery); 
-    
-          resolve({
-            success: true,
-            err: 0,
-            msg: products.length ? 'OK' : 'No products found.',
-            status: 200,
-            response: {
-              total,
-              products
-            }
-          });
-    
+      const products = await ProductAuction.find(searchQuery)
+        .skip(offset)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate('product_type', 'name imgURL')
+        .populate('product_brand', 'name')
+        .populate('product_condition', 'name')
+        .populate('product_supplier', 'name')
+        .populate('auctionPricing')
+        .select('product_name product_price image product_description hasVariants  product_brand product_format product_condition product_supplier  product_ratingAvg product_view  weight_g isActive status disabledAt auctionPricing')
+        .lean();
+
+      const total = await ProductAuction.countDocuments(searchQuery);
+
+      resolve({
+        success: true,
+        err: 0,
+        msg: products.length ? 'OK' : 'No products found.',
+        status: 200,
+        response: {
+          total,
+          products
+        }
+      });
+
 
     } catch (error) {
       reject({

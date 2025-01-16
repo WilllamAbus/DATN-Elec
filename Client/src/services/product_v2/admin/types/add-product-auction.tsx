@@ -6,7 +6,22 @@ export interface reponseProduct {
   product?: ProductAuction;
   error?: string;
 }
-
+export interface AuctionPricing {
+  _id: string;
+  startTime: string;  
+  endTime: string;   
+  startingPrice: number; 
+  maxPrice: number;     
+  currentPrice: number;   
+  priceStep: number;     
+  status: 'active' | 'inactive' | 'completed' | 'canceled'; 
+  product_randBib: string; 
+  isPriceStepAdjusted: boolean;
+  emailSent: boolean;  
+  createdAt: string;  
+  updatedAt: string;  
+      
+}
 export interface ProductAuction {
   _id: string;
   product_name: string;
@@ -28,6 +43,7 @@ export interface ProductAuction {
   updatedAt: string;
   product_slug: string;
   image?: FileList;
+  auctionPricing?: AuctionPricing;
 }
 
 export interface ProductDiscount {

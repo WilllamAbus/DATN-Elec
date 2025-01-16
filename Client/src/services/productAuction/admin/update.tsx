@@ -8,7 +8,6 @@ export const updateProductAuction = async (id: string, product: ProductAuction):
     formData.append("product_name", product.product_name);
     formData.append("product_description", product.product_description);
     formData.append("product_type", product.product_type);
-    formData.append("product_discount", product.product_discount.toString());
     formData.append("product_supplier", product.product_supplier);
     formData.append("product_brand", product.product_brand);
     formData.append("product_condition", product.product_condition);

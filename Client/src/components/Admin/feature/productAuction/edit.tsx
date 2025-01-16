@@ -30,7 +30,7 @@ const EditProduct: React.FC = () => {
   const product = useSelector((state: RootState) => state.products.getone.product);
   const fetchStatus = useSelector((state: RootState) => state.products.getone.status);
   const fetchError = useSelector((state: RootState) => state.products.getone.error);
-  const { categories, brands, conditionShopping, suppliers, discounts } = useFetchData();
+  const { categories, brands, conditionShopping, suppliers } = useFetchData();
   useEffect(() => {
     if (product) {
       if (product.image && product.image.length > 0) {
@@ -163,17 +163,7 @@ const EditProduct: React.FC = () => {
                 errorMessage={errors.product_supplier?.message}
               />
 
-              <FormSelect
-                label="Giảm giá"
-                id="product_discount"
-                options={(discounts ?? []).map((discount) => ({
-                  _id: discount._id,
-                  name: discount.discountPercent,
-                }))}
-                register={register}
-                validation={{ required: "Giảm giá là bắt buộc" }}
-                errorMessage={errors.product_discount?.message}
-              />
+
             </div>
           </div>
         </div>
@@ -492,7 +482,7 @@ const EditProduct: React.FC = () => {
                     Đang thêm...
                   </div>
                 ) : (
-                  "Thêm sản phẩm"
+                  "Cập nhật sản phẩm"
                 )}
               </button>
             </div>

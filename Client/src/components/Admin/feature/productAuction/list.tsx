@@ -60,47 +60,67 @@ const ProductListAuction: React.FC = () => {
             {product.product_type?.name || "Chưa có loại"}
           </Chip>
         );
-      case "product_price":
-        return new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(product.product_price);
+        case "product_price":
+          return product.product_price ? (
+            new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(product.product_price)
+          ) : (
+            <Tooltip  className="w-[240px]" content="Khi sản phẩm đưa lên phiên, giá sẽ được cập nhật" delay={0}>
+              <span className="text-gray-500 cursor-help">Chờ cập nhật</span>
+            </Tooltip>
+          );
+        
+        
       case "status":
         return (
           <CustomChip color={product.status === "active" ? "springGreen" : "danger"}    startContent={<CheckIcon size={18} /> }>
             {product.status === "active" ? "Hiển thị" : "Đã ẩn"}
           </CustomChip>
         );
-      case "actions":
-        return (
-          <div className="flex items-center space-x-2">
-            <Tooltip content="Xóa mềm">
-              <MyButton
-                variant="shadow"
-                size="sm"
-                className="text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
-                onClick={() => handleSoftDeleteProduct(product._id, dispatch, currentPage, searchTerm)}
-              >
-                <DeleteIcon /> Xóa
-              </MyButton>
-            </Tooltip>
-
-            <Tooltip content="Cập nhật">
-              <div>
-                <CustomMyButton
-                  as={Link} // Link component từ react-router-dom
-                  to={`/admin/edit-product-auction/${product._id}`} // Đường dẫn
+        case "auctionPricing":
+          return (
+            <CustomChip color={product.auctionPricing ? "warning" : "default"}>
+              {product.auctionPricing ? "Đã lên phiên" : "Chưa lên phiên"}
+            </CustomChip>
+          );
+    
+        case "actions":
+          const isAuctionPricing = !!product.auctionPricing; 
+        
+          return (
+            <div className="flex items-center space-x-2">
+              <Tooltip content="Xóa mềm">
+                <MyButton
                   variant="shadow"
                   size="sm"
-                  className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
+                  className={`text-[#C20E4D] bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black ${
+                    isAuctionPricing ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+                  }`}
+                  onClick={() => !isAuctionPricing && handleSoftDeleteProduct(product._id, dispatch, currentPage, searchTerm)}
                 >
-                  <EditDocumentIcon /> Cập nhật
-                </CustomMyButton>
-              </div>
-            </Tooltip>
-
-          </div>
-        );
+                  <DeleteIcon /> Xóa
+                </MyButton>
+              </Tooltip>
+        
+              <Tooltip content="Cập nhật">
+                <div className={isAuctionPricing ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}>
+                  <CustomMyButton
+                    as={isAuctionPricing ? "div" : Link}
+                    to={!isAuctionPricing ? `/admin/edit-product-auction/${product._id}` : "#"}
+                    variant="shadow"
+                    size="sm"
+                    className="text-success bg-gray-100 hover:bg-gray-200 drop-shadow shadow-black"
+                  >
+                    <EditDocumentIcon /> Cập nhật
+                  </CustomMyButton>
+                </div>
+              </Tooltip>
+            </div>
+          );
+        
+        
 
       default:
         return null;
@@ -129,12 +149,13 @@ const ProductListAuction: React.FC = () => {
             <TableColumn>Danh mục</TableColumn>
             <TableColumn>Giá gốc</TableColumn>
             <TableColumn>Trạng thái</TableColumn>
+            <TableColumn>Phiên đấu giá</TableColumn>
             <TableColumn>Chức năng</TableColumn>
           </TableHeader>
           <TableBody>
             {products.map((product) => (
               <TableRow key={product._id}>
-                {["image", "product_name", "product_type", "product_price", "status", "actions"].map((columnKey) => (
+                {["image", "product_name", "product_type", "product_price", "status","auctionPricing","actions"].map((columnKey) => (
                   <TableCell key={columnKey}>{renderCell(product, columnKey)}</TableCell>
                 ))}
               </TableRow>

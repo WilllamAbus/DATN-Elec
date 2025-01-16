@@ -1,6 +1,6 @@
 const ProducAuction = require('../../../model/productAuction/productAuction');
 const { uploadImage } = require('../../../utils/uploadImage');
-const { calculateDiscount } = require('../product_v2/calculator/discount');
+
 const { 
   checkProductNameExists, 
   isValidProductName,
