@@ -13,27 +13,6 @@ const BankController = {
           .status(400)
           .json({ message: "Thông tin ngân hàng không đầy đủ" });
       }
-      if (
-        !bankData.accountNumber ||
-        bankData.accountNumber.length < 8 ||
-        bankData.accountNumber.length > 15
-      ) {
-        return res
-          .status(400)
-          .json({ message: "Số tài khoản phải từ 8 đến 15 ký tự" });
-      }
-      if (
-        !bankData.fullName ||
-        !/^[a-zA-ZÀ-ỹ\s]+$/.test(bankData.fullName) ||
-        bankData.fullName.length > 25
-      ) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Họ tên chỉ được chứa chữ cái, khoảng trắng và không quá 25 ký tự",
-          });
-      }
 
       const user = await User.findById(userId);
       if (!user) {
@@ -114,41 +93,57 @@ const BankController = {
   },
 
   // Xóa ngân hàng khỏi danh sách
-
   deleteBank: async (req, res) => {
     try {
       const userId = req.user.id;
       const { bankId } = req.params;
 
-      // Kiểm tra người dùng tồn tại
       const user = await User.findById(userId);
-      if (!user) {
+      if (!user)
         return res.status(404).json({ message: "Người dùng không tồn tại" });
-      }
 
-      console.log("Banks before deletion:", user.banks);
-
-      const bankIndex = user.banks.findIndex(
-        (bank) => bank._id.toString() === bankId
-      );
-
-      if (bankIndex === -1) {
+      const bank = user.banks.id(bankId);
+      if (!bank)
         return res.status(404).json({ message: "Ngân hàng không tồn tại" });
-      }
 
-      user.banks.splice(bankIndex, 1);
-
+      bank.remove();
       await user.save();
-
-      console.log("Banks after deletion:", user.banks);
 
       res.json({ message: "Ngân hàng đã được xóa", banks: user.banks });
     } catch (error) {
-      console.error("Error while deleting bank:", error);
       res.status(500).json({ message: "Có lỗi xảy ra", error });
     }
   },
+  // setDefaultBank: async (req, res) => {
+  //   try {
+  //     const userId = req.user.id;
+  //     const { bankId } = req.params;
 
+  //     const user = await User.findById(userId);
+  //     if (!user) {
+  //       return res.status(404).json({ message: "Người dùng không tồn tại" });
+  //     }
+
+  //     const bankExists = user.banks.includes(bankId);
+  //     if (!bankExists) {
+  //       return res
+  //         .status(400)
+  //         .json({ message: "Ngân hàng không tồn tại trong danh sách của bạn" });
+  //     }
+
+  //     // Cập nhật ngân hàng mặc định
+  //     user.defaultBank = bankId;
+  //     await user.save();
+
+  //     res.json({
+  //       message: "Ngân hàng mặc định đã được cập nhật",
+  //       defaultBank: user.defaultBank,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error setting default bank:", error);
+  //     res.status(500).json({ message: "Có lỗi xảy ra", error });
+  //   }
+  // },
   setDefaultBank: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -159,15 +154,18 @@ const BankController = {
         return res.status(404).json({ message: "Người dùng không tồn tại" });
       }
 
-      const bank = user.banks.id(bankId);
+      // Kiểm tra danh sách ngân hàng của người dùng
+      const bank = user.banks.id(bankId); // Tìm ngân hàng theo ObjectId
       if (!bank) {
         return res
           .status(404)
           .json({ message: "Ngân hàng không tồn tại trong danh sách của bạn" });
       }
 
+      // Đặt tất cả ngân hàng khác về isDefault = false
       user.banks.forEach((b) => (b.isDefault = false));
 
+      // Đặt ngân hàng hiện tại là mặc định
       bank.isDefault = true;
 
       await user.save();
