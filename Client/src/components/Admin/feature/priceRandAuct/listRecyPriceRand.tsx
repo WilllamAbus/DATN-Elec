@@ -324,7 +324,6 @@ const ListPriceRandRecy: React.FC = () => {
             <th scope="col" className="p-4">
               Bước giá (đ)
             </th>
-
             <th scope="col" className="p-4">
               Thời gian bắt đầu{" "}
             </th>

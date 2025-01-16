@@ -33,7 +33,7 @@ import AuctionWin0 from "./auctionWin0";
 import AuctionWait1 from "./auctionWait";
 import AuctionBetterLuckNextTime2 from "./auctionBetterLuckNextTime1";
 import TheAuctionContinues from "./TheAuctionContinues";
-import RelatedProduct from "../detalsListting/relatedProduct/relatedProduct";
+import RelatedProduct from "./relatedAuction";
 import PaidAuctionIsOver from "./paidAuctionIsOver";
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
