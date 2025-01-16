@@ -5,6 +5,32 @@ const { v4: uuidv4 } = require("uuid");
 const serviceAccount = require("./authFirebase.json");
 const User = require("../../model/users.model");
 const authService = require("../../services/authGoogle.service");
+const emailExistence = require("email-existence");
+
+const isEmailExist = (email) => {
+  return new Promise((resolve, reject) => {
+    emailExistence.check(email, (error, response) => {
+      if (error) {
+        console.error("Lỗi kiểm tra email:", error);
+        reject(error); // Ném lỗi nếu có vấn đề
+      } else {
+        resolve(response); // Trả về kết quả true/false
+      }
+    });
+  });
+};
+
+// Ví dụ sử dụng
+(async () => {
+  const email = "test@example.com";
+  try {
+    const exists = await isEmailExist(email);
+    console.log(`Email ${email} tồn tại: ${exists}`);
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra email:", error.message);
+  }
+})();
+
 const {
   sendPasswordResetEmail,
   sendVerificationEmail,
@@ -39,11 +65,13 @@ const authController = {
   //   const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
 
   //   try {
-  //     await axios.get(url);
+  //     const response = await axios.get(url);
+
   //     const data = response.data;
+
   //     if (
-  //       data.data.result === "undeliverable" ||
-  //       data.data.result === "risky"
+  //       data.data.status === "undeliverable" ||
+  //       data.data.status === "risky"
   //     ) {
   //       return false;
   //     }
@@ -53,29 +81,81 @@ const authController = {
   //     throw new Error("Không thể xác thực email");
   //   }
   // },
+
+  isEmailExist: (email) => {
+    return new Promise((resolve, reject) => {
+      emailExistence.check(email, (error, response) => {
+        if (error) {
+          console.error("Lỗi kiểm tra email:", error);
+          reject(error); // Ném lỗi nếu có vấn đề
+        } else {
+          resolve(response); // Trả về kết quả true/false
+        }
+      });
+    });
+  },
   CheckEmailHunter: async (email) => {
     const apiKey = process.env.HUNTER_API_KEY;
     const apiUrl = process.env.HUNTER_API_URL;
 
-    const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
+    const hunterUrl = `${apiUrl}?email=${email}&api_key=${apiKey}`;
 
     try {
-      const response = await axios.get(url);
+      // Gọi API Hunter.io
+      const hunterResponse = await axios.get(hunterUrl);
+      const hunterData = hunterResponse.data;
 
-      const data = response.data;
+      console.log("Phản hồi từ Hunter.io:", hunterData.data);
 
+      // Nếu email bị đánh giá là không hợp lệ (undeliverable), trả về false
       if (
-        data.data.status === "undeliverable" ||
-        data.data.status === "risky"
+        hunterData.data.status === "undeliverable" ||
+        hunterData.data.status === "risky"
       ) {
+        console.log("Hunter.io: Email không hợp lệ.");
         return false;
       }
+
+      // Kiểm tra email với thư viện email-existence
+      const exists = await isEmailExist(email);
+      if (!exists) {
+        console.log("SMTP Check: Email không tồn tại trên máy chủ.");
+        return false;
+      }
+
+      // Email hợp lệ
       return true;
     } catch (error) {
-      console.error("Lỗi xác thực email với Hunter.io:", error);
+      console.error("Lỗi khi kiểm tra email:", error.message);
       throw new Error("Không thể xác thực email");
     }
   },
+  // CheckEmailHunter: async (email) => {
+  //   const apiKey = process.env.HUNTER_API_KEY;
+  //   const apiUrl = process.env.HUNTER_API_URL;
+
+  //   const url = `${apiUrl}?email=${email}&api_key=${apiKey}`;
+
+  //   try {
+  //     const response = await axios.get(url);
+  //     const data = response.data;
+
+  //     console.log("Phản hồi từ Hunter.io:", data.data); // Kiểm tra phản hồi
+
+  //     // Từ chối email nếu là "risky", "accept_all" hoặc "undeliverable"
+  //     if (
+  //       data.data.status === "undeliverable" ||
+  //       data.data.status === "risky" ||
+  //       data.data.status === "accept_all"
+  //     ) {
+  //       return false;
+  //     }
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Lỗi xác thực email với Hunter.io:", error);
+  //     throw new Error("Không thể xác thực email");
+  //   }
+  // },
 
   registerUser: async (req, res) => {
     try {
@@ -87,7 +167,10 @@ const authController = {
       }
 
       const { email, password, name } = req.body;
+      console.log("Kiểm tra email:", email);
       const isEmailValid = await authController.CheckEmailHunter(email);
+      console.log("Kết quả xác thực email:", isEmailValid);
+
       if (!isEmailValid) {
         return res.status(400).json({ message: "Email không chính xác" });
       }
