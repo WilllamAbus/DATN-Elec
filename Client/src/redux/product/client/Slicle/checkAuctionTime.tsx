@@ -1,16 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { checkAuctionTimeThunk } from "../Thunk";
-import { CheckAuctionTimeResponse } from "../../../../services/detailProductAuction/types/checkAuctionTime";
+import { CheckAuctionTimeResponse, Bidder } from "../../../../services/detailProductAuction/types/checkAuctionTime";
 
-interface CheckAuctionTimeState {
-  auctionTimeData: CheckAuctionTimeResponse | null;
+interface AuctionCheckTimeState {
+  bidders: Bidder[] | null;
+  auctionDetails: CheckAuctionTimeResponse['bidders'] | null;
+  product: CheckAuctionTimeResponse['product'] | null;
   status: "idle" | "loading" | "success" | "fail";
-  error: { code: string; msg: string } | null;
+  error: string | null;
   isLoading: boolean;
 }
 
-const initialState: CheckAuctionTimeState = {
-  auctionTimeData: null,
+const initialState: AuctionCheckTimeState = {
+  bidders: null,
+  auctionDetails: null,
+  product: null,
   status: "idle",
   error: null,
   isLoading: false,
@@ -32,14 +36,16 @@ const checkAuctionTimeSlice = createSlice({
         (state, action: PayloadAction<CheckAuctionTimeResponse>) => {
           state.status = "success";
           state.isLoading = false;
-          state.auctionTimeData = action.payload;
+          state.auctionDetails = action.payload.bidders;
+          state.bidders = action.payload.bidders;
+          state.product = action.payload.product;
           state.error = null;
         }
       )
       .addCase(checkAuctionTimeThunk.rejected, (state, action) => {
         state.status = "fail";
         state.isLoading = false;
-        state.error = action.payload || { code: "LOI_KHONG_XAC_DINH", msg: "Lỗi không xác định" };
+        state.error = action.payload || "Lỗi khi kiểm tra thời gian đấu giá";
       });
   },
 });

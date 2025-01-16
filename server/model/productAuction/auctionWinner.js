@@ -12,6 +12,7 @@ const auctionWinnerSchema = new Schema(
       ref: "AuctionRound",
       required: true,
     },
+    product_randBib: { type: Schema.Types.ObjectId, ref: 'productAuction' },
     user: {
       type: Schema.Types.ObjectId,
       ref: "users",
@@ -42,10 +43,13 @@ const auctionWinnerSchema = new Schema(
       enum: ["pending", "confirmed", "canceled"],
       default: "pending",
     },
+    hasWinner: { type: Boolean},
+    notWinner:{ type: Boolean},
     startTime: { type: Date, default: Date.now, required: true },
     endTime: { type: Date, required: true },
     remainingTime: { type: String },
     noteAuctionWinner: { type: String },
+    emailSent: { type: Boolean, default: false },
     createdAt: {
       type: Date,
       default: Date.now,

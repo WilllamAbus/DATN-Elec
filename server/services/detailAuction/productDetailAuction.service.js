@@ -11,14 +11,14 @@ const ProductDetailService = {
         .populate('product_brand')
         .populate('product_condition')
         .populate('product_supplier')
-        .populate('auctionPricing'); // Đảm bảo auctionPricing được populate như đối tượng
+        .populate('auctionPricing'); 
 
       if (!productAuction) {
         return {
           success: false,
           err: 1,
           msg: 'Không tìm thấy sản phẩm',
-          status: 404,
+          status: 200,
         };
       }
 

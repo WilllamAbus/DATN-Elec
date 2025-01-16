@@ -18,6 +18,8 @@
       auctionPriceHistory:{ type: Schema.Types.ObjectId, ref: 'AuctionPriceHistory' },
       isPriceStepAdjusted: { type: Boolean, default: false },
       checkCurrentPrice: { type: Number },
+      hasWinner: { type: Boolean},
+      emailSent: { type: Boolean, default: false },
     },
     {
       collection: "auctionPricingRange",

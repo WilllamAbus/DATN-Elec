@@ -25,3 +25,4 @@ export * from "./getTop3HighestBidders";
 export * from "./getUserCart";
 export * from "./checkAuctionTime";
 export * from "./checkAuctionTimeAuctionPricingRange";
+export * from "./emailTwowinners";

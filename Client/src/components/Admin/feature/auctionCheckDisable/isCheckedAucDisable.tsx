@@ -68,18 +68,18 @@ const isCheckedAuct: React.FC = () => {
     //   );
     // };
 
-    const formatDateVN = (dateString: string) => {
-      const date = new Date(dateString); // Chuyển đổi chuỗi thành đối tượng Date
-      return date.toLocaleString("vi-VN", {
-        timeZone: "Asia/Ho_Chi_Minh", // Thiết lập múi giờ
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      });
-    };
+    // const formatDateVN = (dateString: string) => {
+    //   const date = new Date(dateString); // Chuyển đổi chuỗi thành đối tượng Date
+    //   return date.toLocaleString("vi-VN", {
+    //     timeZone: "Asia/Ho_Chi_Minh", // Thiết lập múi giờ
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     second: "2-digit",
+    //     year: "numeric",
+    //     month: "numeric",
+    //     day: "numeric",
+    //   });
+    // };
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between mx-4 py-4 border-t dark:border-gray-700 space-y-3 md:space-y-0 md:space-x-3">
@@ -108,15 +108,20 @@ const isCheckedAuct: React.FC = () => {
             <th scope="col" className="p-4">
               VỊ THẾ 
             </th>
-            <th scope="col" className="p-4">
-              THỜI GIAN CHIẾN THẮNG
-            </th>
+
+       
+
             <th scope="col" className="p-4">
               GIÁ CHIẾN THẮNG (VNĐ)
+            </th>
+
+            <th scope="col" className="p-4">
+              GHI CHÚ
             </th>
             <th scope="col" className="p-4">
               TRẠNG THÁI
             </th>
+            
             <th scope="col" className="p-4">
               CHỨC NĂNG
             </th>
@@ -149,11 +154,19 @@ const isCheckedAuct: React.FC = () => {
                 >
                   {winnneerCheck?.auctionStatus === "won" ? "Thắng phiên đấu giá" : "Đã hủy chiến thắng"}
                 </td>
-                <td className="py-4 px-6 border-b border-grey-light">
-                  {formatDateVN(winnneerCheck?.endTime)}
-                </td>
+          
                 <td className="py-4 px-6 border-b border-grey-light">
                   {formatCurrency(winnneerCheck?.bidPrice)}
+                </td>
+
+                <td  className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
+                    winnneerCheck?.emailSent === false
+                      ? "bg-green-50 text-green-700"
+                      : "bg-yellow-50 text-yellow-700"
+                  }`}
+                >
+               
+                  {winnneerCheck?.emailSent === false ? "Khác" : "Hết thời gian xác nhận"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span

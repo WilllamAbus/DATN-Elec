@@ -1,3 +1,4 @@
+
 import {
   Modal,
   ModalContent,
@@ -7,48 +8,62 @@ import {
   useDisclosure,
   Image,
 } from "@nextui-org/react";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { MyButton } from "../../../../../common/customs/MyButton";
-
 
 export default function AuctionPending() {
   const { isOpen, onOpenChange } = useDisclosure({ defaultOpen: true });
 
   return (
-    <Modal
-      backdrop="opaque"
-      classNames={{
-        body: "py-6",
-        backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
-        base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
-        header: "border-b-[1px] border-[#292f46]",
-        footer: "border-t-[1px] border-[#292f46]",
-        closeButton: "hover:bg-white/5 active:bg-white/10",
-      }}
-      isOpen={isOpen}
-      radius="lg"
-      onOpenChange={onOpenChange}
-      size="3xl"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{ duration: 0.5 }}
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">Thông báo</ModalHeader>
-        <ModalBody>
-          <div className="flex flex-col items-center">
+      <Modal
+        backdrop="opaque"
+        classNames={{
+          body: "py-6",
+          backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
+          base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
+          header: "border-b-[1px] border-[#292f46]",
+          footer: "border-t-[1px] border-[#292f46]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+        isOpen={isOpen}
+        radius="lg"
+        onOpenChange={onOpenChange}
+        size="3xl"
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">Thông báo</ModalHeader>
+          <ModalBody className="flex flex-col items-center">
             <Image
-              alt="Ảnh chờ"
-              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2FOrange%20White%20Modern%20Gradient%20%20IOS%20Icon%20(5).svg?alt=media&token=a65549f3-c8d0-477d-b2bf-50a86022d46b"
+              alt="Đang chờ"
+              src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2Fwait1.svg?alt=media&token=9edb9c92-6d23-4e2c-bd75-853667f5c4dd"
               width={300}
-              height={250}
-              className="mb-4"
             />
-         <p> Bạn đang trong danh sách hàng chờ người trúng đấu giá</p>
-         
-          </div>
-        </ModalBody>
-        <ModalFooter>
-        <Link to="/auction"> <MyButton variant="gradientBlue" size="sm"  >Trở về danh sách đấu giá </MyButton> </Link>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center text-lg font-medium"
+            >
+              Bạn đang trong danh sách hàng chờ. Nếu trong vòng 2 ngày, người trúng đấu giá không thanh toán, bạn sẽ được trúng đấu giá này.
+            </motion.p>
+          </ModalBody>
+          <ModalFooter>
+            <Link to="/session-auction">
+              <MyButton variant="gradientBlue" size="sm">
+                Đi đến phiên đấu giá
+              </MyButton>
+            </Link>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </motion.div>
   );
-}
+};
+

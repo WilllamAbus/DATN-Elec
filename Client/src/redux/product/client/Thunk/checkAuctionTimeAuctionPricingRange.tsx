@@ -4,16 +4,26 @@ import { CheckAuctionTimeAuctionPricingRangeResponse } from "../../../../service
 
 export const checkAuctionTimeAuctionPricingRangeThunk = createAsyncThunk<
   CheckAuctionTimeAuctionPricingRangeResponse,
-  string, 
-  { rejectValue: { code: string; msg: string } }
+  string,
+  { rejectValue: string }
 >(
   "auctionClient/checkAuctionTimeAuctionPricingRange",
   async (slug, { rejectWithValue }) => {
     try {
+      if (!slug) {
+        return rejectWithValue("Slug là bắt buộc");
+      }
+
       const response = await checkAuctionTimeAuctionPricingRange(slug);
-      return response;
+
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.msg || "Lỗi không xác định");
+      }
     } catch (error: any) {
-      return rejectWithValue({ code: error.code || "LOI_KHONG_XAC_DINH", msg: error.msg || "Lỗi không xác định" });
+      console.error('Error fetching auction pricing range:', error);
+      return rejectWithValue(error.message || "Lỗi không xác định");
     }
   }
 );

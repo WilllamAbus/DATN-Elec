@@ -1,5 +1,6 @@
 const AuctionWinner = require('../../../model/productAuction/auctionWinner');
 const Cart = require('../../../model/orders/cart.model');
+const AuctionPricingRange = require('../../../model/productAuction/auctionPricingRange');
 const mongoose = require('mongoose');
 
 const confirmAuction = async (req, res) => {
@@ -29,22 +30,35 @@ const confirmAuction = async (req, res) => {
     auctionWinner.confirmationStatus = 'confirmed';
     await auctionWinner.save();
 
-    // Set auction end time to 1 hour from now
-    const auctionEndTime = new Date();
-    auctionEndTime.setHours(auctionEndTime.getHours() + 1);
-
-    // Calculate remaining time
+    let auctionStartTime, auctionEndTime, remainingTimeString;
     const currentTime = new Date();
+
+    if (auctionWinner.status === 'active') {
+      auctionEndTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // 1 giờ từ bây giờ
+    } else if (auctionWinner.status === 'temporary') {
+      auctionEndTime = new Date(currentTime.getTime() + 30 * 60 * 1000); // 30 phút từ bây giờ
+    } else {
+      return res.status(400).json({
+        code: 'TRANG_THAI_KHONG_HOP_LE',
+        msg: 'Trạng thái không hợp lệ.',
+        status: 'error',
+        error: 'Invalid status'
+      });
+    }
+
+    auctionStartTime = currentTime;
+    
+    // Tính thời gian còn lại
     const remainingTime = auctionEndTime.getTime() - currentTime.getTime();
     const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
     const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((remainingTime % (1000 * 60)) / (1000 * 60));
     const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-    const remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+    remainingTimeString = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
 
     const itemAuction = {
       auctionWinner: auctionWinner._id,
-      auctionStartTime: currentTime, 
+      auctionStartTime: auctionStartTime, 
       auctionEndTime: auctionEndTime,
       remainingTime: remainingTimeString,
       price: auctionWinner.bidPrice,

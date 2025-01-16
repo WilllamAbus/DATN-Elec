@@ -1,3 +1,16 @@
+export interface AuctionPricing {
+  _id: string;
+  startTime: Date;
+  endTime: Date;
+  remainingTime: string;
+  startingPrice: number;
+  maxPrice: number;
+  currentPrice: number;
+  priceStep: number;
+  status: string;
+  hasWinner: boolean;
+}
+
 export interface CheckAuctionTimeAuctionPricingRangeResponse {
   success: boolean;
   code: string;
@@ -6,5 +19,6 @@ export interface CheckAuctionTimeAuctionPricingRangeResponse {
   error?: string;
   statusOutOfTimeAuctionPricingRange: boolean;
   statusCheckAuctionTimeAuctionPricingRange: number;
-  remainingTime?: string; 
+  remainingTime?: string;
+  auctionPricing?: AuctionPricing;
 }

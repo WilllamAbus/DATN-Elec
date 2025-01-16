@@ -15,7 +15,8 @@ const {
     getAuctionProgress,
     getTop3HighestBidders,
     getUserCart,
-    checkAuctionTimeAuctionPricingRange
+    checkAuctionTimeAuctionPricingRange,
+    emailTwowinners
 } = require('../../../controler/client');
 
 const middlewareController = require("../../../middleware/auth");
@@ -35,5 +36,5 @@ router.get('/user/bidding-history', middlewareController.getHeader, getUserBiddi
 router.get('/user/bidding-details/:slug', middlewareController.getHeader, getUserBiddingDetails);
 router.get('/check-list-cart', middlewareController.getHeader,getUserCart);
 router.get('/check-auctio-time-auction-pricing-range/:slug', middlewareController.getHeader,checkAuctionTimeAuctionPricingRange);
+router.get('/email-two-winner/:slug', middlewareController.getHeader,emailTwowinners);
 module.exports = router;
-getTop3HighestBidders

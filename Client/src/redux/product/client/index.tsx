@@ -25,7 +25,8 @@ import {
   getTop3HighestBiddersSlice,
   getUserCartSlice,
   checkAuctionTimeSlice,
-  checkAuctionTimeAuctionPricingRangeSlice
+  checkAuctionTimeAuctionPricingRangeSlice,
+  emailTwowinnerSlice
 
 
 } from "./Slicle";
@@ -55,7 +56,8 @@ const productsReducer = combineReducers({
   getTop3HighestBidders:getTop3HighestBiddersSlice,
   getUserCart:getUserCartSlice,
   checkAuctionTime:checkAuctionTimeSlice,
-  checkAuctionTimeAuctionPricingRange:checkAuctionTimeAuctionPricingRangeSlice
+  checkAuctionTimeAuctionPricingRange:checkAuctionTimeAuctionPricingRangeSlice,
+  emailTwowinner:emailTwowinnerSlice
 
 
 });

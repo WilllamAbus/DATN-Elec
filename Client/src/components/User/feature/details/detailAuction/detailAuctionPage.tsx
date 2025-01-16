@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams,useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useParams, useNavigate } from "react-router-dom";
 import ImageAuction from "./imageAuction";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../../redux/store";
-import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk, getAuctionPricingRangeThunk, checkStatusAuctionPricingRangeThunk, highBidderInformationThunk, getAuctionProgressThunk, getTop3HighestBiddersThunk, getUserCartThunk, checkAuctionTimeThunk } from "../../../../../redux/product/client/Thunk";
+import { getProductDetailAuctionThunk, getAuctionDetailsBySlugThunk, getAuctionPricingRangeThunk, checkStatusAuctionPricingRangeThunk, highBidderInformationThunk, getAuctionProgressThunk, getTop3HighestBiddersThunk, getUserCartThunk, checkAuctionTimeThunk, emailTwowinnerThunk } from "../../../../../redux/product/client/Thunk";
 import ProductName from "./nameAuction";
 import ProductPrice from "./priceAuction";
 import AuctionTime from "./auctionTime";
@@ -22,14 +23,22 @@ import AuctionNotice from "./auctionNotice";
 import AppAuctionList from "./appAuctionList/appAuctionList";
 import { Bid } from "../../../../../services/detailProductAuction/types/getAuctionProgress";
 import AlertCheckStatusCart from "src/common/alert/alertcheckStatusCart";
-import RelatedProduct from "./relatedAuction";
-import AuctionStatusOutOfTime from "./auctionStatusOutOfTime";
-import AuctionEnded from "./auctionEnded";
-
+import AuctionStatusOutOfTime0 from "./auctionStatusOutOfTime0";
+import AuctionStatusOutOfTime1 from "./auctionStatusOutOfTime1";
+import AuctionStatusOutOfTime2 from "./auctionStatusOutOfTime2";
+import AuctionStatusOutOfTime3 from "./auctionStatusOutOfTime3";
+import AuctionStatusOutOfTime4 from "./auctionStatusOutOfTime4";
+import AuctionEnded4 from "./auctionEnded4";
+import AuctionWin0 from "./auctionWin0";
+import AuctionWait1 from "./auctionWait";
+import AuctionBetterLuckNextTime2 from "./auctionBetterLuckNextTime1";
+import TheAuctionContinues from "./TheAuctionContinues";
+import RelatedProduct from "../detalsListting/relatedProduct/relatedProduct";
+import PaidAuctionIsOver from "./paidAuctionIsOver";
 const DetailPageAuction: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { slug } = useParams<{ slug: string }>();
+  const slug = useParams<{ slug: string }>().slug ?? ''
   const userId = useSelector((state: RootState) => state.auth.profile.profile?._id);
   const category = useSelector(
     (state: RootState) => state.productClient.getProductsByCategory.category
@@ -43,27 +52,30 @@ const DetailPageAuction: React.FC = () => {
   const highBidderInformation = useSelector(
     (state: RootState) => state.productClient.highBidderInformation.auctionData
   );
+
   const [auctionStatus, setAuctionStatus] = useState<null | 0 | 1 | 2>(null);
   const [checkAuctionStatusPricingRange, setAuctionStatusPricingRange] = useState<null | 4 | 5>(null);
   const [auctionStatusTop3Bidder, setAuctionStatusTop3Bidder] = useState<null | 9 | 10 | 11>(null);
-  const [auctionStatusOutOfTime, setAuctionStatusOutOfTime] = useState(false);
-  const [auctionEnded, setAuctionEnded] = useState(false);
+  const [statuscheckAuctionTime, setStatuscheckAuctionTime] = useState<null | 0 | 1 | 2 | 3 | 4 | 5>(null);
+  const [auctionCanceled, setAuctionCanceled] = useState(false)
+  const [showPaidAuctionModal, setShowPaidAuctionModal] = useState(false);
   const [isAuctionTemporary, setIsAuctionTemporary] = useState(auctionPricing?.status === 'temporary');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const auctionProgress = useSelector((state: RootState) => state.productClient.getAuctionProgress);
   const totalPages = useSelector((state: RootState) => state.productClient.getAuctionProgress.pagination?.totalPages || 1);
-  const total = useSelector((state: RootState) => state.productClient.getAuctionProgress.pagination?.total|| 0);
+  const total = useSelector((state: RootState) => state.productClient.getAuctionProgress.pagination?.total || 0);
+
   const hasPrevPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
   const biddingList: Bid[] = auctionProgress.biddingList || [];
   const [statusCart, setStatusCart] = useState<number>(0);
   const [alertVisible, setAlertVisible] = useState<boolean>(true);
-  useEffect(() => { if (slug) { dispatch(getProductDetailAuctionThunk({ slug }));} }, [dispatch, slug]);
+  useEffect(() => { if (slug) { dispatch(getProductDetailAuctionThunk({ slug })); } }, [dispatch, slug]);
   useEffect(() => { if (slug) { setIsLoading(true); dispatch(getAuctionProgressThunk({ slug, page: currentPage })).then(() => setIsLoading(false)); } }, [dispatch, slug, currentPage]);
   useEffect(() => {
     socket.on('topBiddersUpdate', (data) => {
-     
+
       if (data.slug === slug) {
         dispatch(getAuctionProgressThunk({ slug: slug as string, page: currentPage }));
       }
@@ -74,22 +86,22 @@ const DetailPageAuction: React.FC = () => {
     };
   }, [slug, dispatch, currentPage]);
 
-  
-    const userCart = useSelector((state: RootState) => state.productClient.getUserCart.cart);
-    useEffect(() => { dispatch(getUserCartThunk()); }, [dispatch]);
-    useEffect(() => {
-      const checkStatusCart = (): number => {
-        if (userCart && userCart.user === userId) {
-          if (userCart.itemAuction && userCart.itemAuction.length > 0) {
-            return 1; 
-          } else if (userCart.items && userCart.items.length > 0) {
-            return 2; 
-          }
+
+  const userCart = useSelector((state: RootState) => state.productClient.getUserCart.cart);
+  useEffect(() => { dispatch(getUserCartThunk()); }, [dispatch]);
+  useEffect(() => {
+    const checkStatusCart = (): number => {
+      if (userCart && userCart.user === userId) {
+        if (userCart.itemAuction && userCart.itemAuction.length > 0) {
+          return 1;
+        } else if (userCart.items && userCart.items.length > 0) {
+          return 2;
         }
-        return 0; 
-      };
-      setStatusCart(checkStatusCart());
-    }, [userCart, userId]);
+      }
+      return 0;
+    };
+    setStatusCart(checkStatusCart());
+  }, [userCart, userId]);
   const handlePageChange = (newPage: number) => { setCurrentPage(newPage); };
   const breadcrumbPaths = getBreadcrumbPaths(category, productDetailAuction?.product_name);
   const isAuctionEnded = productDetailAuction?.auctionPricing.status === 'ended';
@@ -205,36 +217,187 @@ const DetailPageAuction: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [dispatch, auctionPricing, slug, isAuctionTemporary]);
-  const handleAuctionTimeChange = () => {
+
+  useEffect(() => {
+    socket.on('auctionCanceled', (data) => {
+      if (data.slug === slug) { 
+        setAuctionCanceled(true); 
+        setStatuscheckAuctionTime(null); 
+        dispatch(getProductDetailAuctionThunk({ slug })); 
+        dispatch(getAuctionProgressThunk({ slug, page: currentPage }));
+      }
+    });
+
+    return () => {
+      socket.off('auctionCanceled');
+    };
+  }, [dispatch, slug]);
+
+  useEffect(() => {
+    socket.on('auctionPaid', (data) => {
+      if (data.slug === slug) {
+        setShowPaidAuctionModal(true);
+        setStatuscheckAuctionTime(3);
+        dispatch(getProductDetailAuctionThunk({ slug }));
+        dispatch(getAuctionProgressThunk({ slug, page: currentPage }));
+        setTimeout(() => { setShowPaidAuctionModal(false); navigate("/auction"); }, 10000);
+      }
+    });
+
+    return () => {
+      socket.off('auctionPaid');
+    };
+  }, [slug, dispatch, currentPage]);
+
+
+
+
+  const handleAuctionTimeChange = async () => {
     if (slug) {
-      dispatch(checkAuctionTimeThunk(slug)).then((result: any) => {
-        if (result.payload && result.payload.statusOutOfTime && result.payload.statuscheckAuctionTime === 3) {
-          setAuctionStatusOutOfTime(true);
+      const auctionTimeResult = await dispatch(checkAuctionTimeThunk({ slug }));
+      if (auctionTimeResult.payload && typeof auctionTimeResult.payload !== "string") {
+
+        // Lọc các bidder có statusCheckAuctionTime là 0, 1 hoặc 2, cần so sánh với userId
+        const userBidder = auctionTimeResult.payload.bidders.find(
+          (bidder) => (bidder.statusCheckAuctionTime === 0 || bidder.statusCheckAuctionTime === 1 || bidder.statusCheckAuctionTime === 2)
+            && bidder.user?._id === userId
+        );
+
+        // Lọc các bidder có statusCheckAuctionTime là 3, 4 hoặc 5, không cần so sánh với userId
+        const publicBidder = auctionTimeResult.payload.bidders.find(
+          (bidder) => bidder.statusCheckAuctionTime === 3 || bidder.statusCheckAuctionTime === 4 || bidder.statusCheckAuctionTime === 5
+        );
+
+        // Kiểm tra và lấy thông tin từ bidder người dùng hoặc từ bidder công khai
+        const bidder = userBidder || publicBidder;
+
+        if (bidder) {
+          const statusCheckAuctionTime = bidder.statusCheckAuctionTime;
+
+          if (statusCheckAuctionTime !== undefined && statusCheckAuctionTime !== statuscheckAuctionTime) {
+            setStatuscheckAuctionTime(statusCheckAuctionTime as 0 | 1 | 2 | 3 | 4 | 5 | null);
+
+            // Gọi lại hàm getProductDetailAuctionThunk nếu statusCheckAuctionTime là 5
+            if (statusCheckAuctionTime === 5) {
+              await dispatch(getProductDetailAuctionThunk({ slug }));
+            }
+            handleModal(statusCheckAuctionTime);
+          }
         }
-        if (result.payload && result.payload.statuscheckAuctionTime === 1) {
-          setTimeout(() => {
-            setAuctionEnded(true);
-            setTimeout(() => {
-              navigate('/auction'); // Chuyển hướng về trang đấu giá sau 5 giây
-            }, 5000);
-          }, 5000); // Hiển thị modal sau 5 giây
-        }
-        dispatch(getProductDetailAuctionThunk({ slug })); // Làm mới lại trang
-      });
+      }
     }
   };
+  const handleModal = async (statusCheckAuctionTime: number) => {
+    switch (statusCheckAuctionTime) {
+      case 0:
+        if (slug) {
+          await dispatch(getProductDetailAuctionThunk({ slug }));
+        }
+        if (slug) {
+          await dispatch(emailTwowinnerThunk({ slug }));
+        }
+        break;
+      case 1:
+        if (slug) {
+          await dispatch(getProductDetailAuctionThunk({ slug }));
+        }
+        if (slug) {
+          await dispatch(emailTwowinnerThunk({ slug }));
+        }
+        showAuctionWaitModal();
+        break;
+      case 2:
+        if (slug) {
+          await dispatch(getProductDetailAuctionThunk({ slug }));
+        }
+        showAuctionBetterLuckNextTimeModal();
+        break;
+      case 3:
+        showPaidAuctionIsOverModal();
+        break;
+      case 4:
+        if (slug) {
+          await dispatch(getProductDetailAuctionThunk({ slug }));
+        }
+        setTimeout(() => {
+          showAuctionEndedModal();
+          navigate("/auction");
+        }, 9000);
+        break;
+      case 5:
+        showTheAuctionContinuesModal();
+        break;
+      default:
+
+    }
+  };
+
+  const showAuctionEndedModal = () => { return <AuctionEnded4 />; };
+  const showAuctionWinModal = () => { return <AuctionWin0 />; };
+  const showAuctionWaitModal = () => { return <AuctionWait1 />; };
+  const showAuctionBetterLuckNextTimeModal = () => { return <AuctionBetterLuckNextTime2 />; };
+  const showTheAuctionContinuesModal = () => {return <TheAuctionContinues onClose={() => setAuctionCanceled(false)} />;};
+  const showPaidAuctionIsOverModal = () => {return <PaidAuctionIsOver onClose={() => setShowPaidAuctionModal(false)} />;};
+
 
   useEffect(() => {
     socket.on('auctionStatusOutOfTime', (data: { status: string }) => {
       if (data.status === 'outOfTime') {
+        console.log("Socket Event: auctionStatusOutOfTime");
+        handleAuctionTimeChange();
+      }
+    });
+
+    socket.on('auctionStatusInProgress', (data: { status: string }) => {
+      if (data.status === 'inProgress') {
+        console.log("Socket Event: auctionStatusInProgress");
+        handleAuctionTimeChange();
+      }
+    });
+
+    socket.on('auctionStatusHasWinner', (data: { status: string }) => {
+      if (data.status === 'endedWithWinner') {
+        console.log("Socket Event: auctionStatusHasWinner");
+        handleAuctionTimeChange();
+      }
+    });
+
+    socket.on('auctionStatusNoWinner', (data: { status: string }) => {
+      if (data.status === 'endedNoWinner') {
+        console.log("Socket Event: auctionStatusNoWinner");
+        handleAuctionTimeChange();
+      }
+    });
+
+    socket.on('auctionStatusPaid', (data: { status: string }) => {
+      if (data.status === 'paid') {
+        console.log("Socket Event: auctionStatusPaid");
+        handleAuctionTimeChange();
+      }
+    });
+
+    socket.on('auctionStatusTemporary', (data: { status: string }) => {
+      if (data.status === 'temporary') {
+        console.log("Socket Event: auctionStatusTemporary");
         handleAuctionTimeChange();
       }
     });
 
     return () => {
       socket.off('auctionStatusOutOfTime');
+      socket.off('auctionStatusInProgress');
+      socket.off('auctionStatusHasWinner');
+      socket.off('auctionStatusNoWinner');
+      socket.off('auctionStatusPaid');
+      socket.off('auctionStatusTemporary');
     };
-  }, []);
+  }, [socket, slug]);
+
+  useEffect(() => {
+    console.log("statuscheckAuctionTime:", statuscheckAuctionTime);
+  }, [statuscheckAuctionTime]);
+
+
   return (
     <>
       <ReusableBreadcrumb paths={breadcrumbPaths} />
@@ -256,7 +419,15 @@ const DetailPageAuction: React.FC = () => {
                   <hr className="border-gray-300 dark:border-gray-700" />
                   <AuctionNotice />
                   <ProductPrice product={productDetailAuction} />
-                  {!auctionStatusOutOfTime && ( <AuctionTime onChangeCheckAuctionTimeAuctionPricingRange={handleAuctionTimeChange} /> )} {auctionStatusOutOfTime && <AuctionStatusOutOfTime />}
+                  {statuscheckAuctionTime === null && (
+                    <AuctionTime onChangeCheckAuctionTimeAuctionPricingRange={handleAuctionTimeChange} />
+                  )}
+                  {statuscheckAuctionTime === 0 && <AuctionStatusOutOfTime0 />}
+                  {statuscheckAuctionTime === 1 && <AuctionStatusOutOfTime1 />}
+                  {statuscheckAuctionTime === 2 && <AuctionStatusOutOfTime2 />}
+                  {statuscheckAuctionTime === 3 && <AuctionStatusOutOfTime3 />}
+                  {statuscheckAuctionTime === 4 && <AuctionStatusOutOfTime4 />}
+
                 </div>
               </>
             )}
@@ -286,9 +457,9 @@ const DetailPageAuction: React.FC = () => {
         </div>
 
         <div className="col-span-full xl:col-auto">
-        {statusCart === 1 && <AlertCheckStatusCart visible={alertVisible} setVisible={setAlertVisible} />}
+          {statusCart === 1 && <AlertCheckStatusCart visible={alertVisible} setVisible={setAlertVisible} />}
           {productDetailAuction && (
-            <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded || isAuctionTemporary ? 'opacity-50 pointer-events-none' : ''}`}>
+            <div className={`p-1 mb-4 bg-white border border-gray-50 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 ${isAuctionEnded || isAuctionTemporary || statuscheckAuctionTime === 3 ? 'opacity-50 pointer-events-none' : ''}`}>
               <CurrentPriceAndBidprice
                 product={productDetailAuction}
                 onAuctionEnd={handleAuctionEnd}
@@ -296,19 +467,29 @@ const DetailPageAuction: React.FC = () => {
                 onChangeTemporary={handleTemporaryChange}
                 onChangeTop3Bidder={handleTop3BidderChange}
               />
-            </div>           
+            </div>
           )}
         </div>
       </div>
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
-        <RelatedProduct/>
+      <RelatedProduct/> 
       </div>
       {auctionStatus === 0 && <AuctionWin />}
       {auctionStatus === 1 && <AuctionPending />}
       {auctionStatus === 2 && <AuctionLose />}
       {checkAuctionStatusPricingRange === 4 && <AuctionTemporaryMaxPrice />}
       {checkAuctionStatusPricingRange === 5 && <AuctionTemporary />}
-      {auctionEnded && <AuctionEnded />}
+      <motion.div initial={{ opacity: 0, y: 0 }} exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.6 }} >
+        {statuscheckAuctionTime === 4 && showAuctionEndedModal()}
+        {statuscheckAuctionTime === 0 && showAuctionWinModal()}
+        {statuscheckAuctionTime === 1 && showAuctionWaitModal()}
+        {statuscheckAuctionTime === 2 && showAuctionBetterLuckNextTimeModal()}
+        {statuscheckAuctionTime === 5 && showTheAuctionContinuesModal()}
+        {auctionCanceled && showTheAuctionContinuesModal()}
+        {showPaidAuctionModal && showPaidAuctionIsOverModal()}
+      </motion.div>
+
+
     </>
   );
 };

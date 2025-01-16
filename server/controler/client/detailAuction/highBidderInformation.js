@@ -3,6 +3,7 @@ const { Schema, model, startSession } = require("mongoose");
 const ProductAuction = require('../../../model/productAuction/productAuction');
 const AuctionPricingRange = require('../../../model/productAuction/auctionPricingRange');
 const AuctionWinner = require('../../../model/productAuction/auctionWinner');
+const AuctionPriceHistory = require('../../../model/productAuction/auctionPriceHistory'); // thêm dòng này
 const findUserName = require('./enter-handles/findUserName');
 
 const highBidderInformation = async (req, res) => {
@@ -23,7 +24,6 @@ const highBidderInformation = async (req, res) => {
         }
 
         const auctionPricing = product.auctionPricing;
-
 
         // Kiểm tra trạng thái hiện tại của sản phẩm đấu giá
         if (auctionPricing.status !== 'temporary') {
@@ -46,7 +46,6 @@ const highBidderInformation = async (req, res) => {
                 auctionPricingRange: auctionPricingObjectId,
                 auctionStatus: 'temporary'
             }).session(session);
-
 
             if (!auctionWinner) {
                 await session.endSession();
@@ -86,6 +85,12 @@ const highBidderInformation = async (req, res) => {
                     auctionPricingRange.endTimeTemporarily = null;
                     auctionPricingRange.remainingTimeTemporarily = null;
                     await auctionPricingRange.save();
+
+                    // Update AuctionPriceHistory status to 'disabled'
+                    await AuctionPriceHistory.updateMany(
+                        { auctionPricingRange: auctionPricingRange._id, status: 'active' },
+                        { $set: { status: 'disabled' } }
+                    );
                 }
 
                 // Reset trạng thái của AuctionWinner khi thời gian tạm ngưng kết thúc

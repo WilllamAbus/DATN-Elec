@@ -47,14 +47,14 @@ const RelatedProduct: React.FC = () => {
   return (
     <div className="container pb-16">
       <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6 mt-4">
-        Sản phẩm liên quan
+        Sản phẩm gợi ý
       </h2>
       {loading ? (
         <p>Đang tải...</p>
       ) : error ? (
         <p>{error}</p>
       ) : relatedProducts.length === 0 ? (
-        <p>Không tìm thấy sản phẩm liên quan.</p>
+        <p>Không tìm thấy sản phẩm gợi ý.</p>
       ) : (
         <Swiper
           modules={[Navigation, Pagination]}

@@ -4,14 +4,17 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import {
   fetchPriceRandDeleted,
   restorePriceRandAdminThunk,
-  softDelPriceRandAdminThunk
+  softDelPriceRandAdminThunk,
 } from "../../../../redux/adminPriceRandAuc/deletedPriceRandAuct/deletedPriceRandAuctThunk";
 
 import PaginationComponent from "../../../../ultils/pagination/admin/paginationcrud";
 import SearchFormProduct from "./searchForm/searchFormPriceRand";
 import "../../../../assets/css/admin.style.css";
 import { Link } from "react-router-dom";
-import { PriceRangeRestoreAuct, PriceRangeAuctSoftDel } from "../../../../types/adminPriceRandAuct/deletePriceRandAuct";
+import {
+  PriceRangeRestoreAuct,
+  PriceRangeAuctSoftDel,
+} from "../../../../types/adminPriceRandAuct/deletePriceRandAuct";
 import withReactContent from "sweetalert2-react-content";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -45,13 +48,45 @@ const ListPriceRandRecy: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(5);
   const [search, setSearch] = useState("");
-  const [autoActivated, setAutoActivated] = useState<{ [key: string]: boolean }>({});
+  const [autoActivated, setAutoActivated] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [, setPriceRand] = useState<PriceRangeRestoreAuct[]>([]);
   const [, setPriceRandSoft] = useState<PriceRangeAuctSoftDel[]>([]);
+  const [warnedTimes, setWarnedTimes] = useState<string[]>([]);
+  // const [currentTime, setCurrentTime] = useState<string>("");
+  const [displayBeforeActivation, setDisplayBeforeActivation] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [countdownBeforeActivation, setCountdownBeforeActivation] = useState<{
+    [key: string]: number;
+  }>({});
   useEffect(() => {
+    setAutoActivated({});
+    setPriceRand([]);
+    setPriceRandSoft([]);
+    setWarnedTimes([]);
     dispatch(fetchPriceRandDeleted({ page, pageSize, search }));
   }, [dispatch, page, pageSize, search]);
+  // useEffect(() => {
+  //   const updateTime = () => {
+  //     const now = new Date().toLocaleString("vi-VN", {
+  //       timeZone: "Asia/Ho_Chi_Minh",
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //       second: "2-digit",
+  //       year: "numeric",
+  //       month: "numeric",
+  //       day: "numeric",
+  //     });
+  //     setCurrentTime(now);
+  //   };
 
+  //   updateTime();
+  //   const interval = setInterval(updateTime, 1000); // Cập nhật mỗi giây
+
+  //   return () => clearInterval(interval); // Xóa interval khi component unmount
+  // }, []);
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -60,9 +95,6 @@ const ListPriceRandRecy: React.FC = () => {
     setSearch(searchTerm);
     setPage(1);
   };
-
-
-
 
   const handleSoftDelPriceRand = async (id: string) => {
     MySwal.fire({
@@ -89,7 +121,9 @@ const ListPriceRandRecy: React.FC = () => {
   const autoTriggerPriceRand = async (id: string) => {
     try {
       await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
-      setPriceRand((prevSoftDel) =>     prevSoftDel.filter((rand) => rand._id!== id));
+      setPriceRand((prevSoftDel) =>
+        prevSoftDel.filter((rand) => rand._id !== id)
+      );
 
       setAutoActivated((prev) => ({ ...prev, [id]: true }));
       toast.success("Đưa sản phẩm lên phiên thành công");
@@ -101,86 +135,139 @@ const ListPriceRandRecy: React.FC = () => {
   useEffect(() => {
     const now = new Date().getTime();
 
-    // Đặt trạng thái ban đầu
+    // Trạng thái ban đầu cho các phiên đã kích hoạt
     const initialActivated: { [key: string]: boolean } = {};
+
+    // Lưu trữ thời gian đếm ngược
+    const countdowns: { [key: string]: number } = {};
+    const countdownIntervals: {
+      [key: string]: ReturnType<typeof setInterval>;
+    } = {};
+
+    // Lưu trữ các phiên có cùng thời gian bắt đầu
     interface StartTimesMap {
-      [key: string]: string[]; // Maps startTime (string) to an array of _id (string)
+      [key: string]: string[]; // Maps startTime (HH:mm) to an array of product names
     }
-    
     const startTimesMap: StartTimesMap = {};
+
+    // Lưu trữ các timeout
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const displayTimeouts: ReturnType<typeof setTimeout>[] = [];
+
     deletedPriceRandAuct.forEach((rand) => {
       const startTime = new Date(rand.startTime);
-      
-      // Lấy phần giờ và phút từ startTime (HH:mm)
-      const timeKey = `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
-  
-      // Kiểm tra trùng lặp theo phút
+      const timeKey = `${startTime
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${startTime
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
+
+      // Nhóm sản phẩm theo giờ và phút
       if (startTimesMap[timeKey]) {
         startTimesMap[timeKey].push(rand.product.product_name);
       } else {
         startTimesMap[timeKey] = [rand.product.product_name];
       }
-  
-      // Nếu có hơn 1 phiên đấu giá có cùng giờ và phút
-      if (startTimesMap[timeKey].length > 1) {
-        MySwal.fire({
-          title: "Cảnh báo",
-          text: `Các phiên đấu giá với thời gian bắt đầu giống nhau: ${startTimesMap[timeKey].join(", ")}. Vui lòng điều chỉnh thời gian.`,
-          icon: "warning",
-          confirmButtonColor: "#3085d6",
-          confirmButtonText: "OK",
-        }).then(() => {
-          // Chuyển hướng đến trang thêm nếu có trùng lặp
-        });
-      }
-  
-      // Kiểm tra thời gian bắt đầu
+
+      // Kích hoạt ngay nếu thời gian hiện tại >= startTime
       if (now >= startTime.getTime()) {
         initialActivated[rand._id] = true;
-        autoTriggerPriceRand(rand._id); // Tự động kích hoạt nếu đã đến thời gian
+        autoTriggerPriceRand(rand._id);
+      } else {
+        const delay = startTime.getTime() - now;
+
+        // Hiển thị trước 5 giây
+        const displayTimeout = setTimeout(() => {
+          setDisplayBeforeActivation((prev) => ({
+            ...prev,
+            [rand._id]: true,
+          }));
+
+          // Bắt đầu đếm ngược 5 giây
+          countdowns[rand._id] = 5;
+          countdownIntervals[rand._id] = setInterval(() => {
+            setCountdownBeforeActivation((prev) => {
+              const newCountdown = countdowns[rand._id] - 1;
+              if (newCountdown <= 0) {
+                clearInterval(countdownIntervals[rand._id]);
+                countdowns[rand._id] = 0;
+              } else {
+                countdowns[rand._id] = newCountdown;
+              }
+              return { ...prev, [rand._id]: countdowns[rand._id] };
+            });
+          }, 1000);
+
+          // Kích hoạt tự động sau 5 giây hiển thị
+          const activationTimeout = setTimeout(() => {
+            setAutoActivated((prev) => ({
+              ...prev,
+              [rand._id]: true,
+            }));
+            autoTriggerPriceRand(rand._id);
+          }, 5000);
+
+          timeouts.push(activationTimeout);
+        }, delay - 5000);
+
+        displayTimeouts.push(displayTimeout);
       }
     });
+
+    // Hiển thị cảnh báo nếu có phiên trùng lặp
+    const duplicateWarnings = Object.entries(startTimesMap).filter(
+      ([time, names]) => names.length > 1 && !warnedTimes.includes(time)
+    );
+    if (duplicateWarnings.length > 0) {
+      Swal.fire({
+        title: "Cảnh báo",
+        text: `Các phiên đấu giá trùng lặp:\n${duplicateWarnings
+          .map(([time, names]) => `Thời gian ${time}: ${names.join(", ")}`)
+          .join("\n")}`,
+        icon: "warning",
+      });
+
+      setWarnedTimes((prev) => [
+        ...prev,
+        ...duplicateWarnings.map(([time]) => time),
+      ]);
+    }
     setAutoActivated(initialActivated);
 
-    // Đặt timeout cho các sản phẩm chưa kích hoạt
-    const timeouts = deletedPriceRandAuct
-      .filter((rand) => new Date(rand.startTime).getTime() > now)
-      .map((rand) => {
-        const delay = new Date(rand.startTime).getTime() - now;
-        return setTimeout(() => {
-          setAutoActivated((prev) => ({ ...prev, [rand._id]: true }));
-          autoTriggerPriceRand(rand._id); // Tự động kích hoạt khi đến thời gian
-        }, delay);
-      });
-
+    // Dọn dẹp khi component unmount hoặc danh sách thay đổi
     return () => {
-      // Xóa timeout khi component unmount
-      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.forEach(clearTimeout);
+      displayTimeouts.forEach(clearTimeout);
+      Object.values(countdownIntervals).forEach(clearInterval);
+      setWarnedTimes([]);
     };
   }, [deletedPriceRandAuct]);
-    const handleTriggrtPriceRand = async (id: string) => {
-      MySwal.fire({
-        title: "Hủy sản phẩm?",
-        text: "Bạn có chắc muốn hủy sản phẩm này không?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Có",
-        cancelButtonText: "Hủy",
-      }).then(async (result: SweetAlertResult) => {
-        if (result.isConfirmed) {
-          await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
-          setPriceRand((prevSoftDel) =>     prevSoftDel.filter((rand) => rand._id!== id));
-    
-     
-          toast.success("Đưa sản phẩm lên phiên thành công");
 
-        }else {
-          toast.error("Có lỗi xảy ra khi xóa sản phẩm");
-        }
-      });
-    };
+  const handleTriggrtPriceRand = async (id: string) => {
+    MySwal.fire({
+      title: "Hủy sản phẩm?",
+      text: "Bạn có chắc muốn hủy sản phẩm này không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    }).then(async (result: SweetAlertResult) => {
+      if (result.isConfirmed) {
+        await dispatch(restorePriceRandAdminThunk({ id })).unwrap();
+        setPriceRand((prevSoftDel) =>
+          prevSoftDel.filter((rand) => rand._id !== id)
+        );
+
+        toast.success("Đưa sản phẩm lên phiên thành công");
+      } else {
+        toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+      }
+    });
+  };
 
   return (
     <>
@@ -188,6 +275,9 @@ const ListPriceRandRecy: React.FC = () => {
         <div className="flex-grow">
           <SearchFormProduct onSearch={handleSearch} />
         </div>
+        {/* <div className="flex-shrink-0">
+        {currentTime}
+        </div> */}
         <div className="flex-shrink-0">
           <Link
             to="/admin/addPriceRandAuct"
@@ -234,6 +324,7 @@ const ListPriceRandRecy: React.FC = () => {
             <th scope="col" className="p-4">
               Bước giá (đ)
             </th>
+
             <th scope="col" className="p-4">
               Thời gian bắt đầu{" "}
             </th>
@@ -244,9 +335,9 @@ const ListPriceRandRecy: React.FC = () => {
               Trạng thái
             </th>
             <th scope="col" className="p-4">
-              Kích hoạt tự động 
+              Kích hoạt tự động
             </th>
-            <th scope="col" className="p-4">
+            <th colSpan={1} className="p-4">
               Chức năng
             </th>
           </tr>
@@ -281,6 +372,7 @@ const ListPriceRandRecy: React.FC = () => {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {formatCurrency(rand.priceStep)}
                 </td>
+
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {formatDateVN(rand.startTime)}
                 </td>
@@ -297,25 +389,24 @@ const ListPriceRandRecy: React.FC = () => {
                   {rand.status === "active" ? "Hiển thị" : "Đã ẩn"}
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {autoActivated[rand._id] ? (
-                <span className="group relative flex items-center 
-                text-blue-700 bg-blue-200 hover:text-white border 
-                border-blue-700 hover:bg-blue-800 focus:ring-4 
-                focus:outline-none focus:ring-blue-300 font-medium rounded-lg 
-                text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 
-                dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">Đã kích hoạt</span>
-              ) : (
-                <span className="group relative flex items-center text-blue-700 bg-blue-200 
-                hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 
-                focus:outline-none focus:ring-blue-300 font-medium rounded-lg
-                 text-sm px-2 py-2 text-center dark:border-blue-500
-                  dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 
-                  dark:focus:ring-blue-900">Chờ ...</span>
-              )}
+                  {displayBeforeActivation[rand._id] ? (
+                    <span className="group relative flex items-center text-yellow-700 bg-yellow-200 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900">
+                      Kích hoạt trong {countdownBeforeActivation[rand._id]}{" "}
+                      giây...
+                    </span>
+                  ) : autoActivated[rand._id] ? (
+                    <span className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">
+                      Đã kích hoạt
+                    </span>
+                  ) : (
+                    <span className="group relative flex items-center text-gray-700 bg-gray-200 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900">
+                      Chờ ...
+                    </span>
+                  )}
                 </td>
+
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center space-x-4">
-             
                     <button
                       onClick={() => handleTriggrtPriceRand(rand._id)}
                       className="group relative flex items-center text-blue-700 bg-blue-200 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900"

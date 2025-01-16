@@ -25,3 +25,4 @@ export { default as getTop3HighestBiddersSlice } from "./getTop3HighestBidders";
 export { default as getUserCartSlice } from "./getUserCart";
 export { default as checkAuctionTimeSlice } from "./checkAuctionTime";
 export { default as checkAuctionTimeAuctionPricingRangeSlice } from "./checkAuctionTimeAuctionPricingRange";
+export { default as emailTwowinnerSlice } from "./emailTwowinners";

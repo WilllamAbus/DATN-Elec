@@ -14,6 +14,7 @@ const productAuction = require("../../../model/productAuction/productAuction");
 const OrderService = require("../../../services/orders/orderSp");
 const path = require("path");
 const { spawn } = require("child_process");
+const { getIO } = require('../../../services/skserver/socketServer');
 const {
   sendOrderConfirmationEmail,
   sendOrderAuctionConfirmationEmail,
@@ -295,14 +296,14 @@ const authController = {
       });
     }
   },
+
+
   createOrderAuction: async (req, res) => {
     try {
       // Xác thực người dùng
       const userId = req.user?.id;
       if (!userId) {
-        return res
-          .status(401)
-          .json({ message: "Người dùng chưa được xác thực" });
+        return res.status(401).json({ message: "Người dùng chưa được xác thực" });
       }
       const {
         cartId,
@@ -312,6 +313,7 @@ const authController = {
         shipping,
         payment: paymentInfo,
       } = req.body;
+  
       // Kiểm tra giỏ hàng
       const cart = await Cart.findById(cartId).populate([
         {
@@ -320,90 +322,66 @@ const authController = {
         },
         {
           path: "itemAuction.auctionWinner",
-          select: "auctionStatus",
+          select: "auctionStatus product_randBib",
         },
       ]);
-
+  
       if (!cart) {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
-
+  
       const selectedItems = cart.itemAuction;
-
+  
       if (!selectedItems || selectedItems.length === 0) {
-        return res
-          .status(400)
-          .json({ message: "KKhông có sản phẩm đấu giá trong giỏ hàng" });
+        return res.status(400).json({ message: "Không có sản phẩm đấu giá trong giỏ hàng" });
       }
-
+  
       for (const item of selectedItems) {
         const auctionPricingRange = item.auctionPricingRange;
         const auctionWinner = item.auctionWinner;
-
+  
         if (auctionPricingRange) {
           auctionPricingRange.status = "paid";
           await auctionPricingRange.save();
         }
-
+  
         if (auctionWinner) {
           auctionWinner.auctionStatus = "paid";
+          auctionWinner.paymentStatus = "paid";
+          await auctionWinner.populate({ path: 'product_randBib', select: 'slug' });
           await auctionWinner.save();
         }
       }
-
-      if (!cart) {
-        return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
-      }
-
-      if (!selectedItems || selectedItems.length === 0) {
-        return res
-          .status(400)
-          .json({ message: "Không có sản phẩm nào được chọn để tạo đơn hàng" });
-      }
-      console.log(selectedItems);
-
+  
       if (!paymentInfo) {
-        return res
-          .status(400)
-          .json({ message: "Thông tin thanh toán không được cung cấp" });
+        return res.status(400).json({ message: "Thông tin thanh toán không được cung cấp" });
       }
       if (!shipping) {
-        return res
-          .status(400)
-          .json({ message: "Thông tin giao hàng không được cung cấp" });
+        return res.status(400).json({ message: "Thông tin giao hàng không được cung cấp" });
       }
-
+  
       let paymentId = null;
-
+  
       if (paymentInfo.payment_method === "vnPay") {
-        const existingVnpay = await Vnpay.findOne({
-          transaction: paymentInfo.order_info,
-        });
-
+        const existingVnpay = await Vnpay.findOne({ transaction: paymentInfo.order_info });
+  
         if (!existingVnpay) {
-          return res
-            .status(400)
-            .json({ message: "Giao dịch VNPay không tồn tại" });
+          return res.status(400).json({ message: "Giao dịch VNPay không tồn tại" });
         }
-
-        const existingPayment = await Payment.findOne({
-          order_info: paymentInfo.order_info,
-          payment_method: "vnPay",
-        });
-
+  
+        const existingPayment = await Payment.findOne({ order_info: paymentInfo.order_info, payment_method: "vnPay" });
+  
         if (existingPayment) {
-          return res
-            .status(400)
-            .json({ message: "Giao dịch VNPay đã tồn tại" });
+          return res.status(400).json({ message: "Giao dịch VNPay đã tồn tại" });
         }
-
+  
         const newPayment = new Payment({
           amount: paymentInfo?.amount || 0,
           order_info: paymentInfo?.order_info || "null",
           payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: "vnPay",
         });
-
+  
         await newPayment.save();
         paymentId = newPayment._id;
       } else if (paymentInfo.payment_method === "Thanh toán khi nhận hàng") {
@@ -413,31 +391,27 @@ const authController = {
           payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: "Thanh toán khi nhận hàng",
         });
-
+  
         await newPayment.save();
         paymentId = newPayment._id;
       } else {
-        const existingPayment = await Payment.findOne({
-          order_info: paymentInfo.order_info,
-          payment_method: paymentInfo.payment_method,
-        });
-
+        const existingPayment = await Payment.findOne({ order_info: paymentInfo.order_info, payment_method: paymentInfo.payment_method });
+  
         if (existingPayment) {
           return res.status(400).json({ message: "Giao dịch đã tồn tại" });
         }
-
+  
         const newPayment = new Payment({
           amount: paymentInfo?.amount || 0,
           order_info: paymentInfo?.order_info || "null",
           payment_date: paymentInfo?.payment_date || new Date(),
-          payment_method:
-            paymentInfo?.payment_method || "Chưa chọn phương thức",
+          payment_method: paymentInfo?.payment_method || "Chưa chọn phương thức",
         });
-
+  
         await newPayment.save();
         paymentId = newPayment._id;
       }
-
+  
       const newShipping = new Shipping({
         recipientName: shipping.recipientName || "Chưa có tên người nhận",
         phoneNumber: shipping.phoneNumber || "Chưa có số điện thoại",
@@ -445,14 +419,11 @@ const authController = {
         stateShipping: "Xác nhận",
       });
       await newShipping.save();
-
-      const totalamount = selectedItems.reduce(
-        (sum, item) => sum + item.totalItemPrice,
-        0
-      );
+  
+      const totalamount = selectedItems.reduce((sum, item) => sum + item.totalItemPrice, 0);
       const shippingFee = shipping.shipping || 0;
       const totalPriceWithShipping = totalamount + shippingFee;
-
+  
       const newOrder = new Order({
         user: userId,
         payment: paymentId || null,
@@ -466,36 +437,31 @@ const authController = {
         stateOrder: "Chờ xử lý",
       });
       await newOrder.save();
-
+  
       const orderDetailItems = [];
       for (const item of selectedItems) {
-        const inventory = await Inventory.findOne({
-          productAuction: item.productAuction,
-        });
+        const auctionPricingRange = item.auctionPricingRange;
+  
+        const inventory = await Inventory.findOne({ productAuction: item.productAuction });
         if (!inventory) {
-          return res
-            .status(404)
-            .json({ message: "Không tìm thấy kho hàng cho sản phẩm đấu giá" });
+          return res.status(404).json({ message: "Không tìm thấy kho hàng cho sản phẩm đấu giá" });
         }
-
+  
         if (inventory.quantityShelf < item.quantity) {
           return res.status(400).json({
             message: `Số lượng sản phẩm không đủ. Sản phẩm: ${item.productAuction}, số lượng còn lại: ${inventory.quantityShelf}`,
           });
         }
-        if (
-          !item.auctionPricingRange ||
-          !item.auctionPricingRange.product_randBib
-        ) {
+        if (!item.auctionPricingRange || !item.auctionPricingRange.product_randBib) {
           return res.status(400).json({
-            message: `Dữ liệu sản phẩm bị thiếu thông tin: ${JSON.stringify(
-              item
-            )}`,
+            message: `Dữ liệu sản phẩm bị thiếu thông tin: ${JSON.stringify(item)}`,
           });
         }
+        await auctionPricingRange.populate("product_randBib");
+        const productName = auctionPricingRange.product_randBib?.product_name;
         orderDetailItems.push({
           product_randBib: item.auctionPricingRange.product_randBib,
-          productName: item.auctionPricingRange.product_randBib.product_name,
+          productName: productName,
           quantity: item.quantity,
           price: item.price,
           totalItemPrice: item.totalItemPrice,
@@ -505,15 +471,12 @@ const authController = {
       const orderDetail = new OrderDetail({
         order: newOrder._id,
         itemAuction: orderDetailItems,
-        totalItemPrice: orderDetailItems.reduce(
-          (sum, item) => sum + item.totalItemPrice,
-          0
-        ),
+        totalItemPrice: orderDetailItems.reduce((sum, item) => sum + item.totalItemPrice, 0),
       });
       await orderDetail.save();
       newOrder.cartDetails = [orderDetail._id];
       await newOrder.save();
-
+  
       const newInteraction = new Interaction({
         user: userId,
         OrderCart: newOrder._id,
@@ -522,40 +485,51 @@ const authController = {
         score: 5,
       });
       await newInteraction.save();
-
+      cart.itemAuction = cart.itemAuction.filter((item) => {
+        return !selectedItems.some((selectedItem) => selectedItem._id.toString() === item._id.toString());
+      });
       await cart.save();
-
+  
       for (const item of selectedItems) {
-        if (
-          item.auctionPricingRange &&
-          item.auctionPricingRange.product_randBib
-        ) {
+        if (item.auctionPricingRange && item.auctionPricingRange.product_randBib) {
           const productRandBibId = item.auctionPricingRange.product_randBib;
-
-          await productAuction.findByIdAndUpdate(
-            productRandBibId,
-            { status: "disable" },
-            { new: true }
-          );
+  
+          await productAuction.findByIdAndUpdate(productRandBibId, { status: "disable" }, { new: true });
         }
       }
-      // const user = await User.findById(userId);
-      // if (
-      //   !user.email ||
-      //   !newShipping.recipientName ||
-      //   !orderDetailItems.length
-      // ) {
-      //   await sendOrderAuctionConfirmationEmail(user.email, {
-      //     recipientName: newShipping.recipientName,
-      //     address: newShipping.address,
-      //     paymentMethod: paymentInfo.payment_method,
-      //     itemAuction: orderDetailItems,
-      //     totalPriceWithShipping,
-      //   });
-      //   return res
-      //     .status(400)
-      //     .json({ message: "Dữ liệu gửi email không hợp lệ" });
-      // }
+      const user = await User.findById(userId);
+      try {
+        await sendOrderAuctionConfirmationEmail(user.email, {
+          recipientName: newShipping.recipientName,
+          address: newShipping.address,
+          paymentMethod: paymentInfo.payment_method,
+          itemAuction: orderDetailItems,
+          totalPriceWithShipping,
+        });
+      } catch (error) {
+        console.error("Lỗi khi gửi email:", error);
+        return res.status(500).json({ message: "Gửi email thất bại", error: error.message });
+      }
+  
+      const io = getIO();
+      for (const item of selectedItems) {
+        const auctionWinner = item.auctionWinner;
+        await auctionWinner.populate({ path: 'product_randBib', select: 'slug' });
+        const slug = auctionWinner.product_randBib.slug;
+
+        console.log(`Slug: ${slug}`);
+  
+        io.emit('auctionPaid', {
+          auctionWinnerId: auctionWinner._id,
+          userId: userId,
+          userMessage: user?.message,
+          userWarning: user?.warning,
+          status: auctionWinner.status,
+          auctionStatus: auctionWinner.auctionStatus,
+          slug: slug,
+        });
+      }
+  
       res.status(201).json({
         message: "Đơn hàng đã được tạo thành công",
         order: newOrder,
@@ -568,6 +542,7 @@ const authController = {
       });
     }
   },
+  
 
   getOrders: async (req, res) => {
     const userId = req.user.id;
@@ -654,79 +629,7 @@ const authController = {
       });
     }
   },
-  // cancelOrder: async (req, res) => {
-  //   try {
-  //     const userId = req.user.id;
-  //     const { orderId } = req.params;
-  //     const { cancelReason } = req.body;
 
-  //     const order = await Order.findOne({
-  //       _id: orderId,
-  //       user: userId,
-  //       isDeleted: false,
-  //     }).populate("payment");
-
-  //     if (!order) {
-  //       return res
-  //         .status(404)
-  //         .json({ message: "Order not found or does not belong to this user" });
-  //     }
-
-  //     if (
-  //       order.stateOrder !== "Chờ xử lý" &&
-  //       order.stateOrder !== "Đã xác nhận"
-  //     ) {
-  //       return res.status(400).json({
-  //         message:
-  //           "Order cannot be canceled. Only orders with 'Chờ xử lý' or 'Đã xác nhận' status can be canceled.",
-  //       });
-  //     }
-
-  //     // Kiểm tra phương thức thanh toán
-  //     if (order.payment.payment_method === "Thanh toán khi nhận hàng") {
-  //       // Nếu là "Thanh toán khi nhận hàng", không cần lấy thông tin ngân hàng
-  //       order.stateOrder = "Hủy đơn hàng";
-  //       order.cancelReason = cancelReason;
-  //     } else {
-  //       // Nếu là phương thức thanh toán khác, lấy thông tin ngân hàng
-  //       const user = await User.findById(userId).populate("banks");
-  //       if (!user) {
-  //         return res.status(404).json({ message: "User not found" });
-  //       }
-
-  //       const defaultBank =
-  //         user.banks.find((bank) => bank.isDefault) || user.banks[0];
-
-  //       if (!defaultBank) {
-  //         return res.status(400).json({
-  //           message: "No bank information found for the user",
-  //         });
-  //       }
-
-  //       // Cập nhật thông tin ngân hàng
-  //       order.stateOrder = "Hủy đơn hàng";
-  //       order.cancelReason = cancelReason;
-  //       order.refundBank = {
-  //         bankName: defaultBank.name,
-  //         accountNumber: defaultBank.accountNumber,
-  //         accountName: defaultBank.fullName,
-  //       };
-  //     }
-
-  //     await order.save();
-
-  //     res.status(200).json({
-  //       message: "Order successfully canceled",
-  //       order,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error canceling order:", error);
-  //     res.status(500).json({
-  //       message: "Error canceling order",
-  //       error: error.message || error,
-  //     });
-  //   }
-  // },
   cancelOrder: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -1037,9 +940,8 @@ const authController = {
               const inventory = item.inventory;
               if (!inventory) {
                 return res.status(400).json({
-                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                    item.product?.name || "không xác định"
-                  }.`,
+                  message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                    }.`,
                 });
               }
               inventory.quantityShelf += item.quantity;
@@ -1056,17 +958,15 @@ const authController = {
 
           if (!inventory) {
             return res.status(400).json({
-              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 
           if (!isRestocking && inventory.quantityShelf < item.quantity) {
             return res.status(400).json({
-              message: `Số lượng tồn kho không đủ cho sản phẩm ${
-                item.product?.name || "không xác định"
-              }.`,
+              message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
+                }.`,
             });
           }
 

@@ -4,16 +4,25 @@ import { CheckAuctionTimeResponse } from "../../../../services/detailProductAuct
 
 export const checkAuctionTimeThunk = createAsyncThunk<
   CheckAuctionTimeResponse,
-  string, // Dữ liệu đầu vào của thunk là slug (string)
-  { rejectValue: { code: string; msg: string } }
+  { slug: string },
+  { rejectValue: string }
 >(
   "auctionClient/checkAuctionTime",
-  async (slug, { rejectWithValue }) => {
+  async ({ slug }, { rejectWithValue }) => {
     try {
+      if (!slug) {
+        return rejectWithValue("Slug là bắt buộc");
+      }
+
       const response = await checkAuctionTime(slug);
-      return response;
+
+      if (response.status === "success") {
+        return response;
+      } else {
+        return rejectWithValue(response.message || "Lỗi không xác định");
+      }
     } catch (error: any) {
-      return rejectWithValue({ code: error.code || "LOI_KHONG_XAC_DINH", msg: error.msg || "Lỗi không xác định" });
+      return rejectWithValue(error.message || "Lỗi không xác định");
     }
   }
 );
