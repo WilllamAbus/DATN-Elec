@@ -3,7 +3,7 @@
 }
 
 .productCardContent {
-  @apply flex-grow pt-1 mb-10 min-h-[150px]; /* Thêm chiều cao tối thiểu */
+  @apply flex-grow pt-1 mb-10 min-h-[200px]; /* Thêm chiều cao tối thiểu */
 }
 
 .productDiscount {
@@ -15,7 +15,7 @@
 }
 
 .productImageContainer {
-  @apply h-56 w-auto;
+  @apply h-auto w-auto;
 }
 
 .productLink {
@@ -23,8 +23,8 @@
 }
 
 .productImage {
-  @apply w-full h-56 object-contain rounded-lg; /* Kích thước ban đầu */
-  transform: scale(0.8); /* Giảm kích thước xuống 80% */
+  @apply w-full h-auto object-contain rounded-lg; /* Kích thước ban đầu */
+  transform: scale(0.5); /* Giảm kích thước xuống 80% */
   transform-origin: center; /* Đặt điểm gốc để hình ảnh thu nhỏ từ giữa */
 }
 .productCardContent {

@@ -115,9 +115,9 @@ const isCheckedAuct: React.FC = () => {
               GIÁ CHIẾN THẮNG (VNĐ)
             </th>
 
-            <th scope="col" className="p-4">
-              GHI CHÚ
-            </th>
+            {/* <th scope="col" className="p-4">
+              GIỜ CHIẾN THẮNG
+            </th> */}
             <th scope="col" className="p-4">
               TRẠNG THÁI
             </th>
@@ -158,16 +158,12 @@ const isCheckedAuct: React.FC = () => {
                 <td className="py-4 px-6 border-b border-grey-light">
                   {formatCurrency(winnneerCheck?.bidPrice)}
                 </td>
-
-                <td  className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
-                    winnneerCheck?.emailSent === false
-                      ? "bg-green-50 text-green-700"
-                      : "bg-yellow-50 text-yellow-700"
-                  }`}
+{/* 
+                <td  className="py-4 px-6 border-b border-grey-light"
                 >
                
-                  {winnneerCheck?.emailSent === false ? "Hết thời gian xác nhận" : "Khác"}
-                </td>
+                  {formatDateVN(winnneerCheck?.endTime)}
+                </td> */}
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
                     className={`mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
