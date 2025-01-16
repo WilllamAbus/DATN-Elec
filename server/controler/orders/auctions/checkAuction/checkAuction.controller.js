@@ -236,7 +236,7 @@ const checkAuctionCOntroller = {
               {
                 _id: winnerSetUpId,
               },
-              { $set: { auctionStatus: "lose", status: "disabled" } },
+              { $set: { auctionStatus: "lose", status: "disabled" , confirmationStatus:'canceled'} },
               { new: true }
             );
 
