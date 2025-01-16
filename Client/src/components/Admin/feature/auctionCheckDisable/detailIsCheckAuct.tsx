@@ -196,7 +196,7 @@ const OrderDetails: React.FC = () => {
               </p>
               <p className="text-lg text-red-600 mb-2">
                 <span className="font-medium">Tổng tiền:</span>{" "}
-                {formatCurrency(converNumber) } VND
+                {formatCurrency(converNumber) } VNĐ
               </p>
              
               {renderStatusButton()}

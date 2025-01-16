@@ -1107,7 +1107,7 @@ exports.sendMailWinnerDel = async (userEmail, order, orderDetailSummary) => {
                                     <!--<![endif]-->
                                     <a
                                       class="t67"
-                                      href="http://localhost:3150/auction?_sort=product_price%3AASC&page=1"
+                                      href="http://localhost:3150/session-auction"
                                       style="
                                         display: block;
                                         margin: 0;

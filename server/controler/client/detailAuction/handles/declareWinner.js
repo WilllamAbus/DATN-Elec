@@ -20,6 +20,7 @@ module.exports = async (auctionPricingRange, auctionRound) => {
       auctionStatus: i === 0 ? 'won' : 'pending',
       startTime: convertToLocalTime(currentTime),
       endTime: convertToLocalTime(new Date(currentTime.getTime() + (i === 0 ? 3 : 5) * 24 * 60 * 60 * 1000)), 
+      product_randBib: auctionPricingRange.product_randBib,
       notWinner: true,
     });
     await auctionWinner.save();

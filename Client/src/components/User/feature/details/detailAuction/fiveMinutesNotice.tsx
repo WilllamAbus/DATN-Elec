@@ -21,7 +21,7 @@ const FiveMinutesNotice: React.FC<FiveMinutesNoticeProps> = ({ highBidderInforma
 
   const title = "Thông báo";
   const formattedBidPrice = formatPrice(highBidderInformation.bidPrice);
-  const description = `Người dùng ${highBidderInformation.userName} đã đặt giá với giá tối đa ${formattedBidPrice}. Chúng tôi sẽ tạm ngưng đấu giá trong vòng 5 phút. Nếu người dùng không thanh toán, đấu giá sẽ diễn ra tiếp tục trong 5 phút sau.`;
+  const description = `Người dùng ${highBidderInformation.userName} đã đặt giá với giá tối đa ${formattedBidPrice}. Chúng tôi sẽ tạm ngưng đấu giá trong vòng 30 phút. Nếu người dùng không thanh toán, đấu giá sẽ diễn ra tiếp tục trong 5 phút sau.`;
 
   return (
     <motion.div

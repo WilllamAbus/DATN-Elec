@@ -68,4 +68,10 @@ export interface GetUserCartResponse {
   cart?: Cart;
   statusCart?: number;
   error?: string;
+  statusWarningTimeout?: boolean;
+  timeLimit?: string;
+  isBanned?: boolean;
+  statusAuction?: string;
+  warning?: number;
+  noteWarning?: string;
 }

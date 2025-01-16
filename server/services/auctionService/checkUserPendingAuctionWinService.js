@@ -43,6 +43,7 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
       auction.confirmationStatus = 'canceled';
       auction.status = 'disabled';
       auction.auctionStatus = 'lose';
+      auction.notWinner = false;
       auction.noteAuctionWinner = 'Lý do hủy đơn trúng đấu giá là do hết thời gian mà bạn không bấm xác nhận nên hệ thống ghi nhận và tự động hủy đơn trúng đấu giá của bạn';
       auction.auctionStausCheck = 'Đã duyệt hủy chiến thắng';
 

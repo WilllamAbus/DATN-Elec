@@ -3,14 +3,16 @@ import {
   getAuctionWinsByUserSlice,
   confirmAuctionSlice,
   canceledAuctionSlice,
-  getUserPendingAuctionWinsSlice
+  getUserPendingAuctionWinsSlice,
+  confirmAuctionTemporarySlice
 
 } from "./slice";
 const auctionWinReducer = combineReducers({
   getAuctionWinsByUser: getAuctionWinsByUserSlice,
   confirmAuction:confirmAuctionSlice,
   canceledAuction:canceledAuctionSlice,
-  getUserPendingAuctionWins:getUserPendingAuctionWinsSlice
+  getUserPendingAuctionWins:getUserPendingAuctionWinsSlice,
+  confirmAuctionTemporary:confirmAuctionTemporarySlice
 
 });
 
