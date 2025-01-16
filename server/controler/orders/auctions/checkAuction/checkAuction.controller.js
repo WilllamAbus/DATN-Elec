@@ -19,7 +19,7 @@ const checkAuctionCOntroller = {
 
       // Fetch price range with active status
       const priceRangeWinnwe = await AuctiomWinner.find({ status: "disabled", notWinner: true })
-        .select("user bidPrice status auctionStatus auctionStausCheck endTime")
+        .select("user bidPrice status auctionStatus auctionStausCheck endTime emailSent")
         .lean();
 
       const userIds = priceRangeWinnwe.map((auctWin) => auctWin.user);
@@ -211,19 +211,22 @@ const checkAuctionCOntroller = {
           { new: true }
         );
 
+
         // Nếu trạng thái hiện tại là "Đã duyệt hủy chiến thắng"
         if (updatedStatus.auctionStausCheck === "Đã duyệt hủy chiến thắng") {
           const auctionCheckRound = await AuctiomWinner.find({
-            auctionRound: updatedStatus.auctionRound,
+            auctionRound: updatedStatus.auctionRound, notWinner:true
           });
-
+      
+          
           const checkVariable = auctionCheckRound[0].auctionStausCheck;
-
+       
+          
           if (checkVariable === "Đã duyệt hủy chiến thắng") {
             const winnerSetUp = await AuctiomWinner.findOne({
-              _id: auctionCheckRound[0]._id,
+              _id: auctionCheckRound[0]._id,notWinner:true
             }).lean();
-
+     
             const winnerSetUpId = winnerSetUp._id;
             const winnnerBidPrice = winnerSetUp.bidPrice;
             const converPrice = winnnerBidPrice.toLocaleString("vi-VN");
@@ -260,9 +263,10 @@ const checkAuctionCOntroller = {
        
 
             const auctionCheckRoundTwo = await AuctiomWinner.find({
-              auctionRound: winnerCheck.auctionRound,
+              auctionRound: winnerCheck.auctionRound, notWinner:true
             });
-     
+        
+            
             
             if (auctionCheckRoundTwo.length >= 2) {
               const bidPriceOne = auctionCheckRoundTwo[0];

@@ -35,6 +35,7 @@ export interface UserID {
     userWinnerAuct: ShippingAddress;
     _id: string;
     user:string;
+    emailSent: boolean;
     serialNumber:number,
     stateOrder: string;
     status: string;

@@ -247,8 +247,8 @@ const ListPriceRandRecy: React.FC = () => {
 
   const handleTriggrtPriceRand = async (id: string) => {
     MySwal.fire({
-      title: "Hủy sản phẩm?",
-      text: "Bạn có chắc muốn hủy sản phẩm này không?",
+      title: "Kích hoạt sản phẩm?",
+      text: "Bạn có chắc muốn kích hoạt sản phẩm này không?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
