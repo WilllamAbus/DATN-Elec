@@ -112,10 +112,15 @@ const DetailPageAuction: React.FC = () => {
       if (result.payload && typeof result.payload !== "string") {
         const userBidder = result.payload.bidders.find((bidder) => bidder.user._id === userId);
         const statusCode = userBidder?.statusCode;
-        setAuctionStatus(statusCode as 0 | 1 | 2 | null);
+        if (auctionStatus === null) {
+          setAuctionStatus(statusCode as 0 | 1 | 2 | null);
+        }
+        await dispatch(emailTwowinnerThunk({ slug }));
       }
     }
   };
+  console.log('text',handleAuctionEnd);
+  
   console.log(auctionStatusTop3Bidder);
 
   const handleBidPriceChange = async () => {

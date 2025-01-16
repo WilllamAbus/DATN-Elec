@@ -22,7 +22,6 @@ const updateUserWarningStatus = async (user, session) => {
   await user.save({ session });
 };
 
-
 const canceledAuctionTemporary = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -84,8 +83,10 @@ const canceledAuctionTemporary = async (req, res) => {
       await auctionPricingRange.save({ session });
     }
 
+    const user = auctionWinner.user;
+
     await AuctionPriceHistory.updateMany(
-      { auctionPricingRange: auctionPricingRange._id, status: 'active' },
+      { auctionPricingRange: auctionPricingRange._id, status: 'active', user: user._id },
       { $set: { status: 'disabled' } },
       { session }
     );
@@ -96,10 +97,9 @@ const canceledAuctionTemporary = async (req, res) => {
     auctionWinner.notWinner = false;
     await auctionWinner.save({ session });
 
-    const user = auctionWinner.user;
     await updateUserWarningStatus(user, session);
-    console.log(`Slug: ${auctionWinner.product_randBib.slug}`);
-    const io = getIO(); 
+
+    const io = getIO();
     io.emit('auctionCanceled', {  
       auctionWinnerId: auctionWinner._id,
       userId: user._id,
@@ -107,7 +107,7 @@ const canceledAuctionTemporary = async (req, res) => {
       userWarning: user.warning,
       status: auctionWinner.status,
       auctionStatus: auctionWinner.auctionStatus,
-      slug: slug, 
+      slug: slug,
     });
 
     await session.commitTransaction();

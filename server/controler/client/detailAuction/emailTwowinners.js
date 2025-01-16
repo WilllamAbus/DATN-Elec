@@ -127,7 +127,7 @@ const emailTwowinners = async (req, res) => {
       auctionPricingRange: auctionPricingRange._id, // Cập nhật auctionPricingRange
       emailSent: true,
     });
-    await auctionWinner.save();
+
 
     return res.status(200).json({
       code: "SUCCESS",

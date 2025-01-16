@@ -46,7 +46,7 @@ export default function AuctionTemporary() {
               >
                 <img
                   alt="Ảnh thua"
-                  src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2F10min.svg?alt=media&token=c769c117-123a-4a2d-8ee1-32391648fb9e"
+                  src="https://firebasestorage.googleapis.com/v0/b/xprojreact.appspot.com/o/auctionResult%2F30phut.svg?alt=media&token=fc655f9c-202b-4bd0-9b2b-72dae95357f2"
                   className="w-full"
                 />
               </motion.div>
@@ -64,7 +64,7 @@ export default function AuctionTemporary() {
                 transition={{ duration: 1, delay: 1 }}
                 className="text-lg font-bold text-yellow-500 mt-2"
               >
-                Vui lòng đợi 5 phút để xác nhận.
+                Vui lòng đợi 30 phút để xác nhận.
               </motion.p>
             </ModalBody>
             <ModalFooter>
