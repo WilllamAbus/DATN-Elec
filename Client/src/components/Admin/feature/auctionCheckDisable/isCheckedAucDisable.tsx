@@ -166,7 +166,7 @@ const isCheckedAuct: React.FC = () => {
                   }`}
                 >
                
-                  {winnneerCheck?.emailSent === false ? "Khác" : "Hết thời gian xác nhận"}
+                  {winnneerCheck?.emailSent === false ? "Hết thời gian xác nhận" : "Khác"}
                 </td>
                 <td className="py-4 px-6 border-b border-grey-light">
                   <span
