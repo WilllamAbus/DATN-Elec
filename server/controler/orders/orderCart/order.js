@@ -862,7 +862,7 @@ const authController = {
         }
 
         user.warning += 1;
-        user.timeLimit = new Date();
+
         // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
         if (user.warning > 3) {
           user.statusAuction = "disable";

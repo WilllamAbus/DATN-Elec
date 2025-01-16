@@ -8,6 +8,6 @@ router.get('/auction-win', middlewareController.verifyToken, getAuctionWinsByUse
 router.get('/check-auction-win', middlewareController.verifyToken, getUserPendingAuctionWins);
 router.post('/confirm-auction', middlewareController.verifyToken,confirmAuction);
 router.post('/canceled-auction', middlewareController.verifyToken,canceledAuction);
-router.post('/canceled-auction-temporary', middlewareController.verifyToken,canceledAuctionTemporary);
+router.post('/canceled-auction-temporary', middlewareController.getHeader,canceledAuctionTemporary);
 router.post('/confirm-auction-temporary', middlewareController.verifyToken,confirmAuctionTemporary);
 module.exports = router;
