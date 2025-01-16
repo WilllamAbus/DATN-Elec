@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
-import { fetchCartList } from "../../redux/cart/cartThunk";
+// import { fetchCartList } from "../../redux/cart/cartThunk";
 import { CheckWatchlistThunk } from "../../redux/product/wathList/wathlist";
 
 const Header: React.FC = () => {
@@ -12,14 +12,28 @@ const Header: React.FC = () => {
   const carts = useSelector((state: RootState) => state.cart.carts);
   const wathlist = useSelector((state: RootState) => state.watchlist.items);
 
+  // const totalProducts = carts
+  //   ? carts.reduce((productSet, cart) => {
+  //       if (cart.items && Array.isArray(cart.items)) {
+  //         cart.items.forEach((item) => productSet.add(item.product));
+  //       }
+  //       return productSet;
+  //     }, new Set()).size
+  //   : "";
   const totalProducts = carts
     ? carts.reduce((productSet, cart) => {
+        // Tính toán sản phẩm từ items
         if (cart.items && Array.isArray(cart.items)) {
           cart.items.forEach((item) => productSet.add(item.product));
+        }
+        // Tính toán sản phẩm từ itemAuction
+        if (cart.itemAuction && Array.isArray(cart.itemAuction)) {
+          cart.itemAuction.forEach((item) => productSet.add(item.quantity));
         }
         return productSet;
       }, new Set()).size
     : "";
+
   useEffect(() => {
     dispatch(CheckWatchlistThunk());
   }, [dispatch]);
@@ -27,9 +41,9 @@ const Header: React.FC = () => {
     ? wathlist.filter((item) => item.product).length
     : "";
 
-  useEffect(() => {
-    dispatch(fetchCartList());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchCartList());
+  // }, [dispatch]);
 
   const handleWatchlistView = () => {
     navigate("/profile", { state: { view: "watchlist" } });
@@ -98,7 +112,6 @@ const Header: React.FC = () => {
                   type="button"
                   className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-blue-500 dark:hover:bg-gray-700 text-sm font-medium leading-none text-white dark:text-white"
                 >
-
                   <span className="hidden sm:flex">Phiên đấu giá</span>
                 </Button>
               </Link>
