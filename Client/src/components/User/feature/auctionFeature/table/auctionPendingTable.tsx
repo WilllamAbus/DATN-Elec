@@ -9,6 +9,7 @@ import AlerWaringAuction from "src/common/alert/alerWaringAuction";
 import { handleConfirm } from "../handles/handleConfirm"; 
 import { handleCancel } from "../handles/handleCancel";
 import { handleCancelTemporary } from "../handles/handleCancelTemporary";
+import { handleConfirmTemporary } from "../handles/handleConfirmTemporary";
 import { renderCell } from "./renderCell"; 
 import { useRemainingTimes } from "../handles/useRemainingTimes"; 
 
@@ -63,6 +64,9 @@ const AuctionPendingTable: React.FC<AuctionPendingTableProps> = ({ currentPage }
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onConfirm={() => handleConfirm(selectedAuction, dispatch, currentPage, setSelectedAuction, setIsModalOpen)}
+          onConfirmTemporary={() =>
+            handleConfirmTemporary(selectedAuction, dispatch, currentPage, setSelectedAuction, setIsModalOpen)
+          } 
           onCancel={() => handleCancel(selectedAuction, dispatch, currentPage, setSelectedAuction, setIsModalOpen)}
           onCancelTemporary={() => handleCancelTemporary(selectedAuction, dispatch, currentPage, setSelectedAuction, setIsModalOpen)}
         />

@@ -14,7 +14,8 @@ import { AppDispatch, RootState } from "../../../../redux/store";
 import {
   listPageAuctionProductThunk,
   getAllBrandPageAuctionThunk,
-  getAllConditionShoppingThunk
+  getAllConditionShoppingThunk,
+  getUserCartThunk
 } from "../../../../redux/product/client/Thunk";
 import ProductAuctionSkeleton from "../../skeleton/product/productAuctionSkeleton";
 import ProductList from "./productList";
@@ -48,6 +49,7 @@ export default function AuctionSidebar() {
   );
   const brands = useSelector((state: RootState) => state.productClient.getAllBrandPageAuction.brands || []);
   const conditions = useSelector((state: RootState) => state.productClient.getAllConditionShoppingPageAuction.conditionShopping || []);
+  useEffect(() => { dispatch(getUserCartThunk()); }, [dispatch]);
   useEffect(() => {
     dispatch(getAllBrandPageAuctionThunk());
     dispatch(getAllConditionShoppingThunk());

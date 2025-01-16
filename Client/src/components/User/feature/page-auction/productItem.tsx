@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../redux/store";
 import { Link } from "react-router-dom";
 import { truncateText } from "../listPage/truncate/truncateText";
 import { products } from "../../../../services/product_v2/client/types/listPageAuction";
 import { motion } from "framer-motion";
+import WarningAuction from "./warningAuction";
 
 export interface ProductItemProps {
   product: products;
@@ -10,57 +13,68 @@ export interface ProductItemProps {
 }
 
 const ProductItem: React.FC<ProductItemProps> = ({ product, index }) => {
+  const [showWarning, setShowWarning] = useState(false);
   const isEnded = product.auctionPricing && product.auctionPricing.status === 'ended';
+  const statusWarningTimeout = useSelector((state: RootState) => state.productClient.getUserCart.statusWarningTimeout);
+  const statusAuction = useSelector((state: RootState) => state.productClient.getUserCart.statusAuction);
+  const timeLimit = useSelector((state: RootState) => state.productClient.getUserCart.timeLimit);
+  const warning = useSelector((state: RootState) => state.productClient.getUserCart.warning);
+  const isBanned = useSelector((state: RootState) => state.productClient.getUserCart.isBanned);
+  const isDisabled = statusAuction === 'disabled';
+  const hasWarningTimeout = statusWarningTimeout === true;
+  const isUserBanned = isBanned === true;
+  const isWithinTimeLimit = timeLimit && new Date() < new Date(timeLimit);
+
+  const cannotClickProduct = isDisabled || hasWarningTimeout || isUserBanned || isWithinTimeLimit;
+
+  const warningMessage = `Hệ thống ghi nhận bạn đã hủy ${warning} lần, nên hệ thống sẽ phạt bạn ${timeLimit ? `${Math.ceil((new Date(timeLimit).getTime() - new Date().getTime()) / 60000)} phút mới vào được đấu giá` : "0 phút"
+    }.`;
+
+  const handleProductClick = () => {
+    if (cannotClickProduct) {
+      setShowWarning(true);
+    }
+  };
 
   return (
     <div
       key={index}
-      className={`relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md ${
-        isEnded ? 'opacity-50' : '' 
-      }`}
+      className={`relative w-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md ${isEnded ? 'opacity-50' : ''
+        }`}
+      onClick={handleProductClick}
     >
       <motion.div
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
         className="backdrop-blur-sm bg-white/30"
       >
-        {isEnded ? (
-          <div className="relative">
-            <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-not-allowed">
-              <img
-                className="absolute inset-0 w-full h-full object-contain rounded-lg p-8"
-                style={{ filter: "blur(4px)" }}
-                src={product.image[0]}
-                alt={`product ${index + 1}`}
-              />
-            </figure>
+        <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer">
+          <img
+            className="absolute inset-0 w-full h-full object-contain rounded-lg p-8"
+            style={{ filter: isEnded ? "blur(4px)" : "" }}
+            src={product.image[0]}
+            alt={`product ${index + 1}`}
+          />
+          {isEnded && (
             <div className="absolute top-0 left-0 w-full h-full bg-gray-800 bg-opacity-70 flex items-center justify-center">
               <span className="text-white text-lg text-center font-semibold">Phiên đấu giá kết thúc đang trong quá trình xử lý</span>
             </div>
-          </div>
-        ) : (
-          <Link to={`/product-auction/${product.slug}`}>
-            <figure className="relative w-full h-0 pb-[100%] overflow-hidden transition-all duration-300 cursor-pointer">
-              <img
-                className="absolute inset-0 w-full h-full object-contain rounded-lg p-8"
-                src={product.image[0]}
-                alt={`product ${index + 1}`}
-              />
-            </figure>
-          </Link>
-        )}
+          )}
+        </figure>
       </motion.div>
+      {showWarning && cannotClickProduct && (
+        <div className="px-2 mt-2 text-xs font-medium text-gray-700">
+          <WarningAuction warningCount={warning} penaltyDuration={warningMessage} />
+        </div>
+      )}
+      {!cannotClickProduct && (
+        <Link to={`/product-auction/${product.slug}`} className="absolute inset-0">
+          <span className="sr-only">đi đến trang chi tiết</span>
+        </Link>
+      )}
       <div className="pt-1 mb-10">
         <div className="mb-4 px-2 flex items-center justify-between gap-4">
-          <div className="flex items-center justify-end gap-1">
-            <button
-              type="button"
-              data-tooltip-target="tooltip-add-to-favorites"
-              className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              {/* Nút yêu thích */}
-            </button>
-          </div>
+
         </div>
         <div className="text-md font-semibold leading-tight text-gray-900 hover:text-balance dark:text-white">
           <div className="mt-1 px-2 pb-1">
@@ -71,9 +85,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, index }) => {
             </a>
           </div>
         </div>
-        <div className="mt-2 px-2 flex items-center gap-2">
-          {/* Thông tin thêm */}
-        </div>
+
         <div className="px-2 mt-2 text-xs font-medium text-gray-700">
           <span>Tình trạng: </span>
           <span className="text-gray-900">{product.product_condition.nameCondition}</span>

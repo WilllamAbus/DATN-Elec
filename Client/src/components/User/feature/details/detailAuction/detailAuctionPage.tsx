@@ -220,10 +220,10 @@ const DetailPageAuction: React.FC = () => {
 
   useEffect(() => {
     socket.on('auctionCanceled', (data) => {
-      if (data.slug === slug) { 
-        setAuctionCanceled(true); 
-        setStatuscheckAuctionTime(null); 
-        dispatch(getProductDetailAuctionThunk({ slug })); 
+      if (data.slug === slug) {
+        setAuctionCanceled(true);
+        setStatuscheckAuctionTime(null);
+        dispatch(getProductDetailAuctionThunk({ slug }));
         dispatch(getAuctionProgressThunk({ slug, page: currentPage }));
       }
     });
@@ -336,8 +336,8 @@ const DetailPageAuction: React.FC = () => {
   const showAuctionWinModal = () => { return <AuctionWin0 />; };
   const showAuctionWaitModal = () => { return <AuctionWait1 />; };
   const showAuctionBetterLuckNextTimeModal = () => { return <AuctionBetterLuckNextTime2 />; };
-  const showTheAuctionContinuesModal = () => {return <TheAuctionContinues onClose={() => setAuctionCanceled(false)} />;};
-  const showPaidAuctionIsOverModal = () => {return <PaidAuctionIsOver onClose={() => setShowPaidAuctionModal(false)} />;};
+  const showTheAuctionContinuesModal = () => { return <TheAuctionContinues onClose={() => setAuctionCanceled(false)} />; };
+  const showPaidAuctionIsOverModal = () => { return <PaidAuctionIsOver onClose={() => setShowPaidAuctionModal(false)} />; };
 
 
   useEffect(() => {
@@ -472,7 +472,7 @@ const DetailPageAuction: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-[1fr_1fr] px-4 pt-4 xl:grid-cols-[1fr_1fr] xl:gap-4 dark:bg-gray-900">
-      <RelatedProduct/> 
+        <RelatedProduct />
       </div>
       {auctionStatus === 0 && <AuctionWin />}
       {auctionStatus === 1 && <AuctionPending />}
