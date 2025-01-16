@@ -4,7 +4,7 @@ import { Order } from "../.../../types/order/order";
 const handleExportExcel = (order: Order) => {
   // Chuẩn bị dữ liệu thông tin khách hàng
   const customerInfo = [
-    ["Hóa Đơn Bán Hàng"],
+    ["HÓA ĐƠN BÁN HÀNG"],
     ["Mã đơn hàng:", order._id],
     ["Khách hàng:", order.shipping.recipientName || "Không có tên khách hàng"],
     ["Số điện thoại:", order.shipping.phoneNumber || "Chưa có số điện thoại"],
@@ -18,7 +18,7 @@ const handleExportExcel = (order: Order) => {
       index + 1,
       item.itemAuction[0]?.product_randBib?.product_name || "Không có tên sản phẩm",
       item.itemAuction[0]?.quantity || 0,
-      item.itemAuction[0]?.price.toLocaleString("vi-VN") || 0,
+      (item.itemAuction[0]?.price || 0).toLocaleString("vi-VN") + " VNĐ",
       (
         (item.itemAuction[0]?.quantity || 0) * (item.itemAuction[0]?.price || 0)
       ).toLocaleString("vi-VN") + " VNĐ",
@@ -36,6 +36,21 @@ const handleExportExcel = (order: Order) => {
 
   // Tạo workbook và worksheet
   const worksheet = XLSX.utils.aoa_to_sheet(finalData);
+  
+  // Định dạng cột
+  const columnWidths = [
+    { wch: 5 },  // STT
+    { wch: 30 }, // Tên sản phẩm
+    { wch: 10 }, // Số lượng
+    { wch: 15 }, // Giá
+    { wch: 15 }, // Thành tiền
+  ];
+  worksheet['!cols'] = columnWidths;
+
+  // Tô màu header
+  const headerRange = XLSX.utils.encode_range({ s: { r: 6, c: 0 }, e: { r: 6, c: 4 } });
+  worksheet[headerRange].s = { fill: { fgColor: { rgb: "FFFF00" } }, font: { bold: true } };
+
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Hóa Đơn");
 

@@ -20,7 +20,7 @@ const {
   sendOrderAuctionConfirmationEmail,
   sendEmail,
 } = require("../../../services/email.service");
-const PDFDocument = require("pdfkit");
+const puppeteer = require('puppeteer');
 const authController = {
   createOrder: async (req, res) => {
     try {
@@ -313,7 +313,7 @@ const authController = {
         shipping,
         payment: paymentInfo,
       } = req.body;
-  
+
       // Kiểm tra giỏ hàng
       const cart = await Cart.findById(cartId).populate([
         {
@@ -325,26 +325,26 @@ const authController = {
           select: "auctionStatus product_randBib",
         },
       ]);
-  
+
       if (!cart) {
         return res.status(404).json({ message: "Giỏ hàng không tìm thấy" });
       }
-  
+
       const selectedItems = cart.itemAuction;
-  
+
       if (!selectedItems || selectedItems.length === 0) {
         return res.status(400).json({ message: "Không có sản phẩm đấu giá trong giỏ hàng" });
       }
-  
+
       for (const item of selectedItems) {
         const auctionPricingRange = item.auctionPricingRange;
         const auctionWinner = item.auctionWinner;
-  
+
         if (auctionPricingRange) {
           auctionPricingRange.status = "paid";
           await auctionPricingRange.save();
         }
-  
+
         if (auctionWinner) {
           auctionWinner.auctionStatus = "paid";
           auctionWinner.paymentStatus = "paid";
@@ -352,36 +352,36 @@ const authController = {
           await auctionWinner.save();
         }
       }
-  
+
       if (!paymentInfo) {
         return res.status(400).json({ message: "Thông tin thanh toán không được cung cấp" });
       }
       if (!shipping) {
         return res.status(400).json({ message: "Thông tin giao hàng không được cung cấp" });
       }
-  
+
       let paymentId = null;
-  
+
       if (paymentInfo.payment_method === "vnPay") {
         const existingVnpay = await Vnpay.findOne({ transaction: paymentInfo.order_info });
-  
+
         if (!existingVnpay) {
           return res.status(400).json({ message: "Giao dịch VNPay không tồn tại" });
         }
-  
+
         const existingPayment = await Payment.findOne({ order_info: paymentInfo.order_info, payment_method: "vnPay" });
-  
+
         if (existingPayment) {
           return res.status(400).json({ message: "Giao dịch VNPay đã tồn tại" });
         }
-  
+
         const newPayment = new Payment({
           amount: paymentInfo?.amount || 0,
           order_info: paymentInfo?.order_info || "null",
           payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: "vnPay",
         });
-  
+
         await newPayment.save();
         paymentId = newPayment._id;
       } else if (paymentInfo.payment_method === "Thanh toán khi nhận hàng") {
@@ -391,27 +391,27 @@ const authController = {
           payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: "Thanh toán khi nhận hàng",
         });
-  
+
         await newPayment.save();
         paymentId = newPayment._id;
       } else {
         const existingPayment = await Payment.findOne({ order_info: paymentInfo.order_info, payment_method: paymentInfo.payment_method });
-  
+
         if (existingPayment) {
           return res.status(400).json({ message: "Giao dịch đã tồn tại" });
         }
-  
+
         const newPayment = new Payment({
           amount: paymentInfo?.amount || 0,
           order_info: paymentInfo?.order_info || "null",
           payment_date: paymentInfo?.payment_date || new Date(),
           payment_method: paymentInfo?.payment_method || "Chưa chọn phương thức",
         });
-  
+
         await newPayment.save();
         paymentId = newPayment._id;
       }
-  
+
       const newShipping = new Shipping({
         recipientName: shipping.recipientName || "Chưa có tên người nhận",
         phoneNumber: shipping.phoneNumber || "Chưa có số điện thoại",
@@ -419,11 +419,11 @@ const authController = {
         stateShipping: "Xác nhận",
       });
       await newShipping.save();
-  
+
       const totalamount = selectedItems.reduce((sum, item) => sum + item.totalItemPrice, 0);
       const shippingFee = shipping.shipping || 0;
       const totalPriceWithShipping = totalamount + shippingFee;
-  
+
       const newOrder = new Order({
         user: userId,
         payment: paymentId || null,
@@ -437,16 +437,16 @@ const authController = {
         stateOrder: "Chờ xử lý",
       });
       await newOrder.save();
-  
+
       const orderDetailItems = [];
       for (const item of selectedItems) {
         const auctionPricingRange = item.auctionPricingRange;
-  
+
         const inventory = await Inventory.findOne({ productAuction: item.productAuction });
         if (!inventory) {
           return res.status(404).json({ message: "Không tìm thấy kho hàng cho sản phẩm đấu giá" });
         }
-  
+
         if (inventory.quantityShelf < item.quantity) {
           return res.status(400).json({
             message: `Số lượng sản phẩm không đủ. Sản phẩm: ${item.productAuction}, số lượng còn lại: ${inventory.quantityShelf}`,
@@ -476,7 +476,7 @@ const authController = {
       await orderDetail.save();
       newOrder.cartDetails = [orderDetail._id];
       await newOrder.save();
-  
+
       const newInteraction = new Interaction({
         user: userId,
         OrderCart: newOrder._id,
@@ -489,11 +489,11 @@ const authController = {
         return !selectedItems.some((selectedItem) => selectedItem._id.toString() === item._id.toString());
       });
       await cart.save();
-  
+
       for (const item of selectedItems) {
         if (item.auctionPricingRange && item.auctionPricingRange.product_randBib) {
           const productRandBibId = item.auctionPricingRange.product_randBib;
-  
+
           await productAuction.findByIdAndUpdate(productRandBibId, { status: "disable" }, { new: true });
         }
       }
@@ -510,7 +510,7 @@ const authController = {
         console.error("Lỗi khi gửi email:", error);
         return res.status(500).json({ message: "Gửi email thất bại", error: error.message });
       }
-  
+
       const io = getIO();
       for (const item of selectedItems) {
         const auctionWinner = item.auctionWinner;
@@ -518,7 +518,7 @@ const authController = {
         const slug = auctionWinner.product_randBib.slug;
 
         console.log(`Slug: ${slug}`);
-  
+
         io.emit('auctionPaid', {
           auctionWinnerId: auctionWinner._id,
           userId: userId,
@@ -529,7 +529,7 @@ const authController = {
           slug: slug,
         });
       }
-  
+
       res.status(201).json({
         message: "Đơn hàng đã được tạo thành công",
         order: newOrder,
@@ -542,7 +542,7 @@ const authController = {
       });
     }
   },
-  
+
 
   getOrders: async (req, res) => {
     const userId = req.user.id;
@@ -789,6 +789,138 @@ const authController = {
           accountName: defaultBank.fullName,
         };
       }
+      const orderCart = await Order.findById(orderId).populate({
+        path: "cartDetails",
+        populate: [
+          {
+            path: "items.product",
+            model: "product_v2",
+          },
+          {
+            path: "items.productVariant",
+            model: "productVariant",
+            populate: [
+              { path: "image", model: "ImageVariant" },
+              { path: "battery", model: "Battery" },
+              { path: "color", model: "Color" },
+              { path: "cpu", model: "Cpu" },
+              { path: "operatingSystem", model: "OperatingSystem" },
+              { path: "ram", model: "Ram" },
+              { path: "screen", model: "Screen" },
+              { path: "storage", model: "Storage" },
+            ],
+          },
+          {
+            path: "items.inventory",
+            model: "Inventory",
+          },
+          {
+            path: "itemAuction.product_randBib",
+            model: "productAuction",
+          },
+          {
+            path: "itemAuction.inventory",
+            model: "Inventory",
+          },
+        ],
+      }).populate("user");
+      const userEmail = orderCart.user.email;
+      let productDetails = "";
+      const hasAuctionItems = order.cartDetails.some(
+        (detail) => detail.itemAuction && detail.itemAuction.length > 0
+      );
+      // Kiểm tra nếu không có sản phẩm trong cart hoặc trong itemAuction
+      if (!hasAuctionItems) {
+        productDetails = `
+        <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Thông tin sản phẩm</h2>
+            <div>
+    `;
+        // Logic xử lý cartDetails.items nếu có
+        for (const detail of orderCart.cartDetails) {
+          if (detail.items) {
+            for (const item of detail.items) {
+              productDetails += `
+                    <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                        <div style="display: flex; align-items: center;">
+                            <img src="${item?.productVariant?.image?.[0]?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                 alt="${item?.productVariant?.variant_name || 'No Image'}" 
+                                 style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                                    ${item?.productVariant?.variant_name || 'N/A'}
+                                </h4>
+                                <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item?.quantity || 0}</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 18px; font-weight: bold; color: red; margin: 0; padding-left: 10px;">
+                            ${(item?.totalItemPrice || 0).toLocaleString()} VND
+                        </p>
+                    </div>
+                `;
+            }
+          }
+        }
+        productDetails += `</div></div>`;
+      } else if (hasAuctionItems) {
+        productDetails = `
+        <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Thông tin sản phẩm</h2>
+            <div>
+    `;
+        // Nếu item là 0, kiểm tra và chạy itemAuction
+        if (orderCart.cartDetails && orderCart.cartDetails.length > 0) {
+          for (const detail of orderCart.cartDetails) {
+            if (detail.itemAuction && detail.itemAuction.length > 0) {
+              for (const item of detail.itemAuction) {
+                productDetails += `
+                        <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                            <div style="display: flex; align-items: center;">
+                                <img src="${item?.product_randBib?.image?.[0]?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                     alt="${item?.product_randBib?.product_name || 'No Image'}" 
+                                     style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                                <div>
+                                    <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                                        ${item?.product_randBib?.product_name || 'N/A'}
+                                    </h4>
+                                    <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item?.quantity || 0}</p>
+                                </div>
+                            </div>
+                            <p style="font-size: 18px; font-weight: bold; color: red; margin: 0; padding-left: 10px;">
+                                ${(item?.totalItemPrice || 0).toLocaleString()} VND
+                            </p>
+                        </div>
+                    `;
+              }
+            }
+          }
+        }
+        productDetails += `</div></div>`;
+      } else {
+        productDetails = `<p style="font-size: 16px; color: #7f8c8d; margin-top: 20px;">Không có sản phẩm nào trong đơn hàng.</p>`;
+      }
+
+      // Gửi email
+      const mailOptions = {
+        from: "E-Com <noreply@gmail.com>",
+        to: userEmail,
+        subject: "Cập nhật trạng thái đơn hàng của bạn",
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+              <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${orderCart.user.name}!</h1>
+              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                  Chúng tôi rất tiếc phải thông báo rằng đơn hàng của bạn đã bị hủy. 
+              </p>
+              ${productDetails}
+              <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                  Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+              </p>
+              <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+          </div>
+          `,
+      }
+
+      await sendEmail(mailOptions);
 
       await order.save();
 
@@ -1052,125 +1184,157 @@ const authController = {
       order.stateOrder = stateOrder;
       await order.save();
 
-      if (stateOrder !== "Hoàn tất") {
+      if (stateOrder !== "Hoàn tất" && stateOrder !== "Giao hàng không thành công") {
         const userEmail = order.user.email;
         let productDetails = "";
-
-        if (order.cartDetails.items.length === 0 && order.itemAuction) {
+        const hasAuctionItems = order.cartDetails.some(
+          (detail) => detail.itemAuction && detail.itemAuction.length > 0
+        );
+        // Kiểm tra nếu không có sản phẩm trong cart hoặc trong itemAuction
+        if (!hasAuctionItems) {
           productDetails = `
           <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
-            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Sản Phẩm</h2>
-            <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-              <div style="display: flex; align-items: center;">
-                <img src="${order.itemAuction.product_randBib.image?.[0] || 'https://via.placeholder.com/64'}" 
-                    alt="${order.itemAuction.product_randBib.product_name || 'No Image'}" 
-                    style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
-                <div>
-                  <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
-                    ${order.itemAuction.product_randBib.product_name || 'N/A'}
-                  </h4>
-                  <p style="color: #7f8c8d; margin: 0;">Số lượng: 1</p>
-                </div>
-              </div>
-              <p style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
-                ${order.itemAuction.product_randBib.totalItemPrice?.toLocaleString() || '0'} VND
-              </p>
-            </div>
-          </div>
-          `;
-        } else if (order.cartDetails.items.length > 0) {
-          productDetails = `
-          <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
-            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Sản Phẩm</h2>
-            ${order.cartDetails.items
-                    .map(
-                      (item) => `
-                  <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-                    <div style="display: flex; align-items: center;">
-                      <img src="${item.product.image?.[0] || 'https://via.placeholder.com/64'}" 
-                          alt="${item.product.name || 'No Image'}" 
-                          style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
-                      <div>
-                        <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
-                          ${item.product.name || 'N/A'}
-                        </h4>
-                        <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item.quantity || 0}</p>
+              <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Thông tin sản phẩm</h2>
+              <div>
+      `;
+          // Logic xử lý cartDetails.items nếu có
+          for (const detail of order.cartDetails) {
+            if (detail.items) {
+              for (const item of detail.items) {
+                productDetails += `
+                      <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                          <div style="display: flex; align-items: center;">
+                              <img src="${item?.productVariant?.image?.[0]?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                   alt="${item?.productVariant?.variant_name || 'No Image'}" 
+                                   style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                              <div>
+                                  <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                                      ${item?.productVariant?.variant_name || 'N/A'}
+                                  </h4>
+                                  <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item?.quantity || 0}</p>
+                              </div>
+                          </div>
+                          <p style="font-size: 18px; font-weight: bold; color: red; margin: 0; padding-left: 10px;">
+                              ${(item?.totalItemPrice || 0).toLocaleString()} VND
+                          </p>
                       </div>
-                    </div>
-                    <p style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
-                      ${(item.totalItemPrice || 0).toLocaleString()} VND
-                    </p>
-                  </div>
-                `
-                    )
-                    .join("")}
-          </div>
-        `;
-        } else {
+                  `;
+              }
+            }
+          }
+          productDetails += `</div></div>`;
+        } else if (hasAuctionItems) {
           productDetails = `
-          <p style="font-size: 16px; color: #7f8c8d; margin-top: 20px;">
-            Không có sản phẩm nào trong đơn hàng.
-          </p>
-        `;
+          <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+              <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Thông tin sản phẩm</h2>
+              <div>
+      `;
+          // Nếu item là 0, kiểm tra và chạy itemAuction
+          if (order.cartDetails && order.cartDetails.length > 0) {
+            for (const detail of order.cartDetails) {
+              if (detail.itemAuction && detail.itemAuction.length > 0) {
+                for (const item of detail.itemAuction) {
+                  productDetails += `
+                          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                              <div style="display: flex; align-items: center;">
+                                  <img src="${item?.product_randBib?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                       alt="${item?.product_randBib?.product_name || 'No Image'}"
+                                       style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                                  <div>
+                                      <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                                          ${item?.product_randBib?.product_name || 'N/A'}
+                                      </h4>
+                                      <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item?.quantity || 0}</p>
+                                  </div>
+                              </div>
+                              <p style="font-size: 18px; font-weight: bold; color: red; margin: 0; padding-left: 10px;">
+                                  ${(item?.totalItemPrice || 0).toLocaleString()} VND
+                              </p>
+                          </div>
+                      `;
+                }
+              }
+            }
+          }
+          productDetails += `</div></div>`;
+        } else {
+          productDetails = `<p style="font-size: 16px; color: #7f8c8d; margin-top: 20px;">Không có sản phẩm nào trong đơn hàng.</p>`;
         }
 
+        // Gửi email
         const mailOptions = {
           from: "E-Com <noreply@gmail.com>",
-          to: order.user.email,
+          to: userEmail,
           subject: "Cập nhật trạng thái đơn hàng của bạn",
           html: `
-          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-            <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-              Chúng tôi rất vui được thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
-            </p>
-            <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
-              Trạng thái đơn hàng: ${order.stateOrder}
-            </p>
-            ${productDetails}
-            <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
-              Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
-            </p>
-            <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
-          </div>
-        `,
+                <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                    <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
+                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                        Chúng tôi rất vui được thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+                    </p>
+                    <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
+                        Trạng thái đơn hàng: ${order.stateOrder}
+                    </p>
+                    ${productDetails}
+                    <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                        Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+                    </p>
+                    <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+                </div>
+            `,
         };
 
-
         await sendEmail(mailOptions);
-      } else {
-        // Tạo PDF và gửi email khi đơn hàng hoàn tất
-        const userEmail = order.user.email;
-        const doc = new PDFDocument();
-        let buffers = [];
+      }
 
-        doc.on("data", buffers.push.bind(buffers));
-        doc.on("end", async () => {
-          const pdfBuffer = Buffer.concat(buffers);
+
+      else if (stateOrder === "Hoàn tất") {
+        const userEmail = order.user.email;
+
+        const htmlContent = `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto;">
+            <h1>Xin chào, ${order.user.name}!</h1>
+            <p>Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.</p>
+            <p>Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.</p>
+
+            <h2>Hóa đơn đơn hàng</h2>
+            <p><strong>Tên khách hàng:</strong> ${order.user.name}</p>
+            <p><strong>Email:</strong> ${order.user.email}</p>
+            <p><strong>Tổng tiền:</strong> ${order?.cartDetails?.totalItemPrice} VND</p>
+
+            <h3>Danh sách sản phẩm:</h3>
+            <ul>
+              ${order.cartDetails.map((detail, index) => {
+                const items = detail.itemAuction?.length > 0 ? detail.itemAuction : detail.items;
+                return items.map((item) => `
+                  <li>
+                    ${index + 1}. ${item?.product_randBib?.product_name || "Sản phẩm không xác định"} 
+                    - Số lượng: ${item?.quantity} 
+                    - Giá: ${item?.totalItemPrice} VND
+                  </li>
+                `).join('');
+              }).join('')}
+            </ul>
+          </div>
+        `;
+
+        (async () => {
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
+          await page.setContent(htmlContent);
+          const pdfBuffer = await page.pdf();
+
+          await browser.close();
 
           const mailOptions = {
             from: "E-Com <noreply@gmail.com>",
             to: userEmail,
             subject: "Hóa đơn đơn hàng của bạn",
-            html: `
-            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-              <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                <h1 style="color: #2c3e50;">Xin chào, ${order.user.name}!</h1>
-              </div>
-              <div style="padding: 20px;">
-                <p style="font-size: 16px; line-height: 1.6;">
-                  Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.
-                </p>
-                <p style="font-size: 16px; line-height: 1.6; color: #1abc9c; font-weight: bold; text-align: center;">
-                  Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.
-                </p>
-                <p style="font-size: 16px; line-height: 1.6;">
-                  Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua email này. Chúng tôi luôn sẵn sàng hỗ trợ bạn!
-                </p>
-              </div>
-              <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 E-Com. All Rights Reserved.</p>
-              </div>
+            html:`
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto;">
+            <h1>Xin chào, ${order.user.name}!</h1>
+            <p>Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.</p>
+            <p>Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.</p>
             </div>
             `,
             attachments: [
@@ -1182,29 +1346,34 @@ const authController = {
           };
 
           await sendEmail(mailOptions);
-        });
+        })();
+      }
 
-        // Nội dung PDF
-        doc.fontSize(18).text(`Hóa đơn đơn hàng`, { align: "center" });
-        doc.text(`Tên khách hàng: ${order.user.name}`);
-        doc.text(`Email: ${order.user.email}`);
-        doc.text(`Tổng tiền: ${order.cartDetails.totalItemPrice} VND`);
-
-        // Danh sách sản phẩm
-        doc.moveDown();
-        doc.text("Danh sách sản phẩm:", { underline: true });
-        if (order.cartDetails && Array.isArray(order.cartDetails)) {
-          order.cartDetails.forEach((detail, index) => {
-            if (detail.items && Array.isArray(detail.items)) {
-              detail.items.forEach((item) => {
-                doc.text(`${index + 1}. ${item.product.name || "Sản phẩm không xác định"} - Số lượng: ${item.quantity} - Giá: ${item.price} VND`);
-              });
-            }
-          });
+      else {
+        const userId = order.user.id;
+        const user = await User.findById(userId);
+        console.log(user);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
         }
 
-        // Kết thúc quá trình tạo PDF
-        doc.end();
+        const hasAuctionItems = order.cartDetails.some(
+          (detail) => detail.itemAuction && detail.itemAuction.length > 0
+        );
+
+        // Chỉ tăng cảnh báo nếu có sản phẩm đấu giá
+        if (hasAuctionItems) {
+          user.warning += 1;
+
+          // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
+          if (user.warning > 3) {
+            user.status = "disable";
+            user.noteWarning =
+              "Đã hủy đơn hàng đấu giá quá số lần quy định, vui lòng liên hệ CSKH để được hỗ trợ.";
+          }
+
+          await user.save();
+        }
       }
 
 
