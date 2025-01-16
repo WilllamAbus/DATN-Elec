@@ -1546,7 +1546,7 @@ const authController = {
               productList += `
                 <tr>
                   <td style="padding: 8px;">${index}</td>
-                  <td style="padding: 8px;">${item?.product_randBib?.product_name || "Sản phẩm không xác định"}</td>
+                  <td style="padding: 8px;">${item?.productVariant?.variant_name || "Sản phẩm không xác định"}</td>
                   <td style="padding: 8px;">${item?.quantity}</td>
                   <td style="padding: 8px;">${item?.totalItemPrice.toLocaleString("vi-VN")} VND</td>
                 </tr>
@@ -1561,7 +1561,7 @@ const authController = {
         // Nội dung HTML cho PDF
         const htmlContent = `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 20px auto;">
-            <h2 style="text-align: center;">HÓA ĐƠN ĐƠN HÀNG</h2>
+            <h2 style="text-align: center;">HÓA ĐƠN</h2>
             <p><strong>Tên khách hàng:</strong> ${order.user.name}</p>
             <p><strong>Số điện thoại:</strong> ${order.shipping.phoneNumber}</p>
             <p><strong>Địa chỉ:</strong> ${order.shipping.address}</p>
@@ -1582,7 +1582,7 @@ const authController = {
           const mailOptions = {
             from: "E-Com <noreply@gmail.com>",
             to: userEmail,
-            subject: "Hóa đơn đơn hàng của bạn",
+            subject: "Hóa đơn",
             html: `
               <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
                 <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
