@@ -40,26 +40,10 @@ const getUserCart = async (req, res) => {
       .populate('itemAuction.auctionPricingRange', 'startTime endTime startingPrice maxPrice currentPrice priceStep status product_randBib isPriceStepAdjusted')
       .populate('itemAuction.auctionRound', 'auctionPricing participants bids status');
 
-    if (!userCart) {
-      return res.status(200).json({
-        message: "Giỏ hàng không tồn tại.",
-        success: false,
-        code: 404,
-        statusCart: 0,
-        statusWarningTimeout: user.statusWarningTimeout,
-        timeLimit: user.timeLimit,
-        isBanned: user.isBanned,
-        statusAuction: user.statusAuction,
-        message: user.message,
-        warning: user.warning,
-        noteWarning: user.noteWarning
-      });
-    }
-
     let statusCart = 0;
-    if (userCart.itemAuction && userCart.itemAuction.length > 0) {
+    if (userCart && userCart.itemAuction && userCart.itemAuction.length > 0) {
       statusCart = 1;
-    } else if (userCart.items && userCart.items.length > 0) {
+    } else if (userCart && userCart.items && userCart.items.length > 0) {
       statusCart = 2;
     }
 

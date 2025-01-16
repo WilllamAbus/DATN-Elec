@@ -95,7 +95,9 @@ const checkAuctionTime = async (req, res) => {
     if (auctionPricingRange.status === 'ended' && !auctionPricingRange.hasWinner) {
       const existingAuctionWinners = await AuctionWinner.find({ auctionPricingRange: auctionPricingRange._id });
       if (existingAuctionWinners.length === 0) {
-        const topBids = await AuctionPriceHistory.find({ auctionPricingRange: productAuction.auctionPricing })
+        const topBids = await AuctionPriceHistory.find({ auctionPricingRange: productAuction.auctionPricing,
+          status: { $ne: 'disabled' }
+         })
           .sort({ bidPrice: -1 })
           .limit(2);
 
@@ -127,10 +129,12 @@ const checkAuctionTime = async (req, res) => {
             bidPrice: bid.bidPrice,
             bidTime: bid.bidTime,
             auctionRound: auctionRound._id,
+            product_randBib: auctionPricingRange.product_randBib,
+            notWinner: true,
             auctionStatus: i === 0 ? 'won' : 'pending',
             hasWinner: true,
             startTime: new Date(),
-            endTime: new Date(new Date().getTime() + (i === 0 ? 3 : 5) * 24 * 60 * 60 * 1000),
+            endTime: new Date(new Date().getTime() + (i === 0 ? 1 : 2) * 24 * 60 * 60 * 1000),
           });
           await auctionWinner.save();
         }
@@ -141,6 +145,7 @@ const checkAuctionTime = async (req, res) => {
 
       const auctionWinnersUpdated = await AuctionWinner.find({
         auctionPricingRange: productAuction.auctionPricing,
+        status: { $ne: 'disabled' }
       })
         .populate("user", "name email")
         .sort({ bidPrice: -1 });

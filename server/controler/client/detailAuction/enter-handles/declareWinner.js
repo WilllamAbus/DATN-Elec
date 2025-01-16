@@ -6,38 +6,47 @@ module.exports = async (auctionPricingRange, auctionRound) => {
   const winner = await AuctionPriceHistory.findOne({
     auctionPricingRange: auctionPricingRange._id,
     bidPrice: auctionPricingRange.maxPrice,
+    status: { $ne: 'disabled' } 
   }).sort({ bidPrice: -1 });
 
   const currentTime = new Date();
-  const temporaryEndTime = new Date(currentTime.getTime() +  30 * 60 * 1000); 
+  const temporaryEndTime = new Date(currentTime.getTime() + 30 * 60 * 1000); 
 
   if (winner) {
-    const remainingTime = calculateRemainingTime(temporaryEndTime);
-
-    const auctionWinner = new AuctionWinner({
+    const existingAuctionWinner = await AuctionWinner.findOne({
       user: winner.user,
       auctionPricingRange: auctionPricingRange._id,
-      bidPrice: winner.bidPrice,
-      bidTime: winner.bidTime,
-      auctionRound: auctionRound._id,
-      auctionStatus: 'temporary',
-      startTime: convertToLocalTime(currentTime),
-      endTime: convertToLocalTime(temporaryEndTime),
-      remainingTime: remainingTime, 
-      product_randBib: auctionPricingRange.product_randBib,
-      notWinner: true,
+      status: 'disabled'  
     });
-    await auctionWinner.save();
 
-    // Đồng bộ thời gian từ AuctionWinner qua AuctionPricingRange
-    auctionPricingRange.startTime = auctionWinner.startTime;
-    auctionPricingRange.endTime = auctionWinner.endTime;
-    auctionPricingRange.status = 'temporary';
-    await auctionPricingRange.save();
+    if (!existingAuctionWinner) {
+      const remainingTime = calculateRemainingTime(temporaryEndTime);
+
+      const auctionWinner = new AuctionWinner({
+        user: winner.user,
+        auctionPricingRange: auctionPricingRange._id,
+        bidPrice: winner.bidPrice,
+        bidTime: winner.bidTime,
+        auctionRound: auctionRound._id,
+        auctionStatus: 'temporary',
+        startTime: convertToLocalTime(currentTime),
+        endTime: convertToLocalTime(temporaryEndTime),
+        remainingTime: remainingTime, 
+        product_randBib: auctionPricingRange.product_randBib,
+        notWinner: true,
+      });
+      await auctionWinner.save();
+
+
+      auctionPricingRange.startTime = auctionWinner.startTime;
+      auctionPricingRange.endTime = auctionWinner.endTime;
+      auctionPricingRange.status = 'temporary';
+      await auctionPricingRange.save();
+    }
   }
 };
 
-// Hàm tính toán remainingTime
+
 function calculateRemainingTime(endTime) {
   const currentTime = new Date().getTime();
   const remainingTime = endTime.getTime() - currentTime;
