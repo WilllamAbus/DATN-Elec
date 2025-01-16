@@ -8,15 +8,26 @@ interface ModalComponentProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  onConfirmTemporary: () => void; // Thêm prop onConfirmTemporary
   onCancel: () => void;
   onCancelTemporary: () => void;
 }
 
-const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClose, onConfirm, onCancel, onCancelTemporary }) => {
+const ModalComponent: React.FC<ModalComponentProps> = ({ 
+  auction, 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  onConfirmTemporary, 
+  onCancel, 
+  onCancelTemporary 
+}) => {
   if (!auction) return null;
+
   const productName = auction.auctionPricingRange && auction.auctionPricingRange.product_randBib
     ? auction.auctionPricingRange.product_randBib.product_name
     : "Tên sản phẩm";
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description" placement="center" size="xl">
       <ModalContent>
@@ -30,9 +41,14 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ auction, isOpen, onClos
           <p><strong>Trạng thái đấu giá:</strong> {auction.auctionStatus === "won" ? "Chiến thắng đấu giá" : "Đang trong danh sách hàng chờ"}</p>
         </ModalBody>
         <ModalFooter>
-          {(auction.auctionStatus === "won" || auction.auctionStatus === "temporary") && (
+          {auction.auctionStatus === "won" && (
             <MyButton variant="confirmSolid" color="primary" size="sm" onPress={onConfirm}>
               Xác nhận
+            </MyButton>
+          )}
+          {auction.auctionStatus === "temporary" && (
+            <MyButton variant="confirmSolidTemporary" color="secondary" size="sm" onPress={onConfirmTemporary}>
+              Xác nhận tạm thời
             </MyButton>
           )}
           {auction.auctionStatus === "temporary" ? (
