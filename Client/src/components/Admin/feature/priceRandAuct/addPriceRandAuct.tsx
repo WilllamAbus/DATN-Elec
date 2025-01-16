@@ -155,20 +155,20 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
       const converNumber = (Number(data.startingPrice))
       const stepNumber = (Number(data.priceStep))
       const converNumberMax = (Number(data.maxPrice))
-      if (stepNumber > converNumber) {
+      if (stepNumber >= converNumber) {
         toast.error(
           `Bước giá (${formatCurrency(stepNumber)}) phải nhỏ hơn giá khởi điểm (${formatCurrency(converNumber)})`
         );
         return;
       }
-      if (stepNumber > converNumberMax) {
+      if (stepNumber >= converNumberMax) {
         toast.error(
           `Bước giá (${formatCurrency(stepNumber)}) phải nhỏ hơn giá tối đa (${formatCurrency(converNumberMax)})`
         );
         return;
       }
   // Check if endTime is provided
-  if (inboundPrice !== null && data.startingPrice !== undefined && converNumber < inboundPrice) {
+  if (inboundPrice !== null && data.startingPrice !== undefined && converNumber <= inboundPrice) {
     toast.error(
       `Giá khởi điểm (${formatCurrency(converNumber)}) phải lớn hơn giá ban đầu (${formatCurrency(inboundPrice)})`
     );
