@@ -51,8 +51,8 @@ const getBiddingListAndWinner = async (req, res) => {
 
 
 const getUserBiddingHistory = async (req, res) => {
-  const { page = 1, limit = 5 } = req.query; // Lấy page và limit từ query
-  const userId = req.user ? req.user.id : null; // Lấy userId từ req.user
+  const { page = 1, limit = 5 } = req.query;
+  const userId = req.user ? req.user.id : null;
 
   if (!userId) {
     return res.status(401).json({
@@ -64,7 +64,7 @@ const getUserBiddingHistory = async (req, res) => {
   }
 
   try {
-    // Gọi service lấy danh sách sản phẩm đã tham gia đấu giá
+    // Gọi service để lấy danh sách sản phẩm đã tham gia đấu giá
     const response = await BiddingService.getUserParticipatedProductsService(userId);
 
     if (!response.success) {
@@ -76,7 +76,7 @@ const getUserBiddingHistory = async (req, res) => {
       });
     }
 
-    // Phân trang từ dữ liệu trả về
+    // Phân trang dữ liệu
     const totalItems = response.response.length;
     const totalPages = Math.ceil(totalItems / limit);
     const startIndex = (page - 1) * limit;
@@ -100,8 +100,7 @@ const getUserBiddingHistory = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error:", error);
-
+    console.error("Error in getUserBiddingHistory:", error);
     return res.status(500).json({
       success: false,
       err: -1,
@@ -110,6 +109,7 @@ const getUserBiddingHistory = async (req, res) => {
     });
   }
 };
+
 
 
 const getUserBiddingDetails = async (req, res) => {

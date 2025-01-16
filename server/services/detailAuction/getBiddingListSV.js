@@ -86,7 +86,7 @@ const BiddingService = {
   getUserParticipatedProductsService: (userId) =>
     new Promise(async (resolve, reject) => {
       try {
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId.toString())) {
           return reject({
             success: false,
             err: 1,
@@ -96,7 +96,7 @@ const BiddingService = {
         }
 
         const auctionRounds = await AuctionRound.find({
-          "bids.user": mongoose.Types.ObjectId(userId),
+          "bids.user": new mongoose.Types.ObjectId(userId.toString()), 
         }).populate({
           path: "auctionPricing",
           populate: {
