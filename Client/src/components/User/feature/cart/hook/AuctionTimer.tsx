@@ -1,76 +1,60 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-interface AuctionData {
-  auctionStartTime?: string;
-  auctionEndTime?: string;
+interface AuctionTimerProps {
+  auctionStartTime: string;
+  auctionEndTime: string;
 }
 
-interface CartAuction {
-  itemAuction: AuctionData[];
-}
-
-const useAuctionTimer = (cartauction: CartAuction[]) => {
-  const [timeLeft, setTimeLeft] = useState<string>("Không có dữ liệu đấu giá.");
-  const [status, setStatus] = useState<string>("Không có thông tin đấu giá.");
-
-  // Hàm helper để tính thời gian còn lại
-  const calculateTimeLeft = (startTime: number, endTime: number) => {
-    const now = Date.now();
-    const difference = endTime - now;
-
-    if (difference <= 0) {
-      return { timeLeft: "Hết thời gian!", status: "Đấu giá đã kết thúc." };
-    }
-
-    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((difference / (1000 * 60)) % 60);
-    const seconds = Math.floor((difference / 1000) % 60);
-
-    const formattedTime = `${hours.toString().padStart(2, "0")}h:${minutes
-      .toString()
-      .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`;
-
-    if (now < startTime) {
-      return { timeLeft: formattedTime, status: "Đấu giá chưa bắt đầu." };
-    } else if (now >= startTime && now <= endTime) {
-      return { timeLeft: formattedTime, status: "Vui lòng thanh toán." };
-    }
-
-    return { timeLeft: formattedTime, status: "" };
-  };
+const AuctionTimer: React.FC<AuctionTimerProps> = ({
+  auctionStartTime,
+  auctionEndTime,
+}) => {
+  const [timeLeft, setTimeLeft] = useState<string>("Đang tải...");
+  const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
-    if (
-      cartauction.length === 0 ||
-      cartauction[0].itemAuction.length === 0 ||
-      !cartauction[0].itemAuction[0].auctionStartTime ||
-      !cartauction[0].itemAuction[0].auctionEndTime
-    ) {
-      setTimeLeft("Không có dữ liệu đấu giá.");
-      setStatus("Không có thông tin đấu giá.");
-      return;
-    }
+    const startTime = new Date(auctionStartTime).getTime();
+    const endTime = new Date(auctionEndTime).getTime();
 
-    const startTime = new Date(
-      cartauction[0].itemAuction[0].auctionStartTime!
-    ).getTime();
-    const endTime = new Date(
-      cartauction[0].itemAuction[0].auctionEndTime!
-    ).getTime();
+    const updateTimeLeft = () => {
+      const now = Date.now();
+      const difference = endTime - now;
 
-    const updateTimer = () => {
-      const { timeLeft, status } = calculateTimeLeft(startTime, endTime);
-      setTimeLeft(timeLeft);
-      setStatus(status);
+      if (difference <= 0) {
+        setTimeLeft("Hết thời gian!");
+        setStatus("Đấu giá đã kết thúc.");
+        return;
+      }
+
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      setTimeLeft(
+        `${hours.toString().padStart(2, "0")}h:${minutes
+          .toString()
+          .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
+      );
+
+      if (now < startTime) {
+        setStatus("Đấu giá chưa bắt đầu.");
+      } else if (now >= startTime && now <= endTime) {
+        setStatus("Vui lòng thanh toán.");
+      }
     };
 
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
+    updateTimeLeft();
+    const interval = setInterval(updateTimeLeft, 1000);
 
     return () => clearInterval(interval);
-  }, [cartauction]);
+  }, [auctionStartTime, auctionEndTime]);
 
-  return { timeLeft, status };
+  return (
+    <div>
+      <p>{timeLeft}</p>
+      <p>{status}</p>
+    </div>
+  );
 };
 
-export default useAuctionTimer;
+export default AuctionTimer;

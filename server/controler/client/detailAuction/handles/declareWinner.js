@@ -23,6 +23,9 @@ module.exports = async (auctionPricingRange, auctionRound) => {
       product_randBib: auctionPricingRange.product_randBib,
       notWinner: true,
     });
+    console.log('text',auctionWinner);
     await auctionWinner.save();
   }
+
+  
 };

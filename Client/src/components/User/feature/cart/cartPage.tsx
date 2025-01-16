@@ -15,7 +15,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Button, Checkbox } from "@nextui-org/react";
 import CartSummary from "./hook/CartSumma";
 import Cartauction from "./hook/Cartauction";
-import useAuctionTimer from "./hook/AuctionTimer";
 
 const CartPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -41,12 +40,12 @@ const CartPage: React.FC = () => {
   }>({});
   const [totalAuctionPrice, setTotalAuctionPrice] = useState(0);
   const [totalCartPrice, setTotalCartPrice] = useState(0);
-  // const [timeLeft, setTimeLeft] = useState<string>("Không có dữ liệu đấu giá.");
-  // const [status, setStatus] = useState<string>("Không có thông tin đấu giá.");
-  const { timeLeft, status } = useAuctionTimer(cartauction);
-  useEffect(() => {
-    dispatch(fetchCartList());
-  }, [dispatch]);
+  const [timeLeft, setTimeLeft] = useState<string>("Không có dữ liệu đấu giá.");
+  const [status, setStatus] = useState<string>("Không có thông tin đấu giá.");
+
+  // useEffect(() => {
+  //   dispatch(fetchCartList());
+  // }, [dispatch]);
   if (!userProfile) {
     navigate("/login");
     return null;
@@ -280,60 +279,59 @@ const CartPage: React.FC = () => {
       }
     });
   });
-  // useEffect(() => {
-  //   // Kiểm tra nếu không có dữ liệu hợp lệ
-  //   if (
-  //     cartauction.length === 0 ||
-  //     cartauction[0].itemAuction.length === 0 ||
-  //     !cartauction[0].itemAuction[0].auctionStartTime ||
-  //     !cartauction[0].itemAuction[0].auctionEndTime
-  //   ) {
-  //     setTimeLeft("Không có dữ liệu đấu giá.");
-  //     setStatus("Không có thông tin đấu giá.");
-  //     return;
-  //   }
+  useEffect(() => {
+    // Kiểm tra nếu không có dữ liệu hợp lệ
+    if (
+      cartauction.length === 0 ||
+      cartauction[0].itemAuction.length === 0 ||
+      !cartauction[0].itemAuction[0].auctionStartTime ||
+      !cartauction[0].itemAuction[0].auctionEndTime
+    ) {
+      setTimeLeft("Không có dữ liệu đấu giá.");
+      setStatus("Không có thông tin đấu giá.");
+      return;
+    }
 
-  //   // Dữ liệu hợp lệ
-  //   const startTime = new Date(
-  //     cartauction[0].itemAuction[0].auctionStartTime!
-  //   ).getTime();
-  //   const endTime = new Date(
-  //     cartauction[0].itemAuction[0].auctionEndTime!
-  //   ).getTime();
+    // Dữ liệu hợp lệ
+    const startTime = new Date(
+      cartauction[0].itemAuction[0].auctionStartTime!
+    ).getTime();
+    const endTime = new Date(
+      cartauction[0].itemAuction[0].auctionEndTime!
+    ).getTime();
 
-  //   const updateTimeLeft = () => {
-  //     const now = Date.now();
-  //     const difference = endTime - now;
+    const updateTimeLeft = () => {
+      const now = Date.now();
+      const difference = endTime - now;
 
-  //     if (difference <= 0) {
-  //       setTimeLeft("Hết thời gian!");
-  //       setStatus("Đấu giá đã kết thúc.");
-  //       return;
-  //     }
+      if (difference <= 0) {
+        setTimeLeft("Hết thời gian!");
+        setStatus("Đấu giá đã kết thúc.");
+        return;
+      }
 
-  //     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-  //     const minutes = Math.floor((difference / (1000 * 60)) % 60);
-  //     const seconds = Math.floor((difference / 1000) % 60);
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
 
-  //     setTimeLeft(
-  //       `${hours.toString().padStart(2, "0")}h:${minutes
-  //         .toString()
-  //         .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
-  //     );
+      setTimeLeft(
+        `${hours.toString().padStart(2, "0")}h:${minutes
+          .toString()
+          .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
+      );
 
-  //     if (now < startTime) {
-  //       setStatus("Đấu giá chưa bắt đầu.");
-  //     } else if (now >= startTime && now <= endTime) {
-  //       setStatus("Vui lòng thanh toán.");
-  //     }
-  //   };
+      if (now < startTime) {
+        setStatus("Đấu giá chưa bắt đầu.");
+      } else if (now >= startTime && now <= endTime) {
+        setStatus("Vui lòng thanh toán.");
+      }
+    };
 
-  //   updateTimeLeft();
-  //   const interval = setInterval(updateTimeLeft, 1000);
+    updateTimeLeft();
+    const interval = setInterval(updateTimeLeft, 1000);
 
-  //   return () => clearInterval(interval);
-  // }, [cartauction]);
-
+    return () => clearInterval(interval);
+  }, [cartauction]);
   groupedMap.forEach((cart) => {
     groupedCarts.push(cart);
   });
