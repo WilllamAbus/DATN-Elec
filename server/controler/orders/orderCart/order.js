@@ -874,8 +874,16 @@ const authController = {
             path: "items.inventory",
             model: "Inventory",
           },
+          {
+            path: "itemAuction.product_randBib",
+            model: "productAuction",
+          },
+          {
+            path: "itemAuction.inventory",
+            model: "Inventory",
+          },
         ],
-      });
+      }).populate("user");
 
       if (!order) {
         return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
@@ -1045,39 +1053,93 @@ const authController = {
       await order.save();
 
       if (stateOrder !== "Hoàn tất") {
-        const order = await Order.findById(orderId).populate("user");
         const userEmail = order.user.email;
-        const mailOptions = {
-          from: "DuPiNDuPi <noreply@gmail.com>",
-          to: userEmail,
-          subject: "Cập nhật trạng thái đơn hàng của bạn",
-          html: `
-          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
-            <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-              <h1 style="color: #2c3e50;">Xin chào, ${order.user.name}!</h1>
-            </div>
-            <div style="padding: 20px;">
-              <p style="font-size: 16px; line-height: 1.6;">
-                Chúng tôi rất vui được thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+        let productDetails = "";
+
+        if (order.cartDetails.items.length === 0 && order.itemAuction) {
+          productDetails = `
+          <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Sản Phẩm</h2>
+            <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+              <div style="display: flex; align-items: center;">
+                <img src="${order.itemAuction.product_randBib.image?.[0] || 'https://via.placeholder.com/64'}" 
+                    alt="${order.itemAuction.product_randBib.product_name || 'No Image'}" 
+                    style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                <div>
+                  <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                    ${order.itemAuction.product_randBib.product_name || 'N/A'}
+                  </h4>
+                  <p style="color: #7f8c8d; margin: 0;">Số lượng: 1</p>
+                </div>
+              </div>
+              <p style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                ${order.itemAuction.product_randBib.totalItemPrice?.toLocaleString() || '0'} VND
               </p>
-              <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
-                Trạng thái đơn hàng: ${order.stateOrder}
-              </p>
-              <p style="font-size: 16px; line-height: 1.6;">
-                Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này. Cảm ơn bạn đã tin tưởng sử dụng dịch vụ của <strong>DuPiNDuPi</strong>.
-              </p>
-            </div>
-            <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-              <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 DuPiNDuPi. All Rights Reserved.</p>
             </div>
           </div>
-          `,
+          `;
+        } else if (order.cartDetails.items.length > 0) {
+          productDetails = `
+          <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Sản Phẩm</h2>
+            ${order.cartDetails.items
+                    .map(
+                      (item) => `
+                  <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <div style="display: flex; align-items: center;">
+                      <img src="${item.product.image?.[0] || 'https://via.placeholder.com/64'}" 
+                          alt="${item.product.name || 'No Image'}" 
+                          style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                      <div>
+                        <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                          ${item.product.name || 'N/A'}
+                        </h4>
+                        <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item.quantity || 0}</p>
+                      </div>
+                    </div>
+                    <p style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                      ${(item.totalItemPrice || 0).toLocaleString()} VND
+                    </p>
+                  </div>
+                `
+                    )
+                    .join("")}
+          </div>
+        `;
+        } else {
+          productDetails = `
+          <p style="font-size: 16px; color: #7f8c8d; margin-top: 20px;">
+            Không có sản phẩm nào trong đơn hàng.
+          </p>
+        `;
+        }
+
+        const mailOptions = {
+          from: "E-Com <noreply@gmail.com>",
+          to: order.user.email,
+          subject: "Cập nhật trạng thái đơn hàng của bạn",
+          html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+              Chúng tôi rất vui được thông báo rằng trạng thái đơn hàng của bạn đã được cập nhật.
+            </p>
+            <p style="background-color: #e8f4f8; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: #1abc9c;">
+              Trạng thái đơn hàng: ${order.stateOrder}
+            </p>
+            ${productDetails}
+            <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+              Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+            </p>
+            <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+          </div>
+        `,
         };
+
 
         await sendEmail(mailOptions);
       } else {
         // Tạo PDF và gửi email khi đơn hàng hoàn tất
-        const order = await Order.findById(orderId).populate('user');
         const userEmail = order.user.email;
         const doc = new PDFDocument();
         let buffers = [];
@@ -1087,7 +1149,7 @@ const authController = {
           const pdfBuffer = Buffer.concat(buffers);
 
           const mailOptions = {
-            from: "DuPiNDuPi <noreply@gmail.com>",
+            from: "E-Com <noreply@gmail.com>",
             to: userEmail,
             subject: "Hóa đơn đơn hàng của bạn",
             html: `
@@ -1100,14 +1162,14 @@ const authController = {
                   Chúng tôi xin gửi đến bạn hóa đơn cho đơn hàng của bạn. Vui lòng kiểm tra file đính kèm để xem chi tiết đơn hàng.
                 </p>
                 <p style="font-size: 16px; line-height: 1.6; color: #1abc9c; font-weight: bold; text-align: center;">
-                  Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>DuPiNDuPi</strong>.
+                  Cảm ơn bạn đã tin tưởng và ủng hộ dịch vụ của <strong>E-Com</strong>.
                 </p>
                 <p style="font-size: 16px; line-height: 1.6;">
                   Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua email này. Chúng tôi luôn sẵn sàng hỗ trợ bạn!
                 </p>
               </div>
               <div style="background-color: #f5f5f5; padding: 10px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 DuPiNDuPi. All Rights Reserved.</p>
+                <p style="font-size: 14px; color: #7f8c8d;">&copy; 2025 E-Com. All Rights Reserved.</p>
               </div>
             </div>
             `,
@@ -1126,18 +1188,20 @@ const authController = {
         doc.fontSize(18).text(`Hóa đơn đơn hàng`, { align: "center" });
         doc.text(`Tên khách hàng: ${order.user.name}`);
         doc.text(`Email: ${order.user.email}`);
-        doc.text(`Tổng tiền: ${order.OrderCart?.totalPriceWithShipping} VND`);
+        doc.text(`Tổng tiền: ${order.cartDetails.totalItemPrice} VND`);
 
         // Danh sách sản phẩm
         doc.moveDown();
         doc.text("Danh sách sản phẩm:", { underline: true });
-        order.cartDetails.forEach((detail, index) => {
-          detail.itemAuction.forEach((item) => {
-            doc.text(
-              `${index + 1}. ${item.product_randBib?.product_name || "Sản phẩm không xác định"} - Số lượng: ${item.quantity} - Giá: ${item.price} VND`
-            );
+        if (order.cartDetails && Array.isArray(order.cartDetails)) {
+          order.cartDetails.forEach((detail, index) => {
+            if (detail.items && Array.isArray(detail.items)) {
+              detail.items.forEach((item) => {
+                doc.text(`${index + 1}. ${item.product.name || "Sản phẩm không xác định"} - Số lượng: ${item.quantity} - Giá: ${item.price} VND`);
+              });
+            }
           });
-        });
+        }
 
         // Kết thúc quá trình tạo PDF
         doc.end();
