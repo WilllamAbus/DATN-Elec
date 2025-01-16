@@ -754,7 +754,7 @@ const CartController = {
           user.noteWarning = "Người dùng bị hạn chế đấu giá";
         } else {
           user.warning += 1;
-          user.lastWarningAt = new Date(); // Thời điểm cảnh báo gần nhất
+          user.timeLimit = new Date(); // Thời điểm cảnh báo gần nhất
         }
 
         await user.save();
