@@ -1181,7 +1181,7 @@ const authController = {
           },
         ],
       }).populate("user")
-      .populate("shipping");;
+        .populate("shipping");;
 
       if (!order) {
         return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
@@ -1244,7 +1244,7 @@ const authController = {
           const hasAuctionItems = order.cartDetails.some(
             (detail) => detail.itemAuction && detail.itemAuction.length > 0
           );
-          if(hasAuctionItems){
+          if (hasAuctionItems) {
             for (const detail of order.cartDetails) {
               for (const item of detail.itemAuction) {
                 const inventory = item.inventory;
@@ -1258,7 +1258,7 @@ const authController = {
                 await inventory.save();
               }
             }
-          }else{
+          } else {
             for (const detail of order.cartDetails) {
               for (const item of detail.items) {
                 const inventory = item.inventory;
@@ -1281,47 +1281,47 @@ const authController = {
         const hasAuctionItems = order.cartDetails.some(
           (detail) => detail.itemAuction && detail.itemAuction.length > 0
         );
-        if(hasAuctionItems){
+        if (hasAuctionItems) {
           for (const item of items) {
             const inventory = item.inventory;
-  
+
             if (!inventory) {
               return res.status(400).json({
                 message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product_randBib?.product_name || "không xác định"
                   }.`,
               });
             }
-  
+
             if (!isRestocking && inventory.quantityShelf < item.quantity) {
               return res.status(400).json({
                 message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product_randBib?.product_name || "không xác định"
                   }.`,
               });
             }
-  
+
             inventory.quantityShelf += isRestocking
               ? item.quantity
               : -item.quantity;
             await inventory.save();
           }
-        }else{
+        } else {
           for (const item of items) {
             const inventory = item.inventory;
-  
+
             if (!inventory) {
               return res.status(400).json({
                 message: `Thông tin tồn kho bị thiếu cho sản phẩm ${item.product?.name || "không xác định"
                   }.`,
               });
             }
-  
+
             if (!isRestocking && inventory.quantityShelf < item.quantity) {
               return res.status(400).json({
                 message: `Số lượng tồn kho không đủ cho sản phẩm ${item.product?.name || "không xác định"
                   }.`,
               });
             }
-  
+
             inventory.quantityShelf += isRestocking
               ? item.quantity
               : -item.quantity;
@@ -1329,7 +1329,7 @@ const authController = {
           }
         }
       };
-        
+
 
       // Trừ kho khi chuyển trạng thái sang "Đang vận chuyển"
       if (
@@ -1504,12 +1504,12 @@ const authController = {
 
       else if (stateOrder === "Hoàn tất") {
         const userEmail = order.user.email;
-      
+
         // Kiểm tra xem có sản phẩm đấu giá không
         const hasAuctionItems = order.cartDetails.some(
           (detail) => detail.itemAuction && detail.itemAuction.length > 0
         );
-      
+
         // Tạo bảng danh sách sản phẩm
         let productList = `
           <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
@@ -1523,9 +1523,9 @@ const authController = {
             </thead>
             <tbody>
         `;
-      
+
         let index = 1;
-      
+
         if (hasAuctionItems) {
           for (let detail of order.cartDetails) {
             for (let item of detail.itemAuction || []) {
@@ -1555,9 +1555,9 @@ const authController = {
             }
           }
         }
-      
+
         productList += `</tbody></table>`;
-      
+
         // Nội dung HTML cho PDF
         const htmlContent = `
           <div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 20px auto;">
@@ -1570,15 +1570,15 @@ const authController = {
             ${productList}
           </div>
         `;
-      
+
         (async () => {
           const browser = await puppeteer.launch();
           const page = await browser.newPage();
           await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
           const pdfBuffer = await page.pdf({ format: "A4" });
-      
+
           await browser.close();
-      
+
           const mailOptions = {
             from: "E-Com <noreply@gmail.com>",
             to: userEmail,
@@ -1605,11 +1605,11 @@ const authController = {
               },
             ],
           };
-      
+
           await sendEmail(mailOptions);
         })();
       }
-      
+
 
       else {
         const userId = order.user.id;
@@ -1625,13 +1625,88 @@ const authController = {
 
         // Chỉ tăng cảnh báo nếu có sản phẩm đấu giá
         if (hasAuctionItems) {
+          let productDetails = "";
+          const userEmail = order.user.email;
           user.warning += 1;
+          productDetails = `
+          <div style="margin: 20px 0; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 16px; transition: box-shadow 0.3s;">
+              <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #2c3e50;">Thông tin sản phẩm</h2>
+              <div>
+      `;
+          // Nếu item là 0, kiểm tra và chạy itemAuction
+          if (order.cartDetails && order.cartDetails.length > 0) {
+            for (const detail of order.cartDetails) {
+              if (detail.itemAuction && detail.itemAuction.length > 0) {
+                for (const item of detail.itemAuction) {
+                  productDetails += `
+                          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                              <div style="display: flex; align-items: center;">
+                                  <img src="${item?.product_randBib?.image?.[0] || 'https://via.placeholder.com/64'}" 
+                                       alt="${item?.product_randBib?.product_name || 'No Image'}"
+                                       style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+                                  <div>
+                                      <h4 style="font-size: 18px; font-weight: bold; color: #2c3e50; margin: 0;">
+                                          ${item?.product_randBib?.product_name || 'N/A'}
+                                      </h4>
+                                      <p style="color: #7f8c8d; margin: 0;">Số lượng: ${item?.quantity || 0}</p>
+                                  </div>
+                              </div>
+                              <p style="font-size: 18px; font-weight: bold; color: red; margin: 0; padding-left: 10px;">
+                                  ${(item?.totalItemPrice || 0).toLocaleString()} VND
+                              </p>
+                          </div>
+                      `;
+                }
+              }
+            }
+          }
+          productDetails += `</div></div>`;
 
+          const mailOptions = {
+            from: "E-Com <noreply@gmail.com>",
+            to: userEmail,
+            subject: "Cảnh báo",
+            html: `
+                  <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                      <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
+                      <p style="background-color: #F8D7DA; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: red;">
+                          Hệ thống phát hiện đơn hàng của bạn đã không được nhận. Nếu tiếp tục bom hàng, tài khoản của bạn sẽ bị cấm đấu giá.
+                      </p>
+                      ${productDetails}
+                      <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                          Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+                      </p>
+                      <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+                  </div>
+              `,
+          };
+  
+          await sendEmail(mailOptions);
           // Nếu số lần hủy vượt quá 3 lần, thay đổi trạng thái
           if (user.warning > 3) {
             user.status = "disable";
             user.noteWarning =
               "Đã hủy đơn hàng đấu giá quá số lần quy định, vui lòng liên hệ CSKH để được hỗ trợ.";
+
+              const mailOptions = {
+                from: "E-Com <noreply@gmail.com>",
+                to: userEmail,
+                subject: "Cảnh báo",
+                html: `
+                      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                          <h1 style="color: #2c3e50; text-align: center;">Xin chào, ${order.user.name}!</h1>
+                          <p style="background-color: #F8D7DA; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; font-weight: bold; color: red;">
+                              Tài khoản của bạn đã bị cấm đấu giá.
+                          </p>
+                          <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                              Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này.
+                          </p>
+                          <p style="font-size: 14px; color: #7f8c8d; text-align: center; margin-top: 20px;">&copy; 2025 E-Com. All Rights Reserved.</p>
+                      </div>
+                  `,
+              };
+      
+              await sendEmail(mailOptions);
           }
 
           await user.save();
