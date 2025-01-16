@@ -38,7 +38,7 @@ export const PriceRandService = {
           search,
         },
       });
-      console.log('Response', response);
+
       
     return response.data;
   },

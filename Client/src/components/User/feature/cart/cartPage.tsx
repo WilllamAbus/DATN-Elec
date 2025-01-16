@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Button, Checkbox } from "@nextui-org/react";
 import CartSummary from "./hook/CartSumma";
 import Cartauction from "./hook/Cartauction";
+import useAuctionTimer from "./hook/AuctionTimer";
 
 const CartPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,11 +41,12 @@ const CartPage: React.FC = () => {
   }>({});
   const [totalAuctionPrice, setTotalAuctionPrice] = useState(0);
   const [totalCartPrice, setTotalCartPrice] = useState(0);
-  const [timeLeft, setTimeLeft] = useState<string>("Không có dữ liệu đấu giá.");
-  const [status, setStatus] = useState<string>("Không có thông tin đấu giá.");
-  // useEffect(() => {
-  //   dispatch(fetchCartList());
-  // }, [dispatch]);
+  // const [timeLeft, setTimeLeft] = useState<string>("Không có dữ liệu đấu giá.");
+  // const [status, setStatus] = useState<string>("Không có thông tin đấu giá.");
+  const { timeLeft, status } = useAuctionTimer(cartauction);
+  useEffect(() => {
+    dispatch(fetchCartList());
+  }, [dispatch]);
   if (!userProfile) {
     navigate("/login");
     return null;
@@ -68,23 +70,6 @@ const CartPage: React.FC = () => {
     }
   }, [carts]);
 
-  // useEffect(() => {
-  //   const total = carts.reduce((total, cart) => {
-  //     return (
-  //       total +
-  //       cart.itemAuction.reduce((itemTotal, item) => {
-  //         if (item.isSelected) {
-  //           const quantity =
-  //             itemQuantities[item.auctionPricingRange?.product_randBib?._id] ||
-  //             item.quantity;
-  //           return itemTotal + (item.auctionWinner?.bidPrice || 0) * quantity;
-  //         }
-  //         return itemTotal;
-  //       }, 0)
-  //     );
-  //   }, 0);
-  //   setTotalAuctionPrice(total);
-  // }, [carts, itemQuantities]);
   useEffect(() => {
     const total = carts.reduce((total, cart) => {
       return (
@@ -295,121 +280,63 @@ const CartPage: React.FC = () => {
       }
     });
   });
+  // useEffect(() => {
+  //   // Kiểm tra nếu không có dữ liệu hợp lệ
+  //   if (
+  //     cartauction.length === 0 ||
+  //     cartauction[0].itemAuction.length === 0 ||
+  //     !cartauction[0].itemAuction[0].auctionStartTime ||
+  //     !cartauction[0].itemAuction[0].auctionEndTime
+  //   ) {
+  //     setTimeLeft("Không có dữ liệu đấu giá.");
+  //     setStatus("Không có thông tin đấu giá.");
+  //     return;
+  //   }
+
+  //   // Dữ liệu hợp lệ
+  //   const startTime = new Date(
+  //     cartauction[0].itemAuction[0].auctionStartTime!
+  //   ).getTime();
+  //   const endTime = new Date(
+  //     cartauction[0].itemAuction[0].auctionEndTime!
+  //   ).getTime();
+
+  //   const updateTimeLeft = () => {
+  //     const now = Date.now();
+  //     const difference = endTime - now;
+
+  //     if (difference <= 0) {
+  //       setTimeLeft("Hết thời gian!");
+  //       setStatus("Đấu giá đã kết thúc.");
+  //       return;
+  //     }
+
+  //     const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+  //     const minutes = Math.floor((difference / (1000 * 60)) % 60);
+  //     const seconds = Math.floor((difference / 1000) % 60);
+
+  //     setTimeLeft(
+  //       `${hours.toString().padStart(2, "0")}h:${minutes
+  //         .toString()
+  //         .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
+  //     );
+
+  //     if (now < startTime) {
+  //       setStatus("Đấu giá chưa bắt đầu.");
+  //     } else if (now >= startTime && now <= endTime) {
+  //       setStatus("Vui lòng thanh toán.");
+  //     }
+  //   };
+
+  //   updateTimeLeft();
+  //   const interval = setInterval(updateTimeLeft, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, [cartauction]);
 
   groupedMap.forEach((cart) => {
     groupedCarts.push(cart);
   });
-
-  // useEffect(() => {
-  //   // Kiểm tra nếu cartauction và itemAuction có dữ liệu hợp lệ
-  //   if (
-  //     cartauction.length > 0 &&
-  //     cartauction[0].itemAuction.length > 0 &&
-  //     cartauction[0].itemAuction[0].auctionStartTime &&
-  //     cartauction[0].itemAuction[0].auctionEndTime
-  //   ) {
-  //     const startTime = new Date(
-  //       cartauction[0].itemAuction[0].auctionStartTime
-  //     ).getTime();
-  //     const endTime = new Date(
-  //       cartauction[0].itemAuction[0].auctionEndTime
-  //     ).getTime();
-
-  //     // Hàm cập nhật thời gian còn lại
-  //     const updateTimeLeft = () => {
-  //       const now = new Date().getTime();
-  //       const difference = endTime - now;
-
-  //       if (difference <= 0) {
-  //         // Nếu hết thời gian, dừng lại và cập nhật trạng thái
-  //         clearInterval(interval);
-  //         setTimeLeft("Hết thời gian!");
-  //         setStatus("Đấu giá đã kết thúc.");
-  //       } else {
-  //         // Tính thời gian còn lại
-  //         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-  //         const minutes = Math.floor((difference / (1000 * 60)) % 60);
-  //         const seconds = Math.floor((difference / 1000) % 60);
-
-  //         setTimeLeft(
-  //           `${hours.toString().padStart(2, "0")}h:${minutes
-  //             .toString()
-  //             .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
-  //         );
-  //       }
-
-  //       // Kiểm tra trạng thái đấu giá
-  //       if (now < startTime) {
-  //         setStatus("Đấu giá chưa bắt đầu.");
-  //       } else if (now >= startTime && now <= endTime) {
-  //         setStatus("Đấu giá đang diễn ra.");
-  //       }
-  //     };
-
-  //     // Cập nhật mỗi giây
-  //     const interval = setInterval(updateTimeLeft, 1000);
-
-  //     // Dọn dẹp interval khi component bị unmount hoặc khi có thay đổi dữ liệu đấu giá
-  //     return () => clearInterval(interval);
-  //   } else {
-  //     // Nếu không có thông tin đấu giá hợp lệ
-  //     setTimeLeft("Không có dữ liệu đấu giá.");
-  //     setStatus("Không có thông tin đấu giá.");
-  //   }
-  // }, [cartauction]); // Thêm `cartauction` vào dependency array
-  useEffect(() => {
-    // Kiểm tra nếu không có dữ liệu hợp lệ
-    if (
-      cartauction.length === 0 ||
-      cartauction[0].itemAuction.length === 0 ||
-      !cartauction[0].itemAuction[0].auctionStartTime ||
-      !cartauction[0].itemAuction[0].auctionEndTime
-    ) {
-      setTimeLeft("Không có dữ liệu đấu giá.");
-      setStatus("Không có thông tin đấu giá.");
-      return;
-    }
-
-    // Dữ liệu hợp lệ
-    const startTime = new Date(
-      cartauction[0].itemAuction[0].auctionStartTime!
-    ).getTime();
-    const endTime = new Date(
-      cartauction[0].itemAuction[0].auctionEndTime!
-    ).getTime();
-
-    const updateTimeLeft = () => {
-      const now = Date.now();
-      const difference = endTime - now;
-
-      if (difference <= 0) {
-        setTimeLeft("Hết thời gian!");
-        setStatus("Đấu giá đã kết thúc.");
-        return;
-      }
-
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / (1000 * 60)) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      setTimeLeft(
-        `${hours.toString().padStart(2, "0")}h:${minutes
-          .toString()
-          .padStart(2, "0")}m:${seconds.toString().padStart(2, "0")}s`
-      );
-
-      if (now < startTime) {
-        setStatus("Đấu giá chưa bắt đầu.");
-      } else if (now >= startTime && now <= endTime) {
-        setStatus("Vui lòng thanh toán.");
-      }
-    };
-
-    updateTimeLeft();
-    const interval = setInterval(updateTimeLeft, 1000);
-
-    return () => clearInterval(interval);
-  }, [cartauction]);
 
   if (!Array.isArray(carts)) {
     return <p>Dữ liệu giỏ hàng không hợp lệ</p>;
