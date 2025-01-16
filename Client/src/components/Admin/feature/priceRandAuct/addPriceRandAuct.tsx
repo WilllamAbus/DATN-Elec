@@ -351,11 +351,11 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                     required: "Vui lòng nhập giá khởi điểm",
                     min: {
                       value: 1000,
-                      message: "Giá khởi điểm không thể thấp hơn 1000",
+                      message: `Giá khởi điểm không thể thấp hơn ${formatCurrency(1000)}đ`,
                     },
                     max: {
-                      value: 2000000000,
-                      message: "Giá khởi điểm không thể vượt quá 2000000000",
+                      value: 20000000,
+                      message: `Giá khởi điểm không thể vượt quá ${formatCurrency(20000000)}đ`,
                     },
                     validate: {
                         divisibleByTwo: (value: any) => {
@@ -366,7 +366,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                           const thousandsDigit = Math.floor((numberValue / 1000) % 10);
                       
                           return (
-                            thousandsDigit % 2 === 0 || "Giá tối đa phải có số ở hàng nghìn chia hết cho 2"
+                            thousandsDigit % 2 === 0 || "Giá khởi điểm phải có số ở hàng nghìn chia hết cho 2"
                           );
                         },
                         endsWithThreeZeros: (value: any) => {
@@ -401,11 +401,11 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                     required: "Vui lòng nhập giá tối đa",
                     min: {
                       value: 1000,
-                      message: "Giá tối đa không thể thấp hơn 1000",
+                      message: `Giá tối đa không thể thấp hơn ${formatCurrency(1000)}đ`,
                     },
                     max: {
-                      value: 2000000000,
-                      message: "Giá tối đa không thể vượt quá 2000000000",
+                      value: 20000000,
+                      message: `Giá tối đa không thể vượt quá ${formatCurrency(20000000)}đ`,
                     },
                     validate: {
                         divisibleByTwo: (value: any) => {
@@ -451,11 +451,11 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                     required: "Vui lòng nhập bước giá",
                     min: {
                       value: 1000,
-                      message: "bước giá  không thể thấp hơn 1000",
+                      message: `Bước giá  không thể thấp hơn ${formatCurrency(1000)}đ`,
                     },
                     max: {
-                      value: 2000000000,
-                      message: "Bước giá không thể vượt quá 2000000000",
+                      value: 2000000,
+                      message: `Bước giá không thể vượt quá ${formatCurrency(2000000)}đ`,
                     },
                     validate: {
                         divisibleByTwo: (value: any) => {
@@ -466,7 +466,7 @@ const [inboundPrice, setInboundPrice] = useState<number | null>(null);
                           const thousandsDigit = Math.floor((numberValue / 1000) % 10);
                       
                           return (
-                            thousandsDigit % 2 === 0 || "Giá tối đa phải có số ở hàng nghìn chia hết cho 2"
+                            thousandsDigit % 2 === 0 || "Bước giá phải có số ở hàng nghìn chia hết cho 2"
                           );
                         },
                         endsWithThreeZeros: (value: any) => {
