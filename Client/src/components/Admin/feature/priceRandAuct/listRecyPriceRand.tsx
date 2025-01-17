@@ -390,7 +390,7 @@ const ListPriceRandRecy: React.FC = () => {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {displayBeforeActivation[rand._id] ? (
                     <span className="group relative flex items-center text-yellow-700 bg-yellow-200 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900">
-                      Chờ {countdownBeforeActivation[rand._id]}{" "}
+                      Lên phiên {countdownBeforeActivation[rand._id]}{" "}
                       giây...
                     </span>
                   ) : autoActivated[rand._id] ? (
