@@ -23,8 +23,8 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
 
   const updateUserWarningStatus = async (user) => {
     user.warning += 1;
-    user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${100 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
-    if (user.warning >= 100) {
+    user.noteWarning = `Cảnh báo lần ${user.warning}: Nếu tiếp tục hủy kết quả đấu giá ${3 - user.warning} lần nữa, tài khoản của bạn sẽ bị khóa.`;
+    if (user.warning >= 3) {
       user.status = 'disabled';
       user.disabledAt = new Date();
       user.message = 'Tài khoản của bạn đã bị khóa do hủy kết quả đấu giá nhiều lần.';
@@ -35,7 +35,7 @@ const checkAndUpdateUserPendingAuctionWins = async (userId) => {
   let isUpdated = false;
 
   for (const auction of pendingAuctionWinners) {
-    if (auction.auctionStatus !== 'temporary') {
+    if (!['pending', 'temporary'].includes(auction.auctionStatus)) {
       continue;
     }
 

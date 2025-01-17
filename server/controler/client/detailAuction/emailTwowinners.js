@@ -110,24 +110,11 @@ const emailTwowinners = async (req, res) => {
         productDetails: productDetails,
         auctionTime: auctionTime,
         productImage: productImage,
-        bidPrice: highestBids[0].bidPrice,
+        bidPrice: highestBids[1].bidPrice,
       });
       highestBids[1].emailSent = true;
       await highestBids[1].save();
     }
-
-    // Kiểm tra và cập nhật emailSent trong bảng AuctionWinner nếu có
-    const auctionWinner = new AuctionWinner({
-      productAuction: productAuction._id,
-      winner: highestBids[0].user._id,
-      bidPrice: highestBids[0].bidPrice,        // Cập nhật bidPrice
-      endTime: auctionPricingRange.endTime,    // Cập nhật endTime
-      user: highestBids[0].user._id,           // Cập nhật user
-      auctionRound: auctionPricingRange._id,   // Cập nhật auctionRound
-      auctionPricingRange: auctionPricingRange._id, // Cập nhật auctionPricingRange
-      emailSent: true,
-    });
-
 
     return res.status(200).json({
       code: "SUCCESS",
@@ -148,4 +135,3 @@ const emailTwowinners = async (req, res) => {
 module.exports = {
   emailTwowinners,
 };
-

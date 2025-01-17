@@ -143,7 +143,7 @@ const UserRoutes: RouteObject[] = [
         children: [{ index: true, element: <UserAuction /> }],
       },
       { path: "product/:slug", element: <UserPageDetail /> },
-      { path: "product-auction/:slug", element: <UserPageDetailAuction /> },
+      { path: "product-auction/:slug", element: <ProtectedRoute />, children: [{ index: true, element: <UserPageDetailAuction /> }], },
       { path: "session-auction", element: <UserAuctionPage /> },
       { path: "detailAuc/:productId", element: <UserdetailsAuc /> },
       { path: "cart", element: <UserCartPage /> },

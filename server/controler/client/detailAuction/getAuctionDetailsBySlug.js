@@ -26,6 +26,7 @@ const getAuctionDetailsBySlug = async (req, res) => {
     }
     const auctionWinners = await AuctionWinner.find({
       auctionPricingRange: productAuction.auctionPricing,
+      status: { $ne: 'disabled' } 
     })
       .populate("user", "name email")
       .sort({ bidPrice: -1 });

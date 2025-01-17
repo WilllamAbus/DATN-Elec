@@ -119,7 +119,7 @@ const DetailPageAuction: React.FC = () => {
       }
     }
   };
-  console.log('text',handleAuctionEnd);
+
   
   console.log(auctionStatusTop3Bidder);
 
@@ -398,9 +398,6 @@ const DetailPageAuction: React.FC = () => {
     };
   }, [socket, slug]);
 
-  useEffect(() => {
-    console.log("statuscheckAuctionTime:", statuscheckAuctionTime);
-  }, [statuscheckAuctionTime]);
 
 
   return (
