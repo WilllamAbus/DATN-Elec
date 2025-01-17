@@ -306,9 +306,9 @@ const ListPriceRandRecy: React.FC = () => {
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" className="p-4">
+            {/* <th scope="col" className="p-1">
               STT
-            </th>
+            </th> */}
             <th scope="col" className="p-4">
               Hình ảnh
             </th>
@@ -330,13 +330,13 @@ const ListPriceRandRecy: React.FC = () => {
             <th scope="col" className="p-4">
               Thời gian kết thúc{" "}
             </th>
-            <th scope="col" className="p-4">
+            {/* <th scope="col" className="p-4">
               Trạng thái
-            </th>
+            </th> */}
             <th scope="col" className="p-4">
-              Kích hoạt tự động
+              Chờ kích hoạt
             </th>
-            <th colSpan={1} className="p-4">
+            <th colSpan={1} className="p-3">
               Chức năng
             </th>
           </tr>
@@ -348,18 +348,18 @@ const ListPriceRandRecy: React.FC = () => {
                 key={rand._id}
                 className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                {/* <td className="px-2 py-4 font-semibold text-gray-900 dark:text-white">
                   {rand.serialNumber}
-                </td>
-                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                </td> */}
+                <td className="px-1 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="flex items-center mr-3">
                     <img
                       src={rand.product.image[0]}
-                      className="h-12 w-12 object-cover mr-3"
+                      className="h-12 w-24 object-cover mr-3"
                     />
                   </div>
                 </td>
-                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <td className="px-3 py-4 font-semibold text-gray-900 dark:text-white">
                   {rand.product.product_name}
                 </td>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -378,19 +378,19 @@ const ListPriceRandRecy: React.FC = () => {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {formatDateVN(rand.endTime)}
                 </td>
-                <td
-                  className={`inline-flex items-center rounded-md px-2 py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
+                {/* <td
+                  className={`inline-flex items-center rounded-md py-1 mt-5 ml-5 text-xs font-medium ring-1 ring-current ${
                     rand.status === "active"
                       ? "bg-green-50 text-green-700"
                       : "bg-red-50 text-red-700"
                   }`}
                 >
                   {rand.status === "active" ? "Hiển thị" : "Đã ẩn"}
-                </td>
+                </td> */}
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {displayBeforeActivation[rand._id] ? (
                     <span className="group relative flex items-center text-yellow-700 bg-yellow-200 hover:text-white border border-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-2 py-2 text-center dark:border-yellow-500 dark:text-yellow-500 dark:hover:text-white dark:hover:bg-yellow-600 dark:focus:ring-yellow-900">
-                      Kích hoạt trong {countdownBeforeActivation[rand._id]}{" "}
+                      Chờ {countdownBeforeActivation[rand._id]}{" "}
                       giây...
                     </span>
                   ) : autoActivated[rand._id] ? (
