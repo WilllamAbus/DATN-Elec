@@ -1,0 +1,39 @@
+.sectionContainer {
+  @apply bg-white shadow-md sm:rounded-b-lg overflow-hidden border border-gray-100 antialiased dark:bg-gray-900 md:py-4;
+}
+.container {
+  @apply mx-auto max-w-screen-xl px-2;
+}
+
+.gridContainer {
+  @apply gap-2 grid grid-cols-2 sm:grid-cols-4;
+}
+.productCard {
+  @apply relative w-full flex-col overflow-hidden rounded-s-sm border border-gray-100 bg-white shadow-md;
+}
+.productImageContainer {
+  @apply h-56 w-auto;
+}
+
+.productLink {
+  @apply relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale-0;
+}
+
+.productImage {
+  @apply rounded-lg;
+}
+.productCardContent {
+  @apply pt-1 mb-10;
+}
+
+.productCardHeader {
+  @apply mb-4 px-1 flex items-center justify-between gap-4;
+}
+
+.productDiscount {
+  @apply rounded bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300;
+}
+
+.productNoDiscount {
+  @apply me-2 rounded px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300;
+}

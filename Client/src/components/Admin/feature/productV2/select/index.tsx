@@ -1,0 +1,12 @@
+export { default as RamSelect } from "./ramSelect";
+export { default as ColorSelect } from "./colorSelect";
+export { default as DiscountSelect } from "./discountSelect";
+export { default as CategorySelect } from "./categorySelect";
+export { default as BrandSelect } from "./brandSelect";
+export { default as SupplierSelect } from "./supplierSelect";
+export { default as ScreenSelect } from "./screenSelect";
+export { default as CpuSelect } from "./cpuSelect";
+export { default as CardSelect } from "./cardSelect";
+export { default as BatterySelect } from "./batterySelect";
+export { default as OsSelect } from "./osSelect";
+export { default as StorageSelect } from "./storageSelect";

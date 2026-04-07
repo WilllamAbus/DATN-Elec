@@ -1,0 +1,17 @@
+# Ignore node_modules in any directory
+node_modules/
+
+# Ignore package-lock.json in Client and server directories
+Client/package-lock.json
+server/package-lock.json
+
+# Ignore .vscode directory
+.vscode/
+
+
+# Other files and directories to ignore
+.DS_Store
+*.log
+.env
+.hintrc
+.codegpt

@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Oswald:wght@200..700&family=Roboto+Condensed:wght@100..900&family=Roboto+Mono:wght@100..700&family=Work+Sans:wght@100..900&display=swap"rel="stylesheet");
+.font-family-karla {
+  font-family: "Barlow";
+}
+.bg-sidebar {
+  background: rgba(245, 245, 245, 1);
+} /* Peach Fuzz */
+.cta-btn {
+  color: rgba(4, 38, 57, 1); /* Coral */
+}
+
+.upgrade-btn {
+  background: #daa49a; /* Dusty Rose */
+}
+
+.upgrade-btn:hover {
+  background: #a2b6b9; /* Dusty Blue */
+}
+
+.active-nav-link {
+  background: rgba(255, 161, 76, 1); /* Sage Green */
+}
+
+.nav-item:hover {
+  background: rgba(255, 161, 76, 1); /* Sage Green */
+}
+
+.account-link:hover {
+  background: #fff8e7; /* Cream */
+}
+
+.form-container {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-container button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-container button.cancel {
+  background-color: #ccc;
+  color: white;
+}
+
+.form-container button.submit {
+  background-color: #4CAF50;
+  color: white;
+}
+

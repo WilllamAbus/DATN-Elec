@@ -1,0 +1,31 @@
+.navContainer {
+  @apply flex flex-col md:flex-row justify-center items-start md:items-center space-y-3 md:space-y-0 p-4;
+}
+
+.paginationList {
+  @apply inline-flex items-stretch -space-x-px;
+}
+
+.roundedLeft {
+  @apply rounded-l-lg;
+}
+
+.roundedRight {
+  @apply rounded-r-lg;
+}
+
+.paginationButton {
+  @apply flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
+}
+
+.pageNumberButton {
+  @apply flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 transition duration-75;
+}
+
+.currentPage {
+  @apply text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white;
+}
+
+.otherPage {
+  @apply text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
+}

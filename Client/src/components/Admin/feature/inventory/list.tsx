@@ -1,0 +1,346 @@
+import React, { useEffect, useState } from "react";
+import { listInventory, searchInventory } from "../../../../services/inventory/crudInventory.service";
+// import Swal, { SweetAlertResult } from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+
+
+// const MySwal = withReactContent(Swal);
+
+const InventoryList: React.FC = () => {
+  const [inventories, setInventory] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Thêm state để lưu từ khóa tìm kiếm
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const currentPage = parseInt(queryParams.get("page") || "1", 10);
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      setLoading(true);
+      setIsSearching(true);
+
+      try {
+        const queryParams = new URLSearchParams(location.search);
+        const keyword = queryParams.get("keyword") || ""; // Lấy từ khóa từ URL
+        const page = parseInt(queryParams.get("page") || "1", 10);
+
+        // Gọi API tùy theo có từ khóa hay không
+        const response = keyword.trim()
+          ? await searchInventory(keyword, page)
+          : await listInventory(page);
+
+        if (response && response.data) {
+          setInventory(response.data);
+          setTotalPages(response.totalPages);
+          setSearchTerm(keyword); // Cập nhật state của searchTerm để giữ input đồng bộ với URL
+        } else {
+          setError("Dữ liệu không hợp lệ từ server.");
+        }
+      } catch (error) {
+        console.error("Error fetching invenroy:", error);
+        setError("Lỗi khi tìm kiếm kho hàng.");
+      } finally {
+        setLoading(false);
+        setIsSearching(false);
+      }
+    };
+
+    fetchInventory();
+  }, [location.search]); // Theo dõi sự thay đổi của URL để gọi lại API
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault(); // Ngăn chặn việc tải lại trang
+    setIsSearching(true);
+
+    try {
+      const url = new URL(window.location.href);
+
+      if (searchTerm.trim()) {
+        // Nếu có từ khóa, thêm từ khóa vào URL
+        url.searchParams.set('keyword', searchTerm.trim());
+      } else {
+        // Nếu không có từ khóa, xóa tham số keyword khỏi URL
+        url.searchParams.delete('keyword');
+      }
+
+      // Khi tìm kiếm, luôn bắt đầu từ trang 1
+      url.searchParams.set('page', "1");
+      window.history.pushState({}, '', url.toString());
+
+      const response = searchTerm.trim()
+        ? await searchInventory(searchTerm.trim(), 1)  // Luôn tìm từ trang 1 khi có từ khóa
+        : await listInventory(1);  // Nếu không có từ khóa, trả về trang đầu tiên của danh sách
+
+      // Kiểm tra dữ liệu phản hồi trước khi cập nhật state
+      if (response && response.data) {
+        setInventory(response.data);
+        setTotalPages(response.totalPages);
+      } else {
+        setError("Dữ liệu không hợp lệ từ server.");
+      }
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      setError("Lỗi khi tìm kiếm kho hàng.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  const handlePageChange = (page: number) => {
+    // Cập nhật URL khi trang thay đổi
+    navigate(`?page=${page}`);
+  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <>
+      {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+        <div className="flex-1 flex items-center space-x-2">
+          <h5>
+            <span className="text-gray-500">Tổng có: </span>
+            <span className="dark:text-white"> {inventories.length}</span>
+          </h5>
+          <h5 className="text-gray-500 dark:text-gray-400 ml-1">Đơn hàng</h5>
+        </div>
+      </div> */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+        <div className="w-full md:w-1/2">
+          <form className="flex items-center" onSubmit={handleSearch}>
+            <label htmlFor="simple-search" className="sr-only">
+              Tìm
+            </label>
+            <div className="relative w-full">
+              <input
+                id="simple-search"
+                type="search"
+                value={searchTerm} // Gắn state searchTerm vào input
+                onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật searchTerm khi người dùng nhập liệu
+                className="w-full py-1 px-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="Tìm kiếm"
+
+              />
+              <button
+                type="submit"
+                disabled={isSearching}
+                className="absolute inset-y-0 right-0 flex items-center p-2 text-white bg-blue-500 border border-gray-300 rounded-r-md"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M14.795 13.408l5.204 5.204a1 1 0 01-1.414 1.414l-5.204-5.204a7.5 7.5 0 111.414-1.414zM8.5 14A5.5 5.5 0 103 8.5 5.506 5.506 0 008.5 14z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+          <Link
+            to="/admin/addInventory"
+            id="createProductButton"
+            data-modal-toggle="createProductModal"
+            className="flex items-center justify-center text-white bg-blue-500 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+          >
+            <svg
+              className="h-3.5 w-3.5 mr-1.5 -ml-1"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                clipRule="evenodd"
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              />
+            </svg>
+            Thêm số lượng khả dụng
+          </Link>
+        </div>
+      </div>
+      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            {/* <th scope="col" className="p-4">
+              <div className="flex items-center">
+                <input
+                  id="checkbox-all"
+                  type="checkbox"
+                  className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="checkbox-all" className="sr-only">
+                  checkbox
+                </label>
+              </div>
+            </th> */}
+            <th scope="col" className="p-4">Tên sản phẩm</th>
+            <th scope="col" className="p-4">Tên nhà cung cấp</th>
+            <th scope="col" className="p-4">Số lượng kho</th>
+            <th scope="col" className="p-4">Số lượng khả dụng</th>
+            <th scope="col" className="p-4">Giá tiền</th>
+            <th scope="col" className="p-4">Trạng thái kệ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {inventories && inventories.length > 0 ? (
+            inventories.map((inventory) => {
+              const { product_variant, quantityStock, quantityShelf, price, _id } = inventory;
+
+              let buttonText = "Còn trống";
+              let buttonClass =
+                "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-lime-600 rounded-lg hover:bg-lime-500 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800";
+              let buttonDisabled = false;
+              let quantityWarning = "";
+              let quantityStockWarning = "";
+
+              if (quantityShelf <= 5) {
+                quantityWarning = "Cần nhập hàng lên kệ!";
+              } 
+              else if(quantityStock < 10){
+                quantityStockWarning = "Cần nhập thêm hàng!"
+              }else if (quantityShelf >= 30) {
+                buttonText = "Kệ đầy";
+                buttonClass =
+                  "py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-gray-400 rounded-lg cursor-not-allowed";
+                buttonDisabled = true;
+              }
+
+              return (
+                <tr key={_id} className="hover:bg-grey-lighter">
+                  {/* <td className="p-4 w-4">
+                    <div className="flex items-center">
+                      <input
+                        id={`checkbox-table-search-${_id}`}
+                        type="checkbox"
+                        className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label htmlFor={`checkbox-table-search-${_id}`} className="sr-only">
+                        checkbox
+                      </label>
+                    </div>
+                  </td> */}
+                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {product_variant.variant_name}
+                  </td>
+                  <td className="px-4 py-3">{product_variant.product.product_supplier.name}</td>
+                  <td className="px-4 py-3">{quantityStock}
+                    {quantityStockWarning && (
+                      <p className="text-red-500 text-xs italic">{quantityStockWarning}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {quantityShelf}
+                    {quantityWarning && (
+                      <p className="text-red-500 text-xs italic">{quantityWarning}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{price.toLocaleString()}đ</td>
+                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <div className="flex items-center space-x-4">
+                      {buttonDisabled ? (
+                        <span className={buttonClass}>{buttonText}</span>
+                      ) : (
+                        <Link
+                          to={`/admin/addInventory`}
+                          className={buttonClass}
+                        >
+                          {buttonText}
+                        </Link>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={7} className="text-center p-4">
+                Không có kho hàng nào để hiển thị
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      <nav
+        className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+        aria-label="Table navigation"
+      >
+        <ul className="inline-flex items-stretch -space-x-px">
+          <li>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              <span className="sr-only">Previous</span>
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </li>
+          {[...Array(totalPages)].map((_, index) => (
+            <li key={index}>
+              <button
+                onClick={() => handlePageChange(index + 1)}
+                className={`flex items-center justify-center text-sm py-2 px-3 leading-tight ${currentPage === index + 1
+                  ? "text-primary-600 bg-primary-50 border border-primary-300"
+                  : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  }`}
+              >
+                {index + 1}
+              </button>
+            </li>
+          ))}
+          <li>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              <span className="sr-only">Next</span>
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </>
+  );
+};
+
+
+export default InventoryList;
