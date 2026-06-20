@@ -37,6 +37,4 @@ Objectives
 The project aims to provide a secure, scalable, and intelligent online auction system where users can buy, sell, and bid on products efficiently. By integrating real-time communication through Socket.IO and a Python-based recommendation engine, the platform enhances user engagement and delivers a more personalized auction experience.
 
 
-Developed by Thai Kha
 
-Graduation Thesis Project
